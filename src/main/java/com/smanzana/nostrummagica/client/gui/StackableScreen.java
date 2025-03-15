@@ -29,7 +29,7 @@ public class StackableScreen extends Screen {
 	@Override
 	public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
 		if (p_keyPressed_1_ == 256 && prevScreen != null) {
-			this.minecraft.displayGuiScreen(prevScreen);
+			this.minecraft.setScreen(prevScreen);
 			this.setPrevScreen(null);
 			return true;
 		}

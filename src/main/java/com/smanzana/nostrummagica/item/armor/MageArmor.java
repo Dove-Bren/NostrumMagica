@@ -40,7 +40,7 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 	protected Multimap<Attribute, AttributeModifier> attributes;
 
 	public MageArmor(EquipmentSlotType slot, Item.Properties properties) {
-		super(ArmorMaterial.LEATHER, slot, properties.maxDamage(250));
+		super(ArmorMaterial.LEATHER, slot, properties.durability(250));
 	}
 	
 	protected Multimap<Attribute, AttributeModifier> makeAttributes() {
@@ -80,17 +80,17 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 //	}
 	
 	@Override
-	public int getItemEnchantability() {
+	public int getEnchantmentValue() {
 		return 20; // not as much as gold but very good otherwise
 	}
 	
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
 		return !repair.isEmpty() && NostrumTags.Items.CrystalSmall.contains(repair.getItem());
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		if (equipmentSlot == this.slot) {
 			if (attributes == null) {
 				attributes = this.makeAttributes();

@@ -144,7 +144,7 @@ public class MagicEffectProxy {
 	}
 	
 	private void apply(SpecialEffect effect, EffectData value, LivingEntity entity) {
-		UUID id = entity.getUniqueID();
+		UUID id = entity.getUUID();
 		
 		if (!effects.containsKey(id)) {
 			effects.put(id, new EnumMap<SpecialEffect, EffectData>(SpecialEffect.class));
@@ -188,7 +188,7 @@ public class MagicEffectProxy {
 	}
 	
 	public void remove(SpecialEffect effect, LivingEntity entity) {
-		UUID id = entity.getUniqueID();
+		UUID id = entity.getUUID();
 		Map<SpecialEffect, EffectData> record = effects.get(id);
 		if (record == null)
 			return;
@@ -208,10 +208,10 @@ public class MagicEffectProxy {
 	}
 	
 	protected float applyMagicShields(LivingEntity hurt, DamageSource source, float inAmt) {
-		if (source.isDamageAbsolute())
+		if (source.isBypassMagic())
 			return inAmt;
 		
-		UUID id = hurt.getUniqueID();
+		UUID id = hurt.getUUID();
 		if (!effects.containsKey(id))
 			return inAmt;
 		
@@ -247,7 +247,7 @@ public class MagicEffectProxy {
 	
 	@SubscribeEvent
 	public void onAttack(LivingHurtEvent event) {
-		if (event.getEntity().world.isRemote) {
+		if (event.getEntity().level.isClientSide) {
 			return;
 		}
 		
@@ -276,7 +276,7 @@ public class MagicEffectProxy {
 			return;
 		}
 		
-		if (((EntityDamageSource) source).getIsThornsDamage()) {
+		if (((EntityDamageSource) source).isThorns()) {
 			return;
 		}
 		
@@ -284,10 +284,10 @@ public class MagicEffectProxy {
 			return;
 		}
 		
-		Entity sourceEnt = source.getTrueSource();
+		Entity sourceEnt = source.getEntity();
 		if (source != null && sourceEnt instanceof LivingEntity) {
 			LivingEntity living = (LivingEntity) sourceEnt;
-			UUID id = living.getUniqueID();
+			UUID id = living.getUUID();
 			if (!effects.containsKey(id)) {
 				return;
 			}
@@ -296,7 +296,7 @@ public class MagicEffectProxy {
 			if (data != null) {
 				SpellDamage.DamageEntity(target, data.element, (float) data.amt, living);
 				target.setInvulnerable(false);
-				target.hurtResistantTime = 0;
+				target.invulnerableTime = 0;
 				
 				NostrumMagicaSounds.MELT_METAL.play(target);
 				
@@ -304,7 +304,7 @@ public class MagicEffectProxy {
 				data.count--;
 				if (data.count <= 0) {
 					remove(SpecialEffect.MAGIC_BUFF, living);
-					living.removePotionEffect(NostrumEffects.magicBuff);
+					living.removeEffect(NostrumEffects.magicBuff);
 				}
 				
 				notify(living, SpecialEffect.MAGIC_BUFF, data.count == 0 ? null : data);
@@ -314,7 +314,7 @@ public class MagicEffectProxy {
 	
 	@SubscribeEvent
 	public void onAttackStart(LivingAttackEvent e) {
-		if (e.getEntity().world.isRemote) {
+		if (e.getEntity().level.isClientSide) {
 			return;
 		}
 		
@@ -347,15 +347,15 @@ public class MagicEffectProxy {
 		}
 		
 		if (potion != null) {
-			EffectInstance eff = entity.getActivePotionEffect(potion);
+			EffectInstance eff = entity.getEffect(potion);
 			if (eff != null && eff.getDuration() > 1) {
-				entity.removePotionEffect(potion);
+				entity.removeEffect(potion);
 			}
 		}
 	}
 	
 	public EffectData getData(LivingEntity entity, SpecialEffect effectType) {
-		UUID id = entity.getUniqueID();
+		UUID id = entity.getUUID();
 		Map<SpecialEffect, EffectData> map = effects.get(id);
 		EffectData data = null;
 		
@@ -382,7 +382,7 @@ public class MagicEffectProxy {
 					|| effect == SpecialEffect.CONTINGENCY_MANA
 					|| effect == SpecialEffect.CONTINGENCY_FOOD) {
 				if (override != null) {
-					override.amt = NostrumMagica.instance.proxy.getPlayer().ticksExisted;
+					override.amt = NostrumMagica.instance.proxy.getPlayer().tickCount;
 				}
 			}
 			
@@ -401,11 +401,11 @@ public class MagicEffectProxy {
 			return;
 		}
 		
-		if (base.world.isRemote) {
+		if (base.level.isClientSide) {
 			return;
 		}
 		
-		for (ServerPlayerEntity player : ((ServerWorld) base.world).getPlayers()) {
+		for (ServerPlayerEntity player : ((ServerWorld) base.level).players()) {
 			if (!(player instanceof ServerPlayerEntity)) {
 				continue;
 			}

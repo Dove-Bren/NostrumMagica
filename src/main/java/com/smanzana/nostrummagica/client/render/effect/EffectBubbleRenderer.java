@@ -79,7 +79,7 @@ public class EffectBubbleRenderer implements IEffectRenderer {
 	}
 	
 	public EffectBubbleRenderer(float yExtraOffset, Effect effect) {
-		this(yExtraOffset + GetDefaultOffset(effect.getEffectType()), GetDefaultOrbit(effect.getEffectType()), GetDefaultOrbitOffset(effect), effect.getLiquidColor());
+		this(yExtraOffset + GetDefaultOffset(effect.getCategory()), GetDefaultOrbit(effect.getCategory()), GetDefaultOrbitOffset(effect), effect.getColor());
 	}
 	
 	public EffectBubbleRenderer(Effect effect) {
@@ -105,43 +105,43 @@ public class EffectBubbleRenderer implements IEffectRenderer {
 	@Override
 	public void renderEffectOnEntity(EffectInstance effect, MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		final Minecraft mc = Minecraft.getInstance();
-		final ActiveRenderInfo activeInfo = mc.gameRenderer.getActiveRenderInfo();
+		final ActiveRenderInfo activeInfo = mc.gameRenderer.getMainCamera();
 		
-		final float entYaw = MathHelper.interpolateAngle(partialTicks, entity.prevRenderYawOffset, entity.renderYawOffset);
+		final float entYaw = MathHelper.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
 		
-		stack.push();
+		stack.pushPose();
 		
 		// Stack is offset to up 1.5. Undo, and then offset to just above the entity's height.
 		stack.translate(0, (double)+1.501F, 0);
-		stack.translate(0, -entity.getHeight() * 1.15, 0);
+		stack.translate(0, -entity.getBbHeight() * 1.15, 0);
 		stack.translate(0, -getYOffset(), 0);
 		
 		// Undo entity rotation
-		stack.rotate(Vector3f.YP.rotationDegrees(-entYaw));
+		stack.mulPose(Vector3f.YP.rotationDegrees(-entYaw));
 		
 		// Orbit
 		final float periodBaseTicks = 5 * 20; // move to static
 		final float periodTicks = periodBaseTicks / this.getOrbitSpeed();
-		final float orbitProg = (((entity.ticksExisted + partialTicks) % periodTicks) / periodTicks) + this.getOrbitOffset();
+		final float orbitProg = (((entity.tickCount + partialTicks) % periodTicks) / periodTicks) + this.getOrbitOffset();
 		
-		stack.rotate(Vector3f.YP.rotationDegrees(orbitProg * 360f));
+		stack.mulPose(Vector3f.YP.rotationDegrees(orbitProg * 360f));
 		
-		stack.translate(0, 0, -entity.getWidth()*.5f);
+		stack.translate(0, 0, -entity.getBbWidth()*.5f);
 		
 		// Rotate to camera
 		//stack.rotate(Vector3f.YP.rotationDegrees(180f + activeInfo.getYaw()));
-		stack.rotate(Vector3f.YP.rotationDegrees(-(orbitProg * 360f)));
+		stack.mulPose(Vector3f.YP.rotationDegrees(-(orbitProg * 360f)));
 		stack.scale(1f, -1f, -1f);
-		stack.rotate(activeInfo.getRotation());
+		stack.mulPose(activeInfo.rotation());
 		
 		renderOrb(stack, typeBuffer, packedLight, getWidth(), red, green, blue, alpha);
-		stack.pop();
+		stack.popPose();
 	}
 	
 	protected void renderOrb(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, float width, float red, float green, float blue, float alpha) {
-		final IVertexBuilder buffer = typeBuffer.getBuffer(RenderType.getEntityTranslucent(TEX_BUBBLE));
-		final Matrix4f transform = stack.getLast().getMatrix();
-		final Matrix3f normal = stack.getLast().getNormal();
+		final IVertexBuilder buffer = typeBuffer.getBuffer(RenderType.entityTranslucent(TEX_BUBBLE));
+		final Matrix4f transform = stack.last().pose();
+		final Matrix3f normal = stack.last().normal();
 		final int packedOverlay = OverlayTexture.NO_OVERLAY;
 		final float xMin = -width/2f;
 		final float xMax = width/2f;
@@ -151,9 +151,9 @@ public class EffectBubbleRenderer implements IEffectRenderer {
 		final float uMax = 1;
 		final float vMin = 0;
 		final float vMax = 1;
-		buffer.pos(transform, xMax, yMin, 0).color(red, green, blue, alpha).tex(uMax, vMax).overlay(packedOverlay).lightmap(packedLight).normal(normal, 0, 1, 0).endVertex();
-		buffer.pos(transform, xMin, yMin, 0).color(red, green, blue, alpha).tex(uMin, vMax).overlay(packedOverlay).lightmap(packedLight).normal(normal, 0, 1, 0).endVertex();
-		buffer.pos(transform, xMin, yMax, 0).color(red, green, blue, alpha).tex(uMin, vMin).overlay(packedOverlay).lightmap(packedLight).normal(normal, 0, 1, 0).endVertex();
-		buffer.pos(transform, xMax, yMax, 0).color(red, green, blue, alpha).tex(uMax, vMin).overlay(packedOverlay).lightmap(packedLight).normal(normal, 0, 1, 0).endVertex();
+		buffer.vertex(transform, xMax, yMin, 0).color(red, green, blue, alpha).uv(uMax, vMax).overlayCoords(packedOverlay).uv2(packedLight).normal(normal, 0, 1, 0).endVertex();
+		buffer.vertex(transform, xMin, yMin, 0).color(red, green, blue, alpha).uv(uMin, vMax).overlayCoords(packedOverlay).uv2(packedLight).normal(normal, 0, 1, 0).endVertex();
+		buffer.vertex(transform, xMin, yMax, 0).color(red, green, blue, alpha).uv(uMin, vMin).overlayCoords(packedOverlay).uv2(packedLight).normal(normal, 0, 1, 0).endVertex();
+		buffer.vertex(transform, xMax, yMax, 0).color(red, green, blue, alpha).uv(uMax, vMin).overlayCoords(packedOverlay).uv2(packedLight).normal(normal, 0, 1, 0).endVertex();
 	}
 }

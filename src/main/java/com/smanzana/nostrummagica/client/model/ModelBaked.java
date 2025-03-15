@@ -20,7 +20,7 @@ public class ModelBaked<T extends Entity> extends EntityModel<T> {
 	protected List<ModelRendererBaked> children;
 	
 	public ModelBaked(ResourceLocation ... models) {
-		this(RenderType::getEntityCutoutNoCull, models);
+		this(RenderType::entityCutoutNoCull, models);
 	}
 	
 	public ModelBaked(Function<ResourceLocation, RenderType> renderTypeMap, ResourceLocation ... models) {
@@ -41,13 +41,13 @@ public class ModelBaked<T extends Entity> extends EntityModel<T> {
 	}
 	
 	@Override
-	public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setupAnim(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {
 		;
 	}
 
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
 			float red, float green, float blue, float alpha) {
 		int i = 0;
 		for (ModelRendererBaked child : children) {

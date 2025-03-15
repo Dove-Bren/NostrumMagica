@@ -65,11 +65,11 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	public abstract int compareTo(BatchRenderParticle o);
 	
 	@Override
-	public void renderParticle(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
+	public void render(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
 		
 		// Just don't render if too far away
 		final double maxDistSQ = 60 * 60;
-		if (renderInfo.getProjectedView().squareDistanceTo(posX, posY, posZ) < maxDistSQ) {
+		if (renderInfo.getPosition().distanceToSqr(x, y, z) < maxDistSQ) {
 			ParticleBatchRenderer.instance().queueParticle(this);
 		}
 	}
@@ -80,30 +80,30 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	}
 	
 	public double getPosX() {
-		return this.posX;
+		return this.x;
 	}
 	
 	public double getPosY() {
-		return this.posY;
+		return this.y;
 	}
 	
 	public double getPosZ() {
-		return this.posZ;
+		return this.z;
 	}
 	
 	public static void RenderQuad(MatrixStack matrixStackIn, IVertexBuilder buffer, BatchRenderParticle particle, ActiveRenderInfo renderInfo, float partialTicks, float scale) {
-		Vector3d originPos = renderInfo.getProjectedView();
-		final float offsetX = (float)((particle.prevPosX + (particle.getPosX() - particle.prevPosX) * partialTicks) - originPos.getX()); // could use MathHelper.lerp
-		final float offsetY = (float)((particle.prevPosY + (particle.getPosY() - particle.prevPosY) * partialTicks) - originPos.getY());
-		final float offsetZ = (float)((particle.prevPosZ + (particle.getPosZ() - particle.prevPosZ) * partialTicks) - originPos.getZ());
+		Vector3d originPos = renderInfo.getPosition();
+		final float offsetX = (float)((particle.xo + (particle.getPosX() - particle.xo) * partialTicks) - originPos.x()); // could use MathHelper.lerp
+		final float offsetY = (float)((particle.yo + (particle.getPosY() - particle.yo) * partialTicks) - originPos.y());
+		final float offsetZ = (float)((particle.zo + (particle.getPosZ() - particle.zo) * partialTicks) - originPos.z());
 		final float radius = /*particle.particleScale*/1 * scale;
-		final int lightmap = particle.getBrightnessForRender(partialTicks);
+		final int lightmap = particle.getLightColor(partialTicks);
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(offsetX, offsetY, offsetZ);
 		
-		RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, renderInfo, radius, lightmap, OverlayTexture.NO_OVERLAY, particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha);
-		matrixStackIn.pop();
+		RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, renderInfo, radius, lightmap, OverlayTexture.NO_OVERLAY, particle.rCol, particle.gCol, particle.bCol, particle.alpha);
+		matrixStackIn.popPose();
 		
 //		buffer.pos(offsetX - (rX * radius) - (rXY * radius), offsetY - (rZ * radius), offsetZ - (rYZ * radius) - (rXZ * radius))
 //			.tex(0, 0)

@@ -53,13 +53,13 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 			CompoundNBT tag = new CompoundNBT();
 			tag.putLong(NBT_TICK, addTick);
 			tag.put(NBT_ITEM, stack.serializeNBT());
-			tag.putInt(NBT_DIRECTION, inputDirection.getIndex());
+			tag.putInt(NBT_DIRECTION, inputDirection.get3DDataValue());
 			return tag;
 		}
 		
 		public static final ItemDuctTileEntity.ItemEntry fromNBT(CompoundNBT tag) {
 			final long tick = tag.getLong(NBT_TICK);
-			final ItemStack stack = ItemStack.read(tag.getCompound(NBT_ITEM));
+			final ItemStack stack = ItemStack.of(tag.getCompound(NBT_ITEM));
 			final Direction dir = Direction.values()[tag.getInt(NBT_DIRECTION)];
 			return new ItemEntry(tick, stack, dir);
 		}
@@ -156,8 +156,8 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		ListNBT list = new ListNBT();
 		for (ItemDuctTileEntity.ItemEntry entry : itemQueue) {
@@ -171,8 +171,8 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		itemQueue.clear();
 		ListNBT list = nbt.getList(NBT_SORTED, NBT.TAG_COMPOUND);
@@ -200,13 +200,13 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	
 	public void clear() {
 		this.itemQueue.clear();
-		this.markDirty();
+		this.setChanged();
 	}
 	
 	protected ItemDuctTileEntity.ItemEntry addItem(@Nonnull ItemStack stack, Direction dir) {
 		ItemDuctTileEntity.ItemEntry entry = new ItemEntry(ticks, stack, dir);
 		this.itemQueue.add(entry);
-		this.markDirty();
+		this.setChanged();
 		return entry;
 	}
 	
@@ -222,7 +222,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		if (isFull()) {
 			// Drop on floor
 			// TODO make it actually drop on the face that it's being added?
-			InventoryHelper.spawnItemStack(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, stack);
+			InventoryHelper.dropItemStack(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5, stack);
 			return false;
 		}
 		
@@ -266,7 +266,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	
 	@Override
 	public void tick() {
-		if (world != null && !world.isRemote) {
+		if (level != null && !level.isClientSide) {
 			this.ticks++;
 			
 			// Check any items and see if it's time they move on.
@@ -294,7 +294,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 			// Item is good to push!
 			pushItem(entry);
 			itemQueue.remove(0);
-			this.markDirty();
+			this.setChanged();
 			return true;
 		}
 		
@@ -335,7 +335,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		if (!stack.isEmpty()) {
 			// Throw on the floor!
 			// TODO make it actually drop on the face that we would be coming out of
-			InventoryHelper.spawnItemStack(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, stack);
+			InventoryHelper.dropItemStack(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5, stack);
 		}
 	}
 	
@@ -348,7 +348,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	 * @return
 	 */
 	private @Nonnull ItemStack attemptPush(ItemStack stack, Direction direction) {
-		@Nullable TileEntity te = world.getTileEntity(pos.offset(direction));
+		@Nullable TileEntity te = level.getBlockEntity(worldPosition.relative(direction));
 		
 		if (te != null) {
 			if (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent()) {
@@ -362,9 +362,9 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 				
 				// Special cast for stupid chests :P
 				if (te instanceof ChestTileEntity) {
-					BlockState state = world.getBlockState(pos.offset(direction));
+					BlockState state = level.getBlockState(worldPosition.relative(direction));
 					if (state != null && state.getBlock() instanceof ChestBlock) {
-						inv = ChestBlock.getChestInventory((ChestBlock) state.getBlock(), state, world, pos.offset(direction), true);
+						inv = ChestBlock.getContainer((ChestBlock) state.getBlock(), state, level, worldPosition.relative(direction), true);
 					}
 				}
 				
@@ -379,13 +379,13 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		if (inventory instanceof ISidedInventory) {
 			ISidedInventory sided = (ISidedInventory) inventory;
 			for (int insertIndex : sided.getSlotsForFace(direction.getOpposite())) {
-				if (!sided.canInsertItem(insertIndex, stack, direction.getOpposite())) {
+				if (!sided.canPlaceItemThroughFace(insertIndex, stack, direction.getOpposite())) {
 					continue;
 				}
 				
 				// Can insert. Would it fit?
-				@Nullable ItemStack inSlot = sided.getStackInSlot(insertIndex);
-				final int maxStack = (stack.isStackable() ? Math.min(stack.getMaxStackSize(), sided.getInventoryStackLimit()) : 1);
+				@Nullable ItemStack inSlot = sided.getItem(insertIndex);
+				final int maxStack = (stack.isStackable() ? Math.min(stack.getMaxStackSize(), sided.getMaxStackSize()) : 1);
 				final int taken;
 				if (inSlot.isEmpty()) {
 					taken = Math.min(maxStack, stack.getCount());
@@ -401,7 +401,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 				}
 				
 				if (taken > 0) {
-					sided.setInventorySlotContents(insertIndex, inSlot);
+					sided.setItem(insertIndex, inSlot);
 					if (stack.getCount() <= 0) {
 						stack = ItemStack.EMPTY;
 						break;

@@ -39,19 +39,19 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class TeleportRuneBlock extends Block  {
 	
 	public static final String ID = "teleport_rune";
-	protected static final VoxelShape RUNE_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 2D, 16.0D);
+	protected static final VoxelShape RUNE_AABB = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2D, 16.0D);
 	
 	public TeleportRuneBlock() {
-		super(Block.Properties.create(Material.CARPET)
-				.hardnessAndResistance(0.5f, 5.0f)
+		super(Block.Properties.of(Material.CLOTH_DECORATION)
+				.strength(0.5f, 5.0f)
 				.sound(SoundType.STONE)
-				.tickRandomly()
-				.notSolid()
+				.randomTicks()
+				.noOcclusion()
 				);
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return true;
     }
 	
@@ -68,39 +68,39 @@ public class TeleportRuneBlock extends Block  {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-		super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+	public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+		super.setPlacedBy(worldIn, pos, state, placer, stack);
 	}
 	
 	public static final int TELEPORT_RANGE = 64;
 	
 	
 	@Override
-	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
+	public void entityInside(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
 		;
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
-		if (worldIn.isRemote) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+		if (worldIn.isClientSide) {
 			return ActionResultType.SUCCESS;
 		}
 		
-		TileEntity te = worldIn.getTileEntity(pos);
+		TileEntity te = worldIn.getBlockEntity(pos);
 		if (te == null || !(te instanceof TeleportRuneTileEntity)) {
 			return ActionResultType.SUCCESS;
 		}
 		TeleportRuneTileEntity ent = (TeleportRuneTileEntity) te;
 		
-		ItemStack heldItem = playerIn.getHeldItem(hand);
+		ItemStack heldItem = playerIn.getItemInHand(hand);
 		
 		if (heldItem.isEmpty() || !(heldItem.getItem() instanceof PositionCrystal)) {
-			if (!worldIn.isRemote) {
+			if (!worldIn.isClientSide) {
 				ent.doTeleport(playerIn);
 			}
 			return ActionResultType.SUCCESS;
@@ -114,13 +114,13 @@ public class TeleportRuneBlock extends Block  {
 		if (!playerIn.isCreative()) {
 			// 1) has to be another teleport rune there, and 2) has to be within X blocks
 			if (!NostrumMagica.isBlockLoaded(worldIn, heldPos)) {
-				playerIn.sendMessage(new TranslationTextComponent("info.teleportrune.unloaded"), Util.DUMMY_UUID);
+				playerIn.sendMessage(new TranslationTextComponent("info.teleportrune.unloaded"), Util.NIL_UUID);
 				return ActionResultType.SUCCESS;
 			}
 			
 			BlockState targetState = worldIn.getBlockState(heldPos);
 			if (targetState == null || !(targetState.getBlock() instanceof TeleportRuneBlock)) {
-				playerIn.sendMessage(new TranslationTextComponent("info.teleportrune.norune"), Util.DUMMY_UUID);
+				playerIn.sendMessage(new TranslationTextComponent("info.teleportrune.norune"), Util.NIL_UUID);
 				return ActionResultType.SUCCESS;
 			}
 			
@@ -132,8 +132,8 @@ public class TeleportRuneBlock extends Block  {
 			// Look for lightning belt
 			IInventory baubles = NostrumMagica.instance.curios.getCurios(playerIn);
 			if (baubles != null) {
-				for (int i = 0; i < baubles.getSizeInventory(); i++) {
-					ItemStack stack = baubles.getStackInSlot(i);
+				for (int i = 0; i < baubles.getContainerSize(); i++) {
+					ItemStack stack = baubles.getItem(i);
 					if (stack.isEmpty() || stack.getItem() != NostrumCurios.enderBelt) {
 						continue;
 					}
@@ -146,7 +146,7 @@ public class TeleportRuneBlock extends Block  {
 			final double range = TELEPORT_RANGE * (hasEnderBelt ? 2 : 1) * (hasEnderSet ? 2 : 1);
 			
 			if (dist > range) {
-				playerIn.sendMessage(new TranslationTextComponent("info.teleportrune.toofar"), Util.DUMMY_UUID);
+				playerIn.sendMessage(new TranslationTextComponent("info.teleportrune.toofar"), Util.NIL_UUID);
 				return ActionResultType.SUCCESS;
 			}
 		}
@@ -155,17 +155,17 @@ public class TeleportRuneBlock extends Block  {
 		if (targetState != null && targetState.getBlock() instanceof TeleportRuneBlock) {
 			;
 		} else {
-			heldPos = heldPos.up();
+			heldPos = heldPos.above();
 		}
 		
 		ent.setTargetPosition(heldPos);
-		playerIn.sendMessage(new TranslationTextComponent("info.generic.block_linked"), Util.DUMMY_UUID);
+		playerIn.sendMessage(new TranslationTextComponent("info.generic.block_linked"), Util.NIL_UUID);
 		
 		// If creative, can target tele tiles that are pointing to other ones. But, if it's not pointing anywhere, we'll conveniently hook them up.
 		// Non-creative placement forces them to be linked to eachother, though.
 		boolean shouldLink = true;
 		if (playerIn.isCreative()) {
-			TileEntity otherTE = worldIn.getTileEntity(heldPos);
+			TileEntity otherTE = worldIn.getBlockEntity(heldPos);
 			if (otherTE != null && otherTE instanceof TeleportRuneTileEntity) {
 				TeleportRuneTileEntity otherEnt = (TeleportRuneTileEntity) otherTE;
 				shouldLink = (otherEnt.getOffset() == null);
@@ -174,7 +174,7 @@ public class TeleportRuneBlock extends Block  {
 		
 		if (shouldLink) {
 			BlockPos oldOffset = null;
-			TileEntity otherTE = worldIn.getTileEntity(heldPos);
+			TileEntity otherTE = worldIn.getBlockEntity(heldPos);
 			if (otherTE != null && otherTE instanceof TeleportRuneTileEntity) {
 				TeleportRuneTileEntity otherEnt = (TeleportRuneTileEntity) otherTE;
 				oldOffset = otherEnt.getOffset();
@@ -183,7 +183,7 @@ public class TeleportRuneBlock extends Block  {
 			
 			if (oldOffset != null && !playerIn.isCreative()) {
 				// Unlink old one, too!
-				otherTE = worldIn.getTileEntity(heldPos.add(oldOffset));
+				otherTE = worldIn.getBlockEntity(heldPos.offset(oldOffset));
 				if (otherTE != null && otherTE instanceof TeleportRuneTileEntity) {
 					TeleportRuneTileEntity otherEnt = (TeleportRuneTileEntity) otherTE;
 					otherEnt.setTargetPosition(null);
@@ -207,7 +207,7 @@ public class TeleportRuneBlock extends Block  {
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
-		TileEntity te = worldIn.getTileEntity(pos);
+		TileEntity te = worldIn.getBlockEntity(pos);
 		if (te == null || !(te instanceof TeleportRuneTileEntity)) {
 			return;
 		}

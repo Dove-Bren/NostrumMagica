@@ -71,7 +71,7 @@ public class SpellRegistry extends WorldSavedData {
 			registry.put(id, spell);
 		}
 		
-		this.markDirty();
+		this.setDirty();
 		return id;
 	}
 	
@@ -90,7 +90,7 @@ public class SpellRegistry extends WorldSavedData {
 			transients.add(id);
 		}
 		
-		this.markDirty();
+		this.setDirty();
 		return id;
 	}
 	
@@ -105,7 +105,7 @@ public class SpellRegistry extends WorldSavedData {
 			registry.put(id, spell);
 		}
 		
-		this.markDirty();
+		this.setDirty();
 	}
 	
 	public void removeTransientStatus(Spell spell) {
@@ -113,7 +113,7 @@ public class SpellRegistry extends WorldSavedData {
 			this.transients.remove((Integer) spell.getRegistryID());
 		}
 		
-		this.markDirty();
+		this.setDirty();
 	}
 	
 	public Spell lookup(int id) {
@@ -133,7 +133,7 @@ public class SpellRegistry extends WorldSavedData {
 			registry.clear();
 		}
 		
-		this.markDirty();
+		this.setDirty();
 	}
 	
 	public void evict(Spell spell) {
@@ -143,16 +143,16 @@ public class SpellRegistry extends WorldSavedData {
 			registry.remove(id);
 		}
 		
-		this.markDirty();
+		this.setDirty();
 	}
 
 	@Override
-	public void read(CompoundNBT nbt) {
+	public void load(CompoundNBT nbt) {
 		synchronized(this) {
 			this.registry.clear();
 			this.transients.clear();
 			
-			for (String key : nbt.keySet()) {
+			for (String key : nbt.getAllKeys()) {
 				int id;
 				try {
 					id = Integer.parseInt(key);
@@ -171,7 +171,7 @@ public class SpellRegistry extends WorldSavedData {
 	}
 
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
+	public CompoundNBT save(CompoundNBT nbt) {
 		
 		NostrumMagica.logger.info("Saving Spell registry");
 		

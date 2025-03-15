@@ -354,12 +354,12 @@ public class RoomChallenge1 extends StaticRoom {
 				'X', NostrumBlocks.lightDungeonBlock,
 				'0', Blocks.LAVA,
 				' ', null,
-				'L', new StaticBlockState(Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, Direction.EAST)), // EAST
-				'l', new StaticBlockState(Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, Direction.NORTH)), // NORTH 
+				'L', new StaticBlockState(Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.EAST)), // EAST
+				'l', new StaticBlockState(Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.NORTH)), // NORTH 
 				'I', Blocks.IRON_BARS,
-				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
-				'E', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST)),
-				'S', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.SOUTH)),
+				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
+				'E', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.EAST)),
+				'S', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.SOUTH)),
 				'F', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_FIRE)),
 				'P', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_LIGHTNING)));
 	}

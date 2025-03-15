@@ -44,12 +44,12 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	public ParticleLightningStatic(ClientWorld worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
-		particleRed = red;
-		particleGreen = green;
-		particleBlue = blue;
-		particleAlpha = 0f;
+		rCol = red;
+		gCol = green;
+		bCol = blue;
+		alpha = 0f;
 		this.maxAlpha = alpha;
-		maxAge = lifetime;
+		lifetime = lifetime;
 		
 		type = NostrumMagica.rand.nextInt(2);
 	}
@@ -59,7 +59,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	}
 	
 	public ParticleLightningStatic setGravityStrength(float strength) {
-		particleGravity = strength;
+		gravity = strength;
 		return this;
 	}
 	
@@ -77,9 +77,9 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	
 	public ParticleLightningStatic setMotion(double xVelocity, double yVelocity, double zVelocity,
 			double xJitter, double yJitter, double zJitter) {
-		this.motionX = xVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter); // 1 +- jitter
-		this.motionY = yVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter);
-		this.motionZ = zVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter);
+		this.xd = xVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter); // 1 +- jitter
+		this.yd = yVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter);
+		this.zd = zVelocity * (1.0 + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter);
 		return this;
 	}
 	
@@ -98,7 +98,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	}
 	
 	protected float getDisplayProgress() {
-		return (float) age / (float) maxAge;
+		return (float) age / (float) lifetime;
 	}
 	
 	protected static int GetDisplayFrame(float progress, int count) {
@@ -161,24 +161,24 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 		
 		if (this.age < 20) {
 			// fade in in first second
-			this.particleAlpha = ((float) age / 20f);
+			this.alpha = ((float) age / 20f);
 //		} else if (this.age >= this.maxAge - 20f) {
 //			// Fade out in last second
 //			this.particleAlpha = ((float) (maxAge - age) / 20f);
 		} else {
-			this.particleAlpha = 1f;
+			this.alpha = 1f;
 		}
 		
-		this.particleAlpha *= maxAlpha;
+		this.alpha *= maxAlpha;
 		
 		if (targetEntity != null && targetEntity.isAlive()) {
-			Vector3d curVelocity = new Vector3d(this.motionX, this.motionY, this.motionZ);
-			Vector3d posDelta = targetEntity.getPositionVec().add(0, targetEntity.getHeight()/2, 0).subtract(posX, posY, posZ);
+			Vector3d curVelocity = new Vector3d(this.xd, this.yd, this.zd);
+			Vector3d posDelta = targetEntity.position().add(0, targetEntity.getBbHeight()/2, 0).subtract(x, y, z);
 			Vector3d idealVelocity = posDelta.normalize().scale(.3);
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 		} else if (targetPos != null) {
-			Vector3d curVelocity = new Vector3d(this.motionX, this.motionY, this.motionZ);
-			Vector3d posDelta = targetPos.subtract(posX, posY, posZ);
+			Vector3d curVelocity = new Vector3d(this.xd, this.yd, this.zd);
+			Vector3d posDelta = targetPos.subtract(x, y, z);
 			Vector3d idealVelocity = posDelta.normalize().scale(.3);
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 		}
@@ -200,7 +200,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 				particle = new ParticleLightningStatic(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime);
 				
 				if (params.targetEntID != null) {
-					particle.setTarget(world.getEntityByID(params.targetEntID));
+					particle.setTarget(world.getEntity(params.targetEntID));
 				}
 				if (params.targetPos != null) {
 					particle.setTarget(params.targetPos);
@@ -213,7 +213,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 				}
 				particle.dieOnTarget(params.dieOnTarget);
 				Minecraft mc = Minecraft.getInstance();
-				mc.particles.addEffect(particle);
+				mc.particleEngine.add(particle);
 			}
 			return particle;
 		}

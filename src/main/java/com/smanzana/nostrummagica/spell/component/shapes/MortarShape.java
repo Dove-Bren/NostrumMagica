@@ -80,9 +80,9 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 			// that aren't players
 			final Vector3d dir;
 			final LivingEntity target;
-			if (caster instanceof MobEntity && ((MobEntity) caster).getAttackTarget() != null) {
+			if (caster instanceof MobEntity && ((MobEntity) caster).getTarget() != null) {
 				MobEntity ent = (MobEntity) caster  ;
-				target = ent.getAttackTarget(); // We already know target
+				target = ent.getTarget(); // We already know target
 				dir = null;
 			} else {
 				target = null; // Solve for target on main thread with raytrace
@@ -93,7 +93,7 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 			// If we have entity target, set that as dest. Otherwise, raytrace
 			final Vector3d dest;
 			if (target != null) {
-				dest = target.getPositionVec().add(0, target.getHeight()/2, 0);
+				dest = target.position().add(0, target.getBbHeight()/2, 0);
 			} else {
 				RayTraceResult mop = RayTrace.raytraceApprox(world, getState().getSelf(), pos, dir, MaxHDist, (ent) -> {
 					if (!hitEnts) {
@@ -113,9 +113,9 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 				// Note: not opting out of block MOP dest setting based on params because we fizzle on blocks even if we don't affect them
 				if (mop.getType() == RayTraceResult.Type.ENTITY && hitEnts) {
 					final LivingEntity hitEntity = RayTrace.livingFromRaytrace(mop);
-					dest = hitEntity.getPositionVec().add(0, hitEntity.getHeight()/2, 0);
+					dest = hitEntity.position().add(0, hitEntity.getBbHeight()/2, 0);
 				} else if (mop.getType() == RayTraceResult.Type.BLOCK) {
-					dest = mop.getHitVec();
+					dest = mop.getLocation();
 				} else {
 					Vector3d actual = pos.add(dir.scale(MaxHDist));
 					dest = new Vector3d(Math.floor(actual.x) + .5, Math.floor(actual.y) + .5, Math.floor(actual.z) + .5);
@@ -129,12 +129,12 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 				// Drop from above
 				// Try not to start in the ceiling
 				BlockPos.Mutable cursor = new BlockPos.Mutable();
-				cursor.setPos(dest.x, dest.y + 2, dest.z); // start 2 (+1) above; best we can do
+				cursor.set(dest.x, dest.y + 2, dest.z); // start 2 (+1) above; best we can do
 				
 				for (int i = 0; i < 7; i++) {
 					cursor.move(Direction.UP);
 					BlockState state = world.getBlockState(cursor);
-					if (!(state.getBlock() instanceof DungeonAirBlock) && !world.isAirBlock(cursor)) {
+					if (!(state.getBlock() instanceof DungeonAirBlock) && !world.isEmptyBlock(cursor)) {
 						// can't go here. Go back down and bail
 						cursor.move(Direction.DOWN);
 						break;
@@ -175,7 +175,7 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 				return true;
 			});
 			
-			world.addEntity(projectile);
+			world.addFreshEntity(projectile);
 		}
 		
 		@Override
@@ -193,7 +193,7 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 				onProjectileHit(new SpellLocation(world, this.pos));
 			}
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
-				onProjectileHit(new SpellLocation(entity.world, entity.getPosition()));
+				onProjectileHit(new SpellLocation(entity.level, entity.blockPosition()));
 			} else if (hitEnts) {
 				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null);
 			}
@@ -244,7 +244,7 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.from(ItemStack.EMPTY,
+		return NonNullList.of(ItemStack.EMPTY,
 				ReagentItem.CreateStack(ReagentType.SKY_ASH, 1));
 	}
 
@@ -283,9 +283,9 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 		// that aren't players
 		final Vector3d dir;
 		final LivingEntity target;
-		if (state.getSelf() instanceof MobEntity && ((MobEntity) state.getSelf()).getAttackTarget() != null) {
+		if (state.getSelf() instanceof MobEntity && ((MobEntity) state.getSelf()).getTarget() != null) {
 			MobEntity ent = (MobEntity) state.getSelf()  ;
-			target = ent.getAttackTarget(); // We already know target
+			target = ent.getTarget(); // We already know target
 			dir = null;
 		} else {
 			target = null; // Solve for target on main thread with raytrace
@@ -297,7 +297,7 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 		boolean success = false;
 		final Vector3d dest;
 		if (target != null) {
-			dest = target.getPositionVec();
+			dest = target.position();
 			success = true;
 		} else {
 			RayTraceResult mop = RayTrace.raytraceApprox(location.world, state.getSelf(), location.shooterPosition, dir, MaxHDist, (ent) -> {
@@ -317,17 +317,17 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 			// Note: not opting out of block MOP dest setting based on params because we fizzle on blocks even if we don't affect them
 			if (mop.getType() == RayTraceResult.Type.ENTITY && hitEnts) {
 				final LivingEntity hit = RayTrace.livingFromRaytrace(mop);
-				dest = hit.getPositionVec().add(0, hit.getHeight() / 2, 0);
+				dest = hit.position().add(0, hit.getBbHeight() / 2, 0);
 				state.trigger(Lists.newArrayList(hit), null);
 				success = true;
 			} else if (mop.getType() == RayTraceResult.Type.BLOCK) {
-				dest = mop.getHitVec();
+				dest = mop.getLocation();
 				if (hitBlocks) {
 					state.trigger(null, Lists.newArrayList(new SpellLocation(location.world, mop)));
 				}
 				success = true;
 			} else {
-				dest = Vector3d.copyCentered(new BlockPos(location.shooterPosition.add(dir.scale(MaxHDist))));
+				dest = Vector3d.atCenterOf(new BlockPos(location.shooterPosition.add(dir.scale(MaxHDist))));
 				// Don't 'trigger' at spot because we'll probably keep flying through it and not hit there
 				//state.trigger(null, world, Lists.newArrayList(new BlockPos(dest)));
 				success = false;
@@ -338,12 +338,12 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 			// Drop from above
 			// Try not to start in the ceiling
 			BlockPos.Mutable cursor = new BlockPos.Mutable();
-			cursor.setPos(dest.x, dest.y + 2, dest.z); // start 2 (+1) above; best we can do
+			cursor.set(dest.x, dest.y + 2, dest.z); // start 2 (+1) above; best we can do
 			
 			for (int i = 0; i < 7; i++) {
 				cursor.move(Direction.UP);
 				BlockState blockstate = location.world.getBlockState(cursor);
-				if (!(blockstate.getBlock() instanceof DungeonAirBlock) && !location.world.isAirBlock(cursor)) {
+				if (!(blockstate.getBlock() instanceof DungeonAirBlock) && !location.world.isEmptyBlock(cursor)) {
 					// can't go here. Go back down and bail
 					cursor.move(Direction.DOWN);
 					break;
@@ -356,7 +356,7 @@ public class MortarShape extends SpellShape implements ISelectableShape {
 			Vector3d start = location.shooterPosition;
 			if (dir != null) {
 				// Offset so curve isn't in line with player vision
-				start = start.add(dir.normalize().rotateYaw(90f));
+				start = start.add(dir.normalize().yRot(90f));
 			}
 			builder.add(new SpellShapePreviewComponent.Curve(start, null, new Curves.Mortar(MortarShapeInstance.HVel, dest.subtract(start), OverworldGravity)));
 		}

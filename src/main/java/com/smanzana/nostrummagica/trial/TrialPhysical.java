@@ -22,13 +22,13 @@ public class TrialPhysical extends WorldTrial {
 	public void onDeath(LivingDeathEvent e) {
 		if (e.getEntityLiving() instanceof IronGolemEntity) {
 			DamageSource source = e.getSource();
-			if (source.getTrueSource() == null ||
-					!(source.getTrueSource() instanceof PlayerEntity))
+			if (source.getEntity() == null ||
+					!(source.getEntity() instanceof PlayerEntity))
 				return;
 			
-			PlayerEntity player = (PlayerEntity) source.getTrueSource();
+			PlayerEntity player = (PlayerEntity) source.getEntity();
 			
-			if (!player.getHeldItemMainhand().isEmpty())
+			if (!player.getMainHandItem().isEmpty())
 				return;
 			
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);

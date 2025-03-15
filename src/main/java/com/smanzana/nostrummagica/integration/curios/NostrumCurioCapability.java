@@ -56,7 +56,7 @@ public class NostrumCurioCapability implements ICurio {
 
 	@Override
 	public void playRightClickEquipSound(LivingEntity entity) {
-		NostrumMagicaSounds.BAUBLE_EQUIP.play(entity.world, entity.getPosX(), entity.getPosY(), entity.getPosZ());
+		NostrumMagicaSounds.BAUBLE_EQUIP.play(entity.level, entity.getX(), entity.getY(), entity.getZ());
 		//entity.world.playSound(null, entity.getPosX(), entity.getPosY(), entity.getPosZ(), NostrumMagicaSounds.BAUBLE_EQUIP, entity.getSoundCategory(), 0.1F, 1.3F);
 	}
 

@@ -29,24 +29,24 @@ public class RenderEnderRodBall extends EntityRenderer<EnderRodBallEntity> {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public ResourceLocation getEntityTexture(EnderRodBallEntity entity) {
-		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
+	public ResourceLocation getTextureLocation(EnderRodBallEntity entity) {
+		return AtlasTexture.LOCATION_BLOCKS;
 	}
 	
 	@Override
 	public void render(EnderRodBallEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		// Render orb three times with different alphas and sizes to do a glow effect.
-		final float time = entityIn.ticksExisted + partialTicks;
+		final float time = entityIn.tickCount + partialTicks;
 		//134, 80, 185
 		final float red = .525f;
 		final float green = .314f;
 		final float blue = .725f;
-		IVertexBuilder buffer = bufferIn.getBuffer(RenderType.getEntityCutout(getEntityTexture(entityIn)));
+		IVertexBuilder buffer = bufferIn.getBuffer(RenderType.entityCutout(getTextureLocation(entityIn)));
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		
 		// All three orbs rotate at the same rate and have the same offset
-		final float offset = entityIn.getHeight() / 2;
+		final float offset = entityIn.getBbHeight() / 2;
 		final float rotY = time / (20f * 3.0f);
 		final float rotX = time / (20f * 10f);
 		
@@ -57,35 +57,35 @@ public class RenderEnderRodBall extends EntityRenderer<EnderRodBallEntity> {
 		matrixStackIn.translate(0, offset, 0);
 		
 		// Center orb is perfectly opaque
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.scale(scale, scale, scale);
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rotY));
-		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(rotX));
-		ballOrb.render(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, 1f);
-		matrixStackIn.pop();
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(rotY));
+		matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(rotX));
+		ballOrb.renderToBuffer(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, 1f);
+		matrixStackIn.popPose();
 		
-		buffer = bufferIn.getBuffer(this.ballOrb.getRenderType(getEntityTexture(entityIn)));
+		buffer = bufferIn.getBuffer(this.ballOrb.renderType(getTextureLocation(entityIn)));
 		
 		// Inner glow orb is slightly larger but pulses at same rate and is transparent
 		scale += .2f;
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.scale(scale, scale, scale);
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rotY));
-		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(rotX));
-		ballOrb.render(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, .2f);
-		matrixStackIn.pop();
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(rotY));
+		matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(rotX));
+		ballOrb.renderToBuffer(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, .2f);
+		matrixStackIn.popPose();
 		
 		// Outer glow changes at a different rate and is much lighter
 		frac = time / (20f * .6f);
         scale += .2f * (1 - (frac % 1f));
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.scale(scale, scale, scale);
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rotY));
-		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(rotX));
-		ballOrb.render(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, .05f);
-		matrixStackIn.pop();
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(rotY));
+		matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(rotX));
+		ballOrb.renderToBuffer(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, .05f);
+		matrixStackIn.popPose();
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 //        GlStateManager.rotatef(entity.rotationPitch, 1, 0, 0);
 	}

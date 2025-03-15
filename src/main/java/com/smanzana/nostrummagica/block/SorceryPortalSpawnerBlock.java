@@ -13,8 +13,8 @@ public class SorceryPortalSpawnerBlock extends Block implements ITriggeredBlock 
 	public static final String ID = "portal_spawner";
 	
 	public SorceryPortalSpawnerBlock() {
-		super(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(3.0f, 15.0f)
+		super(Block.Properties.of(Material.STONE)
+				.strength(3.0f, 15.0f)
 				.sound(SoundType.STONE)
 				.noDrops()
 				);
@@ -22,11 +22,11 @@ public class SorceryPortalSpawnerBlock extends Block implements ITriggeredBlock 
 	
 	protected void deactivatePortal(World world, BlockPos pos, BlockState state) {
 		// Remove portal above us
-		world.removeBlock(pos.up(), false);
+		world.removeBlock(pos.above(), false);
 	}
 	
 	protected void activatePortal(World world, BlockPos pos, BlockState state) {
-		world.setBlockState(pos.up(), NostrumBlocks.sorceryPortal.getMaster());
+		world.setBlockAndUpdate(pos.above(), NostrumBlocks.sorceryPortal.getMaster());
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
@@ -40,25 +40,25 @@ public class SorceryPortalSpawnerBlock extends Block implements ITriggeredBlock 
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			this.destroy(worldIn, pos, state);
 		}
 	}
 	
 	@Override
-	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
-		return (worldIn.isAirBlock(pos) && worldIn.isAirBlock(pos.up()) && worldIn.isAirBlock(pos.up().up()));
+	public boolean canSurvive(BlockState state, IWorldReader worldIn, BlockPos pos) {
+		return (worldIn.isEmptyBlock(pos) && worldIn.isEmptyBlock(pos.above()) && worldIn.isEmptyBlock(pos.above().above()));
 	}
 	
 	@Override
-	public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
+	public void onPlace(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
 		activatePortal(worldIn, pos, state);
 	}
 
 	@Override
 	public void trigger(World world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
-		BlockState aboveState = world.getBlockState(blockPos.up());
+		BlockState aboveState = world.getBlockState(blockPos.above());
 		if (aboveState == null || !(aboveState.getBlock() instanceof SorceryPortalBlock)) {
 			this.activatePortal(world, blockPos, state);
 		}

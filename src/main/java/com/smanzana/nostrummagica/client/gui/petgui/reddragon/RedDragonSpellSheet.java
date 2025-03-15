@@ -137,7 +137,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		leftOffset = (width - invWidth) / 2;
 		initSlots();
 		
-		if (!player.world.isRemote) {
+		if (!player.level.isClientSide) {
 			this.sendAllGambits(dragonInv.getAllGambits());
 		}
 	}
@@ -149,10 +149,10 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	
 	private void drawCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(x, y, 0);
 		PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	private static @Nonnull ItemStack scrollShadow = ItemStack.EMPTY;
@@ -164,7 +164,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 			scrollShadow = new ItemStack(NostrumItems.spellScroll);
 		}
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(x, y, 0);
 		PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
 
@@ -172,19 +172,19 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		RenderFuncs.RenderGUIItem(scrollShadow, matrixStackIn, 0, 0, -100);
 			
 		int color = 0x55FFFFFF;
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(0, 0, 1);
 		RenderFuncs.drawRect(matrixStackIn, 
 				0, 0,
 				16, 16,
 				color);
-		matrixStackIn.pop();
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
+		matrixStackIn.popPose();
 	}
 	
 	private void drawShadowCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(x, y, 0);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
@@ -192,12 +192,12 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
 		RenderSystem.color4f(1f, 1f, 1f, 1f);
 		RenderSystem.disableBlend();
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	private void drawFadedCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(x, y, 0);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
@@ -205,7 +205,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
 		RenderSystem.color4f(1f, 1f, 1f, 1f);
 		RenderSystem.disableBlend();
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	private void drawGambit(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, DragonGambit gambit) {
@@ -215,7 +215,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 			texOffsetX = gambit.getTexOffsetX();
 			texOffsetY = gambit.getTexOffsetY();
 		}
-		mc.getTextureManager().bindTexture(DRAGON_ICON_TEXT);
+		mc.getTextureManager().bind(DRAGON_ICON_TEXT);
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
 				y,
 				GUI_TEX_TOGGLE_HOFFSET + texOffsetX,
@@ -230,7 +230,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		int count;
 		int ghostCount;
 		
-		mc.fontRenderer.drawString(matrixStackIn, title, 5, y + 1 + (cellWidth - mc.fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
+		mc.font.draw(matrixStackIn, title, 5, y + 1 + (cellWidth - mc.font.lineHeight) / 2, 0xFFFFFFFF);
 		
 		count = 0;
 		ghostCount = 0;
@@ -260,7 +260,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	@Override
 	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		// Draw sheet
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		{
 //			final int cellWidth = 18;
 //			final int invRow = 9;
@@ -283,7 +283,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 			drawRow(matrixStackIn, mc, partialTicks, leftOffset - 1, dragonTopOffset - 1 + rowIncr + rowIncr, "Ally", dragonInv.getAllySpells(), dragonInv.getAllyGambits());
 			
 			final int playerTopOffset = dragonTopOffset + (rowIncr * 3) + 10;
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(leftOffset - 1, playerTopOffset - 1, 0);
 			// ... First 27
 			PetGUIRenderHelper.DrawSlots(matrixStackIn, cellWidth, cellWidth, Math.min(27, playerInvSize), invRow);
@@ -293,9 +293,9 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 			matrixStackIn.translate(0, 10 + yOffset, 0);
 			PetGUIRenderHelper.DrawSlots(matrixStackIn, cellWidth, cellWidth, Math.max(0, playerInvSize-27), invRow);
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	@Override
@@ -321,7 +321,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 			final long period = 2000;
 			final float alpha = .85f + .1f * (float) Math.sin(Math.PI * 2 * (float) (System.currentTimeMillis() % period) / period);
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 251);
 			
 			// Target
@@ -381,7 +381,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 				}
 			}
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		// Draw gambit overlay
@@ -429,20 +429,20 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 			}
 			
 			int index = (row * RedDragonSpellInventory.MaxSpellsPerCategory) + col;
-			if (dragonInv.getStackInSlot(index).isEmpty()) {
+			if (dragonInv.getItem(index).isEmpty()) {
 				break;
 			}
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 201);
 			RenderFuncs.drawRect(matrixStackIn, cellX, cellY, cellX + toggleSize, cellY + toggleSize, 0x50FFFFFF);
 			
 			DragonGambit gambit = dragonInv.getAllGambits()[index];
 			if (gambit != null) {
-				GuiUtils.drawHoveringText(matrixStackIn, gambit.getDesc(), mouseX, mouseY, this.width, this.height, 150, mc.fontRenderer);
+				GuiUtils.drawHoveringText(matrixStackIn, gambit.getDesc(), mouseX, mouseY, this.width, this.height, 150, mc.font);
 			}
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		} while (false);
 	}
 
@@ -492,7 +492,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		}
 		
 		int index = (row * RedDragonSpellInventory.MaxSpellsPerCategory) + col;
-		if (dragonInv.getStackInSlot(index).isEmpty()) {
+		if (dragonInv.getItem(index).isEmpty()) {
 			return false;
 		}
 		
@@ -607,7 +607,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	private void receiveAllGambits(CompoundNBT nbt) {
 		ListNBT list = nbt.getList("gambits", NBT.TAG_STRING);
 		if (list != null) {
-			for (int i = 0; i < dragonInv.getSizeInventory() && i < list.size(); i++) {
+			for (int i = 0; i < dragonInv.getContainerSize() && i < list.size(); i++) {
 				String name = list.getString(i);
 				DragonGambit gambit;
 				try {
@@ -676,7 +676,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		}
 		
 		@Override
-		public boolean isItemValid(@Nonnull ItemStack stack) {
+		public boolean mayPlace(@Nonnull ItemStack stack) {
 			if (!dragon.canManageSpells())
 				return false;
 			
@@ -700,7 +700,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 			}
 			
 			// If our previous slow doesn't have something in it, can't put something in us!
-			if (prev != null && !prev.getHasStack()) {
+			if (prev != null && !prev.hasItem()) {
 				return false;
 			}
 			
@@ -717,12 +717,12 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		
 		@Override
 		@OnlyIn(Dist.CLIENT)
-		public boolean isEnabled() {
+		public boolean isActive() {
 			if (subIndex >= RedDragonSpellInventory.MaxSpellsPerCategory) {
 				return false;
 			}
 			
-			if (this.getHasStack()) {
+			if (this.hasItem()) {
 				return true;
 			}
 			
@@ -738,7 +738,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 				if (prev == null) {
 					return true;
 				}
-				if (prev.getHasStack()) {
+				if (prev.hasItem()) {
 					return true;
 				}
 			}
@@ -747,11 +747,11 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		}
 		
 		@Override
-		public void onSlotChanged() {
-			super.onSlotChanged();
+		public void setChanged() {
+			super.setChanged();
 			sheet.dragonInv.clean();
 			
-			if (!this.dragon.world.isRemote) {
+			if (!this.dragon.level.isClientSide) {
 				sheet.sendAllGambits(sheet.dragonInv.getAllGambits());
 			}
 			sheet.container.clearSlots();

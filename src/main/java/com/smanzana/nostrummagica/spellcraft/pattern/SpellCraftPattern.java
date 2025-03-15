@@ -47,7 +47,7 @@ public abstract class SpellCraftPattern extends ForgeRegistryEntry<SpellCraftPat
 	}
 	
 	public ITextComponent getName() {
-		return new TranslationTextComponent(getUnlocalizedName()).mergeStyle(TextFormatting.DARK_GREEN);
+		return new TranslationTextComponent(getUnlocalizedName()).withStyle(TextFormatting.DARK_GREEN);
 	}
 	
 	public String getUnlocalizedDescription() {

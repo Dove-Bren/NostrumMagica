@@ -32,8 +32,8 @@ public class ClientPlayerListener extends PlayerListener {
 	
 	@SubscribeEvent
 	public void onInputUpdate(InputUpdateEvent event) {
-		final boolean newPress = !jumpPressedLastFrame && event.getMovementInput().jump;
-		jumpPressedLastFrame = event.getMovementInput().jump;
+		final boolean newPress = !jumpPressedLastFrame && event.getMovementInput().jumping;
+		jumpPressedLastFrame = event.getMovementInput().jumping;
 		// 
 		
 		if (newPress) {
@@ -50,7 +50,7 @@ public class ClientPlayerListener extends PlayerListener {
 		
 		if (jumpConsumedThisPress) {
 			// Keep eating the jump so that it never appears to transition to on in the regular player loop
-			event.getMovementInput().jump = false;
+			event.getMovementInput().jumping = false;
 		}
 	}
 	
@@ -83,7 +83,7 @@ public class ClientPlayerListener extends PlayerListener {
 				if (jumps != null) {
 					if (jumps.getCount() < extraJumps) {
 						jumps.incrCount();
-						player.jump();
+						player.jumpFromGround();
 						event.consume();
 					}
 				}

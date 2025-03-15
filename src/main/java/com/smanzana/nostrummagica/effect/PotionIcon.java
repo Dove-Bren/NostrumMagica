@@ -42,7 +42,7 @@ public enum PotionIcon {
 	
 	@OnlyIn(Dist.CLIENT)
 	public void draw(MatrixStack matrixStackIn, Minecraft mc, int posX, int posY) {
-		mc.getRenderManager().textureManager.bindTexture(text);
+		mc.getEntityRenderDispatcher().textureManager.bind(text);
 		
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, posX,
 				posY, TEXT_OFFSETU + (u * 18),

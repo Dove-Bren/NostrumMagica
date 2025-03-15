@@ -157,7 +157,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		float extra = .1f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
 		float inv = .1f - extra;
 		
-		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK);
+		Minecraft.getInstance().getTextureManager().bind(RES_BACK);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 				0, 0, TEX_BACK_WIDTH, TEX_BACK_HEIGHT,
 				width, height, TEX_BACK_WIDTH, TEX_BACK_HEIGHT,
@@ -167,8 +167,8 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 	@Override
 	public void drawForeground(IMirrorScreen parent, MatrixStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
 		final Minecraft mc = Minecraft.getInstance();
-		final FontRenderer font = mc.fontRenderer;
-		matrixStackIn.push();
+		final FontRenderer font = mc.font;
+		matrixStackIn.pushPose();
 		
 		matrixStackIn.translate(width/2, 20, 0);
 		RenderFuncs.drawGradientRect(matrixStackIn, -40, 0, 40, 20,
@@ -180,20 +180,20 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		if (activeElement == null) {
 			matrixStackIn.translate(0, 8, 0);
 			String str = "Skillpoints: " + attr.getSkillPoints();
-			int strWidth = font.getStringWidth(str);
-			matrixStackIn.push();
+			int strWidth = font.width(str);
+			matrixStackIn.pushPose();
 			matrixStackIn.scale(.75f, .75f, 1f);
-			font.drawString(matrixStackIn, str, -strWidth/2, 0, 0xFFFFFFFF);
-			matrixStackIn.pop();
+			font.draw(matrixStackIn, str, -strWidth/2, 0, 0xFFFFFFFF);
+			matrixStackIn.popPose();
 		} else {
 			matrixStackIn.translate(0, 4, 0);
 			String str = "Skillpoints: " + attr.getElementalSkillPoints(activeElement);
-			int strWidth = font.getStringWidth(str);
-			matrixStackIn.push();
+			int strWidth = font.width(str);
+			matrixStackIn.pushPose();
 			matrixStackIn.scale(.75f, .75f, 1f);
-			font.drawString(matrixStackIn, str, -strWidth/2, 0, 0xFFFFFFFF);
-			matrixStackIn.pop();
-			matrixStackIn.translate(0, font.FONT_HEIGHT, 0);
+			font.draw(matrixStackIn, str, -strWidth/2, 0, 0xFFFFFFFF);
+			matrixStackIn.popPose();
+			matrixStackIn.translate(0, font.lineHeight, 0);
 			
 			{
 				final int xp = attr.getElementXP(activeElement);
@@ -209,7 +209,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		}
 		
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	@Override
@@ -364,13 +364,13 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		
 		@SuppressWarnings("deprecation")
 		private void renderLine(MatrixStack matrixStackIn, SkillButton other, boolean faded) {
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 //			GlStateManager.pushLightingAttributes();
 			matrixStackIn.translate(width / 2, height / 2, 0);
 			
-			final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+			final Matrix4f transform = matrixStackIn.last().pose();
 			
-			BufferBuilder buf = Tessellator.getInstance().getBuffer();
+			BufferBuilder buf = Tessellator.getInstance().getBuilder();
 			RenderSystem.enableBlend();
 			RenderSystem.disableTexture();
 			RenderSystem.lineWidth(3f);
@@ -381,16 +381,16 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 	        //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 //	        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
 	        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-	        buf.pos(transform, x, y, 0).color(1f, 1f, 1f, faded ? .2f : .6f).endVertex();
-	        buf.pos(transform, other.x, other.y, 0).color(1f, 1f, 1f, faded ? 0f : .6f).endVertex();
-	        Tessellator.getInstance().draw();
+	        buf.vertex(transform, x, y, 0).color(1f, 1f, 1f, faded ? .2f : .6f).endVertex();
+	        buf.vertex(transform, other.x, other.y, 0).color(1f, 1f, 1f, faded ? 0f : .6f).endVertex();
+	        Tessellator.getInstance().end();
 	        RenderSystem.enableTexture();
 //	        GlStateManager.enableTexture();
 	        RenderSystem.disableBlend();
 			RenderSystem.lineWidth(1f);
 			
 //	        GlStateManager.popAttributes();
-	        matrixStackIn.pop();
+	        matrixStackIn.popPose();
 		}
 		
 		@Override
@@ -398,12 +398,12 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 			// Render tree lines even if we're out of bounds
 			if (!this.isHidden()) {
 				updateState();
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(0, 0, 0);
 				drawTreeLines(matrixStackIn, Minecraft.getInstance());
 				matrixStackIn.translate(0, 0, 1);
 				super.render(matrixStackIn, mouseX, mouseY, partialTicks);
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 		}
 		
@@ -428,15 +428,15 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 			}
 			
 			RenderSystem.enableBlend();
-			Minecraft.getInstance().getTextureManager().bindTexture(RES_ICONS);
+			Minecraft.getInstance().getTextureManager().bind(RES_ICONS);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 					u, v, TEX_ICON_BUTTON_WIDTH, TEX_ICON_BUTTON_HEIGHT,
 					this.width, this.height, TEX_ICON_WIDTH, TEX_ICON_HEIGHT,
 					color[0], color[1], color[2], color[3]);
 
 			// Icon
-			matrixStackIn.push();
-			RenderHelper.enableStandardItemLighting();
+			matrixStackIn.pushPose();
+			RenderHelper.turnBackOn();
 			// RenderGuiItem moves 100 forward. Blocks render several z deep.
 			// Squish to 8 deep, and shift back
 			matrixStackIn.scale(1f, 1f, .4f);
@@ -444,35 +444,35 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 			matrixStackIn.scale(.75f, .75f, 1f);
 			RenderFuncs.RenderGUIItem(skill.getIcon(), matrixStackIn, (- 16) / 2, (- 16) / 2);
 			RenderSystem.enableDepthTest();
-			RenderHelper.disableStandardItemLighting();
+			RenderHelper.turnOff();
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		@Override
 		public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			if (this.isHovered()) { 
 				final Minecraft mc = Minecraft.getInstance();
-				final FontRenderer font = mc.fontRenderer;
-				matrixStackIn.push();
+				final FontRenderer font = mc.font;
+				matrixStackIn.pushPose();
 				matrixStackIn.scale(fontScale, fontScale, 1f);
 				matrixStackIn.translate((int) (mouseX / fontScale) - mouseX, (int) (mouseY / fontScale) - mouseY, 0);
 				GuiUtils.drawHoveringText(matrixStackIn, tooltip, mouseX, mouseY, subscreen.width, subscreen.height, 400, font);
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 		}
 		
 		private List<ITextComponent> genTooltip() {
 			List<ITextComponent> tooltip = new LinkedList<>();
-			tooltip.add(((TextComponent) skill.getName()).mergeStyle(TextFormatting.BLUE));
+			tooltip.add(((TextComponent) skill.getName()).withStyle(TextFormatting.BLUE));
 			tooltip.addAll(skill.getDescription());
 			
 			if (this.subscreen.attr.hasSkill(skill)) {
 				tooltip.add(new StringTextComponent(" "));
-				tooltip.add(new StringTextComponent("Owned").mergeStyle(TextFormatting.BOLD, TextFormatting.DARK_GREEN));
+				tooltip.add(new StringTextComponent("Owned").withStyle(TextFormatting.BOLD, TextFormatting.DARK_GREEN));
 			} else {
 				tooltip.add(new StringTextComponent(" "));
-				tooltip.add(new TranslationTextComponent("info.research.purchase").mergeStyle(TextFormatting.GREEN));
+				tooltip.add(new TranslationTextComponent("info.research.purchase").withStyle(TextFormatting.GREEN));
 			}
 			
 			return tooltip;

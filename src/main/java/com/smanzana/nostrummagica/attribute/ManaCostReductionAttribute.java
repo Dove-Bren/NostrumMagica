@@ -10,7 +10,7 @@ public class ManaCostReductionAttribute extends RangedAttribute implements IPerc
 	
 	public ManaCostReductionAttribute(String name) {
 		super(name, 0, -200.0D, 100.0D);
-		this.setShouldWatch(true);
+		this.setSyncable(true);
 	}
 
 }

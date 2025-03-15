@@ -59,20 +59,20 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 	private static final int HarvestLevel = 3;
 	
 	public AspectedEarthWeapon() {
-		super(AttackDamage, AttackSpeed, ItemTier.DIAMOND, new HashSet<>(), NostrumItems.PropEquipment().maxDamage(1440).addToolType(ToolType.PICKAXE, HarvestLevel).addToolType(ToolType.SHOVEL, HarvestLevel));
+		super(AttackDamage, AttackSpeed, ItemTier.DIAMOND, new HashSet<>(), NostrumItems.PropEquipment().durability(1440).addToolType(ToolType.PICKAXE, HarvestLevel).addToolType(ToolType.SHOVEL, HarvestLevel));
 	}
 	
 	@Override
-	public boolean hitEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-		stack.damageItem(1, attacker, (p) -> {
-			p.sendBreakAnimation(EquipmentSlotType.MAINHAND);
+	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+		stack.hurtAndBreak(1, attacker, (p) -> {
+			p.broadcastBreakEvent(EquipmentSlotType.MAINHAND);
 		});
 		return true;
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-		Multimap<Attribute, AttributeModifier> multimap = super.getAttributeModifiers(equipmentSlot);
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+		Multimap<Attribute, AttributeModifier> multimap = super.getDefaultAttributeModifiers(equipmentSlot);
 //		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
 //			multimap.put(Attributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", (double)attackDamage, AttributeModifier.Operation.ADDITION));
 //			multimap.put(Attributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", (double)attackSpeed, AttributeModifier.Operation.ADDITION));
@@ -83,7 +83,7 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 	
 	@Override
 	public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-		if (enchantment.type == EnchantmentType.WEAPON) {
+		if (enchantment.category == EnchantmentType.WEAPON) {
 			return true;
 		}
 		
@@ -94,7 +94,7 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 	 * Check whether this Item can harvest the given Block
 	 */
 	@Override
-	public boolean canHarvestBlock(BlockState blockIn) {
+	public boolean isCorrectToolForDrops(BlockState blockIn) {
 		Block block = blockIn.getBlock();
 		final int harvestLevel = this.getHarvestLevel(ItemStack.EMPTY, blockIn.getHarvestTool(), null, blockIn);
 		if (harvestLevel != -1) {
@@ -103,7 +103,7 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 		
 		// Copied from pickaxe and shovel
 		Material material = blockIn.getMaterial();
-		return material == Material.ROCK || material == Material.IRON || material == Material.ANVIL
+		return material == Material.STONE || material == Material.METAL || material == Material.HEAVY_METAL
 				|| block == Blocks.SNOW || block == Blocks.SNOW_BLOCK;
 	}
 
@@ -111,7 +111,7 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 	public float getDestroySpeed(ItemStack stack, BlockState state) {
 		// Copied from pickaxe
 		Material material = state.getMaterial();
-		return material != Material.IRON && material != Material.ANVIL && material != Material.ROCK ? super.getDestroySpeed(stack, state) : this.efficiency;
+		return material != Material.METAL && material != Material.HEAVY_METAL && material != Material.STONE ? super.getDestroySpeed(stack, state) : this.speed;
 	}
 	
 	@Override
@@ -140,7 +140,7 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 	}
 	
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
 		if (repair.isEmpty()) {
 			return false;
 		} else {
@@ -152,39 +152,39 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 	public void apply(LivingEntity caster, Spell spell, SpellCastSummary summary, ItemStack stack) {
 		// We provide -10% mana cost reduct
 		summary.addCostRate(-.1f);
-		ItemStacks.damageItem(stack, caster, caster.getHeldItem(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+		ItemStacks.damageItem(stack, caster, caster.getItemInHand(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		tooltip.add(new StringTextComponent("Mana Cost Discount: 10%"));
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
+	public ActionResultType useOn(ItemUseContext context) {
 		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(context.getPlayer());
-		final ItemStack held = context.getItem();
+		final ItemStack held = context.getItemInHand();
 		final boolean hasBonus = ElementalArmor.GetSetCount(context.getPlayer(), EMagicElement.EARTH, ElementalArmor.Type.MASTER) == 4;
 		final boolean canUpgrade = attr != null && attr.hasSkill(NostrumSkills.Earth_Weapon);
 		final int manaCost = 20;
 		
-		if (context.getPlayer().isSneaking() && hasBonus && attr.getMana() >= manaCost) {
-			if (!context.getWorld().isRemote()) {
-				if (canUpgrade && context.getWorld().getBlockState(context.getPos()).getBlock() instanceof MineBlock) {
-					BlockState state = context.getWorld().getBlockState(context.getPos());
-					if (state.get(MineBlock.LEVEL) < 3) {
-						context.getWorld().setBlockState(context.getPos(), state.with(MineBlock.LEVEL, state.get(MineBlock.LEVEL) + 1));
-						doMineEffect(context.getPlayer(), context.getWorld(), context.getPos());
+		if (context.getPlayer().isShiftKeyDown() && hasBonus && attr.getMana() >= manaCost) {
+			if (!context.getLevel().isClientSide()) {
+				if (canUpgrade && context.getLevel().getBlockState(context.getClickedPos()).getBlock() instanceof MineBlock) {
+					BlockState state = context.getLevel().getBlockState(context.getClickedPos());
+					if (state.getValue(MineBlock.LEVEL) < 3) {
+						context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(MineBlock.LEVEL, state.getValue(MineBlock.LEVEL) + 1));
+						doMineEffect(context.getPlayer(), context.getLevel(), context.getClickedPos());
 						attr.addMana(-manaCost);
 						NostrumMagica.instance.proxy.sendMana(context.getPlayer());
 					}
-				} else if (context.getWorld().isAirBlock(context.getPos().offset(context.getFace()))) {
-				BlockPos pos = context.getPos().offset(context.getFace());
-					if (makeMine(context.getWorld(), context.getPlayer(), pos, context.getFace().getOpposite())) {
+				} else if (context.getLevel().isEmptyBlock(context.getClickedPos().relative(context.getClickedFace()))) {
+				BlockPos pos = context.getClickedPos().relative(context.getClickedFace());
+					if (makeMine(context.getLevel(), context.getPlayer(), pos, context.getClickedFace().getOpposite())) {
 						ItemStacks.damageItem(held, context.getPlayer(), context.getHand(), 1);
-						doMineEffect(context.getPlayer(), context.getWorld(), context.getPos());
+						doMineEffect(context.getPlayer(), context.getLevel(), context.getClickedPos());
 						attr.addMana(-manaCost);
 						NostrumMagica.instance.proxy.sendMana(context.getPlayer());
 					}
@@ -196,7 +196,7 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 	}
 	
 	protected static void doMineEffect(PlayerEntity caster, World world, BlockPos pos) {
-		if (caster.world.isRemote) {
+		if (caster.level.isClientSide) {
 			return;
 		}
 		
@@ -218,9 +218,9 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 	}
 	
 	protected static boolean makeMine(World world, PlayerEntity playerIn, BlockPos pos, Direction face) {
-		BlockState stateToPlace = NostrumBlocks.mineBlock.getDefaultState().with(MineBlock.FACING, face);
-		if (NostrumBlocks.mineBlock.isValidPosition(stateToPlace, world, pos)) {
-			world.setBlockState(pos, stateToPlace, 3);
+		BlockState stateToPlace = NostrumBlocks.mineBlock.defaultBlockState().setValue(MineBlock.FACING, face);
+		if (NostrumBlocks.mineBlock.canSurvive(stateToPlace, world, pos)) {
+			world.setBlock(pos, stateToPlace, 3);
 			return true;
 		} else {
 			return false;

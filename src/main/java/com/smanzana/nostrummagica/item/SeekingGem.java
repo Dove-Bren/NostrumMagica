@@ -44,15 +44,15 @@ public class SeekingGem extends Item implements ILoreTagged {
 		public boolean test(World world, BlockPos pos, BlockState state);
 	}
 	
-	protected static final IChestFilter IS_DUNGEONCHEST = (world, pos, state) -> state.getBlock() instanceof DungeonKeyChestBlock && !state.get(DungeonKeyChestBlock.OPEN);
+	protected static final IChestFilter IS_DUNGEONCHEST = (world, pos, state) -> state.getBlock() instanceof DungeonKeyChestBlock && !state.getValue(DungeonKeyChestBlock.OPEN);
 	
 	public static @Nullable BlockPos FindKeyChest(World world, MutableBoundingBox bounds, BlockPos center, @Nullable IChestFilter chestFilterIn) {
 		final IChestFilter chestFilter = chestFilterIn != null
 				? chestFilterIn
 				: IS_DUNGEONCHEST; 
 		
-		final BlockPos min = new BlockPos(bounds.minX, bounds.minY, bounds.minZ);
-		final BlockPos max = new BlockPos(bounds.maxX, bounds.maxY, bounds.maxZ);
+		final BlockPos min = new BlockPos(bounds.x0, bounds.y0, bounds.z0);
+		final BlockPos max = new BlockPos(bounds.x1, bounds.y1, bounds.z1);
 		List<BlockPos> matches = new ArrayList<>();
 		WorldUtil.ScanBlocks(world, min, max, (worldIn, pos) -> {
 			BlockState state = world.getBlockState(pos);
@@ -65,7 +65,7 @@ public class SeekingGem extends Item implements ILoreTagged {
 		BlockPos closest = null;
 		int minLength = Integer.MAX_VALUE;
 		for (BlockPos candidate : matches) {
-			final int dist = center.manhattanDistance(candidate);
+			final int dist = center.distManhattan(candidate);
 			if (dist < minLength) {
 				closest = center;
 				minLength = dist;
@@ -83,13 +83,13 @@ public class SeekingGem extends Item implements ILoreTagged {
 	
 	protected @Nullable BlockPos attemptDungeonSeek(PlayerEntity playerIn, World worldIn, ItemStack gem, DungeonRecord dungeon) {
 		if (dungeon != null && dungeon.currentRoom != null) {
-			return FindKeyChest(worldIn, dungeon.currentRoom.getBounds(), playerIn.getPosition(), (world, pos, state) -> {
+			return FindKeyChest(worldIn, dungeon.currentRoom.getBounds(), playerIn.blockPosition(), (world, pos, state) -> {
 				if (!IS_DUNGEONCHEST.test(world, pos, state)) {
 					return false;
 				}
 				
 				// Also make sure its key matches the dungeon!
-				TileEntity te = world.getTileEntity(pos);
+				TileEntity te = world.getBlockEntity(pos);
 				if (te == null || !(te instanceof DungeonKeyChestTileEntity)) {
 					return false;
 				}
@@ -106,46 +106,46 @@ public class SeekingGem extends Item implements ILoreTagged {
 		DungeonRecord dungeon = AutoDungeons.GetDungeonTracker().getDungeon(player);
 		if (dungeon != null) {
 			// Only do work on client side!
-			if (world.isRemote) {
+			if (world.isClientSide) {
 				@Nullable BlockPos nearest = attemptDungeonSeek(player, world, stack, dungeon);
 				if (nearest != null) {
 					NostrumMagicaSounds.AMBIENT_WOOSH3.playClient(world, nearest.getX() + .5, nearest.getY() + .5, nearest.getZ() + .5);
 				} else {
 					NostrumMagicaSounds.CAST_FAIL.playClient(player);
 				}
-				player.getCooldownTracker().setCooldown(stack.getItem(), 20); // Jut client side
+				player.getCooldowns().addCooldown(stack.getItem(), 20); // Jut client side
 				return nearest != null;
 			}
 			
 			return true;
 		} else {
-			if (world.isRemote) {
-				player.sendMessage(new StringTextComponent("It doesn't seem to do anything here..."), Util.DUMMY_UUID);
+			if (world.isClientSide) {
+				player.sendMessage(new StringTextComponent("It doesn't seem to do anything here..."), Util.NIL_UUID);
 			}
 		}
 		return false;
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		final World worldIn = context.getWorld();
+	public ActionResultType useOn(ItemUseContext context) {
+		final World worldIn = context.getLevel();
 		final PlayerEntity playerIn = context.getPlayer();
-		if (doSeek(worldIn, playerIn, context.getItem())) {
+		if (doSeek(worldIn, playerIn, context.getItemInHand())) {
 			if (playerIn instanceof ServerPlayerEntity) {
-				CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayerEntity)playerIn, context.getItem());
+				CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayerEntity)playerIn, context.getItemInHand());
 			}
 		}
 		return ActionResultType.SUCCESS;
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		if (doSeek(worldIn, playerIn, playerIn.getHeldItem(hand))) {
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		if (doSeek(worldIn, playerIn, playerIn.getItemInHand(hand))) {
 			if (playerIn instanceof ServerPlayerEntity) {
-				CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayerEntity)playerIn, playerIn.getHeldItem(hand));
+				CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayerEntity)playerIn, playerIn.getItemInHand(hand));
 			}
 		}
-		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getHeldItem(hand));
+		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getItemInHand(hand));
 	}
 
 	@Override

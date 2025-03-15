@@ -68,19 +68,19 @@ public class NostrumStructures {
 		// (max-min) ?
 		
 		structure = new PortalStructure();
-		configured = structure.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
+		configured = structure.configured(IFeatureConfig.NONE);
 		// Avg dist: sqrt(24^2 + 24^2) = 543 blocks
 		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PORTAL_ID), NostrumMagica.Loc(DUNGEONGEN_PORTAL_CONF_ID), 12, 24, 0x26F1BDCF);
 		CONFIGURED_DUNGEON_PORTAL = configured;
 		
 		structure = new DragonStructure();
-		configured = structure.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
+		configured = structure.configured(IFeatureConfig.NONE);
 		// Avg dist: sqrt(32^2 + 32^2) = 724 blocks
 		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_DRAGON_ID), NostrumMagica.Loc(DUNGEONGEN_DRAGON_CONF_ID), 24, 32, 0x4558c30e);
 		CONFIGURED_DUNGEON_DRAGON = configured;
 		
 		structure = new PlantBossStructure();
-		configured = structure.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG);
+		configured = structure.configured(IFeatureConfig.NONE);
 		// Avg dist: sqrt(32^2 + 32^2) = 724 blocks
 		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_ID), NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_CONF_ID), 20, 38, 0x2cc3005e);
 		CONFIGUREDDUNGEON_PLANTBOSS = configured;
@@ -91,13 +91,13 @@ public class NostrumStructures {
 	private static void registerStructure(RegistryEvent.Register<Structure<?>> event, Structure<?> structure, StructureFeature<?, ?> config, ResourceLocation structName, ResourceLocation confName, int min, int max, int rand) {
 		// Register structure itself
 		event.getRegistry().register(structure.setRegistryName(structName));
-		Structure.NAME_STRUCTURE_BIMAP.put(structName.toString(), structure);
+		Structure.STRUCTURES_REGISTRY.put(structName.toString(), structure);
 		
 		// Create seperation settings for structure
 		StructureSeparationSettings seperation = new StructureSeparationSettings(max, min, rand);
 		
 		// Force into dimension structure settings map
-		DimensionStructuresSettings.field_236191_b_ = ImmutableMap.<Structure<?>, StructureSeparationSettings>builder().putAll(DimensionStructuresSettings.field_236191_b_).
+		DimensionStructuresSettings.DEFAULTS = ImmutableMap.<Structure<?>, StructureSeparationSettings>builder().putAll(DimensionStructuresSettings.DEFAULTS).
 				put(structure, seperation).build();
 		
 		// Stash seperation settings in our own map for injection on world load
@@ -107,17 +107,17 @@ public class NostrumStructures {
 		Registry.register(WorldGenRegistries.CONFIGURED_STRUCTURE_FEATURE, confName, config);
 		
 		// Put in flat generation settings, which apparently is useful for playing nice with other mods
-		FlatGenerationSettings.STRUCTURES.put(structure, config);
+		FlatGenerationSettings.STRUCTURE_FEATURES.put(structure, config);
 	}
 	
 	//@SubscribeEvent subscribed to listener in #registerStructures as a hack because we can't mix busses
 	public static void loadWorld(WorldEvent.Load event) {
 		if(event.getWorld() instanceof ServerWorld && DimensionUtils.IsOverworld((ServerWorld)event.getWorld())) {
 			final ServerWorld serverWorld = (ServerWorld)event.getWorld();
-			final ServerChunkProvider provider = serverWorld.getChunkProvider();
-			Map<Structure<?>, StructureSeparationSettings> tempMap = new HashMap<>(provider.generator.func_235957_b_().func_236195_a_());
+			final ServerChunkProvider provider = serverWorld.getChunkSource();
+			Map<Structure<?>, StructureSeparationSettings> tempMap = new HashMap<>(provider.generator.getSettings().structureConfig());
 			tempMap.putAll(CUSTOM_SEPARATION_SETTINGS);
-			provider.generator.func_235957_b_().field_236193_d_ = tempMap;
+			provider.generator.getSettings().structureConfig = tempMap;
 		}
 	}
 }

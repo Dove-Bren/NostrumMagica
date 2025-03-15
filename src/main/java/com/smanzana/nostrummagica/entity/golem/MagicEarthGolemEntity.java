@@ -47,7 +47,7 @@ public class MagicEarthGolemEntity extends MagicGolemEntity {
 
 	@Override
 	public void doMeleeTask(LivingEntity target) {
-		this.attackEntityAsMob(target);
+		this.doHurtTarget(target);
 	}
 
 	@Override
@@ -59,12 +59,12 @@ public class MagicEarthGolemEntity extends MagicGolemEntity {
 	public void doBuffTask(LivingEntity target) {
 		MagicEarthGolemEntity.init();
 		
-		LivingEntity targ = this.getAttackTarget();
+		LivingEntity targ = this.getTarget();
 		if (targ != target)
-			this.setAttackTarget(target);
+			this.setTarget(target);
 		
-		boolean canStrength = target.getActivePotionEffect(Effects.STRENGTH) == null;
-		boolean canShield = target.getActivePotionEffect(NostrumEffects.physicalShield) == null;
+		boolean canStrength = target.getEffect(Effects.DAMAGE_BOOST) == null;
+		boolean canShield = target.getEffect(NostrumEffects.physicalShield) == null;
 		
 		Spell spell;
 		if (canStrength && canShield) {
@@ -80,23 +80,23 @@ public class MagicEarthGolemEntity extends MagicGolemEntity {
 		spell.cast(this, 1.0f);
 		
 		if (targ != target)
-			this.setAttackTarget(targ);
+			this.setTarget(targ);
 	}
 
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
-		return target.getActivePotionEffect(Effects.STRENGTH) == null
-				|| target.getActivePotionEffect(NostrumEffects.physicalShield) == null;
+		return target.getEffect(Effects.DAMAGE_BOOST) == null
+				|| target.getEffect(NostrumEffects.physicalShield) == null;
 	}
 
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		return MagicGolemEntity.BuildBaseAttributes()
-				.createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.20D)
+				.add(Attributes.MOVEMENT_SPEED, 0.20D)
 
-				.createMutableAttribute(Attributes.MAX_HEALTH, 24.0D)
+				.add(Attributes.MAX_HEALTH, 24.0D)
 
-				.createMutableAttribute(Attributes.ATTACK_DAMAGE, 4.0D)
-				.createMutableAttribute(Attributes.ARMOR, 12.0D);
+				.add(Attributes.ATTACK_DAMAGE, 4.0D)
+				.add(Attributes.ARMOR, 12.0D);
 	}
 
 	@Override

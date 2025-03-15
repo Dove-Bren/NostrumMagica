@@ -30,7 +30,7 @@ public class MagicEffectUpdate {
 	private final EffectData data;
 	
 	public MagicEffectUpdate(LivingEntity entity, SpecialEffect type, EffectData data) {
-		this(entity.getUniqueID(), type, data);
+		this(entity.getUUID(), type, data);
 	}
 	
 	public MagicEffectUpdate(UUID entityID, SpecialEffect type, EffectData data) {
@@ -41,20 +41,20 @@ public class MagicEffectUpdate {
 
 	public static MagicEffectUpdate decode(PacketBuffer buf) {
 		return new MagicEffectUpdate(
-				buf.readUniqueId(),
-				buf.readEnumValue(SpecialEffect.class),
+				buf.readUUID(),
+				buf.readEnum(SpecialEffect.class),
 				buf.readBoolean()
-						? EffectData.fromNBT(buf.readCompoundTag())
+						? EffectData.fromNBT(buf.readNbt())
 						: null
 				);
 	}
 
 	public static void encode(MagicEffectUpdate msg, PacketBuffer buf) {
-		buf.writeUniqueId(msg.entityID);
-		buf.writeEnumValue(msg.type);
+		buf.writeUUID(msg.entityID);
+		buf.writeEnum(msg.type);
 		buf.writeBoolean(msg.data != null);
 		if (msg.data != null) {
-			buf.writeCompoundTag(msg.data.toNBT());
+			buf.writeNbt(msg.data.toNBT());
 		}
 	}
 

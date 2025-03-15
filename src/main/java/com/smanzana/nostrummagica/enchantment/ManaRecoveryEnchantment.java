@@ -4,6 +4,8 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.inventory.EquipmentSlotType;
 
+import net.minecraft.enchantment.Enchantment.Rarity;
+
 public class ManaRecoveryEnchantment extends Enchantment {
 
 	public static final String ID = "nostrum_enchantment_mana_recovery";
@@ -29,7 +31,7 @@ public class ManaRecoveryEnchantment extends Enchantment {
     /**
      * Returns the minimal value of enchantability needed on the enchantment level passed.
      */
-    public int getMinEnchantability(int enchantmentLevel)
+    public int getMinCost(int enchantmentLevel)
     {
         return 10 + ((enchantmentLevel - 1) * 15); // 10, 25, 40
     }
@@ -37,12 +39,12 @@ public class ManaRecoveryEnchantment extends Enchantment {
     /**
      * Returns the maximum value of enchantability nedded on the enchantment level passed.
      */
-    public int getMaxEnchantability(int enchantmentLevel)
+    public int getMaxCost(int enchantmentLevel)
     {
-        return this.getMinEnchantability(enchantmentLevel) + 15;
+        return this.getMinCost(enchantmentLevel) + 15;
     }
 
-    public boolean isTreasureEnchantment()
+    public boolean isTreasureOnly()
     {
         return false;
     }

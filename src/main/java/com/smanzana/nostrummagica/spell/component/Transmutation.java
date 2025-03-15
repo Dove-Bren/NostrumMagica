@@ -498,7 +498,7 @@ public class Transmutation {
 		public ItemTransmutationSource(Item item) {
 			super();
 			this.item = item;
-			this.inputIngredient = Ingredient.fromItems(item);
+			this.inputIngredient = Ingredient.of(item);
 		}
 
 		@Override
@@ -533,7 +533,7 @@ public class Transmutation {
 		public BlockTransmutationSource(Block block) {
 			super();
 			this.block = block;
-			this.inputIngredient = Ingredient.fromItems(block);
+			this.inputIngredient = Ingredient.of(block);
 		}
 
 		@Override

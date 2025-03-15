@@ -35,7 +35,7 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 		protected final int startY;
 		
 		public SlotWidget(HideableSlot slot, int guiLeft, int guiTop) {
-			super(guiLeft + slot.xPos - 1, guiTop + slot.yPos - 1, 18, 18, StringTextComponent.EMPTY);
+			super(guiLeft + slot.x - 1, guiTop + slot.y - 1, 18, 18, StringTextComponent.EMPTY);
 			this.startX = this.x;
 			this.startY = this.y;
 			this.slot = slot;
@@ -43,7 +43,7 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 		
 		@Override
 		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
+			Minecraft.getInstance().getTextureManager().bind(TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y, TEX_SLOT_HOFFSET, TEX_SLOT_VOFFSET, TEX_SLOT_WIDTH, TEX_SLOT_HEIGHT, this.width, this.height, TEX_WIDTH, TEX_HEIGHT);
 		}
 		
@@ -64,8 +64,8 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 			final int diffY = (y - this.y);
 			this.x = x;
 			this.y = y;
-			this.slot.xPos += diffX;
-			this.slot.yPos += diffY;
+			this.slot.x += diffX;
+			this.slot.y += diffY;
 			
 			this.slot.setHidden(!this.inBounds());
 		}
@@ -202,26 +202,26 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 	
 	@Override
 	public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(this.x, this.y, 0);
 		renderInventoryBackground(matrixStackIn, this.width, this.height, color[0], color[1], color[2], color[3]);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	@Override
 	protected void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		final Minecraft mc = Minecraft.getInstance();
-		final FontRenderer fontRenderer = mc.fontRenderer;
+		final FontRenderer fontRenderer = mc.font;
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(this.x, this.y, 0);
 		renderInventoryOverlay(matrixStackIn, this.width, this.height, guiBounds, color[0], color[1], color[2], color[3]);
-		fontRenderer.func_243248_b(matrixStackIn, getMessage(), 8, 6, 4210752); // pos and color copied from ContainerScreen
-		matrixStackIn.pop();
+		fontRenderer.draw(matrixStackIn, getMessage(), 8, 6, 4210752); // pos and color copied from ContainerScreen
+		matrixStackIn.popPose();
 	}
 	
 	protected void renderInventoryBackground(MatrixStack matrixStackIn, int width, int height, float red, float green, float blue, float alpha) {
-		Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
+		Minecraft.getInstance().getTextureManager().bind(TEXT);
 		
 		// Note: hardcoding border size to be 4
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, TEX_BORDER_TL_HOFFSET, TEX_BORDER_TL_VOFFSET, TEX_BORDER_TL_WIDTH, TEX_BORDER_TL_HEIGHT, 4, 4, TEX_WIDTH, TEX_HEIGHT, red, green, blue, alpha);
@@ -238,7 +238,7 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 	}
 	
 	protected void renderInventoryOverlay(MatrixStack matrixStackIn, int width, int height, Rectangle2d hollow, float red, float green, float blue, float alpha) {
-		Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
+		Minecraft.getInstance().getTextureManager().bind(TEXT);
 		
 //		final int innerOffset = 4;
 //		final int topY = hollow.getY() - 1;

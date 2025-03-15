@@ -44,15 +44,15 @@ public class OutcomeBindSpell implements IRitualOutcome {
 		
 		Spell spell = SpellScroll.GetSpell(scroll);
 		if (spell == null) {
-			if (!player.world.isRemote) {
-				player.sendMessage(new StringTextComponent("The scroll is missing it's spell..."), Util.DUMMY_UUID);
+			if (!player.level.isClientSide) {
+				player.sendMessage(new StringTextComponent("The scroll is missing it's spell..."), Util.NIL_UUID);
 			}
 			return false;
 		}
 		
 		if (!SpellTome.hasRoom(tome, spell)) {
-			if (!player.world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.tome.full"), Util.DUMMY_UUID);
+			if (!player.level.isClientSide) {
+				player.sendMessage(new TranslationTextComponent("info.tome.full"), Util.NIL_UUID);
 			}
 			return false;
 		}
@@ -80,11 +80,11 @@ public class OutcomeBindSpell implements IRitualOutcome {
 				|| scroll.isEmpty())
 			return;
 		
-		AltarTileEntity altar = (AltarTileEntity) world.getTileEntity(center);
+		AltarTileEntity altar = (AltarTileEntity) world.getBlockEntity(center);
 		altar.setItem(tome); // Re-set tome back into altar
 		
 		if (!SpellTome.startBinding(player, tome, scroll)) {
-			altar = (AltarTileEntity) world.getTileEntity(center.add(4, 0, 0));
+			altar = (AltarTileEntity) world.getBlockEntity(center.offset(4, 0, 0));
 			altar.setItem(scroll);
 		}
 	}

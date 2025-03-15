@@ -116,9 +116,9 @@ public abstract class CombatTrialStaged extends CombatTrial {
 		for (int x = -10; x <= 10; x++)
 		for (int z = -10; z <= 10; z++)
 		for (int y = -2; y <= 2; y++) {
-			cursor.setPos(center.getX() + x, center.getY() + y, center.getZ() + z);
+			cursor.set(center.getX() + x, center.getY() + y, center.getZ() + z);
 			if (filter.test(world.getBlockState(cursor))) {
-				list.add(cursor.toImmutable());
+				list.add(cursor.immutable());
 			}
 		}
 		
@@ -135,19 +135,19 @@ public abstract class CombatTrialStaged extends CombatTrial {
 	protected static final BlockPos findRandomSpawnPos(World world, BlockPos center, LivingEntity entity) {
 		int attempts = 50; // Vanilla just doesn't spawn if it can't find one
 		while (attempts-- > 0) {
-			BlockPos attemptSpot = center.add(
+			BlockPos attemptSpot = center.offset(
 					NostrumMagica.rand.nextInt(16) - 8,
 					NostrumMagica.rand.nextInt(3) - 1,
 					NostrumMagica.rand.nextInt(16) - 8
 					);
-			if (world.isAirBlock(attemptSpot)) {
-				if (entity.getHeight() <= 1 || world.isAirBlock(attemptSpot.up())) {
+			if (world.isEmptyBlock(attemptSpot)) {
+				if (entity.getBbHeight() <= 1 || world.isEmptyBlock(attemptSpot.above())) {
 					return attemptSpot;
 				}
 			}
 		}
 		
-		return center.up().up();
+		return center.above().above();
 	}
 	
 	protected static interface TrialMobProvider {
@@ -183,10 +183,10 @@ public abstract class CombatTrialStaged extends CombatTrial {
 		protected MobEntity spawnOneEntity(World world, BlockPos center, @Nullable PlayerEntity focusPlayer) {
 			final MobEntity ent = genEntity(world);
 			final BlockPos spawn = findSpawnPos(world, center, ent);
-			ent.setPosition(spawn.getX() + .5, spawn.getY(), spawn.getZ() + .5);
-			world.addEntity(ent);
+			ent.setPos(spawn.getX() + .5, spawn.getY(), spawn.getZ() + .5);
+			world.addFreshEntity(ent);
 			if (focusPlayer != null) {
-				ent.setAttackTarget(focusPlayer);
+				ent.setTarget(focusPlayer);
 			}
 			CombatTrial.playSpawnEffects(center, ent);
 			return ent;
@@ -251,7 +251,7 @@ public abstract class CombatTrialStaged extends CombatTrial {
 				return CombatTrialStaged.findRandomSpawnPos(world, center, entity);
 			} else {
 				BlockPos randSpawn = spawnCandidates.get(NostrumMagica.rand.nextInt(spawnCandidates.size()));
-				return randSpawn.up();
+				return randSpawn.above();
 			}
 		}
 	}

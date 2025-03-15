@@ -56,7 +56,7 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	public static final String ID = "sword_physical";
 	
 	public AspectedPhysicalWeapon() {
-		super(ItemTier.DIAMOND, 6, -3.0F, NostrumItems.PropEquipment().maxDamage(1240).addToolType(ToolType.AXE, 3));
+		super(ItemTier.DIAMOND, 6, -3.0F, NostrumItems.PropEquipment().durability(1240).addToolType(ToolType.AXE, 3));
 	}
 	
 	@Override
@@ -66,13 +66,13 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-		return super.getAttributeModifiers(equipmentSlot);
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+		return super.getDefaultAttributeModifiers(equipmentSlot);
     }
 	
 	@Override
 	public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-		if (enchantment.type == EnchantmentType.DIGGER) {
+		if (enchantment.category == EnchantmentType.DIGGER) {
 			return true;
 		}
 		
@@ -106,7 +106,7 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	}
 	
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
 		if (repair.isEmpty()) {
 			return false;
 		} else {
@@ -118,25 +118,25 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	public void apply(LivingEntity caster, Spell spell, SpellCastSummary summary, ItemStack stack) {
 		// We provide -10% mana cost reduct
 		summary.addCostRate(-.1f);
-		ItemStacks.damageItem(stack, caster, caster.getHeldItem(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+		ItemStacks.damageItem(stack, caster, caster.getItemInHand(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		tooltip.add(new StringTextComponent("Mana Cost Discount: 10%"));
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final ItemStack held = playerIn.getHeldItem(hand);
-		playerIn.setActiveHand(hand);
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		final ItemStack held = playerIn.getItemInHand(hand);
+		playerIn.startUsingItem(hand);
 		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, held);
 	}
 	
 	@Override
-	public UseAction getUseAction(ItemStack stack) {
+	public UseAction getUseAnimation(ItemStack stack) {
 		return UseAction.BLOCK;
 	}
 	
@@ -156,7 +156,7 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	}
 	
 	protected static void doBlockEffect(LivingEntity caster) {
-		if (caster.world.isRemote) {
+		if (caster.level.isClientSide) {
 			return;
 		}
 		
@@ -181,19 +181,19 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(blocker);
 		final boolean hasBonus = ElementalArmor.GetSetCount(blocker, EMagicElement.PHYSICAL, ElementalArmor.Type.MASTER) == 4;
 		final boolean hasSkill = attr != null && attr.hasSkill(NostrumSkills.Physical_Weapon);
-		blocker.addPotionEffect(new EffectInstance(NostrumEffects.rendStrike, 1 * 20, 0));
+		blocker.addEffect(new EffectInstance(NostrumEffects.rendStrike, 1 * 20, 0));
 		
 		if (hasBonus) {
-			blocker.addPotionEffect(new EffectInstance(NostrumEffects.steelSkin, 3 * 20, 0));
+			blocker.addEffect(new EffectInstance(NostrumEffects.steelSkin, 3 * 20, 0));
 			if (hasSkill) {
-				blocker.addPotionEffect(new EffectInstance(NostrumEffects.magicShield, 10 * 20, 0));
+				blocker.addEffect(new EffectInstance(NostrumEffects.magicShield, 10 * 20, 0));
 			}
 		}
 	}
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public static void onEntityHit(LivingAttackEvent event) {
-		if (event.getEntityLiving().world.isRemote()) {
+		if (event.getEntityLiving().level.isClientSide()) {
 			return;
 		}
 		
@@ -201,12 +201,12 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 		
 		final LivingEntity ent = event.getEntityLiving();
 		final DamageSource source = event.getSource();
-		if (ent.isActiveItemStackBlocking() && ent.getActiveItemStack().getItem() instanceof AspectedPhysicalWeapon) {
+		if (ent.isBlocking() && ent.getUseItem().getItem() instanceof AspectedPhysicalWeapon) {
 			// This is based on LivingEntity#attackEntityFrom
 			if (event.getAmount() > 0.0F
 					// && ent.canBlockDamageSource(source)) { not visible
-					&& !source.isUnblockable()
-					&& source.getTrueSource() != null
+					&& !source.isBypassArmor()
+					&& source.getEntity() != null
 					) { 
 				doBlock(ent);
 				doBlockEffect(ent);
@@ -217,7 +217,7 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	
 	@OnlyIn(Dist.CLIENT)
 	public static final float ModelBlocking(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
-		return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
+		return entityIn != null && entityIn.isUsingItem() && entityIn.getUseItem() == stack ? 1.0F : 0.0F;
 	}
 
 }

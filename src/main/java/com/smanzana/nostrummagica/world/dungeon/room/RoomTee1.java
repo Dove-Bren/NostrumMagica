@@ -217,13 +217,13 @@ public class RoomTee1 extends StaticRoom {
 				"XXXXXXXXX",
 				'X', NostrumBlocks.lightDungeonBlock,
 				' ', null,
-				'L', new StaticBlockState(Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, Direction.NORTH)),
+				'L', new StaticBlockState(Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.NORTH)),
 				'B', Blocks.IRON_BARS,
-				'W', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.WEST)),
-				'E', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST)),
-				'S', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.SOUTH)),
+				'W', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.WEST)),
+				'E', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.EAST)),
+				'S', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.SOUTH)),
 				'C', new StaticBlockState(Blocks.RED_CARPET),
-				'T', new StaticBlockState(Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, Direction.EAST)),
+				'T', new StaticBlockState(Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.EAST)),
 				'G', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_LIGHTNING)));
 	}
 

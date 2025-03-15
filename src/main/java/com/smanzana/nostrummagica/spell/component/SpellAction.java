@@ -195,10 +195,10 @@ public class SpellAction {
 		
 		@Override
 		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
-			caster.setLastAttackedEntity(entity);
-			entity.setRevengeTarget(caster);
+			caster.setLastHurtMob(entity);
+			entity.setLastHurtByMob(caster);
 			//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
-			entity.hurtResistantTime = 0;
+			entity.invulnerableTime = 0;
 			
 			final float baseDmg = amount;
 			log.damageStart(this.amount, this.element);
@@ -270,16 +270,16 @@ public class SpellAction {
 				log.addGlobalModifier(LABEL_MOD_ICE_MASTER, +1f, ESpellLogModifierType.BONUS_SCALE);
 			}
 			
-			if (entity.isEntityUndead()) {
-				caster.setLastAttackedEntity(entity);
-				entity.setRevengeTarget(caster);
+			if (entity.isInvertedHealAndHarm()) {
+				caster.setLastHurtMob(entity);
+				entity.setLastHurtByMob(caster);
 				//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
 				
 				log.damageStart(this.amount, EMagicElement.ICE); // trickery here: skill modifiers added globally so 'start' with real base
 													// even though later we use the current 'base' modified amount
 				final float fin = SpellDamage.DamageEntity(entity, EMagicElement.ICE, base, efficiency, caster, log);
 				
-				entity.hurtResistantTime = 0;
+				entity.invulnerableTime = 0;
 				resultBuilder.damage += fin;
 				log.damageFinish(fin);
 			} else {
@@ -293,7 +293,7 @@ public class SpellAction {
 					}
 				} else if (entity instanceof ArcaneWolfEntity) {
 					ArcaneWolfEntity wolf = (ArcaneWolfEntity) entity;
-					if (wolf.isTamed() && wolf.getOwner() == caster) {
+					if (wolf.isTame() && wolf.getOwner() == caster) {
 						wolf.addBond(1f);
 					}
 				}
@@ -302,7 +302,7 @@ public class SpellAction {
 				
 				if (attr != null && attr.hasSkill(NostrumSkills.Ice_Adept)) {
 					if (NostrumMagica.rand.nextBoolean()) {
-						entity.addPotionEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * efficiency), 0));
+						entity.addEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * efficiency), 0));
 					}
 				}
 			}
@@ -344,7 +344,7 @@ public class SpellAction {
 			
 			if (entity instanceof PlayerEntity) {
 				PlayerEntity player = (PlayerEntity) entity;
-				player.getFoodStats().addStats((int) (amount * efficiency), 2);
+				player.getFoodData().eat((int) (amount * efficiency), 2);
 				NostrumMagicaSounds.STATUS_BUFF2.play(entity);
 				resultBuilder.applied |= true;
 				log.generalEffectStart(LABEL_FOOD_NAME, new TranslationTextComponent("spelllog.nostrummagica.food.desc", "" + amount, "" + (int) (amount * efficiency)), false);
@@ -437,7 +437,7 @@ public class SpellAction {
 		
 		@Override
 		public boolean isHarmful() {
-			return this.effect.getEffectType() == EffectType.HARMFUL;
+			return this.effect.getCategory() == EffectType.HARMFUL;
 		}
 		
 		protected @Nonnull EffectInstance makeEffect(LivingEntity caster, LivingEntity target, float efficiency, SpellActionResult resultBuilder) {
@@ -446,12 +446,12 @@ public class SpellAction {
 		
 		@Override
 		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
-			entity.addPotionEffect(this.makeEffect(caster, entity, efficiency, resultBuilder));
+			entity.addEffect(this.makeEffect(caster, entity, efficiency, resultBuilder));
 			
 			if (isHarmful()) {
-				caster.setLastAttackedEntity(entity);
-				entity.setRevengeTarget(caster);
-				entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
+				caster.setLastHurtMob(entity);
+				entity.setLastHurtByMob(caster);
+				entity.hurt(DamageSource.mobAttack(caster), 0);
 				NostrumMagicaSounds.STATUS_DEBUFF2.play(entity);
 			} else {
 				NostrumMagicaSounds.STATUS_BUFF1.play(entity);
@@ -497,15 +497,15 @@ public class SpellAction {
 			
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			
-			if (number == -1 || entity.getActivePotionEffects().size() < number) {
-				entity.clearActivePotions();
+			if (number == -1 || entity.getActiveEffects().size() < number) {
+				entity.removeAllEffects();
 			} else {
 				// Remove #number effects. We do this by getting another list of effects and shuffling, and then
 				// just walking that list to remove from the real one
-				List<EffectInstance> effectList = Lists.newArrayList(entity.getActivePotionEffects());
+				List<EffectInstance> effectList = Lists.newArrayList(entity.getActiveEffects());
 				Collections.shuffle(effectList);
 				for (int i = 0; i < number; i++) {
-					entity.removePotionEffect(effectList.get(i).getPotion());
+					entity.removeEffect(effectList.get(i).getEffect());
 				}
 			}
 			resultBuilder.applied |= true;
@@ -590,8 +590,8 @@ public class SpellAction {
 				// Look for lightning belt
 				IInventory baubles = NostrumMagica.instance.curios.getCurios((PlayerEntity) caster);
 				if (baubles != null) {
-					for (int i = 0; i < baubles.getSizeInventory(); i++) {
-						ItemStack stack = baubles.getStackInSlot(i);
+					for (int i = 0; i < baubles.getContainerSize(); i++) {
+						ItemStack stack = baubles.getItem(i);
 						if (stack.isEmpty() || stack.getItem() != NostrumCurios.enderBelt) {
 							continue;
 						}
@@ -615,20 +615,20 @@ public class SpellAction {
 			
 			// Apply efficiency bonus
 			float dist = this.dist * efficiency;
-			Vector3d direction = entity.getLookVec().normalize();
-			Vector3d source = entity.getPositionVec();
+			Vector3d direction = entity.getLookAngle().normalize();
+			Vector3d source = entity.position();
 			source = source.add(0, entity.getEyeHeight(), 0);
-			Vector3d dest = SpellTeleportation.Blink(entity, source, direction, dist, hasBelt && entity.isSneaking());			
+			Vector3d dest = SpellTeleportation.Blink(entity, source, direction, dist, hasBelt && entity.isShiftKeyDown());			
 			
 			if (dest != null) {
 				// We are about to put feet at dest, so try to shift down so that eye position matches
-				if (entity.world.isAirBlock(new BlockPos(dest.subtract(0, 1.5, 0)))) {
+				if (entity.level.isEmptyBlock(new BlockPos(dest.subtract(0, 1.5, 0)))) {
 					dest = dest.subtract(0, 1.5, 0);
 				}
 				
 				NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entity, .5 + Math.floor(dest.x), Math.floor(dest.y), .5 + Math.floor(dest.z), caster);
 				if (!event.isCanceled()) {
-					entity.setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
+					entity.teleportTo(event.getTargetX(), event.getTargetY(), event.getTargetZ());
 					entity.fallDistance = 0;
 					NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 					NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), caster, event.getPrev(), event.getTarget());
@@ -637,7 +637,7 @@ public class SpellAction {
 			}
 			
 			log.generalEffectStart(LABEL_BLINK_NAME, new TranslationTextComponent("spelllog.nostrummagica.blink.desc",
-					String.format("%.1f", this.dist), String.format("%.1f", dist), String.format("%.1f", source.distanceTo(entity.getPositionVec().add(0, entity.getEyeHeight(), 0)))), false);
+					String.format("%.1f", this.dist), String.format("%.1f", dist), String.format("%.1f", source.distanceTo(entity.position().add(0, entity.getEyeHeight(), 0)))), false);
 			log.generalEffectFinish(0f, 0f);
 			log.popModifierStack();
 		}
@@ -686,21 +686,21 @@ public class SpellAction {
 
 			// We abs the amp here, but check it belwo for pull and negate vector
 			float magnitude = .35f * (Math.abs(amp) + 1.0f) * (float) Math.min(2.0f, Math.max(0.0f, 1.0f + Math.log(efficiency)));
-			Vector3d center = Vector3d.copyCentered(location.hitBlockPos); // idr why I wanted it centered in the block?
+			Vector3d center = Vector3d.atCenterOf(location.hitBlockPos); // idr why I wanted it centered in the block?
 			NostrumMagicaSounds.DAMAGE_WIND.play(location.world, center.x, center.y, center.z);
 			
 			boolean any = false;
-			for (Entity e : location.world.getEntitiesWithinAABBExcludingEntity(null, 
+			for (Entity e : location.world.getEntities(null, 
 					new AxisAlignedBB(center.x - range, center.y - range, center.z - range, center.x + range, center.y + range, center.z + range)
 					)) {
-				double dist = e.getPositionVec().distanceTo(center); 
+				double dist = e.position().distanceTo(center); 
 				if (dist <= range) {
 					
 					// If push, straight magnitude
 					// If pull, cap magnitude so that it doesn't fly past player
 					
 					Vector3d force;
-					Vector3d direction = e.getPositionVec().add(0, e.getEyeHeight(), 0).subtract(center).normalize();
+					Vector3d direction = e.position().add(0, e.getEyeHeight(), 0).subtract(center).normalize();
 					force = new Vector3d(
 							direction.x * magnitude,
 							direction.y * magnitude,
@@ -725,7 +725,7 @@ public class SpellAction {
 								force.z * -1.0);
 					}
 					
-					e.addVelocity(force.x, force.y, force.z);
+					e.push(force.x, force.y, force.z);
 					any = true;
 				}
 			}
@@ -757,10 +757,10 @@ public class SpellAction {
 		
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
-			ItemStack inhand = entity.getHeldItemMainhand();
+			ItemStack inhand = entity.getMainHandItem();
 			boolean offhand = false;
 			if (inhand.isEmpty() || inhand.getItem() instanceof SpellScroll) {
-				inhand = entity.getHeldItemOffhand();
+				inhand = entity.getOffhandItem();
 				offhand = true;
 			}
 			
@@ -772,12 +772,12 @@ public class SpellAction {
 			
 			if (!result.valid) {
 				NostrumMagicaSounds.CAST_FAIL.play(entity);
-				log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute_fail.desc", item.getName()), false);
+				log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute_fail.desc", item.getDescription()), false);
 				log.generalEffectFinish(0f, 0f);
 				return;
 			}
 
-			log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute.desc", item.getName(), result.output.getName()), false);
+			log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute.desc", item.getDescription(), result.output.getDescription()), false);
 			log.generalEffectFinish(0f, 0f);
 			
 			ItemStack stack = new ItemStack(result.output);
@@ -794,18 +794,18 @@ public class SpellAction {
 				PlayerEntity p = (PlayerEntity) entity;
 				if (inhand.getCount() == 1) {
 					if (offhand) {
-						p.inventory.removeStackFromSlot(40);
+						p.inventory.removeItemNoUpdate(40);
 					} else {
-						p.inventory.removeStackFromSlot(p.inventory.currentItem);
+						p.inventory.removeItemNoUpdate(p.inventory.selected);
 					}
-					((PlayerEntity) entity).inventory.addItemStackToInventory(stack);
+					((PlayerEntity) entity).inventory.add(stack);
 				} else {
 					inhand.split(1);
-					((PlayerEntity) entity).inventory.addItemStackToInventory(stack);
+					((PlayerEntity) entity).inventory.add(stack);
 				}
 			} else {
 				// MobEntity has held item in slot 0
-				entity.setHeldItem(Hand.MAIN_HAND, stack);
+				entity.setItemInHand(Hand.MAIN_HAND, stack);
 			}
 
 			resultBuilder.applied |= true;
@@ -817,12 +817,12 @@ public class SpellAction {
 			TransmuteResult<Block> result = Transmutation.GetTransmutationResult(block, level);
 			if (!result.valid) {
 				NostrumMagicaSounds.CAST_FAIL.play(location.world, location.selectedBlockPos.getX() + .5, location.selectedBlockPos.getY(), location.selectedBlockPos.getZ() + .5);
-				log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute_fail.desc", new TranslationTextComponent(block.getTranslationKey())), false);
+				log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute_fail.desc", new TranslationTextComponent(block.getDescriptionId())), false);
 				log.generalEffectFinish(0f, 0f);
 				return;
 			}
 			
-			log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute.desc", new TranslationTextComponent(block.getTranslationKey()), new TranslationTextComponent(result.output.getTranslationKey())), false);
+			log.generalEffectStart(LABEL_TRANSMUTE_NAME, new TranslationTextComponent("spelllog.nostrummagica.transmute.desc", new TranslationTextComponent(block.getDescriptionId()), new TranslationTextComponent(result.output.getDescriptionId())), false);
 			log.generalEffectFinish(0f, 0f);
 			
 			NostrumMagicaSounds.CAST_CONTINUE.play(location.world, location.selectedBlockPos.getX() + .5, location.selectedBlockPos.getY(), location.selectedBlockPos.getZ() + .5);
@@ -835,7 +835,7 @@ public class SpellAction {
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) caster);
 			}
 			
-			location.world.setBlockState(location.selectedBlockPos, result.output.getDefaultState());
+			location.world.setBlockAndUpdate(location.selectedBlockPos, result.output.defaultBlockState());
 			resultBuilder.applied |= true;
 			resultBuilder.affectedPos = new SpellLocation(location.world, location.selectedBlockPos);
 		}
@@ -869,20 +869,20 @@ public class SpellAction {
 			
 			NostrumMagicaSounds.DAMAGE_FIRE.play(entity);
 			
-			caster.setLastAttackedEntity(entity);
-			entity.setRevengeTarget(caster);
-			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
-			entity.hurtResistantTime = 0;
+			caster.setLastHurtMob(entity);
+			entity.setLastHurtByMob(caster);
+			entity.hurt(DamageSource.mobAttack(caster), 0);
+			entity.invulnerableTime = 0;
 			
-			entity.setFire((int) Math.ceil((float) duration / 20.0f));
+			entity.setSecondsOnFire((int) Math.ceil((float) duration / 20.0f));
 			
 			@Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 			if (attr != null && attr.hasSkill(NostrumSkills.Fire_Inflict)) {
 				// Also bust shields
-				entity.removePotionEffect(NostrumEffects.mysticWater);
-				entity.removePotionEffect(NostrumEffects.physicalShield);
-				entity.removePotionEffect(NostrumEffects.magicShield);
-				entity.removePotionEffect(Effects.ABSORPTION);
+				entity.removeEffect(NostrumEffects.mysticWater);
+				entity.removeEffect(NostrumEffects.physicalShield);
+				entity.removeEffect(NostrumEffects.magicShield);
+				entity.removeEffect(Effects.ABSORPTION);
 			}
 			
 			resultBuilder.applied |= true;
@@ -907,8 +907,8 @@ public class SpellAction {
 				return;
 			}
 			
-			if (location.world.isAirBlock(applyPos)) {
-				location.world.setBlockState(applyPos, Blocks.FIRE.getDefaultState());
+			if (location.world.isEmptyBlock(applyPos)) {
+				location.world.setBlockAndUpdate(applyPos, Blocks.FIRE.defaultBlockState());
 				NostrumMagicaSounds.DAMAGE_FIRE.play(location.world,
 						applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
 				resultBuilder.applied |= true;
@@ -943,9 +943,9 @@ public class SpellAction {
 		
 		@Override
 		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
-			entity.setRevengeTarget(caster);
-			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
-			entity.hurtResistantTime = 0;
+			entity.setLastHurtByMob(caster);
+			entity.hurt(DamageSource.mobAttack(caster), 0);
+			entity.invulnerableTime = 0;
 			apply(caster, new SpellLocation(entity), efficiency, resultBuilder, log);
 		}
 
@@ -959,13 +959,13 @@ public class SpellAction {
 				// Look for lightning belt
 				IInventory baubles = NostrumMagica.instance.curios.getCurios((PlayerEntity) caster);
 				if (baubles != null) {
-					for (int i = 0; i < baubles.getSizeInventory(); i++) {
-						ItemStack stack = baubles.getStackInSlot(i);
+					for (int i = 0; i < baubles.getContainerSize(); i++) {
+						ItemStack stack = baubles.getItem(i);
 						if (stack.isEmpty() || stack.getItem() != NostrumCurios.lightningBelt) {
 							continue;
 						}
 						
-						count = caster.getRNG().nextInt(3) + 3;
+						count = caster.getRandom().nextInt(3) + 3;
 						log.addGlobalModifier(LABEL_LIGHTNING_MOD_BELT, count - 1, ESpellLogModifierType.FINAL_FLAT); // dishonest; not a damage bonus
 						break;
 					}
@@ -985,22 +985,22 @@ public class SpellAction {
 			log.generalEffectFinish(damage * count, 0f);
 			
 			final BlockPos applyPos = location.hitBlockPos;
-			BlockPos.Mutable cursor = new BlockPos.Mutable().setPos(applyPos);
-			Random rand = (caster == null ? new Random() : caster.getRNG());
+			BlockPos.Mutable cursor = new BlockPos.Mutable().set(applyPos);
+			Random rand = (caster == null ? new Random() : caster.getRandom());
 			for (int i = 0; i < count; i++) {
 				
 				if (i == 0) {
 					; // Don't adjust pos
 				} else {
 					// Apply random x/z offsets. Then step up to 4 to find surface
-					cursor.setPos(
+					cursor.set(
 							applyPos.getX() + rand.nextInt(6) - 3,
 							applyPos.getY() - 2,
 							applyPos.getZ() + rand.nextInt(6) - 3);
 					
 					// Find surface
 					int dist = 0;
-					while (dist++ < 4 && !location.world.isAirBlock(cursor)) {
+					while (dist++ < 4 && !location.world.isEmptyBlock(cursor)) {
 						cursor.setY(cursor.getY() + 1);
 					}
 				}
@@ -1009,7 +1009,7 @@ public class SpellAction {
 				bolt.setEntityToIgnore(caster);
 				bolt.setDamage(damage);
 				
-				((ServerWorld) location.world).addEntity(bolt);
+				((ServerWorld) location.world).addFreshEntity(bolt);
 				
 				
 			}
@@ -1046,24 +1046,24 @@ public class SpellAction {
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			// Pick a place to spawn it and then defer to location one
-			World world = caster.getEntityWorld();
-			BlockPos center = caster.getPosition();
+			World world = caster.getCommandSenderWorld();
+			BlockPos center = caster.blockPosition();
 			BlockPos pos;
 			do {
-				pos = center.add(1, 1, 0);
-				if (world.isAirBlock(pos))
+				pos = center.offset(1, 1, 0);
+				if (world.isEmptyBlock(pos))
 					break;
 				
-				pos = center.add(-1, 1, 0);
-				if (world.isAirBlock(pos))
+				pos = center.offset(-1, 1, 0);
+				if (world.isEmptyBlock(pos))
 					break;
 				
-				pos = center.add(0, 1, -1);
-				if (world.isAirBlock(pos))
+				pos = center.offset(0, 1, -1);
+				if (world.isEmptyBlock(pos))
 					break;
 				
-				pos = center.add(0, 1, 1);
-				if (world.isAirBlock(pos))
+				pos = center.offset(0, 1, 1);
+				if (world.isEmptyBlock(pos))
 					break;
 				
 				pos = center;
@@ -1084,24 +1084,24 @@ public class SpellAction {
 				}
 				
 				NostrumMagica.getMagicWrapper(caster).clearFamiliars();
-				caster.removeActivePotionEffect(NostrumEffects.familiar);
+				caster.removeEffectNoUpdate(NostrumEffects.familiar);
 				for (int i = 0; i < power; i++) {
 					MagicGolemEntity golem = spawnGolem(location.world);
-					golem.setPosition(applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
-					location.world.addEntity(golem);
-					golem.setOwnerId(caster.getUniqueID());
+					golem.setPos(applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
+					location.world.addFreshEntity(golem);
+					golem.setOwnerUUID(caster.getUUID());
 					NostrumMagica.getMagicWrapper(caster).addFamiliar(golem);
 				}
 				int baseTime = (int) (20 * 60 * 2.5 * Math.pow(2, Math.max(0, power - 1)));
 				int time = (int) (baseTime * efficiency);
-				caster.addPotionEffect(new EffectInstance(NostrumEffects.familiar, time, 0) {
+				caster.addEffect(new EffectInstance(NostrumEffects.familiar, time, 0) {
 					@Override
 					public boolean tick(LivingEntity entityIn, Runnable onComplete) {
 						// heh snekky
 						boolean ret = super.tick(entityIn, onComplete);
 						if (ret) {
 							// we're not being removed. Check familiars
-							if (entityIn.world.isRemote) {
+							if (entityIn.level.isClientSide) {
 								return true;
 							}
 							
@@ -1135,9 +1135,9 @@ public class SpellAction {
 				final int time = (int) (20f * (15f * efficiency));
 				for (int i = 0; i < power; i++) {
 					MagicGolemEntity golem = spawnGolem(location.world);
-					golem.setPosition(applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
+					golem.setPos(applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
 					golem.setExpiresAfterTicks(time);
-					location.world.addEntity(golem);
+					location.world.addFreshEntity(golem);
 				}
 			}
 			
@@ -1205,20 +1205,20 @@ public class SpellAction {
 			if (caster == null || entity == null)
 				return;
 			
-			Vector3d pos = caster.getPositionVec();
-			float pitch = caster.rotationPitch;
-			float yaw = caster.rotationYawHead;
+			Vector3d pos = caster.position();
+			float pitch = caster.xRot;
+			float yaw = caster.yHeadRot;
 			
-			NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(caster, entity.getPosX(), entity.getPosY(), entity.getPosZ(), caster);
+			NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(caster, entity.getX(), entity.getY(), entity.getZ(), caster);
 			if (!event.isCanceled()) {
 				if (caster instanceof PlayerEntity) {
-					caster.setPositionAndRotation(caster.getPosX(), caster.getPosY(), caster.getPosZ(), entity.rotationYawHead, entity.rotationPitch);
-					caster.setPositionAndUpdate(
+					caster.absMoveTo(caster.getX(), caster.getY(), caster.getZ(), entity.yHeadRot, entity.xRot);
+					caster.teleportTo(
 							event.getTargetX(), event.getTargetY(), event.getTargetZ());
 				} else {
-					caster.setPositionAndRotation(
+					caster.absMoveTo(
 							event.getTargetX(), event.getTargetY(), event.getTargetZ(),
-							entity.rotationPitch, entity.rotationYawHead
+							entity.xRot, entity.yHeadRot
 							);
 				}
 				NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), caster, event.getPrev(), event.getTarget());
@@ -1227,10 +1227,10 @@ public class SpellAction {
 			event = NostrumMagica.fireTeleportAttemptEvent(entity, pos.x, pos.y, pos.z, caster);
 			if (!event.isCanceled()) {
 				if (entity instanceof PlayerEntity) {
-					entity.setPositionAndRotation(entity.getPosX(), entity.getPosY(), entity.getPosZ(), yaw, pitch);
-					entity.setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
+					entity.absMoveTo(entity.getX(), entity.getY(), entity.getZ(), yaw, pitch);
+					entity.teleportTo(event.getTargetX(), event.getTargetY(), event.getTargetZ());
 				} else {
-					entity.setPositionAndRotation(event.getTargetX(), event.getTargetY(), event.getTargetZ(), yaw, pitch);
+					entity.absMoveTo(event.getTargetX(), event.getTargetY(), event.getTargetZ(), yaw, pitch);
 				}
 				NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), caster, event.getPrev(), event.getTarget());
 			}
@@ -1243,8 +1243,8 @@ public class SpellAction {
 		protected BlockPos adjustPosition(World world, BlockPos pos) {
 			// Do one graceful positioning attempt. If block above is not air but there's room to shift down
 			// one, do so
-			if (!world.isAirBlock(pos.up()) && world.isAirBlock(pos.down())) {
-				return pos.down();
+			if (!world.isEmptyBlock(pos.above()) && world.isEmptyBlock(pos.below())) {
+				return pos.below();
 			}
 			
 			return pos;
@@ -1256,7 +1256,7 @@ public class SpellAction {
 			
 			NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(caster, pos.getX() + .5, pos.getY(), pos.getZ() + .5, caster);
 			if (!event.isCanceled()) {
-				caster.setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
+				caster.teleportTo(event.getTargetX(), event.getTargetY(), event.getTargetZ());
 				caster.fallDistance = 0;
 				resultBuilder.applied |= true;
 				resultBuilder.affectedPos = new SpellLocation(location.world, pos);
@@ -1286,17 +1286,17 @@ public class SpellAction {
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 
-			Vector3d force = entity.getLookVec().add(0, 0.15, 0).normalize();
+			Vector3d force = entity.getLookAngle().add(0, 0.15, 0).normalize();
 			float scale = 1f * (.5f * (level + 1)) * efficiency;
 			
-			if (entity.isElytraFlying()) {
+			if (entity.isFallFlying()) {
 				scale *= .5f;
 			}
 			
 			force = new Vector3d(force.x * scale, force.y * scale, force.z * scale);
 			
-			entity.setMotion(entity.getMotion().add(force.x, force.y, force.z));
-			entity.velocityChanged = true;
+			entity.setDeltaMovement(entity.getDeltaMovement().add(force.x, force.y, force.z));
+			entity.hurtMarked = true;
 			
 			NostrumMagicaSounds.DAMAGE_WIND.play(entity);
 			resultBuilder.applied |= true;
@@ -1330,9 +1330,9 @@ public class SpellAction {
 		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			if (caster != entity && entity instanceof MobEntity) {
 				// Make sure they want to attack you if you do it
-				entity.setRevengeTarget(caster);
-				entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
-				entity.hurtResistantTime = 0;
+				entity.setLastHurtByMob(caster);
+				entity.hurt(DamageSource.mobAttack(caster), 0);
+				entity.invulnerableTime = 0;
 			}
 			
 			double radius = (16 * Math.min(1, level)) * efficiency;
@@ -1342,8 +1342,8 @@ public class SpellAction {
 				// Look for ender belt
 				IInventory baubles = NostrumMagica.instance.curios.getCurios((PlayerEntity) caster);
 				if (baubles != null) {
-					for (int i = 0; i < baubles.getSizeInventory(); i++) {
-						ItemStack stack = baubles.getStackInSlot(i);
+					for (int i = 0; i < baubles.getContainerSize(); i++) {
+						ItemStack stack = baubles.getItem(i);
 						if (stack.isEmpty() || stack.getItem() != NostrumCurios.enderBelt) {
 							continue;
 						}
@@ -1369,20 +1369,20 @@ public class SpellAction {
 				// Pick a random direction to blink in
 				float dirYaw = NostrumMagica.rand.nextFloat() * 360f;
 				float dirPitch = NostrumMagica.rand.nextFloat() * 180f;
-				Vector3d direction = Vector3d.fromPitchYaw(dirPitch, dirYaw);
+				Vector3d direction = Vector3d.directionFromRotation(dirPitch, dirYaw);
 				
 				// Blink in that direction
-				Vector3d dest = SpellTeleportation.Blink(entity, entity.getPositionVec().add(0, entity.getEyeHeight(), 0), direction, radius, hasBelt);
+				Vector3d dest = SpellTeleportation.Blink(entity, entity.position().add(0, entity.getEyeHeight(), 0), direction, radius, hasBelt);
 				
 				// Check if far enough
-				if (dest != null && dest.distanceTo(entity.getPositionVec()) > 3) {
+				if (dest != null && dest.distanceTo(entity.position()) > 3) {
 					// Try to teleport
 			        NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entity, dest.x, dest.y, dest.z, caster);
 					if (event.isCanceled()) {
 						// Break on a single cancel
 						break;
 					} else {
-						if (entity.attemptTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), false)) {
+						if (entity.randomTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), false)) {
 							NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), caster, event.getPrev(), event.getTarget());
 							break;
 						}
@@ -1412,9 +1412,9 @@ public class SpellAction {
 					entity = EntityType.ENDERMITE.create(location.world);
 				}
 				
-				entity.setPosition(location.hitPosition.x, location.hitPosition.y + .1, location.hitPosition.z);
+				entity.setPos(location.hitPosition.x, location.hitPosition.y + .1, location.hitPosition.z);
 				
-				location.world.addEntity(entity);
+				location.world.addFreshEntity(entity);
 			}
 			
 			NostrumMagicaSounds.DAMAGE_ENDER.play(location.world, location.hitPosition.x, location.hitPosition.y, location.hitPosition.z);
@@ -1455,16 +1455,16 @@ public class SpellAction {
 			if (!(caster instanceof PlayerEntity)) {
 				int count = level + 1;
 				double amt = 2 + level;
-				caster.removeActivePotionEffect(NostrumEffects.magicBuff);
+				caster.removeEffectNoUpdate(NostrumEffects.magicBuff);
 				NostrumMagica.magicEffectProxy.applyMagicBuff(entity, element, amt, count);
-				entity.addPotionEffect(new EffectInstance(NostrumEffects.magicBuff, 60 * 20, 0));
+				entity.addEffect(new EffectInstance(NostrumEffects.magicBuff, 60 * 20, 0));
 				resultBuilder.applied |= true;
 			}
 			
-			ItemStack inhand = entity.getHeldItemMainhand();
+			ItemStack inhand = entity.getMainHandItem();
 			boolean offhand = false;
 			if (!isEnchantable(inhand)) {
-				inhand = entity.getHeldItemOffhand();
+				inhand = entity.getOffhandItem();
 				offhand = true;
 			}
 			
@@ -1492,30 +1492,30 @@ public class SpellAction {
 					if (consumeInput) {
 						if (inhand.getCount() == 1) {
 							if (offhand) {
-								p.inventory.removeStackFromSlot(40);
+								p.inventory.removeItemNoUpdate(40);
 							} else {
-								p.inventory.removeStackFromSlot(p.inventory.currentItem);
+								p.inventory.removeItemNoUpdate(p.inventory.selected);
 							}
 						} else {
 							inhand.split(1);
 						}
 					}
 					if (!addedItem.isEmpty()) {
-						((PlayerEntity) entity).inventory.addItemStackToInventory(addedItem);
+						((PlayerEntity) entity).inventory.add(addedItem);
 					}
 					
 					
 				} else {
 					// MobEntity has held item in slot 0
 					if (!addedItem.isEmpty()) {
-						entity.setHeldItem(Hand.MAIN_HAND, addedItem);
+						entity.setItemInHand(Hand.MAIN_HAND, addedItem);
 					}
 				}
 				NostrumMagicaSounds.CAST_CONTINUE.play(entity);
 			}
 			
 			// Apply enchant effect
-			entity.addPotionEffect(new EffectInstance(ElementalEnchantEffect.GetForElement(this.element), (int) (20 * 15 * efficiency), level-1));
+			entity.addEffect(new EffectInstance(ElementalEnchantEffect.GetForElement(this.element), (int) (20 * 15 * efficiency), level-1));
 			resultBuilder.applied |= true;
 			
 		}
@@ -1548,7 +1548,7 @@ public class SpellAction {
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			if (entity instanceof AnimalEntity) {
 				AnimalEntity animal = (AnimalEntity) entity;
-				animal.addGrowth((int) (count * 500 * efficiency));
+				animal.ageUp((int) (count * 500 * efficiency));
 				NostrumMagicaSounds.STATUS_BUFF2.play(entity);
 				resultBuilder.applied |= true;
 			}
@@ -1561,15 +1561,15 @@ public class SpellAction {
 			// the block below the farmland. So try and step up if we're in that specific case.
 			BlockPos pos = location.selectedBlockPos;
 			
-			if (location.world.getBlockState(pos.up()).getBlock() instanceof FarmlandBlock) {
-				pos = pos.up();
+			if (location.world.getBlockState(pos.above()).getBlock() instanceof FarmlandBlock) {
+				pos = pos.above();
 			}
 			
 			if (location.world.getBlockState(pos).getBlock() instanceof FarmlandBlock) {
-				pos = pos.up();
+				pos = pos.above();
 			}
 			
-			if (location.world.isAirBlock(pos)) {
+			if (location.world.isEmptyBlock(pos)) {
 				return;
 			}
 			
@@ -1581,7 +1581,7 @@ public class SpellAction {
 						break;
 					}
 				} else {
-					if (!BoneMealItem.applyBonemeal(junk, location.world, pos)) {
+					if (!BoneMealItem.growCrop(junk, location.world, pos)) {
 						break;
 					}
 				}
@@ -1624,25 +1624,25 @@ public class SpellAction {
 				amount *= 2;
 			
 			int count = 0;
-			for (ItemStack equip : entity.getArmorInventoryList()) {
+			for (ItemStack equip : entity.getArmorSlots()) {
 				if (equip.isEmpty())
 					continue;
 				
 				count++;
 			}
 			if (count != 0) {
-				for (ItemStack equip : entity.getArmorInventoryList()) {
+				for (ItemStack equip : entity.getArmorSlots()) {
 					if (equip.isEmpty() || !(equip.getItem() instanceof ArmorItem))
 						continue;
-					ItemStacks.damageEquippedArmor(equip, entity, ((ArmorItem) equip.getItem()).getEquipmentSlot(), amount/count);
+					ItemStacks.damageEquippedArmor(equip, entity, ((ArmorItem) equip.getItem()).getSlot(), amount/count);
 				}
 			}
 			
 			NostrumMagicaSounds.MELT_METAL.play(entity);
-			caster.setLastAttackedEntity(entity);
-			entity.setRevengeTarget(caster);
-			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
-			entity.hurtResistantTime = 0;
+			caster.setLastHurtMob(entity);
+			entity.setLastHurtByMob(caster);
+			entity.hurt(DamageSource.mobAttack(caster), 0);
+			entity.invulnerableTime = 0;
 			resultBuilder.applied |= true;
 		}
 
@@ -1677,18 +1677,18 @@ public class SpellAction {
 			// Doing in here instead of a status effect so that wall doesn't get created if used on an entity
 			final int duration = (int) (20 * 60 * efficiency);
 			final int amp = (int) (level * efficiency) - 1; // amp 0 is 1
-			entity.addPotionEffect(new EffectInstance(NostrumEffects.mysticAir, duration, amp));
+			entity.addEffect(new EffectInstance(NostrumEffects.mysticAir, duration, amp));
 			resultBuilder.applied |= true;
 		}
 
 		@Override
 		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			BlockPos pos = location.hitBlockPos;
-			if (!location.world.isAirBlock(pos) && !(location.world.getBlockState(pos).getBlock() instanceof MagicWallBlock)) {
+			if (!location.world.isEmptyBlock(pos) && !(location.world.getBlockState(pos).getBlock() instanceof MagicWallBlock)) {
 				NostrumMagicaSounds.CAST_FAIL.play(location.world, pos);
 			} else {
 				NostrumMagicaSounds.DAMAGE_WIND.play(location.world, pos);
-				location.world.setBlockState(pos, NostrumBlocks.magicWall.getState(level));
+				location.world.setBlockAndUpdate(pos, NostrumBlocks.magicWall.getState(level));
 				resultBuilder.applied |= true;
 				resultBuilder.affectedPos = new SpellLocation(location.world, pos);
 			}
@@ -1728,13 +1728,13 @@ public class SpellAction {
 				amp *= 2;
 			}
 			
-			entity.addPotionEffect(new EffectInstance(NostrumEffects.mysticWater, (int) (effectDuration * efficiency), (int) amp));
+			entity.addEffect(new EffectInstance(NostrumEffects.mysticWater, (int) (effectDuration * efficiency), (int) amp));
 			NostrumMagicaSounds.STATUS_BUFF1.play(entity);
 			resultBuilder.applied |= true;
 			
 			if (attr != null && attr.hasSkill(NostrumSkills.Ice_Adept)) {
 				if (NostrumMagica.rand.nextBoolean()) {
-					entity.addPotionEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * efficiency), 0));
+					entity.addEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * efficiency), 0));
 				}
 			}
 		}
@@ -1742,8 +1742,8 @@ public class SpellAction {
 		@Override
 		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			BlockPos pos = location.hitBlockPos;
-			if (location.world.isAirBlock(pos) || location.world.getBlockState(pos).getBlock() instanceof MysticWaterBlock) {
-				location.world.setBlockState(pos, NostrumBlocks.mysticWaterBlock.getStateWithPower(this.waterLevel));
+			if (location.world.isEmptyBlock(pos) || location.world.getBlockState(pos).getBlock() instanceof MysticWaterBlock) {
+				location.world.setBlockAndUpdate(pos, NostrumBlocks.mysticWaterBlock.getStateWithPower(this.waterLevel));
 				NostrumMagicaSounds.DAMAGE_ICE.play(location.world, pos);
 				resultBuilder.applied |= true;
 				resultBuilder.affectedPos = new SpellLocation(location.world, pos);
@@ -1771,18 +1771,18 @@ public class SpellAction {
 
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
-			@Nullable EffectInstance instance = entity.getActivePotionEffect(NostrumEffects.cursedFire);
+			@Nullable EffectInstance instance = entity.getEffect(NostrumEffects.cursedFire);
 			final int duration = 20 * 1200;
 			if (instance == null || instance.getDuration() < (int) (duration * .8f)) {
-				entity.addPotionEffect(new EffectInstance(
+				entity.addEffect(new EffectInstance(
 						NostrumEffects.cursedFire,
 						duration,
 						0
 						));
 			}
-			caster.setLastAttackedEntity(entity);
-			entity.setRevengeTarget(caster);
-			entity.attackEntityFrom(DamageSource.causeMobDamage(caster), 0);
+			caster.setLastHurtMob(entity);
+			entity.setLastHurtByMob(caster);
+			entity.hurt(DamageSource.mobAttack(caster), 0);
 			resultBuilder.applied |= true;
 		}
 
@@ -1790,7 +1790,7 @@ public class SpellAction {
 		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			final BlockState state = NostrumBlocks.cursedFire.GetWithLevel(level);
 			final BlockPos pos = location.hitBlockPos;
-			if (location.world.getBlockState(pos).getMaterial().isReplaceable() && state.isValidPosition(location.world, pos) && location.world.setBlockState(pos, state)) {
+			if (location.world.getBlockState(pos).getMaterial().isReplaceable() && state.canSurvive(location.world, pos) && location.world.setBlockAndUpdate(pos, state)) {
 				NostrumMagicaSounds.DAMAGE_FIRE.play(location.world, pos);
 				resultBuilder.applied |= true;
 				resultBuilder.affectedPos = new SpellLocation(location.world, pos);
@@ -1818,7 +1818,7 @@ public class SpellAction {
 		
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
-			apply(caster, new SpellLocation(entity.world, entity.getPosition().add(0, -1, 0)), eff, resultBuilder, log);
+			apply(caster, new SpellLocation(entity.level, entity.blockPosition().offset(0, -1, 0)), eff, resultBuilder, log);
 		}
 		
 		protected boolean isTool(@Nullable PlayerEntity player, ItemStack stack) {
@@ -1840,7 +1840,7 @@ public class SpellAction {
 		@Override
 		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			final BlockPos pos = location.selectedBlockPos;
-			if (location.world.isAirBlock(pos))
+			if (location.world.isEmptyBlock(pos))
 				return;
 			
 			if (DimensionUtils.IsSorceryDim(location.world)) {
@@ -1859,7 +1859,7 @@ public class SpellAction {
 			}
 			
 			boolean usePickaxe = (level >= 3);
-			float hardness = state.getBlockHardness(location.world, pos);
+			float hardness = state.getDestroySpeed(location.world, pos);
 			
 			if (hardness >= 100f || hardness < 0f)
 				return;
@@ -1872,9 +1872,9 @@ public class SpellAction {
 				
 				if (usePickaxe) {
 					// Check if they have a pickaxe
-					ItemStack inHand = caster.getHeldItemMainhand();
+					ItemStack inHand = caster.getMainHandItem();
 					if (!isTool((PlayerEntity) caster, inHand)) {
-						inHand = caster.getHeldItemOffhand();
+						inHand = caster.getOffhandItem();
 					}
 					if (!isTool((PlayerEntity) caster, inHand)) {
 						usePickaxe = false;
@@ -1882,7 +1882,7 @@ public class SpellAction {
 				}
 				
 				if (usePickaxe) {
-					((ServerPlayerEntity) caster).interactionManager.tryHarvestBlock(pos);
+					((ServerPlayerEntity) caster).gameMode.destroyBlock(pos);
 				} else {
 					location.world.destroyBlock(pos, true);
 				}
@@ -1921,10 +1921,10 @@ public class SpellAction {
 		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 			if (attr != null && attr.hasSkill(NostrumSkills.Earth_Corrupt)) {
-				entity.addPotionEffect(new EffectInstance(NostrumEffects.lootLuck, (int) (15 * eff) * 20, level-1));
+				entity.addEffect(new EffectInstance(NostrumEffects.lootLuck, (int) (15 * eff) * 20, level-1));
 				resultBuilder.applied = true;
 			} else {
-				apply(caster, new SpellLocation(entity.world, entity.getPosition().add(0, -1, 0)), eff, resultBuilder, log);
+				apply(caster, new SpellLocation(entity.level, entity.blockPosition().offset(0, -1, 0)), eff, resultBuilder, log);
 			}
 		}
 		
@@ -1978,7 +1978,7 @@ public class SpellAction {
 		
 		protected boolean harvestTreeBlock(LivingEntity caster, World world, BlockPos pos, @Nullable ItemStack tool) {
 			if (tool != null) {
-				((ServerPlayerEntity) caster).interactionManager.tryHarvestBlock(pos);
+				((ServerPlayerEntity) caster).gameMode.destroyBlock(pos);
 			} else {
 				world.destroyBlock(pos, true);
 			}
@@ -2026,7 +2026,7 @@ public class SpellAction {
 		@Override
 		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			final BlockPos pos = location.selectedBlockPos;
-			if (location.world.isAirBlock(pos))
+			if (location.world.isEmptyBlock(pos))
 				return;
 			
 			if (DimensionUtils.IsSorceryDim(location.world)) {
@@ -2037,16 +2037,16 @@ public class SpellAction {
 			if (state == null || state.getMaterial().isLiquid())
 				return;
 			
-			float hardness = state.getBlockHardness(location.world, pos);
+			float hardness = state.getDestroySpeed(location.world, pos);
 			
 			if (hardness >= 100f || hardness < 0f)
 				return; // unbreakable?
 			
 			ItemStack tool = null;
 			if (level >= 3 && caster instanceof ServerPlayerEntity) {
-				tool = caster.getHeldItemMainhand();
+				tool = caster.getMainHandItem();
 				if (!isTool((PlayerEntity) caster, tool)) {
-					tool = caster.getHeldItemOffhand();
+					tool = caster.getOffhandItem();
 				}
 				if (!isTool((PlayerEntity) caster, tool)) {
 					tool = null;
@@ -2065,10 +2065,10 @@ public class SpellAction {
 					resultBuilder.applied = true;
 					resultBuilder.affectedPos = new SpellLocation(location.world, pos);
 				}
-			} else if (HarvestUtil.canHarvestCrop(location.world.getBlockState(pos.up()))) {
-				if (harvestCrop(caster, location.world, pos.up(), tool, spread)) {
+			} else if (HarvestUtil.canHarvestCrop(location.world.getBlockState(pos.above()))) {
+				if (harvestCrop(caster, location.world, pos.above(), tool, spread)) {
 					resultBuilder.applied = true;
-					resultBuilder.affectedPos = new SpellLocation(location.world, pos.up());
+					resultBuilder.affectedPos = new SpellLocation(location.world, pos.above());
 				}
 			} else {
 				;
@@ -2105,8 +2105,8 @@ public class SpellAction {
 				log.generalEffectFinish(0f, 0f);
 				
 				if (entity instanceof MobEntity) {
-					((MobEntity) entity).setAttackTarget(null);
-					((MobEntity) entity).setRevengeTarget(null);
+					((MobEntity) entity).setTarget(null);
+					((MobEntity) entity).setLastHurtByMob(null);
 				}
 			}
 		}
@@ -2151,14 +2151,14 @@ public class SpellAction {
 				log.generalEffectFinish(0f, 0f);
 				
 				if (caster != entity) {
-					List<EffectInstance> casterClone = caster.getActivePotionEffects().stream().map(orig -> new EffectInstance(orig.getPotion(), orig.getDuration(), orig.getAmplifier())).collect(Collectors.toList());
-					List<EffectInstance> targetClone = entity.getActivePotionEffects().stream().map(orig -> new EffectInstance(orig.getPotion(), orig.getDuration(), orig.getAmplifier())).collect(Collectors.toList());
+					List<EffectInstance> casterClone = caster.getActiveEffects().stream().map(orig -> new EffectInstance(orig.getEffect(), orig.getDuration(), orig.getAmplifier())).collect(Collectors.toList());
+					List<EffectInstance> targetClone = entity.getActiveEffects().stream().map(orig -> new EffectInstance(orig.getEffect(), orig.getDuration(), orig.getAmplifier())).collect(Collectors.toList());
 					
-					caster.clearActivePotions();
-					entity.clearActivePotions();
+					caster.removeAllEffects();
+					entity.removeAllEffects();
 					
-					casterClone.forEach(inst -> entity.addPotionEffect(inst));
-					targetClone.forEach(inst -> caster.addPotionEffect(inst));
+					casterClone.forEach(inst -> entity.addEffect(inst));
+					targetClone.forEach(inst -> caster.addEffect(inst));
 				}
 			}
 		}
@@ -2203,10 +2203,10 @@ public class SpellAction {
 				
 				int left = this.pieces;
 				for (EquipmentSlotType slot : slots) {
-					ItemStack held = entity.getItemStackFromSlot(slot);
+					ItemStack held = entity.getItemBySlot(slot);
 					if (!held.isEmpty()) {
-						entity.entityDropItem(held);
-						entity.setItemStackToSlot(slot, ItemStack.EMPTY);
+						entity.spawnAtLocation(held);
+						entity.setItemSlot(slot, ItemStack.EMPTY);
 						left--;
 						
 						if (left <= 0) {
@@ -2256,7 +2256,7 @@ public class SpellAction {
 	 * @return
 	 */
 	public SpellActionResult apply(LivingEntity source, LivingEntity entity, float efficiency, ISpellLogBuilder log) {
-		if (entity.world.isRemote)
+		if (entity.level.isClientSide)
 			return SpellActionResult.FAIL;
 		
 		final LivingEntity ent = entity;
@@ -2268,7 +2268,7 @@ public class SpellAction {
 			for (SpellEffect e : effects) {
 				final SpellEffect effect = e;
 				
-				if (!entity.getServer().isOnExecutionThread()) { // TODO I think?
+				if (!entity.getServer().isSameThread()) { // TODO I think?
 					throw new RuntimeException("Wrong thread for spell effects!");
 				}
 				effect.apply(source, ent, summary.getEfficiency(), result, log);
@@ -2286,13 +2286,13 @@ public class SpellAction {
 	 * @return
 	 */
 	public SpellActionResult apply(LivingEntity source, SpellLocation location, float efficiency, ISpellLogBuilder log) {
-		if (location.world.isRemote)
+		if (location.world.isClientSide)
 			return SpellActionResult.FAIL;
 		SpellActionResult result = new SpellActionResult();
 		for (SpellEffect e : effects) {
 			final SpellEffect effect = e;
 			
-			if (!location.world.getServer().isOnExecutionThread()) {
+			if (!location.world.getServer().isSameThread()) {
 				throw new RuntimeException("Wrong thread for spell effects!");
 			}
 			

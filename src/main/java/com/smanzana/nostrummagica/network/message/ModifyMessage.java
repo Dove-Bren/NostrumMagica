@@ -29,10 +29,10 @@ public class ModifyMessage {
 		ctx.get().setPacketHandled(true);
 		ctx.get().enqueueWork(() -> {
 			PlayerEntity sp = ctx.get().getSender();
-			World world = sp.world;
+			World world = sp.level;
 			
 			// Get the TE
-			TileEntity TE = world.getTileEntity(message.pos);
+			TileEntity TE = world.getBlockEntity(message.pos);
 			if (TE == null) {
 				NostrumMagica.logger.warn("Got modify message that didn't line up with a modification table. This is a bug!");
 				return;

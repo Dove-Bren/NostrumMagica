@@ -169,8 +169,8 @@ public final class Curves {
 		@Override
 		public Vector3d getPosition(float progress) {
 			// X and Z are easy as it's just linear interpolation based on progress.
-			final double x = this.diff.getX() * progress;
-			final double z = this.diff.getZ() * progress;
+			final double x = this.diff.x() * progress;
+			final double z = this.diff.z() * progress;
 			
 			// Y at any time t is  y0 + v0 * t - (1/2) * g * (t^2)
 			final double time = flightTime * progress;

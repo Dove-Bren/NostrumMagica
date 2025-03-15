@@ -84,7 +84,7 @@ public class SpellShapeRenderer {
 		
 		clearOutlines();
 		
-		ItemStack held = player.getHeldItemMainhand();
+		ItemStack held = player.getMainHandItem();
 		if (!held.isEmpty() && held.getItem() instanceof ISpellContainerItem) {
 			Spell spell = ((ISpellContainerItem) held.getItem()).getSpell(held);
 			if (spell != null && spell.supportsPreview()) {
@@ -93,7 +93,7 @@ public class SpellShapeRenderer {
 		}
 		
 		if (preview == null) {
-			held = player.getHeldItemOffhand();
+			held = player.getOffhandItem();
 			if (!held.isEmpty() && held.getItem() instanceof ISpellContainerItem) {
 				Spell spell = ((ISpellContainerItem) held.getItem()).getSpell(held);
 				if (spell != null && spell.supportsPreview()) {
@@ -103,19 +103,19 @@ public class SpellShapeRenderer {
 		}
 		
 		if (preview != null) {
-			IRenderTypeBuffer bufferIn = mc.getRenderTypeBuffers().getBufferSource();
+			IRenderTypeBuffer bufferIn = mc.renderBuffers().bufferSource();
 
-			Vector3d cameraPos = mc.gameRenderer.getActiveRenderInfo().getProjectedView();
+			Vector3d cameraPos = mc.gameRenderer.getMainCamera().getPosition();
 			//Vector3d playerPosOffset = mc.player.getEyePosition(partialTicks).subtract(cameraPos);
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 			//matrixStackIn.translate(-playerPosOffset.x, -playerPosOffset.y, -playerPosOffset.z);
 			for (SpellShapePreviewComponent comp : preview.getComponents()) {
 				renderComponent(matrixStackIn, bufferIn, partialTicks, comp, 1f, 0f, 1f, 1f);
 			}
-			matrixStackIn.pop();
-			mc.getRenderTypeBuffers().getBufferSource().finish();
+			matrixStackIn.popPose();
+			mc.renderBuffers().bufferSource().endBatch();
 		}
 	}
 	

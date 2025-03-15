@@ -33,7 +33,7 @@ public class DelayLoadedMimicBlockTileEntity extends MimicBlockTileEntity implem
 	
 	@Override
 	public void tick() {
-		if (!world.isRemote() && loading && loadingTicks++ % 20 == 19) {
+		if (!level.isClientSide() && loading && loadingTicks++ % 20 == 19) {
 			// Attempt to load again
 			updateBlock();
 			if (successfullyLoaded()) {

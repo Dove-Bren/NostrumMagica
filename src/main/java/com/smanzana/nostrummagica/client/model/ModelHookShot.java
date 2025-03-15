@@ -20,12 +20,12 @@ public class ModelHookShot extends EntityModel<HookShotEntity> {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		main.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
 	
 	@Override
-	public void setRotationAngles(HookShotEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setupAnim(HookShotEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {
 		
 	}

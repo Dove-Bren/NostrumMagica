@@ -51,25 +51,25 @@ public class MysticSpellTableTileEntity extends BasicSpellTableTileEntity {
 	}
 	
 	@Override
-	public int getSizeInventory() {
+	public int getContainerSize() {
 		return getRuneSlotCount() + 1;
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
+	public boolean stillValid(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		return nbt;
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 	}
 	
 	@Override

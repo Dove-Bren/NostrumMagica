@@ -6,7 +6,7 @@ import net.minecraft.client.audio.ISound;
 public class SoundUtil {
 
 	public static final void stopSound(ISound sound) {
-		Minecraft.getInstance().getSoundHandler().stop(sound);
+		Minecraft.getInstance().getSoundManager().stop(sound);
 		
 		// TODO is this still real?
 		
@@ -14,7 +14,7 @@ public class SoundUtil {
 //		// you crash. Remove from the internal playing map, too.
 //		try {
 //			SoundManager handler_sndManager =
-//					ObfuscationReflectionHelper.getPrivateValue(SoundHandler.class, Minecraft.getInstance().getSoundHandler(), "field_147694_f");
+//					ObfuscationReflectionHelper.getPrivateValue(SoundHandler.class, Minecraft.getInstance().getSoundHandler(), "soundEngine");
 //			Map<String, ISound> manager_playingSounds = 
 //				ObfuscationReflectionHelper.getPrivateValue(SoundManager.class, handler_sndManager, "field_148629_h"); //"playingSounds");
 //			

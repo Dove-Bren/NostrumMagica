@@ -16,21 +16,21 @@ public final class RedDragonBodyPartTypeSerializer implements IDataSerializer<Dr
 	
 	@Override
 	public void write(PacketBuffer buf, DragonBodyPartType value) {
-		buf.writeEnumValue(value);
+		buf.writeEnum(value);
 	}
 
 	@Override
 	public DragonBodyPartType read(PacketBuffer buf)  {
-		return buf.readEnumValue(DragonBodyPartType.class);
+		return buf.readEnum(DragonBodyPartType.class);
 	}
 
 	@Override
-	public DataParameter<DragonBodyPartType> createKey(int id) {
+	public DataParameter<DragonBodyPartType> createAccessor(int id) {
 		return new DataParameter<>(id, this);
 	}
 
 	@Override
-	public DragonBodyPartType copyValue(DragonBodyPartType value) {
+	public DragonBodyPartType copy(DragonBodyPartType value) {
 		return value;
 	}
 }

@@ -29,11 +29,11 @@ public class OutcomeCreateTome implements IRitualOutcome {
 		
 		// If there's an altar, we'll enchant the item there
 		// Otherwise enchant the item the player has
-		AltarTileEntity altar = (AltarTileEntity) world.getTileEntity(center);
+		AltarTileEntity altar = (AltarTileEntity) world.getBlockEntity(center);
 		if (recipe.getTier() == 0) {
 			// give to player
 			
-			player.inventory.addItemStackToInventory(tome);
+			player.inventory.add(tome);
 		} else {
 			altar.setItem(tome);
 		}

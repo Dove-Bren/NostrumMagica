@@ -54,26 +54,26 @@ public class ObeliskBlock extends Block {
 	public static final int TILE_OFFSETH = 3; // horizontal distance between master and pillars
 	public static final int TILE_HEIGHT = 4; // Total height of corner pillars
 	
-	private static final VoxelShape TILE_SHAPE = Block.makeCuboidShape(4.8D, 4.8D, 4.8D, 11.2D, 11.2D, 11.2D);
+	private static final VoxelShape TILE_SHAPE = Block.box(4.8D, 4.8D, 4.8D, 11.2D, 11.2D, 11.2D);
 	
 	public static final String ID = "nostrum_obelisk";
 	
 	public ObeliskBlock() {
-		super(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(2f, 10f)
+		super(Block.Properties.of(Material.STONE)
+				.strength(2f, 10f)
 				.sound(SoundType.STONE)
 				.harvestTool(ToolType.PICKAXE)
 				.harvestLevel(2)
 				.noDrops()
 				);
 		
-		this.setDefaultState(this.stateContainer.getBaseState()
-				.with(MASTER, false)
-				.with(TILE, false));
+		this.registerDefaultState(this.stateDefinition.any()
+				.setValue(MASTER, false)
+				.setValue(TILE, false));
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return false;
     }
 	
@@ -81,20 +81,20 @@ public class ObeliskBlock extends Block {
 	public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
 		if (state == null)
 			return 0;
-		if (!state.get(TILE))
+		if (!state.getValue(TILE))
 			return 0;
 		
-		if (!state.get(MASTER))
+		if (!state.getValue(MASTER))
 			return 8;
 		
 		return 12;
 	}
 	
 	@Override
-	public int getOpacity(BlockState state, IBlockReader world, BlockPos pos) {
+	public int getLightBlock(BlockState state, IBlockReader world, BlockPos pos) {
 		if (state == null)
 			return 15;
-		if (!state.get(TILE))
+		if (!state.getValue(TILE))
 			return 15;
 		
 		return 0;
@@ -102,10 +102,10 @@ public class ObeliskBlock extends Block {
 	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader source, BlockPos pos, ISelectionContext context) {
-		if (state.get(TILE) && !state.get(MASTER)) {
+		if (state.getValue(TILE) && !state.getValue(MASTER)) {
 			return TILE_SHAPE;
 		} else {
-			return VoxelShapes.fullCube();
+			return VoxelShapes.block();
 		}
 	}
 	
@@ -125,17 +125,17 @@ public class ObeliskBlock extends Block {
 //	}
 	
 	@Override
-	public boolean isReplaceable(BlockState state, BlockItemUseContext context) {
+	public boolean canBeReplaced(BlockState state, BlockItemUseContext context) {
         return false;
     }
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(MASTER, TILE);
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
-		if (world.isRemote)
+		if (world.isClientSide)
 			return;
 		
 		if (state == null)
@@ -147,8 +147,8 @@ public class ObeliskBlock extends Block {
 		// If we're a tile, get TE and call destroy
 		// Else, search up and down to find a tile
 		// If none are found, exit; we'll be destroyed
-		if (state.get(TILE)) {
-			TileEntity ent = world.getTileEntity(pos);
+		if (state.getValue(TILE)) {
+			TileEntity ent = world.getBlockEntity(pos);
 			if (ent == null || !(ent instanceof ObeliskTileEntity))
 				return;
 			
@@ -163,8 +163,8 @@ public class ObeliskBlock extends Block {
 			// (tile = 0, master = 1 for example)
 			// just cause this is rarely called and it's not THAT many checks
 			for (int i = -(TILE_HEIGHT - 1); i < TILE_HEIGHT; i++) {
-				BlockPos bp = pos.add(0, i, 0);
-				TileEntity ent = world.getTileEntity(bp);
+				BlockPos bp = pos.offset(0, i, 0);
+				TileEntity ent = world.getBlockEntity(bp);
 				if (ent == null || !(ent instanceof ObeliskTileEntity))
 					continue;
 				
@@ -178,23 +178,23 @@ public class ObeliskBlock extends Block {
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
 	public static boolean blockIsMaster(BlockState state) {
-		return state.get(TILE) && state.get(MASTER);
+		return state.getValue(TILE) && state.getValue(MASTER);
 	}
 	
 	public BlockState getMasterState() {
-		return this.getDefaultState().with(MASTER, true)
-				.with(TILE, true);
+		return this.defaultBlockState().setValue(MASTER, true)
+				.setValue(TILE, true);
 	}
 
 
 	public BlockState getTileState() {
-		return this.getDefaultState().with(MASTER, false)
-				.with(TILE, true);
+		return this.defaultBlockState().setValue(MASTER, false)
+				.setValue(TILE, true);
 	}
 	
 	@Override
@@ -204,17 +204,17 @@ public class ObeliskBlock extends Block {
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		if (state.get(TILE))
-			return new ObeliskTileEntity(state.get(MASTER));
+		if (state.getValue(TILE))
+			return new ObeliskTileEntity(state.getValue(MASTER));
 		
 		return null;
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			destroy(world, pos, state);
-			world.removeTileEntity(pos);
+			world.removeBlockEntity(pos);
 		}
 	}
 	
@@ -227,22 +227,22 @@ public class ObeliskBlock extends Block {
 //	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		
-		if (state.get(MASTER) == false) {
+		if (state.getValue(MASTER) == false) {
 			return ActionResultType.PASS;
 		}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (!ModConfig.config.obeliskReqMagic() && (attr == null || !attr.isUnlocked())) {
-			if (worldIn.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.obelisk.nomagic"), Util.DUMMY_UUID);
+			if (worldIn.isClientSide) {
+				player.sendMessage(new TranslationTextComponent("info.obelisk.nomagic"), Util.NIL_UUID);
 			}
 			return ActionResultType.SUCCESS;
 		}
 		
-		if (!worldIn.isRemote()) {
-			worldIn.notifyBlockUpdate(pos, state, state, 2);
+		if (!worldIn.isClientSide()) {
+			worldIn.sendBlockUpdated(pos, state, state, 2);
 		} else {
 			NostrumMagica.instance.proxy.openObeliskScreen(worldIn, pos);
 		}
@@ -255,11 +255,11 @@ public class ObeliskBlock extends Block {
 	
 	public static boolean canSpawnObelisk(World world, BlockPos center) {
 		BlockState state = world.getBlockState(center);
-		if (state == null || state.getBlockHardness(world, center) > 2.0f)
+		if (state == null || state.getDestroySpeed(world, center) > 2.0f)
 			return false;
 		
 		for (int i = 0; i < xs.length; i++) {
-			if (!checkPillar(world, center.add(xs[i], 1, zs[i])))
+			if (!checkPillar(world, center.offset(xs[i], 1, zs[i])))
 				return false;
 		}
 		
@@ -272,30 +272,30 @@ public class ObeliskBlock extends Block {
 		}
 		
 		for (int i = 0; i < xs.length; i++) {
-			spawnPillar(world, center.add(xs[i], 1, zs[i]), corners[i]);
+			spawnPillar(world, center.offset(xs[i], 1, zs[i]), corners[i]);
 		}
 		for (int i = -TILE_OFFSETH; i <= TILE_OFFSETH; i++)
 			for (int j = -TILE_OFFSETH; j <= TILE_OFFSETH; j++) {
-				world.setBlockState(center.add(i, 0, j), Blocks.OBSIDIAN.getDefaultState());
+				world.setBlockAndUpdate(center.offset(i, 0, j), Blocks.OBSIDIAN.defaultBlockState());
 			}
 		for (int i = -1; i <= 1; i++) {
 			int offset = (TILE_OFFSETH + 1);
-			world.setBlockState(center.add(i, 0, offset), Blocks.OBSIDIAN.getDefaultState());
-			world.setBlockState(center.add(i, 0, -offset), Blocks.OBSIDIAN.getDefaultState());
-			world.setBlockState(center.add(offset, 0, i), Blocks.OBSIDIAN.getDefaultState());
-			world.setBlockState(center.add(-offset, 0, i), Blocks.OBSIDIAN.getDefaultState());
+			world.setBlockAndUpdate(center.offset(i, 0, offset), Blocks.OBSIDIAN.defaultBlockState());
+			world.setBlockAndUpdate(center.offset(i, 0, -offset), Blocks.OBSIDIAN.defaultBlockState());
+			world.setBlockAndUpdate(center.offset(offset, 0, i), Blocks.OBSIDIAN.defaultBlockState());
+			world.setBlockAndUpdate(center.offset(-offset, 0, i), Blocks.OBSIDIAN.defaultBlockState());
 		}
-		world.setBlockState(center, NostrumBlocks.obelisk.getMasterState());
-		world.setTileEntity(center, new ObeliskTileEntity(true));
+		world.setBlockAndUpdate(center, NostrumBlocks.obelisk.getMasterState());
+		world.setBlockEntity(center, new ObeliskTileEntity(true));
 		
-		((ObeliskTileEntity) world.getTileEntity(center)).init();
+		((ObeliskTileEntity) world.getBlockEntity(center)).init();
 		
 		return true;
 	}
 	
 	private static boolean checkPillar(World world, BlockPos center) {
 		for (int i = 0; i < TILE_HEIGHT; i++) {
-			if (!world.isAirBlock(center.add(0, i, 0)))
+			if (!world.isEmptyBlock(center.offset(0, i, 0)))
 				return false;
 		}
 		
@@ -304,12 +304,12 @@ public class ObeliskBlock extends Block {
 
 	private static void spawnPillar(World world, BlockPos center, Corner corner) {
 		for (int i = 0; i < TILE_HEIGHT; i++) {
-			BlockPos pos = center.add(0, i, 0);
+			BlockPos pos = center.offset(0, i, 0);
 			if (i == TILE_OFFSETY - 1) {
-				world.setBlockState(pos, NostrumBlocks.obelisk.getTileState());
-				world.setTileEntity(pos, new ObeliskTileEntity(corner));
+				world.setBlockAndUpdate(pos, NostrumBlocks.obelisk.getTileState());
+				world.setBlockEntity(pos, new ObeliskTileEntity(corner));
 			} else {
-				world.setBlockState(pos, NostrumBlocks.obelisk.getDefaultState());
+				world.setBlockAndUpdate(pos, NostrumBlocks.obelisk.defaultBlockState());
 			}
 		}
 	}

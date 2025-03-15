@@ -29,23 +29,23 @@ public class TileEntityTrialRenderer extends TileEntityRenderer<TrialBlockTileEn
 		EMagicElement element = tileEntityIn.getElement();
 		SpellComponentIcon icon = SpellComponentIcon.get(element);
 		ResourceLocation textLoc = icon.getModelLocation();
-		float rot = 2.0f * (float)((double) tileEntityIn.getWorld().getGameTime() / 2.5);
+		float rot = 2.0f * (float)((double) tileEntityIn.getLevel().getGameTime() / 2.5);
 		float scale = tileEntityIn.getScale();
 		
 		// Before this was disabling lighting...
-		final IVertexBuilder buffer = bufferIn.getBuffer(RenderType.getEntityCutoutNoCull(textLoc));
+		final IVertexBuilder buffer = bufferIn.getBuffer(RenderType.entityCutoutNoCull(textLoc));
 		
 		// Recompute lighting for block above
-		combinedLightIn = WorldRenderer.getCombinedLight(tileEntityIn.getWorld(), tileEntityIn.getPos().up());
+		combinedLightIn = WorldRenderer.getLightColor(tileEntityIn.getLevel(), tileEntityIn.getBlockPos().above());
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(.5, 1.25, .5);
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rot));
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(rot));
 		matrixStackIn.scale(scale, scale, scale);
 		matrixStackIn.translate(0, .5, 0); // x: [-.5, .5] y: [0, 1]
 		RenderFuncs.renderSpaceQuad(matrixStackIn, buffer, .5f, combinedLightIn, combinedOverlayIn, 1f, 1f, 1f, 1f);
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(90f));
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(90f));
 		RenderFuncs.renderSpaceQuad(matrixStackIn, buffer, .5f, combinedLightIn, combinedOverlayIn, 1f, 1f, 1f, 1f);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 }

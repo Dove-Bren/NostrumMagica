@@ -71,7 +71,7 @@ public class SpellLocation {
 	}
 	
 	public SpellLocation(World world, BlockPos isolatedBlockPos) {
-		this(world, Vector3d.copyCentered(isolatedBlockPos), isolatedBlockPos);
+		this(world, Vector3d.atCenterOf(isolatedBlockPos), isolatedBlockPos);
 	}
 	
 	public SpellLocation(World world, Vector3d isolatedPos) {
@@ -80,11 +80,11 @@ public class SpellLocation {
 	
 	@OnlyIn(Dist.CLIENT)
 	public SpellLocation(LivingEntity entity, float partialTicks) {
-		this(entity.getEntityWorld(), entity.func_242282_l(partialTicks), new BlockPos(entity.func_242282_l(partialTicks)), entity.getEyePosition(partialTicks));
+		this(entity.getCommandSenderWorld(), entity.getPosition(partialTicks), new BlockPos(entity.getPosition(partialTicks)), entity.getEyePosition(partialTicks));
 	}
 	
 	public SpellLocation(LivingEntity entity) {
-		this(entity.getEntityWorld(), entity.getPositionVec(), new BlockPos(entity.getPositionVec()), entity.getPositionVec().add(0, entity.getEyeHeight(), 0));
+		this(entity.getCommandSenderWorld(), entity.position(), new BlockPos(entity.position()), entity.position().add(0, entity.getEyeHeight(), 0));
 	}
 	
 	
@@ -96,7 +96,7 @@ public class SpellLocation {
 	 * @return
 	 */
 	protected static final BlockPos GetHitPos(Vector3d hitVec, BlockPos selectedPos) {
-		final Vector3d diff = hitVec.subtract(Vector3d.copyCentered(selectedPos));
+		final Vector3d diff = hitVec.subtract(Vector3d.atCenterOf(selectedPos));
 		return new BlockPos(
 				hitVec.add(diff.normalize().scale(.05))
 				);
@@ -104,10 +104,10 @@ public class SpellLocation {
 	
 	public SpellLocation(World world, BlockRayTraceResult rayTrace) {
 		this(world,
-			rayTrace.getHitVec(),
-			GetHitPos(rayTrace.getHitVec(), rayTrace.getPos()),
-			rayTrace.getPos(),
-			Vector3d.copyCentered(rayTrace.getPos())
+			rayTrace.getLocation(),
+			GetHitPos(rayTrace.getLocation(), rayTrace.getBlockPos()),
+			rayTrace.getBlockPos(),
+			Vector3d.atCenterOf(rayTrace.getBlockPos())
 		);
 	}
 	

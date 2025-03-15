@@ -16,21 +16,21 @@ public final class ArcaneWolfElementalTypeSerializer implements IDataSerializer<
 	
 	@Override
 	public void write(PacketBuffer buf, ArcaneWolfElementalType value) {
-		buf.writeEnumValue(value);
+		buf.writeEnum(value);
 	}
 
 	@Override
 	public ArcaneWolfElementalType read(PacketBuffer buf) {
-		return buf.readEnumValue(ArcaneWolfElementalType.class);
+		return buf.readEnum(ArcaneWolfElementalType.class);
 	}
 
 	@Override
-	public DataParameter<ArcaneWolfElementalType> createKey(int id) {
+	public DataParameter<ArcaneWolfElementalType> createAccessor(int id) {
 		return new DataParameter<>(id, this);
 	}
 
 	@Override
-	public ArcaneWolfElementalType copyValue(ArcaneWolfElementalType value) {
+	public ArcaneWolfElementalType copy(ArcaneWolfElementalType value) {
 		return value;
 	}
 }

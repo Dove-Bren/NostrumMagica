@@ -43,7 +43,7 @@ public abstract class EquipmentSet extends ForgeRegistryEntry<EquipmentSet> {
 		if (setCount == this.getFullSetCount()) {
 			final String extraKey = "set." + this.getRegistryName().getNamespace() + "."
 					+ this.getRegistryName().getPath() + ".extra";
-			if (I18n.hasKey(extraKey)) {
+			if (I18n.exists(extraKey)) {
 				return TextUtils.GetTranslatedList(extraKey);
 			}
 		}

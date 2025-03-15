@@ -98,11 +98,11 @@ public enum NostrumMagicaSounds {
 	}
 	
 	public void play(Entity at) {
-		play(null, at.world, at.getPositionVec());
+		play(null, at.level, at.position());
 	}
 	
 	public void play(PlayerEntity at) {
-		play(at, at.world, at.getPositionVec());
+		play(at, at.level, at.position());
 	}
 	
 	public void play(PlayerEntity player, World world, Vector3d at) {
@@ -118,11 +118,11 @@ public enum NostrumMagicaSounds {
 	}
 	
 	public void playClient(Entity at) {
-		playClient(at.world, at.getPosX(), at.getPosY(), at.getPosZ());
+		playClient(at.level, at.getX(), at.getY(), at.getZ());
 	}
 	
 	public void playClient(World world, double x, double y, double z) {
-		world.playSound(x, y, z, event, category, volume, .8f + (NostrumMagica.rand.nextFloat() * 0.4f), false);
+		world.playLocalSound(x, y, z, event, category, volume, .8f + (NostrumMagica.rand.nextFloat() * 0.4f), false);
 	}
 	
 	public void play(PlayerEntity player, World world, double x, double y, double z) {

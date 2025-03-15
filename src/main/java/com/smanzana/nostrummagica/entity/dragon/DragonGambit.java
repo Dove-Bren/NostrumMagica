@@ -57,11 +57,11 @@ public enum DragonGambit {
 	@OnlyIn(Dist.CLIENT)
 	public List<ITextComponent> getDesc() {
 		if (this.desc == null) {
-			String raw = I18n.format("gambit." + getUnlocName() + ".desc", "" + TextFormatting.DARK_GREEN + TextFormatting.BOLD, TextFormatting.RESET);
+			String raw = I18n.get("gambit." + getUnlocName() + ".desc", "" + TextFormatting.DARK_GREEN + TextFormatting.BOLD, TextFormatting.RESET);
 			String[] lines = raw.split("\\|");
 			
 			this.desc = new ArrayList<>(lines.length + 1);
-			desc.add(new StringTextComponent(getName()).mergeStyle(TextFormatting.BLUE).mergeStyle(TextFormatting.BOLD));
+			desc.add(new StringTextComponent(getName()).withStyle(TextFormatting.BLUE).withStyle(TextFormatting.BOLD));
 			for (String line : lines) {
 				desc.add(new StringTextComponent(line));
 			}
@@ -73,7 +73,7 @@ public enum DragonGambit {
 	@OnlyIn(Dist.CLIENT)
 	public String getName() {
 		if (this.transName == null) {
-			this.transName = I18n.format("gambit." + getUnlocName() + ".name");
+			this.transName = I18n.get("gambit." + getUnlocName() + ".name");
 		}
 		
 		return this.transName;

@@ -44,14 +44,14 @@ public class WorldKeyItem extends Item {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		String keyName = "No key set";
 		WorldKey key = getKey(stack);
 		if (key != null) {
 			keyName = key.toString();
 		}
 		
-		tooltip.add(new StringTextComponent(keyName).mergeStyle(TextFormatting.GREEN));
+		tooltip.add(new StringTextComponent(keyName).withStyle(TextFormatting.GREEN));
 	}
 	
 	public WorldKey getKey(ItemStack stack) {
@@ -88,32 +88,32 @@ public class WorldKeyItem extends Item {
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		final World worldIn = context.getWorld();
-		final BlockPos pos = context.getPos();
+	public ActionResultType useOn(ItemUseContext context) {
+		final World worldIn = context.getLevel();
+		final BlockPos pos = context.getClickedPos();
 		final PlayerEntity playerIn = context.getPlayer();
-		final @Nonnull ItemStack stack = context.getItem();
+		final @Nonnull ItemStack stack = context.getItemInHand();
 		
-		if (worldIn.isRemote)
+		if (worldIn.isClientSide)
 			return ActionResultType.SUCCESS;
 		
 		if (pos == null)
 			return ActionResultType.PASS;
 		
-		TileEntity te = worldIn.getTileEntity(pos);
+		TileEntity te = worldIn.getBlockEntity(pos);
 		if (te instanceof IWorldKeyHolder) {
 			IWorldKeyHolder holder = (IWorldKeyHolder) te;
-			if (playerIn.isSneaking()) {
+			if (playerIn.isShiftKeyDown()) {
 				WorldKey key = getKey(stack);
 				holder.setWorldKey(key);
-				playerIn.sendMessage(new StringTextComponent("Set object's key to " + key.toString().substring(0, 8)), Util.DUMMY_UUID);
+				playerIn.sendMessage(new StringTextComponent("Set object's key to " + key.toString().substring(0, 8)), Util.NIL_UUID);
 			} else {
 				if (holder.hasWorldKey()) {
 					WorldKey key = holder.getWorldKey();
 					setKey(stack, key);
-					playerIn.sendMessage(new StringTextComponent("Remembered key " + key.toString().substring(0, 8)), Util.DUMMY_UUID);
+					playerIn.sendMessage(new StringTextComponent("Remembered key " + key.toString().substring(0, 8)), Util.NIL_UUID);
 				} else {
-					playerIn.sendMessage(new StringTextComponent("No key to take"), Util.DUMMY_UUID);
+					playerIn.sendMessage(new StringTextComponent("No key to take"), Util.NIL_UUID);
 				}
 			}
 			return ActionResultType.SUCCESS;
@@ -123,9 +123,9 @@ public class WorldKeyItem extends Item {
 			// Convert chests to locked chests
 			final WorldKey key = this.getKey(stack);
 			if (!LockedChestTileEntity.LockChest(worldIn, pos, key)) {
-				playerIn.sendMessage(new StringTextComponent("Failed to lock chest"), Util.DUMMY_UUID);
+				playerIn.sendMessage(new StringTextComponent("Failed to lock chest"), Util.NIL_UUID);
 			} else {
-				playerIn.sendMessage(new StringTextComponent("Locked chest with key " + key.toString().substring(0, 8)), Util.DUMMY_UUID); 
+				playerIn.sendMessage(new StringTextComponent("Locked chest with key " + key.toString().substring(0, 8)), Util.NIL_UUID); 
 			}
 		}
 		
@@ -133,13 +133,13 @@ public class WorldKeyItem extends Item {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		final @Nonnull ItemStack itemStackIn = playerIn.getItemInHand(hand);
 		
-		if (!worldIn.isRemote() && playerIn.isSneaking()) {
+		if (!worldIn.isClientSide() && playerIn.isShiftKeyDown()) {
 			clearKey(itemStackIn);
 			final WorldKey key = this.getKey(itemStackIn);
-			playerIn.sendMessage(new StringTextComponent("Generated new key " + key.toString().substring(0, 8)), Util.DUMMY_UUID);
+			playerIn.sendMessage(new StringTextComponent("Generated new key " + key.toString().substring(0, 8)), Util.NIL_UUID);
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		}
 		

@@ -34,6 +34,6 @@ public class QuestRequirement implements IRequirement{
 	@Override
 	public List<ITextComponent> getDescription(PlayerEntity player) {
 		return Lists.newArrayList(new TranslationTextComponent("info.requirement.quest", 
-				new TranslationTextComponent("quest." + questKey + ".name").mergeStyle(TextFormatting.BLUE)));
+				new TranslationTextComponent("quest." + questKey + ".name").withStyle(TextFormatting.BLUE)));
 	}
 }

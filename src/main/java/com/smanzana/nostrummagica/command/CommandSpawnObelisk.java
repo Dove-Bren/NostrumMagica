@@ -15,17 +15,17 @@ public class CommandSpawnObelisk {
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
 				Commands.literal("spawnobelisk")
-					.requires(s -> s.hasPermissionLevel(2))
+					.requires(s -> s.hasPermission(2))
 					.executes(ctx -> execute(ctx))
 				);
 	}
 
 	private static final int execute(CommandContext<CommandSource> context) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().asPlayer();
+		ServerPlayerEntity player = context.getSource().getPlayerOrException();
 		
-		if (!ObeliskBlock.spawnObelisk(player.world,
-				player.getPosition().add(0, -1, 0))) {
-			context.getSource().sendFeedback(new StringTextComponent("Not enough space to spawn an obelisk"), true);
+		if (!ObeliskBlock.spawnObelisk(player.level,
+				player.blockPosition().offset(0, -1, 0))) {
+			context.getSource().sendSuccess(new StringTextComponent("Not enough space to spawn an obelisk"), true);
 			return 1;
 		}
 		

@@ -93,7 +93,7 @@ public class ItemSetListener {
 	protected static final boolean ScanEntityEquipment(LivingEntity entity, BiFunction<IInventorySlotKey<? extends LivingEntity>, ItemStack, Boolean> action) {
 		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
 			EquipmentSlotKey key = new EquipmentSlotKey(slot);
-			if (!action.apply(key, entity.getItemStackFromSlot(slot))) {
+			if (!action.apply(key, entity.getItemBySlot(slot))) {
 				return false;
 			}
 		}
@@ -129,7 +129,7 @@ public class ItemSetListener {
 	protected boolean entityChangedEquipment(LivingEntity entity) {
 		EquipmentState lastTickState = getLastTickState(entity);
 		
-		if (!ScanEntityEquipment(entity, (slot, stack) -> ItemStack.areItemStacksEqual(lastTickState.equipment.getOrDefault(slot, ItemStack.EMPTY), stack))) {
+		if (!ScanEntityEquipment(entity, (slot, stack) -> ItemStack.matches(lastTickState.equipment.getOrDefault(slot, ItemStack.EMPTY), stack))) {
 			return true;
 		}
 		
@@ -139,13 +139,13 @@ public class ItemSetListener {
 	protected void onEntityEquipChange(LivingEntity entity) {
 		EquipmentState state = getLastTickState(entity);
 		// Remove old
-		entity.getAttributeManager().removeModifiers(state.attributes);
+		entity.getAttributes().removeAttributeModifiers(state.attributes);
 		
 		// Calculate new
 		state.setFrom(entity);
 		
 		// Apply new
-		entity.getAttributeManager().reapplyModifiers(state.attributes);
+		entity.getAttributes().addTransientAttributeModifiers(state.attributes);
 	}
 	
 	protected void onEntitySetTick(LivingEntity entity, EquipmentSet set, Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> setPieces) {
@@ -183,13 +183,13 @@ public class ItemSetListener {
 	@SubscribeEvent
 	public void ServerWorldTick(ServerTickEvent event) {
 		if (event.phase == TickEvent.Phase.END) {
-			for (ServerWorld world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getWorlds()) {
+			for (ServerWorld world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getAllLevels()) {
 				world.getEntities().forEach((ent) -> {
 					if (ent instanceof LivingEntity) {
 						LivingEntity living = (LivingEntity) ent;
 						updateEntity(living);
 		
-						if (living.isElytraFlying() && living.isSneaking() && living instanceof ServerPlayerEntity) {
+						if (living.isFallFlying() && living.isShiftKeyDown() && living instanceof ServerPlayerEntity) {
 							((ServerPlayerEntity) living).stopFallFlying();
 						}
 					}
@@ -203,13 +203,13 @@ public class ItemSetListener {
 		if (event.phase == TickEvent.Phase.END
 				&& !NostrumMagica.instance.proxy.hasIntegratedServer()
 				&& NostrumMagica.instance.proxy.getPlayer() != null
-				&& NostrumMagica.instance.proxy.getPlayer().world != null) {
-			((ClientWorld) NostrumMagica.instance.proxy.getPlayer().world).getAllEntities().forEach((ent) -> {
+				&& NostrumMagica.instance.proxy.getPlayer().level != null) {
+			((ClientWorld) NostrumMagica.instance.proxy.getPlayer().level).entitiesForRendering().forEach((ent) -> {
 				if (ent instanceof LivingEntity) {
 					LivingEntity living = (LivingEntity) ent;
 					updateEntity(living);
 	
-					if (living.isElytraFlying() && living.isSneaking() && living instanceof ServerPlayerEntity) {
+					if (living.isFallFlying() && living.isShiftKeyDown() && living instanceof ServerPlayerEntity) {
 						((ServerPlayerEntity) living).stopFallFlying();
 					}
 				}

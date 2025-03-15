@@ -21,26 +21,26 @@ public class OptionalParticleDataSerializer implements IDataSerializer<Optional<
 	public void write(PacketBuffer buf, Optional<IParticleData> value) {
 		buf.writeBoolean(value.isPresent());
 		if (value.isPresent()) {
-			DataSerializers.PARTICLE_DATA.write(buf, value.get());
+			DataSerializers.PARTICLE.write(buf, value.get());
 		}
 	}
 
 	@Override
 	public Optional<IParticleData> read(PacketBuffer buf)  {
 		if (buf.readBoolean()) {
-			return Optional.of(DataSerializers.PARTICLE_DATA.read(buf));
+			return Optional.of(DataSerializers.PARTICLE.read(buf));
 		} else {
 			return Optional.empty();
 		}
 	}
 
 	@Override
-	public DataParameter<Optional<IParticleData>> createKey(int id) {
+	public DataParameter<Optional<IParticleData>> createAccessor(int id) {
 		return new DataParameter<>(id, this);
 	}
 
 	@Override
-	public Optional<IParticleData> copyValue(Optional<IParticleData> value) {
+	public Optional<IParticleData> copy(Optional<IParticleData> value) {
 		return Optional.ofNullable(value.orElse(null));
 	}
 }

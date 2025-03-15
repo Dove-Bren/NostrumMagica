@@ -30,7 +30,7 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreS
 	public static final String ID = "entity_shadow_dragon_red";
 
 	private static final DataParameter<Boolean> HASTARGET =
-			EntityDataManager.<Boolean>createKey(RedDragonEntity.class, DataSerializers.BOOLEAN);
+			EntityDataManager.<Boolean>defineId(RedDragonEntity.class, DataSerializers.BOOLEAN);
 	private static final String DRAGON_SERIAL_HASTARGET_TOK = "DragonShadowTarget";
 	
 	private LivingEntity target;
@@ -39,19 +39,19 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreS
 	public ShadowRedDragonEntity(EntityType<? extends ShadowRedDragonEntity> type, World worldIn) {
 		super(type, worldIn);
 		
-        this.stepHeight = 2;
+        this.maxUpStep = 2;
         this.targetInitted = false;
 	}
 	
 	public ShadowRedDragonEntity(EntityType<? extends ShadowRedDragonEntity> type, World worldIn, LivingEntity target) {
 		this(type, worldIn);
 		this.target = target;
-		this.dataManager.set(HASTARGET, true);
+		this.entityData.set(HASTARGET, true);
 	}
 	
-	protected void registerData() {
-		super.registerData();
-		this.dataManager.register(HASTARGET, false);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(HASTARGET, false);
 	}
 	
 	private void setTargetTasks() {
@@ -59,7 +59,7 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreS
 			if (this.target != null) {
 				this.targetSelector.addGoal(1, new DragonFocusedTargetGoal<LivingEntity>(this, this.target, true));
 			} else {
-				this.targetSelector.addGoal(1, new HurtByTargetGoal(this).setCallsForHelp(ShadowRedDragonEntity.class));
+				this.targetSelector.addGoal(1, new HurtByTargetGoal(this).setAlertOthers(ShadowRedDragonEntity.class));
 				this.targetSelector.addGoal(2, new DragonNearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, true));
 			}
 			targetInitted = true;
@@ -137,16 +137,16 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreS
 
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		return RedDragonBaseEntity.BuildBaseRedDragonAttributes()
-	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.33D)
-	        .createMutableAttribute(Attributes.MAX_HEALTH, 50.0D)
-	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 5.0D)
-	        .createMutableAttribute(Attributes.ARMOR, 8.0D)
-	        .createMutableAttribute(Attributes.ATTACK_SPEED, 0.5D)
-	        .createMutableAttribute(Attributes.FOLLOW_RANGE, 64D);
+	        .add(Attributes.MOVEMENT_SPEED, 0.33D)
+	        .add(Attributes.MAX_HEALTH, 50.0D)
+	        .add(Attributes.ATTACK_DAMAGE, 5.0D)
+	        .add(Attributes.ARMOR, 8.0D)
+	        .add(Attributes.ATTACK_SPEED, 0.5D)
+	        .add(Attributes.FOLLOW_RANGE, 64D);
     }
 	
 	@Override
-	public boolean canDespawn(double nearestPlayer) {
+	public boolean removeWhenFarAway(double nearestPlayer) {
 		return true;
 	}
 	
@@ -157,27 +157,27 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreS
 		
 		if (this.target != null) {
 			if (!this.target.isAlive()) {
-				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(Attributes.MAX_HEALTH).getValue());
+				this.hurt(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(Attributes.MAX_HEALTH).getValue());
 			}
 		} else {
 			// If target is null but we're a target-type, DIE
-			if (this.dataManager.get(HASTARGET)) {
-				this.attackEntityFrom(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(Attributes.MAX_HEALTH).getValue());
+			if (this.entityData.get(HASTARGET)) {
+				this.hurt(DamageSource.OUT_OF_WORLD, (float) this.getAttribute(Attributes.MAX_HEALTH).getValue());
 			}
 		}
 	}
 	
-	public void readAdditional(CompoundNBT compound) {
-		super.readAdditional(compound);
+	public void readAdditionalSaveData(CompoundNBT compound) {
+		super.readAdditionalSaveData(compound);
 
 		if (compound.contains(DRAGON_SERIAL_HASTARGET_TOK, NBT.TAG_ANY_NUMERIC)) {
-        	this.dataManager.set(HASTARGET, compound.getBoolean(DRAGON_SERIAL_HASTARGET_TOK));
+        	this.entityData.set(HASTARGET, compound.getBoolean(DRAGON_SERIAL_HASTARGET_TOK));
         }
 	}
 	
-	public void writeAdditional(CompoundNBT compound) {
-    	super.writeAdditional(compound);
-    	compound.putBoolean(DRAGON_SERIAL_HASTARGET_TOK, this.dataManager.get(HASTARGET));
+	public void addAdditionalSaveData(CompoundNBT compound) {
+    	super.addAdditionalSaveData(compound);
+    	compound.putBoolean(DRAGON_SERIAL_HASTARGET_TOK, this.entityData.get(HASTARGET));
 	}
 
 }

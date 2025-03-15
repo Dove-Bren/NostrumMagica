@@ -19,22 +19,22 @@ public class RenderKoid extends MobRenderer<KoidEntity, ModelRenderShiv<KoidEnti
 	
 	private static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "entity/koid");
 	
-	protected ModelBaked<KoidEntity> model;
+	protected ModelBaked<KoidEntity> modelBase;
 
 	public RenderKoid(EntityRendererManager renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelRenderShiv<>(), shadowSizeIn);
-		this.model = new ModelBaked<>(MODEL);
+		this.modelBase = new ModelBaked<>(MODEL);
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public ResourceLocation getEntityTexture(KoidEntity entity) {
-		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
+	public ResourceLocation getTextureLocation(KoidEntity entity) {
+		return AtlasTexture.LOCATION_BLOCKS;
 	}
 	
 	@Override
 	public void render(KoidEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		this.entityModel.setPayload((deferredStack, deferredBufferIn, deferredPackedLightIn, packedOverlayIn, red, green, blue, alpha) -> {
+		this.model.setPayload((deferredStack, deferredBufferIn, deferredPackedLightIn, packedOverlayIn, red, green, blue, alpha) -> {
 			// Could pass through bufferIn to allow access to different buffer types, but only need the base one
 			this.renderModel(entityIn, deferredStack, deferredBufferIn, deferredPackedLightIn, packedOverlayIn, red, green, blue, alpha, partialTicks);
 		});
@@ -84,16 +84,16 @@ public class RenderKoid extends MobRenderer<KoidEntity, ModelRenderShiv<KoidEnti
 		blue *= color[2];
 		alpha *= color[3];
 		
-		final float yOffset = entityIn.getHeight();
-		final float rotY = 360f * ((entityIn.ticksExisted + partialTicks) / (20f * 3.0f));
-		final float rotX = 360f * ((entityIn.ticksExisted + partialTicks) / (20f * 10f));
+		final float yOffset = entityIn.getBbHeight();
+		final float rotY = 360f * ((entityIn.tickCount + partialTicks) / (20f * 3.0f));
+		final float rotX = 360f * ((entityIn.tickCount + partialTicks) / (20f * 10f));
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(0, yOffset, 0);
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rotY));
-		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(rotX));
-		model.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		matrixStackIn.pop();
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(rotY));
+		matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(rotX));
+		model.renderToBuffer(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		matrixStackIn.popPose();
 	}
 	
 

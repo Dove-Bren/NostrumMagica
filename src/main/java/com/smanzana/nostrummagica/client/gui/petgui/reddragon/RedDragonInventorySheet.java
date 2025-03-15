@@ -43,8 +43,8 @@ public class RedDragonInventorySheet extends PetInventorySheet<TameRedDragonEnti
 			final int i = slot.ordinal();
 			Slot slotIn = new Slot(dragonEquips, i, leftOffset + offsetX - (cellWidth + 4), dragonTopOffset + offsetY + (cellWidth * i * 2)) {
 				@Override
-				public boolean isItemValid(@Nonnull ItemStack stack) {
-					return dragonEquips.isItemValidForSlot(this.getSlotIndex(), stack);
+				public boolean mayPlace(@Nonnull ItemStack stack) {
+					return dragonEquips.canPlaceItem(this.getSlotIndex(), stack);
 				}
 			};
 			container.addSheetSlot(slotIn);
@@ -56,7 +56,7 @@ public class RedDragonInventorySheet extends PetInventorySheet<TameRedDragonEnti
 		super.draw(matrixStackIn, mc, partialTicks, width, height, mouseX, mouseY);
 		
 		// Draw sheet
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		{
 			final int cellWidth = 18;
 			final int invRow = 9;
@@ -74,13 +74,13 @@ public class RedDragonInventorySheet extends PetInventorySheet<TameRedDragonEnti
 				// NOT IMPLEMENTED TODO
 				
 				final int i = slot.ordinal();
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(leftOffset - 1 - (cellWidth + 4), dragonTopOffset - 1 + (cellWidth * (i * 2)), 0);
 				PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 	}
 

@@ -91,9 +91,9 @@ public abstract class AreaShape extends SpellShape implements ISelectableShape {
 					for (int i = -(int)radiusHint; i <= radiusHint; i++)
 					for (int j = -(int)radiusHint; j <= radiusHint; j++)
 					for (int k = -(int)radiusHint; k <= radiusHint; k++) {
-						cursor.setPos(pos.x + i, pos.y + j, pos.z + k);
+						cursor.set(pos.x + i, pos.y + j, pos.z + k);
 						if (this.isInArea(world, cursor)) {
-							list.add(new SpellLocation(world, cursor.toImmutable()));
+							list.add(new SpellLocation(world, cursor.immutable()));
 						}
 					}
 					TriggerData data = new TriggerData(
@@ -141,9 +141,9 @@ public abstract class AreaShape extends SpellShape implements ISelectableShape {
 			
 			Integer last = affected.get(entity);
 			if (last == null
-					|| (continuous && last + 20 < entity.ticksExisted)
+					|| (continuous && last + 20 < entity.tickCount)
 					) {
-				affected.put(entity, entity.ticksExisted);
+				affected.put(entity, entity.tickCount);
 				return true;
 			}
 			return false;

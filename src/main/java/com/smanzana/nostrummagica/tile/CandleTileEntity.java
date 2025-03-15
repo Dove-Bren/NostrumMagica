@@ -52,8 +52,8 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity,
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.putString(NBT_TYPE, serializeType(type));
 		
@@ -61,8 +61,8 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity,
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_TYPE, NBT.TAG_STRING))
 			return;
@@ -72,23 +72,23 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity,
 	
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
 	private void dirty() {
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		markDirty();
+		level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+		setChanged();
 	}
 	
 	@Override
@@ -98,12 +98,12 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity,
 			this.lifeTicks = Math.max(-1, this.lifeTicks-1);
 		}
 		
-		if (this.lifeTicks == 0 && !world.isRemote) {
-			BlockState state = world.getBlockState(this.pos);
+		if (this.lifeTicks == 0 && !level.isClientSide) {
+			BlockState state = level.getBlockState(this.worldPosition);
 			if (state == null)
 				return;
 			
-			CandleBlock.extinguish(world, this.pos, state, false);
+			CandleBlock.extinguish(level, this.worldPosition, state, false);
 		}
 	}
 	
@@ -113,7 +113,7 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity,
 	}
 	
 	protected boolean isEnhanced() {
-		return CandleBlock.IsCandleEnhanced(getWorld(), getPos());
+		return CandleBlock.IsCandleEnhanced(getLevel(), getBlockPos());
 	}
 
 	@Override

@@ -27,9 +27,9 @@ public class RuneBagToggleMessage {
 		ctx.get().enqueueWork(()-> {
 			ItemStack bag;
 			if (message.isMainHand)
-				bag = sp.getHeldItemMainhand();
+				bag = sp.getMainHandItem();
 			else
-				bag = sp.getHeldItemOffhand();
+				bag = sp.getOffhandItem();
 			if (bag.isEmpty() || !(bag.getItem() instanceof RuneBag)) {
 				NostrumMagica.logger.warn("Rune bag double-check position was invalid! Is the server behind?");
 			}

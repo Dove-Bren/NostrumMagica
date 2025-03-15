@@ -25,7 +25,7 @@ public class HealResistEffect extends Effect {
 		super(EffectType.HARMFUL, 0xFF0E0485);
 	}
 	
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return false; // No tick effects
 	}
 	
@@ -38,7 +38,7 @@ public class HealResistEffect extends Effect {
 		}
 		RecursionGuard = true;
 		if (event.getAmount() > 0f && !event.isCanceled()) {
-			EffectInstance effect = event.getEntityLiving().getActivePotionEffect(NostrumEffects.healResist);
+			EffectInstance effect = event.getEntityLiving().getEffect(NostrumEffects.healResist);
 			if (effect != null && effect.getDuration() > 0) {
 				final float origAmt = event.getAmount();
 				final float reduc = Math.max(0f, (3 - (effect.getAmplifier()+1)) / 3f);
@@ -49,10 +49,10 @@ public class HealResistEffect extends Effect {
 					final float hurt = (float) ((effect.getAmplifier()+1)-3) / 3f;
 					final float amt = hurt * origAmt;
 					final LivingEntity target = event.getEntityLiving();
-					target.attackEntityFrom(DamageSource.MAGIC, amt); // Vanilla magic ; no modification
+					target.hurt(DamageSource.MAGIC, amt); // Vanilla magic ; no modification
 					NostrumMagicaSounds.CAST_CONTINUE.play(target);
-					NostrumParticles.FILLED_ORB.spawn(target.world, new SpawnParams(
-							50, target.getPosX(), target.getPosY() + target.getHeight()/2, target.getPosZ(), 0,
+					NostrumParticles.FILLED_ORB.spawn(target.level, new SpawnParams(
+							50, target.getX(), target.getY() + target.getBbHeight()/2, target.getZ(), 0,
 							30, 10,
 							new Vector3d(0, .1, 0), new Vector3d(.2, .05, .2)
 							).color(0xFF0E0485).gravity(true));

@@ -22,9 +22,9 @@ public class ModelWillo extends EntityModel<WilloEntity> {
 	protected float waveProg;
 	
 	public ModelWillo() {
-		super(RenderType::getEntityCutoutNoCull);
-		this.textureHeight = 64;
-		this.textureWidth = 64;
+		super(RenderType::entityCutoutNoCull);
+		this.texHeight = 64;
+		this.texWidth = 64;
 		
 		armLeft = new ArrayList<>();
 		armRight = new ArrayList<>();
@@ -33,7 +33,7 @@ public class ModelWillo extends EntityModel<WilloEntity> {
 		final float spacing = 16f * .75f;
 		for (int i = 0; i < SEGMENTS; i++) {
 			ModelRenderer render = new ModelRenderer(this, 0, 0);
-			render.setTextureOffset(0, 18);
+			render.texOffs(0, 18);
 			render.addBox(-4.5f + (offset + (i+1) * spacing), -4.5f, -4.5f, 9, 9, 9);
 			//render.offsetX = offset + (i+1) * spacing;
 			//main.addChild(render);
@@ -42,7 +42,7 @@ public class ModelWillo extends EntityModel<WilloEntity> {
 		
 		for (int i = 0; i < SEGMENTS; i++) {
 			ModelRenderer render = new ModelRenderer(this, 0, 0);
-			render.setTextureOffset(0, 18);
+			render.texOffs(0, 18);
 			render.addBox(-4.5f + (-offset + (i+1) * -spacing), -4.5f, -4.5f, 9, 9, 9);
 //			render.offsetX = -offset + (i+1) * -spacing;
 			//main.addChild(render);
@@ -51,15 +51,15 @@ public class ModelWillo extends EntityModel<WilloEntity> {
 	}
 	
 	@Override
-	public void setLivingAnimations(WilloEntity entity, float limbSwing, float limbSwingAmount, float partialTickTime) {
-		super.setLivingAnimations(entity, limbSwing, limbSwingAmount, partialTickTime);
+	public void prepareMobModel(WilloEntity entity, float limbSwing, float limbSwingAmount, float partialTickTime) {
+		super.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTickTime);
 		
 		// Wave timing information for rendering arms
-		this.waveProg = ((float) entity.ticksExisted + partialTickTime) / PERIOD;
+		this.waveProg = ((float) entity.tickCount + partialTickTime) / PERIOD;
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
 			float red, float green, float blue, float alpha) {
 		// Used to have all parented to a main modelrender, and adjusted the yoffset to make it do the wave with its arms.
 		// There is no adjustable offset on model renderers OR on their boxes. So isntead we iterate the lists ourselves
@@ -72,20 +72,20 @@ public class ModelWillo extends EntityModel<WilloEntity> {
 			final float offsetLeft = (float) (Math.sin(2 * Math.PI * progressAdjLeft) * .5);
 			final float offsetRight = (float) (Math.sin(2 * Math.PI * progressAdjRight) * .5);
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, offsetLeft, 0);
 			armLeft.get(i).render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, offsetRight, 0);
 			armRight.get(i).render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 	}
 
 	@Override
-	public void setRotationAngles(WilloEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setupAnim(WilloEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {
 		// TODO Auto-generated method stub
 		

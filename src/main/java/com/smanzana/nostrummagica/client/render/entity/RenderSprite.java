@@ -19,21 +19,21 @@ public class RenderSprite extends MobRenderer<SpriteEntity, ModelSpriteCore> {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public ResourceLocation getEntityTexture(SpriteEntity entity) {
-		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
+	public ResourceLocation getTextureLocation(SpriteEntity entity) {
+		return AtlasTexture.LOCATION_BLOCKS;
 	}
 	
 	@Override
 	public void render(SpriteEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		this.entityModel.setColor(0xFF75B589);
+		this.model.setColor(0xFF75B589);
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 	}
 	
 	@Override
-	protected void preRenderCallback(SpriteEntity entityIn, MatrixStack matrixStackIn, float partialTickTime) {
+	protected void scale(SpriteEntity entityIn, MatrixStack matrixStackIn, float partialTickTime) {
 		matrixStackIn.translate(0, -.5, .75f);
 		matrixStackIn.scale(.5f, .5f, .5f);
-		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(90f));
+		matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(90f));
 	}
 
 }

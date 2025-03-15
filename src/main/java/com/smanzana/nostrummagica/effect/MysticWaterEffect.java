@@ -27,22 +27,22 @@ public class MysticWaterEffect extends Effect {
 		super(EffectType.BENEFICIAL, 0xFF98E8FF);
 	}
 	
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return duration % 20 == 0; // No tick effects
 	}
 	
 	protected void reduceAmp(LivingEntity entity, int newAmplifier) {
-		EffectInstance instance = entity.getActivePotionEffect(this);
-		entity.removePotionEffect(this);
+		EffectInstance instance = entity.getEffect(this);
+		entity.removeEffect(this);
 		
 		if (newAmplifier >= 0) {
-			entity.addPotionEffect(new EffectInstance(this, instance.getDuration(), newAmplifier));
+			entity.addEffect(new EffectInstance(this, instance.getDuration(), newAmplifier));
 		}
 	}
 	
 	@Override
-	public void performEffect(LivingEntity entity, int amplifier) {
-		if (entity.world.isRemote()) {
+	public void applyEffectTick(LivingEntity entity, int amplifier) {
+		if (entity.level.isClientSide()) {
 			return;
 		}
 		final int diff = (int) Math.floor(entity.getMaxHealth() - entity.getHealth());
@@ -51,12 +51,12 @@ public class MysticWaterEffect extends Effect {
 			
 			entity.heal(heal);
 			reduceAmp(entity, (amplifier) - heal);
-			NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
-					5, entity.getPosX(), entity.getPosY() + .75, entity.getPosZ(), 1,
+			NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
+					5, entity.getX(), entity.getY() + .75, entity.getZ(), 1,
 					40, 0,
-					entity.getEntityId()
+					entity.getId()
 					).color(EMagicElement.ICE.getColor()).setTargetBehavior(TargetBehavior.ORBIT));
-			entity.world.playSound(null, entity.getPosX(), entity.getPosY(), entity.getPosZ(), SoundEvents.BLOCK_BREWING_STAND_BREW, SoundCategory.PLAYERS, 1f, 1.75f);
+			entity.level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.BREWING_STAND_BREW, SoundCategory.PLAYERS, 1f, 1.75f);
 		}
 	}
 	
@@ -67,19 +67,19 @@ public class MysticWaterEffect extends Effect {
 			return;
 		}
 		
-		if (event.getEntity().world.isRemote()) {
+		if (event.getEntity().level.isClientSide()) {
 			return;
 		}
 		
 		if (event.getSource() == DamageSource.ON_FIRE) {
-			EffectInstance effect = event.getEntityLiving().getActivePotionEffect(NostrumEffects.mysticWater);
+			EffectInstance effect = event.getEntityLiving().getEffect(NostrumEffects.mysticWater);
 			if (effect != null && effect.getDuration() > 0) {
 				final LivingEntity living = event.getEntityLiving();
 				// Instantly extinguish and cancel in exchange for some effect
 				event.setCanceled(true);
-				living.extinguish();
-				((MysticWaterEffect) effect.getPotion()).reduceAmp(living, effect.getAmplifier() - 5);
-				event.getEntityLiving().world.playSound(null, living.getPosX(), living.getPosY(), living.getPosZ(), SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1f, 1f);
+				living.clearFire();
+				((MysticWaterEffect) effect.getEffect()).reduceAmp(living, effect.getAmplifier() - 5);
+				event.getEntityLiving().level.playSound(null, living.getX(), living.getY(), living.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1f, 1f);
 			}
 		}
 		

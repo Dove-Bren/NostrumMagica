@@ -65,30 +65,30 @@ public abstract class SpellSaucerEntity extends SpellProjectileEntity {
 	}
 	
 	protected void addHit(Entity entity) {
-		this.hitEntities.put(entity, this.ticksExisted);
+		this.hitEntities.put(entity, this.tickCount);
 	}
 	
 	// -1 cooldown means EVER
 	protected boolean hasBeenHit(Entity entity, int cooldown) {
 		Integer hitTickCount = hitEntities.get(entity);
 		return hitTickCount != null &&
-				(cooldown == -1 || this.ticksExisted - hitTickCount < cooldown);
+				(cooldown == -1 || this.tickCount - hitTickCount < cooldown);
 	}
 	
 	protected void addHit(BlockPos pos) {
-		this.hitBlocks.put(pos.toImmutable(), this.ticksExisted);
+		this.hitBlocks.put(pos.immutable(), this.tickCount);
 	}
 	
 	// -1 cooldown means EVER
 	protected boolean hasBeenHit(BlockPos pos, int cooldown) {
 		Integer hitTickCount = hitBlocks.get(pos);
 		return hitTickCount != null &&
-				(cooldown == -1 || this.ticksExisted - hitTickCount < cooldown);
+				(cooldown == -1 || this.tickCount - hitTickCount < cooldown);
 	}
 
 	@Override
-	protected void onImpact(RayTraceResult result) {
-		super.onImpact(result);
+	protected void onHit(RayTraceResult result) {
+		super.onHit(result);
 	}
 	
 	@Override
@@ -134,13 +134,13 @@ public abstract class SpellSaucerEntity extends SpellProjectileEntity {
 	}
 
 	@Override
-	protected void registerData() {
-		super.registerData();
+	protected void defineSynchedData() {
+		super.defineSynchedData();
 		//this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
 	}
 	
 	@Override
-	public boolean writeUnlessRemoved(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundNBT compound) {
 		return false; // This makes us not save and persist!!
 	}
 
@@ -162,12 +162,12 @@ public abstract class SpellSaucerEntity extends SpellProjectileEntity {
 //	}
 	
 	@Override
-	public boolean canBeCollidedWith() {
+	public boolean isPickable() {
 		return true;
 	}
 	
 	@Override
-	public float getCollisionBorderSize() {
+	public float getPickRadius() {
 		return 1f;
 	}
 }

@@ -24,7 +24,7 @@ public final class ShapedWithRemainingRecipe extends ShapedRecipe {
 		// ResourceLocation idIn, String groupIn, int recipeWidthIn, int recipeHeightIn, NonNullList<Ingredient> recipeItemsIn, ItemStack recipeOutputIn
 		super(new ResourceLocation(original.getId().getNamespace(), original.getId().getPath()), original.getGroup(),
 				original.getRecipeWidth(), original.getRecipeHeight(), original.getIngredients(),
-				original.getRecipeOutput());
+				original.getResultItem());
 		inner = original;
 		this.remaining = remaining;
 		
@@ -37,19 +37,19 @@ public final class ShapedWithRemainingRecipe extends ShapedRecipe {
 	public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
 		NonNullList<ItemStack> list = inner.getRemainingItems(inv);
 		if (list == null) {
-			list = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+			list = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
 		}
 		
 		// Fill with any we find, too.
 		// Replace items that have overlap
-		for (int i = 0; i < inv.getSizeInventory(); i++) {
-			if (inv.getStackInSlot(i).isEmpty()) {
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			if (inv.getItem(i).isEmpty()) {
 				continue;
 			}
 			
 			for (Ingredient ingredientToLeave : remaining) {
-				if (ingredientToLeave.test(inv.getStackInSlot(i))) {
-					list.set(i, inv.getStackInSlot(i).copy()); // Stamp it back in there
+				if (ingredientToLeave.test(inv.getItem(i))) {
+					list.set(i, inv.getItem(i).copy()); // Stamp it back in there
 					break;
 				}
 			}
@@ -68,38 +68,38 @@ public final class ShapedWithRemainingRecipe extends ShapedRecipe {
 		public static final String ID = "shaped_with_remaining";
 		
 		@Override
-		public ShapedWithRemainingRecipe read(ResourceLocation recipeId, JsonObject json) {
-			ShapedRecipe original = IRecipeSerializer.CRAFTING_SHAPED.read(recipeId, json);
+		public ShapedWithRemainingRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+			ShapedRecipe original = IRecipeSerializer.SHAPED_RECIPE.fromJson(recipeId, json);
 			
 			NonNullList<Ingredient> remaining = NonNullList.create();
-			for (JsonElement ele : JSONUtils.getJsonArray(json, "remaining")) {
-				remaining.add(Ingredient.deserialize(ele));
+			for (JsonElement ele : JSONUtils.getAsJsonArray(json, "remaining")) {
+				remaining.add(Ingredient.fromJson(ele));
 			}
 			
 			return new ShapedWithRemainingRecipe(original, remaining);
 		}
 
 		@Override
-		public ShapedWithRemainingRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
-			ShapedRecipe original = IRecipeSerializer.CRAFTING_SHAPED.read(recipeId, buffer);
+		public ShapedWithRemainingRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+			ShapedRecipe original = IRecipeSerializer.SHAPED_RECIPE.fromNetwork(recipeId, buffer);
 			
 			int remainingSize = buffer.readInt();
 			NonNullList<Ingredient> remaining = NonNullList.withSize(remainingSize, Ingredient.EMPTY);
 			for (int i = 0; i < remainingSize; i++) {
-				remaining.set(i, Ingredient.read(buffer));
+				remaining.set(i, Ingredient.fromNetwork(buffer));
 			}
 			
 			return new ShapedWithRemainingRecipe(original, remaining);
 		}
 
 		@Override
-		public void write(PacketBuffer buffer, ShapedWithRemainingRecipe recipe) {
-			IRecipeSerializer.CRAFTING_SHAPED.write(buffer, recipe);
+		public void toNetwork(PacketBuffer buffer, ShapedWithRemainingRecipe recipe) {
+			IRecipeSerializer.SHAPED_RECIPE.toNetwork(buffer, recipe);
 			
 			// Write size and then list of remaining items
 			buffer.writeInt(recipe.remaining.size());
 			for (Ingredient remaining : recipe.remaining) {
-				remaining.write(buffer);
+				remaining.toNetwork(buffer);
 			}
 		}
 

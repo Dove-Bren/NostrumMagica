@@ -71,18 +71,18 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	private static final UUID WARLOCKBLADE_POTENCY_UUID = UUID.fromString("2d5dd2dc-3f5c-4dce-be8f-fa93627fe560");
 	
 	public WarlockSword() {
-		super(ItemTier.DIAMOND, 3, -2.4F, NostrumItems.PropEquipment().maxDamage(1200).rarity(Rarity.UNCOMMON));
+		super(ItemTier.DIAMOND, 3, -2.4F, NostrumItems.PropEquipment().durability(1200).rarity(Rarity.UNCOMMON));
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 
 		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
 			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 			builder.putAll(multimap);
-			builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 7, AttributeModifier.Operation.ADDITION));
-			builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.7000000953674316D, AttributeModifier.Operation.ADDITION));
+			builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 7, AttributeModifier.Operation.ADDITION));
+			builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", -2.7000000953674316D, AttributeModifier.Operation.ADDITION));
 			builder.put(NostrumAttributes.magicPotency, new AttributeModifier(WARLOCKBLADE_POTENCY_UUID, "Potency modifier", 10, AttributeModifier.Operation.ADDITION));
 			multimap = builder.build();
 		}
@@ -117,7 +117,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	}
 	
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return !repair.isEmpty() && NostrumTags.Items.CrystalMedium.contains(repair.getItem());
     }
 
@@ -129,8 +129,8 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
 		boolean extra = Screen.hasShiftDown();
 		
@@ -151,7 +151,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 		if (extra) {
 			tooltip.add(new StringTextComponent("Capacity: " + getCapacity(stack)));
 			if (hasEnderIOTravel(stack)) {
-				tooltip.add(new StringTextComponent("EnderIO Travel Anchor Support").mergeStyle(TextFormatting.DARK_PURPLE));
+				tooltip.add(new StringTextComponent("EnderIO Travel Anchor Support").withStyle(TextFormatting.DARK_PURPLE));
 			}
 		} else {
 			tooltip.add(new StringTextComponent("[Hold Shift]"));			
@@ -159,8 +159,8 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	}
 	
 	@Override
-	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-		if (this.isInGroup(group)) {
+	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+		if (this.allowdedIn(group)) {
 			items.add(addCapacity(new ItemStack(this), 10));
 			items.add(setLevel(setLevel(setLevel(setLevel(
 					new ItemStack(this),
@@ -291,19 +291,19 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 //	}
 	
 	public static void doEffect(LivingEntity entity, EMagicElement element) {
-		if (entity.world.isRemote) {
+		if (entity.level.isClientSide) {
 			return;
 		}
 		
-		NostrumParticles.GLOW_ORB.spawn(entity.world, new SpawnParams(
+		NostrumParticles.GLOW_ORB.spawn(entity.level, new SpawnParams(
 				3,
-				entity.getPosX(), entity.getPosY() + entity.getHeight(), entity.getPosZ(), 1, 30, 5,
+				entity.getX(), entity.getY() + entity.getBbHeight(), entity.getZ(), 1, 30, 5,
 				new Vector3d(0, -0.05, 0), null
 				).color(0x80000000 | (0x00FFFFFF & element.getColor())));
 	}
 	
 	@Override
-	public boolean hitEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 		
 		// Add magic damage, but only if weapon cooldown is recovered
 		// Except hitEntity is called after cooldown is checked and reset, so can't actually check
@@ -313,7 +313,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 			for (EMagicElement elem : EMagicElement.values()) {
 				Float level = levels.get(elem);
 				if (level != null && level >= 1f) {
-					target.hurtResistantTime = 0;
+					target.invulnerableTime = 0;
 					SpellDamage.DamageEntity(target, elem, (float) Math.floor(level), attacker);
 					doEffect(target, elem);
 				}
@@ -328,7 +328,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 			}
 		}
 		
-		return super.hitEntity(stack, target, attacker);
+		return super.hurtEnemy(stack, target, attacker);
 	}
 	
 	public static void awardExperience(ItemStack stack, EMagicElement elem) {
@@ -383,16 +383,16 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
 
-		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
-		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
+		final @Nonnull ItemStack stack = playerIn.getItemInHand(hand);
+		if (playerIn.getAttackStrengthScale(0.5F) > .95) {
 		
 			// Earlier right-click stuff here
-			if (playerIn.isSneaking()) {
+			if (playerIn.isShiftKeyDown()) {
 				// else if nothign else, try client-side enderIO teleport?
 				if (canEnderTravel(stack, playerIn)) {
-					if (worldIn.isRemote) {
+					if (worldIn.isClientSide) {
 //						if (NostrumMagica.instance.enderIO.AttemptEnderIOTravel(stack, hand, worldIn, playerIn, TravelSourceWrapper.STAFF)) {
 //							playerIn.resetCooldown();
 //							playerIn.swingArm(hand);
@@ -421,16 +421,16 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 
 	protected boolean tryCast(World worldIn, PlayerEntity playerIn, Hand hand, ItemStack stack) {
 		boolean used = false;
-		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
+		if (playerIn.getAttackStrengthScale(0.5F) > .95) {
 			
 			// Earlier right-click stuff here
-			if (!worldIn.isRemote) {
+			if (!worldIn.isClientSide) {
 				// We have a target?
-				RayTraceResult result = RayTrace.raytraceApprox(worldIn, playerIn, playerIn.getPositionVec().add(0, playerIn.getEyeHeight(), 0),
-						playerIn.rotationPitch, playerIn.rotationYaw, SeekingBulletShape.MAX_DIST, (ent) -> {
+				RayTraceResult result = RayTrace.raytraceApprox(worldIn, playerIn, playerIn.position().add(0, playerIn.getEyeHeight(), 0),
+						playerIn.xRot, playerIn.yRot, SeekingBulletShape.MAX_DIST, (ent) -> {
 							if (ent != null && playerIn != ent) {
 								if (ent instanceof ITameableEntity && ((ITameableEntity) ent).getOwner() != null) {
-									if (playerIn.getUniqueID().equals(((ITameableEntity) ent).getOwner().getUniqueID())) {
+									if (playerIn.getUUID().equals(((ITameableEntity) ent).getOwner().getUUID())) {
 										return false; // We own the target entity
 									}
 								}
@@ -455,8 +455,8 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 					if (any) {
 						ItemStacks.damageItem(stack, playerIn, hand, 1);
 						NostrumMagicaSounds.DAMAGE_LIGHTNING.play(playerIn);
-						playerIn.resetCooldown();
-						playerIn.swingArm(hand);
+						playerIn.resetAttackStrengthTicker();
+						playerIn.swing(hand);
 						used = true;
 					}
 				}
@@ -469,18 +469,18 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	public static boolean DoCast(PlayerEntity player) {
 		// Try to find weapon
 		Hand hand = Hand.MAIN_HAND;
-		@Nonnull ItemStack stack = player.getHeldItem(hand);
+		@Nonnull ItemStack stack = player.getItemInHand(hand);
 		if (stack.getItem() instanceof WarlockSword) {
-			if (((WarlockSword) stack.getItem()).tryCast(player.world, player, hand, stack)) {
+			if (((WarlockSword) stack.getItem()).tryCast(player.level, player, hand, stack)) {
 				return true;
 			}
 		}
 		
 		// Try with offhand
 		hand = Hand.OFF_HAND;
-		stack = player.getHeldItem(hand);
+		stack = player.getItemInHand(hand);
 		if (stack.getItem() instanceof WarlockSword) {
-			if (((WarlockSword) stack.getItem()).tryCast(player.world, player, hand, stack)) {
+			if (((WarlockSword) stack.getItem()).tryCast(player.level, player, hand, stack)) {
 				return true;
 			}
 		}

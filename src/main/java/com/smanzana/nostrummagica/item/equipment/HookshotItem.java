@@ -108,8 +108,8 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 	}
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final ItemStack itemStackIn = playerIn.getHeldItem(hand); 
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		final ItemStack itemStackIn = playerIn.getItemInHand(hand); 
 		if (true) {
 			if (type == null) {
 				return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn); 
@@ -129,7 +129,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 					} else {
 						// Check if there are other hookshots that might want this event if we're in the mainhand (and checked first)
 						if (hand == Hand.MAIN_HAND) {
-							@Nonnull ItemStack offHandStack = playerIn.getHeldItemOffhand();
+							@Nonnull ItemStack offHandStack = playerIn.getOffhandItem();
 							if (!offHandStack.isEmpty() && offHandStack.getItem() instanceof HookshotItem) {
 								// See if it's hooked yet or not. If it's hooked, we'll handle this event. Otherwise, we'll pass it
 								@Nullable HookShotEntity otherHook = GetHookEntity(worldIn, offHandStack);
@@ -151,16 +151,16 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 					ClearHookEntity(worldIn, itemStackIn);
 				}
 			} else {
-				if (!worldIn.isRemote) {
+				if (!worldIn.isClientSide) {
 					if (DimensionUtils.IsSorceryDim(DimensionUtils.GetDimension(playerIn))) {
-						playerIn.sendMessage(new TranslationTextComponent("info.hookshot.bad_dim"), Util.DUMMY_UUID);
+						playerIn.sendMessage(new TranslationTextComponent("info.hookshot.bad_dim"), Util.NIL_UUID);
 					} else {
 						HookShotEntity hook = new HookShotEntity(NostrumEntityTypes.hookShot, worldIn, playerIn, getMaxDistance(itemStackIn), 
-								Projectiles.getVectorForRotation(playerIn.rotationPitch, playerIn.rotationYaw).scale(getVelocity(itemStackIn)),
+								Projectiles.getVectorForRotation(playerIn.xRot, playerIn.yRot).scale(getVelocity(itemStackIn)),
 								this.type);
-						worldIn.addEntity(hook);
+						worldIn.addFreshEntity(hook);
 						SetHook(itemStackIn, hook);
-						NostrumMagicaSounds.HOOKSHOT_FIRE.play(worldIn, playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ());
+						NostrumMagicaSounds.HOOKSHOT_FIRE.play(worldIn, playerIn.getX(), playerIn.getY(), playerIn.getZ());
 					}
 				}
 			}
@@ -198,7 +198,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 //			tag.remove(NBT_HOOK_ID + "Most");
 //			tag.remove(NBT_HOOK_ID + "Least");
 		} else {
-			tag.putUniqueId(NBT_HOOK_ID, entity.getUniqueID());
+			tag.putUUID(NBT_HOOK_ID, entity.getUUID());
 		}
 		
 		stack.setTag(tag);
@@ -224,14 +224,14 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 		CompoundNBT tag = stack.getTag();
 		UUID id = null;
 		if (tag != null && tag.contains(NBT_HOOK_ID)) {
-			id = tag.getUniqueId(NBT_HOOK_ID); // Crashes if tag not present
+			id = tag.getUUID(NBT_HOOK_ID); // Crashes if tag not present
 		}
 		
 		return id;
 	}
 	
 	protected static void ClearHookEntity(World world, ItemStack stack) {
-		if (world.isRemote) {
+		if (world.isClientSide) {
 			return;
 		}
 		HookShotEntity hook = GetHookEntity(world, stack);
@@ -252,7 +252,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 			// Clear extended if we can't find the anchor entity or it's not in our hand anymore
 			if (entityIn instanceof LivingEntity)  {
 				LivingEntity holder = (LivingEntity) entityIn;
-				if (!(holder.getHeldItem(Hand.MAIN_HAND) == stack || holder.getHeldItem(Hand.OFF_HAND) == stack)) {
+				if (!(holder.getItemInHand(Hand.MAIN_HAND) == stack || holder.getItemInHand(Hand.OFF_HAND) == stack)) {
 					if (entityIn instanceof PlayerEntity) {
 					}
 					ClearHookEntity(worldIn, stack);
@@ -273,10 +273,10 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 			if (entityIn instanceof LivingEntity) {
 				LivingEntity living = (LivingEntity) entityIn;
 				final Hand hand = (itemSlot == 0 ? Hand.OFF_HAND : Hand.MAIN_HAND);
-				@Nonnull final ItemStack otherHand = living.getHeldItem(hand == Hand.MAIN_HAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
+				@Nonnull final ItemStack otherHand = living.getItemInHand(hand == Hand.MAIN_HAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
 				if (!otherHand.isEmpty() && otherHand.getItem() instanceof HookshotItem && IsExtended(otherHand)) {
 					HookShotEntity otherHook = GetHookEntity(worldIn, otherHand);
-					if (otherHook != null && otherHook.isPulling() && otherHook.ticksExisted < anchor.ticksExisted) {
+					if (otherHook != null && otherHook.isPulling() && otherHook.tickCount < anchor.tickCount) {
 						ClearHookEntity(worldIn, stack);
 						return;
 					}
@@ -340,7 +340,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 			if (blockState.getMaterial() == Material.WOOD) {
 				return true;
 			}
-			if (blockState.getBlock() instanceof PaneBlock && blockState.getMaterial() == Material.IRON) {
+			if (blockState.getBlock() instanceof PaneBlock && blockState.getMaterial() == Material.METAL) {
 				return true;
 			}
 			break;
@@ -390,14 +390,14 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 	}
 	
 	private static final boolean isPulling(LivingEntity entity, Hand hand) {
-		ItemStack stack = entity.getHeldItem(hand);
+		ItemStack stack = entity.getItemInHand(hand);
 		if (stack.isEmpty() || !(stack.getItem() instanceof HookshotItem)) {
 			return false;
 		}
 		
 		if (IsExtended(stack)) {
 			// See if we're being pulled
-			HookShotEntity anchor = GetHookEntity(entity.world, stack);
+			HookShotEntity anchor = GetHookEntity(entity.level, stack);
 			return anchor != null && anchor.isPulling();
 		}
 		
@@ -429,7 +429,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 	public static final float ModelExtended(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 		return entityIn != null
 				&& (IsExtended(stack)
-				&& (entityIn.getHeldItem(Hand.MAIN_HAND) == stack || entityIn.getHeldItem(Hand.OFF_HAND) == stack))
+				&& (entityIn.getItemInHand(Hand.MAIN_HAND) == stack || entityIn.getItemInHand(Hand.OFF_HAND) == stack))
 				? 1.0F : 0.0F;
 	}
 	

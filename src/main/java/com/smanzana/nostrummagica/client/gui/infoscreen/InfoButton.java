@@ -33,16 +33,16 @@ public abstract class InfoButton extends AbstractButton implements IForegroundRe
 			&& mouseX <= this.x + this.width
 			&& mouseY <= this.y + this.height) {
 			Minecraft mc = Minecraft.getInstance();
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 500);
 			GuiUtils.drawHoveringText(matrixStackIn, getDescription(),
 					mouseX,
 					mouseY,
-					mc.getMainWindow().getWidth(),
-					mc.getMainWindow().getHeight(),
+					mc.getWindow().getScreenWidth(),
+					mc.getWindow().getScreenHeight(),
 					100,
-					mc.fontRenderer);
-			matrixStackIn.pop();
+					mc.font);
+			matrixStackIn.popPose();
 		}
 	}
 	

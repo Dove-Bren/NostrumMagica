@@ -89,12 +89,12 @@ public class CurioInventoryWrapper implements IInventory {
 	}
 	
 	@Override
-	public void clear() {
+	public void clearContent() {
 		slots.replaceAll((slot, existing) -> ItemStack.EMPTY);
 	}
 
 	@Override
-	public int getSizeInventory() {
+	public int getContainerSize() {
 		return slots.size();
 	}
 
@@ -108,32 +108,32 @@ public class CurioInventoryWrapper implements IInventory {
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int index) {
+	public ItemStack getItem(int index) {
 		return slots.get(getKey(index));
 	}
 
 	@Override
-	public ItemStack decrStackSize(int index, int count) {
+	public ItemStack removeItem(int index, int count) {
 		return slots.get(getKey(index)).split(count);
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(int index) {
+	public ItemStack removeItemNoUpdate(int index) {
 		return slots.remove(getKey(index));
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, ItemStack stack) {
+	public void setItem(int index, ItemStack stack) {
 		slots.put(getKey(index), stack);
 	}
 
 	@Override
-	public void markDirty() {
+	public void setChanged() {
 		;
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
+	public boolean stillValid(PlayerEntity player) {
 		return true;
 	}
 }

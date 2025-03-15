@@ -32,7 +32,7 @@ public class DragonSummonShadowAttackGoal<T extends DragonEntity> extends Goal {
 	}
 	
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		this.attackTicks = Math.max(0, this.attackTicks-1);
 		
 		if (!dragon.isAlive())
@@ -45,13 +45,13 @@ public class DragonSummonShadowAttackGoal<T extends DragonEntity> extends Goal {
 			return false;
 		}
 
-		if (odds > 0 && dragon.getRNG().nextInt(odds) != 0) {
+		if (odds > 0 && dragon.getRandom().nextInt(odds) != 0) {
 			return false;
 		}
 		
 		boolean found = false;
 		for (LivingEntity targ : this.pool) {
-			if (dragon.getEntitySenses().canSee(targ)) {
+			if (dragon.getSensing().canSee(targ)) {
 				found = true;
 				break;
 			}
@@ -65,12 +65,12 @@ public class DragonSummonShadowAttackGoal<T extends DragonEntity> extends Goal {
 	}
 	
 	@Override
-	public boolean shouldContinueExecuting() {
+	public boolean canContinueToUse() {
 		return false;
 	}
 
 	@Override
-	public void startExecuting() {
+	public void start() {
 		if (this.pool.isEmpty())
 			return;
 		
@@ -80,7 +80,7 @@ public class DragonSummonShadowAttackGoal<T extends DragonEntity> extends Goal {
 		Iterator<LivingEntity> it = pool.iterator();
 		while (it.hasNext()) {
 			LivingEntity targ = it.next();
-			if (!targ.isAlive() || targ.getDistanceSq(dragon) > MaxRange) {
+			if (!targ.isAlive() || targ.distanceToSqr(dragon) > MaxRange) {
 				it.remove();
 			}
 		}
@@ -88,14 +88,14 @@ public class DragonSummonShadowAttackGoal<T extends DragonEntity> extends Goal {
 		if (this.pool.isEmpty())
 			return;
 		
-		Random rand = dragon.getRNG();
+		Random rand = dragon.getRandom();
 		for (LivingEntity targ : this.pool) {
-			ShadowRedDragonEntity ent = new ShadowRedDragonEntity(NostrumEntityTypes.shadowDragonRed, targ.world, targ);
-			ent.setPosition(targ.getPosX() + 5.0 * (rand.nextDouble() - .5D), targ.getPosY(), targ.getPosZ() + 5.0 * (rand.nextDouble() - .5D));
-			targ.world.addEntity(ent);
+			ShadowRedDragonEntity ent = new ShadowRedDragonEntity(NostrumEntityTypes.shadowDragonRed, targ.level, targ);
+			ent.setPos(targ.getX() + 5.0 * (rand.nextDouble() - .5D), targ.getY(), targ.getZ() + 5.0 * (rand.nextDouble() - .5D));
+			targ.level.addFreshEntity(ent);
 		}
 		
-		NostrumMagicaSounds.DRAGON_DEATH.play(dragon.world, dragon.getPosX(), dragon.getPosY(), dragon.getPosZ());
+		NostrumMagicaSounds.DRAGON_DEATH.play(dragon.level, dragon.getX(), dragon.getY(), dragon.getZ());
 		
 		attackTicks = this.delay;
 	}

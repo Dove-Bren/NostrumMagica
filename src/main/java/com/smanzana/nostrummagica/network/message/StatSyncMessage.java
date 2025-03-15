@@ -24,7 +24,7 @@ public class StatSyncMessage {
 		
 		NostrumMagica.logger.info("Recieved Nostrum Magica sync message from server");
 		
-		Minecraft.getInstance().runAsync(() -> {
+		Minecraft.getInstance().submit(() -> {
 			INostrumMagic override = CAPABILITY.getDefaultInstance();
 			CAPABILITY.getStorage().readNBT(CAPABILITY, override, null, message.tag);
 			NostrumMagica.instance.proxy.receiveStatOverrides(override);
@@ -47,11 +47,11 @@ public class StatSyncMessage {
 	}
 
 	public static StatSyncMessage decode(PacketBuffer buf) {
-		return new StatSyncMessage(buf.readCompoundTag());
+		return new StatSyncMessage(buf.readNbt());
 	}
 
 	public static void encode(StatSyncMessage msg, PacketBuffer buf) {
-		buf.writeCompoundTag(msg.tag);
+		buf.writeNbt(msg.tag);
 	}
 
 }

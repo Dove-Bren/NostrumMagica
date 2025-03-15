@@ -36,7 +36,7 @@ public class SublimationEffect extends Effect {
 	}
 	
 	@Override
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		if (duration <= 0)
 			return false;
 		
@@ -46,8 +46,8 @@ public class SublimationEffect extends Effect {
 	}
 
 	@Override
-	public void performEffect(LivingEntity entity, int amp) {
-		if (!entity.world.isRemote() && entity.isInWaterRainOrBubbleColumn()) {
+	public void applyEffectTick(LivingEntity entity, int amp) {
+		if (!entity.level.isClientSide() && entity.isInWaterRainOrBubble()) {
 			handleRainTick(entity, amp);
 		}
 		
@@ -58,7 +58,7 @@ public class SublimationEffect extends Effect {
 		// Look for nearby spread-enablers
 		boolean spread = false;
 		Entity spreadingEnt = null;
-		List<Entity> nearbyEnts = target.getEntityWorld().getEntitiesInAABBexcluding(target, target.getEntity().getBoundingBox().grow(10), e -> true);
+		List<Entity> nearbyEnts = target.getCommandSenderWorld().getEntities(target, target.getEntity().getBoundingBox().inflate(10), e -> true);
 		for (Entity ent : nearbyEnts) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(ent);
 			if (attr != null && attr.hasSkill(NostrumSkills.Fire_Corrupt) && NostrumMagica.rand.nextBoolean()) {
@@ -70,7 +70,7 @@ public class SublimationEffect extends Effect {
 		
 		// Spread
 		if (spread) {
-			final EffectInstance effect = target.getActivePotionEffect(NostrumEffects.sublimation);
+			final EffectInstance effect = target.getEffect(NostrumEffects.sublimation);
 			for (Entity ent : nearbyEnts) {
 				if (!(ent instanceof LivingEntity)) {
 					continue;
@@ -84,17 +84,17 @@ public class SublimationEffect extends Effect {
 					continue;
 				}
 				
-				((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.sublimation, effect.getDuration(), effect.getAmplifier()));
+				((LivingEntity) ent).addEffect(new EffectInstance(NostrumEffects.sublimation, effect.getDuration(), effect.getAmplifier()));
 				
-				NostrumParticles.FILLED_ORB.spawn(target.world, new SpawnParams(
-						10, target.getPosX(), target.getPosY() + target.getHeight()/2, target.getPosZ(), 0,
+				NostrumParticles.FILLED_ORB.spawn(target.level, new SpawnParams(
+						10, target.getX(), target.getY() + target.getBbHeight()/2, target.getZ(), 0,
 						40, 10,
-						ent.getEntityId()
+						ent.getId()
 						).color(0xFFEC6D8E).dieOnTarget(true));
 			}
 			
-			NostrumParticles.FILLED_ORB.spawn(target.world, new SpawnParams(
-					50, target.getPosX(), target.getPosY() + target.getHeight()/2, target.getPosZ(), 0,
+			NostrumParticles.FILLED_ORB.spawn(target.level, new SpawnParams(
+					50, target.getX(), target.getY() + target.getBbHeight()/2, target.getZ(), 0,
 					30, 10,
 					new Vector3d(0, .1, 0), new Vector3d(.2, .05, .2)
 					).color(0xFFEC6D8E).gravity(true));
@@ -111,7 +111,7 @@ public class SublimationEffect extends Effect {
 			final float perc = .25f * (float) Math.pow(2, amp); // .25%, 50%, 100%, 200%
 			final float addDmg = Math.max(.25f, amt * perc);
 			//NostrumMagica.logger.debug(addDmg + " - doing fire bonus");
-			entity.hurtResistantTime = 0;
+			entity.invulnerableTime = 0;
 			SpellDamage.DamageEntity(entity, EMagicElement.FIRE, addDmg, null);
 			onSublimationDamage(entity);
 			
@@ -121,7 +121,7 @@ public class SublimationEffect extends Effect {
 	
 	protected static void handleRainTick(LivingEntity entity, int amp) {
 		//NostrumMagica.logger.debug("1.0 - doing rain tick");
-		entity.attackEntityFrom(DamageSource.DROWN, 1f);
+		entity.hurt(DamageSource.DROWN, 1f);
 		onSublimationDamage(entity);
 	}
 	
@@ -131,14 +131,14 @@ public class SublimationEffect extends Effect {
 		final DamageSource source = event.getSource();
 		final LivingEntity entity = event.getEntityLiving();
 		
-		if (entity == null || entity.world.isRemote()) {
+		if (entity == null || entity.level.isClientSide()) {
 			return;
 		}
 		
-		if (source.isFireDamage()) {
+		if (source.isFire()) {
 			// To avoid bypassing hurt cooldowns from fire damage, only care if the regular fire
 			// damage would apply
-			isFire = entity.hurtResistantTime <= 10;
+			isFire = entity.invulnerableTime <= 10;
 		} else if (source instanceof MagicDamageSource) {
 			isFire = ((MagicDamageSource) source).getElement() == EMagicElement.FIRE;
 		} else {
@@ -146,7 +146,7 @@ public class SublimationEffect extends Effect {
 		}
 		
 		if (isFire) {
-			EffectInstance effect = entity.getActivePotionEffect(NostrumEffects.sublimation);
+			EffectInstance effect = entity.getEffect(NostrumEffects.sublimation);
 			if (effect != null) {
 				int amp = effect.getAmplifier();
 				handleFireAttack(entity, source, event.getAmount(), amp);
@@ -154,10 +154,10 @@ public class SublimationEffect extends Effect {
 				// If we suspect regular fire damage is happening next, set resistant time to 0 so it still happens.
 				// Otherwise, don't reset
 				final boolean lavaSet = ElementalArmor.GetSetCount(entity, EMagicElement.FIRE, ElementalArmor.Type.MASTER) == 4;
-				if (!entity.isImmuneToFire()
-						&& entity.getActivePotionEffect(Effects.FIRE_RESISTANCE) == null
+				if (!entity.fireImmune()
+						&& entity.getEffect(Effects.FIRE_RESISTANCE) == null
 						&& !lavaSet) {
-					entity.hurtResistantTime = 0;
+					entity.invulnerableTime = 0;
 				}
 			}
 		}

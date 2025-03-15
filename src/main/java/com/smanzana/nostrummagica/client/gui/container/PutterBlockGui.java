@@ -78,21 +78,21 @@ public class PutterBlockGui {
 		
 		@Override
 		@Nonnull
-		public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
-			Slot slot = (Slot)this.inventorySlots.get(index);
+		public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+			Slot slot = (Slot)this.slots.get(index);
 			ItemStack prev = ItemStack.EMPTY;
 
-			if (slot != null && slot.getHasStack()) {
+			if (slot != null && slot.hasItem()) {
 				//IInventory from = slot.inventory;
 				IInventory to;
 				
-				if (slot.inventory == putter.getInventory()) {
+				if (slot.container == putter.getInventory()) {
 					to = playerIn.inventory;
 				} else {
 					to = putter.getInventory();
 				}
 				
-				ItemStack stack = slot.getStack();
+				ItemStack stack = slot.getItem();
 				prev = stack.copy();
 
 				stack = Inventories.addItem(to, stack);
@@ -104,7 +104,7 @@ public class PutterBlockGui {
 					return ItemStack.EMPTY;
 				};
 				
-				slot.putStack(stack);
+				slot.set(stack);
 				slot.onTake(playerIn, stack);
 			}
 
@@ -112,12 +112,12 @@ public class PutterBlockGui {
 		}
 		
 		@Override
-		public boolean canDragIntoSlot(Slot slotIn) {
+		public boolean canDragTo(Slot slotIn) {
 			return true;
 		}
 		
 		@Override
-		public boolean canInteractWith(PlayerEntity playerIn) {
+		public boolean stillValid(PlayerEntity playerIn) {
 			return true;
 		}
 	}
@@ -131,8 +131,8 @@ public class PutterBlockGui {
 			super(container, playerInv, name);
 			//this.container = container;
 			
-			this.xSize = GUI_WIDTH;
-			this.ySize = GUI_HEIGHT;
+			this.imageWidth = GUI_WIDTH;
+			this.imageHeight = GUI_HEIGHT;
 		}
 		
 		@Override
@@ -141,17 +141,17 @@ public class PutterBlockGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
-			int horizontalMargin = (width - xSize) / 2;
-			int verticalMargin = (height - ySize) / 2;
+		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+			int horizontalMargin = (width - imageWidth) / 2;
+			int verticalMargin = (height - imageHeight) / 2;
 			
-			mc.getTextureManager().bindTexture(TEXT);
+			mc.getTextureManager().bind(TEXT);
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
-			super.drawGuiContainerForegroundLayer(matrixStackIn, mouseX, mouseY);
+		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+			super.renderLabels(matrixStackIn, mouseX, mouseY);
 		}
 		
 	}

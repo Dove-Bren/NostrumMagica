@@ -16,21 +16,21 @@ public class MagicElementDataSerializer implements IDataSerializer<EMagicElement
 	
 	@Override
 	public void write(PacketBuffer buf, EMagicElement value) {
-		buf.writeEnumValue(value);
+		buf.writeEnum(value);
 	}
 
 	@Override
 	public EMagicElement read(PacketBuffer buf)  {
-		return buf.readEnumValue(EMagicElement.class);
+		return buf.readEnum(EMagicElement.class);
 	}
 
 	@Override
-	public DataParameter<EMagicElement> createKey(int id) {
+	public DataParameter<EMagicElement> createAccessor(int id) {
 		return new DataParameter<>(id, this);
 	}
 
 	@Override
-	public EMagicElement copyValue(EMagicElement value) {
+	public EMagicElement copy(EMagicElement value) {
 		return value;
 	}
 }

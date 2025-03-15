@@ -73,10 +73,10 @@ public class ProjectileShape extends SpellShape implements ISelectableShape {
 			// Do a little more work of getting a good vector for things
 			// that aren't players
 			final Vector3d dir;
-			if (caster instanceof MobEntity && ((MobEntity) caster).getAttackTarget() != null) {
+			if (caster instanceof MobEntity && ((MobEntity) caster).getTarget() != null) {
 				MobEntity ent = (MobEntity) caster  ;
-				dir = ent.getAttackTarget().getPositionVec().add(0.0, ent.getHeight() / 2.0, 0.0)
-						.subtract(caster.getPosX(), caster.getPosY() + caster.getEyeHeight(), caster.getPosZ());
+				dir = ent.getTarget().position().add(0.0, ent.getBbHeight() / 2.0, 0.0)
+						.subtract(caster.getX(), caster.getY() + caster.getEyeHeight(), caster.getZ());
 			} else {
 				dir = Projectiles.getVectorForRotation(pitch, yaw);
 			}
@@ -89,7 +89,7 @@ public class ProjectileShape extends SpellShape implements ISelectableShape {
 			
 			projectile.setFilter(hitEnts ? new ProjectileFilter(this.getState(), hitAllies) : e -> false);
 			
-			world.addEntity(projectile);
+			world.addFreshEntity(projectile);
 		}
 		
 		@Override
@@ -107,7 +107,7 @@ public class ProjectileShape extends SpellShape implements ISelectableShape {
 				onProjectileHit(new SpellLocation(world, this.pos));
 			}
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
-				onProjectileHit(new SpellLocation(entity.world, entity.getPosition()));
+				onProjectileHit(new SpellLocation(entity.level, entity.blockPosition()));
 			} else if (hitEnts) {
 				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null);
 			}
@@ -199,7 +199,7 @@ public class ProjectileShape extends SpellShape implements ISelectableShape {
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.from(ItemStack.EMPTY,
+		return NonNullList.of(ItemStack.EMPTY,
 				ReagentItem.CreateStack(ReagentType.MANI_DUST, 1));
 	}
 
@@ -235,25 +235,25 @@ public class ProjectileShape extends SpellShape implements ISelectableShape {
 		final boolean hitAllies = getHitsAllies(properties);
 		final Vector3d dir;
 		final LivingEntity self = state.getSelf();
-		if (self instanceof MobEntity && ((MobEntity) self).getAttackTarget() != null) {
+		if (self instanceof MobEntity && ((MobEntity) self).getTarget() != null) {
 			MobEntity ent = (MobEntity) self  ;
-			dir = ent.getAttackTarget().getPositionVec().add(0.0, ent.getHeight() / 2.0, 0.0)
-					.subtract(self.getPosX(), self.getPosY() + self.getEyeHeight(), self.getPosZ());
+			dir = ent.getTarget().position().add(0.0, ent.getBbHeight() / 2.0, 0.0)
+					.subtract(self.getX(), self.getY() + self.getEyeHeight(), self.getZ());
 		} else {
 			dir = Projectiles.getVectorForRotation(pitch, yaw);
 		}
 		
 		RayTraceResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, dir, (float) PROJECTILE_RANGE, hitEnts ? new ProjectileFilter(state, hitAllies) : e -> false);
 		if (trace.getType() == RayTraceResult.Type.BLOCK) {
-			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), trace.getHitVec()));
+			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), trace.getLocation()));
 			if (hitBlocks) {
 				state.trigger(null, Lists.newArrayList(new SpellLocation(location.world, trace)));
 			}
 			return true;
 		} else if (trace.getType() == RayTraceResult.Type.ENTITY && RayTrace.livingFromRaytrace(trace) != null && hitEnts) {
-			final float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
+			final float partialTicks = Minecraft.getInstance().getFrameTime();
 			final LivingEntity living = RayTrace.livingFromRaytrace(trace);
-			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), living.func_242282_l(partialTicks).add(0, living.getHeight() / 2, 0)));
+			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), living.getPosition(partialTicks).add(0, living.getBbHeight() / 2, 0)));
 			state.trigger(Lists.newArrayList(living), null);
 			return true;
 		} else {

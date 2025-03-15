@@ -21,7 +21,7 @@ public class SteelSkinEffect extends Effect {
 		super(EffectType.BENEFICIAL, 0xFF394653); 
 	}
 	
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return false; // No tick effects
 	}
 	
@@ -29,7 +29,7 @@ public class SteelSkinEffect extends Effect {
 	public static void onEntityAttack(LivingHurtEvent event) {
 		if (event.getAmount() > 0f && !event.isCanceled()) {
 			LivingEntity ent = event.getEntityLiving();
-			EffectInstance effect = ent.getActivePotionEffect(NostrumEffects.steelSkin);
+			EffectInstance effect = ent.getEffect(NostrumEffects.steelSkin);
 			
 			if (effect != null && effect.getDuration() > 0) {
 				final int reduc = 2 * (effect.getAmplifier() + 1);

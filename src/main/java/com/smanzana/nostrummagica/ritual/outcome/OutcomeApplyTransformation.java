@@ -32,7 +32,7 @@ public class OutcomeApplyTransformation implements IRitualOutcome {
 	}
 	
 	protected @Nullable LivingEntity findEntity(World world, PlayerEntity player, BlockPos center) {
-		for (LivingEntity ent : Entities.GetEntities((ServerWorld) world, (e) -> {return e.getDistanceSq(center.getX() + .5, center.getY() + .5, center.getZ() + .5) < 25;})) {
+		for (LivingEntity ent : Entities.GetEntities((ServerWorld) world, (e) -> {return e.distanceToSqr(center.getX() + .5, center.getY() + .5, center.getZ() + .5) < 25;})) {
 			if (this.selector.test((LivingEntity) ent)) {
 				return (LivingEntity) ent;
 			}
@@ -45,7 +45,7 @@ public class OutcomeApplyTransformation implements IRitualOutcome {
 		@Nullable LivingEntity target = findEntity(world, player, center);
 		if (target != null) {
 			// Apply effect to the selected entity
-			target.addPotionEffect(new EffectInstance(NostrumEffects.nostrumTransformation, duration, 0, true, true));
+			target.addEffect(new EffectInstance(NostrumEffects.nostrumTransformation, duration, 0, true, true));
 		}
 	}
 	
@@ -62,8 +62,8 @@ public class OutcomeApplyTransformation implements IRitualOutcome {
 	@Override
 	public boolean canPerform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout) {
 		if (findEntity(world, player, center) == null) {
-			if (!player.world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.transformation.noentity"), Util.DUMMY_UUID);
+			if (!player.level.isClientSide) {
+				player.sendMessage(new TranslationTextComponent("info.transformation.noentity"), Util.NIL_UUID);
 			}
 			return false;
 		}

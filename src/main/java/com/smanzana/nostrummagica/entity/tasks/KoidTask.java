@@ -21,6 +21,8 @@ import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class KoidTask extends Goal {
 	
 	public static final class Vec2f {
@@ -307,22 +309,22 @@ public class KoidTask extends Goal {
 		meleeCooldown = 0;
 		rangeCooldown = 0;
 		auxCooldown = 0;
-		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+		this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 	
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		if (!koid.isAlive())
 			return false;
 		
-		if (koid.getAttackTarget() == null)
+		if (koid.getTarget() == null)
 			return false;
 		
 		return true;
 	}
 
 	@Override
-	public boolean shouldContinueExecuting() {
+	public boolean canContinueToUse() {
 		return running;
 	}
 	
@@ -332,7 +334,7 @@ public class KoidTask extends Goal {
 	}
 	
 	@Override
-	public void startExecuting() {
+	public void start() {
 		meleeCooldown = 0;
 		rangeCooldown = 0;
 		strafeTime = 0;
@@ -365,7 +367,7 @@ public class KoidTask extends Goal {
 		
 		boolean inMelee = false;
 		boolean inRange = false;
-		LivingEntity target = koid.getAttackTarget();
+		LivingEntity target = koid.getTarget();
 
 		boolean done = false;
 		boolean again = true;
@@ -380,7 +382,7 @@ public class KoidTask extends Goal {
 		}
 		
 		// Does not check done so we can do even when target is dead
-		if (hasAux && auxCooldown <= 0 && koid.ticksExisted > 100) {
+		if (hasAux && auxCooldown <= 0 && koid.tickCount > 100) {
 			// Can do aux skill if not in melee
 			if (!inMelee) {
 				// Figure out who to do it to.
@@ -394,9 +396,9 @@ public class KoidTask extends Goal {
 		}
 
 		if (target != null && target.isAlive()) {
-			double distTarget = target.getPositionVec().distanceTo(koid.getPositionVec());
+			double distTarget = target.position().distanceTo(koid.position());
 			
-			double meleeRange = (double)(koid.getWidth() * 2.0F * koid.getWidth() * 2.0F + koid.getWidth());
+			double meleeRange = (double)(koid.getBbWidth() * 2.0F * koid.getBbWidth() * 2.0F + koid.getBbWidth());
 			if (distTarget < meleeRange) {
 				inMelee = true;
 			}
@@ -406,7 +408,7 @@ public class KoidTask extends Goal {
 			
 			if (!done && !inMelee && hasRange && inRange && rangeCooldown <= 0) {
 				// Can we do a ranged attack?
-				if (koid.canEntityBeSeen(target)) {
+				if (koid.canSee(target)) {
 					Spell spell = this.getRanged();
 					spell.cast(koid, 1.0f);
 					rangeCooldown = 20 * 3 * (1 + KoidTask.rand.nextInt(3));
@@ -439,26 +441,26 @@ public class KoidTask extends Goal {
 			if (updateCooldown > 0)
         		updateCooldown--;
         	
-        	if (updateCooldown > 0 && !koid.getNavigator().noPath())
+        	if (updateCooldown > 0 && !koid.getNavigation().isDone())
     			return true;
         	
         	//if (Math.abs(koid.getPosY() - target.getPosY()) > 1) {
         	//	if (koid.getNavigator().)
         	//}
 			
-        	koid.getNavigator().clearPath();
-			success = koid.getNavigator().tryMoveToEntityLiving(target, 1.0);
+        	koid.getNavigation().stop();
+			success = koid.getNavigation().moveTo(target, 1.0);
 			if (success) {
 				updateCooldown = 5;
 			}
 		} else if (hasRange) {
 			
 			success = true;
-			double dist = koid.getDistanceSq(target.getPosX(), target.getBoundingBox().minY, target.getPosZ());
+			double dist = koid.distanceToSqr(target.getX(), target.getBoundingBox().minY, target.getZ());
 
-            if (dist <= RANGE_SQR - 64.0 && koid.canEntityBeSeen(target))
+            if (dist <= RANGE_SQR - 64.0 && koid.canSee(target))
             {
-            	koid.getNavigator().clearPath();
+            	koid.getNavigation().stop();
             	++this.strafeTime;
             }
             else
@@ -467,22 +469,22 @@ public class KoidTask extends Goal {
             	if (updateCooldown > 0)
             		updateCooldown--;
             	
-            	if (updateCooldown > 0 && !koid.getNavigator().noPath())
+            	if (updateCooldown > 0 && !koid.getNavigation().isDone())
         			return true;
             	
-            	koid.getNavigator().clearPath();
-            	koid.getNavigator().tryMoveToEntityLiving(target, 1.0);
+            	koid.getNavigation().stop();
+            	koid.getNavigation().moveTo(target, 1.0);
                 this.updateCooldown = 5;
             }
 
             if (this.strafeTime >= 20)
             {
-                if ((double) koid.getRNG().nextFloat() < 0.3D)
+                if ((double) koid.getRandom().nextFloat() < 0.3D)
                 {
                     this.strafeClockwise = !this.strafeClockwise;
                 }
 
-                if ((double) koid.getRNG().nextFloat() < 0.3D)
+                if ((double) koid.getRandom().nextFloat() < 0.3D)
                 {
                     this.strafeBack = !this.strafeBack;
                 }
@@ -503,7 +505,7 @@ public class KoidTask extends Goal {
                 
                 if (koid.isOnGround()) {
                 	Vector3d forward = getForward(koid);
-                	Vector3d right = getForward(koid).rotatePitch(90.0f);
+                	Vector3d right = getForward(koid).xRot(90.0f);
                 	double mag = strafeBack ? -.1 : 0;
                 	double x, y, z;
                 	x = forward.x * mag;
@@ -514,15 +516,15 @@ public class KoidTask extends Goal {
                 	y += right.y * mag;
                 	z += right.z * mag;
                 	y += .8;
-                	koid.addVelocity(x, y, z);
+                	koid.push(x, y, z);
                 	koid.setOnGround(false);
                 }
-                koid.faceEntity(target, 30.0F, 30.0F);
+                koid.lookAt(target, 30.0F, 30.0F);
                 
             }
             else
             {
-            	koid.getLookController().setLookPositionWithEntity(target, 30.0F, 30.0F);
+            	koid.getLookControl().setLookAt(target, 30.0F, 30.0F);
             }
 			
 		}
@@ -606,7 +608,7 @@ public class KoidTask extends Goal {
 	}
 	
 	private static Vec2f getPitchYaw(LivingEntity entity){
-		Vec2f vec2f = new Vec2f(entity.rotationPitch, entity.rotationYaw);
+		Vec2f vec2f = new Vec2f(entity.xRot, entity.yRot);
 		return vec2f;
 	}
 

@@ -45,50 +45,50 @@ public class MagicIceGolemEntity extends MagicGolemEntity {
 
 	@Override
 	public void doMeleeTask(LivingEntity target) {
-		this.attackEntityAsMob(target);
+		this.doHurtTarget(target);
 	}
 
 	@Override
 	public void doRangeTask(LivingEntity target) {
 		MagicIceGolemEntity.init();
 		
-		LivingEntity targ = this.getAttackTarget();
+		LivingEntity targ = this.getTarget();
 		if (targ != target)
-			this.setAttackTarget(target);
+			this.setTarget(target);
 		
 		spellRange.cast(this, 1.0f);
 		
 		if (targ != target)
-			this.setAttackTarget(targ);
+			this.setTarget(targ);
 	}
 
 	@Override
 	public void doBuffTask(LivingEntity target) {
 		MagicIceGolemEntity.init();
 		
-		LivingEntity targ = this.getAttackTarget();
+		LivingEntity targ = this.getTarget();
 		if (targ != target)
-			this.setAttackTarget(target);
+			this.setTarget(target);
 		
 		spellBuff.cast(this, 1.0f);
 		
 		if (targ != target)
-			this.setAttackTarget(targ);
+			this.setTarget(targ);
 	}
 
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
-		return target.getActivePotionEffect(NostrumEffects.magicShield) == null;
+		return target.getEffect(NostrumEffects.magicShield) == null;
 	}
 
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		return MagicGolemEntity.BuildBaseAttributes()
-	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.22D)
+	        .add(Attributes.MOVEMENT_SPEED, 0.22D)
 	
-	        .createMutableAttribute(Attributes.MAX_HEALTH, 20.0D)
+	        .add(Attributes.MAX_HEALTH, 20.0D)
 	
-	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 6.0D)
-	        .createMutableAttribute(Attributes.ARMOR, 10.0D);
+	        .add(Attributes.ATTACK_DAMAGE, 6.0D)
+	        .add(Attributes.ARMOR, 10.0D);
 	}
 
 	@Override

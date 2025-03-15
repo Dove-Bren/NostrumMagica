@@ -19,16 +19,16 @@ public class MagicResistEffect extends Effect {
 	
 	public MagicResistEffect() {
 		super(EffectType.BENEFICIAL, 0xFFA5359A);
-		this.addAttributesModifier(NostrumAttributes.magicResist, "662c96d6-19d7-4fe8-a6ff-b46befaa16a2", 20.D, AttributeModifier.Operation.ADDITION);
+		this.addAttributeModifier(NostrumAttributes.magicResist, "662c96d6-19d7-4fe8-a6ff-b46befaa16a2", 20.D, AttributeModifier.Operation.ADDITION);
 	}
 	
 	@Override
-	public double getAttributeModifierAmount(int amplifier, AttributeModifier modifier) {
+	public double getAttributeModifierValue(int amplifier, AttributeModifier modifier) {
 		// Effect used to be a (... * .75 ^ (amp+1)) on damage.
-		return super.getAttributeModifierAmount(amplifier, modifier);
+		return super.getAttributeModifierValue(amplifier, modifier);
 	}
 	
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return duration > 0; // Every tick
 	}
 	

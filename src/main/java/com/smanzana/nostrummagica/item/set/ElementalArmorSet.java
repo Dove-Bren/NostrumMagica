@@ -148,7 +148,7 @@ public class ElementalArmorSet extends EquipmentSet {
 		
 		Item item = stack.getItem();
 		if (slot instanceof EquipmentSlotKey) {
-			return ((EquipmentSlotKey) slot).getSlotType() == ((ArmorItem) item).getEquipmentSlot();
+			return ((EquipmentSlotKey) slot).getSlotType() == ((ArmorItem) item).getSlot();
 		}
 		// else just guess? Could hardcode inventory numbers here
 		return false;

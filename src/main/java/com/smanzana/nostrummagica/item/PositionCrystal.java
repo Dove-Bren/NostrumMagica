@@ -51,7 +51,7 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		RegistryKey<World> dim = getDimension(stack);
 		BlockPos pos = getBlockPosition(stack);
 		
@@ -62,8 +62,8 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 		if (dimName == null)
 			dimName = "An Unknown Dimension";
 		
-		tooltip.add(new StringTextComponent("<" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ">").mergeStyle(TextFormatting.GREEN));
-		tooltip.add(new StringTextComponent(dimName).mergeStyle(TextFormatting.DARK_GREEN));
+		tooltip.add(new StringTextComponent("<" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ">").withStyle(TextFormatting.GREEN));
+		tooltip.add(new StringTextComponent(dimName).withStyle(TextFormatting.DARK_GREEN));
 	}
 	
 	public static BlockPos getBlockPosition(ItemStack stack) {
@@ -115,7 +115,7 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 		else
 			tag = stack.getTag();
 		
-		tag.putString(NBT_DIMENSION, dimension.getLocation().toString());
+		tag.putString(NBT_DIMENSION, dimension.location().toString());
 		tag.putInt(NBT_X, pos.getX());
 		tag.putInt(NBT_Y, pos.getY());
 		tag.putInt(NBT_Z, pos.getZ());
@@ -141,13 +141,13 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		final World worldIn = context.getWorld();
-		final BlockPos pos = context.getPos();
+	public ActionResultType useOn(ItemUseContext context) {
+		final World worldIn = context.getLevel();
+		final BlockPos pos = context.getClickedPos();
 		final PlayerEntity playerIn = context.getPlayer();
-		final @Nonnull ItemStack stack = context.getItem();
+		final @Nonnull ItemStack stack = context.getItemInHand();
 		
-		if (worldIn.isRemote)
+		if (worldIn.isClientSide)
 			return ActionResultType.SUCCESS;
 		
 		if (pos == null)
@@ -158,10 +158,10 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		final @Nonnull ItemStack itemStackIn = playerIn.getItemInHand(hand);
 		
-		if (playerIn.isSneaking()) {
+		if (playerIn.isShiftKeyDown()) {
 			clearPosition(itemStackIn);
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		}
@@ -202,12 +202,12 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 			name = "Nether";
 		} else if (DimensionUtils.IsEnd(dim)) {
 			name = "The End";
-		} else if (I18n.hasKey(dim.getLocation().toString())) {
-			name = I18n.format(dim.getLocation().toString());
-		} else if (I18n.hasKey(dim.getLocation().toString().replace(':', '.'))) {
-			name = I18n.format(dim.getLocation().toString().replace(':', '.'));
+		} else if (I18n.exists(dim.location().toString())) {
+			name = I18n.get(dim.location().toString());
+		} else if (I18n.exists(dim.location().toString().replace(':', '.'))) {
+			name = I18n.get(dim.location().toString().replace(':', '.'));
 		} else {
-			String raw = dim.getLocation().getPath();
+			String raw = dim.location().getPath();
 			name = raw.substring(0, 1).toUpperCase() + raw.substring(1);
 		}
 		
@@ -222,24 +222,24 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 
 	@Override
 	public boolean shouldRenderSelection(PlayerEntity player, ItemStack stack) {
-		return player.isCreative() && player.isSneaking()
-				&& !player.getHeldItemMainhand().isEmpty() && player.getHeldItemMainhand().getItem() instanceof PositionCrystal
-				&& !player.getHeldItemOffhand().isEmpty() && player.getHeldItemOffhand().getItem() instanceof PositionCrystal
-				&& getBlockPosition(player.getHeldItemMainhand()) != null
-				&& getBlockPosition(player.getHeldItemOffhand()) != null
-				&& DimensionUtils.InDimension(player, getDimension(player.getHeldItemMainhand()))
-				&& DimensionUtils.InDimension(player, getDimension(player.getHeldItemOffhand()))
+		return player.isCreative() && player.isShiftKeyDown()
+				&& !player.getMainHandItem().isEmpty() && player.getMainHandItem().getItem() instanceof PositionCrystal
+				&& !player.getOffhandItem().isEmpty() && player.getOffhandItem().getItem() instanceof PositionCrystal
+				&& getBlockPosition(player.getMainHandItem()) != null
+				&& getBlockPosition(player.getOffhandItem()) != null
+				&& DimensionUtils.InDimension(player, getDimension(player.getMainHandItem()))
+				&& DimensionUtils.InDimension(player, getDimension(player.getOffhandItem()))
 				;
 	}
 
 	@Override
 	public BlockPos getAnchor(PlayerEntity player, ItemStack stack) {
-		return getBlockPosition(player.getHeldItemMainhand());
+		return getBlockPosition(player.getMainHandItem());
 	}
 
 	@Override
 	public BlockPos getBoundingPos(PlayerEntity player, ItemStack stack) {
-		return getBlockPosition(player.getHeldItemOffhand());
+		return getBlockPosition(player.getOffhandItem());
 	}
 
 	@Override

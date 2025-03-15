@@ -84,28 +84,28 @@ public class ResearchTranscriptItem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
-		if (playerIn.isSneaking()) {
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		final @Nonnull ItemStack stack = playerIn.getItemInHand(hand);
+		if (playerIn.isShiftKeyDown()) {
 			return new ActionResult<ItemStack>(ActionResultType.PASS, stack);
 		}
 		
 		NostrumResearch research = getResearch(stack);
 		if (research == null) {
-			playerIn.sendMessage(new StringTextComponent("This transcript doesn't appear to have a valid research in it."), Util.DUMMY_UUID);
+			playerIn.sendMessage(new StringTextComponent("This transcript doesn't appear to have a valid research in it."), Util.NIL_UUID);
 			return new ActionResult<ItemStack>(ActionResultType.FAIL, stack);
 		}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
-		if (!worldIn.isRemote && attr != null) {
+		if (!worldIn.isClientSide && attr != null) {
 			if (attr.getCompletedResearches().contains(research.getKey())) {
-				playerIn.sendMessage(new TranslationTextComponent("info.research.already_know", new TranslationTextComponent(research.getNameKey())), Util.DUMMY_UUID);
+				playerIn.sendMessage(new TranslationTextComponent("info.research.already_know", new TranslationTextComponent(research.getNameKey())), Util.NIL_UUID);
 			} else {
 				attr.completeResearch(research.getKey());
-				NostrumMagicaSounds.LORE.play(null, playerIn.world, playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ());
+				NostrumMagicaSounds.LORE.play(null, playerIn.level, playerIn.getX(), playerIn.getY(), playerIn.getZ());
 				stack.shrink(1);
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) playerIn);
-				playerIn.sendMessage(new TranslationTextComponent("info.research.learn", new TranslationTextComponent(research.getNameKey())), Util.DUMMY_UUID);
+				playerIn.sendMessage(new TranslationTextComponent("info.research.learn", new TranslationTextComponent(research.getNameKey())), Util.NIL_UUID);
 				
 			}
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
@@ -116,23 +116,23 @@ public class ResearchTranscriptItem extends Item implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		NostrumResearch research = this.getResearch(stack);
 		if (research != null) {
-			tooltip.add(new TranslationTextComponent("item.nostrummagica." + ID + ".desc", new TranslationTextComponent(research.getNameKey()).mergeStyle(TextFormatting.BLUE)));
+			tooltip.add(new TranslationTextComponent("item.nostrummagica." + ID + ".desc", new TranslationTextComponent(research.getNameKey()).withStyle(TextFormatting.BLUE)));
 			
 			final PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 			INostrumMagic attr = player == null ? null : NostrumMagica.getMagicWrapper(player);
 			if (attr != null && attr.getCompletedResearches().contains(research.getKey())) {
 				tooltip.add(new StringTextComponent(" "));
-				tooltip.add(new StringTextComponent("Already Researched").mergeStyle(TextFormatting.RED));
+				tooltip.add(new StringTextComponent("Already Researched").withStyle(TextFormatting.RED));
 			}
 		}
 	}
 	
 	@Override
-	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-		if (this.isInGroup(group)) {
+	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+		if (this.allowdedIn(group)) {
 			
 			for (String key: CREATIVE_RESEARCHES) {
 				NostrumResearch research = NostrumResearch.lookup(key);

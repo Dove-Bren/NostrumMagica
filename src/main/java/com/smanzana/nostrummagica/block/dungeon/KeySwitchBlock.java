@@ -22,7 +22,7 @@ import net.minecraft.world.World;
  */
 public class KeySwitchBlock extends SwitchBlock {
 	
-	protected static final VoxelShape SWITCH_BLOCK_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16D, 3.2D, 16D);
+	protected static final VoxelShape SWITCH_BLOCK_AABB = Block.box(0.0D, 0.0D, 0.0D, 16D, 3.2D, 16D);
 
 	public static final String ID = "key_switch_block";
 	
@@ -46,14 +46,14 @@ public class KeySwitchBlock extends SwitchBlock {
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-		if (worldIn.isRemote || !player.isCreative()) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+		if (worldIn.isClientSide || !player.isCreative()) {
 			return ActionResultType.FAIL;
 		}
 
-		if (player.isCreative() && !player.getHeldItemMainhand().isEmpty() && player.getHeldItemMainhand().getItem() instanceof DyeItem) {
-			KeySwitchBlockTileEntity ent = (KeySwitchBlockTileEntity) worldIn.getTileEntity(pos);
-			DyeItem dye = (DyeItem) player.getHeldItemMainhand().getItem();
+		if (player.isCreative() && !player.getMainHandItem().isEmpty() && player.getMainHandItem().getItem() instanceof DyeItem) {
+			KeySwitchBlockTileEntity ent = (KeySwitchBlockTileEntity) worldIn.getBlockEntity(pos);
+			DyeItem dye = (DyeItem) player.getMainHandItem().getItem();
 			ent.setColor(dye.getDyeColor());
 			return ActionResultType.SUCCESS;
 		}

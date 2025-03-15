@@ -271,15 +271,15 @@ public class RoomChallenge2 extends StaticRoom {
 				"XXXXXXXXXXXXXXXXXXXXX",
 				'X', NostrumBlocks.lightDungeonBlock,
 				' ', null,
-				'(', new StaticBlockState(Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, Direction.EAST)), // EAST
-				')', new StaticBlockState(Blocks.LADDER.getDefaultState().with(LadderBlock.FACING, Direction.WEST)), // NORTH 
+				'(', new StaticBlockState(Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.EAST)), // EAST
+				')', new StaticBlockState(Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.WEST)), // NORTH 
 				'B', Blocks.IRON_BARS,
-				'V', new StaticBlockState(Blocks.VINE.getDefaultState().with(VineBlock.NORTH, true)),
+				'V', new StaticBlockState(Blocks.VINE.defaultBlockState().setValue(VineBlock.NORTH, true)),
 				'C', new StaticBlockState(Blocks.RED_CARPET),
-				'U', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
-				'R', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST)),
-				'D', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.SOUTH)),
-				'L', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.WEST)),
+				'U', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
+				'R', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.EAST)),
+				'D', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.SOUTH)),
+				'L', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.WEST)),
 				'1', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_WIND)),
 				'2', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_ENDER)),
 				'3', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_EARTH)),

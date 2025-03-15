@@ -88,7 +88,7 @@ public class NostrumSorceryDimension {
 		}
 		
 		protected static final boolean DungeonPresent(ServerWorld world, BlockPos center) {
-			return !world.isAirBlock(center.up());
+			return !world.isEmptyBlock(center.above());
 		}
 		
 	}
@@ -118,21 +118,21 @@ public class NostrumSorceryDimension {
 			// Capture current spawn point and then set new one in the sorcery dimension
 			if (NostrumMagica.getMagicWrapper(player) != null) {
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-				BlockPos blockpos = player.func_241140_K_();
+				BlockPos blockpos = player.getRespawnPosition();
 				
 				// Vanilla encodes no specific respawn as blockpos==null
 				if (blockpos != null) {
-					float yawToSave = player.func_242109_L();
-					boolean force = player.func_241142_M_();
-					RegistryKey<World> dim = player.func_241141_L_();
+					float yawToSave = player.getRespawnAngle();
+					boolean force = player.isRespawnForced();
+					RegistryKey<World> dim = player.getRespawnDimension();
 					attr.setSavedRespawnInfo(new VanillaRespawnInfo(dim, blockpos, yawToSave, force));
 				}
 				// else clear?
 			}
-			player.func_242111_a(NostrumDimensions.GetSorceryDimension(), spawn.up(2), Direction.NORTH.getHorizontalAngle(), true, false);
+			player.setRespawnPosition(NostrumDimensions.GetSorceryDimension(), spawn.above(2), Direction.NORTH.toYRot(), true, false);
 			
 			if (!player.isCreative() && !player.isSpectator()) {
-				player.setGameType(GameType.ADVENTURE);
+				player.setGameMode(GameType.ADVENTURE);
 			}
 			
 			return repositionEntity.apply(false);
@@ -147,7 +147,7 @@ public class NostrumSorceryDimension {
 			
 			final ServerPlayerEntity player = (ServerPlayerEntity) entity;
 			final BlockPos center = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
-			final UUID dungeonID = player.getUniqueID(); // Use entity UUID as dungeon ID?
+			final UUID dungeonID = player.getUUID(); // Use entity UUID as dungeon ID?
 			
 			if (!DungeonSpawner.DungeonPresent(destWorld, center)) {
 				DungeonSpawner.SpawnDungeon(destWorld, center, dungeonID);
@@ -155,7 +155,7 @@ public class NostrumSorceryDimension {
 			
 			final BlockPos spawn = center.north(); // Idr why this is like it is
 			Vector3d pos = new Vector3d(spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5);
-			float yaw = Direction.NORTH.getHorizontalAngle();
+			float yaw = Direction.NORTH.toYRot();
 			float pitch = 0;
 			return new PortalInfo(pos, Vector3d.ZERO, yaw, pitch);
 		}
@@ -176,20 +176,20 @@ public class NostrumSorceryDimension {
 		 * @param player
 		 */
 		public static void respawnPlayer(ServerPlayerEntity player) {
-			if (player.world.isRemote) {
+			if (player.level.isClientSide) {
 				return;
 			}
 			
 			BlockPos spawn = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
 			if (spawn == null) {
 				NostrumMagica.logger.warn("Unable to find player spawning location. Sending to overworld.");
-				player.changeDimension(player.server.getWorld(World.OVERWORLD));
+				player.changeDimension(player.server.getLevel(World.OVERWORLD));
 			} else {
 				spawn = spawn.north();
 				
-				player.teleport(player.server.getWorld(NostrumDimensions.GetSorceryDimension()),
+				player.teleportTo(player.server.getLevel(NostrumDimensions.GetSorceryDimension()),
 						spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5,
-						Direction.NORTH.getHorizontalAngle(),
+						Direction.NORTH.toYRot(),
 						0
 						);
 				player.fallDistance = 0;
@@ -214,7 +214,7 @@ public class NostrumSorceryDimension {
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 				@Nullable VanillaRespawnInfo info = attr.getSavedRespawnInfo();
 				if (info != null) {
-					((ServerPlayerEntity) entity).func_242111_a(info.dimension, info.pos, info.yaw, info.forced, false);
+					((ServerPlayerEntity) entity).setRespawnPosition(info.dimension, info.pos, info.yaw, info.forced, false);
 					attr.setSavedRespawnInfo(null);
 				}
 				
@@ -222,8 +222,8 @@ public class NostrumSorceryDimension {
 			}
 			
 			if (entity instanceof ServerPlayerEntity) {
-				if (((ServerPlayerEntity) entity).interactionManager.getGameType() == GameType.ADVENTURE) {
-					((ServerPlayerEntity) entity).setGameType(GameType.SURVIVAL);
+				if (((ServerPlayerEntity) entity).gameMode.getGameModeForPlayer() == GameType.ADVENTURE) {
+					((ServerPlayerEntity) entity).setGameMode(GameType.SURVIVAL);
 				}
 			}
 			
@@ -241,22 +241,22 @@ public class NostrumSorceryDimension {
 				// If no saved portal, try and used saved respawn info
 				if (pos == null) {
 					@Nullable VanillaRespawnInfo info = attr.getSavedRespawnInfo();
-					if (info != null && info.dimension.equals(destWorld.getDimensionKey())) {
+					if (info != null && info.dimension.equals(destWorld.dimension())) {
 						pos = info.pos;
 					}
 				}
 			}
 			
 			if (pos == null) {
-				pos = destWorld.getSpawnPoint();
+				pos = destWorld.getSharedSpawnPos();
 			}
 			
-			while (pos.getY() < destWorld.getHeight() && (!destWorld.isAirBlock(pos) || !destWorld.isAirBlock(pos.up()))) {
-				pos = pos.up();
+			while (pos.getY() < destWorld.getMaxBuildHeight() && (!destWorld.isEmptyBlock(pos) || !destWorld.isEmptyBlock(pos.above()))) {
+				pos = pos.above();
 			}
 			
 			Vector3d setPos = new Vector3d(pos.getX() + .5, pos.getY() + 2, pos.getZ() + .5);
-			float yaw = Direction.NORTH.getHorizontalAngle();
+			float yaw = Direction.NORTH.toYRot();
 			float pitch = 0;
 			return new PortalInfo(setPos, Vector3d.ZERO, yaw, pitch);
 		}
@@ -392,7 +392,7 @@ public class NostrumSorceryDimension {
 		@SubscribeEvent
 		public void onMobGrief(EntityMobGriefingEvent event) {
 			if (event.getEntity() != null
-					&& event.getEntity().world != null
+					&& event.getEntity().level != null
 					&& checkDimension(event.getEntity())) {
 				event.setResult(Result.DENY);
 			}
@@ -407,7 +407,7 @@ public class NostrumSorceryDimension {
 				return;
 			}
 			
-			if (event.world == null || event.world.isRemote()) {
+			if (event.world == null || event.world.isClientSide()) {
 				return;
 			}
 			final ServerWorld world = (ServerWorld) event.world;
@@ -416,10 +416,10 @@ public class NostrumSorceryDimension {
 				return;
 			}
 			
-			for (ServerPlayerEntity player : world.getPlayers()) {
+			for (ServerPlayerEntity player : world.players()) {
 				
 				// Make sure they aren't falling out of the world
-				if (player.getPosY() < 1) {
+				if (player.getY() < 1) {
 					NostrumMagica.logger.info("Respawning player " + player + " because they seem to have fallen out of the world");
 					DimensionEntryTeleporter.respawnPlayer(player);
 					continue; // skip rate limitting
@@ -429,12 +429,12 @@ public class NostrumSorceryDimension {
 					continue;
 				}
 				
-				double distSqr = Math.pow(player.getPosX() - player.lastTickPosX, 2)
-						+ Math.pow(player.getPosZ() - player.lastTickPosZ, 2)
-						+ Math.pow(player.getPosY() - player.lastTickPosY, 2);
+				double distSqr = Math.pow(player.getX() - player.xOld, 2)
+						+ Math.pow(player.getZ() - player.zOld, 2)
+						+ Math.pow(player.getY() - player.yOld, 2);
 				if (distSqr > 25) {
 					// Player appears to have teleported
-					player.setPositionAndUpdate(player.lastTickPosX, player.lastTickPosY, player.lastTickPosZ);
+					player.teleportTo(player.xOld, player.yOld, player.zOld);
 				}
 			}
 		}
@@ -449,20 +449,20 @@ public class NostrumSorceryDimension {
 		@SuppressWarnings("deprecation")
 		@SubscribeEvent
 		public void onFogDensityCheck(EntityViewRenderEvent.FogDensity event) {
-			final Entity entity = event.getInfo().getRenderViewEntity();
-			if (!checkDimension(entity.world)) {
+			final Entity entity = event.getInfo().getEntity();
+			if (!checkDimension(entity.level)) {
 				return;
 			}
 			
 			event.setCanceled(true);
 			
-			if (entity instanceof LivingEntity && ((LivingEntity)entity).isPotionActive(Effects.BLINDNESS)) {
+			if (entity instanceof LivingEntity && ((LivingEntity)entity).hasEffect(Effects.BLINDNESS)) {
 				//final Minecraft mc = Minecraft.getInstance();
-				float farPlaneDistance = event.getRenderer().getFarPlaneDistance();
+				float farPlaneDistance = event.getRenderer().getRenderDistance();
 				//final Vector3d cameraPos = event.getInfo().getProjectedView();
-				//boolean nearFog = ((ClientWorld) entity.world).func_239132_a_().func_230493_a_(MathHelper.floor(cameraPos.getX()), MathHelper.floor(cameraPos.getY())) || mc.ingameGUI.getBossOverlay().shouldCreateFog();
+				//boolean nearFog = ((ClientWorld) entity.world).effects().isFoggyAt(MathHelper.floor(cameraPos.getX()), MathHelper.floor(cameraPos.getY())) || mc.ingameGUI.getBossOverlay().shouldCreateFog();
 				
-				int i = ((LivingEntity)entity).getActivePotionEffect(Effects.BLINDNESS).getDuration();
+				int i = ((LivingEntity)entity).getEffect(Effects.BLINDNESS).getDuration();
 				float rangeMod = MathHelper.lerp(Math.min(1.0F, (float)i / 20.0F), farPlaneDistance, 5.0F);
 				final float near;
 				final float far;
@@ -486,7 +486,7 @@ public class NostrumSorceryDimension {
 		
 		@SubscribeEvent
 		public void onFogColorCheck(EntityViewRenderEvent.FogColors event) {
-			if (!checkDimension(event.getInfo().getRenderViewEntity().world)) {
+			if (!checkDimension(event.getInfo().getEntity().level)) {
 				return;
 			}
 			event.setRed(.2f);

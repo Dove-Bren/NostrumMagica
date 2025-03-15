@@ -70,12 +70,12 @@ public class ResourceItem extends Item implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
 		final String descKey = "item." + this.getRegistryName().getPath() + ".desc";
 		
-		if (I18n.hasKey(descKey)) {
+		if (I18n.exists(descKey)) {
 			tooltip.add(new TranslationTextComponent(descKey));
 		}
 	}

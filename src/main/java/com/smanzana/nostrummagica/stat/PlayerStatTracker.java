@@ -32,11 +32,11 @@ public class PlayerStatTracker extends WorldSavedData {
 	}
 	
 	@Override
-	public void read(CompoundNBT nbt) {
+	public void load(CompoundNBT nbt) {
 		synchronized(this) {
 			this.playerTable.clear();
 			
-			for (String key : nbt.keySet()) {
+			for (String key : nbt.getAllKeys()) {
 				UUID id;
 				try {
 					id = UUID.fromString(key);
@@ -53,7 +53,7 @@ public class PlayerStatTracker extends WorldSavedData {
 	}
 
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
+	public CompoundNBT save(CompoundNBT nbt) {
 		synchronized(this) {
 			for (Entry<UUID, PlayerStats> entry : playerTable.entrySet()) {
 					nbt.put(entry.getKey().toString(), entry.getValue().toNBT(null));
@@ -64,7 +64,7 @@ public class PlayerStatTracker extends WorldSavedData {
 	}
 	
 	public static final void Update(@Nonnull PlayerEntity player, Consumer<PlayerStats> updater) {
-		if (player.world.isRemote()) {
+		if (player.level.isClientSide()) {
 			return;
 		}
 		
@@ -75,24 +75,24 @@ public class PlayerStatTracker extends WorldSavedData {
 	}
 	
 	public @Nonnull PlayerStats get(@Nonnull PlayerEntity player) {
-		return playerTable.computeIfAbsent(player.getUniqueID(), (u) -> new PlayerStats());
+		return playerTable.computeIfAbsent(player.getUUID(), (u) -> new PlayerStats());
 	}
 	
 	public void update(@Nonnull PlayerEntity player, PlayerStats stats) {
-		if (player.world.isRemote()) {
+		if (player.level.isClientSide()) {
 			return;
 		}
-		if (!playerTable.containsKey(player.getUniqueID()) || stats != playerTable.get(player.getUniqueID())) {
-			playerTable.put(player.getUniqueID(), stats);
+		if (!playerTable.containsKey(player.getUUID()) || stats != playerTable.get(player.getUUID())) {
+			playerTable.put(player.getUUID(), stats);
 		}
 		
-		this.markDirty();
+		this.setDirty();
 	    NostrumMagica.instance.proxy.sendPlayerStatSync(player);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	public void override(@Nonnull PlayerEntity player, PlayerStats stats) {
-		playerTable.put(player.getUniqueID(), stats);
+		playerTable.put(player.getUUID(), stats);
 	}
 	
 }

@@ -35,7 +35,7 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 	private final InfoScreen screen;
 	
 	public PaginatedInfoSubScreen(InfoScreen screen, String key) {
-		desc = I18n.format("info." + key + ".name", (Object[]) null);
+		desc = I18n.get("info." + key + ".name", (Object[]) null);
 		this.key = key;
 		this.page = 0;
 		this.screen = screen;
@@ -43,34 +43,34 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 	
 	@Override
 	public void draw(INostrumMagic attr, Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
-		int len = mc.fontRenderer.getStringWidth(desc);
-		mc.fontRenderer.drawStringWithShadow(matrixStackIn, desc, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
+		int len = mc.font.width(desc);
+		mc.font.drawShadow(matrixStackIn, desc, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
 		
 		if (pages == null) {
-			String translation = I18n.format("info." + key + ".desc", (Object[]) null);
+			String translation = I18n.get("info." + key + ".desc", (Object[]) null);
 			paginate(translation, width - 10, height - 20);
 		}
 		
 		int i = 0;
 		for (String line : pages[page])
-			mc.fontRenderer.drawString(matrixStackIn, line,
+			mc.font.draw(matrixStackIn, line,
 					x + 5,
-					y + 20 + (i++ * (mc.fontRenderer.FONT_HEIGHT + LINE_HEIGHT_EXTRA)),
+					y + 20 + (i++ * (mc.font.lineHeight + LINE_HEIGHT_EXTRA)),
 					0xFFFFFFFF);
 		
 		if (pages.length > 1) {
 			String str = (page + 1) + " / " + pages.length;
-			len = mc.fontRenderer.getStringWidth(str);
-			mc.fontRenderer.drawString(matrixStackIn, str,
+			len = mc.font.width(str);
+			mc.font.draw(matrixStackIn, str,
 					x + (width - len) / 2,
-					y + height - (mc.fontRenderer.FONT_HEIGHT + 2), 0xFFDD55);
+					y + height - (mc.font.lineHeight + 2), 0xFFDD55);
 		}
 	}
 	
 	private void paginate(String input, int pageWidth, int pageHeight) {
 		Minecraft mc = Minecraft.getInstance();
-		FontRenderer fonter = mc.fontRenderer;
-		final int maxLines = (pageHeight / (LINE_HEIGHT_EXTRA + fonter.FONT_HEIGHT)) - 1;
+		FontRenderer fonter = mc.font;
+		final int maxLines = (pageHeight / (LINE_HEIGHT_EXTRA + fonter.lineHeight)) - 1;
 		int count;
 		List<String[]> pages = new LinkedList<>();
 		String[] lines;
@@ -108,7 +108,7 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 					} else
 						word = input.substring(0, pos + 1);
 					
-					int width = fonter.getStringWidth(word);
+					int width = fonter.width(word);
 					if (length > 0 && length + width > pageWidth) {
 						lines[count++] = buffer.toString();
 						buffer = new StringBuffer();
@@ -155,7 +155,7 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 
 				Minecraft mc = Minecraft.getInstance();
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				mc.getTextureManager().bindTexture(BookScreen.background);
+				mc.getTextureManager().bind(BookScreen.background);
 				int textureX = 0;
 				int textureY = 223;
 
@@ -198,7 +198,7 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 
         		Minecraft mc = Minecraft.getInstance();
         		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                mc.getTextureManager().bindTexture(BookScreen.background);
+                mc.getTextureManager().bind(BookScreen.background);
                 int textureX = 48;
                 int textureY = 221;
 
@@ -213,7 +213,7 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
         }
         
         public void playPressSound(SoundHandler soundHandlerIn) {
-        	soundHandlerIn.play(SimpleSound.master(NostrumMagicaSounds.UI_TICK.getEvent(), 1.0F));
+        	soundHandlerIn.play(SimpleSound.forUI(NostrumMagicaSounds.UI_TICK.getEvent(), 1.0F));
         }
 		
 		@Override

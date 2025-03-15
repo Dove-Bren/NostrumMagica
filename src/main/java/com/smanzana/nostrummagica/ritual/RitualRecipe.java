@@ -138,7 +138,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 				icon,
 				element,
 				reagents,
-				Ingredient.fromStacks(center),
+				Ingredient.of(center),
 				requirement,
 				outcome
 				);
@@ -204,14 +204,14 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 		Ingredient[] extraTags;
 		extraTags = new Ingredient[extras.length];
 		for (int i = 0; i < extras.length; i++) {
-			extraTags[i] = extras[i].isEmpty() ? Ingredient.EMPTY : Ingredient.fromStacks(extras[i]);
+			extraTags[i] = extras[i].isEmpty() ? Ingredient.EMPTY : Ingredient.of(extras[i]);
 		}
 		
 		return createTier3(titleKey,
 				icon,
 				element,
 				reagents,
-				Ingredient.fromStacks(center),
+				Ingredient.of(center),
 				extraTags,
 				requirement,
 				outcome
@@ -283,7 +283,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 	 */
 	public RitualResult perform(World world, PlayerEntity player, BlockPos center, IRitualLayout ingredients) {
 		
-		if (world.isRemote) {
+		if (world.isClientSide) {
 			return new RitualResult(true, this.element, ItemStack.EMPTY, ItemStack.EMPTY, null, null);
 		}
 		

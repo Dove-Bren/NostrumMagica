@@ -53,8 +53,8 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 		super(NostrumTileEntities.DungeonLauncherTileType);
 		this.inventory = new Inventory(9) {
 			@Override
-			public void markDirty() {
-				DungeonLauncherTileEntity.this.markDirty();
+			public void setChanged() {
+				DungeonLauncherTileEntity.this.setChanged();
 			}
 		};
 		cooldownTicks = 0;
@@ -85,7 +85,7 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 	}
 	
 	protected boolean checkForEntity() {
-		Direction direction = world.getBlockState(this.pos).get(PutterBlock.FACING);
+		Direction direction = level.getBlockState(this.worldPosition).getValue(PutterBlock.FACING);
 		final int range = getRange();
 		int dx = 0;
 		int dy = 0;
@@ -126,7 +126,7 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 			gz = 1;
 			break;
 		}
-		List<LivingEntity> ents = world.getEntitiesWithinAABB(LivingEntity.class, VoxelShapes.fullCube().getBoundingBox().offset(pos).expand(dx, dy, dz).grow(gx, gy, gz), this::canSeeEntity);
+		List<LivingEntity> ents = level.getEntitiesOfClass(LivingEntity.class, VoxelShapes.block().bounds().move(worldPosition).expandTowards(dx, dy, dz).inflate(gx, gy, gz), this::canSeeEntity);
 		return ents != null && !ents.isEmpty();
 	}
 	
@@ -140,8 +140,8 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 	
 	protected Vector3d getFirePos() {
 		final float startDistance = 1f;
-		final BlockPos pos = this.getPos();
-		final Direction direction = world.getBlockState(pos).get(PutterBlock.FACING);
+		final BlockPos pos = this.getBlockPos();
+		final Direction direction = level.getBlockState(pos).getValue(PutterBlock.FACING);
 		switch (direction) {
 		case DOWN:
 			return new Vector3d(pos.getX() + .5, pos.getY() - startDistance, pos.getZ() + .5);
@@ -191,19 +191,19 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 	
 	protected void fire() {
 		final Vector3d source = getFirePos();
-		ProjectileEntity projectile = this.makeProjectile(getWorld(), source.getX(), source.getY(), source.getZ());
+		ProjectileEntity projectile = this.makeProjectile(getLevel(), source.x(), source.y(), source.z());
 		if (projectile != null) {
-			final Vector3d direction = source.subtract(Vector3d.copyCentered(this.getPos())).normalize();
-			projectile.shoot(direction.getX(), direction.getY(), direction.getZ(), getFireSpeed(projectile), getFireInaccuracy(projectile));
-			getWorld().addEntity(projectile);
+			final Vector3d direction = source.subtract(Vector3d.atCenterOf(this.getBlockPos())).normalize();
+			projectile.shoot(direction.x(), direction.y(), direction.z(), getFireSpeed(projectile), getFireInaccuracy(projectile));
+			getLevel().addFreshEntity(projectile);
 			playFireEffect(projectile, direction);
 		}
 	}
 	
 	protected void playFireEffect(ProjectileEntity projectile, Vector3d direction) {
-		projectile.world.playSound(null, this.getPos(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 1f, 1f);
-		((ServerWorld) projectile.world).spawnParticle(ParticleTypes.SMOKE, projectile.getPosX(), projectile.getPosY(), projectile.getPosZ(),
-				10, direction.getX(), direction.getY(), direction.getZ(), .2f);
+		projectile.level.playSound(null, this.getBlockPos(), SoundEvents.FIRECHARGE_USE, SoundCategory.BLOCKS, 1f, 1f);
+		((ServerWorld) projectile.level).sendParticles(ParticleTypes.SMOKE, projectile.getX(), projectile.getY(), projectile.getZ(),
+				10, direction.x(), direction.y(), direction.z(), .2f);
 	}
 	
 	protected @Nullable ProjectileEntity makeProjectile(World world, double x, double y, double z) {
@@ -217,12 +217,12 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 			return makeElementalProjectile(world, x, y, z, element);
 		} else if (stack.getItem() instanceof TippedArrowItem) {
 			ArrowEntity arrow = new ArrowEntity(world, x, y, z);
-			arrow.pickupStatus = AbstractArrowEntity.PickupStatus.DISALLOWED;
-			arrow.setPotionEffect(stack);
+			arrow.pickup = AbstractArrowEntity.PickupStatus.DISALLOWED;
+			arrow.setEffectsFromItem(stack);
 			return arrow; 
 		} else if (stack.getItem() instanceof ArrowItem) {
 			ArrowEntity arrow = new ArrowEntity(world, x, y, z);
-			arrow.pickupStatus = AbstractArrowEntity.PickupStatus.DISALLOWED;
+			arrow.pickup = AbstractArrowEntity.PickupStatus.DISALLOWED;
 			return arrow;
 		}
 		
@@ -232,7 +232,7 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 	
 	protected MagicDamageProjectileEntity makeElementalProjectile(World world, double x, double y, double z, EMagicElement element) {
 		MagicDamageProjectileEntity proj = new MagicDamageProjectileEntity(NostrumEntityTypes.magicDamageProjectile, world);
-		proj.setPosition(x, y, z);
+		proj.setPos(x, y, z);
 		proj.setElement(element);
 		proj.setDamage(4f);
 		return proj;
@@ -240,8 +240,8 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 	
 	protected ItemStack getRandomHeldItem() {
 		List<ItemStack> heldItems = new ArrayList<>(9);
-		for (int i = 0; i < inventory.getSizeInventory(); i++) {
-			ItemStack stack = inventory.getStackInSlot(i);
+		for (int i = 0; i < inventory.getContainerSize(); i++) {
+			ItemStack stack = inventory.getItem(i);
 			if (stack.isEmpty()) {
 				continue;
 			}
@@ -256,8 +256,8 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.put(NBT_INVENTORY, Inventories.serializeInventory(inventory));
 		
@@ -265,8 +265,8 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		if (nbt == null)
 			return;
@@ -277,7 +277,7 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 	@Override
 	public void tick() {
 		ticksExisted++;
-		if (world == null || world.isRemote) {
+		if (level == null || level.isClientSide) {
 			return;
 		}
 		

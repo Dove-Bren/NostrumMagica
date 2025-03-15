@@ -57,11 +57,11 @@ public class MagicCyclerShape extends SpellShape implements ISelectableShape {
 		
 		@Override
 		public void spawn(LivingEntity caster) {
-			SpellSaucerEntity projectile = new CyclerSpellSaucerEntity(getState().getSelf().world, getState().getSelf(),
+			SpellSaucerEntity projectile = new CyclerSpellSaucerEntity(getState().getSelf().level, getState().getSelf(),
 					MagicCyclerShapeInstance.this,
 					5.0f, (int) duration * 20, hitBlocks, false);
 			
-			world.addEntity(projectile);
+			world.addFreshEntity(projectile);
 		}
 
 		@Override
@@ -78,7 +78,7 @@ public class MagicCyclerShape extends SpellShape implements ISelectableShape {
 				onProjectileHit(new SpellLocation(world, this.pos));
 			}
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
-				onProjectileHit(new SpellLocation(entity.world, entity.getPosition()));
+				onProjectileHit(new SpellLocation(entity.level, entity.blockPosition()));
 			} else if (hitEnts) {
 				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, 1f, true);
 			}
@@ -96,7 +96,7 @@ public class MagicCyclerShape extends SpellShape implements ISelectableShape {
 	}
 	
 	private static final String ID = "vortex_blade";
-	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.GINSENG, 1),
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.of(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.GINSENG, 1),
 			ReagentItem.CreateStack(ReagentType.SKY_ASH, 1)));
 	
 	public static final SpellShapeProperty<Integer> DURATION = new IntSpellShapeProperty("duration", 10, 20, 50);
@@ -146,7 +146,7 @@ public class MagicCyclerShape extends SpellShape implements ISelectableShape {
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
-			costs = NonNullList.from(ItemStack.EMPTY,
+			costs = NonNullList.of(ItemStack.EMPTY,
 				ItemStack.EMPTY,
 				new ItemStack(Items.COAL),
 				new ItemStack(Blocks.COAL_BLOCK)

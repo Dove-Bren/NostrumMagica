@@ -22,36 +22,36 @@ public class CommandForceBind {
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
 				Commands.literal("nostrumbind")
-					.requires(s -> s.hasPermissionLevel(2))
+					.requires(s -> s.hasPermission(2))
 					.executes(ctx -> execute(ctx))
 				);
 	}
 
 	private static final int execute(CommandContext<CommandSource> context) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().asPlayer();
+		ServerPlayerEntity player = context.getSource().getPlayerOrException();
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
-			context.getSource().sendFeedback(new StringTextComponent("Could not find magic wrapper for player"), true);
+			context.getSource().sendSuccess(new StringTextComponent("Could not find magic wrapper for player"), true);
 			return 1;
 		}
 		
-		ItemStack stack = player.getHeldItemMainhand();
+		ItemStack stack = player.getMainHandItem();
 		if (stack.isEmpty() || !(stack.getItem() instanceof SpellTome)) {
-			context.getSource().sendFeedback(new StringTextComponent("To force a bind, hold the tome that's being binded to in your main hand"), true);
+			context.getSource().sendSuccess(new StringTextComponent("To force a bind, hold the tome that's being binded to in your main hand"), true);
 			return 1;
 		}
 		
-		ItemStack offhand = player.getHeldItemOffhand();
+		ItemStack offhand = player.getOffhandItem();
 		if (offhand.isEmpty() || !(offhand.getItem() instanceof SpellScroll)
 				|| SpellScroll.GetSpell(offhand) == null) {
-			context.getSource().sendFeedback(new StringTextComponent("Either use while holding a tome that's currently binding OR hold a spell scroll in your offhand"), true);
+			context.getSource().sendSuccess(new StringTextComponent("Either use while holding a tome that's currently binding OR hold a spell scroll in your offhand"), true);
 		} else {
 			Spell spell = SpellScroll.GetSpell(offhand);
 			if (SpellTome.hasRoom(stack, spell)) {
 				SpellTome.addSpell(stack, spell);
 			} else {
-				context.getSource().sendFeedback(new StringTextComponent("The tome is full"), true);
+				context.getSource().sendSuccess(new StringTextComponent("The tome is full"), true);
 			}
 		}
 			

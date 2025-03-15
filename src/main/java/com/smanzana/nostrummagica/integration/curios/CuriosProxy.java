@@ -87,8 +87,8 @@ public class CuriosProxy {
 				new ItemStack(NostrumCurios.smallRibbon),
 				null,
 				new ReagentType[] {ReagentType.MANI_DUST, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
-				Ingredient.fromTag(NostrumTags.Items.CrystalSmall),
-				new Ingredient[] {Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromTag(ItemTags.WOOL), Ingredient.fromTag(ItemTags.WOOL), Ingredient.fromTag(Tags.Items.NUGGETS_GOLD)},
+				Ingredient.of(NostrumTags.Items.CrystalSmall),
+				new Ingredient[] {Ingredient.of(Tags.Items.NUGGETS_GOLD), Ingredient.of(ItemTags.WOOL), Ingredient.of(ItemTags.WOOL), Ingredient.of(Tags.Items.NUGGETS_GOLD)},
 				new ResearchRequirement("ribbons"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.smallRibbon)));
 		registry.register(recipe);
@@ -97,8 +97,8 @@ public class CuriosProxy {
 				new ItemStack(NostrumCurios.mediumRibbon),
 				null,
 				new ReagentType[] {ReagentType.MANI_DUST, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
-				Ingredient.fromItems(NostrumCurios.smallRibbon),
-				new Ingredient[] {Ingredient.fromTag(Tags.Items.INGOTS_GOLD), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.EMPTY, Ingredient.fromTag(Tags.Items.INGOTS_GOLD)},
+				Ingredient.of(NostrumCurios.smallRibbon),
+				new Ingredient[] {Ingredient.of(Tags.Items.INGOTS_GOLD), Ingredient.of(NostrumTags.Items.CrystalMedium), Ingredient.EMPTY, Ingredient.of(Tags.Items.INGOTS_GOLD)},
 				new ResearchRequirement("ribbons"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.mediumRibbon)));
 		registry.register(recipe);
@@ -107,8 +107,8 @@ public class CuriosProxy {
 				new ItemStack(NostrumCurios.largeRibbon),
 				null,
 				new ReagentType[] {ReagentType.MANI_DUST, ReagentType.SPIDER_SILK, ReagentType.MANI_DUST, ReagentType.SPIDER_SILK},
-				Ingredient.fromItems(NostrumCurios.mediumRibbon),
-				new Ingredient[] {Ingredient.fromTag(Tags.Items.GEMS_DIAMOND), Ingredient.fromTag(NostrumTags.Items.CrystalLarge), Ingredient.fromTag(Tags.Items.GEMS_EMERALD), Ingredient.fromTag(Tags.Items.GEMS_DIAMOND)},
+				Ingredient.of(NostrumCurios.mediumRibbon),
+				new Ingredient[] {Ingredient.of(Tags.Items.GEMS_DIAMOND), Ingredient.of(NostrumTags.Items.CrystalLarge), Ingredient.of(Tags.Items.GEMS_EMERALD), Ingredient.of(Tags.Items.GEMS_DIAMOND)},
 				new ResearchRequirement("ribbons"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.largeRibbon)));
 		registry.register(recipe);
@@ -117,8 +117,8 @@ public class CuriosProxy {
 				new ItemStack(NostrumCurios.fierceRibbon),
 				null,
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST, ReagentType.BLACK_PEARL, ReagentType.GRAVE_DUST},
-				Ingredient.fromItems(NostrumCurios.largeRibbon),
-				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(NostrumTags.Items.SlabFierce), Ingredient.fromTag(Tags.Items.GEMS_DIAMOND), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
+				Ingredient.of(NostrumCurios.largeRibbon),
+				new Ingredient[] {Ingredient.of(NostrumTags.Items.CrystalSmall), Ingredient.of(NostrumTags.Items.SlabFierce), Ingredient.of(Tags.Items.GEMS_DIAMOND), Ingredient.of(NostrumTags.Items.CrystalSmall)},
 				new ResearchRequirement("ribbons_enhanced"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.fierceRibbon)));
 		registry.register(recipe);
@@ -127,8 +127,8 @@ public class CuriosProxy {
 				new ItemStack(NostrumCurios.kindRibbon),
 				null,
 				new ReagentType[] {ReagentType.SKY_ASH, ReagentType.CRYSTABLOOM, ReagentType.SKY_ASH, ReagentType.CRYSTABLOOM},
-				Ingredient.fromItems(NostrumCurios.largeRibbon),
-				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(NostrumTags.Items.SlabKind), Ingredient.fromTag(Tags.Items.GEMS_EMERALD), Ingredient.fromTag(NostrumTags.Items.CrystalSmall)},
+				Ingredient.of(NostrumCurios.largeRibbon),
+				new Ingredient[] {Ingredient.of(NostrumTags.Items.CrystalSmall), Ingredient.of(NostrumTags.Items.SlabKind), Ingredient.of(Tags.Items.GEMS_EMERALD), Ingredient.of(NostrumTags.Items.CrystalSmall)},
 				new ResearchRequirement("ribbons_enhanced"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.kindRibbon)));
 		registry.register(recipe);
@@ -137,8 +137,8 @@ public class CuriosProxy {
 				new ItemStack(NostrumCurios.enderBelt),
 				EMagicElement.ENDER,
 				new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.GINSENG, ReagentType.SPIDER_SILK, ReagentType.SPIDER_SILK},
-				Ingredient.fromTag(NostrumTags.Items.InfusedGemEnder),
-				new Ingredient[] {Ingredient.fromTag(Tags.Items.LEATHER), Ingredient.fromTag(Tags.Items.LEATHER), Ingredient.fromTag(Tags.Items.LEATHER), Ingredient.fromTag(NostrumTags.Items.CrystalMedium)},
+				Ingredient.of(NostrumTags.Items.InfusedGemEnder),
+				new Ingredient[] {Ingredient.of(Tags.Items.LEATHER), Ingredient.of(Tags.Items.LEATHER), Ingredient.of(Tags.Items.LEATHER), Ingredient.of(NostrumTags.Items.CrystalMedium)},
 				new ResearchRequirement("belts"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.enderBelt)));
 		registry.register(recipe);
@@ -147,8 +147,8 @@ public class CuriosProxy {
 				new ItemStack(NostrumCurios.lightningBelt),
 				EMagicElement.LIGHTNING,
 				new ReagentType[] {ReagentType.SPIDER_SILK, ReagentType.BLACK_PEARL, ReagentType.SPIDER_SILK, ReagentType.SPIDER_SILK},
-				Ingredient.fromTag(NostrumTags.Items.InfusedGemLightning),
-				new Ingredient[] {Ingredient.fromTag(Tags.Items.LEATHER), Ingredient.fromTag(Tags.Items.LEATHER), Ingredient.fromTag(Tags.Items.LEATHER), Ingredient.fromTag(NostrumTags.Items.CrystalMedium)},
+				Ingredient.of(NostrumTags.Items.InfusedGemLightning),
+				new Ingredient[] {Ingredient.of(Tags.Items.LEATHER), Ingredient.of(Tags.Items.LEATHER), Ingredient.of(Tags.Items.LEATHER), Ingredient.of(NostrumTags.Items.CrystalMedium)},
 				new ResearchRequirement("belts"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.lightningBelt)));
 		registry.register(recipe);
@@ -157,8 +157,8 @@ public class CuriosProxy {
 				new ItemStack(NostrumCurios.ringGold),
 				null,
 				new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
-				Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
-				new Ingredient[] {Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(Tags.Items.NUGGETS_GOLD), Ingredient.fromTag(Tags.Items.NUGGETS_GOLD)},
+				Ingredient.of(Tags.Items.INGOTS_GOLD),
+				new Ingredient[] {Ingredient.of(Tags.Items.NUGGETS_GOLD), Ingredient.of(NostrumTags.Items.CrystalSmall), Ingredient.of(Tags.Items.NUGGETS_GOLD), Ingredient.of(Tags.Items.NUGGETS_GOLD)},
 				new ResearchRequirement("rings"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringGold)));
 		registry.register(recipe);
@@ -167,8 +167,8 @@ public class CuriosProxy {
 				new ItemStack(NostrumCurios.ringTrueGold),
 				null,
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL},
-				Ingredient.fromItems(NostrumCurios.ringGold),
-				new Ingredient[] {Ingredient.fromTag(Tags.Items.INGOTS_GOLD), Ingredient.fromTag(NostrumTags.Items.SlabFierce), Ingredient.EMPTY, Ingredient.fromTag(Tags.Items.INGOTS_GOLD)},
+				Ingredient.of(NostrumCurios.ringGold),
+				new Ingredient[] {Ingredient.of(Tags.Items.INGOTS_GOLD), Ingredient.of(NostrumTags.Items.SlabFierce), Ingredient.EMPTY, Ingredient.of(Tags.Items.INGOTS_GOLD)},
 				new ResearchRequirement("rings_true"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringTrueGold)));
 		registry.register(recipe);
@@ -177,23 +177,23 @@ public class CuriosProxy {
 				new ItemStack(NostrumCurios.ringCorruptedGold),
 				null,
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL},
-				Ingredient.fromItems(NostrumCurios.ringGold),
-				new Ingredient[] {Ingredient.fromTag(Tags.Items.INGOTS_GOLD), Ingredient.fromTag(NostrumTags.Items.SlabKind), Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(Tags.Items.INGOTS_GOLD)},
+				Ingredient.of(NostrumCurios.ringGold),
+				new Ingredient[] {Ingredient.of(Tags.Items.INGOTS_GOLD), Ingredient.of(NostrumTags.Items.SlabKind), Ingredient.of(NostrumTags.Items.CrystalSmall), Ingredient.of(Tags.Items.INGOTS_GOLD)},
 				new ResearchRequirement("rings_corrupted"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringCorruptedGold)));
 		registry.register(recipe);
 		
 		// Try to use silver, but use iron if no silver is in the modpack
-		Ingredient silver = NostrumTags.Items.SilverIngot.getAllElements().isEmpty()
-				? Ingredient.fromTag(Tags.Items.INGOTS_IRON)
-				: Ingredient.fromTag(NostrumTags.Items.SilverIngot);
+		Ingredient silver = NostrumTags.Items.SilverIngot.getValues().isEmpty()
+				? Ingredient.of(Tags.Items.INGOTS_IRON)
+				: Ingredient.of(NostrumTags.Items.SilverIngot);
 		
 		recipe = RitualRecipe.createTier3("ring_silver",
 				new ItemStack(NostrumCurios.ringSilver),
 				null,
 				new ReagentType[] {ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST, ReagentType.MANI_DUST},
 				silver,
-				new Ingredient[] {silver, Ingredient.fromTag(NostrumTags.Items.CrystalSmall), silver, silver},
+				new Ingredient[] {silver, Ingredient.of(NostrumTags.Items.CrystalSmall), silver, silver},
 				new ResearchRequirement("rings"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringSilver)));
 		registry.register(recipe);
@@ -202,8 +202,8 @@ public class CuriosProxy {
 				new ItemStack(NostrumCurios.ringTrueSilver),
 				null,
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL},
-				Ingredient.fromItems(NostrumCurios.ringSilver),
-				new Ingredient[] {silver, Ingredient.fromTag(NostrumTags.Items.SlabKind), silver, silver},
+				Ingredient.of(NostrumCurios.ringSilver),
+				new Ingredient[] {silver, Ingredient.of(NostrumTags.Items.SlabKind), silver, silver},
 				new ResearchRequirement("rings_true"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringTrueSilver)));
 		registry.register(recipe);
@@ -212,8 +212,8 @@ public class CuriosProxy {
 				new ItemStack(NostrumCurios.ringCorruptedSilver),
 				null,
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL},
-				Ingredient.fromItems(NostrumCurios.ringSilver),
-				new Ingredient[] {silver, Ingredient.fromTag(NostrumTags.Items.SlabFierce), Ingredient.fromTag(NostrumTags.Items.CrystalSmall), silver},
+				Ingredient.of(NostrumCurios.ringSilver),
+				new Ingredient[] {silver, Ingredient.of(NostrumTags.Items.SlabFierce), Ingredient.of(NostrumTags.Items.CrystalSmall), silver},
 				new ResearchRequirement("rings_corrupted"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringCorruptedSilver)));
 		registry.register(recipe);
@@ -222,8 +222,8 @@ public class CuriosProxy {
 				new ItemStack(NostrumCurios.ringMage),
 				null,
 				new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANDRAKE_ROOT, ReagentType.CRYSTABLOOM, ReagentType.BLACK_PEARL},
-				Ingredient.fromItems(NostrumCurios.ringSilver),
-				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.CrystalSmall), Ingredient.fromTag(NostrumTags.Items.SlabKind), Ingredient.EMPTY, silver},
+				Ingredient.of(NostrumCurios.ringSilver),
+				new Ingredient[] {Ingredient.of(NostrumTags.Items.CrystalSmall), Ingredient.of(NostrumTags.Items.SlabKind), Ingredient.EMPTY, silver},
 				new ResearchRequirement("rings_true"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.ringMage)));
 		registry.register(recipe);
@@ -232,8 +232,8 @@ public class CuriosProxy {
 				new ItemStack(NostrumCurios.floatGuard),
 				EMagicElement.WIND,
 				new ReagentType[] {ReagentType.SKY_ASH, ReagentType.GRAVE_DUST, ReagentType.MANI_DUST, ReagentType.SKY_ASH},
-				Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
-				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.SpriteCore), Ingredient.fromTag(NostrumTags.Items.SpriteCore), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.SpriteCore)},
+				Ingredient.of(Tags.Items.INGOTS_GOLD),
+				new Ingredient[] {Ingredient.of(NostrumTags.Items.SpriteCore), Ingredient.of(NostrumTags.Items.SpriteCore), Ingredient.of(NostrumTags.Items.CrystalMedium), Ingredient.of(NostrumTags.Items.SpriteCore)},
 				new ResearchRequirement("ribbons"),
 				new OutcomeSpawnItem(new ItemStack(NostrumCurios.floatGuard)));
 		registry.register(recipe);
@@ -244,8 +244,8 @@ public class CuriosProxy {
 				dragonwings,
 				EMagicElement.PHYSICAL,
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
-				Ingredient.fromTag(Tags.Items.INGOTS_GOLD),
-				new Ingredient[] {Ingredient.fromTag(NostrumTags.Items.DragonWing), Ingredient.fromItems(NostrumCurios.ringGold), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.fromTag(NostrumTags.Items.DragonWing)},
+				Ingredient.of(Tags.Items.INGOTS_GOLD),
+				new Ingredient[] {Ingredient.of(NostrumTags.Items.DragonWing), Ingredient.of(NostrumCurios.ringGold), Ingredient.of(NostrumTags.Items.CrystalMedium), Ingredient.of(NostrumTags.Items.DragonWing)},
 				new ResearchRequirement("dragon_wing_pendants"),
 				new OutcomeSpawnItem(dragonwings));
 		registry.register(recipe);
@@ -260,8 +260,8 @@ public class CuriosProxy {
 					upgradedStack,
 					elem,
 					new ReagentType[] {ReagentType.SKY_ASH, ReagentType.SKY_ASH, ReagentType.MANI_DUST, ReagentType.CRYSTABLOOM},
-					Ingredient.fromItems(armor),
-					new Ingredient[] {Ingredient.EMPTY, Ingredient.fromItems(NostrumCurios.dragonWingPendant), Ingredient.fromTag(NostrumTags.Items.CrystalMedium), Ingredient.EMPTY},
+					Ingredient.of(armor),
+					new Ingredient[] {Ingredient.EMPTY, Ingredient.of(NostrumCurios.dragonWingPendant), Ingredient.of(NostrumTags.Items.CrystalMedium), Ingredient.EMPTY},
 					IRequirement.AND(
 							new ResearchRequirement("dragon_wing_pendants"),
 							new ResearchRequirement("enchanted_armor_adv")

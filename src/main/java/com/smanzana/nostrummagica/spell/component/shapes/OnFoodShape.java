@@ -72,7 +72,7 @@ public class OnFoodShape extends OnMetricLevelShape {
 			
 			
 			if (SetTrigger(entity, this)) {
-				NostrumMagica.magicEffectProxy.applyOnFoodEffect(entity, entity.ticksExisted, 20 * duration);
+				NostrumMagica.magicEffectProxy.applyOnFoodEffect(entity, entity.tickCount, 20 * duration);
 			}
 		}
 		
@@ -86,7 +86,7 @@ public class OnFoodShape extends OnMetricLevelShape {
 							);
 					
 					this.trigger(data);
-					NostrumMagica.instance.proxy.spawnSpellShapeVfx(this.getState().getSelf().world,
+					NostrumMagica.instance.proxy.spawnSpellShapeVfx(this.getState().getSelf().level,
 							NostrumSpellShapes.OnFood, properties,
 							this.getState().getSelf(), null, this.getState().getSelf(), null, characteristics);
 					NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_FOOD, this.entity);
@@ -98,7 +98,7 @@ public class OnFoodShape extends OnMetricLevelShape {
 					expired = true;
 					if (this.entity instanceof PlayerEntity) {
 						PlayerEntity player = (PlayerEntity) this.entity;
-						player.sendMessage(new TranslationTextComponent("modification.damaged_duration.health"), Util.DUMMY_UUID);
+						player.sendMessage(new TranslationTextComponent("modification.damaged_duration.health"), Util.NIL_UUID);
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_FOOD, this.entity);
 					}
 				}
@@ -111,7 +111,7 @@ public class OnFoodShape extends OnMetricLevelShape {
 	private static final Map<UUID, FoodShapeInstance> ActiveMap = new HashMap<>();
 	
 	private static final boolean SetTrigger(LivingEntity entity, @Nullable FoodShapeInstance trigger) {
-		FoodShapeInstance existing = ActiveMap.put(entity.getUniqueID(), trigger);
+		FoodShapeInstance existing = ActiveMap.put(entity.getUUID(), trigger);
 		if (existing != null && existing != trigger) {
 			existing.expired = true;
 		}
@@ -119,7 +119,7 @@ public class OnFoodShape extends OnMetricLevelShape {
 	}
 	
 	private static final String ID = "food";
-	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.GINSENG, 1),
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.of(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.GINSENG, 1),
 			ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1)));
 	
 	protected OnFoodShape(String key) {

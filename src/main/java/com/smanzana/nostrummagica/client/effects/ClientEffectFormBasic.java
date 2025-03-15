@@ -29,10 +29,10 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 		else
 			this.offset = null;
 		
-		BlockRendererDispatcher renderer = Minecraft.getInstance().getBlockRendererDispatcher();
+		BlockRendererDispatcher renderer = Minecraft.getInstance().getBlockRenderer();
 		
 		final String modelLoc = "effect/" + key;
-		model = renderer.getBlockModelShapes().getModelManager().getModel(NostrumMagica.Loc(modelLoc));
+		model = renderer.getBlockModelShaper().getModelManager().getModel(NostrumMagica.Loc(modelLoc));
 	}
 	
 	public ClientEffectFormBasic(ClientEffectIcon icon, double x, double y, double z) {
@@ -42,19 +42,19 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		if (this.offset != null) {
 			matrixStackIn.translate(offset.x, offset.y, offset.z);
 		}
 		
 		int unused; // make this be a passed in thing! Not all are objs!
-		mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+		mc.getTextureManager().bind(AtlasTexture.LOCATION_BLOCKS);
 		
 		final int light = ClientEffectForm.InferLightmap(matrixStackIn, mc);
 		RenderSystem.disableCull();
 		RenderSystem.enableDepthTest();
 		ClientEffectForm.drawModel(matrixStackIn, model, color, light);
 		RenderSystem.enableCull();
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 }

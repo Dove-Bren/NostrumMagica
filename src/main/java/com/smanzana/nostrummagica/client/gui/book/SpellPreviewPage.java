@@ -48,8 +48,8 @@ public class SpellPreviewPage implements IClickableBookPage {
 			
 			tooltip.add(new StringTextComponent(count + " " + type.prettyName()));
 		}
-		tooltip.add(new StringTextComponent("Click for details").mergeStyle(TextFormatting.GRAY));
-		tooltip.add(new StringTextComponent("Shift+Right Click to remove and destroy").mergeStyle(TextFormatting.DARK_RED));
+		tooltip.add(new StringTextComponent("Click for details").withStyle(TextFormatting.GRAY));
+		tooltip.add(new StringTextComponent("Shift+Right Click to remove and destroy").withStyle(TextFormatting.DARK_RED));
 		
 		description = "";
 		this.tome = tome;
@@ -64,7 +64,7 @@ public class SpellPreviewPage implements IClickableBookPage {
 		Minecraft mc = Minecraft.getInstance();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(mc.player);
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		RenderFuncs.drawRect(matrixStackIn, xoffset, yoffset, xoffset + width, yoffset + height, 0x40000000);
 		
 		// Draw element icon
@@ -74,35 +74,35 @@ public class SpellPreviewPage implements IClickableBookPage {
 		//matrixStackIn.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		icon.render(Minecraft.getInstance(), matrixStackIn, xoffset + 4, icony, 24, 24);
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(xoffset + 32, yoffset + 2, 0);
 		matrixStackIn.scale(.7f, .7f, 1);
 		
-		fonter.drawString(matrixStackIn, spell.getName(), 0, 0, spell.getPrimaryElement().getColor());
-		yoffset = fonter.FONT_HEIGHT + 3;
-		fonter.drawString(matrixStackIn, "Mana: " + spell.getManaCost(), 0, yoffset, 0xFF354AA8);
-		yoffset += fonter.FONT_HEIGHT + 3;
-		fonter.drawString(matrixStackIn, "Weight: " + spell.getWeight(), 0, yoffset, 0xFF354AA8);
-		yoffset += fonter.FONT_HEIGHT + 3;
+		fonter.draw(matrixStackIn, spell.getName(), 0, 0, spell.getPrimaryElement().getColor());
+		yoffset = fonter.lineHeight + 3;
+		fonter.draw(matrixStackIn, "Mana: " + spell.getManaCost(), 0, yoffset, 0xFF354AA8);
+		yoffset += fonter.lineHeight + 3;
+		fonter.draw(matrixStackIn, "Weight: " + spell.getWeight(), 0, yoffset, 0xFF354AA8);
+		yoffset += fonter.lineHeight + 3;
 		if (attr != null) {
 			float xp = spell.getXP(true);
 			float perc = xp / attr.getMaxXP();
 			perc *= 100f;
-			fonter.drawString(matrixStackIn, String.format("XP: %.1f (%03.2f%%)", xp, perc)
+			fonter.draw(matrixStackIn, String.format("XP: %.1f (%03.2f%%)", xp, perc)
 					, 0, yoffset, 0xFF0A3500);
-			yoffset += fonter.FONT_HEIGHT + 3;
+			yoffset += fonter.lineHeight + 3;
 		}
 		RenderFuncs.drawSplitString(matrixStackIn, fonter, description, 0,
 				yoffset, width, 0xFF000000);
 		
-		matrixStackIn.pop();
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
+		matrixStackIn.popPose();
 	}
 
 	@Override
 	public void overlay(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
 		Minecraft mc = Minecraft.getInstance();
-		GuiUtils.drawHoveringText(matrixStackIn, tooltip, trueX, trueY, mc.getMainWindow().getScaledWidth(), mc.getMainWindow().getScaledHeight(), 200, fonter);
+		GuiUtils.drawHoveringText(matrixStackIn, tooltip, trueX, trueY, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), 200, fonter);
 	}
 
 	@Override
@@ -110,8 +110,8 @@ public class SpellPreviewPage implements IClickableBookPage {
 		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 		
 		if (button == 0) {
-			Minecraft.getInstance().displayGuiScreen(new ScrollScreen(spell));
-		} else if (button == 1 && InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT)) {
+			Minecraft.getInstance().setScreen(new ScrollScreen(spell));
+		} else if (button == 1 && InputMappings.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)) {
 			// Fake on client
 			SpellTome.removeSpell(tome, spell.getRegistryID());
 			NostrumMagica.instance.proxy.openBook(player, (SpellTome) tome.getItem(), tome);

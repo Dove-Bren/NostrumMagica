@@ -16,38 +16,38 @@ public class DragonFlyRandomGoal extends Goal {
     public DragonFlyRandomGoal(DragonEntity dragon)
     {
         this.parentEntity = dragon;
-        this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
+        this.setFlags(EnumSet.of(Goal.Flag.MOVE));
     }
 
     /**
      * Returns whether the Goal should begin execution.
      */
-    public boolean shouldExecute()
+    public boolean canUse()
     {
-        MovementController MovementController = this.parentEntity.getMoveHelper();
+        MovementController MovementController = this.parentEntity.getMoveControl();
 
-        if (MovementController.isUpdating())
+        if (MovementController.hasWanted())
         {
             return false;
         }
         else
         {
-            double d0 = MovementController.getX() - this.parentEntity.getPosX();
-            double d1 = MovementController.getY() - this.parentEntity.getPosY();
-            double d2 = MovementController.getZ() - this.parentEntity.getPosZ();
+            double d0 = MovementController.getWantedX() - this.parentEntity.getX();
+            double d1 = MovementController.getWantedY() - this.parentEntity.getY();
+            double d2 = MovementController.getWantedZ() - this.parentEntity.getZ();
             double d3 = d0 * d0 + d1 * d1 + d2 * d2;
             if (d3 >= 1.0D && d3 <= 3600.0D) {
             	return false;
             }
         }
         
-        return this.parentEntity.getRNG().nextInt(25) == 0;
+        return this.parentEntity.getRandom().nextInt(25) == 0;
     }
 
     /**
      * Returns whether an in-progress Goal should continue executing
      */
-    public boolean shouldContinueExecuting()
+    public boolean canContinueToUse()
     {
         return false;
     }
@@ -55,18 +55,18 @@ public class DragonFlyRandomGoal extends Goal {
     /**
      * Execute a one shot task or start executing a continuous task
      */
-    public void startExecuting()
+    public void start()
     {
-        Random random = this.parentEntity.getRNG();
-        double x = this.parentEntity.getPosX() + (double)((random.nextFloat() * 2.0F - 1.0F) * 32.0F);
-        double z = this.parentEntity.getPosZ() + (double)((random.nextFloat() * 2.0F - 1.0F) * 32.0F);
+        Random random = this.parentEntity.getRandom();
+        double x = this.parentEntity.getX() + (double)((random.nextFloat() * 2.0F - 1.0F) * 32.0F);
+        double z = this.parentEntity.getZ() + (double)((random.nextFloat() * 2.0F - 1.0F) * 32.0F);
         
         // Find y
         double y;
         {
-        	BlockPos.Mutable pos = new BlockPos.Mutable().setPos(this.parentEntity.getPosition());
+        	BlockPos.Mutable pos = new BlockPos.Mutable().set(this.parentEntity.blockPosition());
     		while(pos.getY() > 0) {
-    			if (this.parentEntity.world.isAirBlock(pos)) {
+    			if (this.parentEntity.level.isEmptyBlock(pos)) {
     				pos.setY(pos.getY() - 1);
     			} else {
     				break;
@@ -74,7 +74,7 @@ public class DragonFlyRandomGoal extends Goal {
     		}
         	
         	for (int i = 0; i < 20 + (random.nextInt(6) - 3); i++) {
-        		if (this.parentEntity.world.isAirBlock(pos)) {
+        		if (this.parentEntity.level.isEmptyBlock(pos)) {
         			pos.setY(pos.getY() + 1);
         		}
         	}
@@ -82,8 +82,8 @@ public class DragonFlyRandomGoal extends Goal {
         	y = pos.getY();
         }
         
-        if (!parentEntity.getNavigator().tryMoveToXYZ(x, y, z, 1.0D)) {
-        	parentEntity.getMoveHelper().setMoveTo(x, y, z, 1.0D);
+        if (!parentEntity.getNavigation().moveTo(x, y, z, 1.0D)) {
+        	parentEntity.getMoveControl().setWantedPosition(x, y, z, 1.0D);
 		}
         //this.parentEntity.getMoveHelper().setMoveTo(x, y, z, 1.0D);
     }

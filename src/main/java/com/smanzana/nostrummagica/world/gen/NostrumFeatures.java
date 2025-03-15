@@ -40,23 +40,23 @@ public class NostrumFeatures {
 		// registry.register(new NostrumFlowerGenerator(NoFeatureConfig::deserialize).setRegistryName(FLOWERGEN_ID));
 		
 		// Register configured features
-		CONFFEATURE_FLOWER_CRYSTABLOOM = registerConfiguredFeature(NostrumMagica.Loc(ID_FLOWER_CRYSTABLOOM), Feature.FLOWER.withConfiguration(
-				(new BlockClusterFeatureConfig.Builder(new SimpleBlockStateProvider(NostrumBlocks.crystabloom.getDefaultState()), SimpleBlockPlacer.PLACER))
+		CONFFEATURE_FLOWER_CRYSTABLOOM = registerConfiguredFeature(NostrumMagica.Loc(ID_FLOWER_CRYSTABLOOM), Feature.FLOWER.configured(
+				(new BlockClusterFeatureConfig.Builder(new SimpleBlockStateProvider(NostrumBlocks.crystabloom.defaultBlockState()), SimpleBlockPlacer.INSTANCE))
 				.tries(32).build()
-			).withPlacement(Features.Placements.VEGETATION_PLACEMENT).withPlacement(Features.Placements.HEIGHTMAP_PLACEMENT));
+			).decorated(Features.Placements.ADD_32).decorated(Features.Placements.HEIGHTMAP_SQUARE));
 		
-		CONFFEATURE_FLOWER_MIDNIGHTIRIS = registerConfiguredFeature(NostrumMagica.Loc(ID_FLOWER_MIDNIGHTIRIS), Feature.FLOWER.withConfiguration(
-				(new BlockClusterFeatureConfig.Builder(new SimpleBlockStateProvider(NostrumBlocks.midnightIris.getDefaultState()), SimpleBlockPlacer.PLACER))
+		CONFFEATURE_FLOWER_MIDNIGHTIRIS = registerConfiguredFeature(NostrumMagica.Loc(ID_FLOWER_MIDNIGHTIRIS), Feature.FLOWER.configured(
+				(new BlockClusterFeatureConfig.Builder(new SimpleBlockStateProvider(NostrumBlocks.midnightIris.defaultBlockState()), SimpleBlockPlacer.INSTANCE))
 				.tries(48).build()
-			).withPlacement(Features.Placements.VEGETATION_PLACEMENT).withPlacement(Features.Placements.HEIGHTMAP_PLACEMENT));
+			).decorated(Features.Placements.ADD_32).decorated(Features.Placements.HEIGHTMAP_SQUARE));
 		
-		CONFFEATURE_ORE_MANI = registerConfiguredFeature(NostrumMagica.Loc(ID_ORE_MANI), Feature.ORE.withConfiguration(
-				new OreFeatureConfig(OreFeatureConfig.FillerBlockType.BASE_STONE_OVERWORLD, NostrumBlocks.maniOre.getDefaultState(), 9))
-				.range(128).square().func_242731_b(15));
+		CONFFEATURE_ORE_MANI = registerConfiguredFeature(NostrumMagica.Loc(ID_ORE_MANI), Feature.ORE.configured(
+				new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, NostrumBlocks.maniOre.defaultBlockState(), 9))
+				.range(128).squared().count(15));
 		
-		CONFFEATURE_ORE_ESSORE = registerConfiguredFeature(NostrumMagica.Loc(ID_ORE_ESSORE), Feature.ORE.withConfiguration(
-				new OreFeatureConfig(OreFeatureConfig.FillerBlockType.BASE_STONE_OVERWORLD, NostrumBlocks.essenceOre.getDefaultState(), 4))
-				.range(60).square().func_242731_b(8));
+		CONFFEATURE_ORE_ESSORE = registerConfiguredFeature(NostrumMagica.Loc(ID_ORE_ESSORE), Feature.ORE.configured(
+				new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, NostrumBlocks.essenceOre.defaultBlockState(), 4))
+				.range(60).squared().count(8));
 	}
 	
 	private static ConfiguredFeature<?, ?> registerConfiguredFeature(ResourceLocation id, ConfiguredFeature<?, ?> feature) {

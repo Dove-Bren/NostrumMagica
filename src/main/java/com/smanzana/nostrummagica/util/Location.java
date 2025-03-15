@@ -21,7 +21,7 @@ public class Location {
 	}
 	
 	public Location(World world, BlockPos pos) {
-		this(pos, world.getDimensionKey());
+		this(pos, world.dimension());
 	}
 	
 	public BlockPos getPos() {
@@ -50,7 +50,7 @@ public class Location {
 	}
 	
 	public CompoundNBT toNBT(CompoundNBT tag) {
-		tag.putString(NBT_DIM, dimension.getLocation().toString());
+		tag.putString(NBT_DIM, dimension.location().toString());
 		tag.put(NBT_POS, NBTUtil.writeBlockPos(pos));
 		return tag;
 	}
@@ -58,7 +58,7 @@ public class Location {
 	public static Location FromNBT(CompoundNBT tag) {
 		return new Location(
 				NBTUtil.readBlockPos(tag.getCompound(NBT_POS)),
-				RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(tag.getString(NBT_DIM)))
+				RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(tag.getString(NBT_DIM)))
 				);
 	}
 	

@@ -36,14 +36,14 @@ import net.minecraft.world.server.ServerWorld;
 public class AltarBlock extends Block {
 	
 	public static final String ID = "altar_block";
-	protected static final VoxelShape ALTAR_AABB = Block.makeCuboidShape(16 * 0.3D, 16 * 0.0D, 16 * 0.3D, 16 * 0.7D, 16 * 0.8D, 16 * 0.7D);
+	protected static final VoxelShape ALTAR_AABB = Block.box(16 * 0.3D, 16 * 0.0D, 16 * 0.3D, 16 * 0.7D, 16 * 0.8D, 16 * 0.7D);
 	private static final int TICK_DELAY = 5;
 	
 	public AltarBlock() {
-		super(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(3.5f, 10f)
+		super(Block.Properties.of(Material.STONE)
+				.strength(3.5f, 10f)
 				.sound(SoundType.STONE)
-				.setLightLevel((state) -> (1))
+				.lightLevel((state) -> (1))
 			);
 	}
 	
@@ -53,7 +53,7 @@ public class AltarBlock extends Block {
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
@@ -73,7 +73,7 @@ public class AltarBlock extends Block {
 //	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 		return false;
 	}
 	
@@ -89,48 +89,48 @@ public class AltarBlock extends Block {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
-			TileEntity te = world.getTileEntity(pos);
+			TileEntity te = world.getBlockEntity(pos);
 			if (te != null) {
 				AltarTileEntity altar = (AltarTileEntity) te;
 				if (altar.getItem() != null) {
-					InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), altar.getItem());
+					InventoryHelper.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), altar.getItem());
 				}
 			}
 			
-	        world.removeTileEntity(pos);
+	        world.removeBlockEntity(pos);
 		}
-		super.onReplaced(state, world, pos, newState, isMoving);
+		super.onRemove(state, world, pos, newState, isMoving);
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
-		super.eventReceived(state, worldIn, pos, eventID, eventParam);
-		TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity == null ? false : tileentity.receiveClientEvent(eventID, eventParam);
+	public boolean triggerEvent(BlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
+		super.triggerEvent(state, worldIn, pos, eventID, eventParam);
+		TileEntity tileentity = worldIn.getBlockEntity(pos);
+        return tileentity == null ? false : tileentity.triggerEvent(eventID, eventParam);
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
-		if (!worldIn.getPendingBlockTicks().isTickScheduled(pos, this)) {
-			worldIn.getPendingBlockTicks().scheduleTick(pos, this, TICK_DELAY);
+	public void onPlace(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
+		if (!worldIn.getBlockTicks().hasScheduledTick(pos, this)) {
+			worldIn.getBlockTicks().scheduleTick(pos, this, TICK_DELAY);
 		}
 		
-		if (!worldIn.isRemote()) {
+		if (!worldIn.isClientSide()) {
 			this.tick(oldState, (ServerWorld) worldIn, pos, this.RANDOM);
 		}
 		
-		super.onBlockAdded(state, worldIn, pos, oldState, isMoving);
+		super.onPlace(state, worldIn, pos, oldState, isMoving);
 	}
 	
 	protected List<ItemEntity> getCapturableItems(World worldIn, BlockPos altarPos) {
 		// Copied from HopperTileEntity
-		return IHopper.COLLECTION_AREA_SHAPE.toBoundingBoxList().stream().flatMap((box) -> {
-			return worldIn.getEntitiesWithinAABB(ItemEntity.class, box.offset(altarPos.getX() - .5, altarPos.getY() - .5, altarPos.getZ() - .5),
-					EntityPredicates.IS_ALIVE).stream();
+		return IHopper.SUCK.toAabbs().stream().flatMap((box) -> {
+			return worldIn.getEntitiesOfClass(ItemEntity.class, box.move(altarPos.getX() - .5, altarPos.getY() - .5, altarPos.getZ() - .5),
+					EntityPredicates.ENTITY_STILL_ALIVE).stream();
 		}).collect(Collectors.toList());
 				
 				
@@ -140,7 +140,7 @@ public class AltarBlock extends Block {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
-		TileEntity te = worldIn.getTileEntity(pos);
+		TileEntity te = worldIn.getBlockEntity(pos);
 		if (te != null && te instanceof AltarTileEntity && ((AltarTileEntity) te).getItem().isEmpty()) {
 			AltarTileEntity altar = (AltarTileEntity) te;
 			List<ItemEntity> items = getCapturableItems(worldIn, pos);
@@ -155,24 +155,24 @@ public class AltarBlock extends Block {
 			}
 		}
 		
-		if (!worldIn.getPendingBlockTicks().isTickScheduled(pos, this)) {
-			worldIn.getPendingBlockTicks().scheduleTick(pos, this, TICK_DELAY);
+		if (!worldIn.getBlockTicks().hasScheduledTick(pos, this)) {
+			worldIn.getBlockTicks().scheduleTick(pos, this, TICK_DELAY);
 		}
 		
 		super.tick(state, worldIn, pos, rand);
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
-		if (worldIn.isRemote()) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+		if (worldIn.isClientSide()) {
 			return ActionResultType.SUCCESS;
 		}
 		
-		TileEntity te = worldIn.getTileEntity(pos);
+		TileEntity te = worldIn.getBlockEntity(pos);
 		if (te == null)
 			return ActionResultType.PASS;
 		
-		ItemStack heldItem = playerIn.getHeldItem(hand);
+		ItemStack heldItem = playerIn.getItemInHand(hand);
 		
 		AltarTileEntity altar = (AltarTileEntity) te;
 		if (altar.getItem().isEmpty()) {
@@ -186,8 +186,8 @@ public class AltarBlock extends Block {
 			// Has an item
 			if (heldItem.isEmpty()) {
 				final ItemStack altarItem = altar.getItem();
-				if (!playerIn.inventory.addItemStackToInventory(altarItem)) {
-					worldIn.addEntity(
+				if (!playerIn.inventory.add(altarItem)) {
+					worldIn.addFreshEntity(
 							new ItemEntity(worldIn,
 									pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5,
 									altar.getItem())

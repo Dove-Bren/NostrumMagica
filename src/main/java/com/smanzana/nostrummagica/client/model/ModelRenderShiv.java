@@ -26,7 +26,7 @@ public class ModelRenderShiv<T extends Entity> extends EntityModel<T> {
 	private RenderRunnable payload;
 	
 	public ModelRenderShiv() {
-		this(RenderType::getEntityCutoutNoCull);
+		this(RenderType::entityCutoutNoCull);
 	}
 	
 	public ModelRenderShiv(Function<ResourceLocation, RenderType> renderTypeMap) {
@@ -39,13 +39,13 @@ public class ModelRenderShiv<T extends Entity> extends EntityModel<T> {
 	}
 
 	@Override
-	public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount,
+	public void setupAnim(T entityIn, float limbSwing, float limbSwingAmount,
 			float ageInTicks, float netHeadYaw, float headPitch) {
 		;
 	}
 
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
 			float red, float green, float blue, float alpha) {
 		if (this.payload != null) {
 			this.payload.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);

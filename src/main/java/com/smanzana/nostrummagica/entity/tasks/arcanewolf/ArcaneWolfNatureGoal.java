@@ -29,11 +29,11 @@ public class ArcaneWolfNatureGoal extends Goal {
 	}
 	
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		return wolf.isAlive()
-				&& !wolf.isSitting()
+				&& !wolf.isOrderedToSit()
 				&& wolf.getOwner() != null
-				&& wolf.ticksExisted >= cooldownTicks
+				&& wolf.tickCount >= cooldownTicks
 				&& wolf.getMana() >= manaCost
 				&& wolf.getElementalType() == ArcaneWolfElementalType.NATURE;
 	}
@@ -42,34 +42,34 @@ public class ArcaneWolfNatureGoal extends Goal {
 		LivingEntity owner = wolf.getOwner();
 		List<LivingEntity> tames = PetFuncs.GetTamedEntities(owner);
 		tames.add(owner);
-		tames.removeIf((e) -> { return e.getDistance(wolf) > 15;});
+		tames.removeIf((e) -> { return e.distanceTo(wolf) > 15;});
 		return tames;
 	}
 	
 	protected boolean applyTo(ArcaneWolfEntity wolf, LivingEntity target) {
 		// Nature keeps the "Nature's blessing" status effect constant
-		EffectInstance effect = target.getActivePotionEffect(NostrumEffects.naturesBlessing);
+		EffectInstance effect = target.getEffect(NostrumEffects.naturesBlessing);
 		if (effect == null || effect.getDuration() < 11 * 20) {
-			target.addPotionEffect(new EffectInstance(NostrumEffects.naturesBlessing, 20 * 30, 0));
+			target.addEffect(new EffectInstance(NostrumEffects.naturesBlessing, 20 * 30, 0));
 		}
 		
 		return effect == null; // Only charge for applying the first time
 	}
 	
 	@Override
-	public void startExecuting() {
+	public void start() {
 		int backoff = 5;
 		List<LivingEntity> targets = this.getTargets(wolf);
 		for (LivingEntity target : targets) {
 			if (applyTo(wolf, target)) {
 				wolf.addMana(-manaCost);
-				NostrumParticles.FILLED_ORB.spawn(wolf.world, new SpawnParams(
-						1, wolf.getPosX(), wolf.getPosY() + wolf.getHeight()/2, wolf.getPosZ(), 0, 20, 0, target.getEntityId()
+				NostrumParticles.FILLED_ORB.spawn(wolf.level, new SpawnParams(
+						1, wolf.getX(), wolf.getY() + wolf.getBbHeight()/2, wolf.getZ(), 0, 20, 0, target.getId()
 						).color(ArcaneWolfElementalType.NATURE.getColor()));
 			}
 		}
 		
-		cooldownTicks = wolf.ticksExisted + backoff;
+		cooldownTicks = wolf.tickCount + backoff;
 	}
 
 }

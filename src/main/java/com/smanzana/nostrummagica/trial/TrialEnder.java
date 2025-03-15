@@ -22,8 +22,8 @@ public class TrialEnder extends WorldTrial {
 		
 		if (e.getEntity() instanceof PlayerEntity) {
 
-			Vector3d pos = e.getEntity().getPositionVec();
-			if (pos.squareDistanceTo(e.getTargetX(), e.getTargetY(), e.getTargetZ())
+			Vector3d pos = e.getEntity().position();
+			if (pos.distanceToSqr(e.getTargetX(), e.getTargetY(), e.getTargetZ())
 					< 10000)
 				return; // 100x100
 			

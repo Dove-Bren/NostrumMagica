@@ -37,8 +37,8 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 		final PutterBlockTileEntity putter = this;
 		this.inventory = new Inventory(9) {
 			@Override
-			public void markDirty() {
-				putter.markDirty();
+			public void setChanged() {
+				putter.setChanged();
 			}
 		};
 	}
@@ -48,8 +48,8 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.put(NBT_INVENTORY, Inventories.serializeInventory(inventory));
 		
@@ -57,8 +57,8 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		if (nbt == null)
 			return;
@@ -69,28 +69,28 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	@Override
 	public void tick() {
 		ticksExisted++;
-		if (world == null || world.isRemote) {
+		if (level == null || level.isClientSide) {
 			return;
 		}
 		
 		// If being powered, disable everything
-		if (ticksExisted % 10 != 0 || world.isBlockPowered(pos)) {
+		if (ticksExisted % 10 != 0 || level.hasNeighborSignal(worldPosition)) {
 			return;
 		}
 		
 		// Validate entityItem
 		if (itemEntCache != null) {
 			if (!itemEntCache.isAlive()
-					|| (int) itemEntCache.getPosX() != pos.getX()
-					|| (int) itemEntCache.getPosY() != pos.getY()
-					|| (int) itemEntCache.getPosZ() != pos.getZ()) {
+					|| (int) itemEntCache.getX() != worldPosition.getX()
+					|| (int) itemEntCache.getY() != worldPosition.getY()
+					|| (int) itemEntCache.getZ() != worldPosition.getZ()) {
 				itemEntCache = null;
 			}
 		}
 		
 		// Search for item if cache is busted
 		if (itemEntCache == null) {
-			Direction direction = world.getBlockState(this.pos).get(PutterBlock.FACING);
+			Direction direction = level.getBlockState(this.worldPosition).getValue(PutterBlock.FACING);
 			int dx = 0;
 			int dy = 0;
 			int dz = 0;
@@ -115,7 +115,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 				dx = -1;
 				break;
 			}
-			List<ItemEntity> items = world.getEntitiesWithinAABB(ItemEntity.class, VoxelShapes.fullCube().getBoundingBox().offset(pos).offset(dx, dy, dz));
+			List<ItemEntity> items = level.getEntitiesOfClass(ItemEntity.class, VoxelShapes.block().bounds().move(worldPosition).move(dx, dy, dz));
 			if (items != null && !items.isEmpty()) {
 				itemEntCache = items.get(0);
 			}
@@ -123,24 +123,24 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 		
 		// If we have an item, make sure it survives
 		if (itemEntCache != null) {
-			if (itemEntCache.ticksExisted > (float) itemEntCache.lifespan * .05f) {
+			if (itemEntCache.tickCount > (float) itemEntCache.lifespan * .05f) {
 				itemEntCache = refreshEntityItem(itemEntCache);
 			}
 		} else {
 			// Spawn an item if we have items in our inventory
-			final int size = inventory.getSizeInventory();
+			final int size = inventory.getContainerSize();
 			final int pos = NostrumMagica.rand.nextInt(size);
 			@Nonnull
 			ItemStack toSpawn = ItemStack.EMPTY;
 			for (int i = 0; i < size; i++) {
 				// Get random offset, and then walk until we find an item
 				final int index = (pos + i) % size; 
-				ItemStack stack = inventory.getStackInSlot(index);
+				ItemStack stack = inventory.getItem(index);
 				if (stack.isEmpty()) {
 					continue;
 				}
 				
-				toSpawn = inventory.decrStackSize(index, 1);
+				toSpawn = inventory.removeItem(index, 1);
 				break;
 			}
 			
@@ -149,7 +149,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 				double dx = 0;
 				double dy = 0;
 				double dz = 0;
-				Direction direction = world.getBlockState(this.pos).get(PutterBlock.FACING);
+				Direction direction = level.getBlockState(this.worldPosition).getValue(PutterBlock.FACING);
 				switch (direction) {
 				case DOWN:
 					dy = -.75;
@@ -171,18 +171,18 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 					dx = -.75;
 					break;
 				}
-				itemEntCache = new ItemEntity(world, this.pos.getX() + .5 + dx, this.pos.getY() + .5 + dy, this.pos.getZ() + .5 + dz, toSpawn);
-				itemEntCache.setMotion(0, 0, 0);
-				world.addEntity(itemEntCache);
+				itemEntCache = new ItemEntity(level, this.worldPosition.getX() + .5 + dx, this.worldPosition.getY() + .5 + dy, this.worldPosition.getZ() + .5 + dz, toSpawn);
+				itemEntCache.setDeltaMovement(0, 0, 0);
+				level.addFreshEntity(itemEntCache);
 			}
 		}
 	}
 	
 	private ItemEntity refreshEntityItem(ItemEntity oldItem) {
-		ItemEntity newItem = new ItemEntity(oldItem.world, oldItem.getPosX(), oldItem.getPosY(), oldItem.getPosZ(), oldItem.getItem().copy());
-		newItem.setMotion(oldItem.getMotion());
+		ItemEntity newItem = new ItemEntity(oldItem.level, oldItem.getX(), oldItem.getY(), oldItem.getZ(), oldItem.getItem().copy());
+		newItem.setDeltaMovement(oldItem.getDeltaMovement());
 		newItem.lifespan = oldItem.lifespan;
-		oldItem.world.addEntity(newItem);
+		oldItem.level.addFreshEntity(newItem);
 		oldItem.remove();
 		return newItem;
 	}
@@ -197,12 +197,12 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 
 					@Override
 					public int getSlots() {
-						return inventory.getSizeInventory();
+						return inventory.getContainerSize();
 					}
 
 					@Override
 					public ItemStack getStackInSlot(int slot) {
-						return inventory.getStackInSlot(slot);
+						return inventory.getItem(slot);
 					}
 
 					@Override
@@ -216,7 +216,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 
 					@Override
 					public ItemStack extractItem(int slot, int amount, boolean simulate) {
-						ItemStack stack = inventory.getStackInSlot(slot);
+						ItemStack stack = inventory.getItem(slot);
 						if (stack.isEmpty()) {
 							return stack;
 						}
@@ -224,7 +224,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 						stack = stack.copy();
 						ItemStack taken = stack.split(amount);
 						if (!simulate) {
-							inventory.setInventorySlotContents(slot, stack); // Set it back to dirty the inventory
+							inventory.setItem(slot, stack); // Set it back to dirty the inventory
 						}
 						
 						return taken;

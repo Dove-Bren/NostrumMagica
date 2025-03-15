@@ -40,7 +40,7 @@ import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity {
 	
-	protected static final TicketType<BlockPos> ObeliskChunkLoaderType = TicketType.create("nostrum_obelisk_chunkloader", Comparator.comparingLong(BlockPos::toLong));
+	protected static final TicketType<BlockPos> ObeliskChunkLoaderType = TicketType.create("nostrum_obelisk_chunkloader", Comparator.comparingLong(BlockPos::asLong));
 	
 	public static class NostrumObeliskTarget {
 		private static final String NBT_LEGACY_X = "x";
@@ -173,8 +173,8 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		ListNBT list = new ListNBT();
 		
@@ -200,8 +200,8 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_MASTER, NBT.TAG_BYTE))
 			return;
@@ -240,26 +240,26 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 			int zs[] = new int[] {-ObeliskBlock.TILE_OFFSETH, ObeliskBlock.TILE_OFFSETH, -ObeliskBlock.TILE_OFFSETH, ObeliskBlock.TILE_OFFSETH};
 			for (int i = 0; i < xs.length; i++)
 			for (int j = 1; j <= ObeliskBlock.TILE_HEIGHT; j++) { // j starts at one cause the first block is above the base block
-				BlockPos bp = pos.add(xs[i], j, zs[i]);
-				BlockState state = world.getBlockState(bp);
+				BlockPos bp = worldPosition.offset(xs[i], j, zs[i]);
+				BlockState state = level.getBlockState(bp);
 				if (state.getBlock() instanceof ObeliskBlock) {
-					world.destroyBlock(bp, false);
+					level.destroyBlock(bp, false);
 				}
 			}
 
-			if (!world.isRemote) {
-				NostrumChunkLoader.unforceChunk((ServerWorld) world, ObeliskChunkLoaderType, getPos());
+			if (!level.isClientSide) {
+				NostrumChunkLoader.unforceChunk((ServerWorld) level, ObeliskChunkLoaderType, getBlockPos());
 			}
 			
 			this.deactivatePortal();
 			
-			world.destroyBlock(pos, false);
+			level.destroyBlock(worldPosition, false);
 		} else {
 			int xs[] = new int[] {-ObeliskBlock.TILE_OFFSETH, -ObeliskBlock.TILE_OFFSETH, ObeliskBlock.TILE_OFFSETH, ObeliskBlock.TILE_OFFSETH};
 			int zs[] = new int[] {-ObeliskBlock.TILE_OFFSETH, ObeliskBlock.TILE_OFFSETH, -ObeliskBlock.TILE_OFFSETH, ObeliskBlock.TILE_OFFSETH};
 			for (int i = 0; i < xs.length; i++) {
-				BlockPos base = pos.add(xs[i], -ObeliskBlock.TILE_OFFSETY, zs[i]);
-				TileEntity te = world.getTileEntity(base);
+				BlockPos base = worldPosition.offset(xs[i], -ObeliskBlock.TILE_OFFSETY, zs[i]);
+				TileEntity te = level.getBlockEntity(base);
 				if (te != null && te instanceof ObeliskTileEntity) {
 					ObeliskTileEntity entity = (ObeliskTileEntity) te;
 					if (entity.master)
@@ -305,9 +305,9 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	
 	public static final boolean IsObeliskPos(Location location) {
 		final BlockPos pos = location.getPos();
-		final World world = ServerLifecycleHooks.getCurrentServer().getWorld(location.getDimension());
+		final World world = ServerLifecycleHooks.getCurrentServer().getLevel(location.getDimension());
 		
-		if (world.isRemote()) {
+		if (world.isClientSide()) {
 			return false; // can't load random worlds or chunks on client
 		}
 		
@@ -316,7 +316,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 			return true;
 		
 		if (pos.getY() > 0) {
-			state = world.getBlockState(pos.down());
+			state = world.getBlockState(pos.below());
 			if (state != null && state.getBlock() instanceof ObeliskBlock && ObeliskBlock.blockIsMaster(state))
 				return true;
 		}
@@ -325,14 +325,14 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	}
 	
 	public boolean canAcceptTarget(Location location) {
-		if (DimensionUtils.DimEquals(location.getDimension(), this.world.getDimensionKey())) {
+		if (DimensionUtils.DimEquals(location.getDimension(), this.level.dimension())) {
 			final BlockPos pos = location.getPos();
-			if (pos.equals(this.pos) || pos.equals(this.pos.up())) {
+			if (pos.equals(this.worldPosition) || pos.equals(this.worldPosition.above())) {
 				return false;
 			}
 		}
 		
-		if (!this.hasDimensionUpgrade() && !DimensionUtils.DimEquals(location.getDimension(), this.world.getDimensionKey())) {
+		if (!this.hasDimensionUpgrade() && !DimensionUtils.DimEquals(location.getDimension(), this.level.dimension())) {
 			return false;
 		}
 		
@@ -393,7 +393,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		ItemStack item = new ItemStack(NostrumItems.positionToken);
 		PositionToken.setPosition(item, removed.loc.getDimension(), removed.loc.getPos());
 		if (!removed.title.isEmpty() && !removed.title.startsWith("(")) {
-			item.setDisplayName(new StringTextComponent(removed.title));
+			item.setHoverName(new StringTextComponent(removed.title));
 		}
 		spawnItem(item);
 		
@@ -401,8 +401,8 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	
 	protected void spawnItem(ItemStack stack) {
 		// Spawn a little offset from center so we don't just reabsorb anything
-		final BlockPos pos = this.getPos();
-		this.world.addEntity(new ItemEntity(world, pos.getX() - 1, pos.getY() + 1, pos.getZ() + .5, stack));
+		final BlockPos pos = this.getBlockPos();
+		this.level.addFreshEntity(new ItemEntity(level, pos.getX() - 1, pos.getY() + 1, pos.getZ() + .5, stack));
 	}
 	
 	public void setOnesidedUpgraded(boolean upgraded) {
@@ -417,12 +417,12 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	
 	protected void deactivatePortal() {
 		// Remove portal above us
-		world.removeBlock(pos.up(), false);
+		level.removeBlock(worldPosition.above(), false);
 	}
 	
 	protected void activatePortal() {
-		world.setBlockState(pos.up(), NostrumBlocks.obeliskPortal.getMaster());
-		NostrumBlocks.obeliskPortal.createPaired(world, pos.up());
+		level.setBlockAndUpdate(worldPosition.above(), NostrumBlocks.obeliskPortal.getMaster());
+		NostrumBlocks.obeliskPortal.createPaired(level, worldPosition.above());
 	}
 	
 	protected void refreshPortal() {
@@ -458,32 +458,32 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
 	// Registers this TE as a chunk loader. Gets a ticket and forces the chunk.
 	// Relies on already being placed in the world
 	public void init() {
-		if (world.isRemote)
+		if (level.isClientSide)
 			return;
 		
-		NostrumChunkLoader.forceChunk((ServerWorld) world, ObeliskChunkLoaderType, getPos());
+		NostrumChunkLoader.forceChunk((ServerWorld) level, ObeliskChunkLoaderType, getBlockPos());
 	}
 	
 	private void forceUpdate() {
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		markDirty();
+		level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+		setChanged();
 	}
 
 	@Override
@@ -494,7 +494,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		aliveCount++;
 		
 		// Server logic
-		if (!world.isRemote()) {
+		if (!level.isClientSide()) {
 			if (master) {
 				if (targetOverride != null && aliveCount >= targetOverrideEnd) {
 					targetOverride = null;
@@ -536,11 +536,11 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 				z = Math.sin(angle) * radius;
 				y = ratio * (-ObeliskBlock.TILE_OFFSETY);
 				
-				BlockPos master = pos;
+				BlockPos master = worldPosition;
 				x += master.getX() + .5;
 				z += master.getZ() + .5;
-				y += pos.getY() + .5 + ObeliskBlock.TILE_OFFSETY;
-				world.addParticle(ParticleTypes.DRAGON_BREATH, x, y, z, .01, 0, .01);
+				y += worldPosition.getY() + .5 + ObeliskBlock.TILE_OFFSETY;
+				level.addParticle(ParticleTypes.DRAGON_BREATH, x, y, z, .01, 0, .01);
 			}
 		}
 		
@@ -592,11 +592,11 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	}
 	
 	protected AxisAlignedBB getCaptureBB() {
-		return new AxisAlignedBB(0, 0, 0, 1, 1, 1).offset(pos.up());
+		return new AxisAlignedBB(0, 0, 0, 1, 1, 1).move(worldPosition.above());
 	}
 	
 	protected boolean intakeItems() {
-		for (ItemEntity entity : world.getEntitiesWithinAABB(ItemEntity.class, getCaptureBB())) {
+		for (ItemEntity entity : level.getEntitiesOfClass(ItemEntity.class, getCaptureBB())) {
 			// try and pull from the stack
 			@Nonnull ItemStack stack = entity.getItem();
 			if (canIntakeItem(stack)) {
@@ -651,16 +651,16 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 			final RegistryKey<World> storedDim = PositionToken.getDimension(stack);
 			final Location storedLoc = new Location(storedPos, storedDim);
 			
-			if (stack.hasDisplayName()) {
-				addTarget(storedLoc, stack.getDisplayName().getString());
+			if (stack.hasCustomHoverName()) {
+				addTarget(storedLoc, stack.getHoverName().getString());
 			} else {
 				addTarget(storedLoc);
 			}
 			NostrumMagicaSounds.SUCCESS_QUEST.play(
-					world,
-					pos.getX(),
-					pos.getY(),
-					pos.getZ()
+					level,
+					worldPosition.getX(),
+					worldPosition.getY(),
+					worldPosition.getZ()
 					);
 			return;
 		}

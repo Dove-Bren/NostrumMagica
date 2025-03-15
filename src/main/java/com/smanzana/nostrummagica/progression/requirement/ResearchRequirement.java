@@ -34,6 +34,6 @@ public class ResearchRequirement implements IRequirement{
 	@Override
 	public List<ITextComponent> getDescription(PlayerEntity player) {
 		return Lists.newArrayList(new TranslationTextComponent("info.requirement.research", 
-				new TranslationTextComponent("research." + researchKey + ".name").mergeStyle(TextFormatting.DARK_AQUA)));
+				new TranslationTextComponent("research." + researchKey + ".name").withStyle(TextFormatting.DARK_AQUA)));
 	}
 }

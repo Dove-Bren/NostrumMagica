@@ -29,10 +29,10 @@ public class SorceryPortalBlock extends PortalBlock implements ITileEntityProvid
 	public static final String ID = "sorcery_portal";
 	
 	public SorceryPortalBlock() {
-		super(Block.Properties.create(Material.LEAVES)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		super(Block.Properties.of(Material.LEAVES)
+				.strength(-1.0F, 3600000.8F)
 				.noDrops()
-				.setLightLevel((state) -> 14)
+				.lightLevel((state) -> 14)
 				);
 	}
 	
@@ -61,7 +61,7 @@ public class SorceryPortalBlock extends PortalBlock implements ITileEntityProvid
 	@Override
 	protected void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn) {
 		entityIn.stopRiding();
-		entityIn.removePassengers();
+		entityIn.ejectPassengers();
 		
 		if (!entityIn.getPassengers().isEmpty()) {
 			return;
@@ -77,23 +77,23 @@ public class SorceryPortalBlock extends PortalBlock implements ITileEntityProvid
 			if (attr != null) {
 				// Find bottom block
 				BlockPos bottomBlock = portalPos;
-				if (worldIn.getBlockState(portalPos.down()).getBlock() instanceof SorceryPortalBlock) {
-					bottomBlock = portalPos.down();
+				if (worldIn.getBlockState(portalPos.below()).getBlock() instanceof SorceryPortalBlock) {
+					bottomBlock = portalPos.below();
 				}
 				
 				// Try to use a block next to the portal
 				BlockPos savedPos = bottomBlock;
 				for (BlockPos pos : new BlockPos[]{bottomBlock.north(), bottomBlock.south(), bottomBlock.east(), bottomBlock.west()}) {
-					if (worldIn.isAirBlock(pos) && worldIn.isAirBlock(pos.up())) {
+					if (worldIn.isEmptyBlock(pos) && worldIn.isEmptyBlock(pos.above())) {
 						savedPos = pos;
 						break;
 					}
 				}
 				attr.setSorceryPortalLocation(DimensionUtils.GetDimension(entityIn), new BlockPos(savedPos));
 			}
-			entityIn.changeDimension(entityIn.getServer().getWorld(NostrumDimensions.GetSorceryDimension()), NostrumSorceryDimension.DimensionEntryTeleporter.INSTANCE);
+			entityIn.changeDimension(entityIn.getServer().getLevel(NostrumDimensions.GetSorceryDimension()), NostrumSorceryDimension.DimensionEntryTeleporter.INSTANCE);
 		} else {
-			entityIn.changeDimension(entityIn.getServer().getWorld(World.OVERWORLD), NostrumSorceryDimension.DimensionReturnTeleporter.INSTANCE);
+			entityIn.changeDimension(entityIn.getServer().getLevel(World.OVERWORLD), NostrumSorceryDimension.DimensionReturnTeleporter.INSTANCE);
 		}
 	}
 	
@@ -103,7 +103,7 @@ public class SorceryPortalBlock extends PortalBlock implements ITileEntityProvid
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
+	public TileEntity newBlockEntity(IBlockReader worldIn) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -23,13 +23,13 @@ public class RitualCriteriaTrigger extends AbstractCriterionTrigger<RitualCriter
 	}
 	
 	@Override
-	public RitualCriteriaTrigger.Instance deserializeTrigger(JsonObject json, EntityPredicate.AndPredicate entityPredicate, ConditionArrayParser conditionsParser) {
+	public RitualCriteriaTrigger.Instance createInstance(JsonObject json, EntityPredicate.AndPredicate entityPredicate, ConditionArrayParser conditionsParser) {
 		final String ritual = json.get("ritual").getAsString();
 		return new Instance(entityPredicate, ritual);
 	}
 	
 	public void trigger(ServerPlayerEntity player, String ritual) {
-		this.triggerListeners(player, (instance) -> {
+		this.trigger(player, (instance) -> {
 			return instance.test(ritual);
 		});
 	}
@@ -48,8 +48,8 @@ public class RitualCriteriaTrigger extends AbstractCriterionTrigger<RitualCriter
 		}
 		
 		@Override
-		public JsonObject serialize(ConditionArraySerializer conditions) {
-			JsonObject obj = super.serialize(conditions);
+		public JsonObject serializeToJson(ConditionArraySerializer conditions) {
+			JsonObject obj = super.serializeToJson(conditions);
 			obj.addProperty("ritual", this.ritualKey);
 			return obj;
 		}

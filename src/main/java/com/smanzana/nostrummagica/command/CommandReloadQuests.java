@@ -13,7 +13,7 @@ public class CommandReloadQuests {
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
 				Commands.literal("qreload")
-					.requires(s -> s.hasPermissionLevel(2))
+					.requires(s -> s.hasPermission(2))
 					.executes(ctx -> execute(ctx))
 				);
 	}

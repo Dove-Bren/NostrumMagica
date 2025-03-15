@@ -54,16 +54,16 @@ public class MimicBlockTileEntity extends TileEntity {
 	
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, -1, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, -1, this.getUpdateTag());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-		this.handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		this.handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
 	protected @Nonnull BlockState refreshState() {
-		return ((MimicBlock) getBlockState().getBlock()).getMimickedState(getBlockState(), getWorld(), getPos());
+		return ((MimicBlock) getBlockState().getBlock()).getMimickedState(getBlockState(), getLevel(), getBlockPos());
 	}
 	
 	@Override
@@ -87,7 +87,7 @@ public class MimicBlockTileEntity extends TileEntity {
 	
 	public void updateBlock() {
 		// Something let us know the block we're mimicking has probably changed. Refresh.
-		if (!this.hasWorld() || this.world.isRemote()) {
+		if (!this.hasLevel() || this.level.isClientSide()) {
 			return;
 		}
 		
@@ -101,26 +101,26 @@ public class MimicBlockTileEntity extends TileEntity {
 	protected void signalBlockUpdate() {
 		// On client, request a render update
 		// On server, send TE updates
-		if (this.hasWorld() &&  !this.isRemoved()) {
+		if (this.hasLevel() &&  !this.isRemoved()) {
 			
-			if (this.world.isRemote()) {
+			if (this.level.isClientSide()) {
 				this.requestModelDataUpdate();
-				world.notifyBlockUpdate(getPos(), this.getBlockState(), this.getBlockState(), 11); // On client, rerenders. Server flushes data.
+				level.sendBlockUpdated(getBlockPos(), this.getBlockState(), this.getBlockState(), 11); // On client, rerenders. Server flushes data.
 			} else {
 				// I want to just do this, but I think sometimes it makes packets not fire since it doesn't look
 				// like anything's changed.
 				//world.notifyBlockUpdate(getPos(), this.getBlockState(), this.getBlockState(), 11); // On client, rerenders. Server flushes data.
 				
 				SUpdateTileEntityPacket supdatetileentitypacket = this.getUpdatePacket();
-				for (ServerPlayerEntity player : ((ServerWorld) world).getPlayers()) {
+				for (ServerPlayerEntity player : ((ServerWorld) level).players()) {
 					if (supdatetileentitypacket != null) {
-						player.connection.sendPacket(supdatetileentitypacket);
+						player.connection.send(supdatetileentitypacket);
 					}
 				}
 			}
 			
 			// Update light values on server and client
-			world.getChunkProvider().getLightManager().checkBlock(getPos());
+			level.getChunkSource().getLightEngine().checkBlock(getBlockPos());
 		}
 	}
 	
@@ -128,7 +128,7 @@ public class MimicBlockTileEntity extends TileEntity {
 	@Override
 	public IModelData getModelData() {
 		// Adapted from SecretBases' code
-		if(this.removed) {
+		if(this.remove) {
 			return super.getModelData();
 		}
 		ModelDataMap.Builder builder = new ModelDataMap.Builder()

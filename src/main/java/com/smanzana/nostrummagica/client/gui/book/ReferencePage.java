@@ -26,14 +26,14 @@ public class ReferencePage extends TableOfContentsPage {
 			
 			// If we're nested in another screen, set up prev links
 			Minecraft mc = Minecraft.getInstance();
-			Screen holdingScreen = mc.currentScreen;
+			Screen holdingScreen = mc.screen;
 			if (holdingScreen == parent) {
 				holdingScreen = null;
 			}
 			
 			InfoScreen screen = new InfoScreen(attr, references[index]);
 			screen.setPrevScreen(holdingScreen);
-			Minecraft.getInstance().displayGuiScreen(screen);
+			Minecraft.getInstance().setScreen(screen);
 			
 			return true;
 		}

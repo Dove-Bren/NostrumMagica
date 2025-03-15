@@ -45,7 +45,7 @@ public abstract class CombatTrial {
 	public void trialTick() {
 		if (!playerIsNear()) {
 			if (this.focusedPlayer != null) {
-				focusedPlayer.sendMessage(new TranslationTextComponent("info.trial.fail"), Util.DUMMY_UUID);
+				focusedPlayer.sendMessage(new TranslationTextComponent("info.trial.fail"), Util.NIL_UUID);
 			}
 			endTrial();
 		}
@@ -62,19 +62,19 @@ public abstract class CombatTrial {
 	protected boolean playerIsNear() {
 		if (this.focusedPlayer == null) {
 			// Just check that ANY player is near
-			return world.isPlayerWithin(center.getX() + .5,  center.getY(), center.getZ() + .5, playerRange());
+			return world.hasNearbyAlivePlayer(center.getX() + .5,  center.getY(), center.getZ() + .5, playerRange());
 		} else {
-			return focusedPlayer.isAlive() && focusedPlayer.getDistanceSq(center.getX() + .5,  center.getY(), center.getZ() + .5) < playerRange() * playerRange();
+			return focusedPlayer.isAlive() && focusedPlayer.distanceToSqr(center.getX() + .5,  center.getY(), center.getZ() + .5) < playerRange() * playerRange();
 		}
 	}
 	
 	protected static final void playSpawnEffects(BlockPos center, LivingEntity entity) {
-		((MobEntity)entity).spawnExplosionParticle();
+		((MobEntity)entity).spawnAnim();
 		
-		NostrumParticles.GLOW_ORB.spawn(entity.world, new SpawnParams(
+		NostrumParticles.GLOW_ORB.spawn(entity.level, new SpawnParams(
 				10, center.getX() + .5, center.getY() + 1.25, center.getZ() + .5, .25,
 				60, 10,
-				entity.getEntityId()
+				entity.getId()
 				).dieOnTarget(true));
 	}
 	

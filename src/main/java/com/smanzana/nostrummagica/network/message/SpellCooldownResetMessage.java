@@ -26,8 +26,8 @@ public class SpellCooldownResetMessage {
 			return;
 		}
 		
-		Minecraft.getInstance().runAsync(() -> {
-			NostrumMagica.instance.getSpellCooldownTracker(player.world).clearCooldowns(player);
+		Minecraft.getInstance().submit(() -> {
+			NostrumMagica.instance.getSpellCooldownTracker(player.level).clearCooldowns(player);
 		});
 	}
 		

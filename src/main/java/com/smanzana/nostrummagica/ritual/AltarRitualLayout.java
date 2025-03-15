@@ -137,7 +137,7 @@ public class AltarRitualLayout implements IRitualLayout {
 	}
 	
 	public static final AltarRitualLayout Capture(World world, BlockPos center, EMagicElement element) {
-		final TileEntity centerTE = world.getTileEntity(center);
+		final TileEntity centerTE = world.getBlockEntity(center);
 		
 		// Center may be candle or may be altar. It may not be null.
 		if (centerTE == null) {
@@ -185,7 +185,7 @@ public class AltarRitualLayout implements IRitualLayout {
 	}
 	
 	protected static final ItemStack GetAltarItem(World world, BlockPos pos) {
-		TileEntity te = world.getTileEntity(pos);
+		TileEntity te = world.getBlockEntity(pos);
 		if (te != null && te instanceof AltarTileEntity) {
 			return ((AltarTileEntity) te).getItem();
 		}
@@ -194,7 +194,7 @@ public class AltarRitualLayout implements IRitualLayout {
 	}
 	
 	protected static final ItemStack GetReagent(World world, BlockPos pos) {
-		TileEntity te = world.getTileEntity(pos);
+		TileEntity te = world.getBlockEntity(pos);
 		if (te != null && te instanceof IReagentProviderTile) {
 			return ReagentItem.CreateStack(((IReagentProviderTile) te).getPresentReagentType(te, world, pos), 1);
 		}
@@ -209,7 +209,7 @@ public class AltarRitualLayout implements IRitualLayout {
 	private static final boolean CheckChalk(World world, BlockPos center, int[] xCoords, int[] yCoords) {
 		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		for (int i = 0; i < xCoords.length; i++) {
-			cursor.setPos(center.getX() + xCoords[i], center.getY(), center.getZ() + yCoords[i]);
+			cursor.set(center.getX() + xCoords[i], center.getY(), center.getZ() + yCoords[i]);
 			if (!CheckChalkBlock(world, cursor, world.getBlockState(cursor))) {
 				return false;
 			}
@@ -241,7 +241,7 @@ public class AltarRitualLayout implements IRitualLayout {
 		final int CANDLE_YS[] = {-2, 2, -2, 2};
 		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		for (int i = 0; i < CANDLE_XS.length; i++) {
-			cursor.setPos(center.getX() + CANDLE_XS[i], center.getY(), center.getZ() + CANDLE_YS[i]);
+			cursor.set(center.getX() + CANDLE_XS[i], center.getY(), center.getZ() + CANDLE_YS[i]);
 			visitor.accept(world, cursor);
 		}
 	}
@@ -262,7 +262,7 @@ public class AltarRitualLayout implements IRitualLayout {
 		final int ALTAR_YS[] = {0, -4, 4, 0};
 		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		for (int i = 0; i < ALTAR_XS.length; i++) {
-			cursor.setPos(center.getX() + ALTAR_XS[i], center.getY(), center.getZ() + ALTAR_YS[i]);
+			cursor.set(center.getX() + ALTAR_XS[i], center.getY(), center.getZ() + ALTAR_YS[i]);
 			visitor.accept(world, cursor);
 		}
 	}
@@ -279,7 +279,7 @@ public class AltarRitualLayout implements IRitualLayout {
 	}
 	
 	protected static final void ClearCandle(World world, BlockPos pos) {
-		TileEntity te = world.getTileEntity(pos);
+		TileEntity te = world.getBlockEntity(pos);
 		if (te != null && te instanceof IReagentProviderTile) {
 			((IReagentProviderTile) te).consumeReagentType(te, world, pos, null);
 		}
@@ -287,7 +287,7 @@ public class AltarRitualLayout implements IRitualLayout {
 	
 	protected static final void ClearAltar(World world, BlockPos pos) {
 		TileEntity te;
-		te = world.getTileEntity(pos);
+		te = world.getBlockEntity(pos);
 		if (te != null && te instanceof AltarTileEntity) {
 			((AltarTileEntity) te).setItem(ItemStack.EMPTY);
 		}
@@ -315,7 +315,7 @@ public class AltarRitualLayout implements IRitualLayout {
 		List<ItemStack> leftover = Lists.newArrayList(outputs);
 		
 		if (!leftover.isEmpty()) {
-			TileEntity te = world.getTileEntity(center);
+			TileEntity te = world.getBlockEntity(center);
 			if (te != null && te instanceof AltarTileEntity) {
 				Iterator<ItemStack> it = leftover.iterator();
 				
@@ -327,7 +327,7 @@ public class AltarRitualLayout implements IRitualLayout {
 				
 				VisitTier3Extras(world, center, (w, pos) -> {
 					if (it.hasNext()) {
-						TileEntity posTE = w.getTileEntity(pos);
+						TileEntity posTE = w.getBlockEntity(pos);
 						if (posTE != null && posTE instanceof AltarTileEntity) {
 							if (((AltarTileEntity) posTE).getItem().isEmpty()) {
 								((AltarTileEntity) posTE).setItem(it.next());
@@ -342,7 +342,7 @@ public class AltarRitualLayout implements IRitualLayout {
 		// Drop anything left in the world
 		for (ItemStack stack : leftover) {
 			ItemEntity item = new ItemEntity(world, center.getX() + .5, center.getY() + 1.5, center.getZ() + .5, stack);
-			world.addEntity(item);
+			world.addFreshEntity(item);
 		}
 	}
 	

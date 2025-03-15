@@ -53,7 +53,7 @@ public class NostrumElytraWrapper {
 		}
 		
 		if (!inst.hasModifier(modifier)) {
-			inst.applyPersistentModifier(modifier);
+			inst.addPermanentModifier(modifier);
 		}
 	}
 	
@@ -85,7 +85,7 @@ public class NostrumElytraWrapper {
 		
 		// Cancel if a cape is specifically suppressing it
 		final LivingEntity entity = event.getEntityLiving();
-		final boolean flying = entity.isElytraFlying();
+		final boolean flying = entity.isFallFlying();
 		ItemStack cape = LayerAetherCloak.ShouldRender(entity);
 		if (!flying && !cape.isEmpty() && ((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(entity, cape)) {
 			event.setRender(false);
@@ -99,7 +99,7 @@ public class NostrumElytraWrapper {
 		}
 		
 		// Check if any equipment uses our interface for things that want to render an elytra
-		for (@Nonnull ItemStack stack : entity.getEquipmentAndArmor()) {
+		for (@Nonnull ItemStack stack : entity.getAllSlots()) {
 			if (!stack.isEmpty() && stack.getItem() instanceof IElytraRenderer) {
 				if (((IElytraRenderer) stack.getItem()).shouldRenderElyta(entity, stack)) {
 					event.setRender(true);

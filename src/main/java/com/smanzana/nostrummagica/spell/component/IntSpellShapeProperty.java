@@ -29,7 +29,7 @@ public class IntSpellShapeProperty extends SpellShapeProperty<Integer> {
 
 	@Override
 	public Integer readValue(INBT tag) {
-		return tag instanceof IntNBT ? ((IntNBT) tag).getInt() : getDefault();
+		return tag instanceof IntNBT ? ((IntNBT) tag).getAsInt() : getDefault();
 	}
 
 	@Override

@@ -53,7 +53,7 @@ public class MagicWindGolemEntity extends MagicGolemEntity {
 		if (NostrumMagica.rand.nextFloat() < level) {
 			spellPush.cast(this, 1.0f);
 		} else {
-			this.attackEntityAsMob(target);
+			this.doHurtTarget(target);
 		}
 	}
 
@@ -66,29 +66,29 @@ public class MagicWindGolemEntity extends MagicGolemEntity {
 	public void doBuffTask(LivingEntity target) {
 		MagicWindGolemEntity.init();
 		
-		LivingEntity targ = this.getAttackTarget();
+		LivingEntity targ = this.getTarget();
 		if (targ != target)
-			this.setAttackTarget(target);
+			this.setTarget(target);
 		
 		spellBuff.cast(this, 1.0f);
 		
 		if (targ != target)
-			this.setAttackTarget(targ);
+			this.setTarget(targ);
 	}
 
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
-		return target.getActivePotionEffect(Effects.SPEED) == null;
+		return target.getEffect(Effects.MOVEMENT_SPEED) == null;
 	}
 
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		return MagicGolemEntity.BuildBaseAttributes()
-	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.33D)
+	        .add(Attributes.MOVEMENT_SPEED, 0.33D)
 	
-	        .createMutableAttribute(Attributes.MAX_HEALTH, 16.0D)
+	        .add(Attributes.MAX_HEALTH, 16.0D)
 	
-	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 8.0D)
-	        .createMutableAttribute(Attributes.ARMOR, 6.0D);
+	        .add(Attributes.ATTACK_DAMAGE, 8.0D)
+	        .add(Attributes.ARMOR, 6.0D);
 	}
 
 	@Override

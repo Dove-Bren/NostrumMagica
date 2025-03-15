@@ -31,29 +31,29 @@ public class FlierDiveGoal<T extends MobEntity> extends Goal
 		this.attackDelay = delay;
 		this.maxAttackDistance = maxDistance * maxDistance;
 		this.requiresSight = requiresSight;
-		this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.JUMP));
+		this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.JUMP));
 		
 		lastAttackTicks = 0;
 	}
 	
 	protected boolean attackedTooRecently() {
-		return lastAttackTicks != 0 && entity.world.getGameTime() <= lastAttackTicks + attackDelay;
+		return lastAttackTicks != 0 && entity.level.getGameTime() <= lastAttackTicks + attackDelay;
 	}
 
 	/**
 	 * Returns whether the Goal should begin execution.
 	 */
-	public boolean shouldExecute() {
-		if (!entity.isAlive() || entity.getAttackTarget() == null) {
+	public boolean canUse() {
+		if (!entity.isAlive() || entity.getTarget() == null) {
 			return false;
 		}
 		
-		LivingEntity target = entity.getAttackTarget();
-		if (entity.getDistanceSq(target) > maxAttackDistance) {
+		LivingEntity target = entity.getTarget();
+		if (entity.distanceToSqr(target) > maxAttackDistance) {
 			return false;
 		}
 		
-		if (requiresSight && !entity.getEntitySenses().canSee(target)) {
+		if (requiresSight && !entity.getSensing().canSee(target)) {
 			return false;
 		}
 		
@@ -71,52 +71,52 @@ public class FlierDiveGoal<T extends MobEntity> extends Goal
 	/**
 	 * Returns whether an in-progress Goal should continue executing
 	 */
-	public boolean shouldContinueExecuting() {
+	public boolean canContinueToUse() {
 		return (stallTicks < (20 * 1) && !attackedTooRecently());
 	}
 	
 	/**
 	 * Execute a one shot task or start executing a continuous task
 	 */
-	public void startExecuting() {
-		super.startExecuting();
+	public void start() {
+		super.start();
 		stallTicks = 0;
 	}
 
 	/**
 	 * Resets the task
 	 */
-	public void resetTask() {
-		super.resetTask();
+	public void stop() {
+		super.stop();
 		this.stallTicks = 0;
 		//this.lastAttackTicks = 0;
 	}
 	
 	public void attackTarget(T entity, LivingEntity target) {
-		entity.attackEntityAsMob(entity.getAttackTarget());		
+		entity.doHurtTarget(entity.getTarget());		
 	}
 
 	/**
 	 * Updates the task
 	 */
 	public void tick() {
-		LivingEntity target = this.entity.getAttackTarget();
+		LivingEntity target = this.entity.getTarget();
 
 		if (target != null) {
 			
 			// If close enough, attack!
-			if (entity.getDistanceSq(target.getPosX(), target.getPosY() + (target.getHeight() / 2), target.getPosZ()) < Math.max(entity.getWidth() * entity.getWidth(), 1.5)) {
+			if (entity.distanceToSqr(target.getX(), target.getY() + (target.getBbHeight() / 2), target.getZ()) < Math.max(entity.getBbWidth() * entity.getBbWidth(), 1.5)) {
 				this.attackTarget(entity, target);
-				this.lastAttackTicks = entity.world.getGameTime();
-				entity.getMoveHelper().strafe(1f, 0f);
+				this.lastAttackTicks = entity.level.getGameTime();
+				entity.getMoveControl().strafe(1f, 0f);
 			} else {
 			
 				// Attempt to move towards the target
-				entity.getMoveHelper().setMoveTo(target.getPosX(), target.getPosY() + (target.getHeight() / 2), target.getPosZ(), moveSpeedAmp);
+				entity.getMoveControl().setWantedPosition(target.getX(), target.getY() + (target.getBbHeight() / 2), target.getZ(), moveSpeedAmp);
 				
-				if (Math.abs(entity.prevPosX - entity.getPosX())
-						+ Math.abs(entity.prevPosY - entity.getPosY())
-						+ Math.abs(entity.prevPosZ - entity.getPosZ()) < .01) {
+				if (Math.abs(entity.xo - entity.getX())
+						+ Math.abs(entity.yo - entity.getY())
+						+ Math.abs(entity.zo - entity.getZ()) < .01) {
 					// Stuck?
 					stallTicks++;
 				} else {

@@ -102,24 +102,24 @@ public class RuneShaperGui {
 		
 		public static final IPackedContainerProvider Make(RuneShaperTileEntity table) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
-				return new RuneShaperContainer(windowId, player, playerInv, table, table.getPos(), table.getExtraInventory());
+				return new RuneShaperContainer(windowId, player, playerInv, table, table.getBlockPos(), table.getExtraInventory());
 			}, (buffer) -> {
 				ContainerUtil.PackTE(buffer, table);
-				buffer.writeBlockPos(table.getPos());
+				buffer.writeBlockPos(table.getBlockPos());
 			});
 		}
 		
 		@Override
-		public @Nonnull ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
-			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
+		public @Nonnull ItemStack quickMoveStack(PlayerEntity playerIn, int fromSlot) {
+			Slot slot = (Slot) this.slots.get(fromSlot);
 			
-			if (slot != null && slot.getHasStack()) {
-				ItemStack cur = slot.getStack();
+			if (slot != null && slot.hasItem()) {
+				ItemStack cur = slot.getItem();
 				
-				if (slot.inventory == this.shaper) {
+				if (slot.container == this.shaper) {
 					// Trying to take our rune
-					if (playerIn.inventory.addItemStackToInventory(cur)) {
-						slot.putStack(ItemStack.EMPTY);
+					if (playerIn.inventory.add(cur)) {
+						slot.set(ItemStack.EMPTY);
 						cur = slot.onTake(playerIn, cur);
 					}
 				} else {
@@ -138,18 +138,18 @@ public class RuneShaperGui {
 								final ItemStack taken;
 								final ItemStack remaining;
 								if (existingStack.isEmpty()) {
-									shaper.setInventorySlotContents(0, cur);
+									shaper.setItem(0, cur);
 									taken = cur;
 									remaining = ItemStack.EMPTY;
 								} else {
 									final int amt = room >= cur.getCount() ? cur.getCount() : room;
 									existingStack.setCount(existingStack.getCount() + amt);
-									shaper.setInventorySlotContents(0, existingStack); // generate change event
+									shaper.setItem(0, existingStack); // generate change event
 									taken = cur.split(amt);
 									remaining = cur;
 								}
 								
-								slot.putStack(remaining);
+								slot.set(remaining);
 								slot.onTake(playerIn, taken);
 							}
 						}
@@ -157,7 +157,7 @@ public class RuneShaperGui {
 				}
 				
 				if (cur.isEmpty() || cur.getCount() <= 0) {
-					slot.putStack(ItemStack.EMPTY);
+					slot.set(ItemStack.EMPTY);
 				}
 			}
 			
@@ -165,19 +165,19 @@ public class RuneShaperGui {
 		}
 		
 		@Override
-		public boolean canDragIntoSlot(Slot slotIn) {
+		public boolean canDragTo(Slot slotIn) {
 			return true;
 		}
 		
 		@Override
-		public boolean canInteractWith(PlayerEntity playerIn) {
+		public boolean stillValid(PlayerEntity playerIn) {
 			return true;
 		}
 		
 		@Override
-		public void onContainerClosed(PlayerEntity playerIn) {
-			super.onContainerClosed(playerIn);
-			this.clearContainer(playerIn, playerIn.world, this.modItemInventory);
+		public void removed(PlayerEntity playerIn) {
+			super.removed(playerIn);
+			this.clearContainer(playerIn, playerIn.level, this.modItemInventory);
 		}
 		
 		protected void setAcceptingInput(boolean accepting) {
@@ -201,7 +201,7 @@ public class RuneShaperGui {
 		}
 		
 		protected ItemStack getIngredient() {
-			return this.modItemInventory.getStackInSlot(0);
+			return this.modItemInventory.getItem(0);
 		}
 		
 		protected <T> SpellShapeProperties setOnProperties(SpellShapeProperties props, SpellShapeProperty<T> property, int valueIdx) {
@@ -233,7 +233,7 @@ public class RuneShaperGui {
 			if (requirements != null) {
 				required = requirements.get(propertyValueIdx);
 				if (!required.isEmpty()) {
-					if (!ItemStack.areItemsEqual(required, getIngredient())) {
+					if (!ItemStack.isSame(required, getIngredient())) {
 						NostrumMagica.logger.warn("Rejecting runeshaper submit: missing ingredient");
 						return false;
 					}
@@ -266,7 +266,7 @@ public class RuneShaperGui {
 			@Override
 			public void onPress() {
 				if (canSubmit()) {
-					NetworkHandler.sendToServer(new RuneShaperMessage(gui.container.shaper.getPos(), 
+					NetworkHandler.sendToServer(new RuneShaperMessage(gui.container.shaper.getBlockPos(), 
 							gui.container.getRuneShape(),
 							gui.selectedProperty,
 							gui.propertyValueIdx
@@ -299,7 +299,7 @@ public class RuneShaperGui {
 				
 				final float[] color = ColorUtil.ARGBToColor(this.isHovered() ? 0xFFAAAAAA : 0xFFFFFFFF);
 
-				gui.mc.getTextureManager().bindTexture(TEXT);
+				gui.mc.getTextureManager().bind(TEXT);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y,
 						u, v, uw, vh,
 						this.width, this.height,
@@ -328,32 +328,32 @@ public class RuneShaperGui {
 			
 			@Override
 			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-				if (!gui.container.ingredientSlot.isEnabled()) {
+				if (!gui.container.ingredientSlot.isActive()) {
 					return;
 				}
 				
-				gui.mc.getTextureManager().bindTexture(TEXT);
+				gui.mc.getTextureManager().bind(TEXT);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y,
 						TEX_INGSLOT_HOFFSET, TEX_INGSLOT_VOFFSET, TEX_INGSLOT_WIDTH, TEX_INGSLOT_HEIGHT,
 						this.width, this.height,
 						TEX_WIDTH, TEX_HEIGHT);
 				
 				if (!validItem()) {
-					matrixStackIn.push();
+					matrixStackIn.pushPose();
 					matrixStackIn.translate(x, y, 0);
 					if (gui.container.getIngredient().isEmpty()) {
 						ItemStack needed = gui.container.getRuneShape().getPropertyItemRequirements(gui.selectedProperty).get(gui.propertyValueIdx);
 						if (needed != null && !needed.isEmpty()) { 
-							matrixStackIn.push();
+							matrixStackIn.pushPose();
 							matrixStackIn.translate(0, 0, -50);
 							RenderFuncs.RenderGUIItem(needed, matrixStackIn, 1, 1);
-							matrixStackIn.pop();
+							matrixStackIn.popPose();
 						}
 					}
 					
 					matrixStackIn.translate(0, 0, 60);
 					RenderFuncs.drawRect(matrixStackIn, 1, 1, width - 1, height - 1, 0x30FF0000);
-					matrixStackIn.pop();
+					matrixStackIn.popPose();
 				}
 			}
 		}
@@ -390,18 +390,18 @@ public class RuneShaperGui {
 				
 				final float colors[] = ColorUtil.ARGBToColor(color);
 				
-				gui.mc.getTextureManager().bindTexture(TEXT);
+				gui.mc.getTextureManager().bind(TEXT);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y,
 						TEX_PROPTILE_HOFFSET, TEX_PROPTILE_VOFFSET, TEX_PROPTILE_WIDTH, TEX_PROPTILE_HEIGHT,
 						this.width, this.height,
 						TEX_WIDTH, TEX_HEIGHT,
 						colors[0], colors[1], colors[2], colors[3]);
 				
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(this.x + width/2, this.y + (this.height / 2), 0);
 				matrixStackIn.scale(.75f, .75f, .75f);
-				drawCenteredString(matrixStackIn, gui.font, this.getMessage(), 0, -gui.font.FONT_HEIGHT/2, 0xFFFFFFFF);
-				matrixStackIn.pop();
+				drawCenteredString(matrixStackIn, gui.font, this.getMessage(), 0, -gui.font.lineHeight/2, 0xFFFFFFFF);
+				matrixStackIn.popPose();
 			}
 		}
 
@@ -450,7 +450,7 @@ public class RuneShaperGui {
 				
 				final float colors[] = ColorUtil.ARGBToColor(color);
 				
-				gui.mc.getTextureManager().bindTexture(TEXT);
+				gui.mc.getTextureManager().bind(TEXT);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y,
 						u, v, uw, vh,
 						this.width, this.height,
@@ -465,11 +465,11 @@ public class RuneShaperGui {
 				} else {
 					scale = .75f;
 				}
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(this.x + width/2, this.y + (this.height / 2), 0);
 				matrixStackIn.scale(scale, scale, 1f);
-				drawCenteredString(matrixStackIn, gui.font, this.getMessage(), 0, -gui.font.FONT_HEIGHT/2, 0xFFFFFFFF);
-				matrixStackIn.pop();
+				drawCenteredString(matrixStackIn, gui.font, this.getMessage(), 0, -gui.font.lineHeight/2, 0xFFFFFFFF);
+				matrixStackIn.popPose();
 			}
 		}
 		
@@ -539,8 +539,8 @@ public class RuneShaperGui {
 		public RuneShaperGuiContainer(RuneShaperContainer container, PlayerInventory playerInv, ITextComponent name) {
 			super(container, playerInv, name);
 			this.container = container;
-			this.xSize = GUI_WIDTH;
-			this.ySize = GUI_HEIGHT;
+			this.imageWidth = GUI_WIDTH;
+			this.imageHeight = GUI_HEIGHT;
 			this.extraAreas = new ArrayList<>(1);
 			this.properties = new ArrayList<>();
 		}
@@ -633,11 +633,11 @@ public class RuneShaperGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
-			int horizontalMargin = (width - xSize) / 2;
-			int verticalMargin = (height - ySize) / 2;
+		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+			int horizontalMargin = (width - imageWidth) / 2;
+			int verticalMargin = (height - imageHeight) / 2;
 			
-			mc.getTextureManager().bindTexture(TEXT);
+			mc.getTextureManager().bind(TEXT);
 			
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, TEX_WIDTH, TEX_HEIGHT);
 			
@@ -645,23 +645,23 @@ public class RuneShaperGui {
 				final int xOffset = POS_PANEL_HOFFSET + POS_PANEL_WIDTH + 4;
 				final float scale = .75f;
 				final int areaWidth = GUI_WIDTH - (xOffset + 4);
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(horizontalMargin + xOffset, verticalMargin + POS_PANEL_VOFFSET, 0);
 				matrixStackIn.scale(scale, scale, 1f);
 				RenderFuncs.drawSplitString(matrixStackIn, font, this.description.getString(), 0, 0, (int) ((float) areaWidth / scale), 0xFFFFFFFF);
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 			
 			checkForChanges();
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			
 		}
 		
 		protected void checkForChanges() {
-			if (!ItemStack.areItemStacksEqual(lastViewedRune, container.getRune())) {
+			if (!ItemStack.matches(lastViewedRune, container.getRune())) {
 				selectedProperty = null;
 				propertyValueIdx = -1;
 				description = null;
@@ -720,7 +720,7 @@ public class RuneShaperGui {
 			}
 			
 			// Doesn't work if both are empty stacks
-			return required.isItemEqual(input);
+			return required.sameItem(input);
 		}
 		
 		protected void setSelectedProperty(SpellShapeProperty<?> property) {

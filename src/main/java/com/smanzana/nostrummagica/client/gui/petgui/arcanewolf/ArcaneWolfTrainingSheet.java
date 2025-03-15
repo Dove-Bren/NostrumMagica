@@ -99,7 +99,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 	
 	protected @Nullable EMagicElement getExistingSlottedElement() {
 		for (int i = 1; i < 5; i++) { // start at 1, skipping slot 0 which is mastery orb slot
-			ItemStack inSlot = localInv.getStackInSlot(i);
+			ItemStack inSlot = localInv.getItem(i);
 			if (inSlot.isEmpty()) {
 				continue;
 			}
@@ -275,7 +275,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		// Both modes need all four secondary slots to be full with the same element
 		EMagicElement elem = null;
 		for (int i = 1; i < 5; i++) {
-			ItemStack stackInSlot = localInv.getStackInSlot(i);
+			ItemStack stackInSlot = localInv.getItem(i);
 			if (stackInSlot.isEmpty() || !(stackInSlot.getItem() instanceof InfusedGemItem)) {
 				return;
 			}
@@ -294,7 +294,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		
 		// Primary slot mode needs mastery orb, too
 		if (mode == SlotMode.PRIMARY) {
-			ItemStack center = localInv.getStackInSlot(0);
+			ItemStack center = localInv.getItem(0);
 			if (center.isEmpty() || !(center.getItem() instanceof MasteryOrb)) {
 				return;
 			}
@@ -302,12 +302,12 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		
 		// Start training!
 		wolf.startTraining(elem);
-		localInv.clear();
+		localInv.clearContent();
 		//container.clearSlots();
 	}
 	
 	@Override
-	public void showSheet(ArcaneWolfEntity pet, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(ArcaneWolfEntity pet, PlayerEntity player, IPetContainer<ArcaneWolfEntity> petContainer, int width, int height, int offsetX, int offsetY) {
 		final int cellWidth = 18;
 		final int invRow = 9;
 		final int invWidth = cellWidth * invRow;
@@ -318,7 +318,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		final int upperOffset = 10;
 		final int upperHeight = ((height-upperOffset)-playerTopOffset);
 		
-		for (int i = 0; i < localInv.getSizeInventory(); i++) {
+		for (int i = 0; i < localInv.getContainerSize(); i++) {
 			final int x = getSlotX(pet, i, width);
 			final int y = getSlotY(pet, i, upperHeight);
 			if (x < 0 || y < 0) {
@@ -328,34 +328,34 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 			Slot slotIn = new Slot(localInv, i, offsetX + x, offsetY + upperOffset + y) {
 				
 				@Override
-				public void onSlotChanged() {
-					ArcaneWolfTrainingSheet.this.onSlotChange(pet, player, container);
+				public void setChanged() {
+					ArcaneWolfTrainingSheet.this.onSlotChange(pet, player, petContainer);
 				}
 				
 				@Override
-				public boolean isItemValid(ItemStack stack) {
+				public boolean mayPlace(ItemStack stack) {
 					return canSetInSlot(pet, index, stack);
 				}
 				
 				@Override
-				public int getItemStackLimit(ItemStack stack) {
+				public int getMaxStackSize(ItemStack stack) {
 					return 1;
 				}
 				
 				@Override
 				@OnlyIn(Dist.CLIENT)
-				public boolean isEnabled() {
+				public boolean isActive() {
 					return getSlotMode(pet) != SlotMode.NONE;
 				}
 			};
-			container.addSheetSlot(slotIn);
+			petContainer.addSheetSlot(slotIn);
 		}
 		
 		IInventory playerInv = player.inventory;
 		for (int i = 0; i < playerInvSize; i++) {
 			Slot slotIn = new Slot(playerInv, (i + 9) % 36, leftOffset + offsetX + (cellWidth * (i % invRow)),
 					(i < 27 ? 0 : 10) + playerTopOffset + offsetY + (cellWidth * (i / invRow)));
-			container.addSheetSlot(slotIn);
+			petContainer.addSheetSlot(slotIn);
 		}
 	}
 
@@ -368,7 +368,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 	@Override
 	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		// Draw sheet
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		{
 			final int cellWidth = 18;
 			final int bowlWidth = GUI_SLOT_ICON_WIDTH;
@@ -386,7 +386,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 			// Draw glyphs first
 			if (pet.getTrainingElement() != null || pet.getElementalType().getPrimary() != null)
 			{
-				mc.getTextureManager().bindTexture(TEX_LOC);
+				mc.getTextureManager().bind(TEX_LOC);
 				final EMagicElement primary = pet.getElementalType().getPrimary();
 				
 				// Inner glyph for primary
@@ -486,7 +486,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 						blue = 1f - ((float) db / 255f) * brightness;
 					}
 					
-					mc.getTextureManager().bindTexture(TEX_LOC);
+					mc.getTextureManager().bind(TEX_LOC);
 
 					// Level 1
 					{
@@ -519,7 +519,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 			}
 			
 			// Then draw inventories
-			for (int i = 0; i < localInv.getSizeInventory(); i++) {
+			for (int i = 0; i < localInv.getContainerSize(); i++) {
 				final int x = getSlotX(pet, i, width);
 				final int y = getSlotY(pet, i, upperHeight);
 				if (x < 0 || y < 0) {
@@ -528,13 +528,13 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 				
 				if (i == 0) {
 					// Draw center slot
-					matrixStackIn.push();
+					matrixStackIn.pushPose();
 					matrixStackIn.translate(x-1, upperOffset + y - 1, 0);
 					PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
-					matrixStackIn.pop();
+					matrixStackIn.popPose();
 				} else {
 					// Draw bowl
-					mc.getTextureManager().bindTexture(TEX_LOC);
+					mc.getTextureManager().bind(TEX_LOC);
 					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x + bowlHOffset,
 							upperOffset + y + bowlVOffset, GUI_SLOT_ICON_HOFFSET,
 							GUI_SLOT_ICON_VOFFSET, bowlWidth,
@@ -544,9 +544,9 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 			
 			// Draw title and stage
 			{
-				String str = I18n.format("info.wolf_type." + pet.getElementalType().getNameKey() + ".name");
-				int strWidth = mc.fontRenderer.getStringWidth(str);
-				mc.fontRenderer.drawStringWithShadow(matrixStackIn, str, 0 + (width/2) - (strWidth/2), 0 + 2, 0xFFFFFFFF);
+				String str = I18n.get("info.wolf_type." + pet.getElementalType().getNameKey() + ".name");
+				int strWidth = mc.font.width(str);
+				mc.font.drawShadow(matrixStackIn, str, 0 + (width/2) - (strWidth/2), 0 + 2, 0xFFFFFFFF);
 				
 				if (pet.getTrainingElement() != null) {
 					final String substr;
@@ -563,14 +563,14 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 						break;
 					}
 					str = pet.getTrainingElement().getName() + " " + substr;
-					strWidth = mc.fontRenderer.getStringWidth(str);
-					mc.fontRenderer.drawStringWithShadow(matrixStackIn, str, 0 + (width/2) - (strWidth/2), 0 + 2 + 2 + mc.fontRenderer.FONT_HEIGHT, pet.getTrainingElement().getColor());
+					strWidth = mc.font.width(str);
+					mc.font.drawShadow(matrixStackIn, str, 0 + (width/2) - (strWidth/2), 0 + 2 + 2 + mc.font.lineHeight, pet.getTrainingElement().getColor());
 				}
 			}
 			
 			// Player inventory
 			{
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(leftOffset - 1, playerTopOffset - 1, 0);
 				// ... First 27
 				PetGUIRenderHelper.DrawSlots(matrixStackIn, cellWidth, cellWidth, Math.min(27, playerInvSize), invRow);
@@ -580,10 +580,10 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 				matrixStackIn.translate(0, 10 + yOffset, 0);
 				PetGUIRenderHelper.DrawSlots(matrixStackIn, cellWidth, cellWidth, Math.max(0, playerInvSize-27), invRow);
 				
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 	}
 

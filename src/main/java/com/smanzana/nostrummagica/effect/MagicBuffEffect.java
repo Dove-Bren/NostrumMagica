@@ -25,19 +25,19 @@ public class MagicBuffEffect extends Effect {
 	}
 	
 	@Override
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return false; // No tick actions
 	}
 	
 	@Override
-	public void applyAttributesModifiersToEntity(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
-		super.applyAttributesModifiersToEntity(entity, attributeMap, amplifier);
+	public void addAttributeModifiers(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
+		super.addAttributeModifiers(entity, attributeMap, amplifier);
 	}
 	
 	@Override
-	public void removeAttributesModifiersFromEntity(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
+	public void removeAttributeModifiers(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
 		NostrumMagica.magicEffectProxy.remove(SpecialEffect.MAGIC_BUFF, entityLivingBaseIn);
-		super.removeAttributesModifiersFromEntity(entityLivingBaseIn, attributeMapIn, amplifier);
+		super.removeAttributeModifiers(entityLivingBaseIn, attributeMapIn, amplifier);
     }
 	
 	@OnlyIn(Dist.CLIENT)
@@ -50,8 +50,8 @@ public class MagicBuffEffect extends Effect {
 		int count = data == null ? 0 : data.getCount();
 		if (count > 0) {
 			String display = "" + count;
-			int width = mc.fontRenderer.getStringWidth(display);
-			mc.fontRenderer.drawString(matrixStackIn, "" + count, x + 6 + (20 - width), y + 7 + (20 - mc.fontRenderer.FONT_HEIGHT), 0xFFFFFFFF);
+			int width = mc.font.width(display);
+			mc.font.draw(matrixStackIn, "" + count, x + 6 + (20 - width), y + 7 + (20 - mc.font.lineHeight), 0xFFFFFFFF);
 		}
 		
 	}
@@ -66,8 +66,8 @@ public class MagicBuffEffect extends Effect {
 		int count = data == null ? 0 : data.getCount();
 		if (count > 0) {
 			String display = "" + count;
-			int width = mc.fontRenderer.getStringWidth(display);
-			mc.fontRenderer.drawString(matrixStackIn, "" + count, x + 6 + (16 - width), y + 7 + (16 - mc.fontRenderer.FONT_HEIGHT), 0xFFFFFFFF);
+			int width = mc.font.width(display);
+			mc.font.draw(matrixStackIn, "" + count, x + 6 + (16 - width), y + 7 + (16 - mc.font.lineHeight), 0xFFFFFFFF);
 		}
 		
 	}

@@ -38,13 +38,13 @@ public class ClientEffectMajorSphere extends ClientEffect {
 			final IBakedModel model;
 			if (cloudy) {
 				if (MODEL_CLOUDY == null) {
-					MODEL_CLOUDY = mc.getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getModel(LOC_CLOUDY);
+					MODEL_CLOUDY = mc.getBlockRenderer().getBlockModelShaper().getModelManager().getModel(LOC_CLOUDY);
 				}
 				
 				model = MODEL_CLOUDY;
 			} else {
 				if (MODEL_SCALY == null) {
-					MODEL_SCALY = mc.getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getModel(LOC_SCALY);
+					MODEL_SCALY = mc.getBlockRenderer().getBlockModelShaper().getModelManager().getModel(LOC_SCALY);
 				}
 				
 				model = MODEL_SCALY;
@@ -58,20 +58,20 @@ public class ClientEffectMajorSphere extends ClientEffect {
 //			GlStateManager.enableTexture();
 //			GlStateManager.color4f(0f, 0f, 0f, 0f);
 //			GlStateManager.color4f(1f, 1f, 1f, 1f);
-			Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+			Minecraft.getInstance().getTextureManager().bind(AtlasTexture.LOCATION_BLOCKS);
 			final int light = ClientEffectForm.InferLightmap(matrixStackIn, mc);
 			
 			// outside
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.scale(scale * 2, scale * 2, scale * 2); // input scale is 'blocks radius' vs model is default to .5 blocks.
 			ClientEffectForm.drawModel(matrixStackIn, model, color, light);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 			
 			// inside
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.scale(scale * -2, scale * -2, scale * -2); // input scale is 'blocks radius' vs model is default to .5 blocks.
 			ClientEffectForm.drawModel(matrixStackIn, model, color, light);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 			
 //			GlStateManager.disableBlend();
 			

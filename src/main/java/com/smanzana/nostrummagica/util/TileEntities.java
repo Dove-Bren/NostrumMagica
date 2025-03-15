@@ -7,12 +7,12 @@ import net.minecraft.world.World;
 public class TileEntities {
 
 	public static final void RefreshToClients(TileEntity te) {
-		final BlockPos pos = te.getPos();
-		final World world = te.getWorld();
+		final BlockPos pos = te.getBlockPos();
+		final World world = te.getLevel();
 		
-		if (!world.isRemote()) {
-			world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
-			te.markDirty();
+		if (!world.isClientSide()) {
+			world.sendBlockUpdated(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+			te.setChanged();
 		}
 	}
 	

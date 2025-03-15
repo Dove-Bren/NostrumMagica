@@ -23,8 +23,8 @@ public class LoreInfoSubScreen implements IInfoSubScreen {
 	@Override
 	public void draw(INostrumMagic attr, Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
 		String title = this.tag.getLoreDisplayName();
-		int len = mc.fontRenderer.getStringWidth(title);
-		mc.fontRenderer.drawStringWithShadow(matrixStackIn, title, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
+		int len = mc.font.width(title);
+		mc.font.drawShadow(matrixStackIn, title, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
 		
 		Lore lore = attr.getLore(this.tag);
 		
@@ -32,12 +32,12 @@ public class LoreInfoSubScreen implements IInfoSubScreen {
 		int i = 0;
 		for (String line : data) {
 			// Draw line, splitting where we have to. Record how much vertical space it took.
-			i += RenderFuncs.drawSplitString(matrixStackIn, mc.fontRenderer, line,
+			i += RenderFuncs.drawSplitString(matrixStackIn, mc.font, line,
 					x + 5,
 					y + 35 + i,
 					width, 0xFFFFFFFF);
 			// Add an extra line break to space out lines.
-			i += mc.fontRenderer.FONT_HEIGHT;
+			i += mc.font.lineHeight;
 		}
 	}
 

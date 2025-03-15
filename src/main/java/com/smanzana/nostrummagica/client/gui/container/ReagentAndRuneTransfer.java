@@ -21,10 +21,10 @@ public final class ReagentAndRuneTransfer {
 	
 	public static final boolean ShouldAddTo(PlayerEntity player, Container container) {
 		// Disallow when it's the player inventory container
-		if (container == player.container) {
+		if (container == player.inventoryMenu) {
 			return false;
 		}
-		if (player.world.isRemote() && container instanceof CreativeContainer) {
+		if (player.level.isClientSide() && container instanceof CreativeContainer) {
 			return false;
 		}
 		if (container instanceof ReagentBagGui.BagContainer) {
@@ -35,10 +35,10 @@ public final class ReagentAndRuneTransfer {
 		}
 		
 		boolean foundPlayerInv = false; // Make sure player inventory is represented on the screen in some form
-		for (Slot slot : container.inventorySlots) {
-			if (slot.inventory == player.inventory) {
+		for (Slot slot : container.slots) {
+			if (slot.container == player.inventory) {
 				final int slotIdx = slot.getSlotIndex();
-				if (PlayerInventory.isHotbar(slotIdx) || slotIdx >= 36) {
+				if (PlayerInventory.isHotbarSlot(slotIdx) || slotIdx >= 36) {
 					continue; // hotbar or armor slot
 				}
 				
@@ -68,12 +68,12 @@ public final class ReagentAndRuneTransfer {
 	public static final List<ItemStack> FindReagentBags(PlayerEntity player) {
 		List<ItemStack> ret = new ArrayList<>();
 		
-		for (ItemStack item : player.inventory.mainInventory) {
+		for (ItemStack item : player.inventory.items) {
 			if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
 				ret.add(item);
 			}
 		}
-		for (ItemStack item : player.getEquipmentAndArmor()) {
+		for (ItemStack item : player.getAllSlots()) {
 			if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
 				ret.add(item);
 			}
@@ -81,8 +81,8 @@ public final class ReagentAndRuneTransfer {
 		
 		IInventory curios = NostrumMagica.instance.curios.getCurios(player);
 		if (curios != null) {
-			for (int i = 0; i < curios.getSizeInventory(); i++) {
-				ItemStack equip = curios.getStackInSlot(i);
+			for (int i = 0; i < curios.getContainerSize(); i++) {
+				ItemStack equip = curios.getItem(i);
 				if (equip.isEmpty()) {
 					continue;
 				}
@@ -99,12 +99,12 @@ public final class ReagentAndRuneTransfer {
 	public static final List<ItemStack> FindRuneBags(PlayerEntity player) {
 		List<ItemStack> ret = new ArrayList<>();
 		
-		for (ItemStack item : player.inventory.mainInventory) {
+		for (ItemStack item : player.inventory.items) {
 			if (!item.isEmpty() && item.getItem() instanceof RuneBag) {
 				ret.add(item);
 			}
 		}
-		for (ItemStack item : player.getEquipmentAndArmor()) {
+		for (ItemStack item : player.getAllSlots()) {
 			if (!item.isEmpty() && item.getItem() instanceof RuneBag) {
 				ret.add(item);
 			}
@@ -112,8 +112,8 @@ public final class ReagentAndRuneTransfer {
 		
 		IInventory curios = NostrumMagica.instance.curios.getCurios(player);
 		if (curios != null) {
-			for (int i = 0; i < curios.getSizeInventory(); i++) {
-				ItemStack equip = curios.getStackInSlot(i);
+			for (int i = 0; i < curios.getContainerSize(); i++) {
+				ItemStack equip = curios.getItem(i);
 				if (equip.isEmpty()) {
 					continue;
 				}
@@ -131,27 +131,27 @@ public final class ReagentAndRuneTransfer {
 		List<ItemStack> reagentBags = FindReagentBags(player);
 		List<ItemStack> runeBags = FindRuneBags(player);
 		
-		for (Slot slot : container.inventorySlots) {
-			if (slot.inventory != player.inventory
-					&& slot.getHasStack() && !slot.getStack().isEmpty()) {
-				if (slot.getStack().getItem() instanceof ReagentItem) {
-					ItemStack toAdd = slot.getStack().copy();
+		for (Slot slot : container.slots) {
+			if (slot.container != player.inventory
+					&& slot.hasItem() && !slot.getItem().isEmpty()) {
+				if (slot.getItem().getItem() instanceof ReagentItem) {
+					ItemStack toAdd = slot.getItem().copy();
 					for (ItemStack bag : reagentBags) {
 						toAdd = ReagentBag.addItem(bag, toAdd);
 						if (toAdd.isEmpty()) {
 							break;
 						}
 					}
-					slot.putStack(toAdd);
-				} else if (slot.getStack().getItem() instanceof SpellRune) {
-					ItemStack toAdd = slot.getStack().copy();
+					slot.set(toAdd);
+				} else if (slot.getItem().getItem() instanceof SpellRune) {
+					ItemStack toAdd = slot.getItem().copy();
 					for (ItemStack bag : runeBags) {
 						toAdd = RuneBag.addItem(bag, toAdd);
 						if (toAdd.isEmpty()) {
 							break;
 						}
 					}
-					slot.putStack(toAdd);
+					slot.set(toAdd);
 				}
 			}
 		}

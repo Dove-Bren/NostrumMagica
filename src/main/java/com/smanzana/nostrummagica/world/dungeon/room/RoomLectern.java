@@ -93,12 +93,12 @@ public class RoomLectern extends StaticRoom {
 				"XXXXXXXXXXXXXXXXXXXXX",
 				"XXXXXXXXXXXXXXXXXXXXX",
 				'X', NostrumBlocks.lightDungeonBlock,
-				'W', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.WEST)),
-				'E', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST)),
-				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
-				'S', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.SOUTH)),
+				'W', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.WEST)),
+				'E', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.EAST)),
+				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
+				'S', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.SOUTH)),
 				'C', new StaticBlockState(Blocks.RED_CARPET),
-				'T', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.WEST).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
+				'T', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.WEST).setValue(StairsBlock.HALF, Half.BOTTOM).setValue(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
 				'Q', Blocks.QUARTZ_BLOCK,
 				'G', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_FIRE)),
 				'L', NostrumBlocks.altar,
@@ -339,12 +339,12 @@ public class RoomLectern extends StaticRoom {
 		BlueprintLocation point = NostrumDungeon.asRotated(start, offset, start.getFacing());
 		BlockPos pos = point.getPos();
 		
-		if (bounds == null || bounds.isVecInside(pos)) {
-			TileEntity ent = world.getTileEntity(pos);
+		if (bounds == null || bounds.isInside(pos)) {
+			TileEntity ent = world.getBlockEntity(pos);
 			if (null == ent)
 			{
 				System.out.println("Could not find lectern! (" + pos.getX() + " " + pos.getY() + " " + pos.getZ());
-				world.setBlockState(pos, Blocks.BEDROCK.getDefaultState(), 2);
+				world.setBlock(pos, Blocks.BEDROCK.defaultBlockState(), 2);
 			}
 			else
 			{
@@ -352,7 +352,7 @@ public class RoomLectern extends StaticRoom {
 				ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
 				Spell spell =  genSpell(world.getRandom());
 				SpellScroll.setSpell(scroll, spell);
-				scroll.setDamage(NostrumMagica.rand.nextInt(10));
+				scroll.setDamageValue(NostrumMagica.rand.nextInt(10));
 				
 				if (world instanceof WorldGenRegion) {
 					te.setItemNoDirty(scroll);

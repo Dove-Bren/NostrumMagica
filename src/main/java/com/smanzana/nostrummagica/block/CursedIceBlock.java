@@ -35,21 +35,21 @@ public class CursedIceBlock extends BreakableBlock {
 	private static final IntegerProperty LEVEL = IntegerProperty.create("level", 0, 2);
 	
 	public CursedIceBlock() {
-		super(Block.Properties.create(Material.ICE)
-				.hardnessAndResistance(3.0f)
-				.slipperiness(0.68F)
+		super(Block.Properties.of(Material.ICE)
+				.strength(3.0f)
+				.friction(0.68F)
 				.sound(SoundType.GLASS)
-				.tickRandomly()
+				.randomTicks()
 				.noDrops()
-				.notSolid()
+				.noOcclusion()
 				);
 		//this.setLightOpacity(14);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(LEVEL, 0));
+		this.registerDefaultState(this.stateDefinition.any().setValue(LEVEL, 0));
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(LEVEL);
 	}
 	
@@ -59,12 +59,12 @@ public class CursedIceBlock extends BreakableBlock {
 	 * @return
 	 */
 	public BlockState getState(int level) {
-		return getDefaultState().with(LEVEL, Math.max(Math.min(2, level - 1), 0));
+		return defaultBlockState().setValue(LEVEL, Math.max(Math.min(2, level - 1), 0));
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
+	public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
 		final Block adjacentBlock = adjacentBlockState.getBlock();
 		
 		return (Tags.Blocks.GLASS.contains(adjacentBlock) || Tags.Blocks.STAINED_GLASS.contains(adjacentBlock)
@@ -73,7 +73,7 @@ public class CursedIceBlock extends BreakableBlock {
 	
 	@Override
 	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
-		int level = state.get(LEVEL);
+		int level = state.getValue(LEVEL);
 		
 		// Don't grow is in Sorcery dim
 		if (DimensionUtils.IsSorceryDim(worldIn)) {
@@ -81,49 +81,49 @@ public class CursedIceBlock extends BreakableBlock {
 		}
 		
 		if (NostrumMagica.rand.nextFloat() <= 0.2f * (float) (level + 1)) {
-			List<BlockPos> targets = Lists.newArrayList(pos.add(1, 0, 0),
-									pos.add(0, 0, 1),
-									pos.add(-1, 0, 0),
-									pos.add(0, 0, -1),
-									pos.add(0, 1, 0),
-									pos.add(0, -1, 0));
+			List<BlockPos> targets = Lists.newArrayList(pos.offset(1, 0, 0),
+									pos.offset(0, 0, 1),
+									pos.offset(-1, 0, 0),
+									pos.offset(0, 0, -1),
+									pos.offset(0, 1, 0),
+									pos.offset(0, -1, 0));
 			Collections.shuffle(targets);
 			
 			for (BlockPos target : targets)
-			if (!worldIn.isAirBlock(target)) {
+			if (!worldIn.isEmptyBlock(target)) {
 				BlockState bs = worldIn.getBlockState(target);
 				Block b = bs.getBlock();
 				if (!BlockTags.ICE.contains(b) && !(b == this)) {
-					if (bs.getBlockHardness(worldIn, target) >= 0.0f &&
-							bs.getBlockHardness(worldIn, target) <= Math.pow(2.0f, level)) {
-						worldIn.setBlockState(target, Blocks.ICE.getDefaultState());
+					if (bs.getDestroySpeed(worldIn, target) >= 0.0f &&
+							bs.getDestroySpeed(worldIn, target) <= Math.pow(2.0f, level)) {
+						worldIn.setBlockAndUpdate(target, Blocks.ICE.defaultBlockState());
 						return;
 					}
 					
 				} else if (BlockTags.ICE.contains(b)) {
 					// It's ice. Convert to cursed ice
-					worldIn.setBlockState(target, getDefaultState());
+					worldIn.setBlockAndUpdate(target, defaultBlockState());
 					return;
 				}
 			}
 		}
     }
 	
-	public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn) {
+	public void stepOn(World worldIn, BlockPos pos, Entity entityIn) {
 		
-		if (!worldIn.isRemote) {
+		if (!worldIn.isClientSide) {
 			int amp = 0;
-			if (worldIn.getBlockState(pos).get(LEVEL) == 2)
+			if (worldIn.getBlockState(pos).getValue(LEVEL) == 2)
 				amp = 1;
 			
-			if (entityIn instanceof LivingEntity && ((LivingEntity) entityIn).getActivePotionEffect(NostrumEffects.magicResist) == null) {
+			if (entityIn instanceof LivingEntity && ((LivingEntity) entityIn).getEffect(NostrumEffects.magicResist) == null) {
 				LivingEntity living = (LivingEntity) entityIn;
-				living.addPotionEffect(new EffectInstance(NostrumEffects.frostbite,
+				living.addEffect(new EffectInstance(NostrumEffects.frostbite,
 						45, amp));
 			}
 		}
 		
-		super.onEntityWalk(worldIn, pos, entityIn);
+		super.stepOn(worldIn, pos, entityIn);
     }
 
 }

@@ -43,13 +43,13 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 		PlayerEntity player = (PlayerEntity) ent;
 		IInventory inv = NostrumMagica.instance.curios.getCurios(player);
 		if (inv != null) {
-			for (int i = 0; i < inv.getSizeInventory(); i++) {
-				ItemStack stack = inv.getStackInSlot(i);
+			for (int i = 0; i < inv.getContainerSize(); i++) {
+				ItemStack stack = inv.getItem(i);
 				if (stack.isEmpty() || !(stack.getItem() instanceof DragonWingPendantItem))
 					continue;
 				
 				// Jump-boost gives an extra .1 per level.
-				ent.setMotion(ent.getMotion().add(0, .2, 0));
+				ent.setDeltaMovement(ent.getDeltaMovement().add(0, .2, 0));
 			}
 		}
 		
@@ -70,8 +70,8 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 		PlayerEntity player = (PlayerEntity) ent;
 		IInventory inv = NostrumMagica.instance.curios.getCurios(player);
 		if (inv != null) {
-			for (int i = 0; i < inv.getSizeInventory(); i++) {
-				ItemStack stack = inv.getStackInSlot(i);
+			for (int i = 0; i < inv.getContainerSize(); i++) {
+				ItemStack stack = inv.getItem(i);
 				if (stack.isEmpty() || !(stack.getItem() instanceof DragonWingPendantItem))
 					continue;
 				

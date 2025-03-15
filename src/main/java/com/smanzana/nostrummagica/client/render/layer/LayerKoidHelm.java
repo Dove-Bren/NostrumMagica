@@ -31,7 +31,7 @@ public class LayerKoidHelm extends LayerRenderer<AbstractClientPlayerEntity, Pla
 
 	protected static final IVertexBuilder GetBuffer(IRenderTypeBuffer typeBuffer, @Nullable RenderType type) {
 		if (type == null) {
-			type = Atlases.getTranslucentCullBlockType();
+			type = Atlases.translucentCullBlockSheet();
 		}
 		
 		return typeBuffer.getBuffer(type);
@@ -46,24 +46,24 @@ public class LayerKoidHelm extends LayerRenderer<AbstractClientPlayerEntity, Pla
 	public void render(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		if (ShouldRender(player)) {
 			final float period = 20 * 60;
-			final float time = player.ticksExisted + partialTicks;
+			final float time = player.tickCount + partialTicks;
 			final float prog = ((time % period) / period);
 			final float color[] = ColorUtil.ARGBToColor(Color.HSBtoRGB(prog, .8f, 1f));
 			
-			model.copyModelAngles(this.getEntityModel().bipedHeadwear);
-			model.rotationPointY -= .5f;
+			model.copyFrom(this.getParentModel().hat);
+			model.y -= .5f;
 			model.setOffsetY(-.25f);
 			
-			stack.push();
+			stack.pushPose();
 			//stack.rotate(Vector3f.ZP.rotationDegrees(180f));
 			//stack.scale(1.25f, 1.25f, 1.25f);
 			model.render(stack, GetBuffer(typeBuffer, null), packedLight, OverlayTexture.NO_OVERLAY, color[0], color[1], color[2], 1f);
-			stack.pop();
+			stack.popPose();
 		}
 	}
 	
 	public static boolean ShouldRender(LivingEntity player) {
-		if (player.hasItemInSlot(EquipmentSlotType.HEAD) && player.getItemStackFromSlot(EquipmentSlotType.HEAD).getItem() instanceof KoidHelmet) {
+		if (player.hasItemInSlot(EquipmentSlotType.HEAD) && player.getItemBySlot(EquipmentSlotType.HEAD).getItem() instanceof KoidHelmet) {
 			return true;
 		}
 		

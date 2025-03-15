@@ -80,7 +80,7 @@ public class SpellShapeProperties {
 	}
 	
 	public SpellShapeProperties fromNBT(CompoundNBT nbt) {
-		for (String key : nbt.keySet()) {
+		for (String key : nbt.getAllKeys()) {
 			SpellShapeProperty<?> property = findProperty(key);
 			if (property != null) {
 				properties.put(property, property.readValue(nbt.get(key)));

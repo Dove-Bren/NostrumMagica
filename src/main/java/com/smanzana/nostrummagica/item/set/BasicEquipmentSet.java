@@ -83,7 +83,7 @@ public class BasicEquipmentSet extends EquipmentSet {
 		// If item is armor, make sure it's in right slot
 		if (item instanceof ArmorItem) {
 			if (slot instanceof EquipmentSlotKey) {
-				return ((EquipmentSlotKey) slot).getSlotType() == ((ArmorItem) item).getEquipmentSlot();
+				return ((EquipmentSlotKey) slot).getSlotType() == ((ArmorItem) item).getSlot();
 			}
 			// else just guess? Could hardcode inventory numbers here in case it's a PlayerInventorySlotKey?
 			return false;
@@ -93,7 +93,7 @@ public class BasicEquipmentSet extends EquipmentSet {
 		// If it's a tool or weapon, also accept hands.
 		if (slot instanceof EquipmentSlotKey) {
 			return itemIsWeaponOrTool(stack.getItem())
-					|| ((EquipmentSlotKey) slot).getSlotType().getSlotType() == EquipmentSlotType.Group.ARMOR;
+					|| ((EquipmentSlotKey) slot).getSlotType().getType() == EquipmentSlotType.Group.ARMOR;
 		}
 		
 		// Not just blindly guess if that if it's not a PlayerInventorySlotKey, it's probably something special like

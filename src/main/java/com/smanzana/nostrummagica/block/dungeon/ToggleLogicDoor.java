@@ -27,28 +27,28 @@ public class ToggleLogicDoor extends LogicDoorBlock {
 	protected static final BooleanProperty TOGGLED = BooleanProperty.create("toggled");
 	
 	public ToggleLogicDoor() {
-		super(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		super(Block.Properties.of(Material.STONE)
+				.strength(-1.0F, 3600000.8F)
 				.noDrops()
 				.sound(SoundType.STONE)
-				.notSolid()
+				.noOcclusion()
 				);
 		
-		this.setDefaultState(this.getDefaultState().with(TOGGLED, false));
+		this.registerDefaultState(this.defaultBlockState().setValue(TOGGLED, false));
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		super.fillStateContainer(builder);
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
 		builder.add(TOGGLED);
 	}
 	
 	public boolean isToggled(BlockState state) {
-		return state.get(TOGGLED);
+		return state.getValue(TOGGLED);
 	}
 	
 	public BlockState getStateWith(Direction direction, boolean toggled) {
-		return this.getDefaultState().with(TOGGLED, toggled).with(HORIZONTAL_FACING, direction);
+		return this.defaultBlockState().setValue(TOGGLED, toggled).setValue(FACING, direction);
 	}
 	
 	public BlockState getUntoggled(Direction direction) {
@@ -60,9 +60,9 @@ public class ToggleLogicDoor extends LogicDoorBlock {
 	}
 	
 	protected void toggle(World world, BlockPos pos, BlockState state) {
-		final BlockState newState = (isToggled(state) ? getUntoggled(state.get(HORIZONTAL_FACING)) : getToggled(state.get(HORIZONTAL_FACING)));
+		final BlockState newState = (isToggled(state) ? getUntoggled(state.getValue(FACING)) : getToggled(state.getValue(FACING)));
 		this.walkDoor(world, pos, state, (walkPos, walkState) -> {
-			world.setBlockState(walkPos, newState, 3);
+			world.setBlock(walkPos, newState, 3);
 			return false; // Keep walking
 		});
 	}
@@ -81,7 +81,7 @@ public class ToggleLogicDoor extends LogicDoorBlock {
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		if (isToggled(state)) {
 			// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
-			if (context != ISelectionContext.dummy()) {
+			if (context != ISelectionContext.empty()) {
 				if (context.getEntity() == null || !(context.getEntity() instanceof PlayerEntity) || !((PlayerEntity) context.getEntity()).isCreative()) {
 					return VoxelShapes.empty();
 				}

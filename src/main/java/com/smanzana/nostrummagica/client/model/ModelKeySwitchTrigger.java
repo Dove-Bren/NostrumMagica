@@ -14,7 +14,7 @@ public class ModelKeySwitchTrigger extends EntityModel<KeySwitchTriggerEntity> {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		// Cage is just a textured box
 		RenderFuncs.drawUnitCube(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		
@@ -32,12 +32,12 @@ public class ModelKeySwitchTrigger extends EntityModel<KeySwitchTriggerEntity> {
 	}
 	
 	@Override
-	public void setLivingAnimations(KeySwitchTriggerEntity entityIn, float limbSwing, float limbSwingAmount, float partialTick) {
-		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTick);
+	public void prepareMobModel(KeySwitchTriggerEntity entityIn, float limbSwing, float limbSwingAmount, float partialTick) {
+		super.prepareMobModel(entityIn, limbSwing, limbSwingAmount, partialTick);
 	}
 
 	@Override
-	public void setRotationAngles(KeySwitchTriggerEntity entityIn, float limbSwing, float limbSwingAmount,
+	public void setupAnim(KeySwitchTriggerEntity entityIn, float limbSwing, float limbSwingAmount,
 			float ageInTicks, float netHeadYaw, float headPitch) {
 		;
 		

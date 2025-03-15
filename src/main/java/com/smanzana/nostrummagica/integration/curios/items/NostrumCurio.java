@@ -123,21 +123,21 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
 		if (this.desckey == null) {
 			return;
 		}
 		
-		final String trans = this.getDefaultTranslationKey() + ".desc";
+		final String trans = this.getOrCreateDescriptionId() + ".desc";
 		
-		if (!I18n.hasKey(trans)) {
+		if (!I18n.exists(trans)) {
 			return;
 		}
 		
 		// Format with placeholders for blue and red formatting
-		String translation = I18n.format(trans, TextFormatting.GRAY, TextFormatting.BLUE, TextFormatting.DARK_RED);
+		String translation = I18n.get(trans, TextFormatting.GRAY, TextFormatting.BLUE, TextFormatting.DARK_RED);
 		if (translation.trim().isEmpty())
 			return;
 		String lines[] = translation.split("\\|");
@@ -215,7 +215,7 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 
 	@Override
 	public boolean canEquip(ItemStack stack, LivingEntity entity) {
-		if (entity.world.isRemote && entity != NostrumMagica.instance.proxy.getPlayer()) {
+		if (entity.level.isClientSide && entity != NostrumMagica.instance.proxy.getPlayer()) {
 			return true; // Auto allow for other entities on client side when the server says they have them
 		}
 		

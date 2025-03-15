@@ -36,27 +36,27 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 	public void render(ProgressionDoorTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
 			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		final Minecraft mc = Minecraft.getInstance();
-		final double time = (double)tileEntityIn.getWorld().getGameTime() + partialTicks;
+		final double time = (double)tileEntityIn.getLevel().getGameTime() + partialTicks;
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(mc.player);
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(.5, 1.2, .5);
 		
 		// Render centered on bottom-center of door, not TE (in case they're different)
 		{
-			BlockPos pos = tileEntityIn.getPos();
+			BlockPos pos = tileEntityIn.getBlockPos();
 			BlockPos targ = tileEntityIn.getBottomCenterPos();
 			matrixStackIn.translate(targ.getX() - pos.getX(), targ.getY() - pos.getY(), targ.getZ() - pos.getZ());
 		}
 		
-		final float rotY = tileEntityIn.getFace().getOpposite().getHorizontalAngle();
-		matrixStackIn.rotate(Vector3f.YN.rotationDegrees(rotY));
+		final float rotY = tileEntityIn.getFace().getOpposite().toYRot();
+		matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(rotY));
 		
 		// Draw lock symbol
 		{
 			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.PROGRESSION_DOOR_LOCK);
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			
 			
 			final float horizontalRadius = .2f;
@@ -73,9 +73,9 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 			}
 
 			matrixStackIn.translate(0, 0.25, -.3);
-			matrixStackIn.rotate(Vector3f.YP.rotationDegrees((float) (360.0 * (time % spinRate) / spinRate)));
+			matrixStackIn.mulPose(Vector3f.YP.rotationDegrees((float) (360.0 * (time % spinRate) / spinRate)));
 			
-			final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+			final Matrix4f transform = matrixStackIn.last().pose();
 			for (int i = 0; i < points; i++) {
 				double angle = (2*Math.PI) * ((double) i / (double) points);
 				
@@ -92,16 +92,16 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 				final float v2 = (vy2 + (verticalRadius)) / (verticalRadius * 2);
 				
 				// For znegative, add in ZN, HIGH ANGLE, LOW ANGLE
-				buffer.pos(transform, 0, 0, -depth).color(color[0], color[1], color[2], color[3]).tex(.5f, .5f).lightmap(combinedLightIn).endVertex();
-				buffer.pos(transform, vx2, vy2, 0).color(color[0], color[1], color[2], color[3]).tex(u2, v2).lightmap(combinedLightIn).endVertex();
-				buffer.pos(transform, vx1, vy1, 0).color(color[0], color[1], color[2], color[3]).tex(u1, v1).lightmap(combinedLightIn).endVertex();
+				buffer.vertex(transform, 0, 0, -depth).color(color[0], color[1], color[2], color[3]).uv(.5f, .5f).uv2(combinedLightIn).endVertex();
+				buffer.vertex(transform, vx2, vy2, 0).color(color[0], color[1], color[2], color[3]).uv(u2, v2).uv2(combinedLightIn).endVertex();
+				buffer.vertex(transform, vx1, vy1, 0).color(color[0], color[1], color[2], color[3]).uv(u1, v1).uv2(combinedLightIn).endVertex();
 				
 				// for zpositive, add in ZP, LOW ANGLE, HIGH ANGLE
-				buffer.pos(transform, 0, 0, depth).color(color[0], color[1], color[2], color[3]).tex(.5f, .5f).lightmap(combinedLightIn).endVertex();
-				buffer.pos(transform, vx1, vy1, 0).color(color[0], color[1], color[2], color[3]).tex(u1, v1).lightmap(combinedLightIn).endVertex();
-				buffer.pos(transform, vx2, vy2, 0).color(color[0], color[1], color[2], color[3]).tex(u2, v2).lightmap(combinedLightIn).endVertex();
+				buffer.vertex(transform, 0, 0, depth).color(color[0], color[1], color[2], color[3]).uv(.5f, .5f).uv2(combinedLightIn).endVertex();
+				buffer.vertex(transform, vx1, vy1, 0).color(color[0], color[1], color[2], color[3]).uv(u1, v1).uv2(combinedLightIn).endVertex();
+				buffer.vertex(transform, vx2, vy2, 0).color(color[0], color[1], color[2], color[3]).uv(u2, v2).uv2(combinedLightIn).endVertex();
 			}
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 
@@ -110,11 +110,11 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 			final float angleDiff = (float) (Math.PI/(float)tileEntityIn.getRequiredComponents().size());
 			float angle = (float) (Math.PI + angleDiff/2);
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, -.2);
 			
-			final Matrix4f transform = matrixStackIn.getLast().getMatrix();
-			final Matrix3f normal = matrixStackIn.getLast().getNormal();
+			final Matrix4f transform = matrixStackIn.last().pose();
+			final Matrix3f normal = matrixStackIn.last().normal();
 			
 			for (SpellComponentWrapper comp : tileEntityIn.getRequiredComponents()) {
 				boolean has = false;
@@ -145,36 +145,36 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 					final float plateHalfLength = imageHalfLength * 2;
 					final float radius = .75f;
 					
-					IVertexBuilder buffer = bufferIn.getBuffer(RenderType.getEntityCutoutNoCull(TEX_PLATE_LOC));
+					IVertexBuilder buffer = bufferIn.getBuffer(RenderType.entityCutoutNoCull(TEX_PLATE_LOC));
 					
 					double effAngle = angle + (.04f * Math.cos(2 * Math.PI * (time % wiggleTicks) / wiggleTicks));
 					float vx = (float) (Math.cos(effAngle) * radius);
 					float vy = (float) (Math.sin(effAngle) * radius);
 					
 					// +z
-					buffer.pos(transform, vx, vy + plateHalfLength, 0.0005f).color(color[0], color[1], color[2], color[3]).tex(0.0f, 1.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
-					buffer.pos(transform, vx + plateHalfLength, vy, 0.0005f).color(color[0], color[1], color[2], color[3]).tex(1.0f, 1.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
-					buffer.pos(transform, vx, vy - plateHalfLength, 0.0005f).color(color[0], color[1], color[2], color[3]).tex(1.0f, 0.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
-					buffer.pos(transform, vx - plateHalfLength, vy, 0.0005f).color(color[0], color[1], color[2], color[3]).tex(0.0f, 0.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
+					buffer.vertex(transform, vx, vy + plateHalfLength, 0.0005f).color(color[0], color[1], color[2], color[3]).uv(0.0f, 1.0f).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
+					buffer.vertex(transform, vx + plateHalfLength, vy, 0.0005f).color(color[0], color[1], color[2], color[3]).uv(1.0f, 1.0f).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
+					buffer.vertex(transform, vx, vy - plateHalfLength, 0.0005f).color(color[0], color[1], color[2], color[3]).uv(1.0f, 0.0f).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
+					buffer.vertex(transform, vx - plateHalfLength, vy, 0.0005f).color(color[0], color[1], color[2], color[3]).uv(0.0f, 0.0f).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
 					
 					
 					// Draw icon
-					buffer = bufferIn.getBuffer(RenderType.getEntityCutoutNoCull(icon.getModelLocation()));
+					buffer = bufferIn.getBuffer(RenderType.entityCutoutNoCull(icon.getModelLocation()));
 					if (has)
 						color = new float[] {1, 1, 1, .2f};
 					else
 						color = new float[] {1, 1, 1, .8f};
 					
 					// +z
-					buffer.pos(transform, vx + imageHalfLength, vy - imageHalfLength, 0.0f).color(color[0], color[1], color[2], color[3]).tex(0.0f, 1.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
-					buffer.pos(transform, vx - imageHalfLength, vy - imageHalfLength, 0.0f).color(color[0], color[1], color[2], color[3]).tex(1.0f, 1.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
-					buffer.pos(transform, vx - imageHalfLength, vy + imageHalfLength, 0.0f).color(color[0], color[1], color[2], color[3]).tex(1.0f, 0.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
-					buffer.pos(transform, vx + imageHalfLength, vy + imageHalfLength, 0.0f).color(color[0], color[1], color[2], color[3]).tex(0.0f, 0.0f).overlay(combinedOverlayIn).lightmap(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
+					buffer.vertex(transform, vx + imageHalfLength, vy - imageHalfLength, 0.0f).color(color[0], color[1], color[2], color[3]).uv(0.0f, 1.0f).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
+					buffer.vertex(transform, vx - imageHalfLength, vy - imageHalfLength, 0.0f).color(color[0], color[1], color[2], color[3]).uv(1.0f, 1.0f).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
+					buffer.vertex(transform, vx - imageHalfLength, vy + imageHalfLength, 0.0f).color(color[0], color[1], color[2], color[3]).uv(1.0f, 0.0f).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
+					buffer.vertex(transform, vx + imageHalfLength, vy + imageHalfLength, 0.0f).color(color[0], color[1], color[2], color[3]).uv(0.0f, 0.0f).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, 0, 0, -1).endVertex();
 					
 				}
 				angle += angleDiff;
 			}
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		// Draw required level
@@ -186,39 +186,39 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 					? 0x50A0FFA0
 					: 0xFFFFFFFF;
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 1.25, drawZ);
 			matrixStackIn.scale(-VANILLA_FONT_SCALE * 2, -VANILLA_FONT_SCALE * 2, VANILLA_FONT_SCALE * 2);
 			
-			FontRenderer fonter = this.renderDispatcher.fontRenderer;
-			fonter.renderString(val, fonter.getStringWidth(val) / -2, 0, color, false, matrixStackIn.getLast().getMatrix(), bufferIn, false, 0x0, combinedLightIn);
-			matrixStackIn.pop();
+			FontRenderer fonter = this.renderer.font;
+			fonter.drawInBatch(val, fonter.width(val) / -2, 0, color, false, matrixStackIn.last().pose(), bufferIn, false, 0x0, combinedLightIn);
+			matrixStackIn.popPose();
 		}
 		
 		// Draw required tier
 		if (tileEntityIn.getRequiredTier() != EMagicTier.LOCKED) {
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0.25, -.15);
 
 			final float radius = 1.75f;
 			matrixStackIn.scale(radius, radius, 1f);
 			
 			final float outlineScale = 1.025f;
-			matrixStackIn.push();
-			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180f));
+			matrixStackIn.pushPose();
+			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(180f));
 			matrixStackIn.scale(outlineScale, outlineScale, 1f);
 			matrixStackIn.translate(-.5, -.5, 0);
 			MagicTierIcon.get(tileEntityIn.getRequiredTier()).draw(matrixStackIn, bufferIn, combinedLightIn, 1, 1, false, 1f, 1f, 1f, 1f);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 
-			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180f));
+			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(180f));
 			matrixStackIn.translate(-.5, -.5, 0);
 			MagicTierIcon.get(tileEntityIn.getRequiredTier()).draw(matrixStackIn, bufferIn, combinedLightIn, 1, 1, false, .8f, .8f, .8f, 1f);
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 	}
 }

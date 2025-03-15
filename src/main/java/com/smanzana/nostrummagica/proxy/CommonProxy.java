@@ -105,7 +105,7 @@ public class CommonProxy {
 	}
 	
 	public void openContainer(PlayerEntity player, IPackedContainerProvider provider) {
-		if (!player.world.isRemote() && player instanceof ServerPlayerEntity) {
+		if (!player.level.isClientSide() && player instanceof ServerPlayerEntity) {
 			NetworkHooks.openGui((ServerPlayerEntity) player, provider, provider.getData());
 		}
 	}
@@ -168,9 +168,9 @@ public class CommonProxy {
 			SpellCharacteristics characteristics) {
 		if (world == null) {
 			if (caster == null)
-				world = target.world; // If you NPE here you suck. Supply a world!
+				world = target.level; // If you NPE here you suck. Supply a world!
 			else
-				world = caster.world;
+				world = caster.level;
 		}
 		
 		final double MAX_RANGE = 50.0;
@@ -182,7 +182,7 @@ public class CommonProxy {
 		if (target != null) {
 			NetworkHandler.sendToAllTracking(message, target);
 		} else {
-			NetworkHandler.sendToAllAround(message, new TargetPoint(targetPos.x, targetPos.y, targetPos.z, MAX_RANGE, world.getDimensionKey()));
+			NetworkHandler.sendToAllAround(message, new TargetPoint(targetPos.x, targetPos.y, targetPos.z, MAX_RANGE, world.dimension()));
 		}
 	}
 	
@@ -191,9 +191,9 @@ public class CommonProxy {
 			LivingEntity target, Vector3d targetPos) {
 		if (world == null) {
 			if (caster == null)
-				world = target.world; // If you NPE here you suck. Supply a world!
+				world = target.level; // If you NPE here you suck. Supply a world!
 			else
-				world = caster.world;
+				world = caster.level;
 		}
 		
 		final double MAX_RANGE = 50.0;
@@ -205,7 +205,7 @@ public class CommonProxy {
 		if (target != null) {
 			NetworkHandler.sendToAllTracking(message, target);
 		} else {
-			NetworkHandler.sendToAllAround(message, new TargetPoint(targetPos.x, targetPos.y, targetPos.z, MAX_RANGE, world.getDimensionKey()));
+			NetworkHandler.sendToAllAround(message, new TargetPoint(targetPos.x, targetPos.y, targetPos.z, MAX_RANGE, world.dimension()));
 		}
 	}
 	
@@ -223,7 +223,7 @@ public class CommonProxy {
 	
 	public void sendPlayerStatSync(PlayerEntity player) {
 		PlayerStats stats = NostrumMagica.instance.getPlayerStats().get(player);
-		NetworkHandler.sendTo(new PlayerStatSyncMessage(player.getUniqueID(), stats), (ServerPlayerEntity) player);
+		NetworkHandler.sendTo(new PlayerStatSyncMessage(player.getUUID(), stats), (ServerPlayerEntity) player);
 	}
 	
 	public void sendManaArmorCapability(PlayerEntity player) {
@@ -249,8 +249,8 @@ public class CommonProxy {
 		Set<PlayerEntity> players = new HashSet<>();
 		final double MAX_RANGE_SQR = 2500.0;
 		if (pos != null) {
-			for (PlayerEntity player : ((ServerWorld) world).getPlayers()) {
-				if (player.getDistanceSq(pos.getX(), pos.getY(), pos.getZ()) <= MAX_RANGE_SQR)
+			for (PlayerEntity player : ((ServerWorld) world).players()) {
+				if (player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) <= MAX_RANGE_SQR)
 					players.add(player);
 			}
 		}
@@ -258,7 +258,7 @@ public class CommonProxy {
 		if (!players.isEmpty()) {
 			SpawnNostrumRitualEffectMessage message = new SpawnNostrumRitualEffectMessage(
 					//int dimension, BlockPos pos, ReagentType[] reagents, ItemStack center, @Nullable NonNullList<ItemStack> extras, ItemStack output
-					world.getDimensionKey(),
+					world.dimension(),
 					pos, element, reagents, center, extras, output
 					);
 			for (PlayerEntity player : players) {
@@ -268,20 +268,20 @@ public class CommonProxy {
 	}
 	
 	public void playPredefinedEffect(PredefinedEffect type, int duration, World world, Vector3d position) {
-		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.getDimensionKey(), position), world, position);
+		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.dimension(), position), world, position);
 	}
 	
 	public void playPredefinedEffect(PredefinedEffect type, int duration, World world, Entity entity) {
-		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.getDimensionKey(), entity.getEntityId()), world, entity.getPositionVec());
+		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.dimension(), entity.getId()), world, entity.position());
 	}
 	
 	private void playPredefinedEffect(SpawnPredefinedEffectMessage message, World world, Vector3d center) {
 		final double MAX_RANGE = 50.0;
-		NetworkHandler.sendToAllAround(message, new TargetPoint(center.x, center.y, center.z, MAX_RANGE, world.getDimensionKey()));
+		NetworkHandler.sendToAllAround(message, new TargetPoint(center.x, center.y, center.z, MAX_RANGE, world.dimension()));
 	}
 	
 	public boolean attemptBlockTeleport(Entity entity, BlockPos portalPos) {
-		final World world = entity.getEntityWorld();
+		final World world = entity.getCommandSenderWorld();
 		BlockState worldBlock = world.getBlockState(portalPos);
 		if (!(worldBlock.getBlock() instanceof IPortalBlock)) {
 			NostrumMagica.logger.warn("Entity requested teleport from non-portal block: " + entity + " at " + portalPos);
@@ -299,7 +299,7 @@ public class CommonProxy {
 	
 	public boolean attemptPlayerInteract(PlayerEntity player, World world, BlockPos pos, Hand hand, BlockRayTraceResult hit) {
 		ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-		return serverPlayer.interactionManager.func_219441_a(serverPlayer, world, ItemStack.EMPTY, hand, hit)
+		return serverPlayer.gameMode.useItemOn(serverPlayer, world, ItemStack.EMPTY, hand, hit)
 				!= ActionResultType.PASS;
 	}
 }

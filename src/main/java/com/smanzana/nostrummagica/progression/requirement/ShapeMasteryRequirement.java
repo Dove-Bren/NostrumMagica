@@ -34,6 +34,6 @@ public class ShapeMasteryRequirement implements IRequirement{
 	@Override
 	public List<ITextComponent> getDescription(PlayerEntity player) {
 		return Lists.newArrayList(new TranslationTextComponent("info.requirement.shape", 
-				shape.getDisplayName().copyRaw().mergeStyle(TextFormatting.DARK_GREEN)));
+				shape.getDisplayName().plainCopy().withStyle(TextFormatting.DARK_GREEN)));
 	}
 }

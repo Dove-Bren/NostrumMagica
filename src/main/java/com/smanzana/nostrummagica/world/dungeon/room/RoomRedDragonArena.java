@@ -25,10 +25,10 @@ public class RoomRedDragonArena extends StaticRoom {
 		final int maxY = 10;
 		final int maxZ = 40;
 		
-		final StaticBlockState wall = new StaticRoom.StaticBlockState(NostrumBlocks.lightDungeonBlock.getDefaultState());
-		final StaticBlockState lava = new StaticRoom.StaticBlockState(Blocks.LAVA.getDefaultState());
+		final StaticBlockState wall = new StaticRoom.StaticBlockState(NostrumBlocks.lightDungeonBlock.defaultBlockState());
+		final StaticBlockState lava = new StaticRoom.StaticBlockState(Blocks.LAVA.defaultBlockState());
 		final StaticBlockState spawner = new StaticRoom.StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.DRAGON_RED));
-		final StaticBlockState obsidian = new StaticRoom.StaticBlockState(Blocks.OBSIDIAN.getDefaultState());
+		final StaticBlockState obsidian = new StaticRoom.StaticBlockState(Blocks.OBSIDIAN.defaultBlockState());
 		
 		
 		int s = maxX - minX;

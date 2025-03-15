@@ -55,12 +55,12 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 	private static final float CAST_RANGE = SeekingBulletShape.MAX_DIST;
 	
 	public AspectedFireWeapon() {
-		super(ItemTier.GOLD, 5, -2.6F, NostrumItems.PropEquipment().maxDamage(1240));
+		super(ItemTier.GOLD, 5, -2.6F, NostrumItems.PropEquipment().durability(1240));
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-		return super.getAttributeModifiers(equipmentSlot);
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+		return super.getDefaultAttributeModifiers(equipmentSlot);
     }
 	
 	@Override
@@ -90,7 +90,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 	}
 	
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
 		if (repair.isEmpty()) {
 			return false;
 		} else {
@@ -102,23 +102,23 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 	public void apply(LivingEntity caster, Spell spell, SpellCastSummary summary, ItemStack stack) {
 		// We provide -10% mana cost reduct
 		summary.addCostRate(-.1f);
-		ItemStacks.damageItem(stack, caster, caster.getHeldItem(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+		ItemStacks.damageItem(stack, caster, caster.getItemInHand(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		tooltip.add(new StringTextComponent("Mana Cost Discount: 10%"));
 	}
 	
 	protected void doCastEffect(LivingEntity caster, LivingEntity target) {
-		if (caster.world.isRemote || caster.world != target.world) {
+		if (caster.level.isClientSide || caster.level != target.level) {
 			return;
 		}
 		
-		final Vector3d casterPos = caster.getPositionVec().add(0, caster.getEyeHeight(), 0);
-		final Vector3d targetPos = target.getPositionVec().add(0, target.getHeight()/2, 0); 
+		final Vector3d casterPos = caster.position().add(0, caster.getEyeHeight(), 0);
+		final Vector3d targetPos = target.position().add(0, target.getBbHeight()/2, 0); 
 		Vector3d diff = targetPos.subtract(casterPos);
 		
 		// Could go discrete increments, but just divide and stretch
@@ -126,18 +126,18 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 		for (int i = 0; i < intervals; i++) {
 			Vector3d offset = diff.scale((float) i/ (float) intervals);
 			final Vector3d pos = casterPos.add(offset);
-			NostrumParticles.GLOW_ORB.spawn(caster.world, new SpawnParams(
+			NostrumParticles.GLOW_ORB.spawn(caster.level, new SpawnParams(
 					1,
 					pos.x, pos.y, pos.z, 0, 30, 5,
-					target.getEntityId()
+					target.getId()
 					).color(0xFFFF0000).dieOnTarget(true));
 		}
 	}
 	
 	protected @Nullable LivingEntity getCastTarget(LivingEntity caster) {
 		// We have a target?
-		RayTraceResult result = RayTrace.raytraceApprox(caster.world, caster, caster.getPositionVec().add(0, caster.getEyeHeight(), 0),
-				caster.rotationPitch, caster.rotationYaw, CAST_RANGE, (ent) -> {
+		RayTraceResult result = RayTrace.raytraceApprox(caster.level, caster, caster.position().add(0, caster.getEyeHeight(), 0),
+				caster.xRot, caster.yRot, CAST_RANGE, (ent) -> {
 					return ent != null
 							&& ent != caster
 							&& ent instanceof LivingEntity
@@ -155,12 +155,12 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 		final boolean hasSkill = attr.hasSkill(NostrumSkills.Fire_Weapon);
 		
 		if (hasBonus) {
-			caster.addPotionEffect(new EffectInstance(NostrumEffects.soulVampire, 20 * 5, 0));
+			caster.addEffect(new EffectInstance(NostrumEffects.soulVampire, 20 * 5, 0));
 		}
 		
 		final List<LivingEntity> targets;
 		if (hasSkill) {
-			targets = target.getEntityWorld().getEntitiesInAABBexcluding(null, target.getBoundingBox().grow(5), (e) -> e instanceof LivingEntity && !NostrumMagica.IsSameTeam((LivingEntity) e, caster))
+			targets = target.getCommandSenderWorld().getEntities((Entity) null, target.getBoundingBox().inflate(5), (e) -> e instanceof LivingEntity && !NostrumMagica.IsSameTeam((LivingEntity) e, caster))
 					.stream().map((e) -> (LivingEntity) e).collect(Collectors.toList());
 					
 		} else {
@@ -168,10 +168,10 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 		}
 		
 		for (LivingEntity targ : targets) {
-			targ.addPotionEffect(new EffectInstance(NostrumEffects.soulDrain, 20 * 5, 0));
+			targ.addEffect(new EffectInstance(NostrumEffects.soulDrain, 20 * 5, 0));
 			if (hasBonus) {
-				targ.setFire(1);
-				targ.forceFireTicks(105);
+				targ.setSecondsOnFire(1);
+				targ.setRemainingFireTicks(105);
 			}
 		}
 		
@@ -190,10 +190,10 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 	}
 	
 	@Override
-	public ActionResultType itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
-		if (!playerIn.world.isRemote()) {
+	public ActionResultType interactLivingEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+		if (!playerIn.level.isClientSide()) {
 			if (castOn(playerIn, target)) {
-				ItemStacks.damageItem(stack, playerIn, playerIn.getHeldItemMainhand() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+				ItemStacks.damageItem(stack, playerIn, playerIn.getMainHandItem() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
 			}
 		}
 		
@@ -217,7 +217,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 
 	@Override
 	protected void fireChargedWeapon(World worldIn, LivingEntity playerIn, Hand hand, ItemStack stack) {
-		if (!worldIn.isRemote() && castRod(worldIn, playerIn)) {
+		if (!worldIn.isClientSide() && castRod(worldIn, playerIn)) {
 			ItemStacks.damageItem(stack, playerIn, hand, 1);
 		}
 	}

@@ -40,18 +40,18 @@ public class MageStaff extends SwordItem implements ILoreTagged, ISpellEquipment
 	protected static UUID MAGESTAFF_POTENCY_UUID = UUID.fromString("3c262e7c-237c-48fa-aaf7-7b4be23affb3");
 	
 	public MageStaff() {
-		super(ItemTier.WOOD, 3, -2.4F, NostrumItems.PropEquipment().maxDamage(200));
+		super(ItemTier.WOOD, 3, -2.4F, NostrumItems.PropEquipment().durability(200));
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 		builder.putAll(multimap);
 
 		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
-            builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 3, AttributeModifier.Operation.ADDITION));
-            builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
+            builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 3, AttributeModifier.Operation.ADDITION));
+            builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
 		}
 		
 		if (equipmentSlot == EquipmentSlotType.MAINHAND || equipmentSlot == EquipmentSlotType.OFFHAND) {
@@ -88,7 +88,7 @@ public class MageStaff extends SwordItem implements ILoreTagged, ISpellEquipment
 	}
 	
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
 		if (repair.isEmpty()) {
 			return false;
 		} else {
@@ -101,13 +101,13 @@ public class MageStaff extends SwordItem implements ILoreTagged, ISpellEquipment
 		// We provide -10% reagent cost, +20% potency
 		summary.addReagentCost(-.1f);
 		//summary.addEfficiency(.2f);
-		ItemStacks.damageItem(stack, caster, caster.getHeldItem(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+		ItemStacks.damageItem(stack, caster, caster.getItemInHand(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		//tooltip.add("Magic Potency Bonus: 20%");
 		tooltip.add(new StringTextComponent("Reagent Cost Discount: 10%"));
 	}

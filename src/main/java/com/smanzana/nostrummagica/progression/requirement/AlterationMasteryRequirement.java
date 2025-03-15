@@ -36,6 +36,6 @@ public class AlterationMasteryRequirement implements IRequirement{
 	@Override
 	public List<ITextComponent> getDescription(PlayerEntity player) {
 		return Lists.newArrayList(new TranslationTextComponent("info.requirement.alteration", 
-				new StringTextComponent(alteration.getName()).mergeStyle(TextFormatting.AQUA)));
+				new StringTextComponent(alteration.getName()).withStyle(TextFormatting.AQUA)));
 	}
 }

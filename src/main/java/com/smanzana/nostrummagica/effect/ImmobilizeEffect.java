@@ -13,6 +13,6 @@ public class ImmobilizeEffect extends Effect {
 	public ImmobilizeEffect() {
 		super(EffectType.HARMFUL, 0x4A5C61); // 0x5A6C81 is slowness
 		
-		this.addAttributesModifier(Attributes.MOVEMENT_SPEED, POTENCY_UUID, (double)-1.00F, AttributeModifier.Operation.MULTIPLY_TOTAL);
+		this.addAttributeModifier(Attributes.MOVEMENT_SPEED, POTENCY_UUID, (double)-1.00F, AttributeModifier.Operation.MULTIPLY_TOTAL);
 	}
 }

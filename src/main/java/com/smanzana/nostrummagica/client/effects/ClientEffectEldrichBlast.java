@@ -38,10 +38,10 @@ public class ClientEffectEldrichBlast extends ClientEffect {
 		final float period = 2 * 20;
 		final double angleRad = Math.PI * 2 * ((ticks % period) / period);
 		final Vector3d offset = new Vector3d(Math.cos(angleRad) * .5, .25 + .1 * Math.sin(angleRad), Math.sin(angleRad) * .5);
-		entity.world.addParticle(ParticleTypes.PORTAL,
-				entity.getPosX() + offset.x,
-				entity.getPosY() + entity.getHeight() + offset.y,
-				entity.getPosZ() + offset.z,
+		entity.level.addParticle(ParticleTypes.PORTAL,
+				entity.getX() + offset.x,
+				entity.getY() + entity.getBbHeight() + offset.y,
+				entity.getZ() + offset.z,
 				0, -.1, 0
 				);
 	}
@@ -49,8 +49,8 @@ public class ClientEffectEldrichBlast extends ClientEffect {
 	protected void spawnActiveEffect() {
 		//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
 		//Vector3d velocity, Vector3d velocityJitter
-		NostrumParticles.LIGHTNING_STATIC.spawn(entity.world, new SpawnParams(
-				30, entity.getPosX(), entity.getPosY() + (entity.getHeight() / 2), entity.getPosZ(), entity.getHeight()/2, 30, 5,
+		NostrumParticles.LIGHTNING_STATIC.spawn(entity.level, new SpawnParams(
+				30, entity.getX(), entity.getY() + (entity.getBbHeight() / 2), entity.getZ(), entity.getBbHeight()/2, 30, 5,
 				Vector3d.ZERO, null
 				).color(ArcaneWolfElementalType.ELDRICH.getColor()));
 	}

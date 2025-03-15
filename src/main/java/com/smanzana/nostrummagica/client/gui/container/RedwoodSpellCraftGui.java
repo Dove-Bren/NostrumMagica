@@ -42,12 +42,12 @@ public class RedwoodSpellCraftGui {
 			final BasicSpellTableTileEntity te = ContainerUtil.GetPackedTE(buffer);
 			final ISpellCraftingInventory tableInv = te.getSpellCraftingInventory();
 			@Nullable IInventory extraInventory = te.getExtraInventory();
-			return new RedwoodContainer(windowId, playerInv.player, playerInv, tableInv, te.getPos(), extraInventory);
+			return new RedwoodContainer(windowId, playerInv.player, playerInv, tableInv, te.getBlockPos(), extraInventory);
 		}
 		
 		public static IPackedContainerProvider Make(BasicSpellTableTileEntity table) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
-				return new RedwoodContainer(windowId, player, playerInv, table.getSpellCraftingInventory(), table.getPos(), table.getExtraInventory());
+				return new RedwoodContainer(windowId, player, playerInv, table.getSpellCraftingInventory(), table.getBlockPos(), table.getExtraInventory());
 			}, (buffer) -> {
 				ContainerUtil.PackTE(buffer, table);
 			});

@@ -71,7 +71,7 @@ public enum EAlteration {
 	 * @return
 	 */
 	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(reagent, 1));
+		return NonNullList.of(ItemStack.EMPTY, ReagentItem.CreateStack(reagent, 1));
 	}
 	
 	public ItemStack getCraftItem() {
@@ -88,7 +88,7 @@ public enum EAlteration {
 	public static final EAlteration FromNBT(INBT nbt) {
 		EAlteration alteration = EAlteration.INFLICT;
 		try {
-			alteration = EAlteration.valueOf(((StringNBT) nbt).getString().toUpperCase());
+			alteration = EAlteration.valueOf(((StringNBT) nbt).getAsString().toUpperCase());
 		} catch (Exception e) {
 			;
 		}

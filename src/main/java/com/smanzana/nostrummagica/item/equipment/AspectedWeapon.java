@@ -237,17 +237,17 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	
 	public AspectedWeapon(EMagicElement element, Type type) {
 		super(ItemTier.DIAMOND,
-				(int) (calcDamage(element, type) - ItemTier.DIAMOND.getAttackDamage()), // Calc desired damage, and subtrace the amt diamond tier is gonna give
+				(int) (calcDamage(element, type) - ItemTier.DIAMOND.getAttackDamageBonus()), // Calc desired damage, and subtrace the amt diamond tier is gonna give
 				calcSwingSpeed(element, type),
-				NostrumItems.PropEquipment().maxDamage(calcDurability(element, type)));
+				NostrumItems.PropEquipment().durability(calcDurability(element, type)));
 		
 		this.type = type;
 		this.element = element;
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType slot) {
-		Multimap<Attribute, AttributeModifier> multimap = super.getAttributeModifiers(slot);
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType slot) {
+		Multimap<Attribute, AttributeModifier> multimap = super.getDefaultAttributeModifiers(slot);
 
 		if (slot == EquipmentSlotType.OFFHAND && element == EMagicElement.WIND) {
 			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
@@ -261,7 +261,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	}
 	
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return false;
     }
 
@@ -388,18 +388,18 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 //	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
 		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
-		Vector3d dir = playerIn.getLookVec();
+		Vector3d dir = playerIn.getLookAngle();
 		dir = dir.add(0, -dir.y, 0).normalize();
 		
-		ItemStack itemStackIn = playerIn.getHeldItem(hand);
+		ItemStack itemStackIn = playerIn.getItemInHand(hand);
 		
 		if (element == EMagicElement.ICE) {
 			
-			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
+			if (playerIn.getAttackStrengthScale(0.5F) > .95) {
 				
-				if (!worldIn.isRemote) {
+				if (!worldIn.isClientSide) {
 //					EntityAreaEffectCloud cloud = new EntityAreaEffect(worldIn, );
 //	
 //					dir = dir.scale(5f/(3f * 20f));
@@ -416,22 +416,22 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 //					cloud.getMotion().y = dir.y;
 //					cloud.getMotion().z = dir.z;
 					
-					spawnIceCloud(worldIn, playerIn, new Vector3d(playerIn.getPosX() + dir.x, playerIn.getPosY() + .75, playerIn.getPosZ() + dir.z), dir, this.type);
+					spawnIceCloud(worldIn, playerIn, new Vector3d(playerIn.getX() + dir.x, playerIn.getY() + .75, playerIn.getZ() + dir.z), dir, this.type);
 					
 					ItemStacks.damageItem(itemStackIn, playerIn, hand, 2);
 				}
 				
-				playerIn.resetCooldown();
+				playerIn.resetAttackStrengthTicker();
 			}
 			
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		} else if (element == EMagicElement.WIND) {
-			if (playerIn.getCooledAttackStrength(0.5F) > .95 && playerIn.isSneaking()) {
-				if (!worldIn.isRemote) {
-					spawnWalkingVortex(worldIn, playerIn, new Vector3d(playerIn.getPosX() + dir.x, playerIn.getPosY() + .75, playerIn.getPosZ() + dir.z), dir, this.type);
+			if (playerIn.getAttackStrengthScale(0.5F) > .95 && playerIn.isShiftKeyDown()) {
+				if (!worldIn.isClientSide) {
+					spawnWalkingVortex(worldIn, playerIn, new Vector3d(playerIn.getX() + dir.x, playerIn.getY() + .75, playerIn.getZ() + dir.z), dir, this.type);
 					ItemStacks.damageItem(itemStackIn, playerIn, hand, 1);
 				}
-				playerIn.resetCooldown();
+				playerIn.resetAttackStrengthTicker();
 				return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 			} else if (isWindPropel(itemStackIn, playerIn)) {
 				doPropel(itemStackIn,  playerIn);
@@ -439,24 +439,24 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			}
 			
 		} else if (element == EMagicElement.LIGHTNING && ElementalArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, ElementalArmor.Type.MASTER) == 4) {
-			if (playerIn.getCooledAttackStrength(0.5F) > .95) {
+			if (playerIn.getAttackStrengthScale(0.5F) > .95) {
 				// If full set, strike at targetting location (unless sneaking, then strike self)
 				boolean used = false;
-				if (playerIn.isSneaking()) {
-					if (!worldIn.isRemote) {
+				if (playerIn.isShiftKeyDown()) {
+					if (!worldIn.isClientSide) {
 						summonBoltOnSelf(playerIn);
 					}
 					used = true;
-				} else if (playerIn.isPotionActive(NostrumEffects.lightningAttack)) {
+				} else if (playerIn.hasEffect(NostrumEffects.lightningAttack)) {
 					// This should be client-side... TODO do it on client and send via armor message?
 					
 					// Do quick mana check prior to actually doing raytrace. Redone inside helper func.
 					if (attr != null && attr.getMana() >= 30) {
-						if (!worldIn.isRemote) {
+						if (!worldIn.isClientSide) {
 							final float maxDist = 50;
-							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.getPositionVec().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
+							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.position().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookAngle(), maxDist, (ent) -> { return ent != playerIn;});
 							if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
-								final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVec() : mop.getHitVec());
+								final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).position() : mop.getLocation());
 								summonBoltAtTarget(playerIn, worldIn, at);
 							}
 						}
@@ -464,10 +464,10 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 					}
 				}
 				if (used) {
-					if (!worldIn.isRemote) {
+					if (!worldIn.isClientSide) {
 						ItemStacks.damageItem(itemStackIn, playerIn, hand, 1);
 					}
-					playerIn.resetCooldown();
+					playerIn.resetAttackStrengthTicker();
 					return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 				}
 			}
@@ -477,52 +477,52 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		final World worldIn = context.getWorld();
+	public ActionResultType useOn(ItemUseContext context) {
+		final World worldIn = context.getLevel();
 		final PlayerEntity playerIn = context.getPlayer();
-		final BlockPos pos = context.getPos();
-		Vector3d hitVec = context.getHitVec();
-		ItemStack stack = context.getItem();
+		final BlockPos pos = context.getClickedPos();
+		Vector3d hitVec = context.getClickLocation();
+		ItemStack stack = context.getItemInHand();
 		final Hand hand = context.getHand();
-		if (playerIn.getCooledAttackStrength(0.5F) > .95) {
-			Vector3d dir = hitVec.subtract(playerIn.getPositionVec());
+		if (playerIn.getAttackStrengthScale(0.5F) > .95) {
+			Vector3d dir = hitVec.subtract(playerIn.position());
 			dir = dir.add(0, -dir.y, 0);
 			dir = dir.normalize();
 			if (element == EMagicElement.WIND) {
-				if (playerIn.isSneaking()) {
-					if (!worldIn.isRemote) {
-						spawnWalkingVortex(worldIn, playerIn, new Vector3d(playerIn.getPosX() + dir.x, playerIn.getPosY() + .75, playerIn.getPosZ() + dir.z), dir, this.type);
+				if (playerIn.isShiftKeyDown()) {
+					if (!worldIn.isClientSide) {
+						spawnWalkingVortex(worldIn, playerIn, new Vector3d(playerIn.getX() + dir.x, playerIn.getY() + .75, playerIn.getZ() + dir.z), dir, this.type);
 						ItemStacks.damageItem(stack, playerIn, hand, 1);
 					}
-					playerIn.resetCooldown();
+					playerIn.resetAttackStrengthTicker();
 					return ActionResultType.SUCCESS;
 				}
 			} else if (element == EMagicElement.ICE) {
-				if (!worldIn.isRemote) { 
+				if (!worldIn.isClientSide) { 
 					spawnIceCloud(worldIn, playerIn, new Vector3d(pos.getX() + hitVec.x, pos.getY() + 1, pos.getZ() + hitVec.z), dir, this.type);
 					ItemStacks.damageItem(stack, playerIn, hand, 2);
 				}
-				playerIn.resetCooldown();
+				playerIn.resetAttackStrengthTicker();
 				return ActionResultType.SUCCESS;
 			} else if (element == EMagicElement.LIGHTNING && ElementalArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, ElementalArmor.Type.MASTER) == 4) {
 				
 				boolean used = false;
-				if (playerIn.isSneaking()) {
-					if (!worldIn.isRemote) {
+				if (playerIn.isShiftKeyDown()) {
+					if (!worldIn.isClientSide) {
 						summonBoltOnSelf(playerIn);
 					}
 					used = true;
-				} else if (playerIn.isPotionActive(NostrumEffects.lightningAttack)) {
+				} else if (playerIn.hasEffect(NostrumEffects.lightningAttack)) {
 					// This should be client-side... TODO do it on client and send via armor message?
 					
 					// Do quick mana check prior to actually doing raytrace. Redone inside helper func.
 					INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 					if (attr != null && attr.getMana() >= 30) {
-						if (!worldIn.isRemote) {
+						if (!worldIn.isClientSide) {
 							final float maxDist = 50;
-							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.getPositionVec().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookVec(), maxDist, (ent) -> { return ent != playerIn;});
+							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.position().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookAngle(), maxDist, (ent) -> { return ent != playerIn;});
 							if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
-								final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).getPositionVec() : mop.getHitVec());
+								final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).position() : mop.getLocation());
 								summonBoltAtTarget(playerIn, worldIn, at);
 							}
 						}
@@ -530,10 +530,10 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 					}
 				}
 				if (used) {
-					if (!worldIn.isRemote) {
+					if (!worldIn.isClientSide) {
 						ItemStacks.damageItem(stack, playerIn, hand, 1);
 					}
-					playerIn.resetCooldown();
+					playerIn.resetAttackStrengthTicker();
 					return ActionResultType.SUCCESS;
 				}
 			}
@@ -548,7 +548,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 3 seconds
 		AreaEffectEntity cloud = new AreaEffectEntity(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
-		cloud.setColor(NostrumEffects.frostbite.getLiquidColor());
+		cloud.setFixedColor(NostrumEffects.frostbite.getColor());
 		cloud.setWaitTime(5);
 		cloud.setRadius(0.5f);
 		cloud.setRadiusPerTick((1f + typeScale(weaponType) * .75f) / (20f * 3)); // 1 (+ .75 per extra level) extra radius per 3 seconds
@@ -557,7 +557,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			BlockState state = worldIn.getBlockState(pos);
 			if (state.getMaterial() == Material.WATER
 					&& (state.getBlock() == Blocks.WATER)) {
-				worldIn.setBlockState(pos, Blocks.ICE.getDefaultState());
+				worldIn.setBlockAndUpdate(pos, Blocks.ICE.defaultBlockState());
 			}
 		});
 		final boolean hasHeal = attr != null && attr.hasSkill(NostrumSkills.Ice_Weapon);
@@ -566,25 +566,25 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		cloud.addEffect((World w, Entity ent) -> {
 			if (hasHeal && ent != caster && ent instanceof LivingEntity && NostrumMagica.IsSameTeam(caster, (LivingEntity) ent)) {
 				((LivingEntity) ent).heal(hasHealBoost ? 2f : 1f);
-				((LivingEntity) ent).removeActivePotionEffect(NostrumEffects.frostbite);
+				((LivingEntity) ent).removeEffectNoUpdate(NostrumEffects.frostbite);
 				
 				if (hasHealShield && NostrumMagica.rand.nextInt(8) == 0) {
-					((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1f), 0));
+					((LivingEntity) ent).addEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1f), 0));
 				}
-				NostrumParticles.FILLED_ORB.spawn(ent.world, new SpawnParams(
-						10, ent.getPosX(), ent.getPosY() + ent.getHeight()/2, ent.getPosZ(), 4,
+				NostrumParticles.FILLED_ORB.spawn(ent.level, new SpawnParams(
+						10, ent.getX(), ent.getY() + ent.getBbHeight()/2, ent.getZ(), 4,
 						30, 10,
-						ent.getEntityId()
-						).color(NostrumEffects.frostbite.getLiquidColor()).dieOnTarget(true));
+						ent.getId()
+						).color(NostrumEffects.frostbite.getColor()).dieOnTarget(true));
 			} else if (ent instanceof LivingEntity) {
-				((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.frostbite, 20 * 10));
+				((LivingEntity) ent).addEffect(new EffectInstance(NostrumEffects.frostbite, 20 * 10));
 			}
 		});
 		cloud.setVerticleStepping(true);
 		cloud.setGravity(true, .1);
 		//cloud.setWalksWater();
-		world.addEntity(cloud);
-		cloud.setMotion(direction);
+		world.addFreshEntity(cloud);
+		cloud.setDeltaMovement(direction);
 	}
 	
 	protected static void spawnWalkingVortex(World world, PlayerEntity caster, Vector3d at, Vector3d direction, Type weaponType) {
@@ -597,7 +597,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		//cloud.setRadiusPerTick((.25f + level * .5f) / (20f * 10));
 		cloud.setDuration((int) (20 * (3 + typeScale(weaponType) * .5f))); // 3 seconds + a half a second per extra level
 		cloud.addEffect((IAreaEntityEffect)(worldIn, entity) -> {
-			if (entity.noClip || entity.hasNoGravity()) {
+			if (entity.noPhysics || entity.isNoGravity()) {
 				return;
 			}
 			if (hurricaneCount == 4 && entity == caster) {
@@ -605,9 +605,9 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				cloud.addTime(1, false);
 				
 				// Move in direction of player look
-				Vector3d lookDir = Vector3d.fromPitchYaw(0, entity.rotationYaw).scale(5f/(3f * 20f)); // 5 blocks over 10 seconds;
+				Vector3d lookDir = Vector3d.directionFromRotation(0, entity.yRot).scale(5f/(3f * 20f)); // 5 blocks over 10 seconds;
 				cloud.setWaddle(lookDir, 2);
-				entity.getLookVec();
+				entity.getLookAngle();
 				
 				// disable growing by falling else infinite-size!
 				cloud.setRadiusPerFall(0);
@@ -615,37 +615,37 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				entity.fallDistance = 0; // Reset any fall distance
 				
 				// Only affect caster if they jump
-				if (entity.isOnGround() || entity.isSneaking()) {
+				if (entity.isOnGround() || entity.isShiftKeyDown()) {
 					return;
 				}
 			}
 			// upward effect
 			final int period = 20;
-			final float prog = ((float) (entity.ticksExisted % period) / (float) period);
+			final float prog = ((float) (entity.tickCount % period) / (float) period);
 			final double dy = (Math.sin(prog * 2 * Math.PI) + 1) / 2;
-			final Vector3d target = new Vector3d(cloud.getPosX(), cloud.getPosY() + 2 + dy, cloud.getPosZ());
-			final Vector3d diff = target.subtract(entity.getPositionVec());
-			entity.setMotion(diff.x / 2,
+			final Vector3d target = new Vector3d(cloud.getX(), cloud.getY() + 2 + dy, cloud.getZ());
+			final Vector3d diff = target.subtract(entity.position());
+			entity.setDeltaMovement(diff.x / 2,
 					diff.y / 2,
 					diff.z / 2
 					);
-			entity.velocityChanged = true;
+			entity.hurtMarked = true;
 			//entity.getPosY() = 2 + dy;
 			//entity.setPositionAndUpdate(cloud.getPosX(), cloud.getPosY() + 2 + dy, cloud.getPosZ());
 			
 			// Hurricane vortexes also deal damage to non-friendlies!
-			if (hurricaneCount >= 4 && entity.ticksExisted % 15 == 0) {
+			if (hurricaneCount >= 4 && entity.tickCount % 15 == 0) {
 				if (entity instanceof LivingEntity && !NostrumMagica.IsSameTeam((LivingEntity)entity, caster)) {
 					LivingEntity living = (LivingEntity) entity;
-					entity.hurtResistantTime = 0;
+					entity.invulnerableTime = 0;
 					SpellDamage.DamageEntity(living, EMagicElement.WIND, .5f, caster);
-					entity.hurtResistantTime = 0;
+					entity.invulnerableTime = 0;
 					
-					 NostrumParticles.GLOW_ORB.spawn(living.getEntityWorld(), new NostrumParticles.SpawnParams(
+					 NostrumParticles.GLOW_ORB.spawn(living.getCommandSenderWorld(), new NostrumParticles.SpawnParams(
 							 10,
-							 living.getPosX(), entity.getPosY() + entity.getHeight()/2f, entity.getPosZ(), entity.getWidth() * 2,
+							 living.getX(), entity.getY() + entity.getBbHeight()/2f, entity.getZ(), entity.getBbWidth() * 2,
 							 10, 5,
-							 living.getEntityId())
+							 living.getId())
 							 .color(EMagicElement.WIND.getColor()));
 				}
 			}
@@ -657,11 +657,11 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		cloud.setEffectDelay(0);
 		cloud.setWaddle(direction, 1);
 		
-		cloud.setParticleData(ParticleTypes.MYCELIUM);
-		cloud.setIgnoreRadius(true);
+		cloud.setParticle(ParticleTypes.MYCELIUM);
+		cloud.setWaiting(true);
 		cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
 			final int count = 5 + Math.max(0, (int)Math.floor(cloudIn.getRadius() / 4)); 
-				AspectedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVec(), cloudIn, 0xA0C0EEC0, -.05f);
+				AspectedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.position(), cloudIn, 0xA0C0EEC0, -.05f);
 			//}
 		});
 		if (hurricaneCount >= 4) {
@@ -669,8 +669,8 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			//cloud.setCustomParticleParam1(10);
 			cloud.setCustomParticleFrequency(.4f);
 		}
-		world.addEntity(cloud);
-		cloud.setMotion(direction);
+		world.addFreshEntity(cloud);
+		cloud.setDeltaMovement(direction);
 	}
 	
 	public static void spawnJumpVortex(World world, PlayerEntity caster, Vector3d at, Type weaponType) {
@@ -681,30 +681,30 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		//cloud.setRadiusPerTick((.25f + level * .5f) / (20f * 10));
 		cloud.setDuration((int) (20 * (6 + typeScale(weaponType)))); // 6 seconds + a second per extra level
 		cloud.addEffect((IAreaEntityEffect)(worldIn, entity) -> {
-			if (entity.noClip || entity.hasNoGravity()) {
+			if (entity.noPhysics || entity.isNoGravity()) {
 				return;
 			}
 			
 			// Try and only affect jumping or falling entities
 			final float minY = .1f;
 			final float maxY = 2f;
-			if (!entity.isOnGround() && entity.getMotion().y > minY && entity.getMotion().y < maxY) {
-				entity.setMotion(entity.getMotion().x, Math.min(maxY, entity.getMotion().y + .5f), entity.getMotion().z);
-				entity.velocityChanged = true;
-			} else if (entity.getMotion().y < 0) {
+			if (!entity.isOnGround() && entity.getDeltaMovement().y > minY && entity.getDeltaMovement().y < maxY) {
+				entity.setDeltaMovement(entity.getDeltaMovement().x, Math.min(maxY, entity.getDeltaMovement().y + .5f), entity.getDeltaMovement().z);
+				entity.hurtMarked = true;
+			} else if (entity.getDeltaMovement().y < 0) {
 				entity.fallDistance = 0;
 			}
 		});
 		cloud.setEffectDelay(0);
 		
-		cloud.setParticleData(ParticleTypes.MYCELIUM);
-		cloud.setIgnoreRadius(true);
+		cloud.setParticle(ParticleTypes.MYCELIUM);
+		cloud.setWaiting(true);
 		cloud.addVFXFunc((worldIn, ticksExisted, cloudIn) -> {
 			final int count = 5 + Math.max(0, (int)Math.floor(cloudIn.getRadius() / 4)); 
-				AspectedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.getPositionVec(), cloudIn, 0xA090EE90, -.1f);
+				AspectedWeapon.spawnWhirlwindParticle(worldIn, count, cloudIn.position(), cloudIn, 0xA090EE90, -.1f);
 			//}
 		});
-		world.addEntity(cloud);
+		world.addFreshEntity(cloud);
 		//cloud.getMotion().x = direction.x;
 		//cloud.getMotion().y = direction.y;
 		//cloud.getMotion().z = direction.z;
@@ -716,12 +716,12 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			return false;
 		}
 		
-		if (!(entity.world instanceof ServerWorld)) {
+		if (!(entity.level instanceof ServerWorld)) {
 			return false;
 		}
 		
-		((ServerWorld)entity.world).addEntity(
-				new TameLightning(NostrumEntityTypes.tameLightning, entity.world, entity.getPosX(), entity.getPosY(), entity.getPosZ())
+		((ServerWorld)entity.level).addFreshEntity(
+				new TameLightning(NostrumEntityTypes.tameLightning, entity.level, entity.getX(), entity.getY(), entity.getZ())
 				);
 		attr.addMana(-30);
 		if (entity instanceof PlayerEntity) {
@@ -731,21 +731,21 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		if (attr.hasSkill(NostrumSkills.Lightning_Weapon)) {
 			// Explode magic rend
 			// Spread
-			for (Entity ent : entity.getEntityWorld().getEntitiesInAABBexcluding(entity, entity.getBoundingBox().grow(5), (ent) -> ent instanceof LivingEntity && !NostrumMagica.IsSameTeam((LivingEntity) ent, entity))) {
-				((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.magicRend, 20 * 15, 0));
+			for (Entity ent : entity.getCommandSenderWorld().getEntities(entity, entity.getBoundingBox().inflate(5), (ent) -> ent instanceof LivingEntity && !NostrumMagica.IsSameTeam((LivingEntity) ent, entity))) {
+				((LivingEntity) ent).addEffect(new EffectInstance(NostrumEffects.magicRend, 20 * 15, 0));
 				
-				NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
-						10, entity.getPosX(), entity.getPosY() + entity.getHeight()/2, entity.getPosZ(), 0,
+				NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
+						10, entity.getX(), entity.getY() + entity.getBbHeight()/2, entity.getZ(), 0,
 						40, 10,
-						ent.getEntityId()
-						).color(NostrumEffects.magicRend.getLiquidColor()).dieOnTarget(true));
+						ent.getId()
+						).color(NostrumEffects.magicRend.getColor()).dieOnTarget(true));
 			}
 			
-			NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
-					50, entity.getPosX(), entity.getPosY() + entity.getHeight()/2, entity.getPosZ(), 0,
+			NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
+					50, entity.getX(), entity.getY() + entity.getBbHeight()/2, entity.getZ(), 0,
 					30, 10,
 					new Vector3d(0, .1, 0), new Vector3d(.2, .05, .2)
-					).color(NostrumEffects.magicRend.getLiquidColor()).gravity(true));
+					).color(NostrumEffects.magicRend.getColor()).gravity(true));
 			//NostrumMagicaSounds.MELT_METAL.play(event.getEntityLiving());
 		}
 		return true;
@@ -766,41 +766,41 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			// Look for lightning belt
 			IInventory baubles = NostrumMagica.instance.curios.getCurios((PlayerEntity) caster);
 			if (baubles != null) {
-				for (int i = 0; i < baubles.getSizeInventory(); i++) {
-					ItemStack stack = baubles.getStackInSlot(i);
+				for (int i = 0; i < baubles.getContainerSize(); i++) {
+					ItemStack stack = baubles.getItem(i);
 					if (stack.isEmpty() || stack.getItem() != NostrumCurios.lightningBelt) {
 						continue;
 					}
 					
-					count = caster.getRNG().nextInt(3) + 3;
+					count = caster.getRandom().nextInt(3) + 3;
 					break;
 				}
 			}
 		}
 		
 		BlockPos.Mutable cursor = new BlockPos.Mutable();
-		Random rand = (caster == null ? new Random() : caster.getRNG());
+		Random rand = (caster == null ? new Random() : caster.getRandom());
 		for (int i = 0; i < count; i++) {
 			
 			if (i == 0) {
-				((ServerWorld) world).addEntity(
+				((ServerWorld) world).addFreshEntity(
 						new TameLightning(NostrumEntityTypes.tameLightning, world, pos.x, pos.y, pos.z)
 						);
 			} else {
 				// Apply random x/z offsets. Then step up to 4 to find surface
-				cursor.setPos(
+				cursor.set(
 						pos.x + rand.nextInt(6) - 3,
 						pos.y - 2,
 						pos.z + rand.nextInt(6) - 3);
 				
 				// Find surface
 				int dist = 0;
-				while (dist++ < 4 && !world.isAirBlock(cursor)) {
+				while (dist++ < 4 && !world.isEmptyBlock(cursor)) {
 					cursor.setY(cursor.getY() + 1);
 				}
 				
-				if (world.isAirBlock(cursor)) {
-					((ServerWorld) world).addEntity(
+				if (world.isEmptyBlock(cursor)) {
+					((ServerWorld) world).addFreshEntity(
 						new TameLightning(NostrumEntityTypes.tameLightning, world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5)
 						);
 				}
@@ -815,7 +815,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	}
 	
 	@Override
-	public ActionResultType itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+	public ActionResultType interactLivingEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
 		if (element == EMagicElement.WIND) {
 			SpellAction fly = new SpellAction();
 			fly.push(5.0f, typeScale(this.type));
@@ -831,7 +831,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		NostrumParticles.GLOW_ORB.spawn(world, new NostrumParticles.SpawnParams(count, pos.x, pos.y, pos.z,
 				cloud.getRadius(),
 				cloud.getRemainingTicks() / 4, 20,
-				cloud.getEntityId())
+				cloud.getId())
 					//.gravity(-.1f)
 					//.gravity(.65f)
 					.gravity(gravity)
@@ -856,18 +856,18 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	protected static void doPropel(ItemStack stack, PlayerEntity player) {
 		if (isWindPropel(stack, player)) {
 			// Adjust velocity, ignoring downward velocity so players can use it to move even when falling down fast
-			Vector3d motion = player.getMotion();
+			Vector3d motion = player.getDeltaMovement();
 			if (motion.y < 0) {
 				motion = new Vector3d(motion.x, 0, motion.z);
 			}
-			if (motion.length() < 1.0 || player.isElytraFlying()) {
+			if (motion.length() < 1.0 || player.isFallFlying()) {
 				propelAction.apply(player, player, 1f, ISpellLogBuilder.Dummy);
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 				attr.addMana(-WIND_COST);
 				NostrumMagica.instance.proxy.sendMana(player);
 			}
 		} else {
-			player.stopActiveHand();
+			player.releaseUsingItem();
 		}
 	}
 }

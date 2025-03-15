@@ -23,43 +23,43 @@ public class FastFallEffect extends Effect {
 		super(EffectType.HARMFUL, 0xFFAAB855);
 	}
 	
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return duration > 0; // Every tick
 	}
 
 	@Override
-	public void performEffect(LivingEntity entity, int amp) {
+	public void applyEffectTick(LivingEntity entity, int amp) {
 //		if (entity.world.isRemote()) {
 //			return;
 //		}
 		
-		final Vector3d motion = entity.getMotion();
+		final Vector3d motion = entity.getDeltaMovement();
 		if (motion.y < 0 && motion.y > -MAX_VEL) {
 			final double y = Math.max(-MAX_VEL, motion.y * 1.4);
-			entity.setMotion(motion.x, y, motion.z);
+			entity.setDeltaMovement(motion.x, y, motion.z);
 			//entity.velocityChanged = true;
 		}
 	}
 	
 	@Override
-	public void applyAttributesModifiersToEntity(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
-		super.applyAttributesModifiersToEntity(entity, attributeMap, amplifier);
+	public void addAttributeModifiers(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
+		super.addAttributeModifiers(entity, attributeMap, amplifier);
 	}
 	
 	@Override
-	public void removeAttributesModifiersFromEntity(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
-		super.removeAttributesModifiersFromEntity(entityLivingBaseIn, attributeMapIn, amplifier);
+	public void removeAttributeModifiers(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
+		super.removeAttributeModifiers(entityLivingBaseIn, attributeMapIn, amplifier);
     }
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onFall(LivingFallEvent event) {
 		final LivingEntity ent = event.getEntityLiving();
 		
-		if (ent.world.isRemote()) {
+		if (ent.level.isClientSide()) {
 			return;
 		}
 		
-		EffectInstance effect = ent.getActivePotionEffect(NostrumEffects.fastFall);
+		EffectInstance effect = ent.getEffect(NostrumEffects.fastFall);
 		if (effect != null && effect.getDuration() > 0) {
 			event.setDistance(event.getDistance() + 1 * (1 + effect.getAmplifier()));
 		}

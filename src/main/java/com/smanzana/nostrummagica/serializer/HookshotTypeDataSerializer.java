@@ -16,21 +16,21 @@ public class HookshotTypeDataSerializer implements IDataSerializer<HookshotType>
 	
 	@Override
 	public void write(PacketBuffer buf, HookshotType value) {
-		buf.writeEnumValue(value);
+		buf.writeEnum(value);
 	}
 
 	@Override
 	public HookshotType read(PacketBuffer buf)  {
-		return buf.readEnumValue(HookshotType.class);
+		return buf.readEnum(HookshotType.class);
 	}
 
 	@Override
-	public DataParameter<HookshotType> createKey(int id) {
+	public DataParameter<HookshotType> createAccessor(int id) {
 		return new DataParameter<>(id, this);
 	}
 
 	@Override
-	public HookshotType copyValue(HookshotType value) {
+	public HookshotType copy(HookshotType value) {
 		return value;
 	}
 }

@@ -65,7 +65,7 @@ public class OnHealthShape extends OnMetricLevelShape {
 			NostrumMagica.playerListener.registerTimer(this, 0, 20 * duration);
 			
 			if (SetTrigger(entity, this)) {
-				NostrumMagica.magicEffectProxy.applyOnHealthEffect(entity, entity.ticksExisted, 20 * duration);
+				NostrumMagica.magicEffectProxy.applyOnHealthEffect(entity, entity.tickCount, 20 * duration);
 			}
 		}
 		
@@ -79,7 +79,7 @@ public class OnHealthShape extends OnMetricLevelShape {
 							);
 					
 					this.trigger(data);
-					NostrumMagica.instance.proxy.spawnSpellShapeVfx(this.getState().getSelf().world,
+					NostrumMagica.instance.proxy.spawnSpellShapeVfx(this.getState().getSelf().level,
 							NostrumSpellShapes.OnHealth, properties,
 							this.getState().getSelf(), null, this.getState().getSelf(), null, characteristics);
 					NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_HEALTH, this.entity);
@@ -91,7 +91,7 @@ public class OnHealthShape extends OnMetricLevelShape {
 					expired = true;
 					if (this.entity instanceof PlayerEntity) {
 						PlayerEntity player = (PlayerEntity) this.entity;
-						player.sendMessage(new TranslationTextComponent("modification.damaged_duration.health"), Util.DUMMY_UUID);
+						player.sendMessage(new TranslationTextComponent("modification.damaged_duration.health"), Util.NIL_UUID);
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_HEALTH, this.entity);
 					}
 				}
@@ -104,7 +104,7 @@ public class OnHealthShape extends OnMetricLevelShape {
 	private static final Map<UUID, HealthShapeInstance> ActiveMap = new HashMap<>();
 	
 	private static final boolean SetTrigger(LivingEntity entity, @Nullable HealthShapeInstance trigger) {
-		HealthShapeInstance existing = ActiveMap.put(entity.getUniqueID(), trigger);
+		HealthShapeInstance existing = ActiveMap.put(entity.getUUID(), trigger);
 		if (existing != null && existing != trigger) {
 			existing.expired = true;
 		}
@@ -112,7 +112,7 @@ public class OnHealthShape extends OnMetricLevelShape {
 	}
 	
 	private static final String ID = "health";
-	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.GINSENG, 1),
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.of(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.GINSENG, 1),
 			ReagentItem.CreateStack(ReagentType.MANI_DUST, 1)));
 	
 	protected OnHealthShape(String key) {

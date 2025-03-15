@@ -45,11 +45,11 @@ public class FrostbiteEffect extends Effect {
 	public FrostbiteEffect() {
 		super(EffectType.HARMFUL, 0xFF93E0FF);
 		
-		this.addAttributesModifier(Attributes.MOVEMENT_SPEED,
+		this.addAttributeModifier(Attributes.MOVEMENT_SPEED,
 				"60A6EF27-8A11-2213-A734-30A4B0CC4E90", -0.1D, AttributeModifier.Operation.MULTIPLY_TOTAL);
 	}
 	
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		if (duration <= 0)
 			return false;
 		
@@ -58,16 +58,16 @@ public class FrostbiteEffect extends Effect {
 	}
 
 	@Override
-	public void performEffect(LivingEntity entity, int amp) {
+	public void applyEffectTick(LivingEntity entity, int amp) {
 		if (SnowParticle == null) {
-			SnowParticle = new BlockParticleData(ParticleTypes.FALLING_DUST, Blocks.SNOW.getDefaultState());
+			SnowParticle = new BlockParticleData(ParticleTypes.FALLING_DUST, Blocks.SNOW.defaultBlockState());
 		}
 		
 		// If entity has blizzard set, heal instead of harm
 		final int blizzardCount = ElementalArmor.GetSetCount(entity, EMagicElement.ICE, ElementalArmor.Type.MASTER);
 		if (blizzardCount == 4) {
 			entity.heal(1);
-			if (!entity.world.isRemote) {
+			if (!entity.level.isClientSide) {
 				final int interval = Math.max(1, (int) (20.0 * (2.0 / Math.pow(2, amp))));
 				final INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 				final int manaPerSecond = 10;
@@ -80,7 +80,7 @@ public class FrostbiteEffect extends Effect {
 					NostrumMagica.instance.proxy.sendMana((PlayerEntity) entity);
 				}
 				
-				AreaEffectEntity cloud = new AreaEffectEntity(NostrumEntityTypes.areaEffect, entity.world, entity.getPosX(), entity.getPosY(), entity.getPosZ());
+				AreaEffectEntity cloud = new AreaEffectEntity(NostrumEntityTypes.areaEffect, entity.level, entity.getX(), entity.getY(), entity.getZ());
 				cloud.setOwner(entity);
 				cloud.setIgnoreOwner(true);
 				cloud.setRadius(10f);
@@ -89,9 +89,9 @@ public class FrostbiteEffect extends Effect {
 				cloud.setVerticleStepping(false);
 				cloud.setDuration(0);
 				cloud.setWaitTime(interval); // Turn off vanilla effects completely by putting all time in 'wait'
-				cloud.setParticleData(ParticleTypes.ENTITY_EFFECT);
-				cloud.setColor(Integer.valueOf(PotionUtils.getPotionColorFromEffectList(Lists.newArrayList(new EffectInstance(NostrumEffects.frostbite, 20 * 3, 2)))));
-				cloud.setIgnoreRadius(true);
+				cloud.setParticle(ParticleTypes.ENTITY_EFFECT);
+				cloud.setFixedColor(Integer.valueOf(PotionUtils.getColor(Lists.newArrayList(new EffectInstance(NostrumEffects.frostbite, 20 * 3, 2)))));
+				cloud.setWaiting(true);
 				cloud.setCustomParticle(SnowParticle);
 				cloud.setCustomParticleYOffset(2f);
 				cloud.setCustomParticleFrequency(.4f);
@@ -103,18 +103,18 @@ public class FrostbiteEffect extends Effect {
 					if (ent != entity) {
 						if (hasHeal && ent instanceof LivingEntity && NostrumMagica.IsSameTeam(entity, (LivingEntity) ent)) {
 							((LivingEntity) ent).heal(hasHealBoost ? 2f : 1f);
-							((LivingEntity) ent).removeActivePotionEffect(NostrumEffects.frostbite);
+							((LivingEntity) ent).removeEffectNoUpdate(NostrumEffects.frostbite);
 							
 							if (hasHealShield && NostrumMagica.rand.nextInt(8) == 0) {
-								((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1f), 0));
+								((LivingEntity) ent).addEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1f), 0));
 							}
-							NostrumParticles.FILLED_ORB.spawn(ent.world, new SpawnParams(
-									10, ent.getPosX(), ent.getPosY() + ent.getHeight()/2, ent.getPosZ(), 4,
+							NostrumParticles.FILLED_ORB.spawn(ent.level, new SpawnParams(
+									10, ent.getX(), ent.getY() + ent.getBbHeight()/2, ent.getZ(), 4,
 									30, 10,
-									ent.getEntityId()
-									).color(this.getLiquidColor()).dieOnTarget(true));
+									ent.getId()
+									).color(this.getColor()).dieOnTarget(true));
 						} else if (ent instanceof LivingEntity) {
-							((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.frostbite, 20 * 3, 2));
+							((LivingEntity) ent).addEffect(new EffectInstance(NostrumEffects.frostbite, 20 * 3, 2));
 						}
 					}
 				}
@@ -122,15 +122,15 @@ public class FrostbiteEffect extends Effect {
 				cloud.addEffect(new IAreaLocationEffect() {
 					@Override
 					public void apply(World world, BlockPos pos) {
-						if (world.isAirBlock(pos)) {
-							BlockState belowState = world.getBlockState(pos.down());
-							if (belowState.getMaterial().blocksMovement()) {
-								world.setBlockState(pos, NostrumBlocks.mysticSnowLayer.getDefaultState());
+						if (world.isEmptyBlock(pos)) {
+							BlockState belowState = world.getBlockState(pos.below());
+							if (belowState.getMaterial().blocksMotion()) {
+								world.setBlockAndUpdate(pos, NostrumBlocks.mysticSnowLayer.defaultBlockState());
 							}
 						}
 					}
 				});
-				entity.world.addEntity(cloud);
+				entity.level.addFreshEntity(cloud);
 			}
 		} else {
 			float damage = 1.0f;

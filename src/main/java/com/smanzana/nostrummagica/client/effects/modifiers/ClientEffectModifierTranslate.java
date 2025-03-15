@@ -34,10 +34,10 @@ public class ClientEffectModifierTranslate implements ClientEffectModifier {
 	@Override
 	public void apply(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		if (yaw != 0f) {
-			matrixStackIn.rotate(Vector3f.YP.rotationDegrees(yaw));
+			matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(yaw));
 		}
 		if (pitch != 0f) {
-			matrixStackIn.rotate(Vector3f.XP.rotation(pitch));
+			matrixStackIn.mulPose(Vector3f.XP.rotation(pitch));
 		}
 		matrixStackIn.translate(x, y, z);
 	}

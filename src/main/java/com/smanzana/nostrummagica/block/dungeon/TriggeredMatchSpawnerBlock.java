@@ -29,7 +29,7 @@ public class TriggeredMatchSpawnerBlock extends MatchSpawnerBlock implements ITr
 
 	@Override
 	public void trigger(World world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
-		 TileEntity te = world.getTileEntity(blockPos);
+		 TileEntity te = world.getBlockEntity(blockPos);
 		 if (te == null || !(te instanceof TriggeredMatchSpawnerTileEntity)) {
 			 return;
 		 }

@@ -41,14 +41,14 @@ public class ElementalFireArmor extends ElementalArmor {
 		// Level 2(1) halves fire time
 		// Level 3 prevents fire all-together
 		if (type == Type.MASTER) {
-			if (entity.isBurning()) {
-				entity.extinguish();
+			if (entity.isOnFire()) {
+				entity.clearFire();
 			}
 		} else {
 			if (type == Type.ADEPT || NostrumMagica.rand.nextBoolean()) {
 				try {
 					Field fireField = ObfuscationReflectionHelper.findField(Entity.class,
-							"field_190534_ay");
+							"remainingFireTicks");
 					fireField.setAccessible(true);
 
 					int val = fireField.getInt(entity);

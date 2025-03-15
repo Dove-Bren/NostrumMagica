@@ -22,7 +22,7 @@ public class LootLuckEffect extends Effect {
 		super(EffectType.HARMFUL, 0xFF9F6B76); 
 	}
 	
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return false; // No tick effects
 	}
 	
@@ -30,17 +30,17 @@ public class LootLuckEffect extends Effect {
 	public static void onDropsEvent(LootingLevelEvent event) {
 		if (!event.isCanceled()) {
 			LivingEntity ent = event.getEntityLiving();
-			EffectInstance effect = ent.getActivePotionEffect(NostrumEffects.lootLuck);
+			EffectInstance effect = ent.getEffect(NostrumEffects.lootLuck);
 			
 			if (effect != null && effect.getDuration() > 0) {
 				final int bonus = effect.getAmplifier() + 1;
 				event.setLootingLevel(event.getLootingLevel() + bonus);
 				
 				LivingEntity target = event.getEntityLiving();
-				((ServerWorld) target.world).spawnParticle(ParticleTypes.HAPPY_VILLAGER,
-						target.getPosX(),
-						target.getPosY(),	
-						target.getPosZ(),
+				((ServerWorld) target.level).sendParticles(ParticleTypes.HAPPY_VILLAGER,
+						target.getX(),
+						target.getY(),	
+						target.getZ(),
 						10,
 						.2,
 						.25,

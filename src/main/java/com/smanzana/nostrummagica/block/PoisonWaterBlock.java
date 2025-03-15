@@ -37,20 +37,20 @@ public class PoisonWaterBlock extends FlowingFluidBlock {
 	private final boolean unbreakable;
 
 	public PoisonWaterBlock(Supplier<? extends FlowingFluid> supplier, boolean unbreakable) {
-		super(supplier, Block.Properties.create(Material.WATER)
-				.doesNotBlockMovement().hardnessAndResistance(unbreakable ? 3600000.8F : 100.0F).noDrops()
+		super(supplier, Block.Properties.of(Material.WATER)
+				.noCollission().strength(unbreakable ? 3600000.8F : 100.0F).noDrops()
 				);
 		
 		this.unbreakable = unbreakable;
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 		return false;
 	}
 	
 	@Override
-	public Fluid pickupFluid(IWorld worldIn, BlockPos pos, BlockState state) {
+	public Fluid takeLiquid(IWorld worldIn, BlockPos pos, BlockState state) {
 		// want to do this but we don't know the player
 //		final boolean allowed;
 //		if (this.unbreakable) {
@@ -70,23 +70,23 @@ public class PoisonWaterBlock extends FlowingFluidBlock {
 	}
 	
 	@Override
-	public boolean isReplaceable(BlockState state, BlockItemUseContext useContext) {
+	public boolean canBeReplaced(BlockState state, BlockItemUseContext useContext) {
 		return !unbreakable;
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-		if (!world.isRemote
+	public void entityInside(BlockState state, World world, BlockPos pos, Entity entity) {
+		if (!world.isClientSide
 				&& entity instanceof LivingEntity) {
-			if (entity.ticksExisted % 10 == 0) {
+			if (entity.tickCount % 10 == 0) {
 				LivingEntity living = (LivingEntity) entity;
 				
 				@Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(living);
 				if (attr != null && attr.isUnlocked()) {
 					// Either give full or basic randomly, so that the average experience
 					// is that players have to stay in the water long enough to get full
-					if (attr.hasLore(PoisonWaterTag.instance()) && world.rand.nextInt(50) == 0) {
+					if (attr.hasLore(PoisonWaterTag.instance()) && world.random.nextInt(50) == 0) {
 						attr.giveFullLore(PoisonWaterTag.instance());
 					} else {
 						attr.giveBasicLore(PoisonWaterTag.instance());
@@ -94,16 +94,16 @@ public class PoisonWaterBlock extends FlowingFluidBlock {
 				}
 				
 				// Mystic air effect prevents poison water damage
-				final EffectInstance instance = living.getActivePotionEffect(NostrumEffects.mysticAir);
+				final EffectInstance instance = living.getEffect(NostrumEffects.mysticAir);
 				if (instance != null && instance.getDuration() > 0) {
 					return;
 				}
 				
-				living.attackEntityFrom(PoisonWaterFluid.PoisonWaterDamageSource, .25f);
+				living.hurt(PoisonWaterFluid.PoisonWaterDamageSource, .25f);
 			}
 		}
 		
-		super.onEntityCollision(state, world, pos, entity);
+		super.entityInside(state, world, pos, entity);
 	}
 	
 	public static final class PoisonWaterTag implements IBlockLoreTagged {

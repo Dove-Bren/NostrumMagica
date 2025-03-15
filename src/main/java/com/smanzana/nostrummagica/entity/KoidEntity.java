@@ -52,7 +52,7 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
 	public static final String ID = "entity_koid";
 
 	private static final DataParameter<Integer> KOID_VARIANT =
-			EntityDataManager.<Integer>createKey(KoidEntity.class, DataSerializers.VARINT);
+			EntityDataManager.<Integer>defineId(KoidEntity.class, DataSerializers.INT);
 	
 	private KoidTask kTask;
 	private int idleCooldown;
@@ -78,26 +78,26 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
     }
     
     public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-        return MonsterEntity.func_234295_eP_()
-	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.33D)
-	        .createMutableAttribute(Attributes.MAX_HEALTH, 10.0D)
-	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 2.0D)
-	        .createMutableAttribute(Attributes.ARMOR, 2.0D);
+        return MonsterEntity.createMonsterAttributes()
+	        .add(Attributes.MOVEMENT_SPEED, 0.33D)
+	        .add(Attributes.MAX_HEALTH, 10.0D)
+	        .add(Attributes.ATTACK_DAMAGE, 2.0D)
+	        .add(Attributes.ARMOR, 2.0D);
     }
 
     protected void playStepSound(BlockPos pos, BlockState blockIn)
     {
-        this.playSound(SoundEvents.ENTITY_HUSK_STEP, 0.15F, 1.0F);
+        this.playSound(SoundEvents.HUSK_STEP, 0.15F, 1.0F);
     }
 
     protected SoundEvent getHurtSound(DamageSource source)
     {
-        return SoundEvents.ENTITY_HUSK_HURT;
+        return SoundEvents.HUSK_HURT;
     }
 
     protected SoundEvent getDeathSound()
     {
-    	return SoundEvents.ENTITY_HUSK_DEATH;
+    	return SoundEvents.HUSK_DEATH;
     }
 
     /**
@@ -110,22 +110,22 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
 
     protected float getStandingEyeHeight(Pose pose, EntitySize size)
     {
-        return this.getHeight() * 0.8F;
+        return this.getBbHeight() * 0.8F;
     }
 
-    public boolean attackEntityAsMob(Entity entityIn)
+    public boolean doHurtTarget(Entity entityIn)
     {
-        boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
+        boolean flag = entityIn.hurt(DamageSource.mobAttack(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
 
         if (flag)
         {
-            this.applyEnchantments(this, entityIn);
+            this.doEnchantDamageEffects(this, entityIn);
         }
 
         return flag;
     }
 
-    public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
+    public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
         return ActionResultType.PASS;
     }
 
@@ -152,7 +152,7 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
         		&& NostrumMagica.itemSetListener.getActiveSetCount(target, NostrumEquipmentSets.koidSet) < 3;
     }
 
-    public boolean canBeLeashedTo(PlayerEntity player)
+    public boolean canBeLeashed(PlayerEntity player)
     {
         return false;
     }
@@ -164,7 +164,7 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
 		if (idleCooldown > 0) {
 			idleCooldown--;
 			if (idleCooldown == 0) {
-				if (this.getAttackTarget() == null)
+				if (this.getTarget() == null)
 					NostrumMagicaSounds.CAST_FAIL.play(this);
 				idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10); 
 			}
@@ -220,22 +220,22 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
 	@Override
 	public EMagicElement getElement() {
 		return EMagicElement.values()[
-              this.dataManager.get(KOID_VARIANT).intValue()];
+              this.entityData.get(KOID_VARIANT).intValue()];
 	}
 	
 	public void setElement(EMagicElement element) {
-		this.dataManager.set(KOID_VARIANT, element.ordinal());
+		this.entityData.set(KOID_VARIANT, element.ordinal());
 		setCombatTask();
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
-		this.dataManager.register(KOID_VARIANT, EMagicElement.PHYSICAL.ordinal());
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(KOID_VARIANT, EMagicElement.PHYSICAL.ordinal());
 	}
 	
 	public void setCombatTask() {
-		if (this.world != null && !this.world.isRemote) {
+		if (this.level != null && !this.level.isClientSide) {
 			if (kTask != null)
 				this.goalSelector.removeGoal(kTask);
 			
@@ -244,8 +244,8 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
 		}
 	}
 	
-	public void readAdditional(CompoundNBT compound) {
-		super.readAdditional(compound);
+	public void readAdditionalSaveData(CompoundNBT compound) {
+		super.readAdditionalSaveData(compound);
 
         if (compound.contains("KoidType", NBT.TAG_ANY_NUMERIC)) {
         	int i = compound.getByte("KoidType");
@@ -255,18 +255,18 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
         this.setCombatTask();
 	}
 	
-	public void writeAdditional(CompoundNBT compound) {
-    	super.writeAdditional(compound);
+	public void addAdditionalSaveData(CompoundNBT compound) {
+    	super.addAdditionalSaveData(compound);
         compound.putByte("KoidType", (byte)this.getElement().ordinal());
 	}
 	
 	@Override
-	public boolean onLivingFall(float distance, float damageMulti) {
+	public boolean causeFallDamage(float distance, float damageMulti) {
 		return false; // No fall damage
 	}
 	
 	@Override
-	protected void updateFallState(double y, boolean onGround, BlockState stae, BlockPos pos) {
+	protected void checkFallDamage(double y, boolean onGround, BlockState stae, BlockPos pos) {
 		
 	}
 	
@@ -277,18 +277,18 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
     }
 	
 	@Override
-	protected void dropSpecialItems(DamageSource source, int looting, boolean recentlyHitIn) {
-		super.dropSpecialItems(source, looting, recentlyHitIn);
+	protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHitIn) {
+		super.dropCustomDeathLoot(source, looting, recentlyHitIn);
 		
 		// Drop essence item and maybe gem, since that's harder to express in a loot table
 		if (recentlyHitIn) {
-			int count = this.rand.nextInt(2);
+			int count = this.random.nextInt(2);
 			count += looting;
 			
-			this.entityDropItem(EssenceItem.getEssence(this.getElement(), count), 0);
+			this.spawnAtLocation(EssenceItem.getEssence(this.getElement(), count), 0);
 			
-			if (this.rand.nextFloat() < (.01f + .02f * looting)) {
-				this.entityDropItem(InfusedGemItem.getGem(this.getElement(), 1));
+			if (this.random.nextFloat() < (.01f + .02f * looting)) {
+				this.spawnAtLocation(InfusedGemItem.getGem(this.getElement(), 1));
 			}
 		}
 	}
@@ -310,11 +310,11 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
 //	}
 	
 	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount) {
+	public boolean hurt(DamageSource source, float amount) {
 		if (source.isProjectile()) {
 			amount *= 0.25f;
 		}
 		
-		return super.attackEntityFrom(source, amount);
+		return super.hurt(source, amount);
 	}
 }

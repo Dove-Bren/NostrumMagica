@@ -61,10 +61,10 @@ public class ModelRendererBakedWithOffset extends ModelRendererBaked {
 
 	// Made public with AT :)
 	@Override
-	public void translateRotate(MatrixStack matrixStackIn) {
+	public void translateAndRotate(MatrixStack matrixStackIn) {
 		// Apply offset
 		matrixStackIn.translate(offsetX, offsetY, offsetZ);
-		super.translateRotate(matrixStackIn);
+		super.translateAndRotate(matrixStackIn);
 
 	}
 }

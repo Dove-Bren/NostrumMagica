@@ -30,13 +30,13 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 	private static final String NBT_PETNAME = "pet_name";
 	
 	public PetSoulItem(Item.Properties props) {
-		super(props.maxStackSize(1));
+		super(props.stacksTo(1));
 	}
 	
 	public @Nullable UUID getPetSoulID(ItemStack stack) {
 		CompoundNBT tag = stack.getTag();
-		if (tag != null && tag.hasUniqueId(NBT_PETID)) {
-			return tag.getUniqueId(NBT_PETID);
+		if (tag != null && tag.hasUUID(NBT_PETID)) {
+			return tag.getUUID(NBT_PETID);
 		} else {
 			return null;
 		}
@@ -47,7 +47,7 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 		if (nbt == null) {
 			nbt = new CompoundNBT();
 		}
-		nbt.putUniqueId(NBT_PETID, rawSoulID);
+		nbt.putUUID(NBT_PETID, rawSoulID);
 		stack.setTag(nbt);
 	}
 	
@@ -127,7 +127,7 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 		LivingEntity ent = (LivingEntity) rawEnt;
 		
 		// Check for other copies of the entity in the world, and remove them if so
-		Entity staleEnt = Entities.FindEntity(world, ent.getUniqueID());
+		Entity staleEnt = Entities.FindEntity(world, ent.getUUID());
 		if (staleEnt != null) {
 			staleEnt.remove();
 		}
@@ -141,7 +141,7 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 		soulItem.setWorldID(ent, worldID);
 		soulItem.beforePetRespawn(ent, world, pos, stack);
 		
-		if (!world.addEntity(ent)) {
+		if (!world.addFreshEntity(ent)) {
 			NostrumMagica.logger.error("Failed to spawn pet at least minute when adding it to the world!");
 			ent = null;
 		}

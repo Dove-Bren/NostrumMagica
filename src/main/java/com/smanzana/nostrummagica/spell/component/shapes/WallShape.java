@@ -97,13 +97,13 @@ public class WallShape extends AreaShape {
 			final Vector3d center = new Vector3d(instantLocation.hitBlockPos.getX() + .5, instantLocation.hitBlockPos.getY(), instantLocation.hitBlockPos.getZ() + .5);
 			final float radiusEnts = this.radius + .5f;
 			
-			for (Entity entity : world.getEntitiesWithinAABBExcludingEntity(null, 
-					new AxisAlignedBB(center.getX() - radiusEnts,
-							center.getY() - radiusEnts,
-							center.getZ() - radiusEnts,
-							center.getX() + radiusEnts,
-							center.getY() + radiusEnts,
-							center.getZ() + radiusEnts))) {
+			for (Entity entity : world.getEntities(null, 
+					new AxisAlignedBB(center.x() - radiusEnts,
+							center.y() - radiusEnts,
+							center.z() - radiusEnts,
+							center.x() + radiusEnts,
+							center.y() + radiusEnts,
+							center.z() + radiusEnts))) {
 				LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
 				if (living != null) {
 					if (this.isInArea(living)) {
@@ -113,9 +113,9 @@ public class WallShape extends AreaShape {
 			}
 			
 			List<SpellLocation> positions = new ArrayList<>();
-			for (int x = bounds.minX; x <= bounds.maxX; x++)
-			for (int y = bounds.minY; y <= bounds.maxY; y++)
-			for (int z = bounds.minZ; z <= bounds.maxZ; z++) {
+			for (int x = bounds.x0; x <= bounds.x1; x++)
+			for (int y = bounds.y0; y <= bounds.y1; y++)
+			for (int z = bounds.z0; z <= bounds.z1; z++) {
 				positions.add(new SpellLocation(world, new BlockPos(x, y, z)));
 			}
 			
@@ -124,37 +124,37 @@ public class WallShape extends AreaShape {
 		
 		@Override
 		protected boolean isInArea(LivingEntity entity) {
-			final float hRadius = entity.getWidth() / 2;
-			final double entMinX = entity.getPosX() - hRadius;
-			final double entMaxX = entity.getPosX() + hRadius;
-			final double entMinZ = entity.getPosZ() - hRadius;
-			final double entMaxZ = entity.getPosZ() + hRadius;
-			final double entMinY = entity.getPosY();
-			final double entMaxY = entity.getPosY() + entity.getHeight();
-			return entMinX < (bounds.maxX+1) && entMaxX > bounds.minX
-					&& entMinY < (bounds.maxY+1) && entMaxY >= bounds.minY
-					&& entMinZ < (bounds.maxZ+1) && entMaxZ > bounds.minZ
+			final float hRadius = entity.getBbWidth() / 2;
+			final double entMinX = entity.getX() - hRadius;
+			final double entMaxX = entity.getX() + hRadius;
+			final double entMinZ = entity.getZ() - hRadius;
+			final double entMaxZ = entity.getZ() + hRadius;
+			final double entMinY = entity.getY();
+			final double entMaxY = entity.getY() + entity.getBbHeight();
+			return entMinX < (bounds.x1+1) && entMaxX > bounds.x0
+					&& entMinY < (bounds.y1+1) && entMaxY >= bounds.y0
+					&& entMinZ < (bounds.z1+1) && entMaxZ > bounds.z0
 					;
 		}
 
 		@Override
 		protected boolean isInArea(World world, BlockPos pos) {
-			return bounds.isVecInside(pos);
+			return bounds.isInside(pos);
 		}
 
 		@Override
 		protected void doEffect() {
-			final double diffX = (bounds.maxX+1) - bounds.minX;
-			final double diffZ = (bounds.maxZ+1) - bounds.minZ;
-			final double diffY = (bounds.maxY+1) - bounds.minY;
+			final double diffX = (bounds.x1+1) - bounds.x0;
+			final double diffZ = (bounds.z1+1) - bounds.z0;
+			final double diffY = (bounds.y1+1) - bounds.y0;
 			
 			final double yVel = (diffY / (30f));
 			for (int i = 0; i < radius/2 + 1; i++) {
 				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 						1,
-						bounds.minX + NostrumMagica.rand.nextFloat() * diffX,
-						bounds.minY,
-						bounds.minZ + NostrumMagica.rand.nextFloat() * diffZ,
+						bounds.x0 + NostrumMagica.rand.nextFloat() * diffX,
+						bounds.y0,
+						bounds.z0 + NostrumMagica.rand.nextFloat() * diffZ,
 						0, // pos + posjitter
 						40, 10, // lifetime + jitter
 						new Vector3d(0, yVel, 0), null
@@ -164,13 +164,13 @@ public class WallShape extends AreaShape {
 			if (NostrumMagica.rand.nextBoolean()) {
 				// corners
 				
-				for (int x : new int[] {bounds.minX, bounds.maxX + 1})
-				for (int z : new int[] {bounds.minZ, bounds.maxZ + 1})
+				for (int x : new int[] {bounds.x0, bounds.x1 + 1})
+				for (int z : new int[] {bounds.z0, bounds.z1 + 1})
 				{
 					NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 							1,
 							x,
-							bounds.minY,
+							bounds.y0,
 							z,
 							0, // pos + posjitter
 							40, 10, // lifetime + jitter
@@ -237,13 +237,13 @@ public class WallShape extends AreaShape {
 	
 	protected static final WallFacing MakeFacing(LivingEntity caster, Vector3d pos, float pitch, float yaw, boolean grounded) {
 		// Get N/S or E/W from target positions
-		final double dz = Math.abs(caster.getPosZ() - pos.z);
-		final double dx = Math.abs(caster.getPosX() - pos.x);
+		final double dz = Math.abs(caster.getZ() - pos.z);
+		final double dx = Math.abs(caster.getX() - pos.x);
 		final boolean northsouth = dz < dx;
 		
 		// Get vertical based on target positions as well.
 		// Can't use pitch as it may be several shapes in
-		final double casterY = (caster.getPosY() + caster.getEyeHeight());
+		final double casterY = (caster.getY() + caster.getEyeHeight());
 		final double dy = Math.abs(casterY - pos.y);
 		final double dh = Math.sqrt(dz * dz + dx * dx);
 		// We want to require a steeper angle when aiming down
@@ -289,7 +289,7 @@ public class WallShape extends AreaShape {
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.from(ItemStack.EMPTY,
+		return NonNullList.of(ItemStack.EMPTY,
 				ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
 				ReagentItem.CreateStack(ReagentType.MANDRAKE_ROOT, 1));
 	}
@@ -298,7 +298,7 @@ public class WallShape extends AreaShape {
 	public WallShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw,
 			SpellShapeProperties params, SpellCharacteristics characteristics) {
 		// Determine facing based on actual hit position, but use selected pos (where we're looking) to determine if it's grounded
-		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !location.world.isAirBlock(location.selectedBlockPos) && location.world.isAirBlock(location.selectedBlockPos.up()));
+		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !location.world.isEmptyBlock(location.selectedBlockPos) && location.world.isEmptyBlock(location.selectedBlockPos.above()));
 		final boolean isLingering = isLingering(params);
 		final float radius = wallRadius(params);
 		
@@ -316,13 +316,13 @@ public class WallShape extends AreaShape {
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (RADIUS_COSTS == null) {
-			RADIUS_COSTS = NonNullList.from(ItemStack.EMPTY,
+			RADIUS_COSTS = NonNullList.of(ItemStack.EMPTY,
 				ItemStack.EMPTY,
 				new ItemStack(Items.DIAMOND),
 				new ItemStack(Items.EMERALD),
 				new ItemStack(Blocks.GLASS)
 				);
-			LINGER_COSTS = NonNullList.from(ItemStack.EMPTY,
+			LINGER_COSTS = NonNullList.of(ItemStack.EMPTY,
 					ItemStack.EMPTY,
 					new ItemStack(Items.DRAGON_BREATH)
 					);
@@ -353,15 +353,15 @@ public class WallShape extends AreaShape {
 		final float radius = wallRadius(properties);
 		
 		// Determine facing based on actual hit position, but use hitPos (where we'll actually place it) to determine if it's grounded
-		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !location.world.isAirBlock(location.selectedBlockPos) && location.world.isAirBlock(location.selectedBlockPos.up()));
+		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !location.world.isEmptyBlock(location.selectedBlockPos) && location.world.isEmptyBlock(location.selectedBlockPos.above()));
 		MutableBoundingBox bounds = MakeBounds(location.hitBlockPos, facing, radius);
 		
 		// Do block preview if affecting blocks at all
 		if (this.affectsBlocks(properties)) {
 			List<SpellLocation> positions = new ArrayList<>();
-			for (int x = bounds.minX; x <= bounds.maxX; x++)
-			for (int y = bounds.minY; y <= bounds.maxY; y++)
-			for (int z = bounds.minZ; z <= bounds.maxZ; z++) {
+			for (int x = bounds.x0; x <= bounds.x1; x++)
+			for (int y = bounds.y0; y <= bounds.y1; y++)
+			for (int z = bounds.z0; z <= bounds.z1; z++) {
 				positions.add(new SpellLocation(location.world, new BlockPos(x, y, z)));
 			}
 			state.trigger(null, positions);

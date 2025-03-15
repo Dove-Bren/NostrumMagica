@@ -54,13 +54,13 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	private void dirty() {
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		markDirty();
+		level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+		setChanged();
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.put(NBT_INV, Inventories.serializeInventory(inventory));
 		nbt.put(NBT_LOCK, lockKey.asNBT());
@@ -70,8 +70,8 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		if (nbt == null)
 			return;
@@ -87,30 +87,30 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 	
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 
 	@Override
 	public void tick() {
 		ticksExisted++;
 		
-		if (world != null && !world.isRemote()) {
+		if (level != null && !level.isClientSide()) {
 			if (ticksExisted % 20 == 0) {
-				boolean worldUnlockable = world.getBlockState(pos).get(LockedChestBlock.UNLOCKABLE);
+				boolean worldUnlockable = level.getBlockState(worldPosition).getValue(LockedChestBlock.UNLOCKABLE);
 				boolean tileUnlockable = AutoDungeons.GetWorldKeys().hasKey(lockKey); 
 				if (worldUnlockable != tileUnlockable) {
-					world.setBlockState(pos, world.getBlockState(pos).with(LockedChestBlock.UNLOCKABLE, tileUnlockable), 3);
+					level.setBlock(worldPosition, level.getBlockState(worldPosition).setValue(LockedChestBlock.UNLOCKABLE, tileUnlockable), 3);
 				}
 			}
 		}
@@ -122,23 +122,23 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 				) {
 			unlock();
 		} else {
-			player.sendMessage(new TranslationTextComponent("info.locked_chest.nokey"), Util.DUMMY_UUID);
-			NostrumMagicaSounds.HOOKSHOT_TICK.play(player.world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+			player.sendMessage(new TranslationTextComponent("info.locked_chest.nokey"), Util.NIL_UUID);
+			NostrumMagicaSounds.HOOKSHOT_TICK.play(player.level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
 		}
 	}
 	
 	protected void unlock() {
-		final Direction facing = world.getBlockState(pos).get(LockedChestBlock.FACING);
-		this.world.setBlockState(pos, Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, facing), 3);
-		fillChestEntity(world.getTileEntity(pos));
+		final Direction facing = level.getBlockState(worldPosition).getValue(LockedChestBlock.FACING);
+		this.level.setBlock(worldPosition, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, facing), 3);
+		fillChestEntity(level.getBlockEntity(worldPosition));
 		
 		final double flySpeed = .125;
-		NostrumParticles.WARD.spawn(world, new SpawnParams(
-				50, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, .75,
+		NostrumParticles.WARD.spawn(level, new SpawnParams(
+				50, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5, .75,
 				40, 10,
 				new Vector3d(0, .1, 0), new Vector3d(flySpeed, flySpeed / 2, flySpeed)
 				).gravity(.075f));
-		NostrumMagicaSounds.LORE.play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+		NostrumMagicaSounds.LORE.play(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
 		
 		//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
 		//Vector3d velocity, Vector3d velocityJitter
@@ -148,45 +148,45 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 		if (entity != null && entity instanceof ChestTileEntity) {
 			ChestTileEntity chest = (ChestTileEntity) entity;
 			
-			chest.clear();
+			chest.clearContent();
 			
-			final int sharedSlotCount = Math.min(this.getSizeInventory(), chest.getSizeInventory());
+			final int sharedSlotCount = Math.min(this.getContainerSize(), chest.getContainerSize());
 			
 			int i = 0;
 			for (; i < sharedSlotCount; i++) {
-				chest.setInventorySlotContents(i, this.removeStackFromSlot(i));
+				chest.setItem(i, this.removeItemNoUpdate(i));
 			}
 			
 			// For any leftover items, drop on ground
-			for (; i < this.getSizeInventory(); i++) {
-				Block.spawnAsEntity(world, pos, this.removeStackFromSlot(i));
+			for (; i < this.getContainerSize(); i++) {
+				Block.popResource(level, worldPosition, this.removeItemNoUpdate(i));
 			}
 		}
 	}
 	
 	public void setContents(IInventory chest) {
-		this.clear();
-		final int sharedSlotCount = Math.min(this.getSizeInventory(), chest.getSizeInventory());
+		this.clearContent();
+		final int sharedSlotCount = Math.min(this.getContainerSize(), chest.getContainerSize());
 		
 		int i = 0;
 		for (; i < sharedSlotCount; i++) {
-			this.setInventorySlotContents(i, chest.removeStackFromSlot(i));
+			this.setItem(i, chest.removeItemNoUpdate(i));
 		}
 		
 		// For any leftover items, drop on ground
-		for (; i < this.getSizeInventory(); i++) {
-			Block.spawnAsEntity(world, pos, chest.removeStackFromSlot(i));
+		for (; i < this.getContainerSize(); i++) {
+			Block.popResource(level, worldPosition, chest.removeItemNoUpdate(i));
 		}
 	}
 	
 	@Override
-	public void clear() {
-		this.inventory.clear();
+	public void clearContent() {
+		this.inventory.clearContent();
 	}
 
 	@Override
-	public int getSizeInventory() {
-		return this.inventory.getSizeInventory();
+	public int getContainerSize() {
+		return this.inventory.getContainerSize();
 	}
 
 	@Override
@@ -195,28 +195,28 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int index) {
-		return this.inventory.getStackInSlot(index);
+	public ItemStack getItem(int index) {
+		return this.inventory.getItem(index);
 	}
 
 	@Override
-	public ItemStack decrStackSize(int index, int count) {
-		return this.inventory.decrStackSize(index, count);
+	public ItemStack removeItem(int index, int count) {
+		return this.inventory.removeItem(index, count);
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(int index) {
-		return this.inventory.removeStackFromSlot(index);
+	public ItemStack removeItemNoUpdate(int index) {
+		return this.inventory.removeItemNoUpdate(index);
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, ItemStack stack) {
-		this.inventory.setInventorySlotContents(index, stack);
+	public void setItem(int index, ItemStack stack) {
+		this.inventory.setItem(index, stack);
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
-		return this.inventory.isUsableByPlayer(player);
+	public boolean stillValid(PlayerEntity player) {
+		return this.inventory.stillValid(player);
 	}
 
 	@Override
@@ -260,19 +260,19 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	public static final boolean LockChest(World world, BlockPos pos, WorldKey key) {
-		TileEntity te = world.getTileEntity(pos);
+		TileEntity te = world.getBlockEntity(pos);
 		if (te instanceof ChestTileEntity) {
 			ChestTileEntity chest = (ChestTileEntity) te;
-			final Direction facing = world.getBlockState(pos).get(ChestBlock.FACING);
-			Inventory invCopy = new Inventory(chest.getSizeInventory());
+			final Direction facing = world.getBlockState(pos).getValue(ChestBlock.FACING);
+			Inventory invCopy = new Inventory(chest.getContainerSize());
 			
-			for (int i = 0; i < invCopy.getSizeInventory(); i++) {
-				invCopy.setInventorySlotContents(i, chest.removeStackFromSlot(i));
+			for (int i = 0; i < invCopy.getContainerSize(); i++) {
+				invCopy.setItem(i, chest.removeItemNoUpdate(i));
 			}
 			
-			world.setBlockState(pos, NostrumBlocks.lockedChest.getDefaultState().with(LockedChestBlock.FACING, facing), 3);
+			world.setBlock(pos, NostrumBlocks.lockedChest.defaultBlockState().setValue(LockedChestBlock.FACING, facing), 3);
 			
-			LockedChestTileEntity lockedChest = (LockedChestTileEntity) world.getTileEntity(pos);
+			LockedChestTileEntity lockedChest = (LockedChestTileEntity) world.getBlockEntity(pos);
 			lockedChest.setContents(invCopy);
 			lockedChest.setWorldKey(key);
 			return true;

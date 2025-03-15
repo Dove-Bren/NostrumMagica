@@ -20,21 +20,21 @@ public class TomeWorkshopBlock extends Block {
 	public static final String ID = "tome_workshop";
 	
 	public TomeWorkshopBlock() {
-		super(Block.Properties.create(Material.WOOD)
-				.hardnessAndResistance(2.0f, 10.0f)
+		super(Block.Properties.of(Material.WOOD)
+				.strength(2.0f, 10.0f)
 				.sound(SoundType.WOOD)
 				.harvestTool(ToolType.AXE)
 				);
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		NostrumMagica.instance.proxy.openTomeWorkshopScreen();
 		return ActionResultType.SUCCESS;
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 }

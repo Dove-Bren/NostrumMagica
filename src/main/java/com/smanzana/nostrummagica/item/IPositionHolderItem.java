@@ -64,7 +64,7 @@ public interface IPositionHolderItem {
 		else
 			tag = stack.getTag();
 		
-		tag.putString(NBT_DIMENSION, dimension.getLocation().toString());
+		tag.putString(NBT_DIMENSION, dimension.location().toString());
 		tag.putInt(NBT_X, pos.getX());
 		tag.putInt(NBT_Y, pos.getY());
 		tag.putInt(NBT_Z, pos.getZ());

@@ -50,31 +50,31 @@ public class ParticleBatchRenderer {
 			Collections.sort(batch);
 			BatchRenderParticle last = null;
 			final Minecraft mc = Minecraft.getInstance();
-			final ActiveRenderInfo renderInfo = mc.gameRenderer.getActiveRenderInfo();
+			final ActiveRenderInfo renderInfo = mc.gameRenderer.getMainCamera();
 			
 			Tessellator tessellator = Tessellator.getInstance();
-			BufferBuilder buffer = tessellator.getBuffer();
+			BufferBuilder buffer = tessellator.getBuilder();
 			
 			for (BatchRenderParticle next : batch) {
 				if (last == null || next.compareTo(last) != 0) {
 					
 					if (last != null) {
-						tessellator.draw();
+						tessellator.end();
 						last.teardownBatchedRender();
 					}
 					
-					mc.getTextureManager().bindTexture(next.getTexture());
+					mc.getTextureManager().bind(next.getTexture());
 					next.setupBatchedRender();
 					buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP);
 				}
 
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				next.renderBatched(matrixStackIn, buffer, renderInfo, partialTicks);
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 				last = next;
 			}
 			
-			tessellator.draw();
+			tessellator.end();
 			if (last != null) {
 				last.teardownBatchedRender();
 			}

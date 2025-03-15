@@ -33,8 +33,8 @@ public class EmptyChunkGen extends ChunkGenerator {
 	public static final String ID = "emptychunks";
 	
 	public static final Codec<EmptyChunkGen> CODEC = RecordCodecBuilder.create(instance -> instance.group( 
-		RegistryLookupCodec.getLookUpCodec(Registry.BIOME_KEY).forGetter(EmptyChunkGen::getBiomeRegistry),
-		ResourceLocation.CODEC.xmap(s -> RegistryKey.getOrCreateKey(Registry.BIOME_KEY, s), k -> k.getLocation()).fieldOf("biome").forGetter(EmptyChunkGen::getBiome)
+		RegistryLookupCodec.create(Registry.BIOME_REGISTRY).forGetter(EmptyChunkGen::getBiomeRegistry),
+		ResourceLocation.CODEC.xmap(s -> RegistryKey.create(Registry.BIOME_REGISTRY, s), k -> k.location()).fieldOf("biome").forGetter(EmptyChunkGen::getBiome)
 	).apply(instance, EmptyChunkGen::new));
 	
 	protected final Registry<Biome> biomeRegistry;
@@ -56,7 +56,7 @@ public class EmptyChunkGen extends ChunkGenerator {
 	}
 
 	@Override
-	public void generateSurface(WorldGenRegion region, IChunk chunkIn) {
+	public void buildSurfaceAndBedrock(WorldGenRegion region, IChunk chunkIn) {
 		;
 	}
 
@@ -91,29 +91,29 @@ public class EmptyChunkGen extends ChunkGenerator {
 //	}
 	
 	@Override
-	public int getHeight(int x, int z, Type heightmapType) {
+	public int getBaseHeight(int x, int z, Type heightmapType) {
 		return 0;
 	}
 
 	@Override
-	protected Codec<? extends EmptyChunkGen> func_230347_a_() {
+	protected Codec<? extends EmptyChunkGen> codec() {
 		return CODEC;
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public ChunkGenerator func_230349_a_(long p_230349_1_) { // Some sort of dupe but with new seed?
+	public ChunkGenerator withSeed(long p_230349_1_) { // Some sort of dupe but with new seed?
 		return this; // No difference based on seed, like FlatChunkGenerator
 	}
 
 	@Override
-	public void func_230352_b_(IWorld p_230352_1_, StructureManager p_230352_2_, IChunk p_230352_3_) { // Actual generator?
+	public void fillFromNoise(IWorld p_230352_1_, StructureManager p_230352_2_, IChunk p_230352_3_) { // Actual generator?
 		; // Do nothing
 	}
 
 	@Override
-	public IBlockReader func_230348_a_(int p_230348_1_, int p_230348_2_) { // I'm not sure what this is? Reader for a single x/z column?
-		return new Blockreader(new BlockState[] {Blocks.AIR.getDefaultState()});
+	public IBlockReader getBaseColumn(int p_230348_1_, int p_230348_2_) { // I'm not sure what this is? Reader for a single x/z column?
+		return new Blockreader(new BlockState[] {Blocks.AIR.defaultBlockState()});
 	}
 	
 }

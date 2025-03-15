@@ -32,16 +32,16 @@ public class TileEntityCandleRenderer extends TileEntityRenderer<CandleTileEntit
 
 		final ItemStack item = itemCache.get(tileEntityIn.getReagentType());
 		
-		final float rot = 360f * (float) ((double)(tileEntityIn.getWorld().getGameTime() % 200) / 200.0); // Copied into ClientEffectRitual
+		final float rot = 360f * (float) ((double)(tileEntityIn.getLevel().getGameTime() % 200) / 200.0); // Copied into ClientEffectRitual
 		//float rot = 2.0f * (System.currentTimeMillis() / 50 + partialTicks);
 		final float scale = .75f;
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(.5, 1.25, .5);
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rot));
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(rot));
 		matrixStackIn.scale(scale, scale, scale);
 		RenderFuncs.RenderWorldItem(item, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 	}
 }

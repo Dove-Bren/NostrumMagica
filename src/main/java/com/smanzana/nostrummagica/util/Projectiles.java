@@ -16,7 +16,7 @@ public class Projectiles {
 		Entity shooter;
 		LivingEntity source = null;
 		if (projectile instanceof ProjectileEntity) {
-			shooter = ((ProjectileEntity) projectile).func_234616_v_();// getShooter();
+			shooter = ((ProjectileEntity) projectile).getOwner();// getShooter();
 			if (shooter != null && shooter instanceof LivingEntity)
 				source = (LivingEntity) shooter;
 		} else if (projectile instanceof SpellSaucerEntity) {

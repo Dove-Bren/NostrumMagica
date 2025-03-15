@@ -27,21 +27,21 @@ public abstract class ShrineTriggerEntity<E extends ShrineTileEntity<?>> extends
 	
 	@Override
 	protected BlockPos getCheckPos() {
-		return this.getPosition().down();
+		return this.blockPosition().below();
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
+	protected void defineSynchedData() {
+		super.defineSynchedData();
 	}
 
 	@Override
 	protected boolean canBeHitBy(LivingEntity attacker) {
-		return attacker instanceof PlayerEntity && !isInvisibleToPlayer((PlayerEntity) attacker);
+		return attacker instanceof PlayerEntity && !isInvisibleTo((PlayerEntity) attacker);
 	}
 	
 	@Override
-	public boolean isInvisibleToPlayer(PlayerEntity player) {
+	public boolean isInvisibleTo(PlayerEntity player) {
 		if (this.getLinkedTileEntity() == null) {
 			return true;
 		}

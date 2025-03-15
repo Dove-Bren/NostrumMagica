@@ -31,11 +31,11 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 	}
 	
 	protected void renderLock(LockedChestTileEntity te, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		final Direction direction = te.getBlockState().get(LockedChestBlock.FACING);
-		float rot = direction.getHorizontalAngle() + 90f;
+		final Direction direction = te.getBlockState().getValue(LockedChestBlock.FACING);
+		float rot = direction.toYRot() + 90f;
 		
 		final float glow;
-		if (te.getBlockState().get(LockedChestBlock.UNLOCKABLE)) {
+		if (te.getBlockState().getValue(LockedChestBlock.UNLOCKABLE)) {
 			final double glowPeriod = 20;
 			final double glowProg = ((ticks % glowPeriod) / glowPeriod);
 			glow = .15f * (float) Math.sin(glowProg * 2 * Math.PI);
@@ -60,22 +60,22 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 
 		final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.LOCKEDCHEST_LOCK);
 		
-		matrixStackIn.push();
-		matrixStackIn.rotate(Vector3f.YN.rotationDegrees(rot)); // Rotate arm that's centered in the block
+		matrixStackIn.pushPose();
+		matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(rot)); // Rotate arm that's centered in the block
 		matrixStackIn.translate(11.5, 0, 0); // distance from center of block (so it's outside it)
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(-90f)); // Rotate so it's facing away from block instead of perpendicular
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(-90f)); // Rotate so it's facing away from block instead of perpendicular
 		matrixStackIn.translate(-3, -3, 0); // center
 		
 		// Wiggle a bit
 		matrixStackIn.translate(xWiggle, yWiggle, 0); // center
 		RenderFuncs.drawScaledCustomSizeModalRect(matrixStackIn, buffer, 0, 0, 0, 0, 16, 16, 6, 6, 16, 16, red, green, blue, .25f + glow);
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	protected void renderChains(LockedChestTileEntity te, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		final Direction direction = te.getBlockState().get(LockedChestBlock.FACING);
-		float rot = direction.getHorizontalAngle();
+		final Direction direction = te.getBlockState().getValue(LockedChestBlock.FACING);
+		float rot = direction.toYRot();
 		
 		final float armLen = 10;
 		final int points = 8;
@@ -91,30 +91,30 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		
 		final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.LOCKEDCHEST_CHAIN);
 		
-		matrixStackIn.push();
-		matrixStackIn.rotate(Vector3f.YN.rotationDegrees(rot)); // Rotate to match block's orientation
+		matrixStackIn.pushPose();
+		matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(rot)); // Rotate to match block's orientation
 		
-		matrixStackIn.push();
-		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(-115f - majorWiggle));
+		matrixStackIn.pushPose();
+		matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(-115f - majorWiggle));
 		renderChain(matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 
-		matrixStackIn.push();
-		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(-30f - minorWiggle));
+		matrixStackIn.pushPose();
+		matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(-30f - minorWiggle));
 		renderChain(matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 
-		matrixStackIn.push();
-		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(30f + minorWiggle)); // Is this faster than pushing and popping matrix?
+		matrixStackIn.pushPose();
+		matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(30f + minorWiggle)); // Is this faster than pushing and popping matrix?
 		renderChain(matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 
-		matrixStackIn.push();
-		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(115f + majorWiggle)); // Is this faster than pushing and popping matrix?
+		matrixStackIn.pushPose();
+		matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(115f + majorWiggle)); // Is this faster than pushing and popping matrix?
 		renderChain(matrixStackIn, buffer, packedLightIn, ticks, armLen, points, linkWidth);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	public static void renderChain(MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, double ticks, float armLen, int points, float linkWidth) {
@@ -122,7 +122,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 			
 		final float colorPeriod = 140;
 		final float colorProg = (float) (1 - ((ticks % colorPeriod) / colorPeriod));
-		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		final Matrix4f transform = matrixStackIn.last().pose();
 		//final Matrix3f normal = matrixStackIn.getLast().getNormal();
 		
 		{
@@ -147,16 +147,16 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 				final float offY2 = (float) ((linkWidth/2) * Math.sin(prog2 * Math.PI));
 				final float offZ2 = (float) ((linkWidth/2) * Math.cos(prog2 * Math.PI));
 				
-				buffer.pos(transform, px1 - (linkWidth / 2), py1, pz1).color(1f, 1f, 1f, alpha1).tex(0, v1).lightmap(packedLightIn).endVertex();
-				buffer.pos(transform, px1 + (linkWidth / 2), py1, pz1).color(1f, 1f, 1f, alpha1).tex(1, v1).lightmap(packedLightIn).endVertex();
-				buffer.pos(transform, px2 + (linkWidth / 2), py2, pz2).color(1f, 1f, 1f, alpha2).tex(1, v2).lightmap(packedLightIn).endVertex();
-				buffer.pos(transform, px2 - (linkWidth / 2), py2, pz2).color(1f, 1f, 1f, alpha2).tex(0, v2).lightmap(packedLightIn).endVertex();
+				buffer.vertex(transform, px1 - (linkWidth / 2), py1, pz1).color(1f, 1f, 1f, alpha1).uv(0, v1).uv2(packedLightIn).endVertex();
+				buffer.vertex(transform, px1 + (linkWidth / 2), py1, pz1).color(1f, 1f, 1f, alpha1).uv(1, v1).uv2(packedLightIn).endVertex();
+				buffer.vertex(transform, px2 + (linkWidth / 2), py2, pz2).color(1f, 1f, 1f, alpha2).uv(1, v2).uv2(packedLightIn).endVertex();
+				buffer.vertex(transform, px2 - (linkWidth / 2), py2, pz2).color(1f, 1f, 1f, alpha2).uv(0, v2).uv2(packedLightIn).endVertex();
 				
 				// Cross quad
-				buffer.pos(transform, px1, py1 - offY1, pz1 - offZ1).color(1f, 1f, 1f, alpha1).tex(0, v1).lightmap(packedLightIn).endVertex();
-				buffer.pos(transform, px1, py1 + offY1, pz1 + offZ1).color(1f, 1f, 1f, alpha1).tex(1, v1).lightmap(packedLightIn).endVertex();
-				buffer.pos(transform, px2, py2 + offY2, pz2 + offZ2).color(1f, 1f, 1f, alpha2).tex(1, v2).lightmap(packedLightIn).endVertex();
-				buffer.pos(transform, px2, py2 - offY2, pz2 - offZ2).color(1f, 1f, 1f, alpha2).tex(0, v2).lightmap(packedLightIn).endVertex();
+				buffer.vertex(transform, px1, py1 - offY1, pz1 - offZ1).color(1f, 1f, 1f, alpha1).uv(0, v1).uv2(packedLightIn).endVertex();
+				buffer.vertex(transform, px1, py1 + offY1, pz1 + offZ1).color(1f, 1f, 1f, alpha1).uv(1, v1).uv2(packedLightIn).endVertex();
+				buffer.vertex(transform, px2, py2 + offY2, pz2 + offZ2).color(1f, 1f, 1f, alpha2).uv(1, v2).uv2(packedLightIn).endVertex();
+				buffer.vertex(transform, px2, py2 - offY2, pz2 - offZ2).color(1f, 1f, 1f, alpha2).uv(0, v2).uv2(packedLightIn).endVertex();
 			}
 		}
 	}
@@ -165,10 +165,10 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 	public void render(LockedChestTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
 			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		
-		final double ticks = tileEntityIn.getWorld().getGameTime() + partialTicks;
+		final double ticks = tileEntityIn.getLevel().getGameTime() + partialTicks;
 		final Minecraft mc = Minecraft.getInstance();
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(.5, .5, .5);
 		matrixStackIn.scale(1.0f/16.0f, 1.0f/16.0f, 1.0f/16.0f); // Down to block scale, where 1 block is 16 units/pixels
 		
@@ -186,9 +186,9 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 			boolean matches = false;
 			if (tileEntityIn.hasWorldKey()) {
 				WorldKey key = tileEntityIn.getWorldKey();
-				lockStr = mc.player.isSneaking() ? key.toString() : key.toString().substring(0, 8);
+				lockStr = mc.player.isShiftKeyDown() ? key.toString() : key.toString().substring(0, 8);
 				
-				final ItemStack held = mc.player.getHeldItemMainhand();
+				final ItemStack held = mc.player.getMainHandItem();
 				if ((held.getItem() instanceof WorldKeyItem && key.equals(((WorldKeyItem) held.getItem()).getKey(held)))) {
 					matches = true;
 				}
@@ -197,7 +197,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 			}
 			
 			matrixStackIn.scale(8, 8, 8);
-			ActiveRenderInfo renderInfo = mc.gameRenderer.getActiveRenderInfo();
+			ActiveRenderInfo renderInfo = mc.gameRenderer.getMainCamera();
 			float yOffset = 1.4f;
 			
 			if (matches) {
@@ -206,11 +206,11 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 				yOffset += (float) (.05 * Math.sin(2 * Math.PI * matchWiggleProg));
 			}
 			
-			RenderFuncs.drawNameplate(matrixStackIn, bufferIn, lockStr, mc.fontRenderer, combinedLightIn, yOffset, false, renderInfo);
+			RenderFuncs.drawNameplate(matrixStackIn, bufferIn, lockStr, mc.font, combinedLightIn, yOffset, false, renderInfo);
 			//GameRenderer.drawNameplate(mc.fontRenderer, lockStr, (float)0, (float)0 + yOffset, (float)0, i, viewerYaw, viewerPitch, false);
 		}
 
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 	}
 }

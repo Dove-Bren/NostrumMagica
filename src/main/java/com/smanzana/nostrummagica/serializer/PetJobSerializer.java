@@ -19,21 +19,21 @@ public final class PetJobSerializer implements IDataSerializer<PetInfo.PetAction
 	
 	@Override
 	public void write(PacketBuffer buf, PetInfo.PetAction value) {
-		buf.writeEnumValue(value);
+		buf.writeEnum(value);
 	}
 
 	@Override
 	public PetInfo.PetAction read(PacketBuffer buf)  {
-		return buf.readEnumValue(PetInfo.PetAction.class);
+		return buf.readEnum(PetInfo.PetAction.class);
 	}
 
 	@Override
-	public DataParameter<PetInfo.PetAction> createKey(int id) {
+	public DataParameter<PetInfo.PetAction> createAccessor(int id) {
 		return new DataParameter<>(id, this);
 	}
 
 	@Override
-	public PetInfo.PetAction copyValue(PetInfo.PetAction value) {
+	public PetInfo.PetAction copy(PetInfo.PetAction value) {
 		return value;
 	}
 }

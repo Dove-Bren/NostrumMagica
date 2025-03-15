@@ -39,7 +39,7 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 	
 	public static final String ID = "spell_bullet";
 
-	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(SpellBulletEntity.class, MagicElementDataSerializer.instance);
+	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>defineId(SpellBulletEntity.class, MagicElementDataSerializer.instance);
 	
 	private SeekingBulletShapeInstance trigger;
 	private @Nullable Predicate<Entity> filter;
@@ -81,15 +81,15 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 			IParticleData particle,
 			boolean blockyPath) {
 		//super(shooter.world, shooter, target, axis);
-		this(type, shooter.world);
+		this(type, shooter.level);
 		{ // copied out from super since it hardcodes type now
 			//this.owner = ownerIn;
-			this.setShooter(shooter);
-			BlockPos blockpos = shooter.getPosition();
+			this.setOwner(shooter);
+			BlockPos blockpos = shooter.blockPosition();
 			double d0 = (double)blockpos.getX() + 0.5D;
 			double d1 = (double)blockpos.getY() + 0.5D;
 			double d2 = (double)blockpos.getZ() + 0.5D;
-			this.setLocationAndAngles(d0, d1, d2, this.rotationYaw, this.rotationPitch);
+			this.moveTo(d0, d1, d2, this.yRot, this.xRot);
 			this.target = target;
 			this.direction = Direction.UP;
 			this.selectNextMoveDirection(axis);
@@ -104,17 +104,17 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 		
 		// shulker shells move them to center of block. We want shooter pos + eye height
 		if (shooter != null) {
-			this.setLocationAndAngles(shooter.getPosX(), shooter.getPosY() + shooter.getEyeHeight(), shooter.getPosZ(), this.rotationYaw, this.rotationPitch);
+			this.moveTo(shooter.getX(), shooter.getY() + shooter.getEyeHeight(), shooter.getZ(), this.yRot, this.xRot);
 		}
 		
 		this.setElement(self.getElement());
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
+	protected void defineSynchedData() {
+		super.defineSynchedData();
 		
-		this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
+		this.entityData.define(ELEMENT, EMagicElement.PHYSICAL);
 	}
 	
 	public void setFilter(@Nullable Predicate<Entity> filter) {
@@ -122,15 +122,15 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 	}
 	
 	public void setElement(EMagicElement element) {
-		this.dataManager.set(ELEMENT, element);
+		this.entityData.set(ELEMENT, element);
 	}
 	
 	public EMagicElement getElement() {
-		return this.dataManager.get(ELEMENT);
+		return this.entityData.get(ELEMENT);
 	}
 	
 	@Override
-	protected void onImpact(RayTraceResult result) {
+	protected void onHit(RayTraceResult result) {
 		Entity entityHit = RayTrace.entFromRaytrace(result);
 		if (entityHit == null) {
 			//trigger.onProjectileHit(result.getBlockPos());
@@ -142,16 +142,16 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 	}
 	
 	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount) {
-		if (!this.world.isRemote) {
-			trigger.onProjectileHit(this.getPosition());
+	public boolean hurt(DamageSource source, float amount) {
+		if (!this.level.isClientSide) {
+			trigger.onProjectileHit(this.blockPosition());
 		}
 		this.remove();
 		return true;
 	}
 	
 	@Override
-	public boolean writeUnlessRemoved(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundNBT compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
     }
@@ -168,12 +168,12 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 
 		if (this.target == null)
 		{
-			targetPos = this.getPosition().down();
+			targetPos = this.blockPosition().below();
 		}
 		else
 		{
-			targetHeight = (double)this.target.getHeight() * 0.5D;
-			targetPos = new BlockPos(this.target.getPosX(), this.target.getPosY(), this.target.getPosZ());
+			targetHeight = (double)this.target.getBbHeight() * 0.5D;
+			targetPos = new BlockPos(this.target.getX(), this.target.getY(), this.target.getZ());
 		}
 
 		double targetX = (double)targetPos.getX() + 0.5D;
@@ -183,17 +183,17 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 
 		// Blocky movement looks for next block and tries to move to that one, using random if multiple spots still
 		// move in the right direction.
-		if (blockyPath && targetPos.distanceSq(this.getPosX(), this.getPosY(), this.getPosZ(), true) >= 4.0D) {
-			BlockPos blockpos1 = this.getPosition();
+		if (blockyPath && targetPos.distSqr(this.getX(), this.getY(), this.getZ(), true) >= 4.0D) {
+			BlockPos blockpos1 = this.blockPosition();
 			List<Direction> list = Lists.<Direction>newArrayList();
 
 			if (currentAxis != Direction.Axis.X)
 			{
-				if (blockpos1.getX() < targetPos.getX() && this.world.isAirBlock(blockpos1.east()))
+				if (blockpos1.getX() < targetPos.getX() && this.level.isEmptyBlock(blockpos1.east()))
 				{
 					list.add(Direction.EAST);
 				}
-				else if (blockpos1.getX() > targetPos.getX() && this.world.isAirBlock(blockpos1.west()))
+				else if (blockpos1.getX() > targetPos.getX() && this.level.isEmptyBlock(blockpos1.west()))
 				{
 					list.add(Direction.WEST);
 				}
@@ -201,11 +201,11 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 
 			if (currentAxis != Direction.Axis.Y)
 			{
-				if (blockpos1.getY() < targetPos.getY() && this.world.isAirBlock(blockpos1.up()))
+				if (blockpos1.getY() < targetPos.getY() && this.level.isEmptyBlock(blockpos1.above()))
 				{
 					list.add(Direction.UP);
 				}
-				else if (blockpos1.getY() > targetPos.getY() && this.world.isAirBlock(blockpos1.down()))
+				else if (blockpos1.getY() > targetPos.getY() && this.level.isEmptyBlock(blockpos1.below()))
 				{
 					list.add(Direction.DOWN);
 				}
@@ -213,39 +213,39 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 
 			if (currentAxis != Direction.Axis.Z)
 			{
-				if (blockpos1.getZ() < targetPos.getZ() && this.world.isAirBlock(blockpos1.south()))
+				if (blockpos1.getZ() < targetPos.getZ() && this.level.isEmptyBlock(blockpos1.south()))
 				{
 					list.add(Direction.SOUTH);
 				}
-				else if (blockpos1.getZ() > targetPos.getZ() && this.world.isAirBlock(blockpos1.north()))
+				else if (blockpos1.getZ() > targetPos.getZ() && this.level.isEmptyBlock(blockpos1.north()))
 				{
 					list.add(Direction.NORTH);
 				}
 			}
 
-			enumfacing = Direction.getRandomDirection(this.rand);
+			enumfacing = Direction.getRandom(this.random);
 
 			if (list.isEmpty())
 			{
-				for (int i = 5; !this.world.isAirBlock(blockpos1.offset(enumfacing)) && i > 0; --i)
+				for (int i = 5; !this.level.isEmptyBlock(blockpos1.relative(enumfacing)) && i > 0; --i)
 				{
-					enumfacing = Direction.getRandomDirection(this.rand);
+					enumfacing = Direction.getRandom(this.random);
 				}
 			}
 			else
 			{
-				enumfacing = (Direction)list.get(this.rand.nextInt(list.size()));
+				enumfacing = (Direction)list.get(this.random.nextInt(list.size()));
 			}
 
-			targetX = this.getPosX() + (double)enumfacing.getXOffset();
-			targetY = this.getPosY() + (double)enumfacing.getYOffset();
-			targetZ = this.getPosZ() + (double)enumfacing.getZOffset();
+			targetX = this.getX() + (double)enumfacing.getStepX();
+			targetY = this.getY() + (double)enumfacing.getStepY();
+			targetZ = this.getZ() + (double)enumfacing.getStepZ();
 		}
 
 		this.setDirection(enumfacing);
-		double deltaX = targetX - this.getPosX();
-		double deltaY = targetY - this.getPosY();
-		double deltaZ = targetZ - this.getPosZ();
+		double deltaX = targetX - this.getX();
+		double deltaY = targetY - this.getY();
+		double deltaZ = targetZ - this.getZ();
 		double dist = (double)MathHelper.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
 
 		if (dist == 0.0D)
@@ -261,34 +261,34 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 			this.targetDeltaZ = deltaZ / dist * speed;
 		}
 
-		this.isAirBorne = true;
-		this.steps = (this.blockyPath ? 10 + this.rand.nextInt(5) * 10 : 1);
+		this.hasImpulse = true;
+		this.steps = (this.blockyPath ? 10 + this.random.nextInt(5) * 10 : 1);
 	}
 
 	/**
 	 * Called to update the entity's position/logic.
 	 */
 	public void tick() {
-		if (!this.world.isRemote && this.world.getDifficulty() == Difficulty.PEACEFUL) {
+		if (!this.level.isClientSide && this.level.getDifficulty() == Difficulty.PEACEFUL) {
 			this.remove();
 		} else {
 			//super.tick();
 			this.baseTick();
 
-			if (!this.world.isRemote) {
+			if (!this.level.isClientSide) {
 				double dist = Double.MAX_VALUE;
 				if (this.target == null || !this.target.isAlive() || this.target instanceof PlayerEntity && ((PlayerEntity)this.target).isSpectator()) {
-					if (!this.hasNoGravity()) {
-						this.setMotion(this.getMotion().add(0, -0.04, 0));
+					if (!this.isNoGravity()) {
+						this.setDeltaMovement(this.getDeltaMovement().add(0, -0.04, 0));
 					}
 				} else {
-					dist = target.getPositionVec().add(0, target.getHeight() / 2, 0).distanceTo(this.getPositionVec());
+					dist = target.position().add(0, target.getBbHeight() / 2, 0).distanceTo(this.position());
 					this.targetDeltaX = MathHelper.clamp(this.targetDeltaX * 1.025D, -1.0D, 1.0D);
 					this.targetDeltaY = MathHelper.clamp(this.targetDeltaY * 1.025D, -1.0D, 1.0D);
 					this.targetDeltaZ = MathHelper.clamp(this.targetDeltaZ * 1.025D, -1.0D, 1.0D);
 					final double adj = (this.blockyPath ? .2 : (dist < 2 ? .3 : .05));
-					final Vector3d oldMot = this.getMotion();
-					this.setMotion(oldMot.add(
+					final Vector3d oldMot = this.getDeltaMovement();
+					this.setDeltaMovement(oldMot.add(
 							(this.targetDeltaX - oldMot.x) * adj,
 							(this.targetDeltaY - oldMot.y) * adj,
 							(this.targetDeltaZ - oldMot.z) * adj
@@ -296,21 +296,21 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 				}
 				
 				if (dist < .5) {
-					this.onImpact(new EntityRayTraceResult(target));
+					this.onHit(new EntityRayTraceResult(target));
 				} else {
-					RayTraceResult raytraceresult = ProjectileHelper.func_234618_a_(this, (ent) -> ent != this.shooter);
+					RayTraceResult raytraceresult = ProjectileHelper.getHitResult(this, (ent) -> ent != this.shooter);
 	
 					if (raytraceresult != null) {
-						this.onImpact(raytraceresult);
+						this.onHit(raytraceresult);
 					}
 				}
 			}
 
-			this.setPosition(this.getPosX() + this.getMotion().x, this.getPosY() + this.getMotion().y, this.getPosZ() + this.getMotion().z);
+			this.setPos(this.getX() + this.getDeltaMovement().x, this.getY() + this.getDeltaMovement().y, this.getZ() + this.getDeltaMovement().z);
 			ProjectileHelper.rotateTowardsMovement(this, 0.5F);
 
-			if (this.world.isRemote) {
-				this.world.addParticle(particle, this.getPosX() - this.getMotion().x, this.getPosY() - this.getMotion().y + 0.15D, this.getPosZ() - this.getMotion().z, 0.0D, 0.0D, 0.0D);
+			if (this.level.isClientSide) {
+				this.level.addParticle(particle, this.getX() - this.getDeltaMovement().x, this.getY() - this.getDeltaMovement().y + 0.15D, this.getZ() - this.getDeltaMovement().z, 0.0D, 0.0D, 0.0D);
 			} else if (this.target != null && this.target.isAlive()) {
 				if (this.steps > 0) {
 					--this.steps;
@@ -321,13 +321,13 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 				}
 
 				if (this.direction != null) {
-					BlockPos blockpos = this.getPosition();
+					BlockPos blockpos = this.blockPosition();
 					Direction.Axis enumfacing$axis = this.direction.getAxis();
 
-					if (this.world.isTopSolid(blockpos.offset(this.direction), this)) {
+					if (this.level.loadedAndEntityCanStandOn(blockpos.relative(this.direction), this)) {
 						this.selectNextMoveDirection(enumfacing$axis);
 					} else {
-						BlockPos blockpos1 = this.target.getPosition();
+						BlockPos blockpos1 = this.target.blockPosition();
 
 						if (enumfacing$axis == Direction.Axis.X && blockpos.getX() == blockpos1.getX() || enumfacing$axis == Direction.Axis.Z && blockpos.getZ() == blockpos1.getZ() || enumfacing$axis == Direction.Axis.Y && blockpos.getY() == blockpos1.getY()) {
 							this.selectNextMoveDirection(enumfacing$axis);
@@ -339,7 +339,7 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 	}
 
 	@Override
-	public IPacket<?> createSpawnPacket() {
+	public IPacket<?> getAddEntityPacket() {
 		// Have to override and use forge to use with non-living Entity types even though parent defines
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}

@@ -21,22 +21,22 @@ public final class OptionalDragonArmorMaterialSerializer implements IDataSeriali
 	public void write(PacketBuffer buf, Optional<DragonArmor.DragonArmorMaterial> value) {
 		buf.writeBoolean(value.isPresent());
 		if (value.isPresent()) {
-			buf.writeEnumValue(value.get());
+			buf.writeEnum(value.get());
 		}
 	}
 
 	@Override
 	public Optional<DragonArmor.DragonArmorMaterial> read(PacketBuffer buf)  {
-		return buf.readBoolean() ? Optional.of(buf.readEnumValue(DragonArmor.DragonArmorMaterial.class)) : Optional.empty();
+		return buf.readBoolean() ? Optional.of(buf.readEnum(DragonArmor.DragonArmorMaterial.class)) : Optional.empty();
 	}
 
 	@Override
-	public DataParameter<Optional<DragonArmor.DragonArmorMaterial>> createKey(int id) {
+	public DataParameter<Optional<DragonArmor.DragonArmorMaterial>> createAccessor(int id) {
 		return new DataParameter<>(id, this);
 	}
 
 	@Override
-	public Optional<DragonArmorMaterial> copyValue(Optional<DragonArmorMaterial> value) {
+	public Optional<DragonArmorMaterial> copy(Optional<DragonArmorMaterial> value) {
 		return Optional.ofNullable(value.orElse(null));
 	}
 }

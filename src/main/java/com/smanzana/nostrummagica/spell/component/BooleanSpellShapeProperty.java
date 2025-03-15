@@ -22,7 +22,7 @@ public class BooleanSpellShapeProperty extends SpellShapeProperty<Boolean> {
 
 	@Override
 	public Boolean readValue(INBT tag) {
-		return tag instanceof ByteNBT ? (((ByteNBT) tag).getByte() != 0) : getDefault();
+		return tag instanceof ByteNBT ? (((ByteNBT) tag).getAsByte() != 0) : getDefault();
 	}
 
 	@Override

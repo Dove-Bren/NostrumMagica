@@ -15,11 +15,11 @@ public class CursedGlassTriggerEntity extends SwitchTriggerEntity {
 	
 	@Override
 	protected BlockPos getCheckPos() {
-		return new BlockPos(this.getPosX() + -.5, this.getPosY(), this.getPosZ() + -.5);
+		return new BlockPos(this.getX() + -.5, this.getY(), this.getZ() + -.5);
 	}
 	
 	@Override
-	public boolean isEntityInsideOpaqueBlock() {
+	public boolean isInWall() {
 		return false;
 	}
 }

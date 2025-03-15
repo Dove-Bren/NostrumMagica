@@ -21,7 +21,7 @@ public class ChalkItem extends Item implements ILoreTagged {
 	public static final String ID = "nostrum_chalk";
 
 	public ChalkItem() {
-		super(NostrumItems.PropUnstackable().maxDamage(25));
+		super(NostrumItems.PropUnstackable().durability(25));
 	}
 	
 	public boolean isEnchantable(ItemStack stack) {
@@ -50,15 +50,15 @@ public class ChalkItem extends Item implements ILoreTagged {
 	}
 
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		final BlockPos pos = context.getPos();
+	public ActionResultType useOn(ItemUseContext context) {
+		final BlockPos pos = context.getClickedPos();
 		final PlayerEntity player = context.getPlayer();
-		final World world = context.getWorld();
-		final Direction facing = context.getFace();
+		final World world = context.getLevel();
+		final Direction facing = context.getClickedFace();
 		
-		ItemStack stack = context.getItem();
-        if (facing == Direction.UP && player.canPlayerEdit(pos.offset(facing), facing, stack) && Block.hasSolidSideOnTop(world, pos) && world.isAirBlock(pos.up())) {
-        	world.setBlockState(pos.up(), NostrumBlocks.chalk.getDefaultState());
+		ItemStack stack = context.getItemInHand();
+        if (facing == Direction.UP && player.mayUseItemAt(pos.relative(facing), facing, stack) && Block.canSupportRigidBlock(world, pos) && world.isEmptyBlock(pos.above())) {
+        	world.setBlockAndUpdate(pos.above(), NostrumBlocks.chalk.defaultBlockState());
         	ItemStacks.damageItem(stack, player, context.getHand(), 1);
             return ActionResultType.SUCCESS;
         } else {

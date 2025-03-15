@@ -18,6 +18,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> extends Goal implements IFollowOwnerGoal {
 	
 	private final T thePet;
@@ -38,12 +40,12 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 	
 	public FollowOwnerGenericGoal(T thePetIn, double followSpeedIn, float minDistIn, float maxDistIn, Predicate<? super T> filter) {
 		this.thePet = thePetIn;
-		this.theWorld = thePetIn.world;
+		this.theWorld = thePetIn.level;
 		this.followSpeed = followSpeedIn;
-		this.petPathfinder = thePetIn.getNavigator();
+		this.petPathfinder = thePetIn.getNavigation();
 		this.minDist = minDistIn;
 		this.maxDist = maxDistIn;
-		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+		this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 		
 		this.filter = filter;
 	}
@@ -51,7 +53,7 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 	/**
 	 * Returns whether the Goal should begin execution.
 	 */
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		LivingEntity entitylivingbase = this.thePet.getLivingOwner();
 
 		if (entitylivingbase == null) {
@@ -60,7 +62,7 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 			return false;
 		} else if (this.thePet.isEntitySitting()) {
 			return false;
-		} else if (this.thePet.getDistanceSq(entitylivingbase) < (double)(this.minDist * this.minDist)) {
+		} else if (this.thePet.distanceToSqr(entitylivingbase) < (double)(this.minDist * this.minDist)) {
 			return false;
 		} else if (this.filter != null && !this.filter.apply(this.thePet)) {
 			return false;
@@ -73,26 +75,26 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 	/**
 	 * Returns whether an in-progress Goal should continue executing
 	 */
-	public boolean shouldContinueExecuting() {
-		return !this.petPathfinder.noPath() && this.thePet.getDistanceSq(this.theOwner) > (double)(this.maxDist * this.maxDist) && !this.thePet.isEntitySitting();
+	public boolean canContinueToUse() {
+		return !this.petPathfinder.isDone() && this.thePet.distanceToSqr(this.theOwner) > (double)(this.maxDist * this.maxDist) && !this.thePet.isEntitySitting();
 	}
 
 	/**
 	 * Execute a one shot task or start executing a continuous task
 	 */
-	public void startExecuting() {
+	public void start() {
 		this.timeToRecalcPath = 0;
-		this.oldWaterCost = this.thePet.getPathPriority(PathNodeType.WATER);
-		this.thePet.setPathPriority(PathNodeType.WATER, 0.0F);
+		this.oldWaterCost = this.thePet.getPathfindingMalus(PathNodeType.WATER);
+		this.thePet.setPathfindingMalus(PathNodeType.WATER, 0.0F);
 	}
 
 	/**
 	 * Resets the task
 	 */
-	public void resetTask() {
+	public void stop() {
 		this.theOwner = null;
-		this.petPathfinder.clearPath();
-		this.thePet.setPathPriority(PathNodeType.WATER, this.oldWaterCost);
+		this.petPathfinder.stop();
+		this.thePet.setPathfindingMalus(PathNodeType.WATER, this.oldWaterCost);
 	}
 
 	protected boolean isEmptyBlock(BlockPos pos) {
@@ -100,17 +102,17 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 	}
 	
 	protected static boolean IsEmptyBlock(World world, BlockPos pos) {
-		return world.isAirBlock(pos);
+		return world.isEmptyBlock(pos);
 	}
 	
 	public static boolean TeleportAroundEntity(Entity teleportingEntity, Entity targetEntity) {
-		if (teleportingEntity == null || targetEntity == null || teleportingEntity.world == null || teleportingEntity.world != targetEntity.world) {
+		if (teleportingEntity == null || targetEntity == null || teleportingEntity.level == null || teleportingEntity.level != targetEntity.level) {
 			return false;
 		}
 		
-		final World theWorld = targetEntity.world;
-		int i = MathHelper.floor(targetEntity.getPosX()) - 2;
-		int j = MathHelper.floor(targetEntity.getPosZ()) - 2;
+		final World theWorld = targetEntity.level;
+		int i = MathHelper.floor(targetEntity.getX()) - 2;
+		int j = MathHelper.floor(targetEntity.getZ()) - 2;
 		int k = MathHelper.floor(targetEntity.getBoundingBox().minY);
 		
 		BlockPos.Mutable pos1 = new BlockPos.Mutable();
@@ -119,13 +121,13 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 
 		for (int l = 0; l <= 4; ++l) {
 			for (int i1 = 0; i1 <= 4; ++i1) {
-				pos1.setPos(i + l, k - 1, j + i1);
-				pos2.setPos(i + l, k, j + i1);
-				pos3.setPos(i + l, k + 1, j + i1);
-				if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && theWorld.getBlockState(new BlockPos(pos1)).canEntitySpawn(theWorld, pos1, teleportingEntity.getType()) && IsEmptyBlock(theWorld, pos2) && IsEmptyBlock(theWorld, pos3)) {
-					teleportingEntity.setLocationAndAngles((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), teleportingEntity.rotationYaw, teleportingEntity.rotationPitch);
+				pos1.set(i + l, k - 1, j + i1);
+				pos2.set(i + l, k, j + i1);
+				pos3.set(i + l, k + 1, j + i1);
+				if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && theWorld.getBlockState(new BlockPos(pos1)).isValidSpawn(theWorld, pos1, teleportingEntity.getType()) && IsEmptyBlock(theWorld, pos2) && IsEmptyBlock(theWorld, pos3)) {
+					teleportingEntity.moveTo((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), teleportingEntity.yRot, teleportingEntity.xRot);
 					if (teleportingEntity instanceof MobEntity) {
-						((MobEntity) teleportingEntity).getNavigator().clearPath();
+						((MobEntity) teleportingEntity).getNavigation().stop();
 					}
 					return true;
 				}
@@ -138,15 +140,15 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 	 * Updates the task
 	 */
 	public void tick() {
-		this.thePet.getLookController().setLookPositionWithEntity(this.theOwner, 10.0F, (float)this.thePet.getVerticalFaceSpeed());
+		this.thePet.getLookControl().setLookAt(this.theOwner, 10.0F, (float)this.thePet.getMaxHeadXRot());
 
 		if (!this.thePet.isEntitySitting()) {
 			if (--this.timeToRecalcPath <= 0) {
 				this.timeToRecalcPath = 10;
 
-				if (!this.petPathfinder.tryMoveToEntityLiving(this.theOwner, this.followSpeed)) {
-					if (!this.thePet.getLeashed()) {
-						if (this.thePet.getDistanceSq(this.theOwner) >= 144.0D) {
+				if (!this.petPathfinder.moveTo(this.theOwner, this.followSpeed)) {
+					if (!this.thePet.isLeashed()) {
+						if (this.thePet.distanceToSqr(this.theOwner) >= 144.0D) {
 							TeleportAroundEntity(thePet, theOwner);
 						}
 					}

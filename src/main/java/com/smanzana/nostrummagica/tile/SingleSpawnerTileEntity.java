@@ -25,15 +25,15 @@ public class SingleSpawnerTileEntity extends TileEntity implements ITickableTile
 	
 	// Only call on server
 	protected void majorTick(BlockState state) {
-		NostrumBlocks.singleSpawner.tick(state, (ServerWorld) world, pos, NostrumMagica.rand);
+		NostrumBlocks.singleSpawner.tick(state, (ServerWorld) level, worldPosition, NostrumMagica.rand);
 	}
 	
 	@Override
 	public void tick() {
-		if (!world.isRemote && ++ticksExisted % 32 == 0) {
-			BlockState state = this.world.getBlockState(this.pos);
+		if (!level.isClientSide && ++ticksExisted % 32 == 0) {
+			BlockState state = this.level.getBlockState(this.worldPosition);
 			if (state == null || !(state.getBlock() instanceof SingleSpawnerBlock)) {
-				world.removeTileEntity(pos);
+				level.removeBlockEntity(worldPosition);
 				return;
 			}
 			

@@ -119,7 +119,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 		float extra = .1f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
 		float inv = .1f - extra;
 		
-		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK);
+		Minecraft.getInstance().getTextureManager().bind(RES_BACK);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 				0, 0, TEX_BACK_WIDTH, TEX_BACK_HEIGHT,
 				width, height, TEX_BACK_WIDTH, TEX_BACK_HEIGHT,
@@ -245,29 +245,29 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 		}
 		
 		private void renderLine(MatrixStack matrixStackIn, QuestButton other) {
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 //			GlStateManager.pushLightingAttributes();
 			matrixStackIn.translate(width / 2, height / 2, 0);
 			
-			final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+			final Matrix4f transform = matrixStackIn.last().pose();
 			
-			BufferBuilder buf = Tessellator.getInstance().getBuffer();
+			BufferBuilder buf = Tessellator.getInstance().getBuilder();
 			RenderSystem.enableBlend();
 			RenderSystem.disableTexture();
 			RenderSystem.lineWidth(3f);
 	        //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 //	        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
 	        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-	        buf.pos(transform, x, y, 0).color(1f, 1f, 1f, .6f).endVertex();
-	        buf.pos(transform, other.x, other.y, 0).color(1f, 1f, 1f, .6f).endVertex();
-	        Tessellator.getInstance().draw();
+	        buf.vertex(transform, x, y, 0).color(1f, 1f, 1f, .6f).endVertex();
+	        buf.vertex(transform, other.x, other.y, 0).color(1f, 1f, 1f, .6f).endVertex();
+	        Tessellator.getInstance().end();
 	        RenderSystem.enableTexture();
 //	        GlStateManager.enableTexture();
 	        RenderSystem.disableBlend();
 			RenderSystem.lineWidth(1f);
 			
 //	        GlStateManager.popAttributes();
-	        matrixStackIn.pop();
+	        matrixStackIn.popPose();
 		}
 		
 		@Override
@@ -276,12 +276,12 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 			
 			// Render tree lines even if we're out of bounds
 			if (!this.isHidden()) {
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(0, 0, 0);
 				drawTreeLines(matrixStackIn, Minecraft.getInstance());
 				matrixStackIn.translate(0, 0, 1);
 				super.render(matrixStackIn, mouseX, mouseY, partialTicks);
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 		}
 		
@@ -327,7 +327,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 			}
 			
 			RenderSystem.enableBlend();
-			Minecraft.getInstance().getTextureManager().bindTexture(RES_ICONS);
+			Minecraft.getInstance().getTextureManager().bind(RES_ICONS);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 					u, v, uw, vh, this.width, this.height, TEX_ICON_WIDTH, TEX_ICON_HEIGHT,
 					color[0], color[1], color[2], color[3]);
@@ -345,12 +345,12 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 		public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			if (this.isHovered()) { 
 				final Minecraft mc = Minecraft.getInstance();
-				final FontRenderer font = mc.fontRenderer;
-				matrixStackIn.push();
+				final FontRenderer font = mc.font;
+				matrixStackIn.pushPose();
 				matrixStackIn.scale(fontScale, fontScale, 1f);
 				matrixStackIn.translate((int) (mouseX / fontScale) - mouseX, (int) (mouseY / fontScale) - mouseY, 0);
 				GuiUtils.drawHoveringText(matrixStackIn, tooltip, mouseX, mouseY, subscreen.width, subscreen.height, 400, font);
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 		}
 		
@@ -388,7 +388,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 			int maxWidth = 200; 
 			List<ITextComponent> tooltip = new LinkedList<>();
 			tooltip.add(new TranslationTextComponent("quest." + quest.getKey() + ".name", new Object[0])
-					.mergeStyle(TextFormatting.BLUE));
+					.withStyle(TextFormatting.BLUE));
 			
 			TextFormatting bad = TextFormatting.RED;
 			
@@ -402,7 +402,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 	        		}
         			for (ITextComponent line : req.getDescription(subscreen.player)) {
         				if (line instanceof TextComponent) {
-        					tooltip.add(((TextComponent) line).mergeStyle(style));
+        					tooltip.add(((TextComponent) line).withStyle(style));
         				} else {
         					tooltip.add(line);
         				}
@@ -414,23 +414,23 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 			if (quest.getReward() != null) {
 				String desc = quest.getReward().getDescription();
 				if (desc != null && !desc.isEmpty())
-					tooltip.add(new StringTextComponent(desc).mergeStyle(TextFormatting.GOLD));
+					tooltip.add(new StringTextComponent(desc).withStyle(TextFormatting.GOLD));
 			}
 			
 			if (this.state == QuestState.INACTIVE && NostrumMagica.canTakeQuest(subscreen.player, quest)) {
-				tooltip.add(new TranslationTextComponent("info.quest.accept").mergeStyle(TextFormatting.GREEN));
+				tooltip.add(new TranslationTextComponent("info.quest.accept").withStyle(TextFormatting.GREEN));
 			}
 			
 			if (this.state == QuestState.COMPLETED) {
 				final Minecraft mc = Minecraft.getInstance();
-				final FontRenderer font = mc.fontRenderer;
+				final FontRenderer font = mc.font;
 	            for (ITextComponent line : tooltip) {
-	            	int width = font.getStringPropertyWidth(line);
+	            	int width = font.width(line);
 	            	if (width > maxWidth)
 	            		maxWidth = width;
 	            }
 	            
-	            String desc = I18n.format("quest." + quest.getKey() + ".desc", new Object[0]);
+	            String desc = I18n.get("quest." + quest.getKey() + ".desc", new Object[0]);
 	            if (desc != null && !desc.isEmpty()) {
 	            	tooltip.add(new StringTextComponent(""));
 	            	StringBuffer buf = new StringBuffer();
@@ -440,8 +440,8 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 	            			tooltip.add(new StringTextComponent(buf.toString()));
 	            			buf = new StringBuffer();
 	            		} else {
-		            		int oldlen = font.getStringWidth(buf.toString());
-		            		if (oldlen + font.getStringWidth("" + desc.charAt(index)) > maxWidth) {
+		            		int oldlen = font.width(buf.toString());
+		            		if (oldlen + font.width("" + desc.charAt(index)) > maxWidth) {
 		            			// Go back until we find a space
 		            			boolean isSpace = desc.charAt(index) == ' ';
 		            			if (!isSpace) {

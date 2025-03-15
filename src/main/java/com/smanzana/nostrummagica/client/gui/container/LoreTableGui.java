@@ -61,36 +61,36 @@ public class LoreTableGui {
 			this.inputSlot = new Slot(null, 0, SLOT_INPUT_HOFFSET, SLOT_INPUT_VOFFSET) {
 				
 				@Override
-				public boolean isItemValid(@Nonnull ItemStack stack) {
+				public boolean mayPlace(@Nonnull ItemStack stack) {
 					return stack.isEmpty() || stack.getItem() instanceof ILoreTagged;
 				}
 				
 				@Override
-				public void putStack(@Nonnull ItemStack stack) {
+				public void set(@Nonnull ItemStack stack) {
 					// Swapping items does this instead of a take
 					if (!table.getItem().isEmpty()) {
 						table.onTakeItem(player);
 					}
 					
 					table.setItem(stack);
-					this.onSlotChanged();
+					this.setChanged();
 				}
 				
 				@Override
-				public ItemStack getStack() {
+				public ItemStack getItem() {
 					return table.getItem();
 				}
 				
 				@Override
-				public void onSlotChanged() {
-					table.markDirty();
+				public void setChanged() {
+					table.setChanged();
 				}
 				
-				public int getSlotStackLimit() {
+				public int getMaxStackSize() {
 					return 1;
 				}
 				
-				public ItemStack decrStackSize(int amount) {
+				public ItemStack remove(int amount) {
 					ItemStack item = table.getItem();
 					if (!item.isEmpty()) {
 						if (table.setItem(ItemStack.EMPTY))
@@ -139,28 +139,28 @@ public class LoreTableGui {
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
+		public ItemStack quickMoveStack(PlayerEntity playerIn, int fromSlot) {
 			@Nonnull ItemStack prev = ItemStack.EMPTY;	
-			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
+			Slot slot = (Slot) this.slots.get(fromSlot);
 			
-			if (slot != null && slot.getHasStack()) {
-				ItemStack cur = slot.getStack();
+			if (slot != null && slot.hasItem()) {
+				ItemStack cur = slot.getItem();
 				prev = cur.copy();
 				
 				if (slot == this.inputSlot) {
 					// Trying to take our item
-					if (playerIn.inventory.addItemStackToInventory(cur)) {
-						inputSlot.putStack(ItemStack.EMPTY);
+					if (playerIn.inventory.add(cur)) {
+						inputSlot.set(ItemStack.EMPTY);
 						inputSlot.onTake(playerIn, cur);
 					} else {
 						prev = ItemStack.EMPTY;
 					}
 				} else {
 					// Trying to add an item
-					if (!inputSlot.getHasStack()
-							&& inputSlot.isItemValid(cur)) {
+					if (!inputSlot.hasItem()
+							&& inputSlot.mayPlace(cur)) {
 						ItemStack stack = cur.split(1);
-						inputSlot.putStack(stack);
+						inputSlot.set(stack);
 					} else {
 						prev = ItemStack.EMPTY;
 					}
@@ -172,17 +172,17 @@ public class LoreTableGui {
 		}
 		
 		@Override
-		public boolean canDragIntoSlot(Slot slotIn) {
+		public boolean canDragTo(Slot slotIn) {
 			return slotIn != inputSlot;
 		}
 		
 		@Override
-		public boolean canInteractWith(PlayerEntity playerIn) {
+		public boolean stillValid(PlayerEntity playerIn) {
 			return true;
 		}
 		
 		public void setInput(ItemStack item) {
-			inputSlot.putStack(item);
+			inputSlot.set(item);
 		}
 
 	}
@@ -196,8 +196,8 @@ public class LoreTableGui {
 			super(container, playerInv, name);
 			this.container = container;
 			
-			this.xSize = GUI_WIDTH;
-			this.ySize = GUI_HEIGHT;
+			this.imageWidth = GUI_WIDTH;
+			this.imageHeight = GUI_HEIGHT;
 		}
 		
 		@Override
@@ -206,11 +206,11 @@ public class LoreTableGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
-			int horizontalMargin = (width - xSize) / 2;
-			int verticalMargin = (height - ySize) / 2;
+		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+			int horizontalMargin = (width - imageWidth) / 2;
+			int verticalMargin = (height - imageHeight) / 2;
 			
-			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
+			Minecraft.getInstance().getTextureManager().bind(TEXT);
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			float progress = container.table.getProgress();
@@ -226,7 +226,7 @@ public class LoreTableGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			if (container.table.hasLore()) {
 				int u, v;
 				v = GUI_HEIGHT;
@@ -235,7 +235,7 @@ public class LoreTableGui {
 				u += ((time % 3000) / 1000) * SHINE_LENGTH;
 				float alpha = 1f - .5f * ((float) (time % 1000) / 1000f);
 				
-				Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
+				Minecraft.getInstance().getTextureManager().bind(TEXT);
 				
 				RenderSystem.enableBlend();
 				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(

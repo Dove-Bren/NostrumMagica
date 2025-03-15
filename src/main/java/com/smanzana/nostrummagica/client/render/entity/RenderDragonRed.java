@@ -32,13 +32,13 @@ public class RenderDragonRed<T extends RedDragonBaseEntity> extends MobRenderer<
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public ResourceLocation getEntityTexture(T entity) {
-		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
+	public ResourceLocation getTextureLocation(T entity) {
+		return AtlasTexture.LOCATION_BLOCKS;
 	}
 	
 	@Override
-	protected void preRenderCallback(T entitylivingbaseIn, MatrixStack matrixStackIn, float partialTickTime) {
-		super.preRenderCallback(entitylivingbaseIn, matrixStackIn, partialTickTime);
+	protected void scale(T entitylivingbaseIn, MatrixStack matrixStackIn, float partialTickTime) {
+		super.scale(entitylivingbaseIn, matrixStackIn, partialTickTime);
 	}
 	
 	@Override

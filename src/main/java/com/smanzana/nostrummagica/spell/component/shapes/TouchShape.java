@@ -34,7 +34,7 @@ public class TouchShape extends InstantShape implements ISelectableShape {
 
 	public static final SpellShapeProperty<Boolean> IGNORE_AIR = new BooleanSpellShapeProperty("ignore_air");
 	
-	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1)));
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.of(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1)));
 	
 	public TouchShape() {
 		this(ID);
@@ -87,7 +87,7 @@ public class TouchShape extends InstantShape implements ISelectableShape {
 		if (trace.getType() == RayTraceResult.Type.ENTITY
 				&& this.affectsEntities(params)
 				&& null != RayTrace.livingFromRaytrace(trace)
-				&& !RayTrace.livingFromRaytrace(trace).isEntityEqual(state.getSelf())) {
+				&& !RayTrace.livingFromRaytrace(trace).is(state.getSelf())) {
 			// Cast is safe from 'onlyLiving' option in trace
 			return new TriggerData(Lists.newArrayList(RayTrace.livingFromRaytrace(trace)), null);
 		} else if (trace.getType() == RayTraceResult.Type.BLOCK

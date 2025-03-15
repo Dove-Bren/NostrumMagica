@@ -36,13 +36,13 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class TrialBlock extends Block {
 	
 	public static final String ID = "trial_block";
-	protected static final VoxelShape ALTAR_AABB = Block.makeCuboidShape(16 * 0.3D, 16 * 0.0D, 16 * 0.3D, 16 * 0.7D, 16 * 0.8D, 16 * 0.7D);
+	protected static final VoxelShape ALTAR_AABB = Block.box(16 * 0.3D, 16 * 0.0D, 16 * 0.3D, 16 * 0.7D, 16 * 0.8D, 16 * 0.7D);
 	
 	public TrialBlock() {
-		super(Block.Properties.create(Material.BARRIER)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		super(Block.Properties.of(Material.BARRIER)
+				.strength(-1.0F, 3600000.8F)
 				.noDrops()
-				.setLightLevel((state) -> 16)
+				.lightLevel((state) -> 16)
 				);
 	}
 	
@@ -52,7 +52,7 @@ public class TrialBlock extends Block {
 //	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 		return false;
 	}
 	
@@ -68,7 +68,7 @@ public class TrialBlock extends Block {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
@@ -78,23 +78,23 @@ public class TrialBlock extends Block {
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		
 		if (hand != Hand.MAIN_HAND) {
 			return ActionResultType.SUCCESS;
 		}
 		
-		if (worldIn.isRemote()) {
+		if (worldIn.isClientSide()) {
 			return ActionResultType.SUCCESS;
 		}
 		
-		TileEntity te = worldIn.getTileEntity(pos);
+		TileEntity te = worldIn.getBlockEntity(pos);
 		if (te == null || !(te instanceof TrialBlockTileEntity))
 			return ActionResultType.FAIL;
 		
 		TrialBlockTileEntity trialEntity = ((TrialBlockTileEntity) te);
 		
-		ItemStack heldItem = playerIn.getHeldItem(hand);
+		ItemStack heldItem = playerIn.getItemInHand(hand);
 		
 		// code for map building
 		if (playerIn.isCreative() && !heldItem.isEmpty() && heldItem.getItem() instanceof InfusedGemItem) {
@@ -117,7 +117,7 @@ public class TrialBlock extends Block {
 		final EElementalMastery mastery = attr.getElementalMastery(element);
 		
 		if (mastery == EElementalMastery.UNKNOWN) {
-			playerIn.sendMessage(new TranslationTextComponent("info.trial.weak"), Util.DUMMY_UUID);
+			playerIn.sendMessage(new TranslationTextComponent("info.trial.weak"), Util.NIL_UUID);
 		} else if (mastery == EElementalMastery.NOVICE) {
 			WorldTrial trial = WorldTrial.getTrial(element);
 			if (trial == null) {
@@ -130,14 +130,14 @@ public class TrialBlock extends Block {
 						heldItem.split(1);
 					}
 				} else {
-					playerIn.sendMessage(new TranslationTextComponent("info.trial.already_have"), Util.DUMMY_UUID);
+					playerIn.sendMessage(new TranslationTextComponent("info.trial.already_have"), Util.NIL_UUID);
 				}
 				
 				return ActionResultType.SUCCESS;
 			}
 		} else {
 			if (mastery.isGreaterOrEqual(EElementalMastery.MASTER)) {
-				playerIn.sendMessage(new TranslationTextComponent("info.trial.none"), Util.DUMMY_UUID);
+				playerIn.sendMessage(new TranslationTextComponent("info.trial.none"), Util.NIL_UUID);
 			} else {
 				trialEntity.startTrial(playerIn);
 				if (!playerIn.isCreative()) {
@@ -150,14 +150,14 @@ public class TrialBlock extends Block {
 	}
 	
 	public static void DoEffect(BlockPos shrinePos, LivingEntity entity, int color) {
-		if (entity.world.isRemote) {
+		if (entity.level.isClientSide) {
 			return;
 		}
 		
-		NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
+		NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
 			50,
 			shrinePos.getX() + .5, shrinePos.getY() + 1.75, shrinePos.getZ() + .5, 1, 40, 10,
-			entity.getEntityId()
+			entity.getId()
 			).color(color));
 	}
 }

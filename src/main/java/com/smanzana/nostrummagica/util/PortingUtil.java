@@ -198,7 +198,7 @@ public class PortingUtil {
 		
 		for (EMagicElement element : EMagicElement.values()) {
 			for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-				if (slot.getSlotType() != Group.ARMOR) {
+				if (slot.getType() != Group.ARMOR) {
 					continue;
 				}
 				
@@ -410,7 +410,7 @@ public class PortingUtil {
 	
 	public static @Nullable UUID readNBTUUID(CompoundNBT nbt, String key) {
 		if (nbt.contains(key)) {
-			return nbt.getUniqueId(key);
+			return nbt.getUUID(key);
 		}
 		
 		return readNBTUUID_14_4(nbt, key);

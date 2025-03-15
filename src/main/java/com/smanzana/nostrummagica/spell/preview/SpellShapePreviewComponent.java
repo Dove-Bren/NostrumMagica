@@ -168,7 +168,7 @@ public abstract class SpellShapePreviewComponent {
 		}
 
 		protected Box(Type<? extends Span> type, MutableBoundingBox bounds) {
-			super(type, new Vector3d(bounds.minX, bounds.minY, bounds.minZ), new Vector3d(bounds.maxX, bounds.maxY, bounds.maxZ));
+			super(type, new Vector3d(bounds.x0, bounds.y0, bounds.z0), new Vector3d(bounds.x1, bounds.y1, bounds.z1));
 		}
 		
 		public Box(Vector3d boundsMin, Vector3d boundsMax) {

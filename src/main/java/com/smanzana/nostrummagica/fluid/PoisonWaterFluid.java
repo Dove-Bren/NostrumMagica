@@ -64,7 +64,7 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 //	}
 	
 	@Override
-	public Item getFilledBucket() {
+	public Item getBucket() {
 		if (this.bUnbreakable) {
 			return NostrumItems.unbreakablePoisonWaterBucket;
 		} else {
@@ -77,7 +77,7 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 	public void animateTick(World worldIn, BlockPos pos, FluidState state, Random rand) {
 		super.animateTick(worldIn, pos, state, rand);
 		
-		if (worldIn.isAirBlock(pos.up())) {
+		if (worldIn.isEmptyBlock(pos.above())) {
 			if (rand.nextBoolean() && rand.nextBoolean()
 					&& rand.nextBoolean() && rand.nextBoolean()) {
 				final float brightness = rand.nextFloat();
@@ -101,19 +101,19 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 	
 	@Nullable
 	@OnlyIn(Dist.CLIENT)
-	public IParticleData getDripParticleData() {
+	public IParticleData getDripParticle() {
 		return ParticleTypes.DRIPPING_WATER; // Would be cool to have custom one
 	}
 	
 	@Override
-	protected boolean canSourcesMultiply() {
+	protected boolean canConvertToSource() {
 		return !this.bUnbreakable;
 	}
 	
 	@Override
-	protected void beforeReplacingBlock(IWorld worldIn, BlockPos pos, BlockState state) {
-		TileEntity tileentity = state.hasTileEntity() ? worldIn.getTileEntity(pos) : null;
-		Block.spawnDrops(state, worldIn, pos, tileentity);
+	protected void beforeDestroyingBlock(IWorld worldIn, BlockPos pos, BlockState state) {
+		TileEntity tileentity = state.hasTileEntity() ? worldIn.getBlockEntity(pos) : null;
+		Block.dropResources(state, worldIn, pos, tileentity);
 	}
 	
 	@Override
@@ -122,13 +122,13 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 	}
 	
 	@Override
-	public BlockState getBlockState(FluidState state) {
+	public BlockState createLegacyBlock(FluidState state) {
 		Block block = this.bUnbreakable ? NostrumBlocks.unbreakablePoisonWaterBlock : NostrumBlocks.poisonWaterBlock;
-		return block.getDefaultState().with(FlowingFluidBlock.LEVEL, Integer.valueOf(getLevelFromState(state)));
+		return block.defaultBlockState().setValue(FlowingFluidBlock.LEVEL, Integer.valueOf(getLegacyLevel(state)));
 	}
 	
 	@Override
-	public boolean isEquivalentTo(Fluid fluidIn) {
+	public boolean isSame(Fluid fluidIn) {
 		if (this.bUnbreakable) {
 			return fluidIn == NostrumFluids.unbreakablePoisonWater || fluidIn == NostrumFluids.unbreakablePoisonWaterFlowing;
 		} else {
@@ -137,18 +137,18 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 	}
 	
 	@Override
-	public int getLevelDecreasePerBlock(IWorldReader worldIn) {
+	public int getDropOff(IWorldReader worldIn) {
 		return 1;
 	}
 	
 	@Override
-	public int getTickRate(IWorldReader p_205569_1_) {
+	public int getTickDelay(IWorldReader p_205569_1_) {
 		return 5; // Same as water?
 	}
 	
 	@Override // no clue what this is
-	public boolean canDisplace(FluidState p_215665_1_, IBlockReader p_215665_2_, BlockPos p_215665_3_, Fluid p_215665_4_, Direction p_215665_5_) {
-		return p_215665_5_ == Direction.DOWN && !p_215665_4_.isIn(FluidTags.WATER);
+	public boolean canBeReplacedWith(FluidState p_215665_1_, IBlockReader p_215665_2_, BlockPos p_215665_3_, Fluid p_215665_4_, Direction p_215665_5_) {
+		return p_215665_5_ == Direction.DOWN && !p_215665_4_.is(FluidTags.WATER);
 	}
 
 	@Override
@@ -157,7 +157,7 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 	}
 	
 	@Override
-	public Fluid getFlowingFluid() {
+	public Fluid getFlowing() {
 		if (this.bUnbreakable) {
 			return NostrumFluids.unbreakablePoisonWaterFlowing;
 		} else {
@@ -166,7 +166,7 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 	}
 
 	@Override
-	public Fluid getStillFluid() {
+	public Fluid getSource() {
 		if (this.bUnbreakable) {
 			return NostrumFluids.unbreakablePoisonWater;
 		} else {
@@ -174,7 +174,7 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 		}
 	}
 	
-	public static final DamageSource PoisonWaterDamageSource = (new DamageSource("nostrum_poison_water")).setDamageBypassesArmor();
+	public static final DamageSource PoisonWaterDamageSource = (new DamageSource("nostrum_poison_water")).bypassArmor();
 	
 	public static class Source extends PoisonWaterFluid {
 		
@@ -183,7 +183,7 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 		}
 
 		@Override
-		public int getLevel(FluidState p_207192_1_) {
+		public int getAmount(FluidState p_207192_1_) {
 			return 8;
 		}
 
@@ -200,14 +200,14 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 		}
 		
 		@Override
-		protected void fillStateContainer(StateContainer.Builder<Fluid, FluidState> builder) {
-			super.fillStateContainer(builder);
-			builder.add(FlowingFluid.LEVEL_1_8);
+		protected void createFluidStateDefinition(StateContainer.Builder<Fluid, FluidState> builder) {
+			super.createFluidStateDefinition(builder);
+			builder.add(FlowingFluid.LEVEL);
 		}
 
 		@Override
-		public int getLevel(FluidState p_207192_1_) {
-			return p_207192_1_.get(FlowingFluid.LEVEL_1_8);
+		public int getAmount(FluidState p_207192_1_) {
+			return p_207192_1_.getValue(FlowingFluid.LEVEL);
 		}
 
 		@Override

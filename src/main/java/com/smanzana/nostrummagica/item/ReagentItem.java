@@ -66,13 +66,13 @@ public class ReagentItem extends Item implements ILoreTagged, ICapabilityProvide
 		}
 
 		@Override
-		public String getString() {
+		public String getSerializedName() {
 			return name().toLowerCase();
 		}
 		
 		@Override
 		public String toString() {
-			return getString();
+			return getSerializedName();
 		}
 	}
 	
@@ -150,27 +150,27 @@ public class ReagentItem extends Item implements ILoreTagged, ICapabilityProvide
     }
     
     @Override
-    public ActionResultType onItemUse(ItemUseContext context) {
-    	final @Nonnull ItemStack stack = context.getItem();
+    public ActionResultType useOn(ItemUseContext context) {
+    	final @Nonnull ItemStack stack = context.getItemInHand();
     	ReagentType type = FindType(stack);
     	
     	if (type == ReagentType.MANDRAKE_ROOT) {
     		// Try to plant as seed. Convenient!
-    		return NostrumItems.reagentSeedMandrake.onItemUse(context);
+    		return NostrumItems.reagentSeedMandrake.useOn(context);
     	}
     	
     	if (type == ReagentType.GINSENG) {
-	    	return NostrumItems.reagentSeedGinseng.onItemUse(context);
+	    	return NostrumItems.reagentSeedGinseng.useOn(context);
     	}
     	
     	if (type == ReagentType.CRYSTABLOOM) {
-    		final World worldIn = context.getWorld();
-    		final BlockPos pos = context.getPos();
+    		final World worldIn = context.getLevel();
+    		final BlockPos pos = context.getClickedPos();
     		final PlayerEntity playerIn = context.getPlayer();
-    		final Direction facing = context.getFace();
+    		final Direction facing = context.getClickedFace();
     		BlockState state = worldIn.getBlockState(pos);
-	        if (facing == Direction.UP && playerIn.canPlayerEdit(pos.offset(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, Direction.UP, NostrumBlocks.crystabloom) && worldIn.isAirBlock(pos.up())) {
-	        	worldIn.setBlockState(pos.up(), NostrumBlocks.crystabloom.getDefaultState());
+	        if (facing == Direction.UP && playerIn.mayUseItemAt(pos.relative(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, Direction.UP, NostrumBlocks.crystabloom) && worldIn.isEmptyBlock(pos.above())) {
+	        	worldIn.setBlockAndUpdate(pos.above(), NostrumBlocks.crystabloom.defaultBlockState());
 	            stack.shrink(1);
 	            return ActionResultType.SUCCESS;
 	        } else {

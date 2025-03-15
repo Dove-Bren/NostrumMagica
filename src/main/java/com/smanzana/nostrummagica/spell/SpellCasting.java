@@ -99,13 +99,13 @@ public class SpellCasting {
 			if (!NostrumMagica.canCast(spell, att, problems)) {
 				NostrumMagica.logger.warn("Got cast message from client with too low of stats. They should relog... " + entity);
 				for (ITextComponent problem : problems) {
-					entity.sendMessage(problem, Util.DUMMY_UUID);
+					entity.sendMessage(problem, Util.NIL_UUID);
 				}
 				return EmitCastPostEvent(SpellCastResult.fail(spell, entity));
 			}
 		}
 		
-		if (NostrumMagica.instance.getSpellCooldownTracker(entity.world).hasCooldown(playerCast, spell)) {
+		if (NostrumMagica.instance.getSpellCooldownTracker(entity.level).hasCooldown(playerCast, spell)) {
 			NostrumMagica.logger.warn("Received spell cast while spell in cooldown: " + entity);
 			return EmitCastPostEvent(SpellCastResult.fail(spell, entity));
 		}
@@ -197,7 +197,7 @@ public class SpellCasting {
 				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 					int count = NostrumMagica.getReagentCount(playerCast, row.getKey());
 					if (count < row.getValue()) {
-						playerCast.sendMessage(new TranslationTextComponent("info.spell.bad_reagent", row.getKey().prettyName()), Util.DUMMY_UUID);
+						playerCast.sendMessage(new TranslationTextComponent("info.spell.bad_reagent", row.getKey().prettyName()), Util.NIL_UUID);
 						return EmitCastPostEvent(SpellCastResult.fail(spell, entity, summary));
 					}
 				}

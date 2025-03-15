@@ -31,11 +31,11 @@ public class NostrumDungeon extends Dungeon {
 	
 	@Override
 	protected void spawnDungeonParticles(World world, PlayerEntity player) {
-		Random rand = player.world.rand;
+		Random rand = player.level.random;
 		final float range = 15;
 		for (int i = 0; i < 15; i++) {
-			NostrumParticles.GLOW_ORB.spawn(player.world, new SpawnParams(
-				1, player.getPosX() + (rand.nextGaussian() * range), player.getPosY() + (rand.nextGaussian() * 4), player.getPosZ() + (rand.nextGaussian() * range), .5,
+			NostrumParticles.GLOW_ORB.spawn(player.level, new SpawnParams(
+				1, player.getX() + (rand.nextGaussian() * range), player.getY() + (rand.nextGaussian() * 4), player.getZ() + (rand.nextGaussian() * range), .5,
 				80, 30,
 				new Vector3d(0, .025, 0), new Vector3d(.01, .0125, .01)
 				).color(color));

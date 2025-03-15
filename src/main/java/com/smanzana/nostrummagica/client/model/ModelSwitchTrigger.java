@@ -27,7 +27,7 @@ public class ModelSwitchTrigger extends EntityModel<SwitchTriggerEntity> {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 
 		RenderFuncs.renderDiamond(matrixStackIn, bufferIn, width, height, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		
@@ -69,12 +69,12 @@ public class ModelSwitchTrigger extends EntityModel<SwitchTriggerEntity> {
 	}
 	
 	@Override
-	public void setLivingAnimations(SwitchTriggerEntity trigger, float p_78086_2_, float age, float partialTickTime) {
+	public void prepareMobModel(SwitchTriggerEntity trigger, float p_78086_2_, float age, float partialTickTime) {
 		
 	}
 
 	@Override
-	public void setRotationAngles(SwitchTriggerEntity entityIn, float limbSwing, float limbSwingAmount,
+	public void setupAnim(SwitchTriggerEntity entityIn, float limbSwing, float limbSwingAmount,
 			float ageInTicks, float netHeadYaw, float headPitch) {
 		// TODO Auto-generated method stub
 		

@@ -23,21 +23,21 @@ public class LogicDoorBlock extends MagicDoorBlock implements ITriggeredBlock {
 	}
 	
 	public LogicDoorBlock() {
-		this(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		this(Block.Properties.of(Material.STONE)
+				.strength(-1.0F, 3600000.8F)
 				.noDrops()
 				.sound(SoundType.STONE)
 				);
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-		if (worldIn.isRemote)
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+		if (worldIn.isClientSide)
 			return ActionResultType.SUCCESS;
 		
 		// Allow creative players to open door
 		if (player.isCreative()) {
-			ItemStack heldItem = player.getHeldItem(hand);
+			ItemStack heldItem = player.getItemInHand(hand);
 			if (heldItem.isEmpty() && hand == Hand.MAIN_HAND) {
 				this.trigger(worldIn, pos, state, null);
 				return ActionResultType.SUCCESS;

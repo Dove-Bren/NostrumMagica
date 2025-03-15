@@ -22,13 +22,13 @@ public class TileEntityDungeonDoorRenderer extends TileEntityLockedDoorRenderer<
 	
 	protected void renderLock(DungeonDoorTileEntity tileEntityIn, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		final MutableBoundingBox bounds = tileEntityIn.getDoorBounds();
-		final float yDiff = bounds.maxY + 1 - bounds.minY;
+		final float yDiff = bounds.y1 + 1 - bounds.y0;
 		
 		final float width = .75f;
 		final float height = .75f;
 		
 		final float glow;
-		if (tileEntityIn.getBlockState().get(LockedDoorBlock.UNLOCKABLE)) {
+		if (tileEntityIn.getBlockState().getValue(LockedDoorBlock.UNLOCKABLE)) {
 			final double glowPeriod = 20;
 			final double glowProg = ((ticks % glowPeriod) / glowPeriod);
 			glow = .15f * (float) Math.sin(glowProg * 2 * Math.PI);
@@ -45,7 +45,7 @@ public class TileEntityDungeonDoorRenderer extends TileEntityLockedDoorRenderer<
 		
 		IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.LOCKEDCHEST_LOCK);
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(0, yDiff/2, -.3f);
 		matrixStackIn.translate(-width/2, -height/2, 0); // center
 		
@@ -54,13 +54,13 @@ public class TileEntityDungeonDoorRenderer extends TileEntityLockedDoorRenderer<
 		RenderFuncs.drawScaledCustomSizeModalRect(matrixStackIn, buffer, 0, 0, 0, 0, 16, 16, 1, 1, 16, 16, red, green, blue, .25f + glow);
 		
 		final ResourceLocation keyIcon = tileEntityIn.isLarge() ? TileEntityDungeonKeyChestRenderer.ICON_SILVER_KEY : TileEntityDungeonKeyChestRenderer.ICON_COPPER_KEY;
-		buffer = bufferIn.getBuffer(RenderType.getEntityCutout(keyIcon));
+		buffer = bufferIn.getBuffer(RenderType.entityCutout(keyIcon));
 		matrixStackIn.translate(.75f, .75f, -.0005f);
 		matrixStackIn.scale(.5f, .5f, 1f);
-		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180f));
+		matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(180f));
 		RenderFuncs.drawScaledCustomSizeModalRect(matrixStackIn, buffer, 0, 0, 0, 0, 16, 16, 1, 1, 16, 16, 1f, 1f, 1f, .25f + glow);
 		//RenderFuncs.drawUnitCube(matrixStackIn, buffer, combinedLightIn, combinedOverlayIn, .6f, .6f, .6f, .25f + glow);
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 }

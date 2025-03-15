@@ -24,7 +24,7 @@ public class CommandEnhanceTome {
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
 				Commands.literal("nostrumenhance")
-					.requires(s -> s.hasPermissionLevel(2))
+					.requires(s -> s.hasPermission(2))
 					.then(Commands.argument("enhancement", StringArgumentType.string())
 						.then(Commands.argument("level", IntegerArgumentType.integer(0, 10))
 								.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "enhancement"), IntegerArgumentType.getInteger(ctx, "level")))
@@ -34,11 +34,11 @@ public class CommandEnhanceTome {
 	}
 
 	private static final int execute(CommandContext<CommandSource> context, String enhancementName, int level) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().asPlayer();
+		ServerPlayerEntity player = context.getSource().getPlayerOrException();
 		
-		ItemStack tome = player.getHeldItemMainhand();
+		ItemStack tome = player.getMainHandItem();
 		if (tome.isEmpty() || !(tome.getItem() instanceof SpellTome)) {
-			context.getSource().sendFeedback(new StringTextComponent("No tome found in your hands!"), true);
+			context.getSource().sendSuccess(new StringTextComponent("No tome found in your hands!"), true);
 			return 1;
 		}
 		

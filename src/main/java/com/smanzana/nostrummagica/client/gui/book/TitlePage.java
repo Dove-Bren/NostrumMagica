@@ -24,10 +24,10 @@ public class TitlePage implements IBookPage {
 	@Override
 	public void draw(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
 			if (hoffset == -1) {
-				int w = fonter.getStringWidth(this.text);
+				int w = fonter.width(this.text);
 				hoffset = w/2; 
 			}
-			fonter.drawString(matrixStackIn, text, xoffset + ( (width / 2) - hoffset ), yoffset + 20, 0xFF106020);
+			fonter.draw(matrixStackIn, text, xoffset + ( (width / 2) - hoffset ), yoffset + 20, 0xFF106020);
 	}
 
 	@Override

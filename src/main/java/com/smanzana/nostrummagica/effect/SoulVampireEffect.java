@@ -12,12 +12,12 @@ public class SoulVampireEffect extends Effect {
 		super(EffectType.BENEFICIAL, 0xFFE2346B);
 	}
 	
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return false; // No special effects
 	}
 
 	@Override
-	public void performEffect(LivingEntity entity, int amp) {
+	public void applyEffectTick(LivingEntity entity, int amp) {
 		;
     }
 	

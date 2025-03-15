@@ -33,7 +33,7 @@ public class ContainerUtil {
 	public static final <T extends TileEntity> T GetPackedTE(@Nonnull PacketBuffer buffer) {
 		BlockPos pos = buffer.readBlockPos();
 		final Minecraft mc = Minecraft.getInstance();
-		TileEntity teRaw = mc.world.getTileEntity(pos);
+		TileEntity teRaw = mc.level.getBlockEntity(pos);
 		
 		if (teRaw != null) {
 			return (T) teRaw;
@@ -42,7 +42,7 @@ public class ContainerUtil {
 	}
 	
 	public static final <T extends TileEntity> void PackTE(@Nonnull PacketBuffer buffer, @Nonnull T tileEntity) {
-		buffer.writeBlockPos(tileEntity.getPos());
+		buffer.writeBlockPos(tileEntity.getBlockPos());
 	}
 	
 	public static interface IPackedContainerProvider extends INamedContainerProvider {
@@ -81,7 +81,7 @@ public class ContainerUtil {
 		
 		public void setField(int index, int val);
 		
-		default int size() { return this.getFieldCount(); }
+		default int getCount() { return this.getFieldCount(); }
 		
 		default int get(int index) { return this.getField(index); }
 		
@@ -98,14 +98,14 @@ public class ContainerUtil {
 		}
 		
 		@Override
-		public void onSlotChanged() {
-			super.onSlotChanged();
+		public void setChanged() {
+			super.setChanged();
 			listener.accept(this);
 		}
 		
 		@Override
-		public boolean isItemValid(ItemStack stack) {
-			return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
+		public boolean mayPlace(ItemStack stack) {
+			return this.container.canPlaceItem(this.getSlotIndex(), stack);
 		}
 	}
 }

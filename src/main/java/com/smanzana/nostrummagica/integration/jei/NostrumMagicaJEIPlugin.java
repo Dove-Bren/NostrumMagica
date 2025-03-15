@@ -97,7 +97,7 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
 			Ingredient.invalidateAll();
 			@Nullable PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-			if (player != null && player.world.isRemote() && player instanceof AbstractClientPlayerEntity) {
+			if (player != null && player.level.isClientSide() && player instanceof AbstractClientPlayerEntity) {
 				ClientPlayNetHandler handler = Minecraft.getInstance().getConnection();
 				ForgeHooksClient.onRecipesUpdated(handler.getRecipeManager());
 			}

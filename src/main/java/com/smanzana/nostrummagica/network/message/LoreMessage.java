@@ -38,14 +38,14 @@ public class LoreMessage {
 	public static void handle(LoreMessage message, Supplier<NetworkEvent.Context> ctx) {
 		//update local attributes
 		ctx.get().setPacketHandled(true);
-		Minecraft.getInstance().runAsync(() -> {
+		Minecraft.getInstance().submit(() -> {
 			NostrumMagica.instance.proxy.receiveStatOverrides(message.stats);
 			
 			StringTextComponent loreName = new StringTextComponent("[" + message.lore.getLoreDisplayName() + "]");
 			Style style = Style.EMPTY
-					.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("info.screen.goto")))
-					.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + CommandInfoScreenGoto.Command + " \"" + ILoreTagged.GetInfoKey(message.lore) + "\""))
-					.setColor(Color.fromTextFormatting(TextFormatting.LIGHT_PURPLE))
+					.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslationTextComponent("info.screen.goto")))
+					.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + CommandInfoScreenGoto.Command + " \"" + ILoreTagged.GetInfoKey(message.lore) + "\""))
+					.withColor(Color.fromLegacyFormat(TextFormatting.LIGHT_PURPLE))
 				;
 					
 			loreName.setStyle(style);
@@ -53,8 +53,8 @@ public class LoreMessage {
 			PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 			IFormattableTextComponent comp = new TranslationTextComponent("info.lore.get", loreName);
 			
-			player.sendMessage(comp, Util.DUMMY_UUID);
-			NostrumMagicaSounds.LORE.play(player, player.world, player.getPosX(), player.getPosY(), player.getPosZ());
+			player.sendMessage(comp, Util.NIL_UUID);
+			NostrumMagicaSounds.LORE.play(player, player.level, player.getX(), player.getY(), player.getZ());
 		});
 	}
 	
@@ -71,9 +71,9 @@ public class LoreMessage {
 
 	public static LoreMessage decode(PacketBuffer buf) {
 		INostrumMagic stats = CAPABILITY.getDefaultInstance();
-		CAPABILITY.getStorage().readNBT(CAPABILITY, stats, null, buf.readCompoundTag());
+		CAPABILITY.getStorage().readNBT(CAPABILITY, stats, null, buf.readNbt());
 		
-		final String loreID = buf.readString(32767);
+		final String loreID = buf.readUtf(32767);
 		ILoreTagged lore = LoreRegistry.instance().lookup(loreID);
 		if (lore == null) {
 			throw new DecoderException("Failed to find lore based on " + loreID);
@@ -83,8 +83,8 @@ public class LoreMessage {
 	}
 
 	public static void encode(LoreMessage msg, PacketBuffer buf) {
-		buf.writeCompoundTag((CompoundNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, msg.stats, null));
-		buf.writeString(msg.lore.getLoreKey());
+		buf.writeNbt((CompoundNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, msg.stats, null));
+		buf.writeUtf(msg.lore.getLoreKey());
 	}
 
 }

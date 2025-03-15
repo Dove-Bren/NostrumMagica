@@ -21,8 +21,8 @@ public class EntityEffectLayer<T extends LivingEntity, M extends EntityModel<T>>
 	@Override
 	public void render(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		if (shouldRender(entity)) {
-			for (EffectInstance effect : entity.getActivePotionEffects()) {
-				@Nullable IEffectRenderer renderer = IEffectRenderer.GetRenderer(effect.getPotion());
+			for (EffectInstance effect : entity.getActiveEffects()) {
+				@Nullable IEffectRenderer renderer = IEffectRenderer.GetRenderer(effect.getEffect());
 				if (renderer != null) {
 					renderer.renderEffectOnEntity(effect, stack, typeBuffer, packedLight, entity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
 				}

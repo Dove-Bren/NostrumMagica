@@ -24,7 +24,7 @@ public class EnumSpellShapeProperty<E extends Enum<E> & IPrettyEnum> extends Spe
 	@Override
 	public E readValue(INBT tag) {
 		try {
-			return Enum.valueOf(clazz, ((StringNBT) tag).getString().toUpperCase());
+			return Enum.valueOf(clazz, ((StringNBT) tag).getAsString().toUpperCase());
 		} catch (Exception e) {
 			return this.getDefault();
 		}

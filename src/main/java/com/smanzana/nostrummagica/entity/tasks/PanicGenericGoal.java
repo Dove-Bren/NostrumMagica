@@ -22,14 +22,14 @@ public class PanicGenericGoal<T extends CreatureEntity> extends PanicGoal {
 	}
 
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		if (filter != null) {
 			if (!filter.apply(this.creature)) {
 				return false;
 			}
 		}
 		
-		return super.shouldExecute();
+		return super.canUse();
 	}
 	
 }

@@ -13,7 +13,7 @@ public class MagicSwordBase extends SwordItem implements ILoreTagged {
 	public static final String ID = "magicswordbase";
 	
 	public MagicSwordBase() {
-		super(ItemTier.WOOD, 1, -2.4F, NostrumItems.PropEquipment().maxDamage(5));
+		super(ItemTier.WOOD, 1, -2.4F, NostrumItems.PropEquipment().durability(5));
 	}
 	
 	public String getModelID() {

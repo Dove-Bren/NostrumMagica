@@ -101,7 +101,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		final int capacity = getCapacity(stack);
 		final int slots = getSlots(stack);
 		tooltip.add(new TranslationTextComponent("info.tome.slots", slots));
@@ -289,8 +289,8 @@ public class SpellPlate extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-		if (this.isInGroup(group)) {
+	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+		if (this.allowdedIn(group)) {
 			ItemStack stack = new ItemStack(this);
 			setCapacity(stack, 5);
 			setSlots(stack, 2);

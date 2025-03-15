@@ -36,29 +36,29 @@ public class RenderPlantBossLeaf extends EntityRenderer<PlantBossEntity.PlantBos
 		final int i = entityIn.getLeafIndex();
 		//EntityPlantBoss.PlantBossLeafLimb leaf = plant.getLeafLimb(i);
 		final double offsetRadius = (entityIn.getPitch() >= 85f) ? 1.25 : 1;
-		final double offsetCenter = (i % 2 == 0 ? offsetRadius : offsetRadius * 1.25) * plant.getBody().getWidth();
+		final double offsetCenter = (i % 2 == 0 ? offsetRadius : offsetRadius * 1.25) * plant.getBody().getBbWidth();
 		final double offset = offsetCenter - (3f/2f); // Model starts at 0, not center (for better rotation)
 		
 		// Previously, was changing offset to be to the parent, and then doing another offset
 		// TODO does this look hacky now?
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		
 		// Standard transformation that LivingRenderer does
 		matrixStackIn.scale(-1f, -1f, 1f);
 		matrixStackIn.translate(0f, -1.5f, 0f);
 		
-		matrixStackIn.translate(0, plant.getBody().getHeight() / 2, 0);
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(180 + entityIn.getYawOffset()));
+		matrixStackIn.translate(0, plant.getBody().getBbHeight() / 2, 0);
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(180 + entityIn.getYawOffset()));
 		matrixStackIn.translate(-offset + .5, -.001 * i, 0);
-		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(-entityIn.getPitch()));
+		matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(-entityIn.getPitch()));
 		
-		mainModel.render(matrixStackIn, bufferIn.getBuffer(mainModel.getRenderType(getEntityTexture(entityIn))), packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+		mainModel.renderToBuffer(matrixStackIn, bufferIn.getBuffer(mainModel.renderType(getTextureLocation(entityIn))), packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	@Override
-	public ResourceLocation getEntityTexture(PlantBossEntity.PlantBossLeafLimb entity) {
+	public ResourceLocation getTextureLocation(PlantBossEntity.PlantBossLeafLimb entity) {
 		return PLANT_BOSS_TEXTURE_BASE;
 	}
 	

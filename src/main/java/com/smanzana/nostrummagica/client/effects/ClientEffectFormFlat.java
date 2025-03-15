@@ -50,16 +50,16 @@ public class ClientEffectFormFlat implements ClientEffectForm {
 		final int light = ClientEffectForm.InferLightmap(matrixStackIn, mc);
 		
 		
-		mc.getTextureManager().bindTexture(texture);
-		matrixStackIn.push();
+		mc.getTextureManager().bind(texture);
+		matrixStackIn.pushPose();
 		
 		if (this.offset != null) {
 			matrixStackIn.translate(offset.x, offset.y, offset.z);
 		}
 		
 		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder buffer = tessellator.getBuffer();
-		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ENTITY);
+		BufferBuilder buffer = tessellator.getBuilder();
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.NEW_ENTITY);
 
 		RenderSystem.disableCull();
 		RenderSystem.alphaFunc(GL11.GL_GREATER, 0f);
@@ -68,10 +68,10 @@ public class ClientEffectFormFlat implements ClientEffectForm {
 				1,
 				light, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
 		
-		tessellator.draw();
+		tessellator.end();
 		RenderSystem.defaultAlphaFunc();
 		RenderSystem.enableCull();
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 }

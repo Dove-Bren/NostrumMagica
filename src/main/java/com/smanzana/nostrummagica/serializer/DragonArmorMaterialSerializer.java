@@ -17,21 +17,21 @@ public final class DragonArmorMaterialSerializer implements IDataSerializer<Drag
 	
 	@Override
 	public void write(PacketBuffer buf, DragonArmor.DragonArmorMaterial value) {
-		buf.writeEnumValue(value);
+		buf.writeEnum(value);
 	}
 
 	@Override
 	public DragonArmor.DragonArmorMaterial read(PacketBuffer buf)  {
-		return buf.readEnumValue(DragonArmor.DragonArmorMaterial.class);
+		return buf.readEnum(DragonArmor.DragonArmorMaterial.class);
 	}
 
 	@Override
-	public DataParameter<DragonArmor.DragonArmorMaterial> createKey(int id) {
+	public DataParameter<DragonArmor.DragonArmorMaterial> createAccessor(int id) {
 		return new DataParameter<>(id, this);
 	}
 
 	@Override
-	public DragonArmorMaterial copyValue(DragonArmorMaterial value) {
+	public DragonArmorMaterial copy(DragonArmorMaterial value) {
 		return value;
 	}
 }

@@ -21,7 +21,7 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 	}
 	
 	private static final DataParameter<Integer> DRAGON_FLYING =
-			EntityDataManager.<Integer>createKey(FlyingDragonEntity.class, DataSerializers.VARINT);
+			EntityDataManager.<Integer>defineId(FlyingDragonEntity.class, DataSerializers.INT);
 	
 	private static final String DRAGON_SERIAL_FLYING_TOK = "DragonFlying";
 
@@ -47,11 +47,11 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 	}
 	
 	protected FlyState getFlyState() {
-		return FlyState.values()[this.dataManager.get(DRAGON_FLYING).intValue()];
+		return FlyState.values()[this.entityData.get(DRAGON_FLYING).intValue()];
 	}
 	
 	protected void setFlyState(FlyState state) {
-		this.dataManager.set(DRAGON_FLYING, state.ordinal());
+		this.entityData.set(DRAGON_FLYING, state.ordinal());
 	}
 	
 	private void onFlightStateChange() {
@@ -66,8 +66,8 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 	}
 	
 	@Override
-	public void notifyDataManagerChange(DataParameter<?> key) {
-		super.notifyDataManagerChange(key);
+	public void onSyncedDataUpdated(DataParameter<?> key) {
+		super.onSyncedDataUpdated(key);
 		if (key == DRAGON_FLYING) {
 			onFlightStateChange();
 		}
@@ -123,13 +123,13 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
-		this.dataManager.register(DRAGON_FLYING, FlyState.LANDED.ordinal());
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(DRAGON_FLYING, FlyState.LANDED.ordinal());
 	}
 	
-	public void readAdditional(CompoundNBT compound) {
-		super.readAdditional(compound);
+	public void readAdditionalSaveData(CompoundNBT compound) {
+		super.readAdditionalSaveData(compound);
 
         if (compound.contains(DRAGON_SERIAL_FLYING_TOK, NBT.TAG_ANY_NUMERIC)) {
         	int i = compound.getByte(DRAGON_SERIAL_FLYING_TOK);
@@ -145,8 +145,8 @@ public abstract class FlyingDragonEntity extends DragonEntity {
         }
 	}
 	
-	public void writeAdditional(CompoundNBT compound) {
-    	super.writeAdditional(compound);
+	public void addAdditionalSaveData(CompoundNBT compound) {
+    	super.addAdditionalSaveData(compound);
         compound.putByte(DRAGON_SERIAL_FLYING_TOK, (byte)this.getFlyState().ordinal());
 	}
 	
@@ -169,20 +169,20 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 	
 	// Actually start flying. Called internally when animations are done.
 	protected void entityStartFlying() {
-		if (!this.world.isRemote) {
-			this.moveController = new DragonEntity.DragonFlyMoveHelper(this);
-			this.navigator = new DragonEntity.PathNavigatorDragonFlier(this, world);
+		if (!this.level.isClientSide) {
+			this.moveControl = new DragonEntity.DragonFlyMoveHelper(this);
+			this.navigation = new DragonEntity.PathNavigatorDragonFlier(this, level);
 			this.setFlyingAI();
 		}
-		this.addVelocity(Math.cos(this.rotationYaw) * .2, 0.5, Math.sin(this.rotationYaw) * .2);
+		this.push(Math.cos(this.yRot) * .2, 0.5, Math.sin(this.yRot) * .2);
 		this.setNoGravity(true);
 		
 	}
 	
 	protected void entityStopFlying() {
-		if (!this.world.isRemote) {
-			this.moveController = new MovementController(this);
-			this.navigator = this.createNavigator(world);
+		if (!this.level.isClientSide) {
+			this.moveControl = new MovementController(this);
+			this.navigation = this.createNavigation(level);
 			this.setGroundedAI();
 		}
 		this.setNoGravity(false);
@@ -227,7 +227,7 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 	
 	protected static final AttributeModifierMap.MutableAttribute BuildBaseFlyingAttributes() {
 		return DragonEntity.BuildBaseDragonAttributes()
-				.createMutableAttribute(Attributes.FLYING_SPEED);
+				.add(Attributes.FLYING_SPEED);
 	}
 
 }

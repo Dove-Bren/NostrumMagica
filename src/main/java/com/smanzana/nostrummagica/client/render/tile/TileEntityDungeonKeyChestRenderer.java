@@ -31,7 +31,7 @@ public class TileEntityDungeonKeyChestRenderer extends TileEntityRenderer<Dungeo
 		if (tileEntityIn.getOpenTicks() != -1) {
 			final boolean large = tileEntityIn.isLarge();
 			final float animDuration = large ? 80f : 60f;
-			final float elapsedTicks = (float) (int) (tileEntityIn.getWorld().getGameTime() - tileEntityIn.getOpenTicks()) + partialTicks;
+			final float elapsedTicks = (float) (int) (tileEntityIn.getLevel().getGameTime() - tileEntityIn.getOpenTicks()) + partialTicks;
 			if (elapsedTicks < animDuration) {
 				final float radius = .25f;
 				final float yExtent = large ? 1.25f : .75f;
@@ -53,13 +53,13 @@ public class TileEntityDungeonKeyChestRenderer extends TileEntityRenderer<Dungeo
 						? ICON_SILVER_KEY
 						: ICON_COPPER_KEY;
 				
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(xOffset, yOffset, zOffset);
 				IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.GetBlendedEntity(ICON_GLOW));
-				RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, this.renderDispatcher.renderInfo, radius * glowMult, combinedLightIn, combinedOverlayIn, 1f, 1f, .5f, 1f);
-				buffer = bufferIn.getBuffer(RenderType.getEntityCutout(icon));
-				RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, this.renderDispatcher.renderInfo, radius, combinedLightIn, combinedOverlayIn, 1f, 1f, 1f, 1f);
-				matrixStackIn.pop();
+				RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, this.renderer.camera, radius * glowMult, combinedLightIn, combinedOverlayIn, 1f, 1f, .5f, 1f);
+				buffer = bufferIn.getBuffer(RenderType.entityCutout(icon));
+				RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, this.renderer.camera, radius, combinedLightIn, combinedOverlayIn, 1f, 1f, 1f, 1f);
+				matrixStackIn.popPose();
 			}
 		}
 	}

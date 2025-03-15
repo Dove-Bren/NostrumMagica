@@ -75,8 +75,8 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	private static final String NBT_COOOLDOWN_TICKS = "trigger_cooldown_ticks";
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.putInt(NBT_HIT_TYPE, this.hitType.ordinal());
 		nbt.putInt(NBT_TRIGGER_TYPE, this.triggerType.ordinal());
@@ -88,8 +88,8 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		int ord = nbt.getInt(NBT_HIT_TYPE);
 		for (SwitchBlockTileEntity.SwitchHitType type : SwitchHitType.values()) {
@@ -140,14 +140,14 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	}
 	
 	public void setOffset(BlockPos newOffset, boolean isWorldGen) {
-		this.triggerOffset = newOffset.toImmutable();
+		this.triggerOffset = newOffset.immutable();
 		if (!isWorldGen) {
 			dirty();
 		}
 	}
 	
 	public void offsetTo(BlockPos targ) {
-		this.setOffset(targ.subtract(this.getPos()));
+		this.setOffset(targ.subtract(this.getBlockPos()));
 	}
 	
 	public BlockPos getOffset() {
@@ -165,7 +165,7 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	
 	public long getCurrentCooldownTicks() {
 		if (isTriggered()) {
-			final long worldTicks = world.getGameTime();
+			final long worldTicks = level.getGameTime();
 			final long elapsed = worldTicks - this.triggerWorldTicks;
 			return Math.max(0, this.getTotalCooldownTicks() - elapsed);
 		}
@@ -206,7 +206,7 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 			this.triggerWorldTicks = 0;
 			this.dirty();
 			
-			NostrumMagicaSounds.DAMAGE_ICE.play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+			NostrumMagicaSounds.DAMAGE_ICE.play(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
 		}
 		
 		// Play tick or tock if still going
@@ -229,7 +229,7 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 			// 10 < period NO    // 50
 			
 			final NostrumMagicaSounds sound = tick ? NostrumMagicaSounds.TICK : NostrumMagicaSounds.TOCK;
-			sound.play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+			sound.play(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
 		}
 	}
 	
@@ -237,12 +237,12 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	public void tick() {
 		super.tick();
 		
-		if (world.isRemote) {
+		if (level.isClientSide) {
 			return;
 		}
 		
 		// Do tick logic based on type
-		final long gameTicks = world.getGameTime();
+		final long gameTicks = level.getGameTime();
 		switch (this.triggerType) {
 		case ONE_TIME:
 			oneTimeTick(gameTicks);
@@ -259,37 +259,37 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	@Override
 	protected SwitchTriggerEntity makeTriggerEntity(World world, double x, double y, double z) {
 		SwitchTriggerEntity ent = new SwitchTriggerEntity(NostrumEntityTypes.switchTrigger, world);
-		ent.setPosition(x, y, z);
+		ent.setPos(x, y, z);
 		return ent;
 	}
 	
 	protected void doTriggerInternal() {
 		
-		BlockPos triggerPos = this.getPos().add(this.getOffset());
-		BlockState state = world.getBlockState(triggerPos);
+		BlockPos triggerPos = this.getBlockPos().offset(this.getOffset());
+		BlockState state = level.getBlockState(triggerPos);
 		if (state == null || !(state.getBlock() instanceof ITriggeredBlock)) {
 			return;
 		}
 		
-		((ITriggeredBlock) state.getBlock()).trigger(world, triggerPos, state, this.getPos());
+		((ITriggeredBlock) state.getBlock()).trigger(level, triggerPos, state, this.getBlockPos());
 	}
 	
 	protected void doTrigger() {
-		this.triggerWorldTicks = world.getGameTime();
-		NostrumMagicaSounds.DAMAGE_ICE.play(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+		this.triggerWorldTicks = level.getGameTime();
+		NostrumMagicaSounds.DAMAGE_ICE.play(level, worldPosition.getX() + .5, worldPosition.getY(), worldPosition.getZ() + .5);
 		this.dirty();
 		doTriggerInternal();
 	}
 	
 	@Override
 	public void trigger(LivingEntity entity, DamageSource source, float damage) {
-		if (!this.isTriggered() && !this.world.isRemote()) {
+		if (!this.isTriggered() && !this.level.isClientSide()) {
 			final boolean isMagic = (source instanceof MagicDamageSource);
 			if (hitType == SwitchHitType.ANY || isMagic) {
 				doTrigger();
 			} else {
 				// Wrong input type
-				NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
+				NostrumMagicaSounds.CAST_FAIL.play(level, worldPosition.getX() + .5, worldPosition.getY() + 1, worldPosition.getZ() + .5);
 			}
 		}
 	}

@@ -43,10 +43,10 @@ public class SpellBubbleEntity extends SpellProjectileEntity {
 			LivingEntity shooter, float speedFactor, float dragFactor, int lifetime) {
 		this(type,
 				trigger,
-				shooter.world,
+				shooter.level,
 				shooter,
-				shooter.getPositionVec(),
-				shooter.getLookVec(),
+				shooter.position(),
+				shooter.getLookAngle(),
 				speedFactor, dragFactor, lifetime
 				);
 	}
@@ -56,12 +56,12 @@ public class SpellBubbleEntity extends SpellProjectileEntity {
 	}
 
 	public SpellBubbleEntity(ISpellProjectileShape trigger,	LivingEntity shooter, Vector3d origin, Vector3d direction, float speedFactor, float dragFactor, int lifetime) {
-		this(NostrumEntityTypes.spellBubble, trigger, shooter.world, shooter, origin, direction, speedFactor, dragFactor, lifetime);
+		this(NostrumEntityTypes.spellBubble, trigger, shooter.level, shooter, origin, direction, speedFactor, dragFactor, lifetime);
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
+	protected void defineSynchedData() {
+		super.defineSynchedData();
 	}
 
 	@Override
@@ -96,69 +96,69 @@ public class SpellBubbleEntity extends SpellProjectileEntity {
 	
 	@Override
 	public void tick() {
-		if (!world.isRemote()) {
+		if (!level.isClientSide()) {
 			// Apply drag if still moving
-			if (this.accelerationX != 0 || this.accelerationY != 0 || this.accelerationZ != 0) {
+			if (this.xPower != 0 || this.yPower != 0 || this.zPower != 0) {
 				final float dragMod = 1f - (.2f * this.drag);
 				final double precis = .0000025;
-				this.accelerationX *= dragMod;
-				this.accelerationY *= dragMod;
-				this.accelerationZ *= dragMod;
-				if (accelerationX != 0 && Math.abs(accelerationX) < precis) {
-					accelerationX = 0;
+				this.xPower *= dragMod;
+				this.yPower *= dragMod;
+				this.zPower *= dragMod;
+				if (xPower != 0 && Math.abs(xPower) < precis) {
+					xPower = 0;
 				}
-				if (accelerationY != 0 && Math.abs(accelerationY) < precis) {
-					accelerationY = 0;
+				if (yPower != 0 && Math.abs(yPower) < precis) {
+					yPower = 0;
 				}
-				if (accelerationZ != 0 && Math.abs(accelerationZ) < precis) {
-					accelerationZ = 0;
+				if (zPower != 0 && Math.abs(zPower) < precis) {
+					zPower = 0;
 				}
 			}
 		}
 		
 		super.tick();
 		
-		if (!world.isRemote() && this.accelerationX == 0 && this.accelerationY == 0 && this.accelerationZ == 0) {
+		if (!level.isClientSide() && this.xPower == 0 && this.yPower == 0 && this.zPower == 0) {
 			// Done moving, so bob around a bit
-			final int idx = this.entityUniqueID.hashCode() + this.ticksExisted;
+			final int idx = this.uuid.hashCode() + this.tickCount;
 			final int period = 3 * 20;
 			final float prog = (float) (idx % period) / (float) period;
 			final float floatAccel = (float) Math.sin(Math.PI * 2 * prog);
-			this.setMotion(0, floatAccel * .01, 0);
+			this.setDeltaMovement(0, floatAccel * .01, 0);
 			
 			// DamagingProjectileEntity's collision detection is based on motion and doesn't work at these low speeds,
 			// so do our own checking
-			for (Entity e : this.world.getEntitiesInAABBexcluding(this, this.getBoundingBox(), this::canImpact)) {
-				this.onImpact(new EntityRayTraceResult(e, this.getPositionVec()));
+			for (Entity e : this.level.getEntities(this, this.getBoundingBox(), this::canImpact)) {
+				this.onHit(new EntityRayTraceResult(e, this.position()));
 			}
 		}
 		
-		if (!world.isRemote() && this.ticksExisted >= lifetime) {
+		if (!level.isClientSide() && this.tickCount >= lifetime) {
 			this.onProjectileDeath();
 			this.remove();
 		}
 	}
 
 	@Override
-	protected boolean isFireballFiery() {
+	protected boolean shouldBurn() {
 		return false;
 	}
 	
 	@Override
-	protected IParticleData getParticle() {
+	protected IParticleData getTrailParticle() {
 		return new NostrumParticleData(NostrumParticles.WARD.getType(), new SpawnParams(1, 0, 0, 0, 0, 1, 0, Vector3d.ZERO));
 	}
 	
 	@Override
 	protected void doClientEffect() {
-		if (this.rand.nextBoolean()) {
+		if (this.random.nextBoolean()) {
 			super.doClientEffect();
 		}
 	}
 	
 	@Override
 	protected void onProjectileDeath() {
-		((ServerWorld) world).spawnParticle(ParticleTypes.BUBBLE_POP, this.getPosX(), this.getPosY(), this.getPosZ(), 3, 0, 0, 0, 0);
+		((ServerWorld) level).sendParticles(ParticleTypes.BUBBLE_POP, this.getX(), this.getY(), this.getZ(), 3, 0, 0, 0, 0);
 		NostrumMagicaSounds.BUBBLE_POP.play(this);
 	}
 }

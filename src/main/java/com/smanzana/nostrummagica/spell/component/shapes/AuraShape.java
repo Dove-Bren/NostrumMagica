@@ -64,7 +64,7 @@ public class AuraShape extends AreaShape {
 			super(state);
 			this.radius = radius;
 			this.origin = entity;
-			this.world = entity.getEntityWorld();
+			this.world = entity.getCommandSenderWorld();
 			this.includeAllies = includeAllies;
 			this.characteristics = characteristics;
 			
@@ -91,7 +91,7 @@ public class AuraShape extends AreaShape {
 		}
 		
 		protected boolean isInArea(LivingEntity entity) {
-			return origin.getDistance(entity) <= radius;
+			return origin.distanceTo(entity) <= radius;
 		}
 
 		protected void doEffect() {
@@ -99,9 +99,9 @@ public class AuraShape extends AreaShape {
 			for (int i = 0; i < radius + 1; i++) {
 				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 						1,
-						origin.getPosX(),
-						origin.getPosY() + (origin.getEyeHeight() / 2), // technically correct but visually sucky cause 50% will be underground
-						origin.getPosZ(),
+						origin.getX(),
+						origin.getY() + (origin.getEyeHeight() / 2), // technically correct but visually sucky cause 50% will be underground
+						origin.getZ(),
 						.1,
 						30, 0, // lifetime + jitter
 						Vector3d.ZERO, (new Vector3d(.2, .2, .2)).scale(radius / 4)
@@ -109,9 +109,9 @@ public class AuraShape extends AreaShape {
 						);
 				NostrumParticles.LIGHTNING_STATIC.spawn(world, new SpawnParams(
 						2,
-						origin.getPosX(),
-						origin.getPosY() + (origin.getEyeHeight() / 2), // technically correct but visually sucky cause 50% will be underground
-						origin.getPosZ(),
+						origin.getX(),
+						origin.getY() + (origin.getEyeHeight() / 2), // technically correct but visually sucky cause 50% will be underground
+						origin.getZ(),
 						radius,
 						20, 0, // lifetime + jitter
 						new Vector3d(0, -.025, 0), new Vector3d(0, .05, 0)
@@ -169,9 +169,9 @@ public class AuraShape extends AreaShape {
 			
 			Integer last = affected.get(entity);
 			if (last == null
-					|| (last + 40 < entity.ticksExisted)
+					|| (last + 40 < entity.tickCount)
 					) {
-				affected.put(entity, entity.ticksExisted);
+				affected.put(entity, entity.tickCount);
 				return true;
 			}
 			return false;
@@ -179,7 +179,7 @@ public class AuraShape extends AreaShape {
 	}
 	
 	private static final String ID = "aura";
-	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY,
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.of(ItemStack.EMPTY,
 			ReagentItem.CreateStack(ReagentType.SKY_ASH, 1),
 			ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
 			ReagentItem.CreateStack(ReagentType.CRYSTABLOOM, 1),
@@ -233,7 +233,7 @@ public class AuraShape extends AreaShape {
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
-			costs = NonNullList.from(ItemStack.EMPTY,
+			costs = NonNullList.of(ItemStack.EMPTY,
 				ItemStack.EMPTY,
 				new ItemStack(Items.DRAGON_BREATH),
 				new ItemStack(NostrumItems.resourceSpriteCore, 1),
@@ -290,8 +290,8 @@ public class AuraShape extends AreaShape {
 		final float range = this.getRadius(getDefaultProperties());
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), range));
 		
-		List<LivingEntity> ents = location.world.getEntitiesInAABBexcluding(state.getSelf(), VoxelShapes.fullCube().getBoundingBox().offset(location.hitPosition).grow(range + 1), (ent) -> 
-			ent instanceof LivingEntity && location.hitPosition.distanceTo(ent.getPositionVec()) <= range
+		List<LivingEntity> ents = location.world.getEntities(state.getSelf(), VoxelShapes.block().bounds().move(location.hitPosition).inflate(range + 1), (ent) -> 
+			ent instanceof LivingEntity && location.hitPosition.distanceTo(ent.position()) <= range
 		).stream().map(ent -> (LivingEntity) ent).collect(Collectors.toList());
 		if (ents != null && !ents.isEmpty()) {
 			state.trigger(ents, null);

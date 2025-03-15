@@ -21,7 +21,7 @@ public class ModelBillboard extends Model {
 	}
 	
 	public ModelBillboard() {
-		this(RenderType::getEntityCutoutNoCull); // By default, do cutout instead of transparent
+		this(RenderType::entityCutoutNoCull); // By default, do cutout instead of transparent
 	}
 	
 	public ModelBillboard setRadius(float radius) {
@@ -30,10 +30,10 @@ public class ModelBillboard extends Model {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
 			float red, float green, float blue, float alpha) {
 		final Minecraft mc = Minecraft.getInstance();
-		RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, bufferIn, mc.gameRenderer.getActiveRenderInfo(),
+		RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, bufferIn, mc.gameRenderer.getMainCamera(),
 				radius,
 				packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}

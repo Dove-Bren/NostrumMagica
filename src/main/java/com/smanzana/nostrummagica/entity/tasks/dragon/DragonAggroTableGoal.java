@@ -16,12 +16,12 @@ public class DragonAggroTableGoal<E extends DragonEntity, T extends LivingEntity
 		this.checkSight = checkSight;
 		this.dragon = dragon;
 		aggroTable = new AggroTable<>((ent) -> {
-			return !DragonAggroTableGoal.this.checkSight || DragonAggroTableGoal.this.dragon.getEntitySenses().canSee(ent);
+			return !DragonAggroTableGoal.this.checkSight || DragonAggroTableGoal.this.dragon.getSensing().canSee(ent);
 		});
 	}
 
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		if (dragon == null || !dragon.isAlive()) {
 			return false;
 		}
@@ -29,15 +29,15 @@ public class DragonAggroTableGoal<E extends DragonEntity, T extends LivingEntity
 		// not a great place for this
 		aggroTable.decayTick();
 		
-		LivingEntity current = dragon.getAttackTarget();
+		LivingEntity current = dragon.getTarget();
 		T targ = this.getTarget();
 		
 		return (targ != null && targ != current);
 	}
 	
 	@Override
-	public void startExecuting() {
-		this.dragon.setAttackTarget(getTarget());
+	public void start() {
+		this.dragon.setTarget(getTarget());
 	}
 	
 	private T getTarget() {

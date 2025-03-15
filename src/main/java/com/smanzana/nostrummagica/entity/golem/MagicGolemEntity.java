@@ -52,7 +52,7 @@ import net.minecraft.world.server.ServerWorld;
 public abstract class MagicGolemEntity extends TameableEntity implements ILoreSupplier, IElementalEntity {
 
 	Entity e;
-	private static final DataParameter<Float> DATA_HEALTH_ID = EntityDataManager.<Float>createKey(MagicGolemEntity.class, DataSerializers.FLOAT);
+	private static final DataParameter<Float> DATA_HEALTH_ID = EntityDataManager.<Float>defineId(MagicGolemEntity.class, DataSerializers.FLOAT);
 	protected static final int ROSE_DROP_DENOM = 12500;
 
 	protected boolean isMelee;
@@ -67,13 +67,13 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
 	
     protected MagicGolemEntity(EntityType<? extends MagicGolemEntity> type, World worldIn, EMagicElement element, boolean melee, boolean range, boolean buff) {
         super(type, worldIn);
-        this.setTamed(true);
+        this.setTame(true);
         
         this.isMelee = melee;
         this.isRange = range;
         this.hasBuff = buff;
         
-        if (worldIn != null && !worldIn.isRemote)
+        if (worldIn != null && !worldIn.isClientSide)
         	gTask.initStance(isMelee, isRange, hasBuff);
         
         idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
@@ -81,7 +81,7 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
     }
     
     public void setExpiresAfterTicks(int ticks) {
-    	this.expireTicks = this.ticksExisted + ticks;
+    	this.expireTicks = this.tickCount + ticks;
     }
     
     /**
@@ -114,28 +114,28 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
         this.goalSelector.addGoal(5, new LookAtGoal(this, PlayerEntity.class, 8.0F));
         this.targetSelector.addGoal(1, new OwnerHurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new OwnerHurtTargetGoal(this));
-        this.targetSelector.addGoal(3, new HurtByTargetGoal(this).setCallsForHelp(MagicGolemEntity.class));
+        this.targetSelector.addGoal(3, new HurtByTargetGoal(this).setAlertOthers(MagicGolemEntity.class));
         this.targetSelector.addGoal(1, new GolemAIFindEntityNearestPlayer(this));
     }
     
     protected static final AttributeModifierMap.MutableAttribute BuildBaseAttributes() {
-    	return AnimalEntity.func_233666_p_()
-    			.createMutableAttribute(Attributes.ATTACK_DAMAGE, 2.0)
+    	return AnimalEntity.createMobAttributes()
+    			.add(Attributes.ATTACK_DAMAGE, 2.0)
     			;
     }
 
-    protected void updateAITasks() {
-        this.dataManager.set(DATA_HEALTH_ID, Float.valueOf(this.getHealth()));
+    protected void customServerAiStep() {
+        this.entityData.set(DATA_HEALTH_ID, Float.valueOf(this.getHealth()));
     }
 
     @Override
-    protected void registerData() {
-    	super.registerData();
-        this.dataManager.register(DATA_HEALTH_ID, Float.valueOf(this.getHealth()));
+    protected void defineSynchedData() {
+    	super.defineSynchedData();
+        this.entityData.define(DATA_HEALTH_ID, Float.valueOf(this.getHealth()));
     }
 
     protected void playStepSound(BlockPos pos, BlockState blockIn) {
-        this.playSound(SoundEvents.ENTITY_WOLF_STEP, 0.15F, 1.0F);
+        this.playSound(SoundEvents.WOLF_STEP, 0.15F, 1.0F);
     }
 
     protected SoundEvent getHurtSound(DamageSource source) {
@@ -154,20 +154,20 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
     }
 
     protected float getStandingEyeHeight(Pose pose, EntitySize size) {
-        return this.getHeight() * 0.8F;
+        return this.getBbHeight() * 0.8F;
     }
 
-    public boolean attackEntityAsMob(Entity entityIn) {
-        boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
+    public boolean doHurtTarget(Entity entityIn) {
+        boolean flag = entityIn.hurt(DamageSource.mobAttack(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
 
         if (flag) {
-            this.applyEnchantments(this, entityIn);
+            this.doEnchantDamageEffects(this, entityIn);
         }
 
         return flag;
     }
 
-    public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
+    public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
         return ActionResultType.PASS;
     }
 
@@ -175,27 +175,27 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
      * Checks if the parameter is an item which this animal can be fed to breed it (wheat, carrots or seeds depending on
      * the animal type)
      */
-    public boolean isBreedingItem(@Nonnull ItemStack stack) {
+    public boolean isFood(@Nonnull ItemStack stack) {
         return false;
     }
 
     /**
      * Returns true if the mob is currently able to mate with the specified mob.
      */
-    public boolean canMateWith(AnimalEntity otherAnimal) {
+    public boolean canMate(AnimalEntity otherAnimal) {
         return false;
     }
 
-    public boolean shouldAttackEntity(LivingEntity target, LivingEntity owner) {
+    public boolean wantsToAttack(LivingEntity target, LivingEntity owner) {
         return target != owner;
     }
 
-    public boolean canBeLeashedTo(PlayerEntity player) {
+    public boolean canBeLeashed(PlayerEntity player) {
         return false;
     }
 
 	@Override
-	public AgeableEntity /*createChild*/ func_241840_a(ServerWorld world, AgeableEntity ageable) {
+	public AgeableEntity /*createChild*/ getBreedOffspring(ServerWorld world, AgeableEntity ageable) {
 		return null;
 	}
 	
@@ -208,24 +208,24 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
 		if (idleCooldown > 0) {
 			idleCooldown--;
 			if (idleCooldown == 0) {
-				if (this.getAttackTarget() == null)
+				if (this.getTarget() == null)
 					NostrumMagicaSounds.GOLEM_IDLE.play(this);
 				idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10); 
 			}
 		}
 		
-		if (!world.isRemote && expireTicks != 0 && expireTicks > this.ticksExisted) {
+		if (!level.isClientSide && expireTicks != 0 && expireTicks > this.tickCount) {
 			this.remove();
 		}
 	}
 	
 	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount) {
+	public boolean hurt(DamageSource source, float amount) {
 		if (source.isProjectile()) {
 			amount *= 0.3f;
 		}
 		
-		return super.attackEntityFrom(source, amount);
+		return super.hurt(source, amount);
 	}
 	
 	@Override
@@ -287,13 +287,13 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
 		}
 		
 		@Override
-		public boolean shouldExecute() {
+		public boolean canUse() {
 			if (rood instanceof TameableEntity) {
 				if (((TameableEntity) rood).getOwner() != null)
 					return false;
 			}
 			
-			return super.shouldExecute();
+			return super.canUse();
 		}
 		
 	}

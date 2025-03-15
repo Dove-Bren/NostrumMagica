@@ -26,12 +26,12 @@ public class LockedDoorBlock extends MagicDoorBlock {
 	public LockedDoorBlock() {
 		super();
 
-		this.setDefaultState(this.getDefaultState().with(UNLOCKABLE, false));
+		this.registerDefaultState(this.defaultBlockState().setValue(UNLOCKABLE, false));
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		super.fillStateContainer(builder);
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
 		builder.add(UNLOCKABLE);
 	}
 	
@@ -49,12 +49,12 @@ public class LockedDoorBlock extends MagicDoorBlock {
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote()) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+		if (!worldIn.isClientSide()) {
 			BlockPos master = this.getMasterPos(worldIn, state, pos);
 			if (master != null) {
-				LockedDoorTileEntity door = (LockedDoorTileEntity) worldIn.getTileEntity(master);
-				final ItemStack heldItem = playerIn.getHeldItem(hand);
+				LockedDoorTileEntity door = (LockedDoorTileEntity) worldIn.getBlockEntity(master);
+				final ItemStack heldItem = playerIn.getItemInHand(hand);
 				
 				if (playerIn.isCreative() && !heldItem.isEmpty() && heldItem.getItem() instanceof DyeItem) {
 					DyeItem dye = (DyeItem) heldItem.getItem();

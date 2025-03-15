@@ -71,7 +71,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	public boolean meetsRequirements(LivingEntity entity, List<ITextComponent> missingDepStrings) {
 		boolean meets = true;
 		
-		if (!entity.world.isRemote) {
+		if (!entity.level.isClientSide) {
 			NostrumMagica.logger.info("Checking requirements: lvl [" + this.requiredLevel + "], tier [" + requiredTier + "], components: " + this.requiredComponents.size());
 		}
 		
@@ -134,8 +134,8 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	private static final String NBT_COMPS = "required_componenets";
 	
 	@Override
-	public void read(BlockState state, CompoundNBT compound) {
-		super.read(state, compound);
+	public void load(BlockState state, CompoundNBT compound) {
+		super.load(state, compound);
 		
 		this.requiredLevel = compound.getInt(NBT_LEVEL);
 		this.requiredTier = EMagicTier.FromNBT(compound.get(NBT_TIER));
@@ -149,8 +149,8 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT compound) {
-		CompoundNBT nbt = super.write(compound);
+	public CompoundNBT save(CompoundNBT compound) {
+		CompoundNBT nbt = super.save(compound);
 		
 		if (this.requiredLevel > 0)
 			nbt.putInt(NBT_LEVEL, this.requiredLevel);
@@ -170,33 +170,33 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
 	protected void dirty() {
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		markDirty();
+		level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+		setChanged();
 	}
 	
 	private Direction faceStash = null;
 	public Direction getFace() {
 		if (faceStash == null) {
-			BlockState state = world.getBlockState(getPos());
+			BlockState state = level.getBlockState(getBlockPos());
 			faceStash = Direction.NORTH;
 			if (state != null) {
 				try {
-					faceStash = state.get(ProgressionDoorBlock.HORIZONTAL_FACING);
+					faceStash = state.getValue(ProgressionDoorBlock.FACING);
 				} catch (Exception e) {
 					NostrumMagica.logger.warn("Failed to get face for progression tile entity");
 				}
@@ -209,7 +209,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	private BlockPos bottomStash = null;
 	public BlockPos getBottomCenterPos() {
 		if (bottomStash == null) {
-			bottomStash = ProgressionDoorBlock.FindBottomCenterPos(getWorld(), getPos());
+			bottomStash = ProgressionDoorBlock.FindBottomCenterPos(getLevel(), getBlockPos());
 		}
 		
 		return bottomStash;

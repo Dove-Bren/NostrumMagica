@@ -34,10 +34,10 @@ public class ClientEffectHellBurn extends ClientEffect {
 	protected void spawnFireEffect() {
 		final double angleRad = Math.PI * 2 * NostrumMagica.rand.nextFloat();
 		final Vector3d offset = new Vector3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
-		entity.world.addParticle(ParticleTypes.FLAME,
-				entity.getPosX() + offset.x,
-				entity.getPosY() + entity.getHeight() + offset.y,
-				entity.getPosZ() + offset.z,
+		entity.level.addParticle(ParticleTypes.FLAME,
+				entity.getX() + offset.x,
+				entity.getY() + entity.getBbHeight() + offset.y,
+				entity.getZ() + offset.z,
 				-offset.x * .1,
 				-offset.y * .1,
 				-offset.z * .1
@@ -47,10 +47,10 @@ public class ClientEffectHellBurn extends ClientEffect {
 	protected void spawnPoisonEffect() {
 		final double angleRad = Math.PI * 2 * NostrumMagica.rand.nextFloat();
 		final Vector3d offset = new Vector3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
-		entity.world.addParticle(ParticleTypes.CRIT,
-				entity.getPosX() + offset.x,
-				entity.getPosY() + entity.getHeight() + offset.y,
-				entity.getPosZ() + offset.z,
+		entity.level.addParticle(ParticleTypes.CRIT,
+				entity.getX() + offset.x,
+				entity.getY() + entity.getBbHeight() + offset.y,
+				entity.getZ() + offset.z,
 				0, 0, 0
 				);
 	}
@@ -58,10 +58,10 @@ public class ClientEffectHellBurn extends ClientEffect {
 	protected void spawnMagmaEffect() {
 		final double angleRad = Math.PI * 2 * NostrumMagica.rand.nextFloat();
 		final Vector3d dir = new Vector3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
-		entity.world.addParticle(ParticleTypes.LAVA,
-				entity.getPosX(),
-				entity.getPosY() + entity.getHeight() - .1,
-				entity.getPosZ(),
+		entity.level.addParticle(ParticleTypes.LAVA,
+				entity.getX(),
+				entity.getY() + entity.getBbHeight() - .1,
+				entity.getZ(),
 				dir.x,
 				dir.y,
 				dir.z

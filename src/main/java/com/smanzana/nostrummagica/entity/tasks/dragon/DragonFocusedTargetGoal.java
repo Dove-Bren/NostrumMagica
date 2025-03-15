@@ -16,17 +16,17 @@ public class DragonFocusedTargetGoal<T extends LivingEntity> extends Goal {
 	}
 
 	@Override
-	public boolean shouldExecute() {
-		return this.dragon.getAttackTarget() == null;
+	public boolean canUse() {
+		return this.dragon.getTarget() == null;
 	}
 	
 	@Override
-	public void startExecuting() {
-		this.dragon.setAttackTarget(target);
+	public void start() {
+		this.dragon.setTarget(target);
 	}
 	
 	@Override
-	public boolean shouldContinueExecuting() {
+	public boolean canContinueToUse() {
 		return false;
 	}
 }

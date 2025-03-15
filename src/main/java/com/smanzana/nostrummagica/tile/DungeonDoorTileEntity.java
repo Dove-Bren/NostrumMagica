@@ -13,10 +13,10 @@ public class DungeonDoorTileEntity extends LockedDoorTileEntity {
 	
 	@Override
 	protected void checkBlockState() {
-		boolean worldUnlockable = world.getBlockState(pos).get(DungeonDoorBlock.UNLOCKABLE);
+		boolean worldUnlockable = level.getBlockState(worldPosition).getValue(DungeonDoorBlock.UNLOCKABLE);
 		boolean tileUnlockable = AutoDungeons.GetWorldKeys().hasKey(this.getWorldKey()); 
 		if (worldUnlockable != tileUnlockable) {
-			world.setBlockState(pos, world.getBlockState(pos).with(DungeonDoorBlock.UNLOCKABLE, tileUnlockable), 3);
+			level.setBlock(worldPosition, level.getBlockState(worldPosition).setValue(DungeonDoorBlock.UNLOCKABLE, tileUnlockable), 3);
 		}
 	}
 	

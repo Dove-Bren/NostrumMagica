@@ -42,7 +42,7 @@ public class RitualInfoButton extends InfoButton {
 		}
 		
 		Minecraft mc = Minecraft.getInstance();
-		mc.getTextureManager().bindTexture(InfoScreen.background);
+		mc.getTextureManager().bind(InfoScreen.background);
 		RenderSystem.enableBlend();
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, 0,
 				0, width,
@@ -58,7 +58,7 @@ public class RitualInfoButton extends InfoButton {
 			int x = this.x + (width - itemLength) / 2;
 			int y = this.y + (height - itemLength) / 2;
 			
-			ItemRenderer.renderItemIntoGUI(iconStack, x, y);
+			ItemRenderer.renderGuiItem(iconStack, x, y);
 		}
 	}
 	

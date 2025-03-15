@@ -13,7 +13,7 @@ public class MagicReductionAttribute extends RangedAttribute {
 	public MagicReductionAttribute(EMagicElement elem, String name) {
 		super(name, 0, -20.0D, 20.0D);
 		this.element = elem;
-		this.setShouldWatch(true);
+		this.setSyncable(true);
 	}
 	
 	public EMagicElement getElement() {

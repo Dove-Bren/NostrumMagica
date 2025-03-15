@@ -49,7 +49,7 @@ public class ClientUpdateQuestMessage {
 	}
 
 	public static ClientUpdateQuestMessage decode(PacketBuffer buf) {
-		final String id = buf.readString(32767);
+		final String id = buf.readUtf(32767);
 		NostrumQuest quest = NostrumQuest.lookup(id);
 		if (quest == null) {
 			throw new DecoderException("Could not find Nostrum quest matching " + id);
@@ -58,7 +58,7 @@ public class ClientUpdateQuestMessage {
 	}
 
 		public static void encode(ClientUpdateQuestMessage msg, PacketBuffer buf) {
-		buf.writeString(msg.quest.getKey());
+		buf.writeUtf(msg.quest.getKey());
 	}
 
 }

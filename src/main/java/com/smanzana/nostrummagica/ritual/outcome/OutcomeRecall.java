@@ -31,14 +31,14 @@ public class OutcomeRecall implements IRitualOutcome {
 		
 		BlockPos pos = attr.getMarkLocation();
 		if (pos == null) {
-			if (!world.isRemote)
-				player.sendMessage(new TranslationTextComponent("info.recall.fail", new Object[0]), Util.DUMMY_UUID);
+			if (!world.isClientSide)
+				player.sendMessage(new TranslationTextComponent("info.recall.fail", new Object[0]), Util.NIL_UUID);
 			return false;
 		}
 		
 		if (!DimensionUtils.InDimension(player, attr.getMarkDimension())) {
-			if (!world.isRemote)
-				player.sendMessage(new TranslationTextComponent("info.recall.baddimension", new Object[0]), Util.DUMMY_UUID);
+			if (!world.isClientSide)
+				player.sendMessage(new TranslationTextComponent("info.recall.baddimension", new Object[0]), Util.NIL_UUID);
 			return false;
 		}
 		
@@ -54,13 +54,13 @@ public class OutcomeRecall implements IRitualOutcome {
 		
 		BlockPos pos = attr.getMarkLocation();
 		if (pos == null) {
-			if (world.isRemote)
-				player.sendMessage(new TranslationTextComponent("info.recall.fail", new Object[0]), Util.DUMMY_UUID);
+			if (world.isClientSide)
+				player.sendMessage(new TranslationTextComponent("info.recall.fail", new Object[0]), Util.NIL_UUID);
 			return;
 		}
 		
 		if (DimensionUtils.InDimension(player, attr.getMarkDimension())) {
-			if (!world.isRemote) {
+			if (!world.isClientSide) {
 				
 				NostrumMagica.attemptTeleport(new Location(world, pos), player, true, NostrumMagica.rand.nextInt(4) == 0, player);
 				
@@ -86,7 +86,7 @@ public class OutcomeRecall implements IRitualOutcome {
 //				}
 			}
 		} else {
-			player.sendMessage(new TranslationTextComponent("info.recall.baddimension", new Object[0]), Util.DUMMY_UUID);
+			player.sendMessage(new TranslationTextComponent("info.recall.baddimension", new Object[0]), Util.NIL_UUID);
 		}
 	}
 	

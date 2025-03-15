@@ -326,7 +326,7 @@ public class DragonArmor extends Item {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		// Disable vanilla's so we can do our own
 		if (!stack.hasTag() || !stack.getTag().contains("HideFlags", 99)) {
 			CompoundNBT tag = stack.getTag();
@@ -356,13 +356,13 @@ public class DragonArmor extends Item {
 					double d0 = attributemodifier.getAmount();
 					boolean flag = false;
 
-					if (attributemodifier.getID() == Item.ATTACK_DAMAGE_MODIFIER)
+					if (attributemodifier.getId() == Item.BASE_ATTACK_DAMAGE_UUID)
 					{
 						d0 = d0 + player.getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue();
-						d0 = d0 + (double)EnchantmentHelper.getModifierForCreature(stack, CreatureAttribute.UNDEFINED);
+						d0 = d0 + (double)EnchantmentHelper.getDamageBonus(stack, CreatureAttribute.UNDEFINED);
 						flag = true;
 					}
-					else if (attributemodifier.getID() == Item.ATTACK_SPEED_MODIFIER)
+					else if (attributemodifier.getId() == Item.BASE_ATTACK_SPEED_UUID)
 					{
 						d0 += player.getAttribute(Attributes.ATTACK_SPEED).getBaseValue();
 						flag = true;
@@ -381,22 +381,22 @@ public class DragonArmor extends Item {
 					
 					if (flag)
 					{
-						tooltip.add((new StringTextComponent(" ")).append(new TranslationTextComponent("attribute.modifier.equals." + attributemodifier.getOperation().getId(), ItemStack.DECIMALFORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey().getAttributeName()))).mergeStyle(TextFormatting.DARK_GREEN));
+						tooltip.add((new StringTextComponent(" ")).append(new TranslationTextComponent("attribute.modifier.equals." + attributemodifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey().getDescriptionId()))).withStyle(TextFormatting.DARK_GREEN));
 					}
 					else if (d0 > 0.0D)
 					{
-						tooltip.add((new TranslationTextComponent("attribute.modifier.plus." + attributemodifier.getOperation().getId(), ItemStack.DECIMALFORMAT.format(d1), new TranslationTextComponent(entry.getKey().getAttributeName()))).mergeStyle(TextFormatting.BLUE));
+						tooltip.add((new TranslationTextComponent("attribute.modifier.plus." + attributemodifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), new TranslationTextComponent(entry.getKey().getDescriptionId()))).withStyle(TextFormatting.BLUE));
 					}
 					else if (d0 < 0.0D)
 					{
 						d1 = d1 * -1.0D;
-						tooltip.add((new TranslationTextComponent("attribute.modifier.take." + attributemodifier.getOperation().getId(), ItemStack.DECIMALFORMAT.format(d1), new TranslationTextComponent(entry.getKey().getAttributeName()))).mergeStyle(TextFormatting.RED));
+						tooltip.add((new TranslationTextComponent("attribute.modifier.take." + attributemodifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), new TranslationTextComponent(entry.getKey().getDescriptionId()))).withStyle(TextFormatting.RED));
 					}
 				}
 			}
 		}
 		
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 	}
 	
 }

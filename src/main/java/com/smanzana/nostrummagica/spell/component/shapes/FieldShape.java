@@ -54,14 +54,14 @@ public class FieldShape extends AreaShape {
 		
 		@Override
 		protected boolean isInArea(LivingEntity entity) {
-			return Math.abs(entity.getPosY() - origin.getY()) < 1
-					&& origin.distanceTo(new Vector3d(entity.getPosX(), origin.y, entity.getPosZ())) <= radius; // compare against our y for horizontal distance.
+			return Math.abs(entity.getY() - origin.y()) < 1
+					&& origin.distanceTo(new Vector3d(entity.getX(), origin.y, entity.getZ())) <= radius; // compare against our y for horizontal distance.
 			// .75 wiggle room in listener means you can't be way below.
 		}
 
 		@Override
 		protected boolean isInArea(World world, BlockPos pos) {
-			return pos.getY() == origin.getY() &&
+			return pos.getY() == origin.y() &&
 					(Math.abs((Math.floor(origin.x) + .5) - (pos.getX() + .5))
 					+ Math.abs((Math.floor(origin.z) + .5) - (pos.getZ() + .5))) <= radius;
 		}
@@ -116,7 +116,7 @@ public class FieldShape extends AreaShape {
 	}
 
 	private static String ID = "field";
-	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.of(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
 			ReagentItem.CreateStack(ReagentType.SKY_ASH, 1),
 			ReagentItem.CreateStack(ReagentType.MANI_DUST, 1)));
 	
@@ -166,7 +166,7 @@ public class FieldShape extends AreaShape {
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
-			costs = NonNullList.from(ItemStack.EMPTY,
+			costs = NonNullList.of(ItemStack.EMPTY,
 				ItemStack.EMPTY,
 				new ItemStack(Items.DRAGON_BREATH),
 				new ItemStack(Blocks.EMERALD_BLOCK),

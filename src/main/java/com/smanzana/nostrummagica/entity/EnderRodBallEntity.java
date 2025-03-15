@@ -35,23 +35,23 @@ public class EnderRodBallEntity extends Entity {
 	}
 	
 	@Override
-	public boolean writeUnlessRemoved(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundNBT compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
 	}
 	
 	@Override
-	public IPacket<?> createSpawnPacket() {
+	public IPacket<?> getAddEntityPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 	
 	@Override
-	public boolean canBePushed() {
+	public boolean isPushable() {
 		return false;
 	}
 	
 	@Override
-	public void applyEntityCollision(Entity entityIn) {
+	public void push(Entity entityIn) {
 		return;
 	}
 	
@@ -60,22 +60,22 @@ public class EnderRodBallEntity extends Entity {
 	}
 	
 	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount) {
+	public boolean hurt(DamageSource source, float amount) {
 		return false;
 	}
 
 	@Override
-	protected void registerData() {
+	protected void defineSynchedData() {
 		;
 	}
 
 	@Override
-	protected void readAdditional(CompoundNBT compound) {
+	protected void readAdditionalSaveData(CompoundNBT compound) {
 		;
 	}
 
 	@Override
-	protected void writeAdditional(CompoundNBT compound) {
+	protected void addAdditionalSaveData(CompoundNBT compound) {
 		;
 	}
 	

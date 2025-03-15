@@ -60,12 +60,12 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 	public abstract @Nonnull BlockState getMimickedState(BlockState mimicBlockState, World world, BlockPos myPos);
 	
 	public MimicBlock(Block.Properties builder) {
-		super(builder.notSolid());
+		super(builder.noOcclusion());
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		super.fillStateContainer(builder);
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
 	}
 	
 	@Override
@@ -74,13 +74,13 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public TileEntity createNewTileEntity(IBlockReader world) {
+	public TileEntity newBlockEntity(IBlockReader world) {
 		return new MimicBlockTileEntity();
 	}
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		return createNewTileEntity(world);
+		return newBlockEntity(world);
 	}
 	
 //	@Override
@@ -94,12 +94,12 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 //	}
 	
 	@Override
-	public boolean isReplaceable(BlockState state, BlockItemUseContext context) {
+	public boolean canBeReplaced(BlockState state, BlockItemUseContext context) {
         return false;
     }
 	
 	protected boolean shouldRefreshFromNeighbor(BlockState state, World worldIn, BlockPos myPos, BlockPos fromPos) {
-		return myPos.equals(fromPos.up());
+		return myPos.equals(fromPos.above());
 	}
 	
 	@Override
@@ -108,15 +108,15 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 		
 		if (shouldRefreshFromNeighbor(state, worldIn, pos, fromPos)) {
 			// Block below changed, so refresh tile entity
-			MimicBlockTileEntity te = (MimicBlockTileEntity) worldIn.getTileEntity(pos);
+			MimicBlockTileEntity te = (MimicBlockTileEntity) worldIn.getBlockEntity(pos);
 			te.updateBlock();
 		}
 	}
 	
 	// Mimiced block attributes
 	@Override
-	public int getOpacity(BlockState state, IBlockReader world, BlockPos pos) {
-		return getValue(state, world, pos, BlockState::getOpacity, () -> super.getOpacity(state, world, pos));
+	public int getLightBlock(BlockState state, IBlockReader world, BlockPos pos) {
+		return getValue(state, world, pos, BlockState::getLightBlock, () -> super.getLightBlock(state, world, pos));
 	}
 	
 	@Override
@@ -125,8 +125,8 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
     }
 
 	@Override
-	public float getAmbientOcclusionLightValue(BlockState state, IBlockReader world, BlockPos pos) {
-		return getValue(state, world, pos, BlockState::getAmbientOcclusionLightValue, () -> super.getAmbientOcclusionLightValue(state, world, pos));
+	public float getShadeBrightness(BlockState state, IBlockReader world, BlockPos pos) {
+		return getValue(state, world, pos, BlockState::getShadeBrightness, () -> super.getShadeBrightness(state, world, pos));
 	}
 
 	@Override
@@ -161,13 +161,13 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
     }
 
 	@Override
-    public VoxelShape getRenderShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
-        return getValue(state, worldIn, pos, BlockState::getRenderShape, () -> super.getRenderShape(state, worldIn, pos));
+    public VoxelShape getOcclusionShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
+        return getValue(state, worldIn, pos, BlockState::getBlockSupportShape, () -> super.getOcclusionShape(state, worldIn, pos));
     }
 
     @Override
-    public VoxelShape getRaytraceShape(BlockState state, IBlockReader world, BlockPos pos) {
-        return getValue(state, world, pos, BlockState::getRayTraceShape, () -> super.getRaytraceShape(state, world, pos));
+    public VoxelShape getInteractionShape(BlockState state, IBlockReader world, BlockPos pos) {
+        return getValue(state, world, pos, BlockState::getInteractionShape, () -> super.getInteractionShape(state, world, pos));
     }
 
 //    @Nullable
@@ -200,12 +200,12 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
         Optional<BlockState> mirrorState = getMirrorState(state, world, pos);
         if(mirrorState.isPresent()) {
             BlockState blockstate = mirrorState.get();
-            if (blockstate.getRenderType() != BlockRenderType.INVISIBLE) {
-                Vector3d Vector3d = entity.getMotion();
+            if (blockstate.getRenderShape() != BlockRenderType.INVISIBLE) {
+                Vector3d Vector3d = entity.getDeltaMovement();
                 world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockstate),
-                        entity.getPosX() + (world.rand.nextFloat() - 0.5D) * entity.getWidth(),
-                        entity.getPosY() + 0.1D,
-                        entity.getPosZ() + (world.rand.nextFloat() - 0.5D) * entity.getWidth(),
+                        entity.getX() + (world.random.nextFloat() - 0.5D) * entity.getBbWidth(),
+                        entity.getY() + 0.1D,
+                        entity.getZ() + (world.random.nextFloat() - 0.5D) * entity.getBbWidth(),
 
                         Vector3d.x * -4.0D, 1.5D, Vector3d.z * -4.0D);
             }
@@ -218,19 +218,19 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
     @OnlyIn(Dist.CLIENT)
     public boolean addHitEffects(BlockState state, World world, RayTraceResult target, ParticleManager manager) {
         if(target instanceof BlockRayTraceResult) {
-            BlockPos pos = ((BlockRayTraceResult) target).getPos();
+            BlockPos pos = ((BlockRayTraceResult) target).getBlockPos();
             Optional<BlockState> mirrorState = getMirrorState(state, world, pos);
             if(mirrorState.isPresent()) {
                 BlockState blockstate = mirrorState.get();
-                Direction side = ((BlockRayTraceResult) target).getFace();
-                if (blockstate.getRenderType() != BlockRenderType.INVISIBLE) {
+                Direction side = ((BlockRayTraceResult) target).getDirection();
+                if (blockstate.getRenderShape() != BlockRenderType.INVISIBLE) {
                     int x = pos.getX();
                     int y = pos.getY();
                     int z = pos.getZ();
-                    AxisAlignedBB bb = blockstate.getShape(world, pos).getBoundingBox();
-                    double xPos = x + world.rand.nextDouble() * (bb.maxX - bb.minX - 0.2F) + 0.1F + bb.minX;
-                    double yPos = y + world.rand.nextDouble() * (bb.maxY - bb.minY - 0.2F) + 0.1F + bb.minY;
-                    double zPos = z + world.rand.nextDouble() * (bb.maxZ - bb.minZ - 0.2F) + 0.1F + bb.minZ;
+                    AxisAlignedBB bb = blockstate.getShape(world, pos).bounds();
+                    double xPos = x + world.random.nextDouble() * (bb.maxX - bb.minX - 0.2F) + 0.1F + bb.minX;
+                    double yPos = y + world.random.nextDouble() * (bb.maxY - bb.minY - 0.2F) + 0.1F + bb.minY;
+                    double zPos = z + world.random.nextDouble() * (bb.maxZ - bb.minZ - 0.2F) + 0.1F + bb.minZ;
 
                     switch (side) {
                         case UP: yPos = y + bb.maxY + 0.1F; break;
@@ -242,11 +242,11 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
                     }
 
                     final Minecraft mc = Minecraft.getInstance();
-                    mc.particles.addEffect(
+                    mc.particleEngine.add(
                             new DiggingParticle((ClientWorld) world, xPos, yPos, zPos, 0.0D, 0.0D, 0.0D, blockstate)
-                                    .setBlockPos(pos)
-                                    .multiplyVelocity(0.2F)
-                                    .multiplyParticleScaleBy(0.6F)
+                                    .init(pos)
+                                    .setPower(0.2F)
+                                    .scale(0.6F)
                     );
                 }
             }
@@ -264,7 +264,7 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
             }
             BlockState state = mirrorState.get();
             VoxelShape voxelshape = state.getShape(world, pos);
-            voxelshape.forEachBox((x1, y1, z1, x2, y2, z2) -> {
+            voxelshape.forAllBoxes((x1, y1, z1, x2, y2, z2) -> {
                 double xDelta = Math.min(1.0D, x2 - x1);
                 double yDelta = Math.min(1.0D, y2 - y1);
                 double zDelta = Math.min(1.0D, z2 - z1);
@@ -283,11 +283,11 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
                             double zPos = dz * zDelta + z1;
                             
                             final Minecraft mc = Minecraft.getInstance();
-                            mc.particles.addEffect(
+                            mc.particleEngine.add(
                                     new DiggingParticle((ClientWorld) world,
                                             pos.getX() + xPos,pos.getY() + yPos, pos.getZ() + zPos,
                                             dx - 0.5D, dy - 0.5D,dz - 0.5D, state)
-                                            .setBlockPos(pos)
+                                            .init(pos)
                             );
                         }
                     }
@@ -301,7 +301,7 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
     public boolean addLandingEffects(BlockState state1, ServerWorld ServerWorld, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
         Optional<BlockState> mirrorState = getMirrorState(state2, ServerWorld, pos);
         if(mirrorState.isPresent()) {
-            ServerWorld.spawnParticle(new BlockParticleData(ParticleTypes.BLOCK, mirrorState.get()), entity.getPosX(), entity.getPosY(), entity.getPosZ(), numberOfParticles, 0.0D, 0.0D, 0.0D, 0.15F);
+            ServerWorld.sendParticles(new BlockParticleData(ParticleTypes.BLOCK, mirrorState.get()), entity.getX(), entity.getY(), entity.getZ(), numberOfParticles, 0.0D, 0.0D, 0.0D, 0.15F);
         }
         return true;
     }
@@ -325,7 +325,7 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
         	state = world.getBlockState(pos);
         }
         
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         if (state.getBlock() instanceof MimicBlock && te instanceof MimicBlockTileEntity) {
         	
         	MimicBlockData data = ((MimicBlockTileEntity) te).getData();

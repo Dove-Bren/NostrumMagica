@@ -81,13 +81,13 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	
 	protected static final double LUX_HOME_DISTANCE_SQ = 144;
 	protected static final double LUX_HOME_FORGET_DISTANCE_SQ = 400;
-	protected static final DataParameter<Optional<BlockPos>> HOME  = EntityDataManager.<Optional<BlockPos>>createKey(LuxEntity.class, DataSerializers.OPTIONAL_BLOCK_POS);
+	protected static final DataParameter<Optional<BlockPos>> HOME  = EntityDataManager.<Optional<BlockPos>>defineId(LuxEntity.class, DataSerializers.OPTIONAL_BLOCK_POS);
 	//protected static final DataParameter<Optional<UUID>> OWNER = EntityDataManager.<Optional<UUID>>createKey(EntityLux.class, DataSerializers.OPTIONAL_UNIQUE_ID);
-	protected static final DataParameter<ItemStack> POLLINATED_ITEM = EntityDataManager.<ItemStack>createKey(LuxEntity.class, DataSerializers.ITEMSTACK);
-	protected static final DataParameter<Integer> COMMUNITY_SCORE = EntityDataManager.<Integer>createKey(LuxEntity.class, DataSerializers.VARINT);
+	protected static final DataParameter<ItemStack> POLLINATED_ITEM = EntityDataManager.<ItemStack>defineId(LuxEntity.class, DataSerializers.ITEM_STACK);
+	protected static final DataParameter<Integer> COMMUNITY_SCORE = EntityDataManager.<Integer>defineId(LuxEntity.class, DataSerializers.INT);
 	
 	// For display
-	protected static final DataParameter<Boolean> ROOSTING = EntityDataManager.<Boolean>createKey(LuxEntity.class, DataSerializers.BOOLEAN);
+	protected static final DataParameter<Boolean> ROOSTING = EntityDataManager.<Boolean>defineId(LuxEntity.class, DataSerializers.BOOLEAN);
 	
 	public static final String LoreKey = "nostrum__lux";
 	
@@ -97,25 +97,25 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	public LuxEntity(EntityType<? extends LuxEntity> type, World worldIn) {
 		super(type, worldIn);
 		this.setNoGravity(true);
-		this.noClip = true;
-		this.moveController = new LuxMoveHelper(this);
+		this.noPhysics = true;
+		this.moveControl = new LuxMoveHelper(this);
 		
 		idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
 	}
 	
 	public LuxEntity(EntityType<? extends LuxEntity> type, World worldIn, BlockPos homePos) {
 		this(type, worldIn);
-		this.setHomePosAndDistance(homePos, (int) LUX_HOME_DISTANCE_SQ);
+		this.restrictTo(homePos, (int) LUX_HOME_DISTANCE_SQ);
 		this.setHome(homePos);
 	}
 	
 	@Override
-	public boolean isWithinHomeDistanceFromPosition(BlockPos pos) {
+	public boolean isWithinRestriction(BlockPos pos) {
 		// MobEntity version assumes if distances is not -1 that home is not null
 		if (this.getHome() == null) {
 			return true;
 		} else {
-			return super.isWithinHomeDistanceFromPosition(pos);
+			return super.isWithinRestriction(pos);
 		}
 	}
 	
@@ -129,17 +129,17 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		this.goalSelector.addGoal(priority++, new FlierDiveGoal<LuxEntity>(this, 5.0, 20 * 3, 16, true));
 		this.goalSelector.addGoal(priority++, new OrbitEntityGenericGoal<LuxEntity>(this, null, 4, 20 * 10) {
 			@Override
-			public boolean shouldExecute() {
-				if (this.ent == null || this.ent.getAttackTarget() == null) {
+			public boolean canUse() {
+				if (this.ent == null || this.ent.getTarget() == null) {
 					return false;
 				}
 				
-				return super.shouldExecute();
+				return super.canUse();
 			}
 			
 			@Override
 			protected LivingEntity getOrbitTarget() {
-				return this.ent.getAttackTarget();
+				return this.ent.getTarget();
 			}
 		});
 //		this.goalSelector.addGoal(priority++, new EntityAIOrbitEntityGeneric<EntityLux>(this, null, 3, 20 * 10) {
@@ -165,17 +165,17 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		// If player nearby with a flower, be tempted!
 		this.goalSelector.addGoal(priority++, new GenericTemptGoal(this, 1.1D, false, Ingredient.EMPTY) {
 			@Override
-			protected boolean isTempting(ItemStack stack) {
+			protected boolean shouldFollowItem(ItemStack stack) {
 				return !stack.isEmpty()
 						&& (NostrumTags.Items.ReagentCrystabloom.contains(stack.getItem()) || NostrumTags.Items.ReagentBlackPearl.contains(stack.getItem()));
 			}
 			
 			@Override
 			public void moveToclosestPlayer(CreatureEntity tempted, PlayerEntity player) {
-				if (tempted.getDistanceSq(player) < 6.25D) {
+				if (tempted.distanceToSqr(player) < 6.25D) {
 					//this.temptedEntity.getMoveHelper(). no such thing as stop
 				} else {
-					tempted.getMoveHelper().setMoveTo(player.getPosX(), player.getPosY(), player.getPosZ(), 1D);
+					tempted.getMoveControl().setWantedPosition(player.getX(), player.getY(), player.getZ(), 1D);
 				}
 			}
 		});
@@ -188,13 +188,13 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		this.goalSelector.addGoal(priority++, new AIFlyToRandomFeature(this, 20 * 10) {
 
 			@Override
-			public boolean shouldExecute() {
+			public boolean canUse() {
 				// Don't even try if we're already full
 				if (!getPollinatedItem().isEmpty()) {
 					return false;
 				}
 				
-				return super.shouldExecute();
+				return super.canUse();
 			}
 			
 			@Override
@@ -204,7 +204,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 
 			@Override
 			protected void onArrive(LuxEntity lux, BlockPos pos) {
-				BlockState state = lux.world.getBlockState(pos);
+				BlockState state = lux.level.getBlockState(pos);
 				lux.onFlowerVisit(pos, state);
 			}
 			
@@ -214,22 +214,22 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		this.goalSelector.addGoal(priority++, new AIRandomFly(this));
 		
 		priority = 1;
-		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setCallsForHelp(LuxEntity.class));
+		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setAlertOthers(LuxEntity.class));
 	}
 	
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes(){
-		return AnimalEntity.func_233666_p_()
-			.createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.2D)
-			.createMutableAttribute(Attributes.MAX_HEALTH, 4.0D)
-			.createMutableAttribute(Attributes.ARMOR, 0.0D)
-			.createMutableAttribute(Attributes.FOLLOW_RANGE, 30.0)
-			.createMutableAttribute(NostrumAttributes.magicResist, 0.0D)
-			.createMutableAttribute(Attributes.ATTACK_DAMAGE, 1.0D);
+		return AnimalEntity.createMobAttributes()
+			.add(Attributes.MOVEMENT_SPEED, 0.2D)
+			.add(Attributes.MAX_HEALTH, 4.0D)
+			.add(Attributes.ARMOR, 0.0D)
+			.add(Attributes.FOLLOW_RANGE, 30.0)
+			.add(NostrumAttributes.magicResist, 0.0D)
+			.add(Attributes.ATTACK_DAMAGE, 1.0D);
 	}
 
 	protected void playStepSound(BlockPos pos, BlockState blockIn)
 	{
-		this.playSound(SoundEvents.BLOCK_GLASS_STEP, 0.15F, 1.0F);
+		this.playSound(SoundEvents.GLASS_STEP, 0.15F, 1.0F);
 	}
 
 	protected SoundEvent getHurtSound(DamageSource source)
@@ -252,26 +252,26 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 
 	protected float getStandingEyeHeight(Pose pose, EntitySize size)
 	{
-		return this.getHeight() * 0.5F;
+		return this.getBbHeight() * 0.5F;
 	}
 
-	public boolean attackEntityAsMob(Entity entityIn)
+	public boolean doHurtTarget(Entity entityIn)
 	{
-		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
+		boolean flag = entityIn.hurt(DamageSource.mobAttack(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
 
 		if (flag)
 		{
-			this.applyEnchantments(this, entityIn);
+			this.doEnchantDamageEffects(this, entityIn);
 		}
 
 		return flag;
 	}
 
-	public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
+	public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
 		return ActionResultType.PASS;
 	}
 
-	public boolean canBeLeashedTo(PlayerEntity player) {
+	public boolean canBeLeashed(PlayerEntity player) {
 		return false;
 	}
 	
@@ -279,31 +279,31 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	public void tick() {
 		super.tick();
 		
-		if (world.isRemote) {
+		if (level.isClientSide) {
 			ItemStack stack = this.getPollinatedItem();
 			if (stack.isEmpty()) {
 				// 'drip' particles every once in a while
-				if (rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean()
-						&& rand.nextBoolean() && rand.nextBoolean()) { // 1/64
+				if (random.nextBoolean() && random.nextBoolean() && random.nextBoolean() && random.nextBoolean()
+						&& random.nextBoolean() && random.nextBoolean()) { // 1/64
 					// darken if community  score is high
 					final float darken = (getCommunityScore() >= 50 ? .2f : 0f);
-					NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
+					NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
 							1,
-							getPosX(), getPosY() + getHeight()/2, getPosZ(),
+							getX(), getY() + getBbHeight()/2, getZ(),
 							0.05, 40, 10,
 							new Vector3d(0, -.1, 0),
 							null
 							).color(.3f, .7f - darken, 1f - darken, .9f - darken));
 				}
 			} else {
-				if (rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean() && rand.nextBoolean()) { // 1/16
+				if (random.nextBoolean() && random.nextBoolean() && random.nextBoolean() && random.nextBoolean()) { // 1/16
 					// darken if community  score is high
 					final float darken = (getCommunityScore() >= 50 ? .2f : 0f);
-					NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
+					NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
 							1,
-							getPosX(), getPosY() + getHeight()/2, getPosZ(),
+							getX(), getY() + getBbHeight()/2, getZ(),
 							1, 15, 0,
-							this.getEntityId()
+							this.getId()
 							).color(.4f, .2f - darken, 1f - darken, .4f - darken));
 				}
 			}
@@ -311,7 +311,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			// Check if we're far from home and forget it if so
 			if (this.getHome() != null) {
 				
-				if (this.getHome().distanceSq(this.getPosition()) > LUX_HOME_FORGET_DISTANCE_SQ) {
+				if (this.getHome().distSqr(this.blockPosition()) > LUX_HOME_FORGET_DISTANCE_SQ) {
 					this.setHome(null);
 				}
 			}
@@ -319,25 +319,25 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			if (idleCooldown > 0) {
 				idleCooldown--;
 				if (idleCooldown == 0) {
-					if (this.getAttackTarget() == null) {
+					if (this.getTarget() == null) {
 						NostrumMagicaSounds.LUX_IDLE.play(this);
 					}
 					
 					// If pollinated, drop item occasionally
 					ItemStack stack = this.getPollinatedItem();
-					if (!stack.isEmpty() && rand.nextInt(10) == 0) {
+					if (!stack.isEmpty() && random.nextInt(10) == 0) {
 						this.onPollinationComplete(stack);
 						this.setPollinatedItem(ItemStack.EMPTY);
 					}
 					
 					// Poll for nearby lux and update community score
 					final AxisAlignedBB bb = new AxisAlignedBB(
-							getPosX() - 32, getPosY() - 32, getPosZ() - 32, getPosX() + 32, getPosY() + 32, getPosZ() + 32
+							getX() - 32, getY() - 32, getZ() - 32, getX() + 32, getY() + 32, getZ() + 32
 							);
-					final int count = world.getEntitiesWithinAABB(LuxEntity.class, bb).size();
+					final int count = level.getEntitiesOfClass(LuxEntity.class, bb).size();
 					this.incrCommunityScore(count);
 					
-					idleCooldown = rand.nextInt(20 * 30) + (20 * 10); 
+					idleCooldown = random.nextInt(20 * 30) + (20 * 10); 
 				}
 			}
 		}
@@ -389,30 +389,30 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
+	protected void defineSynchedData() {
+		super.defineSynchedData();
 		
-		this.dataManager.register(HOME, Optional.empty());
+		this.entityData.define(HOME, Optional.empty());
 		//this.dataManager.register(OWNER, Optional.empty());
-		this.dataManager.register(POLLINATED_ITEM, ItemStack.EMPTY);
-		this.dataManager.register(COMMUNITY_SCORE, 0);
-		this.dataManager.register(ROOSTING, false);
+		this.entityData.define(POLLINATED_ITEM, ItemStack.EMPTY);
+		this.entityData.define(COMMUNITY_SCORE, 0);
+		this.entityData.define(ROOSTING, false);
 	}
 	
 	protected void setHome(BlockPos home) {
-		this.dataManager.set(HOME, Optional.ofNullable(home));
-		this.setHomePosAndDistance(home, (int) LUX_HOME_DISTANCE_SQ);
+		this.entityData.set(HOME, Optional.ofNullable(home));
+		this.restrictTo(home, (int) LUX_HOME_DISTANCE_SQ);
 	}
 	
 	public BlockPos getHome() {
-		return this.dataManager.get(HOME).orElse(null);
+		return this.entityData.get(HOME).orElse(null);
 	}
 	
 	@Override
-	public void readAdditional(CompoundNBT compound) {
-		super.readAdditional(compound);
+	public void readAdditionalSaveData(CompoundNBT compound) {
+		super.readAdditionalSaveData(compound);
 		if (compound.contains("home", NBT.TAG_LONG)) {
-			setHome(BlockPos.fromLong(compound.getLong("home"))); // Warning: can break if save used across game versions
+			setHome(BlockPos.of(compound.getLong("home"))); // Warning: can break if save used across game versions
 		} else {
 			setHome(null);
 		}
@@ -424,7 +424,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 //		}
 		
 		if (compound.contains("pollinated_item", NBT.TAG_COMPOUND)) {
-			setPollinatedItem(ItemStack.read(compound.getCompound("pollinated_item")));
+			setPollinatedItem(ItemStack.of(compound.getCompound("pollinated_item")));
 		} else {
 			setPollinatedItem(ItemStack.EMPTY);
 		}
@@ -435,12 +435,12 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	}
 	
 	@Override
-	public void writeAdditional(CompoundNBT compound) {
-		super.writeAdditional(compound);
+	public void addAdditionalSaveData(CompoundNBT compound) {
+		super.addAdditionalSaveData(compound);
 		
 		BlockPos homePos = this.getHome();
 		if (homePos != null) {
-			compound.putLong("home", homePos.toLong());
+			compound.putLong("home", homePos.asLong());
 		}
 //		if (getOwnerId() != null) {
 //			compound.putUniqueId("owner", getOwnerId());
@@ -452,12 +452,12 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	}
 	
 	@Override
-	public boolean onLivingFall(float distance, float damageMulti) {
+	public boolean causeFallDamage(float distance, float damageMulti) {
 		return false; // No fall damage
 	}
 	
 	@Override
-	protected void updateFallState(double y, boolean onGround, BlockState stae, BlockPos pos) {
+	protected void checkFallDamage(double y, boolean onGround, BlockState stae, BlockPos pos) {
 		
 	}
 	
@@ -479,18 +479,18 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 //	}
 	
 	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount) {
+	public boolean hurt(DamageSource source, float amount) {
 		this.playEffect(ParticleTypes.CRIT);
-		return super.attackEntityFrom(source, amount);
+		return super.hurt(source, amount);
 	}
 	
 	private void playEffect(IParticleData particle) {
 		
 		for (int i = 0; i < 15; ++i) {
-			double d0 = this.rand.nextGaussian() * 0.02D;
-			double d1 = this.rand.nextGaussian() * 0.02D;
-			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.addParticle(particle, this.getPosX() + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.getPosY() + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.getPosZ() + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
+			double d0 = this.random.nextGaussian() * 0.02D;
+			double d1 = this.random.nextGaussian() * 0.02D;
+			double d2 = this.random.nextGaussian() * 0.02D;
+			this.level.addParticle(particle, this.getX() + (double)(this.random.nextFloat() * this.getBbWidth() * 2.0F) - (double)this.getBbWidth(), this.getY() + 0.5D + (double)(this.random.nextFloat() * this.getBbHeight()), this.getZ() + (double)(this.random.nextFloat() * this.getBbWidth() * 2.0F) - (double)this.getBbWidth(), d0, d1, d2);
 		}
 	}
 	
@@ -506,31 +506,31 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 
 		@Override
 		public void tick() {
-			if (this.action == MovementController.Action.MOVE_TO) {
-				double d0 = this.getX() - this.parentEntity.getPosX();
-				double d1 = this.getY() - this.parentEntity.getPosY();
-				double d2 = this.getZ() - this.parentEntity.getPosZ();
+			if (this.operation == MovementController.Action.MOVE_TO) {
+				double d0 = this.getWantedX() - this.parentEntity.getX();
+				double d1 = this.getWantedY() - this.parentEntity.getY();
+				double d2 = this.getWantedZ() - this.parentEntity.getZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 
 				d3 = (double)MathHelper.sqrt(d3);
 				
 				if (Math.abs(d3) < .1) {
-					this.parentEntity.setMotion(Vector3d.ZERO);
-					this.action = MovementController.Action.WAIT;
+					this.parentEntity.setDeltaMovement(Vector3d.ZERO);
+					this.operation = MovementController.Action.WAIT;
 					return;
 				} else if (courseChangeCooldown-- <= 0) {
 					float basespeed = (float) this.parentEntity.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
-					final double moveSpeed = (basespeed * this.speed * .3f);
-					courseChangeCooldown = this.parentEntity.getRNG().nextInt(5) + 10;
+					final double moveSpeed = (basespeed * this.speedModifier * .3f);
+					courseChangeCooldown = this.parentEntity.getRandom().nextInt(5) + 10;
 					//speed *= 3f;
-					this.parentEntity.setMotion(
+					this.parentEntity.setDeltaMovement(
 							(d0 / d3) * moveSpeed,
 							(d1 / d3) * moveSpeed,
 							(d2 / d3) * moveSpeed
 							);
 					
 					float f9 = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
-					this.mob.rotationYaw = this.limitAngle(this.mob.rotationYaw, f9, 90.0F);
+					this.mob.yRot = this.rotlerp(this.mob.yRot, f9, 90.0F);
 				}
 			}
 		}
@@ -541,20 +541,20 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		public void travel(Vector3d how) {
 			if (this.isInWater()) {
 				this.moveRelative(0.02F, how);
-				this.move(MoverType.SELF, this.getMotion());
-				this.setMotion(this.getMotion().scale(0.8));
+				this.move(MoverType.SELF, this.getDeltaMovement());
+				this.setDeltaMovement(this.getDeltaMovement().scale(0.8));
 			} else if (this.isInLava()) {
 				this.moveRelative(0.02F, how);
-				this.move(MoverType.SELF, this.getMotion());
-				this.setMotion(this.getMotion().scale(0.5));
+				this.move(MoverType.SELF, this.getDeltaMovement());
+				this.setDeltaMovement(this.getDeltaMovement().scale(0.5));
 			} else {
 				float f = 0.91F;
 
 				if (this.onGround) {
 					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
-					BlockPos underPos = new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()));
-					BlockState underState = this.world.getBlockState(underPos);
-					f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
+					BlockPos underPos = new BlockPos(MathHelper.floor(this.getX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getZ()));
+					BlockState underState = this.level.getBlockState(underPos);
+					f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
 				}
 
 				float f1 = 0.16277136F / (f * f * f);
@@ -563,39 +563,39 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 
 				if (this.onGround) {
 					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
-					BlockPos underPos = new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()));
-					BlockState underState = this.world.getBlockState(underPos);
-					f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
+					BlockPos underPos = new BlockPos(MathHelper.floor(this.getX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getZ()));
+					BlockState underState = this.level.getBlockState(underPos);
+					f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
 				}
 
-				this.move(MoverType.SELF, this.getMotion());
-				this.setMotion(this.getMotion().scale(f));
+				this.move(MoverType.SELF, this.getDeltaMovement());
+				this.setDeltaMovement(this.getDeltaMovement().scale(f));
 			}
 
-			this.prevLimbSwingAmount = this.limbSwingAmount;
-			double d1 = this.getPosX() - this.prevPosX;
-			double d0 = this.getPosZ() - this.prevPosZ;
+			this.animationSpeedOld = this.animationSpeed;
+			double d1 = this.getX() - this.xo;
+			double d0 = this.getZ() - this.zo;
 			float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 			if (f2 > 1.0F) {
 				f2 = 1.0F;
 			}
 
-			this.limbSwingAmount += (f2 - this.limbSwingAmount) * 0.4F;
-			this.limbSwing += this.limbSwingAmount;
+			this.animationSpeed += (f2 - this.animationSpeed) * 0.4F;
+			this.animationPosition += this.animationSpeed;
 		}
 
 	/**
 	 * returns true if this entity is by a ladder, false otherwise
 	 */
 	@Override
-	public boolean isOnLadder() {
+	public boolean onClimbable() {
 		return false;
 	}
 	
 	@Override
-	public boolean canSpawn(IWorld world, SpawnReason spawnReason) {
-		return super.canSpawn(world, spawnReason);
+	public boolean checkSpawnRules(IWorld world, SpawnReason spawnReason) {
+		return super.checkSpawnRules(world, spawnReason);
 	}
 	
 	static class AIRandomFly extends Goal {
@@ -604,26 +604,26 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 
 		public AIRandomFly(LuxEntity wisp) {
 			this.parentEntity = wisp;
-			this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
+			this.setFlags(EnumSet.of(Goal.Flag.MOVE));
 		}
 
 		/**
 		 * Returns whether the Goal should begin execution.
 		 */
-		public boolean shouldExecute() {
-			MovementController MovementController = this.parentEntity.getMoveHelper();
+		public boolean canUse() {
+			MovementController MovementController = this.parentEntity.getMoveControl();
 
 			if (cooldownTicks > 0) {
-				if (!MovementController.isUpdating()) {
+				if (!MovementController.hasWanted()) {
 					cooldownTicks--;
 				}
 				return false;
-			} else if (!MovementController.isUpdating()) {
+			} else if (!MovementController.hasWanted()) {
 				return true;
 			} else {
-				double d0 = MovementController.getX() - this.parentEntity.getPosX();
-				double d1 = MovementController.getY() - this.parentEntity.getPosY();
-				double d2 = MovementController.getZ() - this.parentEntity.getPosZ();
+				double d0 = MovementController.getWantedX() - this.parentEntity.getX();
+				double d1 = MovementController.getWantedY() - this.parentEntity.getY();
+				double d2 = MovementController.getWantedZ() - this.parentEntity.getZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				return d3 < 1.0D || d3 > 3600.0D;
 			}
@@ -633,40 +633,40 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		 * Returns whether an in-progress Goal should continue executing
 		 */
 		@Override
-		public boolean shouldContinueExecuting() {
+		public boolean canContinueToUse() {
 			return false;
 		}
 
 		/**
 		 * Execute a one shot task or start executing a continuous task
 		 */
-		public void startExecuting() {
-			Random random = this.parentEntity.getRNG();
+		public void start() {
+			Random random = this.parentEntity.getRandom();
 			int attempts = 10;
 			while (attempts-- > 0) { 
 				final double radius = 8.0F;
-				final double d1 = this.parentEntity.getPosY() + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
+				final double d1 = this.parentEntity.getY() + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
 				
 				// check acceptable y first
-				if (d1 <= 0 || d1 > parentEntity.world.getHeight()) {
+				if (d1 <= 0 || d1 > parentEntity.level.getMaxBuildHeight()) {
 					continue;
 				}
 				
-				final double d0 = this.parentEntity.getPosX() + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
-				final double d2 = this.parentEntity.getPosZ() + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
+				final double d0 = this.parentEntity.getX() + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
+				final double d2 = this.parentEntity.getZ() + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
 				
 				// Check specific spot
 				BlockPos.Mutable cursor = new BlockPos.Mutable();
-				cursor.setPos(d0, d1, d2);
+				cursor.set(d0, d1, d2);
 				
-				if (!parentEntity.world.isAirBlock(cursor)) {
+				if (!parentEntity.level.isEmptyBlock(cursor)) {
 					continue;
 				}
 				
 				// Check how high above ground that is, and retry if too far up
 				int yDiff = 1;
 				cursor.move(Direction.DOWN);
-				while (cursor.getY() > 0 && parentEntity.world.isAirBlock(cursor)) {
+				while (cursor.getY() > 0 && parentEntity.level.isEmptyBlock(cursor)) {
 					cursor.move(Direction.DOWN);
 					yDiff++;
 				}
@@ -675,8 +675,8 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 					continue;
 				}
 				
-				this.parentEntity.getMoveHelper().setMoveTo(d0, d1, d2, 1D);
-				cooldownTicks = this.parentEntity.getRNG().nextInt(20 * 5) + 40;
+				this.parentEntity.getMoveControl().setWantedPosition(d0, d1, d2, 1D);
+				cooldownTicks = this.parentEntity.getRandom().nextInt(20 * 5) + 40;
 				break;
 			}
 		}
@@ -692,12 +692,12 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		private long lastWakeTicks = -1;
 		
 		public static final Predicate<LuxEntity> ROOST_AT_NIGHT = (ent) -> {
-			return ent.world != null && !ent.world.isDaytime();
+			return ent.level != null && !ent.level.isDay();
 		};
 
 		public AIRoostTask(LuxEntity lux) {
 			this.parentEntity = lux;
-			this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
+			this.setFlags(EnumSet.of(Goal.Flag.MOVE));
 		}
 		
 		public AIRoostTask(LuxEntity lux, boolean atNight) {
@@ -711,7 +711,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		}
 		
 		protected boolean shouldRoost() {
-			if (parentEntity.getAttackTarget() != null) {
+			if (parentEntity.getTarget() != null) {
 				return false;
 			}
 
@@ -722,8 +722,8 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 					return predicate.test(parentEntity);
 				} else {
 					// random wake jitter from already-running task
-					if (parentEntity.world.getGameTime() - lastWakeTicks > 20 * 3) {
-						if (parentEntity.rand.nextInt(4) == 0) {
+					if (parentEntity.level.getGameTime() - lastWakeTicks > 20 * 3) {
+						if (parentEntity.random.nextInt(4) == 0) {
 							return predicate.test(parentEntity);
 						} else {
 							return true; // random snooze
@@ -744,8 +744,8 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		/**
 		 * Returns whether the Goal should begin execution.
 		 */
-		public boolean shouldExecute() {
-			if (lastAttemptTicks < 0 || parentEntity.world.getGameTime() - lastAttemptTicks > 5 * 20) {
+		public boolean canUse() {
+			if (lastAttemptTicks < 0 || parentEntity.level.getGameTime() - lastAttemptTicks > 5 * 20) {
 				//MovementController MovementController = this.parentEntity.getMoveHelper();
 				return shouldRoost();
 			}
@@ -756,27 +756,27 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		 * Returns whether an in-progress Goal should continue executing
 		 */
 		@Override
-		public boolean shouldContinueExecuting() {
+		public boolean canContinueToUse() {
 			if (shouldRoost() && roostPos != null) {
 				// If roost position is destroyed, bail out
-				if (parentEntity.world.isAirBlock(roostPos) // fast simple check
-						|| !parentEntity.isGoodLeavesBlock(parentEntity.world.getBlockState(roostPos), roostPos)) {
+				if (parentEntity.level.isEmptyBlock(roostPos) // fast simple check
+						|| !parentEntity.isGoodLeavesBlock(parentEntity.level.getBlockState(roostPos), roostPos)) {
 					return false;
 				}
 				
 				// If already roosting, snap to right position and hold there with no jitter
-				final double dist = parentEntity.getPositionVec().squareDistanceTo(roostPos.getX() + .5, roostPos.getY() - (parentEntity.getHeight()), roostPos.getZ() + .5);
+				final double dist = parentEntity.position().distanceToSqr(roostPos.getX() + .5, roostPos.getY() - (parentEntity.getBbHeight()), roostPos.getZ() + .5);
 				if (dist < .015) {
 					if (dist > 0.0) {
-						parentEntity.setPosition(roostPos.getX() + .5, roostPos.getY() - (parentEntity.getHeight()), roostPos.getZ() + .5);
+						parentEntity.setPos(roostPos.getX() + .5, roostPos.getY() - (parentEntity.getBbHeight()), roostPos.getZ() + .5);
 					}
 					
-					parentEntity.setMotion(Vector3d.ZERO);
+					parentEntity.setDeltaMovement(Vector3d.ZERO);
 					parentEntity.startRoosting();
-				} else if (!parentEntity.getMoveHelper().isUpdating()) {
-					this.parentEntity.getMoveHelper().setMoveTo(
+				} else if (!parentEntity.getMoveControl().hasWanted()) {
+					this.parentEntity.getMoveControl().setWantedPosition(
 							roostPos.getX() + .5,
-							roostPos.getY() - (parentEntity.getHeight()),
+							roostPos.getY() - (parentEntity.getBbHeight()),
 							roostPos.getZ() + .5,
 							1D);
 				}
@@ -793,23 +793,23 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		/**
 		 * Execute a one shot task or start executing a continuous task
 		 */
-		public void startExecuting() {
-			lastAttemptTicks = lastWakeTicks = parentEntity.world.getGameTime();
+		public void start() {
+			lastAttemptTicks = lastWakeTicks = parentEntity.level.getGameTime();
 			
 			// Try to find roost location
 			roostPos = this.getRoostLocation(parentEntity);
 			if (roostPos != null) {
-				this.parentEntity.getMoveHelper().setMoveTo(
+				this.parentEntity.getMoveControl().setWantedPosition(
 						roostPos.getX() + .5,
-						roostPos.getY() - (parentEntity.getHeight()),
+						roostPos.getY() - (parentEntity.getBbHeight()),
 						roostPos.getZ() + .5,
 						1D);
 			}
 		}
 		
 		@Override
-		public void resetTask() {
-			super.resetTask();
+		public void stop() {
+			super.stop();
 			roostPos = null;
 //			lastAttemptTicks = -1; Only reset on success
 			lastWakeTicks = -1;
@@ -829,7 +829,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		public AIFlyToRandomFeature(LuxEntity lux, long successDelay) {
 			this.parentEntity = lux;
 			this.delay = successDelay;
-			this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
+			this.setFlags(EnumSet.of(Goal.Flag.MOVE));
 			lastAttemptTicks = -1;
 		}
 		
@@ -851,21 +851,21 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		/**
 		 * Returns whether the Goal should begin execution.
 		 */
-		public boolean shouldExecute() {
+		public boolean canUse() {
 			
-			if (parentEntity.world.getGameTime() - lastAttemptTicks < 20 * 5) {
+			if (parentEntity.level.getGameTime() - lastAttemptTicks < 20 * 5) {
 				// too soon
 				return false;
 			}
 			
-			MovementController MovementController = this.parentEntity.getMoveHelper();
+			MovementController MovementController = this.parentEntity.getMoveControl();
 
-			if (!MovementController.isUpdating()) {
+			if (!MovementController.hasWanted()) {
 				return true;
 			} else {
-				double d0 = MovementController.getX() - this.parentEntity.getPosX();
-				double d1 = MovementController.getY() - this.parentEntity.getPosY();
-				double d2 = MovementController.getZ() - this.parentEntity.getPosZ();
+				double d0 = MovementController.getWantedX() - this.parentEntity.getX();
+				double d1 = MovementController.getWantedY() - this.parentEntity.getY();
+				double d2 = MovementController.getWantedZ() - this.parentEntity.getZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				return d3 < 1.0D || d3 > 3600.0D;
 			}
@@ -875,28 +875,28 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		 * Returns whether an in-progress Goal should continue executing
 		 */
 		@Override
-		public boolean shouldContinueExecuting() {
+		public boolean canContinueToUse() {
 			return running;
 		}
 
 		/**
 		 * Execute a one shot task or start executing a continuous task
 		 */
-		public void startExecuting() {
+		public void start() {
 			running = true;
-			lastAttemptTicks = parentEntity.world.getGameTime();
+			lastAttemptTicks = parentEntity.level.getGameTime();
 			
 			targetPos = this.getNearbyFeature(parentEntity);
 			if (targetPos != null) {
-				parentEntity.moveController.setMoveTo(targetPos.getX() + .5, targetPos.getY() + .5, targetPos.getZ() + .5, 1);
+				parentEntity.moveControl.setWantedPosition(targetPos.getX() + .5, targetPos.getY() + .5, targetPos.getZ() + .5, 1);
 			} else {
 				running = false;
 			}
 		}
 		
 		@Override
-		public void resetTask() {
-			super.resetTask();
+		public void stop() {
+			super.stop();
 			running = false;
 			targetPos = null;
 		}
@@ -904,17 +904,17 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		@Override
 		public void tick() {
 			if (running && targetPos != null) {
-				if (!parentEntity.moveController.isUpdating()) {
-					parentEntity.moveController.setMoveTo(targetPos.getX() + .5, targetPos.getY() + .5, targetPos.getZ() + .5, 1);
+				if (!parentEntity.moveControl.hasWanted()) {
+					parentEntity.moveControl.setWantedPosition(targetPos.getX() + .5, targetPos.getY() + .5, targetPos.getZ() + .5, 1);
 				}
 				
-				if (parentEntity.getPositionVec().squareDistanceTo(
+				if (parentEntity.position().distanceToSqr(
 						targetPos.getX() + .5,
 						targetPos.getY() + .5,
 						targetPos.getZ() + .5) < .05) {
 					this.onArrive(parentEntity, targetPos);
 					// use 'lastAttemptTicks' to effectively make sure we dont' try again for 'delay' ticks
-					lastAttemptTicks = parentEntity.world.getGameTime() + this.delay;
+					lastAttemptTicks = parentEntity.level.getGameTime() + this.delay;
 					running = false;
 				}
 			}
@@ -960,19 +960,19 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 //	}
 	
 	public @Nonnull ItemStack getPollinatedItem() {
-		return dataManager.get(POLLINATED_ITEM);
+		return entityData.get(POLLINATED_ITEM);
 	}
 	
 	public void setPollinatedItem(@Nonnull ItemStack stack) {
-		dataManager.set(POLLINATED_ITEM, stack);
+		entityData.set(POLLINATED_ITEM, stack);
 	}
 	
 	public int getCommunityScore() {
-		return dataManager.get(COMMUNITY_SCORE);
+		return entityData.get(COMMUNITY_SCORE);
 	}
 	
 	public void setCommunityScore(int score) {
-		this.dataManager.set(COMMUNITY_SCORE, score);
+		this.entityData.set(COMMUNITY_SCORE, score);
 	}
 	
 	public void incrCommunityScore(int count) {
@@ -982,11 +982,11 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	}
 	
 	public boolean isRoosting() {
-		return dataManager.get(ROOSTING);
+		return entityData.get(ROOSTING);
 	}
 	
 	protected void setRoosting(boolean roosting) {
-		dataManager.set(ROOSTING, roosting);
+		entityData.set(ROOSTING, roosting);
 	}
 	
 	/**
@@ -994,13 +994,13 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	 * @return
 	 */
 	@Override
-	public float getSwingProgress(float partialTicks) {
+	public float getAttackAnim(float partialTicks) {
 		if (this.swingStartTicks == 0) {
-			swingStartTicks = world.getGameTime();
+			swingStartTicks = level.getGameTime();
 		}
 		
 		final long SWING_TICKS = 20 * 2;
-		final long now = world.getGameTime();
+		final long now = level.getGameTime();
 		final long diff = (now - swingStartTicks) % SWING_TICKS;
 		final double curTicks = diff + partialTicks;
 		return (float) (curTicks / (double) SWING_TICKS);
@@ -1012,7 +1012,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	
 	protected boolean isGoodLeavesBlock(BlockState state, BlockPos pos) {
 		return isLeavesBlock(state)
-				&& world.isAirBlock(pos.down());
+				&& level.isEmptyBlock(pos.below());
 	}
 	
 	/**
@@ -1022,34 +1022,34 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	 * @return
 	 */
 	protected @Nullable BlockPos findNearbyLeaves() {
-		if (world == null) {
+		if (level == null) {
 			return null;
 		}
 		
 		// Check home space
 		BlockPos homePos = this.getHome();
-		if (homePos != null && this.isGoodLeavesBlock(world.getBlockState(homePos), homePos)) {
+		if (homePos != null && this.isGoodLeavesBlock(level.getBlockState(homePos), homePos)) {
 			return homePos;
 		}
 		
 		// Do longer search nearby
 		List<BlockPos> leaves = new ArrayList<>();
-		BlockPos center = (homePos == null ? getPosition() : homePos);
+		BlockPos center = (homePos == null ? blockPosition() : homePos);
 		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		final int radius = 10;
 		for (int x = -radius; x <= radius; x++)
 		for (int z = -radius; z <= radius; z++)
 		for (int y = -radius; y <= radius; y++) {
-			cursor.setPos(center.getX() + x, center.getY() + y, center.getZ() + z);
+			cursor.set(center.getX() + x, center.getY() + y, center.getZ() + z);
 			
 			// Make sure y if suitable
-			if (cursor.getY() <= 0 || cursor.getY() > world.getHeight()) {
+			if (cursor.getY() <= 0 || cursor.getY() > level.getMaxBuildHeight()) {
 				continue;
 			}
 			
-			BlockState state = world.getBlockState(cursor);
+			BlockState state = level.getBlockState(cursor);
 			if (isGoodLeavesBlock(state, cursor)) {
-				leaves.add(cursor.toImmutable());
+				leaves.add(cursor.immutable());
 			}
 		}
 		
@@ -1057,7 +1057,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			return null;
 		}
 		
-		return leaves.get(rand.nextInt(leaves.size()));
+		return leaves.get(random.nextInt(leaves.size()));
 	}
 	
 	protected boolean isFlowersBlock(BlockState state) {
@@ -1074,28 +1074,28 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	 * @return
 	 */
 	protected @Nullable BlockPos findNearbyFlowers() {
-		if (world == null) {
+		if (level == null) {
 			return null;
 		}
 		
 		List<BlockPos> flowers = new ArrayList<>();
 		final BlockPos homePos = this.getHome();
-		final BlockPos center = (homePos == null ? getPosition() : homePos);
+		final BlockPos center = (homePos == null ? blockPosition() : homePos);
 		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		final int radius = 10;
 		for (int x = -radius; x <= radius; x++)
 		for (int z = -radius; z <= radius; z++)
 		for (int y = -radius; y <= radius; y++) {
-			cursor.setPos(center.getX() + x, center.getY() + y, center.getZ() + z);
+			cursor.set(center.getX() + x, center.getY() + y, center.getZ() + z);
 			
 			// Make sure y if suitable
-			if (cursor.getY() <= 0 || cursor.getY() > world.getHeight()) {
+			if (cursor.getY() <= 0 || cursor.getY() > level.getMaxBuildHeight()) {
 				continue;
 			}
 			
-			BlockState state = world.getBlockState(cursor);
+			BlockState state = level.getBlockState(cursor);
 			if (isFlowersBlock(state)) {
-				flowers.add(cursor.toImmutable());
+				flowers.add(cursor.immutable());
 			}
 		}
 		
@@ -1103,12 +1103,12 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			return null;
 		}
 		
-		return flowers.get(rand.nextInt(flowers.size()));
+		return flowers.get(random.nextInt(flowers.size()));
 	}
 	
 	protected void onFlowerVisit(BlockPos pos, BlockState state) {
 		// Check what kind of flower, and possible become 'pollinated' (possibly)
-		if (rand.nextBoolean() && rand.nextBoolean()) {
+		if (random.nextBoolean() && random.nextBoolean()) {
 			if (state != null && state.getBlock() instanceof MagicaFlowerBlock) {
 				Item item = ((MagicaFlowerBlock) state.getBlock()).getReagentItem();
 				if (item != null) {
@@ -1117,10 +1117,10 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 				}
 			}
 			
-			((ServerWorld) world).spawnParticle(ParticleTypes.HAPPY_VILLAGER,
-					getPosX(),
-					getPosY() + getHeight() / 2,
-					getPosZ(),
+			((ServerWorld) level).sendParticles(ParticleTypes.HAPPY_VILLAGER,
+					getX(),
+					getY() + getBbHeight() / 2,
+					getZ(),
 					5,
 					.25,
 					.25,
@@ -1138,9 +1138,9 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		if (stack.getItem() instanceof ReagentItem) {
 			switch (ReagentItem.FindType(stack)) {
 			case BLACK_PEARL:
-				return NostrumBlocks.midnightIris.getDefaultState();
+				return NostrumBlocks.midnightIris.defaultBlockState();
 			case CRYSTABLOOM:
-				return NostrumBlocks.crystabloom.getDefaultState();
+				return NostrumBlocks.crystabloom.defaultBlockState();
 			case GINSENG:
 			case GRAVE_DUST:
 			case MANDRAKE_ROOT:
@@ -1158,13 +1158,13 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	protected void onPollinationComplete(ItemStack stack) {
 		// If over bare grass, plant flower. Otherwise, drop
 		BlockPos.Mutable cursor = new BlockPos.Mutable();
-		cursor.setPos(this.getPosition());
+		cursor.set(this.blockPosition());
 		while (cursor.getY() > 0) {
-			BlockState state = world.getBlockState(cursor);
+			BlockState state = level.getBlockState(cursor);
 			if (
 				state == null
-				|| state.getBlock().isAir(state, world, cursor)
-				|| !state.isOpaqueCube(world, cursor)
+				|| state.getBlock().isAir(state, level, cursor)
+				|| !state.isSolidRender(level, cursor)
 				|| state.getMaterial() == Material.LEAVES
 				) {
 				cursor.move(Direction.DOWN);
@@ -1179,10 +1179,10 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		
 		if (flowerState != null
 				&& flowerState.getBlock() instanceof BushBlock
-				&& ((BushBlock) flowerState.getBlock()).isValidPosition(flowerState, world, cursor.toImmutable())) {
-			world.setBlockState(cursor.toImmutable(), flowerState);
+				&& ((BushBlock) flowerState.getBlock()).canSurvive(flowerState, level, cursor.immutable())) {
+			level.setBlockAndUpdate(cursor.immutable(), flowerState);
 			
-			((ServerWorld) world).spawnParticle(ParticleTypes.HAPPY_VILLAGER,
+			((ServerWorld) level).sendParticles(ParticleTypes.HAPPY_VILLAGER,
 					cursor.getX() + .5,
 					cursor.getY() + .5,
 					cursor.getZ() + .5,
@@ -1192,7 +1192,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 					.25,
 					0);
 		} else {
-			this.entityDropItem(stack, 0f);
+			this.spawnAtLocation(stack, 0f);
 		}
 			
 		attemptBreed();
@@ -1206,7 +1206,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		
 		// And set home if none have been set already and we don't have an owner
 		if (/*this.getOwnerId() == null &&*/ this.getHome() == null) {
-			this.setHome(this.getPosition());
+			this.setHome(this.blockPosition());
 		}
 	}
 	
@@ -1215,19 +1215,19 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	}
 	
 	protected void doBreed() {
-		world.addEntity(new LuxEntity(NostrumEntityTypes.lux, world));
+		level.addFreshEntity(new LuxEntity(NostrumEntityTypes.lux, level));
 	}
 	
 	protected void attemptBreed() {
 		final int score = getCommunityScore();
-		if (score < 50 && (score <= 0 || rand.nextInt(score) == 0)) {
+		if (score < 50 && (score <= 0 || random.nextInt(score) == 0)) {
 			this.setCommunityScore(50);
 			doBreed();
 		}
 	}
 
 	@Override
-	public AgeableEntity /*createChild*/ func_241840_a(ServerWorld world, AgeableEntity ageable) {
+	public AgeableEntity /*createChild*/ getBreedOffspring(ServerWorld world, AgeableEntity ageable) {
 		return null;
 	}
 

@@ -37,12 +37,12 @@ public class FloatArraySerializer implements IDataSerializer<Float[]> {
 	}
 
 	@Override
-	public DataParameter<Float[]> createKey(int id) {
+	public DataParameter<Float[]> createAccessor(int id) {
 		return new DataParameter<>(id, this);
 	}
 
 	@Override
-	public Float[] copyValue(Float[] value) {
+	public Float[] copy(Float[] value) {
 		return value.clone();
 	}
 	

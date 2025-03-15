@@ -47,11 +47,11 @@ public class TransmutationItemCategory implements IRecipeCategory<TransmutationR
 		background = guiHelper.drawableBuilder(TEXT_BACK, 0, 0, BACK_WIDTH, BACK_HEIGHT).addPadding(0, 0, 0, 0).build();
 		
 		if (blocks) {
-			title = I18n.format("nei.category.transmutation.block.name", (Object[]) null);
+			title = I18n.get("nei.category.transmutation.block.name", (Object[]) null);
 			icon = guiHelper.drawableBuilder(TEXT_BACK, ICON_HOFFSET + 16, ICON_VOFFSET, 16, 16).build();
 			UID = UID_BLOCKS;
 		} else {
-			title = I18n.format("nei.category.transmutation.item.name", (Object[]) null);
+			title = I18n.get("nei.category.transmutation.item.name", (Object[]) null);
 			icon = guiHelper.drawableBuilder(TEXT_BACK, ICON_HOFFSET, ICON_VOFFSET, 16, 16).build();
 			UID = UID_ITEMS;
 		}
@@ -84,7 +84,7 @@ public class TransmutationItemCategory implements IRecipeCategory<TransmutationR
 		final int jump = recipe.getLevel();
 		final Minecraft minecraft = Minecraft.getInstance();
 		final String label = "" + jump;
-		minecraft.fontRenderer.drawStringWithShadow(matrixStackIn, label, (BACK_WIDTH/2) - 4, BACK_HEIGHT/2 - 4, 0xFFFFFFFF);
+		minecraft.font.drawShadow(matrixStackIn, label, (BACK_WIDTH/2) - 4, BACK_HEIGHT/2 - 4, 0xFFFFFFFF);
 	}
 	
 	@Override
@@ -96,10 +96,10 @@ public class TransmutationItemCategory implements IRecipeCategory<TransmutationR
 		
 		output = recipe.getOutput();
 		Ingredient inputIng = recipe.getRevealedIngredient();
-		if (inputIng == null || inputIng == Ingredient.EMPTY || inputIng.hasNoMatchingItems()) {
+		if (inputIng == null || inputIng == Ingredient.EMPTY || inputIng.isEmpty()) {
 			input = null;
 		} else {
-			input = Lists.newArrayList(inputIng.getMatchingStacks());
+			input = Lists.newArrayList(inputIng.getItems());
 		}
 		
 		ingredients.setOutput(VanillaTypes.ITEM, output);

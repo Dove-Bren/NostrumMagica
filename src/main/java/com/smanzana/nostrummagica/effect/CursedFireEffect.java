@@ -17,11 +17,11 @@ public class CursedFireEffect extends Effect {
 	public CursedFireEffect() {
 		super(EffectType.HARMFUL, 0xFFB028B9);
 		
-		this.addAttributesModifier(Attributes.ATTACK_SPEED,
+		this.addAttributeModifier(Attributes.ATTACK_SPEED,
 				"30886707-7d8b-424d-b1f5-ccf8b4dd8173", -.2D, AttributeModifier.Operation.MULTIPLY_TOTAL);
 	}
 	
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		if (duration <= 0)
 			return false;
 		
@@ -30,7 +30,7 @@ public class CursedFireEffect extends Effect {
 	}
 
 	@Override
-	public void performEffect(LivingEntity entity, int amp) {
+	public void applyEffectTick(LivingEntity entity, int amp) {
 		float damage = 2.0f;
 		SpellDamage.DamageEntity(entity, EMagicElement.FIRE, damage, null);
         NostrumMagicaSounds.DAMAGE_FIRE.play(entity);

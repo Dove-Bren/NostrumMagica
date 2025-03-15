@@ -160,7 +160,7 @@ public class NostrumMagica {
 		NostrumMagica.creativeTab = new ItemGroup(MODID) {
 			@Override
 			@OnlyIn(Dist.CLIENT)
-			public ItemStack createIcon() {
+			public ItemStack makeIcon() {
 				return new ItemStack(NostrumItems.spellTomeNovice);
 			}
 		};
@@ -168,7 +168,7 @@ public class NostrumMagica {
 		NostrumMagica.equipmentTab = new ItemGroup(MODID + "_equipment") {
 			@Override
 			@OnlyIn(Dist.CLIENT)
-			public ItemStack createIcon() {
+			public ItemStack makeIcon() {
 				return new ItemStack(NostrumItems.mageStaff);
 			}
 		};
@@ -176,7 +176,7 @@ public class NostrumMagica {
 		NostrumMagica.enhancementTab = new ItemGroup(MODID + "_enhancements") {
 			@Override
 			@OnlyIn(Dist.CLIENT)
-			public ItemStack createIcon() {
+			public ItemStack makeIcon() {
 				return new ItemStack(NostrumItems.spellTomePage);
 			}
 		};
@@ -184,7 +184,7 @@ public class NostrumMagica {
 		NostrumMagica.runeTab = new ItemGroup(MODID + "_runes") {
 			@Override
 			@OnlyIn(Dist.CLIENT)
-			public ItemStack createIcon() {
+			public ItemStack makeIcon() {
 				return SpellRune.getRune(NostrumSpellShapes.Touch);
 			}
 		};
@@ -192,7 +192,7 @@ public class NostrumMagica {
 		NostrumMagica.dungeonTab = new ItemGroup(MODID + "_dungeon") {
 			@Override
 			@OnlyIn(Dist.CLIENT)
-			public ItemStack createIcon() {
+			public ItemStack makeIcon() {
 				return new ItemStack(NostrumItems.worldKey);
 			}
 		};
@@ -258,13 +258,13 @@ public class NostrumMagica {
 	public static ItemStack findTome(PlayerEntity entity, int tomeID) {
 		// We look in mainhand first, then offhand, then just down
 		// hotbar.
-		for (ItemStack item : entity.inventory.mainInventory) {
+		for (ItemStack item : entity.inventory.items) {
 			if (!item.isEmpty() && item.getItem() instanceof SpellTome)
 				if (SpellTome.getTomeID(item) == tomeID)
 					return item;
 		}
 
-		for (ItemStack item : entity.inventory.offHandInventory) {
+		for (ItemStack item : entity.inventory.offhand) {
 			if (!item.isEmpty() && item.getItem() instanceof SpellTome)
 				if (SpellTome.getTomeID(item) == tomeID)
 					return item;
@@ -278,15 +278,15 @@ public class NostrumMagica {
 		// hotbar.
 		ItemStack tome = ItemStack.EMPTY;
 
-		if (!entity.getHeldItemMainhand().isEmpty() && entity.getHeldItemMainhand().getItem() instanceof SpellTome) {
-			tome = entity.getHeldItemMainhand();
-		} else if (!entity.getHeldItemOffhand().isEmpty()
-				&& entity.getHeldItemOffhand().getItem() instanceof SpellTome) {
-			tome = entity.getHeldItemOffhand();
+		if (!entity.getMainHandItem().isEmpty() && entity.getMainHandItem().getItem() instanceof SpellTome) {
+			tome = entity.getMainHandItem();
+		} else if (!entity.getOffhandItem().isEmpty()
+				&& entity.getOffhandItem().getItem() instanceof SpellTome) {
+			tome = entity.getOffhandItem();
 		} else {
 			// hotbar is items 0-8
 			int count = 0;
-			for (ItemStack stack : entity.inventory.mainInventory) {
+			for (ItemStack stack : entity.inventory.items) {
 				if (!stack.isEmpty() && stack.getItem() instanceof SpellTome) {
 					tome = stack;
 					break;
@@ -318,22 +318,22 @@ public class NostrumMagica {
 
 	public static int getReagentCount(PlayerEntity player, ReagentType type) {
 		int count = 0;
-		for (ItemStack item : player.inventory.mainInventory) {
+		for (ItemStack item : player.inventory.items) {
 			if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
 				count += ReagentBag.getReagentCount(item, type);
 			}
 		}
-		for (ItemStack item : player.inventory.offHandInventory) {
+		for (ItemStack item : player.inventory.offhand) {
 			if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
 				count += ReagentBag.getReagentCount(item, type);
 			}
 		}
-		for (ItemStack item : player.inventory.mainInventory) {
+		for (ItemStack item : player.inventory.items) {
 			if (!item.isEmpty() && item.getItem() instanceof ReagentItem && ReagentItem.FindType(item) == type) {
 				count += item.getCount();
 			}
 		}
-		for (ItemStack item : player.inventory.offHandInventory) {
+		for (ItemStack item : player.inventory.offhand) {
 			if (!item.isEmpty() && item.getItem() instanceof ReagentBag && ReagentItem.FindType(item) == type) {
 				count += item.getCount();
 			}
@@ -341,8 +341,8 @@ public class NostrumMagica {
 		
 		IInventory curios = NostrumMagica.instance.curios.getCurios(player);
 		if (curios != null) {
-			for (int i = 0; i < curios.getSizeInventory(); i++) {
-				ItemStack equip = curios.getStackInSlot(i);
+			for (int i = 0; i < curios.getContainerSize(); i++) {
+				ItemStack equip = curios.getItem(i);
 				if (equip.isEmpty()) {
 					continue;
 				}
@@ -362,8 +362,8 @@ public class NostrumMagica {
 		
 		IInventory curios = NostrumMagica.instance.curios.getCurios(player);
 		if (curios != null) {
-			for (int i = 0; i < curios.getSizeInventory(); i++) {
-				ItemStack equip = curios.getStackInSlot(i);
+			for (int i = 0; i < curios.getContainerSize(); i++) {
+				ItemStack equip = curios.getItem(i);
 				if (equip.isEmpty()) {
 					continue;
 				}
@@ -379,8 +379,8 @@ public class NostrumMagica {
 		}
 
 		if (count != 0)
-		for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
-			ItemStack item = player.inventory.getStackInSlot(i);
+		for (int i = 0; i < player.inventory.getContainerSize(); i++) {
+			ItemStack item = player.inventory.getItem(i);
 			if (item.isEmpty())
 				continue;
 
@@ -394,7 +394,7 @@ public class NostrumMagica {
 						break;
 					} else {
 						count -= item.getCount();
-						player.inventory.setInventorySlotContents(i, ItemStack.EMPTY);
+						player.inventory.setItem(i, ItemStack.EMPTY);
 					}
 				}
 			}
@@ -721,7 +721,7 @@ public class NostrumMagica {
 				return false;
 			}
 			
-			if (ent.getDistanceSq(entity) > blockRadiusSq) {
+			if (ent.distanceToSqr(entity) > blockRadiusSq) {
 				return false;
 			}
 			
@@ -774,37 +774,37 @@ public class NostrumMagica {
 	 * @return
 	 */
 	public static BlockPos getOrCreatePlayerDimensionSpawn(PlayerEntity player) {
-		NostrumDimensionMapper mapper = getDimensionMapper(player.world);
+		NostrumDimensionMapper mapper = getDimensionMapper(player.level);
 
 		// Either register or fetch existing mapping
-		return mapper.register(player.getUniqueID()).getCenterPos(NostrumSorceryDimension.SPAWN_Y);
+		return mapper.register(player.getUUID()).getCenterPos(NostrumSorceryDimension.SPAWN_Y);
 	}
 
 	public static NostrumDimensionMapper getDimensionMapper(World worldAccess) {
-		if (worldAccess.isRemote) {
+		if (worldAccess.isClientSide) {
 			throw new RuntimeException("Accessing dimension mapper before a world has been loaded!");
 		}
 
-		NostrumDimensionMapper mapper = (NostrumDimensionMapper) ((ServerWorld) worldAccess).getServer().getWorld(World.OVERWORLD)
-				.getSavedData()
-				.getOrCreate(NostrumDimensionMapper::new, NostrumDimensionMapper.DATA_NAME);
+		NostrumDimensionMapper mapper = (NostrumDimensionMapper) ((ServerWorld) worldAccess).getServer().getLevel(World.OVERWORLD)
+				.getDataStorage()
+				.computeIfAbsent(NostrumDimensionMapper::new, NostrumDimensionMapper.DATA_NAME);
 
 		serverDimensionMapper = mapper;
 		return mapper;
 	}
 
 	private void initSpellRegistry(World world) {
-		spellRegistry = (SpellRegistry) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(SpellRegistry::new,
+		spellRegistry = (SpellRegistry) ((ServerWorld) world).getServer().getLevel(World.OVERWORLD).getDataStorage().computeIfAbsent(SpellRegistry::new,
 				SpellRegistry.DATA_NAME);
 	}
 
 	private void initPetSoulRegistry(World world) {
-		petSoulRegistry = (PetSoulRegistry) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(PetSoulRegistry::new,
+		petSoulRegistry = (PetSoulRegistry) ((ServerWorld) world).getServer().getLevel(World.OVERWORLD).getDataStorage().computeIfAbsent(PetSoulRegistry::new,
 				PetSoulRegistry.DATA_NAME);
 	}
 
 	private void initPlayerStats(World world) {
-		playerStats = (PlayerStatTracker) ((ServerWorld) world).getServer().getWorld(World.OVERWORLD).getSavedData().getOrCreate(PlayerStatTracker::new,
+		playerStats = (PlayerStatTracker) ((ServerWorld) world).getServer().getLevel(World.OVERWORLD).getDataStorage().computeIfAbsent(PlayerStatTracker::new,
 				PlayerStatTracker.DATA_NAME);
 	}
 
@@ -815,7 +815,7 @@ public class NostrumMagica {
 		// But registry should be global anyways, so we're going to try and allow it.
 		// I'm not sure the 'right' way to use global save data like this.
 
-		if (event.getWorld().isRemote()) {
+		if (event.getWorld().isClientSide()) {
 			// Clients just get a spell registry that's empty that is constantly synced with
 			// the server's
 			// Create one if this is our first world.
@@ -857,7 +857,7 @@ public class NostrumMagica {
 
 	public static final boolean isBlockLoaded(World world, BlockPos pos) {
 		// TODO in the past, this didn't actually work. Does it now??
-		return world.getChunkProvider().isChunkLoaded(new ChunkPos(pos));
+		return world.getChunkSource().isEntityTickingChunk(new ChunkPos(pos));
 	}
 
 	public static boolean IsSameTeam(LivingEntity ent1, LivingEntity ent2) {
@@ -882,8 +882,8 @@ public class NostrumMagica {
 		
 		// EnderDragons are multipart but with no interface anymore
 		if (entityOrSubEntity instanceof EnderDragonPartEntity) {
-			if (((EnderDragonPartEntity) entityOrSubEntity).dragon instanceof LivingEntity) {
-				return (LivingEntity) ((EnderDragonPartEntity) entityOrSubEntity).dragon;
+			if (((EnderDragonPartEntity) entityOrSubEntity).parentMob instanceof LivingEntity) {
+				return (LivingEntity) ((EnderDragonPartEntity) entityOrSubEntity).parentMob;
 			}
 		}
 
@@ -951,18 +951,18 @@ public class NostrumMagica {
 		boolean success = false;
 
 		if (allowPortal && attr != null && attr.hasEnhancedTeleport()) {
-			BlockPos portal = TemporaryTeleportationPortalBlock.spawnNearby(player.getEntityWorld(), player.getPosition().up(), 4, true,
+			BlockPos portal = TemporaryTeleportationPortalBlock.spawnNearby(player.getCommandSenderWorld(), player.blockPosition().above(), 4, true,
 					target, 20 * 30);
 			if (portal != null) {
-				final World targetWorld = ServerLifecycleHooks.getCurrentServer().getWorld(target.getDimension());
-				final Location localPortalPos = new Location(player.getEntityWorld(), portal);
+				final World targetWorld = ServerLifecycleHooks.getCurrentServer().getLevel(target.getDimension());
+				final Location localPortalPos = new Location(player.getCommandSenderWorld(), portal);
 				TemporaryTeleportationPortalBlock.spawnNearby(targetWorld, target.getPos(), 4, true, localPortalPos, 20 * 30);
 				success = true;
 			}
 		} else {
 			NostrumTeleportEvent event = fireTeleportAttemptEvent(player, target.getPos().getX() + .5, target.getPos().getY() + .1, target.getPos().getZ() + .5, causingEntity);
 			if (!event.isCanceled()) {
-				event.getEntity().setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
+				event.getEntity().teleportTo(event.getTargetX(), event.getTargetY(), event.getTargetZ());
 				success = true;
 				if (causingEntity != null) {
 					fireTeleprotedOtherEvent(event.getEntity(), causingEntity, event.getPrev(), event.getTarget());
@@ -971,7 +971,7 @@ public class NostrumMagica {
 		}
 
 		if (success && spawnBristle) {
-			final World targetWorld = ServerLifecycleHooks.getCurrentServer().getWorld(target.getDimension());
+			final World targetWorld = ServerLifecycleHooks.getCurrentServer().getLevel(target.getDimension());
 			float dist = 2 + NostrumMagica.rand.nextFloat() * 2;
 			float dir = NostrumMagica.rand.nextFloat();
 			double dirD = dir * 2 * Math.PI;
@@ -979,7 +979,7 @@ public class NostrumMagica {
 			double dz = Math.sin(dirD) * dist;
 			ItemEntity drop = new ItemEntity(targetWorld, target.getPos().getX() + .5 + dx, target.getPos().getY() + 2, target.getPos().getZ() + .5 + dz,
 					new ItemStack(NostrumItems.resourceEnderBristle));
-			targetWorld.addEntity(drop);
+			targetWorld.addFreshEntity(drop);
 			NostrumMagicaSounds.CAST_FAIL.play(targetWorld, target.getPos().getX() + .5, target.getPos().getY() + 2, target.getPos().getZ() + .5);
 		}
 
@@ -987,7 +987,7 @@ public class NostrumMagica {
 	}
 	
 	public SpellCooldownTracker getSpellCooldownTracker(World world) {
-		if (world.isRemote()) {
+		if (world.isClientSide()) {
 			if (client_spellCooldownTracker == null) {
 				client_spellCooldownTracker = new SpellCooldownTracker();
 			}

@@ -45,7 +45,7 @@ public class ArcaneWolfAbilitySheet implements IPetGUISheet<ArcaneWolfEntity> {
 
 	@Override
 	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
-		mc.fontRenderer.drawString(matrixStackIn, TextFormatting.BOLD + "Abilities" + TextFormatting.RESET, 5, 5, 0xFFFFFFFF);
+		mc.font.draw(matrixStackIn, TextFormatting.BOLD + "Abilities" + TextFormatting.RESET, 5, 5, 0xFFFFFFFF);
 		
 		for (AbilityWidget widget : widgets) {
 			widget.render(matrixStackIn, mouseX, mouseY, partialTicks);
@@ -91,11 +91,11 @@ public class ArcaneWolfAbilitySheet implements IPetGUISheet<ArcaneWolfEntity> {
 		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			Minecraft mc = Minecraft.getInstance();
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(x, y, 0);
-			mc.fontRenderer.func_243246_a(matrixStackIn, ability.getName(), 0, 0, 0xFFFFFFFF);
+			mc.font.drawShadow(matrixStackIn, ability.getName(), 0, 0, 0xFFFFFFFF);
 			
-			mc.fontRenderer.drawString(matrixStackIn, "MP: " + ability.getCost(), 100, 0, 0xFFDDDDFF);
+			mc.font.draw(matrixStackIn, "MP: " + ability.getCost(), 100, 0, 0xFFDDDDFF);
 			
 			final String targetString;
 			if (ability.getTargetGroup() == null) {
@@ -104,13 +104,13 @@ public class ArcaneWolfAbilitySheet implements IPetGUISheet<ArcaneWolfEntity> {
 				targetString = ability.getTargetGroup().name().substring(0, 1)
 						+ ability.getTargetGroup().name().substring(1).toLowerCase();
 			}
-			mc.fontRenderer.drawString(matrixStackIn, "Target: " + targetString, 150, 0, 0xFFDDDDFF);
-			matrixStackIn.pop();
+			mc.font.draw(matrixStackIn, "Target: " + targetString, 150, 0, 0xFFDDDDFF);
+			matrixStackIn.popPose();
 		}
 		
 		public void drawOverlay(Minecraft mc, MatrixStack matrixStackIn, int sheetWidth, int sheetHeight, int mouseX, int mouseY) {
 			if (this.isHovered()) {
-				GuiUtils.drawHoveringText(matrixStackIn, Arrays.asList(ability.getDescription()), mouseX, mouseY, sheetWidth, sheetHeight, -1, mc.fontRenderer);
+				GuiUtils.drawHoveringText(matrixStackIn, Arrays.asList(ability.getDescription()), mouseX, mouseY, sheetWidth, sheetHeight, -1, mc.font);
 			}
 		}
 	}

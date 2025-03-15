@@ -55,7 +55,7 @@ public class LoreInfoButton extends InfoButton {
 			tint = .75f;
 		}
 		
-		mc.getTextureManager().bindTexture(InfoScreen.background);
+		mc.getTextureManager().bind(InfoScreen.background);
 		RenderSystem.enableBlend();
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, 0,
 				0, width,
@@ -77,7 +77,7 @@ public class LoreInfoButton extends InfoButton {
 				if (item != null)
 					iconStack = new ItemStack(item, 1);
 			} else if (lore instanceof IEntityLoreTagged) {
-				iconEntity = ((IEntityLoreTagged<?>) lore).makeEntity(mc.world);
+				iconEntity = ((IEntityLoreTagged<?>) lore).makeEntity(mc.level);
 			} else if (lore instanceof IBlockLoreTagged) {
 				Item item = ((IBlockLoreTagged) lore).getBlock().asItem();
 				if (item != null) {
@@ -89,12 +89,12 @@ public class LoreInfoButton extends InfoButton {
 		if (!iconStack.isEmpty()) {
 			int x = this.x + (width - itemLength) / 2;
 			int y = this.y + (height - itemLength) / 2;
-			Minecraft.getInstance().getItemRenderer().renderItemIntoGUI(iconStack, x, y);
+			Minecraft.getInstance().getItemRenderer().renderGuiItem(iconStack, x, y);
 		} else if (iconEntity != null) {
 			int x = this.x + (width / 2);
 			int y = this.y + (width - 1);
-			RenderHelper.disableStandardItemLighting();
-			InventoryScreen.drawEntityOnScreen(x, y,
+			RenderHelper.turnOff();
+			InventoryScreen.renderEntityInInventory(x, y,
 					(int) (width * .4), (float)(this.x) - mouseX, (float)(this.y) - mouseY, (LivingEntity)iconEntity);
 		}
 	}

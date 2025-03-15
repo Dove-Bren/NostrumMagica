@@ -18,11 +18,11 @@ import net.minecraft.world.World;
 public abstract class RedDragonBaseEntity extends FlyingDragonEntity {
 
 	private static final DataParameter<Boolean> DRAGON_SLASH =
-			EntityDataManager.<Boolean>createKey(RedDragonBaseEntity.class, DataSerializers.BOOLEAN);
+			EntityDataManager.<Boolean>defineId(RedDragonBaseEntity.class, DataSerializers.BOOLEAN);
 	private static final DataParameter<Boolean> DRAGON_BITE =
-			EntityDataManager.<Boolean>createKey(RedDragonBaseEntity.class, DataSerializers.BOOLEAN);
+			EntityDataManager.<Boolean>defineId(RedDragonBaseEntity.class, DataSerializers.BOOLEAN);
 	private static final DataParameter<Boolean> DRAGON_CASTING =
-			EntityDataManager.<Boolean>createKey(RedDragonBaseEntity.class, DataSerializers.BOOLEAN);
+			EntityDataManager.<Boolean>defineId(RedDragonBaseEntity.class, DataSerializers.BOOLEAN);
 	
 	public static long ANIM_SLASH_DUR = 500;
 	
@@ -37,23 +37,23 @@ public abstract class RedDragonBaseEntity extends FlyingDragonEntity {
 	
 	public RedDragonBaseEntity(EntityType<? extends RedDragonBaseEntity> type, World worldIn) {
 		super(type, worldIn);
-        this.ignoreFrustumCheck = true;
-        this.noClip = false;
+        this.noCulling = true;
+        this.noPhysics = false;
 	}
 	
 	@Override
-	public void notifyDataManagerChange(DataParameter<?> key) {
-		super.notifyDataManagerChange(key);
+	public void onSyncedDataUpdated(DataParameter<?> key) {
+		super.onSyncedDataUpdated(key);
 		if (key == DRAGON_SLASH) {
-			if (this.dataManager.get(DRAGON_SLASH)) {
+			if (this.entityData.get(DRAGON_SLASH)) {
 				this.slashTime = System.currentTimeMillis();
 			}
 		} else if (key == DRAGON_BITE) {
-			if (this.dataManager.get(DRAGON_BITE)) {
+			if (this.entityData.get(DRAGON_BITE)) {
 				this.biteTime = System.currentTimeMillis();
 			}
 		} else if (key == DRAGON_CASTING) {
-			if (this.dataManager.get(DRAGON_CASTING)) {
+			if (this.entityData.get(DRAGON_CASTING)) {
 				castTime = System.currentTimeMillis();
 			}
 		}
@@ -72,30 +72,30 @@ public abstract class RedDragonBaseEntity extends FlyingDragonEntity {
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
-		this.dataManager.register(DRAGON_SLASH, false);
-		this.dataManager.register(DRAGON_BITE, false);
-		this.dataManager.register(DRAGON_CASTING, false);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(DRAGON_SLASH, false);
+		this.entityData.define(DRAGON_BITE, false);
+		this.entityData.define(DRAGON_CASTING, false);
 	}
 	
 	public boolean isCasting() {
-		return this.dataManager.get(DRAGON_CASTING).booleanValue();
+		return this.entityData.get(DRAGON_CASTING).booleanValue();
 	}
 	
 	protected void setCasting(boolean isCasting) {
-		this.dataManager.set(DRAGON_CASTING, isCasting);
+		this.entityData.set(DRAGON_CASTING, isCasting);
 		
 	}
 	
 	public void slash(LivingEntity target) {
-		this.dataManager.set(DRAGON_SLASH, Boolean.TRUE);
+		this.entityData.set(DRAGON_SLASH, Boolean.TRUE);
 		
-		this.attackEntityAsMob(target);
+		this.doHurtTarget(target);
 	}
 	
 	public void bite(LivingEntity target) {
-		this.dataManager.set(DRAGON_BITE, Boolean.TRUE);
+		this.entityData.set(DRAGON_BITE, Boolean.TRUE);
 		
 		NostrumMagicaSounds.DRAGON_BITE.play(this);
 		
@@ -116,30 +116,30 @@ public abstract class RedDragonBaseEntity extends FlyingDragonEntity {
 
 		i = 2;
 
-		boolean flag = target.attackEntityFrom(DamageSource.causeMobDamage(this), f);
+		boolean flag = target.hurt(DamageSource.mobAttack(this), f);
 
 		if (flag)
 		{
 			if (i > 0)
 			{
-				target.applyKnockback((float)i * 0.5F, (double)MathHelper.sin(this.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(this.rotationYaw * 0.017453292F)));
-				this.setMotion(this.getMotion().mul(.6, 1, .6));
+				target.knockback((float)i * 0.5F, (double)MathHelper.sin(this.yRot * 0.017453292F), (double)(-MathHelper.cos(this.yRot * 0.017453292F)));
+				this.setDeltaMovement(this.getDeltaMovement().multiply(.6, 1, .6));
 			}
 
 			if (target instanceof PlayerEntity)
 			{
 				PlayerEntity entityplayer = (PlayerEntity)target;
-				ItemStack itemstack1 = entityplayer.isHandActive() ? entityplayer.getActiveItemStack() : ItemStack.EMPTY;
+				ItemStack itemstack1 = entityplayer.isUsingItem() ? entityplayer.getUseItem() : ItemStack.EMPTY;
 
 				if (!itemstack1.isEmpty() && itemstack1.isShield(entityplayer))
 				{
 					float f1 = 0.5F;
 
-					if (this.rand.nextFloat() < f1)
+					if (this.random.nextFloat() < f1)
 					{
 						// Note: Vanilla puts the attacking item on cooldown here instead of the blocking one?
-						entityplayer.getCooldownTracker().setCooldown(itemstack1.getItem(), 100);
-						this.world.setEntityState(entityplayer, (byte)30);
+						entityplayer.getCooldowns().addCooldown(itemstack1.getItem(), 100);
+						this.level.broadcastEntityEvent(entityplayer, (byte)30);
 					}
 				}
 			}
@@ -154,15 +154,15 @@ public abstract class RedDragonBaseEntity extends FlyingDragonEntity {
 		
 		long now = System.currentTimeMillis();
 		
-		if (this.dataManager.get(DRAGON_SLASH)) {
+		if (this.entityData.get(DRAGON_SLASH)) {
 			if (now - slashTime >= ANIM_SLASH_DUR) {
-				this.dataManager.set(DRAGON_SLASH, Boolean.FALSE);
+				this.entityData.set(DRAGON_SLASH, Boolean.FALSE);
 			}
 		}
 		
-		if (this.dataManager.get(DRAGON_BITE)) {
+		if (this.entityData.get(DRAGON_BITE)) {
 			if (now - biteTime >= ANIM_BITE_DUR) {
-				this.dataManager.set(DRAGON_BITE, Boolean.FALSE);
+				this.entityData.set(DRAGON_BITE, Boolean.FALSE);
 			}
 		}
 	}

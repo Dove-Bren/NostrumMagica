@@ -20,14 +20,14 @@ public class NostrumTransformationEffect extends Effect {
 		super(EffectType.NEUTRAL, 0xFF000000);
 	}
 	
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return duration % 20 == 0;
 	}
 
 	@Override
-	public void performEffect(LivingEntity entity, int amp) {
+	public void applyEffectTick(LivingEntity entity, int amp) {
 		if (entity.getHealth() > 1f) {
-			entity.attackEntityFrom(DamageSource.MAGIC, 1f);
+			entity.hurt(DamageSource.MAGIC, 1f);
 		}
     }
 	

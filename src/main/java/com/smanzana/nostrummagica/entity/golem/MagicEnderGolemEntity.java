@@ -62,9 +62,9 @@ public class MagicEnderGolemEntity extends MagicGolemEntity {
 	public void doRangeTask(LivingEntity target) {
 		MagicEnderGolemEntity.init();
 		
-		LivingEntity targ = this.getAttackTarget();
+		LivingEntity targ = this.getTarget();
 		if (targ != target)
-			this.setAttackTarget(target);
+			this.setTarget(target);
 		
 		if (NostrumMagica.rand.nextBoolean()) {
 			spellDebuff.cast(this, 1.0f);
@@ -73,36 +73,36 @@ public class MagicEnderGolemEntity extends MagicGolemEntity {
 		}
 		
 		if (targ != target)
-			this.setAttackTarget(targ);
+			this.setTarget(targ);
 	}
 
 	@Override
 	public void doBuffTask(LivingEntity target) {
 		MagicEnderGolemEntity.init();
 		
-		LivingEntity targ = this.getAttackTarget();
+		LivingEntity targ = this.getTarget();
 		if (targ != target)
-			this.setAttackTarget(target);
+			this.setTarget(target);
 		
 		spellBuff.cast(this, 1.0f);
 		
 		if (targ != target)
-			this.setAttackTarget(targ);
+			this.setTarget(targ);
 	}
 
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
-		return target.getActivePotionEffect(Effects.INVISIBILITY) == null;
+		return target.getEffect(Effects.INVISIBILITY) == null;
 	}
 
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		return MagicGolemEntity.BuildBaseAttributes()
-	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.30D)
+	        .add(Attributes.MOVEMENT_SPEED, 0.30D)
 	
-	        .createMutableAttribute(Attributes.MAX_HEALTH, 30.0D)
+	        .add(Attributes.MAX_HEALTH, 30.0D)
 	
-	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 2.0D)
-	        .createMutableAttribute(Attributes.ARMOR, 4.0D);
+	        .add(Attributes.ATTACK_DAMAGE, 2.0D)
+	        .add(Attributes.ARMOR, 4.0D);
 	}
 
 	@Override

@@ -7,7 +7,7 @@ public class NostrumFlowerGenerator extends DefaultFlowersFeature {
 	
 	int unused; // DELETE?
 	public NostrumFlowerGenerator() {
-		super(BlockClusterFeatureConfig.field_236587_a_);
+		super(BlockClusterFeatureConfig.CODEC);
 	}
 
 //	@Override

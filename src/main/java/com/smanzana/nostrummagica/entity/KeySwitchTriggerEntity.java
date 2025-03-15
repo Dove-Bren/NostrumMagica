@@ -18,16 +18,16 @@ public class KeySwitchTriggerEntity extends TileProxyTriggerEntity<KeySwitchBloc
 	}
 	
 	@Override
-	public void livingTick() {
-		super.livingTick();
+	public void aiStep() {
+		super.aiStep();
 		
-		if (world != null && world.isRemote() && this.ticksExisted % 5 == 0) {
+		if (level != null && level.isClientSide() && this.tickCount % 5 == 0) {
 			KeySwitchBlockTileEntity keyEnt = getLinkedTileEntity();
 			if (keyEnt != null) {
-				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
-						4, this.getPosX(), getPosY() + 1.25, getPosZ(), 1.25,
+				NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
+						4, this.getX(), getY() + 1.25, getZ(), 1.25,
 						20, 0,
-						this.getPositionVec().add(0, 1, 0)
+						this.position().add(0, 1, 0)
 						).gravity(-.025f).color(keyEnt.getColor().getColorValue() | 0xAA000000));
 			}
 		}

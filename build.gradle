@@ -16,11 +16,11 @@ version = "1.16.5-1.11.10"
 group= "com.smanzana.nostrummagica" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "nostrummagica"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8) // Mojang ships Java 8 to end users, so your mod should target Java 8.
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-	mappings channel: 'snapshot', version: "20201028-1.16.3"
+	mappings channel: 'official', version: "1.16.5"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 	
 	 // Structures in 1.16.x require you to place them in some vanilla maps which are private variables

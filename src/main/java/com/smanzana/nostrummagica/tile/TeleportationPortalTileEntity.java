@@ -49,11 +49,11 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	
 	public void setTarget(@Nullable Location target) {
 		this.target = target;
-		this.markDirty();
+		this.setChanged();
 		
-		if (world != null) {
-			BlockState state = world.getBlockState(pos);
-			world.notifyBlockUpdate(pos, state, state, 2);
+		if (level != null) {
+			BlockState state = level.getBlockState(worldPosition);
+			level.sendBlockUpdated(worldPosition, state, state, 2);
 		}
 	}
 	
@@ -84,8 +84,8 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT compound) {
-		super.read(state, compound);
+	public void load(BlockState state, CompoundNBT compound) {
+		super.load(state, compound);
 		
 		if (compound.contains(NBT_TARGET_LEGACY, NBT.TAG_LONG)) {
 			// Legacy!
@@ -101,8 +101,8 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		if (target != null) {
 			nbt.put(NBT_TARGET, target.toNBT());
@@ -113,18 +113,18 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
 }

@@ -80,7 +80,7 @@ public class ClientEffect {
 				: (float) (((double) existedMS + (partialTicks * (1000 / 20))) / (double) durationMS);
 		
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		
 		ClientEffectRenderDetail detail = new ClientEffectRenderDetail();
 		detail.alpha = detail.red = detail.green = detail.blue = 1f;
@@ -91,7 +91,7 @@ public class ClientEffect {
 		drawForm(matrixStackIn, detail, mc, progress, partialTicks);
 		teardownRenderState();
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		return progress < 1f;
 	}
 	

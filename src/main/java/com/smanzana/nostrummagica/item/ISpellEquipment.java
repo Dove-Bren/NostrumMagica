@@ -25,7 +25,7 @@ public interface ISpellEquipment {
 	
 	public static void ApplyAll(LivingEntity entity, Spell spell, SpellCastSummary summary) {
 		// Visit an equipped spell armor
-		for (ItemStack equip : entity.getEquipmentAndArmor()) {
+		for (ItemStack equip : entity.getAllSlots()) {
 			if (equip.isEmpty())
 				continue;
 			if (equip.getItem() instanceof ISpellEquipment) {
@@ -39,8 +39,8 @@ public interface ISpellEquipment {
 			final PlayerEntity playerCast = (PlayerEntity) entity;
 			IInventory curios = NostrumMagica.instance.curios.getCurios(playerCast);
 			if (curios != null) {
-				for (int i = 0; i < curios.getSizeInventory(); i++) {
-					ItemStack equip = curios.getStackInSlot(i);
+				for (int i = 0; i < curios.getContainerSize(); i++) {
+					ItemStack equip = curios.getItem(i);
 					if (equip.isEmpty()) {
 						continue;
 					}

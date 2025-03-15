@@ -16,8 +16,8 @@ public class FloatGuardItem extends NostrumCurio {
 	
 	@Override
 	public void onWornTick(ItemStack stack, LivingEntity player) {
-		player.removePotionEffect(Effects.LEVITATION);
-		player.removePotionEffect(NostrumEffects.rooted);
+		player.removeEffect(Effects.LEVITATION);
+		player.removeEffect(NostrumEffects.rooted);
 	}
 	
 }

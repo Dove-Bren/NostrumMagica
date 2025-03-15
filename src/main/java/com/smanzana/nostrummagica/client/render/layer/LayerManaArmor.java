@@ -59,12 +59,12 @@ public class LayerManaArmor extends LayerRenderer<AbstractClientPlayerEntity, Pl
 			
 			IVertexBuilder buffer = typeBuffer.getBuffer(NostrumRenderTypes.MANA_ARMOR);
 			
-			stack.push();
+			stack.pushPose();
 			stack.scale(1.002f + growAmt, 1.002f + growAmt, 1.002f + growAmt);
 			
-			this.renderPlayer.getEntityModel().render(stack, buffer, packedLight, packedLight, color[0], color[1], color[2], color[3]);
+			this.renderPlayer.getModel().renderToBuffer(stack, buffer, packedLight, packedLight, color[0], color[1], color[2], color[3]);
 			
-			stack.pop();
+			stack.popPose();
 			recurseMarker = false;
 		}
 		

@@ -15,13 +15,13 @@ public class PlayerInventorySlotKey implements IInventorySlotKey<PlayerEntity> {
 
 	@Override
 	public ItemStack getHeldStack(PlayerEntity player) {
-		return player.inventory.getStackInSlot(slotIdx);
+		return player.inventory.getItem(slotIdx);
 	}
 
 	@Override
 	public ItemStack setStack(PlayerEntity player, ItemStack newStack) {
 		ItemStack existing = getHeldStack(player);
-		player.inventory.setInventorySlotContents(slotIdx, newStack);
+		player.inventory.setItem(slotIdx, newStack);
 		return existing;
 	}
 

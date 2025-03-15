@@ -23,71 +23,71 @@ import net.minecraft.util.math.vector.Vector3f;
 public class CursedFireEffectRenderer implements IEffectRenderer {
 	
 	@SuppressWarnings("deprecation")
-	public static final RenderMaterial TEX_FIRE_0 = new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, NostrumMagica.Loc("block/cursed_fire_0"));
+	public static final RenderMaterial TEX_FIRE_0 = new RenderMaterial(AtlasTexture.LOCATION_BLOCKS, NostrumMagica.Loc("block/cursed_fire_0"));
 	@SuppressWarnings("deprecation")
-	public static final RenderMaterial TEX_FIRE_1 = new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, NostrumMagica.Loc("block/cursed_fire_1"));
+	public static final RenderMaterial TEX_FIRE_1 = new RenderMaterial(AtlasTexture.LOCATION_BLOCKS, NostrumMagica.Loc("block/cursed_fire_1"));
 
 	
 	@Override
 	public void renderEffectOnEntity(EffectInstance effect, MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		final Minecraft mc = Minecraft.getInstance();
-		final ActiveRenderInfo activeInfo = mc.gameRenderer.getActiveRenderInfo();
+		final ActiveRenderInfo activeInfo = mc.gameRenderer.getMainCamera();
 		
-		final float entYaw = MathHelper.interpolateAngle(partialTicks, entity.prevRenderYawOffset, entity.renderYawOffset);
+		final float entYaw = MathHelper.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
 		
-		stack.push();
+		stack.pushPose();
 		
 		// Stack is offset to up. Undo
 		stack.translate(0, (double)+1.501F, 0);
 		
-		stack.rotate(Vector3f.YP.rotationDegrees(180f + activeInfo.getYaw() - entYaw));
+		stack.mulPose(Vector3f.YP.rotationDegrees(180f + activeInfo.getYRot() - entYaw));
 		stack.translate(0, 0, -0.32f);
 		
 		// These positions set to player scale. So scale to entities dimensions
 		final float playerWidth = .6f;
 		final float playerHeight = 1.8f;
-		stack.scale(entity.getWidth() / playerWidth, entity.getHeight() / playerHeight, entity.getWidth() / playerWidth);
+		stack.scale(entity.getBbWidth() / playerWidth, entity.getBbHeight() / playerHeight, entity.getBbWidth() / playerWidth);
 		{
-			stack.push();
+			stack.pushPose();
 			stack.translate(.5, (-1.501F) + .2, 0);
-			renderFire(stack, typeBuffer, TEX_FIRE_0.getSprite(), packedLight, .4f, 1f, 1f, 1f, 1f);
-			stack.pop();
-			stack.push();
+			renderFire(stack, typeBuffer, TEX_FIRE_0.sprite(), packedLight, .4f, 1f, 1f, 1f, 1f);
+			stack.popPose();
+			stack.pushPose();
 			stack.translate(-.5, (-1.501F) - .35, 0);
-			renderFire(stack, typeBuffer, TEX_FIRE_1.getSprite(), packedLight, .4f, 1f, 1f, 1f, 1f);
-			stack.pop();
-			stack.push();
+			renderFire(stack, typeBuffer, TEX_FIRE_1.sprite(), packedLight, .4f, 1f, 1f, 1f, 1f);
+			stack.popPose();
+			stack.pushPose();
 			stack.translate(-.4, (-1.501F) + 1.1, 0);
-			renderFire(stack, typeBuffer, TEX_FIRE_0.getSprite(), packedLight, .4f, 1f, 1f, 1f, 1f);
-			stack.pop();
-			stack.push();
+			renderFire(stack, typeBuffer, TEX_FIRE_0.sprite(), packedLight, .4f, 1f, 1f, 1f, 1f);
+			stack.popPose();
+			stack.pushPose();
 			stack.translate(-.1, (-1.501F) + .45, 0);
-			renderFire(stack, typeBuffer, TEX_FIRE_1.getSprite(), packedLight, .4f, 1f, 1f, 1f, 1f);
-			stack.pop();
-			stack.push();
+			renderFire(stack, typeBuffer, TEX_FIRE_1.sprite(), packedLight, .4f, 1f, 1f, 1f, 1f);
+			stack.popPose();
+			stack.pushPose();
 			stack.translate(.6, (-1.501F) + -.5, 0);
-			renderFire(stack, typeBuffer, TEX_FIRE_1.getSprite(), packedLight, .4f, 1f, 1f, 1f, 1f);
-			stack.pop();
+			renderFire(stack, typeBuffer, TEX_FIRE_1.sprite(), packedLight, .4f, 1f, 1f, 1f, 1f);
+			stack.popPose();
 		}
-		stack.pop();
+		stack.popPose();
 	}
 	
 	public static final void renderFire(MatrixStack stack, IRenderTypeBuffer typeBuffer, TextureAtlasSprite sprite, int packedLight, float width, float red, float green, float blue, float alpha) {
-		final Matrix4f transform = stack.getLast().getMatrix();
-		final Matrix3f normal = stack.getLast().getNormal();
+		final Matrix4f transform = stack.last().pose();
+		final Matrix3f normal = stack.last().normal();
 		final int packedOverlay = OverlayTexture.NO_OVERLAY;
 		final float xMin = -width/2f;
 		final float xMax = width/2f;
 		final float yMin = -width/2f;
 		final float yMax = width/2f;
-		final float uMin = sprite.getMinU();
-		final float uMax = sprite.getMaxU();
-		final float vMin = sprite.getMinV();
-		final float vMax = sprite.getMaxV();
-		final IVertexBuilder buffer = typeBuffer.getBuffer(Atlases.getCutoutBlockType());
-		buffer.pos(transform, xMax, yMin, 0).color(red, green, blue, alpha).tex(uMax, vMin).overlay(packedOverlay).lightmap(packedLight).normal(normal, 0, 1, 0).endVertex();
-		buffer.pos(transform, xMin, yMin, 0).color(red, green, blue, alpha).tex(uMin, vMin).overlay(packedOverlay).lightmap(packedLight).normal(normal, 0, 1, 0).endVertex();
-		buffer.pos(transform, xMin, yMax, 0).color(red, green, blue, alpha).tex(uMin, vMax).overlay(packedOverlay).lightmap(packedLight).normal(normal, 0, 1, 0).endVertex();
-		buffer.pos(transform, xMax, yMax, 0).color(red, green, blue, alpha).tex(uMax, vMax).overlay(packedOverlay).lightmap(packedLight).normal(normal, 0, 1, 0).endVertex();
+		final float uMin = sprite.getU0();
+		final float uMax = sprite.getU1();
+		final float vMin = sprite.getV0();
+		final float vMax = sprite.getV1();
+		final IVertexBuilder buffer = typeBuffer.getBuffer(Atlases.cutoutBlockSheet());
+		buffer.vertex(transform, xMax, yMin, 0).color(red, green, blue, alpha).uv(uMax, vMin).overlayCoords(packedOverlay).uv2(packedLight).normal(normal, 0, 1, 0).endVertex();
+		buffer.vertex(transform, xMin, yMin, 0).color(red, green, blue, alpha).uv(uMin, vMin).overlayCoords(packedOverlay).uv2(packedLight).normal(normal, 0, 1, 0).endVertex();
+		buffer.vertex(transform, xMin, yMax, 0).color(red, green, blue, alpha).uv(uMin, vMax).overlayCoords(packedOverlay).uv2(packedLight).normal(normal, 0, 1, 0).endVertex();
+		buffer.vertex(transform, xMax, yMax, 0).color(red, green, blue, alpha).uv(uMax, vMax).overlayCoords(packedOverlay).uv2(packedLight).normal(normal, 0, 1, 0).endVertex();
 	}
 }

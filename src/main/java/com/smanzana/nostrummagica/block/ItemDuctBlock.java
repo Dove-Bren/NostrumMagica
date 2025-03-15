@@ -134,38 +134,38 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 	public static final String ID = "item_duct";
 	
 	public ItemDuctBlock() {
-		super(INNER_RADIUS, Block.Properties.create(Material.IRON));
+		super(INNER_RADIUS, Block.Properties.of(Material.METAL));
 		
-		this.setDefaultState(this.stateContainer.getBaseState()
-				.with(NORTH, false)
-				.with(SOUTH, false)
-				.with(EAST, false)
-				.with(WEST, false)
-				.with(UP, false)
-				.with(DOWN, false)
-				.with(WATERLOGGED, false));
+		this.registerDefaultState(this.stateDefinition.any()
+				.setValue(NORTH, false)
+				.setValue(SOUTH, false)
+				.setValue(EAST, false)
+				.setValue(WEST, false)
+				.setValue(UP, false)
+				.setValue(DOWN, false)
+				.setValue(WATERLOGGED, false));
 	}
 	
 	public static boolean GetFacingActive(BlockState state, Direction face) {
 		switch (face) {
 		case DOWN:
-			return state.get(DOWN);
+			return state.getValue(DOWN);
 		case EAST:
-			return state.get(EAST);
+			return state.getValue(EAST);
 		case NORTH:
 		default:
-			return state.get(NORTH);
+			return state.getValue(NORTH);
 		case SOUTH:
-			return state.get(SOUTH);
+			return state.getValue(SOUTH);
 		case UP:
-			return state.get(UP);
+			return state.getValue(UP);
 		case WEST:
-			return state.get(WEST);
+			return state.getValue(WEST);
 		}
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(NORTH, SOUTH, EAST, WEST, UP, DOWN, WATERLOGGED);
 	}
 	
@@ -176,15 +176,15 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 	 * @deprecated call via {@link IBlockState#onBlockEventReceived(World,BlockPos,int,int)} whenever possible.
 	 * Implementing/overriding is fine.
 	 */
-	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
-		super.eventReceived(state, worldIn, pos, id, param);
-		TileEntity tileentity = worldIn.getTileEntity(pos);
-		return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+	public boolean triggerEvent(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+		super.triggerEvent(state, worldIn, pos, id, param);
+		TileEntity tileentity = worldIn.getBlockEntity(pos);
+		return tileentity == null ? false : tileentity.triggerEvent(id, param);
 	}
 
 	@Nullable
-	public INamedContainerProvider getContainer(BlockState state, World worldIn, BlockPos pos) {
-		TileEntity tileentity = worldIn.getTileEntity(pos);
+	public INamedContainerProvider getMenuProvider(BlockState state, World worldIn, BlockPos pos) {
+		TileEntity tileentity = worldIn.getBlockEntity(pos);
 		return tileentity instanceof INamedContainerProvider ? (INamedContainerProvider)tileentity : null;
 	}
 	
@@ -200,28 +200,28 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 	
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState()
-				.with(NORTH, canConnect(context.getWorld(), context.getPos(), Direction.NORTH))
-				.with(SOUTH, canConnect(context.getWorld(), context.getPos(), Direction.SOUTH))
-				.with(EAST, canConnect(context.getWorld(), context.getPos(), Direction.EAST))
-				.with(WEST, canConnect(context.getWorld(), context.getPos(), Direction.WEST))
-				.with(UP, canConnect(context.getWorld(), context.getPos(), Direction.UP))
-				.with(DOWN, canConnect(context.getWorld(), context.getPos(), Direction.DOWN));
+		return this.defaultBlockState()
+				.setValue(NORTH, canConnect(context.getLevel(), context.getClickedPos(), Direction.NORTH))
+				.setValue(SOUTH, canConnect(context.getLevel(), context.getClickedPos(), Direction.SOUTH))
+				.setValue(EAST, canConnect(context.getLevel(), context.getClickedPos(), Direction.EAST))
+				.setValue(WEST, canConnect(context.getLevel(), context.getClickedPos(), Direction.WEST))
+				.setValue(UP, canConnect(context.getLevel(), context.getClickedPos(), Direction.UP))
+				.setValue(DOWN, canConnect(context.getLevel(), context.getClickedPos(), Direction.DOWN));
 	}
 	
-	public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		if (state.get(WATERLOGGED)) {
-			worldIn.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(worldIn));
+	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		if (state.getValue(WATERLOGGED)) {
+			worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
 		}
 		
 		final boolean connect = canConnect(worldIn, currentPos, facing);
-		return state.with(FACING_TO_PROPERTY_MAP.get(facing), connect);
+		return state.setValue(PROPERTY_BY_DIRECTION.get(facing), connect);
 	}
 	
 	protected boolean canConnect(IWorldReader world, BlockPos centerPos, Direction direction) {
 		// Should be whether there's another pipe or anything else with an inventory?
-		final BlockPos atPos = centerPos.offset(direction);
-		@Nullable TileEntity te = world.getTileEntity(atPos);
+		final BlockPos atPos = centerPos.relative(direction);
+		@Nullable TileEntity te = world.getBlockEntity(atPos);
 		if (te != null) {
 			if (te instanceof IInventory) {
 				return true;
@@ -235,7 +235,7 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 	}
 	
 	@Override
-	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
+	public boolean canSurvive(BlockState state, IWorldReader worldIn, BlockPos pos) {
 		return true;
 	}
 	
@@ -283,13 +283,13 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 //	}
 	
 	@Override
-	public boolean hasComparatorInputOverride(BlockState state) {
+	public boolean hasAnalogOutputSignal(BlockState state) {
 		return true;
 	}
 	
 	@Override
-	public int getComparatorInputOverride(BlockState blockState, World worldIn, BlockPos pos) {
-		final TileEntity tileentity = worldIn.getTileEntity(pos);
+	public int getAnalogOutputSignal(BlockState blockState, World worldIn, BlockPos pos) {
+		final TileEntity tileentity = worldIn.getBlockEntity(pos);
 		final int output;
 
 		if (tileentity instanceof ItemDuctTileEntity) {
@@ -309,33 +309,33 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (newState.getBlock() != state.getBlock()) {
-			TileEntity tileentity = worldIn.getTileEntity(pos);
+			TileEntity tileentity = worldIn.getBlockEntity(pos);
 	
 			if (tileentity instanceof ItemDuctTileEntity) {
 				for (ItemStack stack : ((ItemDuctTileEntity) tileentity).getAllItems()) {
-					InventoryHelper.spawnItemStack(worldIn, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, stack);
+					InventoryHelper.dropItemStack(worldIn, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, stack);
 				}
-				worldIn.updateComparatorOutputLevel(pos, this);
+				worldIn.updateNeighbourForOutputSignal(pos, this);
 			}
 		}
 		
-		super.onReplaced(state, worldIn, pos, newState, isMoving);
+		super.onRemove(state, worldIn, pos, newState, isMoving);
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 		return false;
 	}
 	
 	@Override
 	public FluidState getFluidState(BlockState state) {
-		return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
+		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
 	}
 }

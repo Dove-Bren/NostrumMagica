@@ -31,7 +31,7 @@ public class HarvestUtil {
 	private static final Method seedDrops;
 
 	static {
-		seedDrops = ObfuscationReflectionHelper.findMethod(CropsBlock.class, "func_199772_f");
+		seedDrops = ObfuscationReflectionHelper.findMethod(CropsBlock.class, "getBaseSeedId");
 	}
 
 	private static Item getCropSeed(Block block) {
@@ -51,14 +51,14 @@ public class HarvestUtil {
 		if (world.getBlockState(pos).getBlock() instanceof CropsBlock) {
 			CropsBlock crop = (CropsBlock) world.getBlockState(pos).getBlock();
 			if (crop.isMaxAge(world.getBlockState(pos))) {
-				if (!world.isRemote) {
+				if (!world.isClientSide) {
 					drops = Block.getDrops(world.getBlockState(pos),
 							(ServerWorld) world, pos,
-							world.getTileEntity(pos));
+							world.getBlockEntity(pos));
 					for (int i = 0; i < drops.size(); i++) {
 						if (drops.get(i).getItem() != getCropSeed(crop))
 							world
-									.addEntity(new ItemEntity((World) world, pos.getX(),
+									.addFreshEntity(new ItemEntity((World) world, pos.getX(),
 											pos.getY(), pos.getZ(),
 											(ItemStack) drops.get(i)));
 					}
@@ -67,15 +67,15 @@ public class HarvestUtil {
 								|| crop == Blocks.CARROTS) {
 							drops.remove(0);
 							world
-									.addEntity(new ItemEntity((World) world, pos.getX(),
+									.addFreshEntity(new ItemEntity((World) world, pos.getX(),
 											pos.getY(), pos.getZ(),
 											(ItemStack) drops.get(i)));
 						}
 
 					}
-					world.playSound((PlayerEntity) null, pos, SoundEvents.BLOCK_CROP_BREAK,
-							SoundCategory.BLOCKS, 1.0F, 0.8F + world.rand.nextFloat() * 0.4F);
-					world.setBlockState(pos, crop.getDefaultState(), 2);
+					world.playSound((PlayerEntity) null, pos, SoundEvents.CROP_BREAK,
+							SoundCategory.BLOCKS, 1.0F, 0.8F + world.random.nextFloat() * 0.4F);
+					world.setBlock(pos, crop.defaultBlockState(), 2);
 
 				}
 				
@@ -87,21 +87,21 @@ public class HarvestUtil {
 			NetherWartBlock nether = (NetherWartBlock) world.getBlockState(pos)
 					.getBlock();
 
-			if (world.getBlockState(pos).get(NetherWartBlock.AGE) == 3) {
-				if (!world.isRemote) {
+			if (world.getBlockState(pos).getValue(NetherWartBlock.AGE) == 3) {
+				if (!world.isClientSide) {
 					drops = Block.getDrops(world.getBlockState(pos),
 							(ServerWorld) world, pos,
-							world.getTileEntity(pos));
+							world.getBlockEntity(pos));
 					for (int i = 0; i < drops.size(); i++) {
 						world
-								.addEntity(new ItemEntity((World) world, pos.getX(),
+								.addFreshEntity(new ItemEntity((World) world, pos.getX(),
 										pos.getY(), pos.getZ(),
 										(ItemStack) drops.get(i)));
 					}
 					world.playSound((PlayerEntity) null, pos,
-							SoundEvents.BLOCK_NETHER_WART_BREAK, SoundCategory.BLOCKS, 1.0F,
-							0.8F + world.rand.nextFloat() * 0.4F);
-					world.setBlockState(pos, nether.getDefaultState(), 2);
+							SoundEvents.NETHER_WART_BREAK, SoundCategory.BLOCKS, 1.0F,
+							0.8F + world.random.nextFloat() * 0.4F);
+					world.setBlock(pos, nether.defaultBlockState(), 2);
 				}
 				
 				return true;
@@ -197,7 +197,7 @@ public class HarvestUtil {
 					next.add(new NextNode(visit.pos.south().east(), visit.depth+1));
 					next.add(new NextNode(visit.pos.south().west(), visit.depth+1));
 					
-					BlockPos up = visit.pos.up();
+					BlockPos up = visit.pos.above();
 					
 					next.add(new NextNode(up, visit.depth+1));
 					
@@ -212,7 +212,7 @@ public class HarvestUtil {
 					next.add(new NextNode(up.south().east(), visit.depth+1));
 					next.add(new NextNode(up.south().west(), visit.depth+1));
 					
-					BlockPos down = visit.pos.down();
+					BlockPos down = visit.pos.below();
 					
 					next.add(new NextNode(down, visit.depth+1));
 					
@@ -366,8 +366,8 @@ public class HarvestUtil {
 					next.add(new NextNode(visit.pos.west(), visit.depth+1));
 					next.add(new NextNode(visit.pos.north(), visit.depth+1));
 					next.add(new NextNode(visit.pos.south(), visit.depth+1));
-					next.add(new NextNode(visit.pos.up(), visit.depth+1));
-					next.add(new NextNode(visit.pos.down(), visit.depth+1));
+					next.add(new NextNode(visit.pos.above(), visit.depth+1));
+					next.add(new NextNode(visit.pos.below(), visit.depth+1));
 				}
 				
 				walked = true;

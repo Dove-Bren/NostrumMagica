@@ -19,8 +19,8 @@ public class SpawnNostrumParticleMessage {
 
 	public static void handle(SpawnNostrumParticleMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
-		Minecraft.getInstance().runAsync(() -> {
-			message.type.spawn(NostrumMagica.instance.proxy.getPlayer().getEntityWorld(), message.params);
+		Minecraft.getInstance().submit(() -> {
+			message.type.spawn(NostrumMagica.instance.proxy.getPlayer().getCommandSenderWorld(), message.params);
 		});
 	}
 
@@ -34,14 +34,14 @@ public class SpawnNostrumParticleMessage {
 
 	public static SpawnNostrumParticleMessage decode(PacketBuffer buf) {
 		return new SpawnNostrumParticleMessage(
-				buf.readEnumValue(NostrumParticles.class),
-				SpawnParams.FromNBT(buf.readCompoundTag())
+				buf.readEnum(NostrumParticles.class),
+				SpawnParams.FromNBT(buf.readNbt())
 				);
 	}
 
 	public static void encode(SpawnNostrumParticleMessage msg, PacketBuffer buf) {
-		buf.writeEnumValue(msg.type);
-		buf.writeCompoundTag(msg.params.toNBT(null));
+		buf.writeEnum(msg.type);
+		buf.writeNbt(msg.params.toNBT(null));
 	}
 
 }

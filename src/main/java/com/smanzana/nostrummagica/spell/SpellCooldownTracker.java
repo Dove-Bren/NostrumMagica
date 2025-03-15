@@ -55,11 +55,11 @@ public class SpellCooldownTracker {
 			return false;
 		}
 		
-		return player.ticksExisted < cooldown.endTicks;
+		return player.tickCount < cooldown.endTicks;
 	}
 	
 	public void setSpellCooldown(PlayerEntity player, Spell spell, int ticks) {
-		SpellCooldown cooldown = new SpellCooldown(player.ticksExisted, player.ticksExisted + ticks);
+		SpellCooldown cooldown = new SpellCooldown(player.tickCount, player.tickCount + ticks);
 		cooldowns.computeIfAbsent(player, (p) -> new Cooldowns()).setSpellCooldown(spell, cooldown);
 		notifyPlayer(player, spell, ticks);
 	}
@@ -69,18 +69,18 @@ public class SpellCooldownTracker {
 	}
 	
 	public void overrideSpellCooldown(PlayerEntity player, Spell spell, int cooldownTicks) {
-		SpellCooldown cooldown = new SpellCooldown(player.ticksExisted, player.ticksExisted + cooldownTicks);
+		SpellCooldown cooldown = new SpellCooldown(player.tickCount, player.tickCount + cooldownTicks);
 		cooldowns.computeIfAbsent(player, (p) -> new Cooldowns()).setSpellCooldown(spell, cooldown);
 	}
 	
 	public void setGlobalCooldown(PlayerEntity player, int ticks) {
-		SpellCooldown cooldown = new SpellCooldown(player.ticksExisted, player.ticksExisted + ticks);
+		SpellCooldown cooldown = new SpellCooldown(player.tickCount, player.tickCount + ticks);
 		cooldowns.computeIfAbsent(player, (p) -> new Cooldowns()).setGlobalCooldown(cooldown);
 		notifyPlayer(player, ticks);
 	}
 	
 	public void overrideGlobalCooldown(PlayerEntity player, int cooldownTicks) {
-		SpellCooldown cooldown = new SpellCooldown(player.ticksExisted, player.ticksExisted + cooldownTicks);
+		SpellCooldown cooldown = new SpellCooldown(player.tickCount, player.tickCount + cooldownTicks);
 		cooldowns.computeIfAbsent(player, (p) -> new Cooldowns()).setGlobalCooldown(cooldown);
 	}
 	
@@ -94,7 +94,7 @@ public class SpellCooldownTracker {
 	
 	public void clearCooldowns(PlayerEntity player) {
 		cooldowns.computeIfAbsent(player, (p) -> new Cooldowns()).clear();
-		if (!player.world.isRemote()) {
+		if (!player.level.isClientSide()) {
 			NetworkHandler.sendTo(new SpellCooldownResetMessage(), (ServerPlayerEntity) player);
 		}
 	}

@@ -28,9 +28,9 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 	
 	@Override
 	public boolean canPerform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout) {
-		if (!ObeliskBlock.canSpawnObelisk(world, center.add(0, -1, 0))) {
-			if (!world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.create_obelisk.fail", new Object[0]), Util.DUMMY_UUID);
+		if (!ObeliskBlock.canSpawnObelisk(world, center.offset(0, -1, 0))) {
+			if (!world.isClientSide) {
+				player.sendMessage(new TranslationTextComponent("info.create_obelisk.fail", new Object[0]), Util.NIL_UUID);
 			}
 			return false;
 		}
@@ -40,11 +40,11 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 	@Override
 	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// All logic contained in obelisk class
-		if (!ObeliskBlock.spawnObelisk(world, center.add(0, -1, 0))) {
-			player.sendMessage(new TranslationTextComponent("info.create_obelisk.fail", new Object[0]), Util.DUMMY_UUID);
-		} else if (!world.isRemote) {
+		if (!ObeliskBlock.spawnObelisk(world, center.offset(0, -1, 0))) {
+			player.sendMessage(new TranslationTextComponent("info.create_obelisk.fail", new Object[0]), Util.NIL_UUID);
+		} else if (!world.isClientSide) {
 			// clear altar on server
-			TileEntity te = world.getTileEntity(center.add(0, 0, 0));
+			TileEntity te = world.getBlockEntity(center.offset(0, 0, 0));
 			if (te == null || !(te instanceof AltarTileEntity))
 				return;
 			((AltarTileEntity) te).setItem(ItemStack.EMPTY);
@@ -53,7 +53,7 @@ public class OutcomeCreateObelisk implements IRitualOutcome {
 			int radius = 4;
 			for (int i = -radius; i <= radius; i++)
 			for (int j = -radius; j <= radius; j++) {
-				BlockPos pos = center.add(i, 0, j);
+				BlockPos pos = center.offset(i, 0, j);
 				BlockState state = world.getBlockState(pos);
 				if (state != null &&
 						(state.getBlock() instanceof CandleBlock || state.getBlock() instanceof AltarBlock || state.getBlock() instanceof ChalkBlock)) {

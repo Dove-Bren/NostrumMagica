@@ -34,28 +34,28 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class MysticWaterBlock extends Block implements IBucketPickupHandler {
 
 	public static final String ID = "mystic_water_block";
-	public static final IntegerProperty LEVEL = BlockStateProperties.LEVEL_0_15;
+	public static final IntegerProperty LEVEL = BlockStateProperties.LEVEL;
 	public static final IntegerProperty POWER = IntegerProperty.create("power", 0, 2);
 	
 	private final Supplier<? extends MysticWaterFluid> fluidSupplier;
 	private MysticWaterFluid fluidCache = null;
 	
 	public MysticWaterBlock(Supplier<? extends MysticWaterFluid> supplier) {
-		super(Block.Properties.create(Material.WATER)
-				.doesNotBlockMovement().hardnessAndResistance(100.0F).noDrops()
+		super(Block.Properties.of(Material.WATER)
+				.noCollission().strength(100.0F).noDrops()
 				);
 		this.fluidSupplier = supplier;
-		this.setDefaultState(this.stateContainer.getBaseState().with(LEVEL, 0).with(POWER, 0));
+		this.registerDefaultState(this.stateDefinition.any().setValue(LEVEL, 0).setValue(POWER, 0));
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		super.fillStateContainer(builder);
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
 		builder.add(LEVEL, POWER);
 	}
 	
 	public BlockState getStateWithPower(int power) {
-		return this.getDefaultState().with(POWER, Math.max(0, Math.min(2, power)));
+		return this.defaultBlockState().setValue(POWER, Math.max(0, Math.min(2, power)));
 	}
 	
 	protected MysticWaterFluid getFluid() {
@@ -66,32 +66,32 @@ public class MysticWaterBlock extends Block implements IBucketPickupHandler {
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 		return true;
 	}
 	
 	@Override
-	public Fluid pickupFluid(IWorld worldIn, BlockPos pos, BlockState state) {
+	public Fluid takeLiquid(IWorld worldIn, BlockPos pos, BlockState state) {
 		// Let the player pick it up regardless of level
-		worldIn.setBlockState(pos, Blocks.AIR.getDefaultState(), 11);
+		worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 11);
 		return this.getFluid();
 	}
 	
 	@Override
-	public boolean isReplaceable(BlockState state, BlockItemUseContext useContext) {
+	public boolean canBeReplaced(BlockState state, BlockItemUseContext useContext) {
 		return true;
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+	public void entityInside(BlockState state, World world, BlockPos pos, Entity entity) {
 		// TODO check this works
-		super.onEntityCollision(state, world, pos, entity);
+		super.entityInside(state, world, pos, entity);
 		if (entity instanceof AbstractArrowEntity) {
-			final Vector3d orig = entity.getMotion();
+			final Vector3d orig = entity.getDeltaMovement();
 			final float scale = .2f;
-			entity.setMotion(orig.getX() * scale, orig.getY(), orig.getZ() * scale);
-			entity.velocityChanged = true;
+			entity.setDeltaMovement(orig.x() * scale, orig.y(), orig.z() * scale);
+			entity.hurtMarked = true;
 		}
 	}
 	
@@ -106,7 +106,7 @@ public class MysticWaterBlock extends Block implements IBucketPickupHandler {
 	}
 	
 	@Override
-	public boolean ticksRandomly(BlockState state) {
+	public boolean isRandomlyTicking(BlockState state) {
 		return false;
 	}
 	
@@ -117,23 +117,23 @@ public class MysticWaterBlock extends Block implements IBucketPickupHandler {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
-		return adjacentBlockState.getFluidState().getFluid().isEquivalentTo(this.getFluid());
+	public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
+		return adjacentBlockState.getFluidState().getType().isSame(this.getFluid());
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.INVISIBLE;
 	}
 	
 	@Override
-	public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
-		worldIn.getPendingFluidTicks().scheduleTick(pos, state.getFluidState().getFluid(), this.getFluid().getTickRate(worldIn));
+	public void onPlace(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
+		worldIn.getLiquidTicks().scheduleTick(pos, state.getFluidState().getType(), this.getFluid().getTickDelay(worldIn));
 	}
 	
 	@Override
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		worldIn.getPendingFluidTicks().scheduleTick(currentPos, stateIn.getFluidState().getFluid(), this.getFluid().getTickRate(worldIn));
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		worldIn.getLiquidTicks().scheduleTick(currentPos, stateIn.getFluidState().getType(), this.getFluid().getTickDelay(worldIn));
 		return stateIn;
 	}
 }

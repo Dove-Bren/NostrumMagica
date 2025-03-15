@@ -34,9 +34,9 @@ public class ReagentBagToggleMessage {
 		ctx.get().enqueueWork(() -> {
 			ItemStack bag;
 			if (main)
-				bag = sp.getHeldItemMainhand();
+				bag = sp.getMainHandItem();
 			else
-				bag = sp.getHeldItemOffhand();
+				bag = sp.getOffhandItem();
 			if (bag.isEmpty() || !(bag.getItem() instanceof ReagentBag)) {
 				NostrumMagica.logger.warn("Reagent bag double-check position was invalid! Is the server behind?");
 			}

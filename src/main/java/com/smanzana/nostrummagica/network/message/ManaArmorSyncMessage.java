@@ -28,9 +28,9 @@ public class ManaArmorSyncMessage {
 		ctx.get().setPacketHandled(true);
 		NostrumMagica.logger.info("Recieved Mana Armor sync message from server");
 		
-		Minecraft.getInstance().runAsync(() -> {
+		Minecraft.getInstance().submit(() -> {
 			final Minecraft mc = Minecraft.getInstance();
-			@Nullable Entity ent = mc.player.getEntityWorld().getEntityByID(message.entID);
+			@Nullable Entity ent = mc.player.getCommandSenderWorld().getEntity(message.entID);
 			if (ent != null) {
 				NostrumMagica.instance.proxy.receiveManaArmorOverride(ent, message.stats);
 			}
@@ -44,7 +44,7 @@ public class ManaArmorSyncMessage {
 	private final IManaArmor stats;
 	
 	public ManaArmorSyncMessage(Entity ent, IManaArmor stats) {
-		this(ent.getEntityId(), stats);
+		this(ent.getId(), stats);
 	}
 	
 	public ManaArmorSyncMessage(int entID, IManaArmor stats) {
@@ -55,7 +55,7 @@ public class ManaArmorSyncMessage {
 	public static ManaArmorSyncMessage decode(PacketBuffer buf) {
 		IManaArmor stats = CAPABILITY.getDefaultInstance();
 		final int entID = buf.readVarInt();
-		CAPABILITY.getStorage().readNBT(CAPABILITY, stats, null, buf.readCompoundTag());
+		CAPABILITY.getStorage().readNBT(CAPABILITY, stats, null, buf.readNbt());
 		
 		return new ManaArmorSyncMessage(
 				entID,
@@ -65,7 +65,7 @@ public class ManaArmorSyncMessage {
 
 	public static void encode(ManaArmorSyncMessage msg, PacketBuffer buf) {
 		buf.writeVarInt(msg.entID);
-		buf.writeCompoundTag((CompoundNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, msg.stats, null));
+		buf.writeNbt((CompoundNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, msg.stats, null));
 	}
 
 }

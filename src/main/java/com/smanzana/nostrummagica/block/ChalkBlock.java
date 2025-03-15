@@ -21,22 +21,22 @@ import net.minecraft.world.World;
 public class ChalkBlock extends FourWayBlock {
 
 	public static final String ID = "nostrum_chalk_block";
-	protected static final VoxelShape CHALK_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 16 * 0.03125D, 16.0D);
+	protected static final VoxelShape CHALK_AABB = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16 * 0.03125D, 16.0D);
 	
 	public ChalkBlock() {
-		super(0, 0, 16, 16, 16, Block.Properties.create(Material.CARPET)
-				.hardnessAndResistance(.01f)
-				.setLightLevel((state) -> 1)
+		super(0, 0, 16, 16, 16, Block.Properties.of(Material.CLOTH_DECORATION)
+				.strength(.01f)
+				.lightLevel((state) -> 1)
 				.noDrops()
-				.notSolid()
+				.noOcclusion()
 				);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(NORTH, false).with(EAST, false).with(SOUTH, false).with(WEST, false).with(WATERLOGGED, false));;
+		this.registerDefaultState(this.stateDefinition.any().setValue(NORTH, false).setValue(EAST, false).setValue(SOUTH, false).setValue(WEST, false).setValue(WATERLOGGED, false));;
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		super.fillStateContainer(builder);
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
 		builder.add(NORTH, EAST, WEST, SOUTH, WATERLOGGED);
 	}
 	
@@ -51,29 +51,29 @@ public class ChalkBlock extends FourWayBlock {
 	}
 	
 	@Override
-	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
-		return Block.hasSolidSideOnTop(worldIn, pos.down());
+	public boolean canSurvive(BlockState state, IWorldReader worldIn, BlockPos pos) {
+		return Block.canSupportRigidBlock(worldIn, pos.below());
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		if (stateIn.get(WATERLOGGED)) {
-			worldIn.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(worldIn));
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		if (stateIn.getValue(WATERLOGGED)) {
+			worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
 		}
 		
 		// If below changed, possibly break
 		if (facing == Direction.DOWN) {
-			if (!this.isValidPosition(stateIn, worldIn, currentPos)) {
-				return Blocks.AIR.getDefaultState();
+			if (!this.canSurvive(stateIn, worldIn, currentPos)) {
+				return Blocks.AIR.defaultBlockState();
 			}
 		}
 		
 		if (facing.getAxis().getPlane() == Direction.Plane.HORIZONTAL) {
-			return stateIn.with(FACING_TO_PROPERTY_MAP.get(facing), Boolean.valueOf(this.canConnect(facingState)));
+			return stateIn.setValue(PROPERTY_BY_DIRECTION.get(facing), Boolean.valueOf(this.canConnect(facingState)));
 		}
 		
-		return super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+		return super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
 	}
 	
 	protected boolean canConnect(BlockState state) {
@@ -82,15 +82,15 @@ public class ChalkBlock extends FourWayBlock {
 	
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		final World world = context.getWorld();
-		final BlockPos pos = context.getPos();
+		final World world = context.getLevel();
+		final BlockPos pos = context.getClickedPos();
 		final FluidState fluidstate = world.getFluidState(pos);
 		return super.getStateForPlacement(context)
-				.with(NORTH, canConnect(world.getBlockState(pos.north())))
-				.with(EAST, canConnect(world.getBlockState(pos.east())))
-				.with(SOUTH, canConnect(world.getBlockState(pos.south())))
-				.with(WEST, canConnect(world.getBlockState(pos.west())))
-				.with(WATERLOGGED, Boolean.valueOf(fluidstate.getFluid() == Fluids.WATER))
+				.setValue(NORTH, canConnect(world.getBlockState(pos.north())))
+				.setValue(EAST, canConnect(world.getBlockState(pos.east())))
+				.setValue(SOUTH, canConnect(world.getBlockState(pos.south())))
+				.setValue(WEST, canConnect(world.getBlockState(pos.west())))
+				.setValue(WATERLOGGED, Boolean.valueOf(fluidstate.getType() == Fluids.WATER))
 				;
 	}
 	

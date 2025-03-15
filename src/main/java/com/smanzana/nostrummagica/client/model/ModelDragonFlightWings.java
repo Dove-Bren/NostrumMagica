@@ -16,35 +16,35 @@ public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<
 	
 	private static final <T extends LivingEntity> ModelRenderer createWing(EntityModel<T> base) {
 		ModelRenderer wing = new ModelRenderer(base);
-		wing.setRotationPoint(0.0F, 0, 0.0F);
-		wing.setTextureOffset(1, 10).addBox(-19, -13, 0, 19, 2, 1, false);
-		wing.setTextureOffset(3, 8).addBox(-17, -14, 0, 15, 1, 1, false);
-		wing.setTextureOffset(5, 6).addBox(-15, -15, 0, 11, 1, 1, false);
-		wing.setTextureOffset(6, 4).addBox(-13, -16, 0, 8, 1, 1, false);
-		wing.setTextureOffset(7, 2).addBox(-11, -17, 0, 5, 1, 1, false);
-		wing.setTextureOffset(7, 0).addBox(-10, -18, 0, 4, 1, 1, false);
-		wing.setTextureOffset(0, 13).addBox(-21, -11, 0, 22, 2, 1, false);
-		wing.setTextureOffset(0, 16).addBox(-22, -9, 0, 23, 3, 1, false);
-		wing.setTextureOffset(2, 20).addBox(-3, -6, 0, 2, 1, 1, false);
-		wing.setTextureOffset(8, 20).addBox(-8, -6, 0, 3, 1, 1, false);
-		wing.setTextureOffset(16, 20).addBox(-23, -6, 0, 12, 1, 1, false);
-		wing.setTextureOffset(17, 22).addBox(-23, -5, 0, 11, 1, 1, false);
-		wing.setTextureOffset(18, 24).addBox(-16, -4, 0, 4, 1, 1, false);
-		wing.setTextureOffset(18, 26).addBox(-15, -3, 0, 3, 1, 1, false);
-		wing.setTextureOffset(19, 28).addBox(-15, -2, 0, 2, 1, 1, false);
-		wing.setTextureOffset(19, 30).addBox(-14, -1, 0, 1, 1, 1, false);
-		wing.setTextureOffset(33, 30).addBox(-23, -1, 0, 1, 1, 1, false);
-		wing.setTextureOffset(28, 24).addBox(-23, -4, 0, 4, 1, 1, false);
-		wing.setTextureOffset(30, 26).addBox(-23, -3, 0, 3, 1, 1, false);
-		wing.setTextureOffset(31, 28).addBox(-23, -2, 0, 2, 1, 1, false);
-		wing.setTextureOffset(3, 22).addBox(-3, -5, 0, 1, 1, 1, false);
-		wing.setTextureOffset(9, 22).addBox(-7, -5, 0, 1, 1, 1, false);
+		wing.setPos(0.0F, 0, 0.0F);
+		wing.texOffs(1, 10).addBox(-19, -13, 0, 19, 2, 1, false);
+		wing.texOffs(3, 8).addBox(-17, -14, 0, 15, 1, 1, false);
+		wing.texOffs(5, 6).addBox(-15, -15, 0, 11, 1, 1, false);
+		wing.texOffs(6, 4).addBox(-13, -16, 0, 8, 1, 1, false);
+		wing.texOffs(7, 2).addBox(-11, -17, 0, 5, 1, 1, false);
+		wing.texOffs(7, 0).addBox(-10, -18, 0, 4, 1, 1, false);
+		wing.texOffs(0, 13).addBox(-21, -11, 0, 22, 2, 1, false);
+		wing.texOffs(0, 16).addBox(-22, -9, 0, 23, 3, 1, false);
+		wing.texOffs(2, 20).addBox(-3, -6, 0, 2, 1, 1, false);
+		wing.texOffs(8, 20).addBox(-8, -6, 0, 3, 1, 1, false);
+		wing.texOffs(16, 20).addBox(-23, -6, 0, 12, 1, 1, false);
+		wing.texOffs(17, 22).addBox(-23, -5, 0, 11, 1, 1, false);
+		wing.texOffs(18, 24).addBox(-16, -4, 0, 4, 1, 1, false);
+		wing.texOffs(18, 26).addBox(-15, -3, 0, 3, 1, 1, false);
+		wing.texOffs(19, 28).addBox(-15, -2, 0, 2, 1, 1, false);
+		wing.texOffs(19, 30).addBox(-14, -1, 0, 1, 1, 1, false);
+		wing.texOffs(33, 30).addBox(-23, -1, 0, 1, 1, 1, false);
+		wing.texOffs(28, 24).addBox(-23, -4, 0, 4, 1, 1, false);
+		wing.texOffs(30, 26).addBox(-23, -3, 0, 3, 1, 1, false);
+		wing.texOffs(31, 28).addBox(-23, -2, 0, 2, 1, 1, false);
+		wing.texOffs(3, 22).addBox(-3, -5, 0, 1, 1, 1, false);
+		wing.texOffs(9, 22).addBox(-7, -5, 0, 1, 1, 1, false);
 		return wing;
 	}
 
 	public ModelDragonFlightWings() {
-		textureWidth = 64;
-		textureHeight = 64;
+		texWidth = 64;
+		texHeight = 64;
 		this.rightWing = createWing(this);
 		this.leftWing = createWing(this);
 		this.leftWing.mirror = true;
@@ -54,7 +54,7 @@ public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<
 	 * Sets the models various rotation angles then renders the model.
 	 */
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 //		{
 //			this.rightWing = createWing(this);
 //		}
@@ -70,7 +70,7 @@ public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<
 	 * "far" arms and legs can swing at most.
 	 */
 	@Override
-	public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void setupAnim(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 		//super.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 		
 		final float livingJitterPeriod = 100f;
@@ -82,19 +82,19 @@ public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<
 		final float wingFlapPerc = ElementalArmor.GetWingFlap((LivingEntity) entityIn, ageInTicks - (int) ageInTicks);
 		final float wingFlapMod = MathHelper.sin(3.1415f * 2 * wingFlapPerc);
 		
-		rightWing.rotateAngleX = rightWing.rotateAngleZ = 0;
-		if (entityIn instanceof LivingEntity && ((LivingEntity)entityIn).isElytraFlying()) {
-			rightWing.rotateAngleY = (float) (Math.PI * (.20 + livingJitterMod * .005 + wingFlapMod * .25));
+		rightWing.xRot = rightWing.zRot = 0;
+		if (entityIn instanceof LivingEntity && ((LivingEntity)entityIn).isFallFlying()) {
+			rightWing.yRot = (float) (Math.PI * (.20 + livingJitterMod * .005 + wingFlapMod * .25));
 		} else {
 			// Standing still
-			rightWing.rotateAngleY = (float) (Math.PI * (.25 + livingJitterMod * .005));
+			rightWing.yRot = (float) (Math.PI * (.25 + livingJitterMod * .005));
 		}
 		
 		//rightWing.rotateAngleY = (float) (Math.PI * (.20 + livingJitterMod * .005 + -.3));
 		
-		leftWing.rotateAngleX = rightWing.rotateAngleX;
-		leftWing.rotateAngleY = (float) (-rightWing.rotateAngleY + Math.PI);
-		leftWing.rotateAngleZ = rightWing.rotateAngleZ;
+		leftWing.xRot = rightWing.xRot;
+		leftWing.yRot = (float) (-rightWing.yRot + Math.PI);
+		leftWing.zRot = rightWing.zRot;
 		
 //		float f = 0.2617994F;
 //		float f1 = -0.2617994F;
@@ -153,8 +153,8 @@ public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<
 	 * Used for easily adding entity-dependent animations. The second and third float params here are the same second
 	 * and third as in the setRotationAngles method.
 	 */
-	public void setLivingAnimations(T entitylivingbaseIn, float p_78086_2_, float p_78086_3_, float partialTickTime) {
-		super.setLivingAnimations(entitylivingbaseIn, p_78086_2_, p_78086_3_, partialTickTime);
+	public void prepareMobModel(T entitylivingbaseIn, float p_78086_2_, float p_78086_3_, float partialTickTime) {
+		super.prepareMobModel(entitylivingbaseIn, p_78086_2_, p_78086_3_, partialTickTime);
 	}
 	
 }

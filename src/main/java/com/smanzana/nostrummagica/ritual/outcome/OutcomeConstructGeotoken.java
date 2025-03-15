@@ -31,8 +31,8 @@ public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 		// Requires either a geogem or geotoken. Regardless of which, must contain a location!
 		if (PositionCrystal.getBlockPosition(layout.getCenterItem(world, center)) == null
 				&& PositionToken.getBlockPosition(layout.getCenterItem(world, center)) == null) {
-			if (!world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.create_geotoken.nopos", new Object[0]), Util.DUMMY_UUID);
+			if (!world.isClientSide) {
+				player.sendMessage(new TranslationTextComponent("info.create_geotoken.nopos", new Object[0]), Util.NIL_UUID);
 			}
 			return false;
 		}

@@ -72,12 +72,12 @@ public class MagicFireGolemEntity extends MagicGolemEntity {
 		MagicFireGolemEntity.init();
 		
 		// Pick a spell to do
-		LivingEntity targ = this.getAttackTarget();
+		LivingEntity targ = this.getTarget();
 		if (targ != target)
-			this.setAttackTarget(target);
+			this.setTarget(target);
 		
 		boolean canBurnArmor = false;
-		for (ItemStack item : target.getArmorInventoryList()) {
+		for (ItemStack item : target.getArmorSlots()) {
 			if (item == null)
 				continue;
 			
@@ -94,36 +94,36 @@ public class MagicFireGolemEntity extends MagicGolemEntity {
 		}
 		
 		if (targ != target)
-			this.setAttackTarget(targ);
+			this.setTarget(targ);
 	}
 
 	@Override
 	public void doBuffTask(LivingEntity target) {
 		MagicFireGolemEntity.init();
 		
-		LivingEntity targ = this.getAttackTarget();
+		LivingEntity targ = this.getTarget();
 		if (targ != target)
-			this.setAttackTarget(target);
+			this.setTarget(target);
 		
 		spellBuff.cast(this, 1.0f);
 		
 		if (targ != target)
-			this.setAttackTarget(targ);
+			this.setTarget(targ);
 	}
 
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
-		return target.getActivePotionEffect(Effects.FIRE_RESISTANCE) == null;
+		return target.getEffect(Effects.FIRE_RESISTANCE) == null;
 	}
 
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		return MagicGolemEntity.BuildBaseAttributes()
-	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.22D)
+	        .add(Attributes.MOVEMENT_SPEED, 0.22D)
 	
-	        .createMutableAttribute(Attributes.MAX_HEALTH, 18.0D)
+	        .add(Attributes.MAX_HEALTH, 18.0D)
 	
-	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 6.0D)
-	        .createMutableAttribute(Attributes.ARMOR, 6.0D);
+	        .add(Attributes.ATTACK_DAMAGE, 6.0D)
+	        .add(Attributes.ARMOR, 6.0D);
 	}
 
 	@Override

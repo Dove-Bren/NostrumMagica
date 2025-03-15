@@ -55,7 +55,7 @@ public class CombatTrialLightning extends CombatTrialStaged {
 			} else if (ent instanceof KoidEntity) {
 				((KoidEntity) ent).setElement(EMagicElement.LIGHTNING);
 			} else if (ent instanceof DrownedEntity) {
-				((DrownedEntity) ent).setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.TRIDENT));
+				((DrownedEntity) ent).setItemSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.TRIDENT));
 			}
 			
 			return ent;

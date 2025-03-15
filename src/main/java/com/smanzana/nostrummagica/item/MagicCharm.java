@@ -116,11 +116,11 @@ public class MagicCharm extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
 		
-		final ItemStack stack = playerIn.getHeldItem(hand);
+		final ItemStack stack = playerIn.getItemInHand(hand);
 		
-		if (worldIn.isRemote)
+		if (worldIn.isClientSide)
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
 		
 		boolean used = false;
@@ -165,32 +165,32 @@ public class MagicCharm extends Item implements ILoreTagged {
 		for (int x = -4; x <= 4; x++)
 		for (int y = 0; y < 5; y++)
 		for (int z = -4; z <= 4; z++) {
-			BlockPos pos = new BlockPos(player.getPosX() + x, player.getPosY() + y, player.getPosZ() + z);
+			BlockPos pos = new BlockPos(player.getX() + x, player.getY() + y, player.getZ() + z);
 			
-			if (world.isAirBlock(pos))
+			if (world.isEmptyBlock(pos))
 				continue;
 
 			BlockState state = world.getBlockState(pos);
 			if (state == null || state.getMaterial().isLiquid())
 				continue;
 			
-			float hardness = state.getBlockHardness(world, pos);
+			float hardness = state.getDestroySpeed(world, pos);
 			int harvestLevel = state.getBlock().getHarvestLevel(state);
 			
 			if (hardness > 10 || harvestLevel > 1 || hardness < 0)
 				continue;
 			
-			List<ItemStack> drops = Block.getDrops(state, world, pos, world.getTileEntity(pos));
+			List<ItemStack> drops = Block.getDrops(state, world, pos, world.getBlockEntity(pos));
 			if (!drops.isEmpty()) {
 				for (ItemStack drop : drops) {
-					Block.spawnAsEntity(world, pos, drop);
+					Block.popResource(world, pos, drop);
 				}
 			}
 			
 			world.removeBlock(pos, false);
 		}
 		
-		NostrumMagicaSounds.DAMAGE_EARTH.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
+		NostrumMagicaSounds.DAMAGE_EARTH.play(world, player.getX(), player.getY(), player.getZ());
 		return true;
 	}
 	
@@ -209,76 +209,76 @@ public class MagicCharm extends Item implements ILoreTagged {
 			if (Math.abs(x) <= 1 && Math.abs(z) <= 1)
 				break;
 			
-			BlockPos pos = new BlockPos(player.getPosX() + x, player.getPosY() + y, player.getPosZ() + z);
+			BlockPos pos = new BlockPos(player.getX() + x, player.getY() + y, player.getZ() + z);
 			
 			if (y == -3) {
 				// Bottom block has to be non-air or we can't place fire
-				if (world.isAirBlock(pos))
+				if (world.isEmptyBlock(pos))
 					break; // Skip whole column
 				
-				if (!Block.hasSolidSideOnTop(world, pos))
+				if (!Block.canSupportRigidBlock(world, pos))
 					break; // Same if it's not a solid block
 				
 				continue;
 			}
 			
 			// Non-top block. Just need to find some air
-			if (world.isAirBlock(pos)) {
+			if (world.isEmptyBlock(pos)) {
 				// Success!
-				world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+				world.setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 				break;
 			}
 			
 		}
 		
-		NostrumMagicaSounds.DAMAGE_FIRE.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
+		NostrumMagicaSounds.DAMAGE_FIRE.play(world, player.getX(), player.getY(), player.getZ());
 		return true;
 	}
 	
 	private boolean doIce(PlayerEntity player, ServerWorld world) {
-		player.addPotionEffect(new EffectInstance(NostrumEffects.magicShield, 20 * 60 * 2, 0));
-		player.addPotionEffect(new EffectInstance(NostrumEffects.physicalShield, 20 * 60 * 2, 0));
+		player.addEffect(new EffectInstance(NostrumEffects.magicShield, 20 * 60 * 2, 0));
+		player.addEffect(new EffectInstance(NostrumEffects.physicalShield, 20 * 60 * 2, 0));
 		
-		NostrumMagicaSounds.DAMAGE_ICE.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
+		NostrumMagicaSounds.DAMAGE_ICE.play(world, player.getX(), player.getY(), player.getZ());
 		return true;
 	}
 	
 	private boolean doWind(PlayerEntity player, ServerWorld world) {
 		AxisAlignedBB bb = new AxisAlignedBB(
-				player.getPosX() - 3,
-				player.getPosY() - 1,
-				player.getPosZ() - 3,
-				player.getPosX() + 3,
-				player.getPosY() + 2,
-				player.getPosZ() + 3);
-		List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(player, bb);
+				player.getX() - 3,
+				player.getY() - 1,
+				player.getZ() - 3,
+				player.getX() + 3,
+				player.getY() + 2,
+				player.getZ() + 3);
+		List<Entity> entities = world.getEntities(player, bb);
 		if (entities != null && !entities.isEmpty())
 			for (Entity e : entities) {
-				Vector3d vec = e.getPositionVec().subtract(player.getPositionVec().add(0, -1, 0));
+				Vector3d vec = e.position().subtract(player.position().add(0, -1, 0));
 				vec = vec.normalize();
 				vec = vec.scale(2);
-				e.setVelocity(vec.x, vec.y, vec.z);
+				e.lerpMotion(vec.x, vec.y, vec.z);
 			}
 		
-		NostrumMagicaSounds.DAMAGE_WIND.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
+		NostrumMagicaSounds.DAMAGE_WIND.play(world, player.getX(), player.getY(), player.getZ());
 		return true;
 	}
 	
 	private boolean doEnder(ServerPlayerEntity player, ServerWorld world) { 
-		if (DimensionUtils.InDimension(player, player.func_241141_L_())) {
-			@Nullable BlockPos posOpt = player.func_241140_K_();
+		if (DimensionUtils.InDimension(player, player.getRespawnDimension())) {
+			@Nullable BlockPos posOpt = player.getRespawnPosition();
 			BlockPos pos;
 			if (posOpt == null) {
-				pos = world.getSpawnPoint();
-				while (!world.isAirBlock(pos)) {
-					pos = pos.add(0, 2, 0);
+				pos = world.getSharedSpawnPos();
+				while (!world.isEmptyBlock(pos)) {
+					pos = pos.offset(0, 2, 0);
 				}
 			} else {
 				pos = posOpt;
 			}
 			
-			if (NostrumMagica.attemptTeleport(new Location(world, pos), player, !player.isSneaking(), false, player)) {
-				NostrumMagicaSounds.DAMAGE_ENDER.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
+			if (NostrumMagica.attemptTeleport(new Location(world, pos), player, !player.isShiftKeyDown(), false, player)) {
+				NostrumMagicaSounds.DAMAGE_ENDER.play(world, player.getX(), player.getY(), player.getZ());
 				return true;
 			}
 			
@@ -298,12 +298,12 @@ public class MagicCharm extends Item implements ILoreTagged {
 //			return true;
 		} else if (DimensionUtils.IsSorceryDim(world)) {
 			// In  sorcery dimension. Return to beginning
-			BlockPos spawn = NostrumMagica.getDimensionMapper(player.world).register(player.getUniqueID()).getCenterPos(NostrumSorceryDimension.SPAWN_Y);
-			player.setPositionAndUpdate(spawn.getX() + .5, spawn.getY() + 4, spawn.getZ() + .5);
+			BlockPos spawn = NostrumMagica.getDimensionMapper(player.level).register(player.getUUID()).getCenterPos(NostrumSorceryDimension.SPAWN_Y);
+			player.teleportTo(spawn.getX() + .5, spawn.getY() + 4, spawn.getZ() + .5);
 			// Allow this type of teleportation by updating last coords...
-			player.lastTickPosX = player.getPosX();
-			player.lastTickPosY = player.getPosY();
-			player.lastTickPosZ = player.getPosZ();
+			player.xOld = player.getX();
+			player.yOld = player.getY();
+			player.zOld = player.getZ();
 			player.fallDistance = 0;
 			return true;
 		}
@@ -312,13 +312,13 @@ public class MagicCharm extends Item implements ILoreTagged {
 	}
 	
 	private boolean doPhysical(PlayerEntity player, ServerWorld world) {
-		player.addPotionEffect(new EffectInstance(
-				Effects.SPEED,
+		player.addEffect(new EffectInstance(
+				Effects.MOVEMENT_SPEED,
 				20 * 30,
 				1
 				));
 		
-		NostrumMagicaSounds.DAMAGE_PHYSICAL.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
+		NostrumMagicaSounds.DAMAGE_PHYSICAL.play(world, player.getX(), player.getY(), player.getZ());
 		
 		return true;
 	}
@@ -326,26 +326,26 @@ public class MagicCharm extends Item implements ILoreTagged {
 	private boolean doLightning(PlayerEntity player, ServerWorld world) {
 		if (world.isRaining()) {
 			AxisAlignedBB bb = new AxisAlignedBB(
-					player.getPosX() - 5,
-					player.getPosY() - 2,
-					player.getPosZ() - 5,
-					player.getPosX() + 5,
-					player.getPosY() + 10,
-					player.getPosZ() + 5);
-			List<Entity> entities = world.getEntitiesWithinAABB(LivingEntity.class, bb);
+					player.getX() - 5,
+					player.getY() - 2,
+					player.getZ() - 5,
+					player.getX() + 5,
+					player.getY() + 10,
+					player.getZ() + 5);
+			List<Entity> entities = world.getEntitiesOfClass(LivingEntity.class, bb);
 			if (entities != null && !entities.isEmpty())
 				for (Entity e : entities) {
 					LightningBoltEntity bolt = new LightningBoltEntity(EntityType.LIGHTNING_BOLT, world);
-					bolt.setPosition(e.getPosX(), e.getPosY(), e.getPosZ());
-					bolt.setEffectOnly(false);
-					world.addEntity(bolt); // TODO nostrum lightning?
+					bolt.setPos(e.getX(), e.getY(), e.getZ());
+					bolt.setVisualOnly(false);
+					world.addFreshEntity(bolt); // TODO nostrum lightning?
 				}
 		} else {
-			world.getWorldInfo().setRaining(true);
-			((IServerWorldInfo) world.getWorldInfo()).setThundering(true);
+			world.getLevelData().setRaining(true);
+			((IServerWorldInfo) world.getLevelData()).setThundering(true);
 		}
 		
-		NostrumMagicaSounds.DAMAGE_LIGHTNING.play(world, player.getPosX(), player.getPosY(), player.getPosZ());
+		NostrumMagicaSounds.DAMAGE_LIGHTNING.play(world, player.getX(), player.getY(), player.getZ());
 		return true;
 	}
 	
@@ -358,7 +358,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		if (element == EMagicElement.ENDER) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.instance.proxy.getPlayer());
 			if (attr != null && attr.hasEnhancedTeleport()) {

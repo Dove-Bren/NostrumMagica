@@ -75,9 +75,9 @@ public class SeekingBulletShape extends SpellShape {
 			Direction.Axis axis = Direction.Axis.Y;
 			Vector3d forwardDir = dir;
 			if (target != null) {
-				Vector3d vec = target.getPositionVec().subtract(getState().getSelf().getPositionVec());
+				Vector3d vec = target.position().subtract(getState().getSelf().position());
 				forwardDir = vec.normalize();
-				axis = Direction.getFacingFromVector((float) vec.x, (float) vec.y, (float) vec.z).getAxis();
+				axis = Direction.getNearest((float) vec.x, (float) vec.y, (float) vec.z).getAxis();
 			}
 			
 			Vector3d startMotion;
@@ -85,19 +85,19 @@ public class SeekingBulletShape extends SpellShape {
 			// For players, start with motion ortho to forward
 			if (getState().getSelf() instanceof PlayerEntity) {
 				startMotion = forwardDir
-						.rotateYaw(30f * (NostrumMagica.rand.nextBoolean() ? 1 : -1))
-						.rotatePitch(/*-15f*/ + NostrumMagica.rand.nextFloat() * 30f);
+						.yRot(30f * (NostrumMagica.rand.nextBoolean() ? 1 : -1))
+						.xRot(/*-15f*/ + NostrumMagica.rand.nextFloat() * 30f);
 			}
 			// For non-players, fire mostly up
 			else {
 				startMotion = (new Vector3d(0, 1, 0)).normalize()
-						.rotateYaw(360f * NostrumMagica.rand.nextFloat());
+						.yRot(360f * NostrumMagica.rand.nextFloat());
 			}
 			
 			startMotion = startMotion.scale(.4);
 			
 			SpellBulletEntity bullet = new SpellBulletEntity(NostrumEntityTypes.spellBullet, this, getState().getSelf(), target, axis);
-			bullet.setMotion(startMotion);
+			bullet.setDeltaMovement(startMotion);
 			//bullet.setVelocity(startMotion.x, startMotion.y, startMotion.z); client only :(
 			
 			bullet.setFilter((ent) -> {
@@ -113,7 +113,7 @@ public class SeekingBulletShape extends SpellShape {
 				return true;
 			});
 			
-			world.addEntity(bullet);
+			world.addFreshEntity(bullet);
 		}
 		
 		public void onProjectileHit(BlockPos pos) {
@@ -126,7 +126,7 @@ public class SeekingBulletShape extends SpellShape {
 				onProjectileHit(new BlockPos(this.pos));
 			}
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
-				onProjectileHit(entity.getPosition());
+				onProjectileHit(entity.blockPosition());
 			} else {
 				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null);
 			}
@@ -142,16 +142,16 @@ public class SeekingBulletShape extends SpellShape {
 		// Do a little more work of getting a good vector for things
 		// that aren't players
 		LivingEntity target;
-		if (self instanceof MobEntity && ((MobEntity) self).getAttackTarget() != null) {
+		if (self instanceof MobEntity && ((MobEntity) self).getTarget() != null) {
 			MobEntity ent = (MobEntity) self;
-			target = ent.getAttackTarget(); // We already know target
+			target = ent.getTarget(); // We already know target
 		} else {
 			target = null; // Solve for target with raytrace
 		}
 		
 		if (target == null && start != null && direction != null) {
 			// Ray trace
-			RayTraceResult mop = RayTrace.raytraceApprox(self.world, self, start, direction, MAX_DIST, (ent) -> {
+			RayTraceResult mop = RayTrace.raytraceApprox(self.level, self, start, direction, MAX_DIST, (ent) -> {
 				if (self == ent) {
 					return false;
 				}

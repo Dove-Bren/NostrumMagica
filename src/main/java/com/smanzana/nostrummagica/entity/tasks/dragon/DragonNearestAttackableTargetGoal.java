@@ -22,15 +22,15 @@ public class DragonNearestAttackableTargetGoal<T extends LivingEntity> extends N
 		this.predicate = predicate;
 	}
 
-	protected AxisAlignedBB getTargetableArea(double targetDistance) {
-		return this.goalOwner.getBoundingBox().grow(targetDistance,
-				((RedDragonBaseEntity) this.goalOwner).isFlying() ? 32 : 12.0D, targetDistance);
+	protected AxisAlignedBB getTargetSearchArea(double targetDistance) {
+		return this.mob.getBoundingBox().inflate(targetDistance,
+				((RedDragonBaseEntity) this.mob).isFlying() ? 32 : 12.0D, targetDistance);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	protected boolean isSuitableTarget(LivingEntity target, EntityPredicate predicate) {
-		boolean success = super.isSuitableTarget(target, predicate);
+	protected boolean canAttack(LivingEntity target, EntityPredicate predicate) {
+		boolean success = super.canAttack(target, predicate);
 		
 		if (success && this.predicate != null) {
 			success = this.predicate.apply((T) target);

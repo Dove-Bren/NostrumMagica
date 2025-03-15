@@ -15,51 +15,51 @@ public class ModelPlantBossLeaf extends EntityModel<PlantBossEntity.PlantBossLea
 	
 	public ModelPlantBossLeaf() {
 		
-		this.textureHeight = 256;
-		this.textureWidth = 256;
+		this.texHeight = 256;
+		this.texWidth = 256;
 		main = new ModelRenderer(this, 92, 250);
 		
-		main.setTextureOffset(92, 250);
+		main.texOffs(92, 250);
 		main.addBox(-16, -4, 0, 32, 2, 4);
 		
-		main.setTextureOffset(19, 199);
+		main.texOffs(19, 199);
 		main.addBox(-30, -4, 4, 60, 2, 49);
 
 		// bottom
-		main.setTextureOffset(38, 199);
+		main.texOffs(38, 199);
 		main.addBox(-4, -2, 4, 8, 2, 49).mirror = true;
 		
-		main.setTextureOffset(71, 190);
+		main.texOffs(71, 190);
 		main.addBox(-26, -4, 53, 52, 2, 5);
 		
-		main.setTextureOffset(81, 183);
+		main.texOffs(81, 183);
 		main.addBox(-22, -4, 58, 44, 2, 3);
 		
-		main.setTextureOffset(100, 177);
+		main.texOffs(100, 177);
 		main.addBox(-12, -4, 61, 24, 2, 4);
 		
-		main.setTextureOffset(194, 2254);
+		main.texOffs(194, 2254);
 		main.addBox(-32, -4, 8, 2, 2, 29);
 		
-		main.setTextureOffset(0, 225);
+		main.texOffs(0, 225);
 		main.addBox(30, -4, 8, 2, 2, 29);
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		matrixStackIn.push();
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(90f));
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+		matrixStackIn.pushPose();
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(90f));
 		main.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	@Override
-	public void setLivingAnimations(PlantBossEntity.PlantBossLeafLimb entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
-		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTicks);
+	public void prepareMobModel(PlantBossEntity.PlantBossLeafLimb entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
+		super.prepareMobModel(entityIn, limbSwing, limbSwingAmount, partialTicks);
 	}
 
 	@Override
-	public void setRotationAngles(PlantBossLeafLimb entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setupAnim(PlantBossLeafLimb entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {
 		// TODO Auto-generated method stub
 		

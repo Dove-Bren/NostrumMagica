@@ -15,23 +15,23 @@ import net.minecraft.world.IBlockReader;
 
 public class MandrakeRootCropBlock extends CropsBlock {
 
-	private static final VoxelShape[] AABB = new VoxelShape[] {Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 16*0.125D, 16.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 16*0.1875D, 16.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 16*0.25D, 16.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 16*0.3125D, 16.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 16*0.375D, 16.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 16*0.4375D, 16.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 8D, 16.0D), Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 16*0.5625D, 16.0D)};
+	private static final VoxelShape[] AABB = new VoxelShape[] {Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16*0.125D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16*0.1875D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16*0.25D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16*0.3125D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16*0.375D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16*0.4375D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16*0.5625D, 16.0D)};
 
 	public static final String ID = "mandrake_crop";
 	
 	public MandrakeRootCropBlock() {
-		super(Block.Properties.create(Material.PLANTS)
-				.doesNotBlockMovement().tickRandomly().hardnessAndResistance(0f).sound(SoundType.CROP));
+		super(Block.Properties.of(Material.PLANT)
+				.noCollission().randomTicks().strength(0f).sound(SoundType.CROP));
 	}
 	
 	@Override
-	protected Item getSeedsItem() {
+	protected Item getBaseSeedId() {
 		return NostrumItems.reagentSeedMandrake;
 	}
 	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		return AABB[((Integer)state.get(this.getAgeProperty())).intValue()];
+		return AABB[((Integer)state.getValue(this.getAgeProperty())).intValue()];
 	}
 
 //    @Override

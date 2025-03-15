@@ -31,7 +31,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 
 	@Override
 	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
-		FontRenderer fonter = mc.fontRenderer;
+		FontRenderer fonter = mc.font;
 		int x = 0;
 		int y = 5;
 		int w;
@@ -41,7 +41,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 		final int goodDataColor = 0xFFA0FFA0;
 		final int badDataColor = 0xFFFFA0A0;
 		final int capabilityColor = 0xFFFFA0FF;
-		final int h = fonter.FONT_HEIGHT;
+		final int h = fonter.lineHeight;
 		final int smallMargin = 2;
 		final int mediumMargin = 3;
 		final int largeMargin = 7;
@@ -50,31 +50,31 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 		
 		str = TextFormatting.BOLD + "Attributes" + TextFormatting.RESET;
 		x = 5;
-		fonter.drawString(matrixStackIn, str, x, y, categoryColor);
+		fonter.draw(matrixStackIn, str, x, y, categoryColor);
 		
 		x = 10;
 		y += h + mediumMargin;
 		
 		{
 			str = "Health: ";
-			w = fonter.getStringWidth(str);
+			w = fonter.width(str);
 			
-			fonter.drawString(matrixStackIn, str, x, y, labelColor);
+			fonter.draw(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
-			fonter.drawString(matrixStackIn, "" + (int) dragon.getMaxHealth(), x, y, dataColor);
+			fonter.draw(matrixStackIn, "" + (int) dragon.getMaxHealth(), x, y, dataColor);
 			y += h + smallMargin;
 		}
 		
 		x = 10;
 		if (dragon.getDragonMana() > 0) {
 			str = "Mana: ";
-			w = fonter.getStringWidth(str);
+			w = fonter.width(str);
 			
-			fonter.drawString(matrixStackIn, str, x, y, labelColor);
+			fonter.draw(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
-			fonter.drawString(matrixStackIn, "" + dragon.getDragonMana(), x, y, dataColor);
+			fonter.draw(matrixStackIn, "" + dragon.getDragonMana(), x, y, dataColor);
 			y += h + smallMargin;
 		}
 		
@@ -83,44 +83,44 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 		
 		str = TextFormatting.BOLD + "Movement" + TextFormatting.RESET;
 		x = 5;
-		fonter.drawString(matrixStackIn, str, x, y, categoryColor);
+		fonter.draw(matrixStackIn, str, x, y, categoryColor);
 		y += h + mediumMargin;
 		
 		x = 10;
 		{
 			str = "Jumps: ";
-			w = fonter.getStringWidth(str);
+			w = fonter.width(str);
 			
-			fonter.drawString(matrixStackIn, str, x, y, labelColor);
+			fonter.draw(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
 			int jumps = 1 + dragon.getBonusJumps();
 			
-			fonter.drawString(matrixStackIn, "" + jumps, x, y, jumps > 1 ? goodDataColor : badDataColor);
+			fonter.draw(matrixStackIn, "" + jumps, x, y, jumps > 1 ? goodDataColor : badDataColor);
 			y += h + smallMargin;
 		}
 		
 		x = 10;
 		if (Math.abs(dragon.getSpeedBonus()) > 0.01f) {
 			str = "Speed: ";
-			w = fonter.getStringWidth(str);
+			w = fonter.width(str);
 			
-			fonter.drawString(matrixStackIn, str, x, y, labelColor);
+			fonter.draw(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
-			fonter.drawString(matrixStackIn, String.format("%+.2f%%", dragon.getSpeedBonus()), x, y, dragon.getSpeedBonus() > 0 ? goodDataColor : badDataColor);
+			fonter.draw(matrixStackIn, String.format("%+.2f%%", dragon.getSpeedBonus()), x, y, dragon.getSpeedBonus() > 0 ? goodDataColor : badDataColor);
 			y += h + smallMargin;
 		}
 		
 		x = 10;
 		if (Math.abs(dragon.getJumpHeightBonus()) > 0.01f) {
 			str = "Jump Height: ";
-			w = fonter.getStringWidth(str);
+			w = fonter.width(str);
 			
-			fonter.drawString(matrixStackIn, str, x, y, labelColor);
+			fonter.draw(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
-			fonter.drawString(matrixStackIn, String.format("%+.2f%%", dragon.getJumpHeightBonus()), x, y, dragon.getJumpHeightBonus() > 0 ? goodDataColor : badDataColor);
+			fonter.draw(matrixStackIn, String.format("%+.2f%%", dragon.getJumpHeightBonus()), x, y, dragon.getJumpHeightBonus() > 0 ? goodDataColor : badDataColor);
 			y += h + smallMargin;
 		}
 		
@@ -128,14 +128,14 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 		
 		str = TextFormatting.BOLD + "Capabilities" + TextFormatting.RESET;
 		x = 5;
-		fonter.drawString(matrixStackIn, str, x, y, categoryColor);
+		fonter.draw(matrixStackIn, str, x, y, categoryColor);
 		y += h + mediumMargin;
 		
 		x = 10;
 		{
 			str = "Rideable";
 			
-			fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
+			fonter.draw(matrixStackIn, str, x, y, capabilityColor);
 			y += h + smallMargin;
 		}
 		
@@ -143,7 +143,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 		if (dragon.getCanFly()) {
 			str = "Weak Flight";
 			
-			fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
+			fonter.draw(matrixStackIn, str, x, y, capabilityColor);
 			y += h + smallMargin;
 		}
 		
@@ -151,7 +151,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 		if (dragon.getCanUseMagic()) {
 			str = "Magic";
 			
-			fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
+			fonter.draw(matrixStackIn, str, x, y, capabilityColor);
 			y += h + smallMargin;
 		}
 		
@@ -161,30 +161,30 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 		
 			str = TextFormatting.BOLD + "Magic" + TextFormatting.RESET;
 			x = 5;
-			fonter.drawString(matrixStackIn, str, x, y, categoryColor);
+			fonter.draw(matrixStackIn, str, x, y, categoryColor);
 			y += h + mediumMargin;
 			
 			x = 10;
 			if (dragon.getCanUseMagic()) {
 				str = "Memory: ";
-				w = fonter.getStringWidth(str);
+				w = fonter.width(str);
 				
-				fonter.drawString(matrixStackIn, str, x, y, labelColor);
+				fonter.draw(matrixStackIn, str, x, y, labelColor);
 				x += w;
 				
-				fonter.drawString(matrixStackIn, "" + dragon.getMagicMemorySize(), x, y, goodDataColor);
+				fonter.draw(matrixStackIn, "" + dragon.getMagicMemorySize(), x, y, goodDataColor);
 				y += h + smallMargin;
 			}
 			
 			x = 10;
 			if (dragon.getDragonMana() > 0) {
 				str = "Mana Regen: ";
-				w = fonter.getStringWidth(str);
+				w = fonter.width(str);
 				
-				fonter.drawString(matrixStackIn, str, x, y, labelColor);
+				fonter.draw(matrixStackIn, str, x, y, labelColor);
 				x += w;
 				
-				fonter.drawString(matrixStackIn, String.format("%.2f Mana/Sec", dragon.getManaRegen()), x, y, goodDataColor);
+				fonter.draw(matrixStackIn, String.format("%.2f Mana/Sec", dragon.getManaRegen()), x, y, goodDataColor);
 				y += h + smallMargin;
 			}
 		}

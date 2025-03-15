@@ -141,7 +141,7 @@ public enum EMagicElement {
 	public static final EMagicElement FromNBT(INBT nbt) {
 		EMagicElement element = EMagicElement.PHYSICAL;
 		try {
-			element = EMagicElement.valueOf(((StringNBT) nbt).getString().toUpperCase());
+			element = EMagicElement.valueOf(((StringNBT) nbt).getAsString().toUpperCase());
 		} catch (Exception e) {
 			;
 		}

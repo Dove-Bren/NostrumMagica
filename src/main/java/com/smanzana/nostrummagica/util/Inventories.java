@@ -32,12 +32,12 @@ public class Inventories {
     	ItemStack itemstack = stack.copy();
     	int emptyPos = -1;
 
-    	for (int i = 0; i < inventory.getSizeInventory(); ++i) {
-    		if (!inventory.isItemValidForSlot(i, itemstack)) {
+    	for (int i = 0; i < inventory.getContainerSize(); ++i) {
+    		if (!inventory.canPlaceItem(i, itemstack)) {
     			continue;
     		}
     		
-            ItemStack itemstack1 = inventory.getStackInSlot(i);
+            ItemStack itemstack1 = inventory.getItem(i);
 
             if (itemstack1.isEmpty()) {
             	// If just looking to see if it'll fit, return success.
@@ -59,13 +59,13 @@ public class Inventories {
             	if (room >= itemstack.getCount()) {
             		if (commit) {
 	            		itemstack1.grow(itemstack.getCount());
-	            		inventory.markDirty();
+	            		inventory.setChanged();
             		}
             		return ItemStack.EMPTY;
             	} else if (room > 0) {
             		if (commit) {
 	            		itemstack1.grow(room);
-	            		inventory.markDirty();
+	            		inventory.setChanged();
             		}
             		itemstack.shrink(room);
             	}
@@ -75,8 +75,8 @@ public class Inventories {
     	// If we found an empty spot, add it now
     	if (emptyPos != -1) {
     		if (commit) {
-                inventory.setInventorySlotContents(emptyPos, itemstack);
-                inventory.markDirty();
+                inventory.setItem(emptyPos, itemstack);
+                inventory.setChanged();
         	}
             return ItemStack.EMPTY;
     	}
@@ -137,8 +137,8 @@ public class Inventories {
     	
     	ItemStack itemstack = stack.copy();
     	
-    	for (int i = inventory.getSizeInventory() - 1; i >= 0 ; i--) {
-    		ItemStack inSlot = inventory.getStackInSlot(i);
+    	for (int i = inventory.getContainerSize() - 1; i >= 0 ; i--) {
+    		ItemStack inSlot = inventory.getItem(i);
     		
     		if (inSlot.isEmpty()) {
     			continue;
@@ -149,14 +149,14 @@ public class Inventories {
             	if (inSlot.getCount() > itemstack.getCount()) {
             		if (commit) {
 	            		inSlot.shrink(itemstack.getCount());
-	            		inventory.markDirty();
+	            		inventory.setChanged();
             		}
             		return ItemStack.EMPTY;
             	} else {
             		itemstack.shrink(inSlot.getCount());
             		if (commit) {
-            			inventory.removeStackFromSlot(i);
-	            		inventory.markDirty();
+            			inventory.removeItemNoUpdate(i);
+	            		inventory.setChanged();
             		}
             		
             		if (itemstack.getCount() <= 0) {
@@ -187,8 +187,8 @@ public class Inventories {
 	
 	public static final INBT serializeInventory(IInventory inv) {
 		ListNBT list = new ListNBT();
-		for (int i = 0; i < inv.getSizeInventory(); i++) {
-			@Nonnull ItemStack stack = inv.getStackInSlot(i);
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			@Nonnull ItemStack stack = inv.getItem(i);
 			if (!stack.isEmpty()) {
 				list.add(stack.serializeNBT());
 			} else {
@@ -204,14 +204,14 @@ public class Inventories {
 			return false;
 		}
 		
-		base.clear();
+		base.clearContent();
 		
 		if (nbt != null && nbt instanceof ListNBT) {
 			ListNBT list = (ListNBT) nbt;
 			for (int i = 0; i < list.size(); i++) {
 				CompoundNBT tag = list.getCompound(i);
-				@Nonnull ItemStack stack = ItemStack.read(tag);
-				base.setInventorySlotContents(i, stack);
+				@Nonnull ItemStack stack = ItemStack.of(tag);
+				base.setItem(i, stack);
 			}
 		}
 		
@@ -221,7 +221,7 @@ public class Inventories {
 	public static final int getPlayerHandSlotIndex(PlayerInventory inv, Hand hand) {
 		// Hardcoded stuff
 		if (hand == Hand.MAIN_HAND) {
-			return inv.currentItem;
+			return inv.selected;
 		} else {
 			return 40;
 		}
@@ -254,7 +254,7 @@ public class Inventories {
 			// Special cast for stupid chests :P
 			if (te instanceof ChestTileEntity) {
 				if (state != null && state.getBlock() instanceof ChestBlock) {
-					inv = ChestBlock.getChestInventory((ChestBlock) state.getBlock(), state, te.getWorld(), te.getPos(), true);
+					inv = ChestBlock.getContainer((ChestBlock) state.getBlock(), state, te.getLevel(), te.getBlockPos(), true);
 				}
 			}
 			
@@ -286,70 +286,70 @@ public class Inventories {
 		}
 		
 		@Override
-		public int getSizeInventory() {
+		public int getContainerSize() {
 			return array.length;
 		}
 
 		@Override
-		public @Nonnull ItemStack getStackInSlot(int index) {
+		public @Nonnull ItemStack getItem(int index) {
 			return array[index];
 		}
 
 		@Override
-		public @Nonnull ItemStack decrStackSize(int index, int count) {
+		public @Nonnull ItemStack removeItem(int index, int count) {
 			ItemStack split = ItemStack.EMPTY;
 			if (index < array.length) {
 				split = array[index].split(count);
 			}
-			markDirty();
+			setChanged();
 			return split;
 		}
 
 		@Override
-		public @Nonnull ItemStack removeStackFromSlot(int index) {
+		public @Nonnull ItemStack removeItemNoUpdate(int index) {
 			ItemStack stack = array[index];
 			array[index] = ItemStack.EMPTY;
-			markDirty();
+			setChanged();
 			return stack;
 		}
 
 		@Override
-		public void setInventorySlotContents(int index, @Nonnull ItemStack stack) {
+		public void setItem(int index, @Nonnull ItemStack stack) {
 			array[index] = stack;
-			markDirty();
+			setChanged();
 		}
 
 		@Override
-		public int getInventoryStackLimit() {
+		public int getMaxStackSize() {
 			return 256;
 		}
 
 		@Override
-		public void markDirty() {
+		public void setChanged() {
 			;
 		}
 
 		@Override
-		public void openInventory(PlayerEntity player) {
+		public void startOpen(PlayerEntity player) {
 			;
 		}
 
 		@Override
-		public void closeInventory(PlayerEntity player) {
+		public void stopOpen(PlayerEntity player) {
 			;
 		}
 
 		@Override
-		public boolean isItemValidForSlot(int index, ItemStack stack) {
+		public boolean canPlaceItem(int index, ItemStack stack) {
 			return true;
 		}
 
 		@Override
-		public void clear() {
+		public void clearContent() {
 			for (int i = 0; i < array.length; i++) {
 				array[i] = ItemStack.EMPTY;
 			}
-			markDirty();
+			setChanged();
 		}
 
 		@Override
@@ -364,7 +364,7 @@ public class Inventories {
 		}
 
 		@Override
-		public boolean isUsableByPlayer(PlayerEntity player) {
+		public boolean stillValid(PlayerEntity player) {
 			return true;
 		}
 		
@@ -386,13 +386,13 @@ public class Inventories {
 
 				@Override
 				public boolean hasNext() {
-					return i < inventory.getSizeInventory();
+					return i < inventory.getContainerSize();
 				}
 
 				@Override
 				public ItemStack next() {
 					if (hasNext()) {
-						return inventory.getStackInSlot(i++);
+						return inventory.getItem(i++);
 					}
 					
 					throw new NoSuchElementException();

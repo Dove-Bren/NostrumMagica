@@ -28,7 +28,7 @@ public class RenderMagicProjectile extends EntityRenderer<MagicDamageProjectileE
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(MagicDamageProjectileEntity entity) {
+	public ResourceLocation getTextureLocation(MagicDamageProjectileEntity entity) {
 		return LOC_TEXT;
 	}
 	
@@ -38,18 +38,18 @@ public class RenderMagicProjectile extends EntityRenderer<MagicDamageProjectileE
 		
 		// Copied from DragonFireballRenderer.
 		// Just render a billboard
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.scale(this.scale, this.scale, this.scale);
-		matrixStackIn.rotate(this.renderManager.getCameraOrientation());
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(180.0F));
-		Matrix4f transform = matrixStackIn.getLast().getMatrix();
-		Matrix3f normal = matrixStackIn.getLast().getNormal();
-		IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.GetBlendedEntity(getEntityTexture(entityIn), true));
-		buffer.pos(transform, -0.5f, -0.25f, 0.0f).color(color[0], color[1], color[2], color[3]).tex(0, 1f).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
-		buffer.pos(transform, 0.5f, -0.25f, 0.0f).color(color[0], color[1], color[2], color[3]).tex(1f, 1f).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
-		buffer.pos(transform, 0.5f, 0.75f, 0.0f).color(color[0], color[1], color[2], color[3]).tex(1f, 0f).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
-		buffer.pos(transform, -0.5f, 0.75f, 0.0f).color(color[0], color[1], color[2], color[3]).tex(0f, 0f).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
-		matrixStackIn.pop();
+		matrixStackIn.mulPose(this.entityRenderDispatcher.cameraOrientation());
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(180.0F));
+		Matrix4f transform = matrixStackIn.last().pose();
+		Matrix3f normal = matrixStackIn.last().normal();
+		IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.GetBlendedEntity(getTextureLocation(entityIn), true));
+		buffer.vertex(transform, -0.5f, -0.25f, 0.0f).color(color[0], color[1], color[2], color[3]).uv(0, 1f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
+		buffer.vertex(transform, 0.5f, -0.25f, 0.0f).color(color[0], color[1], color[2], color[3]).uv(1f, 1f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
+		buffer.vertex(transform, 0.5f, 0.75f, 0.0f).color(color[0], color[1], color[2], color[3]).uv(1f, 0f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
+		buffer.vertex(transform, -0.5f, 0.75f, 0.0f).color(color[0], color[1], color[2], color[3]).uv(0f, 0f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
+		matrixStackIn.popPose();
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 		
     }

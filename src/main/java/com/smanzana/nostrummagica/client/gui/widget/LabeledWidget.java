@@ -78,12 +78,12 @@ public class LabeledWidget extends MoveableObscurableWidget {
 	
 	@Override
 	public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(this.x, this.y, 0);
 		matrixStackIn.scale(scale, scale, 1f);
 		final Rectangle2d labelArea = renderLabel(matrixStackIn, 0, 0, partialTicks);
 		final Rectangle2d valueArea = renderValue(matrixStackIn, labelArea.getWidth(), 0, partialTicks, labelArea);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 		// Recalc hover to be actual rendered text length. value can change so have to keep redoing this...
 		final int actingWidth = (int) ((valueArea.getX() + valueArea.getWidth()) * scale); // expect value to return a rect offset by label starting x etc.
@@ -94,10 +94,10 @@ public class LabeledWidget extends MoveableObscurableWidget {
 	@Override
 	public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 		if (this.isHovered() && this.tooltip != null) {
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 100);
-			parent.func_243308_b(matrixStackIn, tooltip, mouseX, mouseY);
-			matrixStackIn.pop();
+			parent.renderComponentTooltip(matrixStackIn, tooltip, mouseX, mouseY);
+			matrixStackIn.popPose();
 		}
 	}
 	
@@ -112,12 +112,12 @@ public class LabeledWidget extends MoveableObscurableWidget {
 		@Override
 		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color) {
 			final Minecraft mc = Minecraft.getInstance();
-			final FontRenderer font = mc.fontRenderer;
-			final int len = font.getStringPropertyWidth(label);
+			final FontRenderer font = mc.font;
+			final int len = font.width(label);
 			
-			font.func_243246_a(matrixStackIn, label, 0, 0, color);
+			font.drawShadow(matrixStackIn, label, 0, 0, color);
 			
-			return new Rectangle2d(x, y, len, font.FONT_HEIGHT);
+			return new Rectangle2d(x, y, len, font.lineHeight);
 		}
 	}
 	
@@ -178,17 +178,17 @@ public class LabeledWidget extends MoveableObscurableWidget {
 		@Override
 		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color, Rectangle2d labelArea) {
 			final Minecraft mc = Minecraft.getInstance();
-			final FontRenderer font = mc.fontRenderer;
+			final FontRenderer font = mc.font;
 			final String value = valueGetter.get();
-			final int len = font.getStringWidth(value);
+			final int len = font.width(value);
 			
 			// Try to center vertically with the label
 			final int labelCenter = (labelArea.getY() + (labelArea.getHeight() / 2));
-			final int yAdjust = labelCenter - (font.FONT_HEIGHT / 2);
+			final int yAdjust = labelCenter - (font.lineHeight / 2);
 			
-			font.drawString(matrixStackIn, value, x, yAdjust, color);
+			font.draw(matrixStackIn, value, x, yAdjust, color);
 			
-			return new Rectangle2d(x, yAdjust, len, font.FONT_HEIGHT);
+			return new Rectangle2d(x, yAdjust, len, font.lineHeight);
 		}
 	}
 }

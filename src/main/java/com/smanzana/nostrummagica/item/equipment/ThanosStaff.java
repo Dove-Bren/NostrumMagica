@@ -45,19 +45,19 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellEquipme
 	protected static UUID THANOSTAFF_POTENCY_UUID = UUID.fromString("d46057a6-872d-45d5-9d09-9cb1f0daf62e");
 	
 	public ThanosStaff() {
-		super(ItemTier.WOOD, 3, -2.4F, NostrumItems.PropEquipment().maxDamage(500));
+		super(ItemTier.WOOD, 3, -2.4F, NostrumItems.PropEquipment().durability(500));
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
         Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
         ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 		builder.putAll(multimap);
         
         if (equipmentSlot == EquipmentSlotType.MAINHAND)
         {
-            builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, AttributeModifier.Operation.ADDITION));
-            builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
+            builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 4, AttributeModifier.Operation.ADDITION));
+            builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
         }
         
         if (equipmentSlot == EquipmentSlotType.MAINHAND || equipmentSlot == EquipmentSlotType.OFFHAND) {
@@ -94,7 +94,7 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellEquipme
 	}
 	
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return !repair.isEmpty() && NostrumTags.Items.CrystalSmall.contains(repair.getItem());
     }
 
@@ -103,7 +103,7 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellEquipme
 		// We provide -5% reagent cost, +15% potency
 		summary.addReagentCost(-.05f);
 		summary.addEfficiency(.15f);
-		ItemStacks.damageItem(stack, caster, caster.getHeldItemMainhand() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+		ItemStacks.damageItem(stack, caster, caster.getMainHandItem() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
 
 		if (summary.getReagentCost() <= 0) {
 			return;
@@ -119,8 +119,8 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellEquipme
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		tooltip.add(new StringTextComponent("Reagent Cost Discount: 5%"));
 	}
 	

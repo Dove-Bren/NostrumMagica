@@ -48,9 +48,9 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	private final boolean isUnbreakable;
 	
 	public MimicOnesidedBlock(boolean isDoor, boolean isUnbreakable) {
-		super(Block.Properties.create(Material.GLASS)
-				.hardnessAndResistance(isUnbreakable ? -1.0F : 1.0f, isUnbreakable ? 3600000.8F : 1.0f)
-				.variableOpacity()
+		super(Block.Properties.of(Material.GLASS)
+				.strength(isUnbreakable ? -1.0F : 1.0f, isUnbreakable ? 3600000.8F : 1.0f)
+				.dynamicShape()
 				);
 		
 		this.isDoor = isDoor;
@@ -64,7 +64,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(FACING);
 	}
 	
@@ -74,15 +74,15 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 		final double dx;
 		final double dz;
 		if (entityIn instanceof PlayerEntity) {
-			dx = entityIn.world.isRemote()
-					? (entityIn.getMotion().x)
-					: (entityIn.getPosX() - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
-			dz = entityIn.world.isRemote()
-					? (entityIn.getMotion().z)
-					: (entityIn.getPosZ() - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
+			dx = entityIn.level.isClientSide()
+					? (entityIn.getDeltaMovement().x)
+					: (entityIn.getX() - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
+			dz = entityIn.level.isClientSide()
+					? (entityIn.getDeltaMovement().z)
+					: (entityIn.getZ() - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
 		} else {
-			dx = entityIn.getMotion().x;
-			dz = entityIn.getMotion().z;
+			dx = entityIn.getDeltaMovement().x;
+			dz = entityIn.getDeltaMovement().z;
 		}
 		
 //				final double dx = worldIn.isRemote
@@ -92,7 +92,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 //						? (entityIn.getMotion().z)
 //						: (entityIn.getPosZ() - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
 		
-		return new Vector3d(dx, entityIn.getMotion().y, dz);
+		return new Vector3d(dx, entityIn.getDeltaMovement().y, dz);
 	}
 	
 	protected Vector3d getEntEffectivePos(Entity entityIn, @Nullable Vector3d motion) {
@@ -101,7 +101,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 		// cant use getCenter cause it's client-side only
 		//Vector3d center = entityBox.getCenter();
 		//Vector3d center = new Vector3d(entityBox.minX + (entityBox.maxX - entityBox.minX) * 0.5D, entityBox.minY + (entityBox.maxY - entityBox.minY) * 0.5D, entityBox.minZ + (entityBox.maxZ - entityBox.minZ) * 0.5D);
-		Vector3d center = entityIn.getPositionVec();
+		Vector3d center = entityIn.position();
 		
 		if (motion == null) {
 			motion = getEntEffectiveMotion(entityIn);
@@ -118,11 +118,11 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
-		if (context != ISelectionContext.dummy()) {
+		if (context != ISelectionContext.empty()) {
 			if (context.getEntity() == null || !(context.getEntity() instanceof PlayerEntity) || !((PlayerEntity) context.getEntity()).isCreative()) {
 				// Hide if looking at from the right way
 				final Vector3d center = getEntEffectivePos(context.getEntity(), null);
-				final Direction side = state.get(FACING);
+				final Direction side = state.getValue(FACING);
 				final boolean blocks;
 				
 				switch (side) {
@@ -166,7 +166,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 			final Entity entityIn = context.getEntity();
 			final Vector3d motion = this.getEntEffectiveMotion(entityIn);
 			final Vector3d center = this.getEntEffectivePos(entityIn, motion);
-			Direction side = state.get(FACING);
+			Direction side = state.getValue(FACING);
 			
 			switch (side) {
 			case DOWN:
@@ -192,7 +192,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 		}
 		
 		if (solid) {
-			return VoxelShapes.fullCube();
+			return VoxelShapes.block();
 		} else {
 			return VoxelShapes.empty();
 		}
@@ -201,46 +201,46 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
 		//Direction enumfacing = Direction.getHorizontal(MathHelper.floor_double((double)(placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3).getOpposite();
-		return this.getDefaultState()
-				.with(FACING,context.getNearestLookingDirection().getOpposite())
+		return this.defaultBlockState()
+				.setValue(FACING,context.getNearestLookingDirection().getOpposite())
 				;
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
-		return side != state.get(FACING);
+	public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
+		return side != state.getValue(FACING);
 	}
 	
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
 	public void onBlockHighlight(DrawHighlightEvent.HighlightBlock event) {
 		if (event.getTarget().getType() == RayTraceResult.Type.BLOCK) {
-			BlockPos pos = new BlockPos(event.getTarget().getHitVec());
-			BlockState hit = event.getInfo().getRenderViewEntity().world.getBlockState(pos);
+			BlockPos pos = new BlockPos(event.getTarget().getLocation());
+			BlockState hit = event.getInfo().getEntity().level.getBlockState(pos);
 			if (hit != null && hit.getBlock() == this) {
-				Direction face = hit.get(FACING);
+				Direction face = hit.getValue(FACING);
 				boolean outside = false;
 				
 				switch (face) {
 				case DOWN:
-					outside = event.getInfo().getProjectedView().y < pos.getY();
+					outside = event.getInfo().getPosition().y < pos.getY();
 					break;
 				case EAST:
-					outside = event.getInfo().getProjectedView().x > pos.getX() + 1;
+					outside = event.getInfo().getPosition().x > pos.getX() + 1;
 					break;
 				case NORTH:
-					outside = event.getInfo().getProjectedView().z < pos.getZ();
+					outside = event.getInfo().getPosition().z < pos.getZ();
 					break;
 				case SOUTH:
-					outside = event.getInfo().getProjectedView().z > pos.getZ() + 1;
+					outside = event.getInfo().getPosition().z > pos.getZ() + 1;
 					break;
 				case UP:
 				default:
-					outside =  event.getInfo().getProjectedView().y > pos.getY() + 1;
+					outside =  event.getInfo().getPosition().y > pos.getY() + 1;
 					break;
 				case WEST:
-					outside = event.getInfo().getProjectedView().x < pos.getX();
+					outside = event.getInfo().getPosition().x < pos.getX();
 					break;
 				}
 				
@@ -255,10 +255,10 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	@Override
 	protected boolean shouldRefreshFromNeighbor(BlockState state, World worldIn, BlockPos myPos, BlockPos fromPos) {
 		// Mimic blocks mimic what's below them, unless placed up/down in which case they go north
-		Direction mimicFacing = state.get(FACING);
+		Direction mimicFacing = state.getValue(FACING);
 		final BlockPos samplePos = (mimicFacing.getAxis() == Axis.Y
 				? myPos.north()
-				: myPos.down());
+				: myPos.below());
 		return samplePos.equals(fromPos);
 	}
 	
@@ -266,12 +266,12 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	@Override
 	public @Nonnull BlockState getMimickedState(BlockState mimicBlockState, World world, BlockPos myPos) {
 		// Mimic blocks mimic what's below them, unless placed up/down in which case they go north
-		Direction mimicFacing = mimicBlockState.get(FACING);
+		Direction mimicFacing = mimicBlockState.getValue(FACING);
 		final Function<BlockPos, BlockPos> moveCursor;
 		if (mimicFacing.getAxis() == Axis.Y) {
 			moveCursor = (pos) -> pos.north();
 		} else {
-			moveCursor = (pos) -> pos.down();
+			moveCursor = (pos) -> pos.below();
 		}
 		
 		BlockPos pos = moveCursor.apply(myPos);
@@ -282,7 +282,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 		while (state.getBlock() instanceof MimicBlock) {
 			pos = moveCursor.apply(pos);
 			if (pos.getY() <= 0) {
-				state = Blocks.AIR.getDefaultState();
+				state = Blocks.AIR.defaultBlockState();
 			} else {
 				state = world.getBlockState(pos);
 			}
@@ -296,7 +296,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		if (state.get(FACING).getAxis() == Axis.Y) {
+		if (state.getValue(FACING).getAxis() == Axis.Y) {
 			return new DelayLoadedMimicBlockTileEntity();
 		}
 		

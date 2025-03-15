@@ -23,16 +23,16 @@ public interface IPrintableAttribute {
 
 		// Formatting here copied from Vanilla
 		if (val > 0) {
-			return (new TranslationTextComponent("attribute.modifier.plus." + modifier.getOperation().getId(),
-					ItemStack.DECIMALFORMAT.format(val),
-					new TranslationTextComponent(attribute.getAttributeName())))
-							.mergeStyle(TextFormatting.BLUE);
+			return (new TranslationTextComponent("attribute.modifier.plus." + modifier.getOperation().toValue(),
+					ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(val),
+					new TranslationTextComponent(attribute.getDescriptionId())))
+							.withStyle(TextFormatting.BLUE);
 		} else {
 			val = -val;
-			return (new TranslationTextComponent("attribute.modifier.take." + modifier.getOperation().getId(),
-					ItemStack.DECIMALFORMAT.format(val),
-					new TranslationTextComponent(attribute.getAttributeName())))
-							.mergeStyle(TextFormatting.RED);
+			return (new TranslationTextComponent("attribute.modifier.take." + modifier.getOperation().toValue(),
+					ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(val),
+					new TranslationTextComponent(attribute.getDescriptionId())))
+							.withStyle(TextFormatting.RED);
 		}
 	}
 
@@ -71,9 +71,9 @@ public interface IPrintableAttribute {
 		}
 		
 		return new TranslationTextComponent(transKey,
-					ItemStack.DECIMALFORMAT.format(val > 0 ? val : -val),
-					new TranslationTextComponent(attribute.getAttributeName())
-				).mergeStyle(color);
+					ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(val > 0 ? val : -val),
+					new TranslationTextComponent(attribute.getDescriptionId())
+				).withStyle(color);
 	}
 	
 	public static interface IPercentageAttribute extends IPrintableAttribute {

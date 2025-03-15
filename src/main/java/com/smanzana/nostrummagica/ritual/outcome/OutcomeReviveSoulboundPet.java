@@ -36,14 +36,14 @@ public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
 	
 	@Override
 	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
-		if (world.isRemote)
+		if (world.isClientSide)
 			return;
 		
 		super.perform(world, player, center, layout, recipe);
 		
 		// Also return soul item to center pedestal
 		TileEntity te;
-		te = world.getTileEntity(center);
+		te = world.getBlockEntity(center);
 		if (te != null && te instanceof AltarTileEntity) {
 			((AltarTileEntity) te).setItem(layout.getCenterItem(world, center).copy());
 		}
@@ -54,17 +54,17 @@ public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
 		// Must have PetSoulItem in center, and must have valid soul.
 		final ItemStack centerItem = layout.getCenterItem(world, center);
 		if (centerItem.isEmpty() || !(centerItem.getItem() instanceof PetSoulItem)) {
-			player.sendMessage(new TranslationTextComponent("info.respawn_soulbound_pet.fail.baditem", new Object[0]), Util.DUMMY_UUID);
+			player.sendMessage(new TranslationTextComponent("info.respawn_soulbound_pet.fail.baditem", new Object[0]), Util.NIL_UUID);
 			return false;
 		}
 		
 		PetSoulItem item = (PetSoulItem) centerItem.getItem();
 		if (item.getPetSoulID(centerItem) == null) {
-			player.sendMessage(new TranslationTextComponent("info.respawn_soulbound_pet.fail.baditem", new Object[0]), Util.DUMMY_UUID);
+			player.sendMessage(new TranslationTextComponent("info.respawn_soulbound_pet.fail.baditem", new Object[0]), Util.NIL_UUID);
 			return false;
 		}
 		
-		if (!item.canSpawnEntity(world, player, Vector3d.copyCentered(center), centerItem)) {
+		if (!item.canSpawnEntity(world, player, Vector3d.atCenterOf(center), centerItem)) {
 			return false;
 		}
 		

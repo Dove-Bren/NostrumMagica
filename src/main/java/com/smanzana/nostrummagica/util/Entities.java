@@ -17,15 +17,15 @@ import net.minecraft.world.server.ServerWorld;
 public class Entities {
 
 	public static @Nullable Entity FindEntity(World world, UUID id) {
-		if (world.isRemote() && world instanceof ClientWorld) {
-			Iterable<Entity> entities = ((ClientWorld)world).getAllEntities();
+		if (world.isClientSide() && world instanceof ClientWorld) {
+			Iterable<Entity> entities = ((ClientWorld)world).entitiesForRendering();
 			for (Entity ent : entities) {
-				if (ent.getUniqueID().equals(id)) {
+				if (ent.getUUID().equals(id)) {
 					return ent;
 				}
 			}
 		} else if (world instanceof ServerWorld) {
-			return ((ServerWorld) world).getEntityByUuid(id);
+			return ((ServerWorld) world).getEntity(id);
 		}
 		
 		return null;

@@ -41,9 +41,9 @@ public class OutcomeSpawnItem implements IItemRitualOutcome {
 			ItemEntity entity = new ItemEntity(world,
 					center.getX() + .5, center.getY() + 1, center.getZ() + .5,
 					stack.copy());
-			world.addEntity(entity);
+			world.addFreshEntity(entity);
 		} else {
-			AltarTileEntity altar = (AltarTileEntity) world.getTileEntity(center);
+			AltarTileEntity altar = (AltarTileEntity) world.getBlockEntity(center);
 			altar.setItem(stack.copy());
 		}
 		
@@ -52,7 +52,7 @@ public class OutcomeSpawnItem implements IItemRitualOutcome {
 			ItemEntity entity = new ItemEntity(world,
 					center.getX() + .5, center.getY() + 1, center.getZ() + .5,
 					leftoverStack.copy());
-			world.addEntity(entity);
+			world.addFreshEntity(entity);
 		}
 	}
 
@@ -69,6 +69,6 @@ public class OutcomeSpawnItem implements IItemRitualOutcome {
 	@Override
 	public List<ITextComponent> getDescription() {
 		return TextUtils.GetTranslatedList("ritual.outcome.spawn_item.desc",
-				new Object[]{stack.getDisplayName()});
+				new Object[]{stack.getHoverName()});
 	}
 }

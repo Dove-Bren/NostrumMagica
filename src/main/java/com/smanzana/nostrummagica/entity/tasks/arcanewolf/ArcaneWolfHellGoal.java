@@ -21,6 +21,8 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvents;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class ArcaneWolfHellGoal extends Goal {
 
 	protected final ArcaneWolfEntity wolf;
@@ -38,97 +40,97 @@ public class ArcaneWolfHellGoal extends Goal {
 		
 		this.activeTicks = 0;
 		
-		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+		this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 	
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		return wolf.isAlive()
-				&& !wolf.isSitting()
-				&& wolf.getAttackTarget() != null
-				&& wolf.ticksExisted >= cooldownTicks
+				&& !wolf.isOrderedToSit()
+				&& wolf.getTarget() != null
+				&& wolf.tickCount >= cooldownTicks
 				&& wolf.getMana() >= manaCost
 				&& wolf.getElementalType() == ArcaneWolfElementalType.HELL
 				;
 	}
 	
 	@Override
-	public boolean shouldContinueExecuting() {
+	public boolean canContinueToUse() {
 		return this.activeTicks > 0
 				&& this.activeTarget != null
 				&& this.activeTarget.isAlive();
 	}
 	
 	@Override
-	public boolean isPreemptible() {
+	public boolean isInterruptable() {
 		return false;
 	}
 	
 	@Override
-	public void resetTask() {
+	public void stop() {
 		final int backoff = 20 * 30;
-		cooldownTicks = wolf.ticksExisted + backoff;
+		cooldownTicks = wolf.tickCount + backoff;
 		activeTicks = 0;
 		activeTarget = null;
 	}
 	
 	protected void poisonEntity(ArcaneWolfEntity wolf, LivingEntity target) {
 		// Capture velocity before attack
-		double velX = target.getMotion().x;
-		double velY = target.getMotion().y;
-		double velZ = target.getMotion().z;
+		double velX = target.getDeltaMovement().x;
+		double velY = target.getDeltaMovement().y;
+		double velZ = target.getDeltaMovement().z;
 		
-		wolf.setLastAttackedEntity(target);
-		target.setRevengeTarget(wolf);
-		target.hurtResistantTime = 0;
-		target.attackEntityFrom(DamageSource.causeMobDamage(wolf), .5f);
+		wolf.setLastHurtMob(target);
+		target.setLastHurtByMob(wolf);
+		target.invulnerableTime = 0;
+		target.hurt(DamageSource.mobAttack(wolf), .5f);
 		
 		// Reset motion; we don't want knockback!
-		target.setMotion(velX, velY, velZ);
-		target.velocityChanged = true;
+		target.setDeltaMovement(velX, velY, velZ);
+		target.hurtMarked = true;
 	}
 	
 	protected void burnEntity(ArcaneWolfEntity wolf, LivingEntity target) {
 		// Capture velocity before attack
-		double velX = target.getMotion().x;
-		double velY = target.getMotion().y;
-		double velZ = target.getMotion().z;
+		double velX = target.getDeltaMovement().x;
+		double velY = target.getDeltaMovement().y;
+		double velZ = target.getDeltaMovement().z;
 		
-		wolf.setLastAttackedEntity(target);
-		target.setRevengeTarget(wolf);
-		target.hurtResistantTime = 0;
+		wolf.setLastHurtMob(target);
+		target.setLastHurtByMob(wolf);
+		target.invulnerableTime = 0;
 		SpellDamage.DamageEntity(target, EMagicElement.FIRE, 4f, wolf);
 		NostrumMagicaSounds.DAMAGE_FIRE.play(target);
 		
 		// Reset motion; we don't want knockback!
-		target.setMotion(velX, velY, velZ);
-		target.velocityChanged = true;
+		target.setDeltaMovement(velX, velY, velZ);
+		target.hurtMarked = true;
 	}
 	
 	protected void startBurnEffect(ArcaneWolfEntity wolf, LivingEntity target, int duration) {
 		NetworkHandler.sendToAllTracking(
-				new SpawnPredefinedEffectMessage(PredefinedEffect.HELL_BURN, duration, DimensionUtils.GetDimension(target), target.getEntityId()),
+				new SpawnPredefinedEffectMessage(PredefinedEffect.HELL_BURN, duration, DimensionUtils.GetDimension(target), target.getId()),
 				target);
 	}
 	
 	@Override
-	public void startExecuting() {
+	public void start() {
 		// Hell ability is a rapid 'poison' effect with fire visual effects
 		// Figure out how long to last for (modified by caster's efficiency!) and then set our active time
 		// to that. Then, each tick, maybe do damage or update effect.
 		// Effect is actually going to be 'predefined' client effect to avoid spamming packets.
 		float base = 20 * 5;
-		EffectInstance boostEffect = wolf.getActivePotionEffect(NostrumEffects.magicBoost);
+		EffectInstance boostEffect = wolf.getEffect(NostrumEffects.magicBoost);
 		if (boostEffect != null) {
 			base *= Math.pow(1.5, boostEffect.getAmplifier() + 1);
 		}
 		
 		this.activeTicks = (int) base;
-		this.activeTarget = wolf.getAttackTarget();
+		this.activeTarget = wolf.getTarget();
 		wolf.addMana(-manaCost);
 		
 		startBurnEffect(wolf, this.activeTarget, this.activeTicks);
-		wolf.playSound(SoundEvents.ENTITY_WOLF_AMBIENT, 1f, .5f);
+		wolf.playSound(SoundEvents.WOLF_AMBIENT, 1f, .5f);
 	}
 	
 	@Override
@@ -139,9 +141,9 @@ public class ArcaneWolfHellGoal extends Goal {
 			poisonEntity(wolf, this.activeTarget);
 		}
 		if (activeTicks % 25 == 0) {
-			wolf.playSound(SoundEvents.ENTITY_WOLF_GROWL, 1f, 1f);
+			wolf.playSound(SoundEvents.WOLF_GROWL, 1f, 1f);
 		}
-		wolf.faceEntity(this.activeTarget, 30f, 180f);
+		wolf.lookAt(this.activeTarget, 30f, 180f);
 		activeTicks--;
 	}
 }

@@ -24,13 +24,13 @@ public class RenderMagicSaucer<T extends SpellSaucerEntity> extends EntityRender
 
 	public RenderMagicSaucer(EntityRendererManager renderManagerIn) {
 		super(renderManagerIn);
-		mainModel = new ModelBaked<>(RenderType::getEntityTranslucent, MODEL);
+		mainModel = new ModelBaked<>(RenderType::entityTranslucent, MODEL);
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public ResourceLocation getEntityTexture(SpellSaucerEntity entity) {
-		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
+	public ResourceLocation getTextureLocation(SpellSaucerEntity entity) {
+		return AtlasTexture.LOCATION_BLOCKS;
 	}
 	
 	@Override
@@ -48,21 +48,21 @@ public class RenderMagicSaucer<T extends SpellSaucerEntity> extends EntityRender
 //        	GlStateManager.translated(vec.x, vec.y, vec.z);
 //        }
 		
-		final float yOffset = entityIn.getHeight() / 2;
+		final float yOffset = entityIn.getBbHeight() / 2;
 		final float[] color = ColorUtil.ARGBToColor(entityIn.getElement().getColor());
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		if (!(entityIn instanceof CyclerSpellSaucerEntity)) {
 			//matrixStackIn.rotate(Vector3f.XP.rotationDegrees(-90.0F - entityLiving.rotationPitch));
-			matrixStackIn.rotate(Vector3f.XP.rotationDegrees(entityIn.rotationPitch));
+			matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(entityIn.xRot));
 		}
 		
 		matrixStackIn.scale(.5f, .5f, .5f);
 		matrixStackIn.translate(0, yOffset, 0);
-		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(-90f));
+		matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(-90f));
 		
-		mainModel.render(matrixStackIn, bufferIn.getBuffer(mainModel.getRenderType(getEntityTexture(entityIn))), packedLightIn, OverlayTexture.NO_OVERLAY, color[0], color[1], color[2], 1f);
+		mainModel.renderToBuffer(matrixStackIn, bufferIn.getBuffer(mainModel.renderType(getTextureLocation(entityIn))), packedLightIn, OverlayTexture.NO_OVERLAY, color[0], color[1], color[2], 1f);
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 }

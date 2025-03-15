@@ -30,12 +30,12 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 	public ParticleFilledOrb(ClientWorld worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
-		particleRed = red;
-		particleGreen = green;
-		particleBlue = blue;
-		particleAlpha = 0f;
+		rCol = red;
+		gCol = green;
+		bCol = blue;
+		alpha = 0f;
 		this.maxAlpha = alpha;
-		maxAge = lifetime;
+		lifetime = lifetime;
 	}
 	
 	public ParticleFilledOrb setGravity(boolean gravity) {
@@ -43,7 +43,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 	}
 	
 	public ParticleFilledOrb setGravityStrength(float strength) {
-		particleGravity = strength;
+		gravity = strength;
 		return this;
 	}
 	
@@ -61,17 +61,17 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 	
 	public ParticleFilledOrb setMotion(double xVelocity, double yVelocity, double zVelocity,
 			double xJitter, double yJitter, double zJitter) {
-		this.motionX = xVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter; // +- jitter
-		this.motionY = yVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter;
-		this.motionZ = zVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter;
+		this.xd = xVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter; // +- jitter
+		this.yd = yVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter;
+		this.zd = zVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter;
 		return this;
 	}
 	
 	public ParticleFilledOrb setTarget(Entity ent) {
 		targetEntity = ent;
 		if (this.targetPos == null && ent != null) {
-			final double wRad = ent.getWidth() * 2; // double width
-			final double hRad = ent.getHeight();
+			final double wRad = ent.getBbWidth() * 2; // double width
+			final double hRad = ent.getBbHeight();
 			this.targetPos = new Vector3d(wRad * (NostrumMagica.rand.nextDouble() - .5),
 					hRad * (NostrumMagica.rand.nextDouble() - .5),
 					wRad * (NostrumMagica.rand.nextDouble() - .5));
@@ -133,31 +133,31 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 		
 		if (this.age < 20) {
 			// fade in in first second
-			this.particleAlpha = ((float) age / 20f);
-		} else if (this.age >= this.maxAge - 20f) {
+			this.alpha = ((float) age / 20f);
+		} else if (this.age >= this.lifetime - 20f) {
 			// Fade out in last second
-			this.particleAlpha = ((float) (maxAge - age) / 20f);
+			this.alpha = ((float) (lifetime - age) / 20f);
 		} else {
-			this.particleAlpha = 1f;
+			this.alpha = 1f;
 		}
 		
-		this.particleAlpha *= maxAlpha;
+		this.alpha *= maxAlpha;
 		
 		if (targetEntity != null) {
 			if (targetEntity.isAlive()) {
 				final float period = 20f;
-				Vector3d offset = targetPos == null ? new Vector3d(0,0,0) : targetPos.rotateYaw((float) (Math.PI * 2 * ((float) age % period) / period));
-				Vector3d curVelocity = new Vector3d(motionX, motionY, motionZ);
-				Vector3d posDelta = targetEntity.getPositionVec()
-						.add(offset.x, offset.y + targetEntity.getHeight()/2, offset.z)
-						.subtract(posX, posY, posZ);
+				Vector3d offset = targetPos == null ? new Vector3d(0,0,0) : targetPos.yRot((float) (Math.PI * 2 * ((float) age % period) / period));
+				Vector3d curVelocity = new Vector3d(xd, yd, zd);
+				Vector3d posDelta = targetEntity.position()
+						.add(offset.x, offset.y + targetEntity.getBbHeight()/2, offset.z)
+						.subtract(x, y, z);
 				Vector3d idealVelocity = posDelta.normalize().scale(.3);
 				this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 			}
 			// Else just do nothing
 		} else if (targetPos != null) {
-			Vector3d curVelocity = new Vector3d(motionX, motionY, motionZ);
-			Vector3d posDelta = targetPos.subtract(posX, posY, posZ);
+			Vector3d curVelocity = new Vector3d(xd, yd, zd);
+			Vector3d posDelta = targetPos.subtract(x, y, z);
 			Vector3d idealVelocity = posDelta.normalize().scale(.3);
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 		}
@@ -179,7 +179,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 				particle = new ParticleFilledOrb(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime);
 				
 				if (params.targetEntID != null) {
-					particle.setTarget(world.getEntityByID(params.targetEntID));
+					particle.setTarget(world.getEntity(params.targetEntID));
 				}
 				if (params.targetPos != null) {
 					particle.setTarget(params.targetPos);
@@ -192,7 +192,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 				}
 				particle.dieOnTarget(params.dieOnTarget);
 				Minecraft mc = Minecraft.getInstance();
-				mc.particles.addEffect(particle);
+				mc.particleEngine.add(particle);
 			}
 			return particle;
 		}

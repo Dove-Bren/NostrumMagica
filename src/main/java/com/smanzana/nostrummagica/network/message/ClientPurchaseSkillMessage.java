@@ -64,7 +64,7 @@ public class ClientPurchaseSkillMessage {
 	}
 
 	public static ClientPurchaseSkillMessage decode(PacketBuffer buf) {
-		final String skillKeyRaw = buf.readString(32767);
+		final String skillKeyRaw = buf.readUtf(32767);
 		Skill skill = Skill.lookup(new ResourceLocation(skillKeyRaw));
 		if (skill == null) {
 			throw new DecoderException("Failed to find nostrum skill for " + skillKeyRaw);
@@ -74,7 +74,7 @@ public class ClientPurchaseSkillMessage {
 	}
 
 	public static void encode(ClientPurchaseSkillMessage msg, PacketBuffer buf) {
-		buf.writeString(msg.skill.getKey().toString());
+		buf.writeUtf(msg.skill.getKey().toString());
 	}
 
 }

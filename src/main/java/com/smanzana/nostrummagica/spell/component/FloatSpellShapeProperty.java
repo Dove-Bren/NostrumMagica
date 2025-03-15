@@ -29,7 +29,7 @@ public class FloatSpellShapeProperty extends SpellShapeProperty<Float> {
 
 	@Override
 	public Float readValue(INBT tag) {
-		return tag instanceof FloatNBT ? ((FloatNBT) tag).getFloat() : getDefault();
+		return tag instanceof FloatNBT ? ((FloatNBT) tag).getAsFloat() : getDefault();
 	}
 
 	@Override

@@ -62,7 +62,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 	private String recipeName;
 	
 	public RitualRecipeCategory(IGuiHelper guiHelper) {
-		title = I18n.format("nei.category.ritual.name", (Object[]) null);
+		title = I18n.get("nei.category.ritual.name", (Object[]) null);
 		backgroundTier1 = guiHelper.drawableBuilder(TEXT_TIER1, 0, 0, BACK_WIDTH, BACK_HEIGHT).addPadding(10, 0, 0, 0).build();
 		backgroundTier2 = guiHelper.drawableBuilder(TEXT_TIER2, 0, 0, BACK_WIDTH, BACK_HEIGHT).addPadding(10, 0, 0, 0).build();
 		backgroundTier3 = guiHelper.drawableBuilder(TEXT_TIER3, 0, 0, BACK_WIDTH, BACK_HEIGHT).addPadding(10, 0, 0, 0).build();
@@ -101,7 +101,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 	@Override
 	public void draw(RitualRecipe recipe, MatrixStack matrixStackIn, double mouseX, double mouseY) {
 		final Minecraft minecraft = Minecraft.getInstance();
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		
 		float red, green, blue, alpha, angle;
 		alpha = 1f;
@@ -119,25 +119,25 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 		green = ((float) ((color >> 8) & 0xFF) / 255f);
 		blue = ((float) (color & 0xFF) / 255f);
 		matrixStackIn.translate(48, 70, 0);
-		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(angle));
+		matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(angle));
 		matrixStackIn.translate(-RING_WIDTH / 2, -RING_HEIGHT/2, 0);
 		
 		RenderSystem.enableBlend();
-		minecraft.getTextureManager().bindTexture(TEXT_RING);
+		minecraft.getTextureManager().bind(TEXT_RING);
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, 0, 0, 0,
 				0, RING_WIDTH, RING_HEIGHT, RING_WIDTH, RING_HEIGHT,
 				red, green, blue, alpha);
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 		if (!canPerform(recipe)) {
-			minecraft.fontRenderer.drawString(matrixStackIn, TextFormatting.BOLD + "x" + TextFormatting.RESET, 108, 70, 0xFFAA0000);
+			minecraft.font.draw(matrixStackIn, TextFormatting.BOLD + "x" + TextFormatting.RESET, 108, 70, 0xFFAA0000);
 		}
 		
 		
 		String title = recipeName;
-		int len = minecraft.fontRenderer.getStringWidth(title);
-		minecraft.fontRenderer.drawString(matrixStackIn, title, (BACK_WIDTH - len) / 2, 2, 0xFF000000);
+		int len = minecraft.font.width(title);
+		minecraft.font.draw(matrixStackIn, title, (BACK_WIDTH - len) / 2, 2, 0xFF000000);
 	}
 	
 	@Override
@@ -145,14 +145,14 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 		List<Ingredient> stackInputs = new ArrayList<>();
 		
 		// Add flavor gem
-		stackInputs.add(Ingredient.fromItems(InfusedGemItem.getGemItem(ritual.getElement())));
+		stackInputs.add(Ingredient.of(InfusedGemItem.getGemItem(ritual.getElement())));
 		Ingredient reagent2, reagent3, reagent4;
 		ReagentType reagents[] = ritual.getTypes();
-		stackInputs.add(Ingredient.fromItems(ReagentItem.GetItem(reagents[0])));
+		stackInputs.add(Ingredient.of(ReagentItem.GetItem(reagents[0])));
 		if (reagents.length > 1) {
-			reagent2 = Ingredient.fromItems(ReagentItem.GetItem(reagents[1]));
-			reagent3 = Ingredient.fromItems(ReagentItem.GetItem(reagents[2]));
-			reagent4 = Ingredient.fromItems(ReagentItem.GetItem(reagents[3]));
+			reagent2 = Ingredient.of(ReagentItem.GetItem(reagents[1]));
+			reagent3 = Ingredient.of(ReagentItem.GetItem(reagents[2]));
+			reagent4 = Ingredient.of(ReagentItem.GetItem(reagents[3]));
 		} else {
 			reagent2 = reagent3 = reagent4 = Ingredient.EMPTY;
 		}
@@ -212,7 +212,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 		
 		recipeFlavor = ritual.getElement();
 		recipeTier = ritual.getTier();
-		recipeName = I18n.format("ritual." + ritual.getTitleKey() + ".name", (Object[]) null);
+		recipeName = I18n.get("ritual." + ritual.getTitleKey() + ".name", (Object[]) null);
 
 		guiItemStacks.init(0, true, 102, 35);
 		if (ritual.getTier() == 0) {

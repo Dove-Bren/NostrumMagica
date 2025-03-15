@@ -18,6 +18,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
+import net.minecraft.item.Item.Properties;
+
 public class GoldMirrorItem extends HandheldMirrorItem implements ILoreTagged {
 
 	public static final String ID = "gold_mirror";
@@ -55,7 +57,7 @@ public class GoldMirrorItem extends HandheldMirrorItem implements ILoreTagged {
 
 	@Override
 	protected void handleOpen(PlayerEntity player, Hand hand, ItemStack stack) {
-		if (!player.world.isRemote()) {
+		if (!player.level.isClientSide()) {
 			return; // Only run client side to kick off handshake
 		}
 		
@@ -64,10 +66,10 @@ public class GoldMirrorItem extends HandheldMirrorItem implements ILoreTagged {
 		
 		if (pos != null && dimension != null && DimensionUtils.InDimension(player, dimension)) {
 			// Since in the dimension, can use player world
-			if (NostrumMagica.isBlockLoaded(player.world, pos)) {
+			if (NostrumMagica.isBlockLoaded(player.level, pos)) {
 				NetworkHandler.sendToServer(new RemoteInteractMessage(dimension, pos, hand));
 			} else {
-				player.sendMessage(new TranslationTextComponent("info.gold_mirror.not_loaded"), Util.DUMMY_UUID);
+				player.sendMessage(new TranslationTextComponent("info.gold_mirror.not_loaded"), Util.NIL_UUID);
 			}
 		}
 	}

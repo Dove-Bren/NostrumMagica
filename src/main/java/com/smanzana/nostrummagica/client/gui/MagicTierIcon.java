@@ -55,17 +55,17 @@ public class MagicTierIcon {
 	
 	public void draw(AbstractGui parent, MatrixStack matrixStackIn, FontRenderer fonter, int xOffset, int yOffset, int width, int height,
 			float red, float green, float blue, float alpha) {
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 
 		{
-			Minecraft.getInstance().getTextureManager().bindTexture(this.getModelLocation());
+			Minecraft.getInstance().getTextureManager().bind(this.getModelLocation());
 			RenderSystem.enableBlend();
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, xOffset, yOffset, 0, 0, this.width, this.height, width, height, this.width, this.height,
 					red, green, blue, alpha);
 			RenderSystem.disableBlend();
 		}
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	public void draw(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, int width, int height, boolean outline) {

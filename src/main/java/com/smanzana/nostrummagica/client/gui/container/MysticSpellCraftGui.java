@@ -139,12 +139,12 @@ public class MysticSpellCraftGui {
 			final MysticSpellTableTileEntity te = ContainerUtil.GetPackedTE(buffer);
 			final ISpellCraftingInventory tableInv = te.getSpellCraftingInventory();
 			final @Nullable IInventory extraInv = te.getExtraInventory();
-			return new MysticContainer(windowId, playerInv.player, playerInv, tableInv, te.getPos(), extraInv);
+			return new MysticContainer(windowId, playerInv.player, playerInv, tableInv, te.getBlockPos(), extraInv);
 		}
 		
 		public static IPackedContainerProvider Make(MysticSpellTableTileEntity table) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
-				return new MysticContainer(windowId, player, playerInv, ((ISpellCraftingTileEntity) table).getSpellCraftingInventory(), table.getPos(), table.getExtraInventory());
+				return new MysticContainer(windowId, player, playerInv, ((ISpellCraftingTileEntity) table).getSpellCraftingInventory(), table.getBlockPos(), table.getExtraInventory());
 			}, (buffer) -> {
 				ContainerUtil.PackTE(buffer, table);
 			});
@@ -305,7 +305,7 @@ public class MysticSpellCraftGui {
 					}
 				}
 
-				mc.getTextureManager().bindTexture(TEXT);
+				mc.getTextureManager().bind(TEXT);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y,
 						u, v, wu, hv,
 						this.width, this.height, TEX_WIDTH, TEX_HEIGHT
@@ -325,10 +325,10 @@ public class MysticSpellCraftGui {
 		public Gui(MysticContainer container, PlayerInventory playerInv, ITextComponent name) {
 			super(container, playerInv, name);
 			
-			this.xSize = POS_CONTAINER_WIDTH;
-			this.ySize = POS_CONTAINER_HEIGHT;
+			this.imageWidth = POS_CONTAINER_WIDTH;
+			this.imageHeight = POS_CONTAINER_HEIGHT;
 			
-			final int runeSlotCount = getContainer().inventory.getRuneSlotCount();
+			final int runeSlotCount = getMenu().inventory.getRuneSlotCount();
 			final int totalWidth = (runeSlotCount * POS_SLOT_RUNES_WIDTH) + ((runeSlotCount - 1) * POS_SLOT_RUNES_SPACER_WIDTH);
 			final int runeSlotXOffset = (POS_CONTAINER_WIDTH - totalWidth) / 2;
 			this.runeSlots = new Vector3i[runeSlotCount];
@@ -346,21 +346,21 @@ public class MysticSpellCraftGui {
 			super.init(); // Clears children
 			
 			final Minecraft mc = Minecraft.getInstance();
-			final int horizontalMargin = ((width - xSize) / 2);
-			final int verticalMargin = (height - ySize) / 2;
+			final int horizontalMargin = ((width - imageWidth) / 2);
+			final int verticalMargin = (height - imageHeight) / 2;
 			
 			// Name input field
-			this.nameField = new TextFieldWidget(mc.fontRenderer, horizontalMargin + POS_NAME_HOFFSET, verticalMargin + POS_NAME_VOFFSET, POS_NAME_WIDTH, POS_NAME_HEIGHT, StringTextComponent.EMPTY);
-			this.nameField.setMaxStringLength(SpellCreationGui.MaxNameLength);
+			this.nameField = new TextFieldWidget(mc.font, horizontalMargin + POS_NAME_HOFFSET, verticalMargin + POS_NAME_VOFFSET, POS_NAME_WIDTH, POS_NAME_HEIGHT, StringTextComponent.EMPTY);
+			this.nameField.setMaxLength(SpellCreationGui.MaxNameLength);
 			this.nameField.setResponder((s) -> {
-				getContainer().name = s;
-				getContainer().validate();
+				getMenu().name = s;
+				getMenu().validate();
 			});
-			this.nameField.setValidator((s) -> {
+			this.nameField.setFilter((s) -> {
 				// do this better? If it ends up sucking. Otherwise this is probably fine
 				return s.codePoints().allMatch(SpellGui::isValidChar);
 			});
-			this.nameField.setText(getContainer().getName());
+			this.nameField.setValue(getMenu().getName());
 			this.addButton(this.nameField);
 			
 			
@@ -385,7 +385,7 @@ public class MysticSpellCraftGui {
 			}
 			
 			// Info panel
-			if (NostrumMagica.getMagicWrapper(getContainer().player).hasSkill(NostrumSkills.Spellcraft_Infopanel)) {
+			if (NostrumMagica.getMagicWrapper(getMenu().player).hasSkill(NostrumSkills.Spellcraft_Infopanel)) {
 				this.infoPanelWidget = new InfoPanel(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT);
 				this.infoPanelWidget.setContent(this::renderSpellPanel);
 				this.addButton(infoPanelWidget);
@@ -412,12 +412,12 @@ public class MysticSpellCraftGui {
 			this.addButton(new PatternIcon(this, horizontalMargin + POS_PATTERN_HOFFSET, verticalMargin + POS_PATTERN_VOFFSET, POS_PATTERN_WIDTH, POS_PATTERN_HEIGHT));
 
 			// Extra inventory
-			if (this.getContainer().extraInventory != null) {
-				final SimpleInventoryContainerlet extraContainer = this.getContainer().extraInventory;
+			if (this.getMenu().extraInventory != null) {
+				final SimpleInventoryContainerlet extraContainer = this.getMenu().extraInventory;
 				this.extraInventoryWidget = new SimpleInventoryWidget(this, extraContainer);
 				this.extraInventoryWidget.setColor(0xFF263D5A);
 				this.addButton(this.extraInventoryWidget);
-				extraAreas.add(new Rectangle2d(horizontalMargin + extraContainer.x, verticalMargin + this.getContainer().extraInventory.y, this.getContainer().extraInventory.width, this.getContainer().extraInventory.height));
+				extraAreas.add(new Rectangle2d(horizontalMargin + extraContainer.x, verticalMargin + this.getMenu().extraInventory.y, this.getMenu().extraInventory.width, this.getMenu().extraInventory.height));
 			}
 			
 			if (infoPanelWidget != null) {
@@ -441,21 +441,21 @@ public class MysticSpellCraftGui {
 				this.addButton(partBarWidget);
 			}
 
-			this.getContainer().validate();
+			this.getMenu().validate();
 		}
 
 		@Override
 		protected void onIconSelected(int icon) {
-			this.getContainer().spellIcon = icon;
+			this.getMenu().spellIcon = icon;
 		}
 
 		@Override
 		protected void onSubmit() {
 			// clicked on submit button
-			getContainer().validate();
-			if (getContainer().spellValid) {
+			getMenu().validate();
+			if (getMenu().spellValid) {
 				// whoo make spell
-				Spell spell = getContainer().makeSpell(true);
+				Spell spell = getMenu().makeSpell(true);
 				if (spell != null) {
 					// All of this happens again and is synced back to client
 					// But in the mean, might as well do it here for the
@@ -463,18 +463,18 @@ public class MysticSpellCraftGui {
 					ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
 					SpellScroll.setSpell(scroll, spell);
 					//getContainer().setScroll(scroll);
-					getContainer().inventory.setScrollSlotContents(scroll);
+					getMenu().inventory.setScrollSlotContents(scroll);
 					//NostrumMagicaSounds.AMBIENT_WOOSH.play(Minecraft.getInstance().thePlayer);
 					
 					NetworkHandler.sendToServer(new SpellCraftMessage(
-							getContainer().name.toString(),
-							getContainer().pos,
-							getContainer().spellIcon,
-							getContainer().getCraftPattern()
+							getMenu().name.toString(),
+							getMenu().pos,
+							getMenu().spellIcon,
+							getMenu().getCraftPattern()
 							));
-					getContainer().name = "";
-					this.nameField.setText("");
-					getContainer().spellIcon = -1;
+					getMenu().name = "";
+					this.nameField.setValue("");
+					getMenu().spellIcon = -1;
 					// getContainer().patternIdx = 0; leave pattern selected?
 				}
 			} else {
@@ -483,14 +483,14 @@ public class MysticSpellCraftGui {
 		}
 		
 		protected void patternChangeButtonClicked(PatternChangeButton button, boolean isLeft) {
-			SpellCraftPattern[] choices = getContainer().getPatternChoices();
+			SpellCraftPattern[] choices = getMenu().getPatternChoices();
 			
 			// Safety check
 			if (choices == null || choices.length == 0) {
 				return;
 			}
 			
-			MysticContainer container = getContainer();
+			MysticContainer container = getMenu();
 			container.patternIdx = ((choices.length + container.patternIdx) + (isLeft ? -1 : 1)) % choices.length;
 			container.validate();
 		}
@@ -498,11 +498,11 @@ public class MysticSpellCraftGui {
 		@Override
 		public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
 			if (p_keyPressed_1_ == 256) {
-				this.mc.player.closeScreen();
+				this.mc.player.closeContainer();
 			}
 
 			// Copied from AnvilScreen
-			return !this.nameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) && !this.nameField.canWrite() ? super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : true;
+			return !this.nameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) && !this.nameField.canConsumeInput() ? super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : true;
 		}
 		
 		@Override
@@ -511,23 +511,23 @@ public class MysticSpellCraftGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
-			int horizontalMargin = (width - xSize) / 2;
-			int verticalMargin = (height - ySize) / 2;
+		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+			int horizontalMargin = (width - imageWidth) / 2;
+			int verticalMargin = (height - imageHeight) / 2;
 			
-			final @Nullable SpellCraftPattern pattern = getContainer().getCraftPattern();
-			final SpellCraftContext context = getContainer().getCraftContext();
+			final @Nullable SpellCraftPattern pattern = getMenu().getCraftPattern();
+			final SpellCraftContext context = getMenu().getCraftContext();
 			
-			mc.getTextureManager().bindTexture(TEXT);
+			mc.getTextureManager().bind(TEXT);
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin, 0, 0, POS_CONTAINER_WIDTH, POS_CONTAINER_HEIGHT, TEX_WIDTH, TEX_HEIGHT);
 			
 			// Manually draw rune slots, since they're not baked onto the sheet
-			final int filledRuneSlots = getContainer().getFilledRuneSlots();
+			final int filledRuneSlots = getMenu().getFilledRuneSlots();
 			for (Vector3i spacerPos : spacerSpots) {
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(horizontalMargin + spacerPos.getX(), verticalMargin + spacerPos.getY(), 0);
 				drawRuneSpacerBackground(matrixStackIn, POS_SLOT_RUNES_SPACER_WIDTH, POS_SLOT_RUNES_WIDTH, spacerPos.getZ() < filledRuneSlots-1);
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 			for (Vector3i slotPos : runeSlots) {
 				final int runeSlotIdx = slotPos.getZ();
@@ -544,15 +544,15 @@ public class MysticSpellCraftGui {
 					isModified = false;
 				}
 				
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(horizontalMargin + slotPos.getX(), verticalMargin + slotPos.getY(), 0);
 				drawRuneCellBackground(matrixStackIn, POS_SLOT_RUNES_WIDTH, POS_SLOT_RUNES_WIDTH, isModified);
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 			
 			// Decide whether to show summary, part info, or modifier info
 			if (this.hoveredSlot != null && this.hoveredSlot instanceof RuneSlot && infoPanelWidget != null) {
-				int highlightedRuneIdx = ((RuneSlot) this.hoveredSlot).getSlotIndex() - getContainer().inventory.getRuneSlotStartingIndex();
+				int highlightedRuneIdx = ((RuneSlot) this.hoveredSlot).getSlotIndex() - getMenu().inventory.getRuneSlotStartingIndex();
 				final @Nullable ISpellCraftModifier modifier;
 				if (pattern != null && pattern.hasModifier(context, highlightedRuneIdx)) {
 					modifier = pattern.getModifier(context, highlightedRuneIdx);
@@ -570,19 +570,19 @@ public class MysticSpellCraftGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
-			if (!getContainer().hasScroll()) {
+		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+			if (!getMenu().hasScroll()) {
 				Minecraft mc = Minecraft.getInstance();
 				final int width = 150;
 				final int height = 50;
-				matrixStackIn.push();
-				matrixStackIn.translate(this.xSize / 2, (height+20) / 2, 300);
-				SpellGui.drawScrollMessage(matrixStackIn, width, height, mc.fontRenderer);
-				matrixStackIn.pop();
+				matrixStackIn.pushPose();
+				matrixStackIn.translate(this.imageWidth / 2, (height+20) / 2, 300);
+				SpellGui.drawScrollMessage(matrixStackIn, width, height, mc.font);
+				matrixStackIn.popPose();
 			}
 			
-			final @Nullable SpellCraftPattern pattern = getContainer().getCraftPattern();
-			final SpellCraftContext context = getContainer().getCraftContext();
+			final @Nullable SpellCraftPattern pattern = getMenu().getCraftPattern();
+			final SpellCraftContext context = getMenu().getCraftContext();
 			
 			for (Vector3i slotPos : runeSlots) {
 				final int runeSlotIdx = slotPos.getZ();
@@ -594,7 +594,7 @@ public class MysticSpellCraftGui {
 						@Nullable ISpellCraftModifier modifier = pattern.getModifier(context, runeSlotIdx);
 						if (modifier != null) {
 							hasModifier = true;
-							final ItemStack rune = getContainer().inventory.getRuneSlotContents(runeSlotIdx);
+							final ItemStack rune = getMenu().inventory.getRuneSlotContents(runeSlotIdx);
 							if (!rune.isEmpty()) {
 								isModified = modifier.canModify(context, SpellCrafting.MakeIngredient(rune));
 							} else {
@@ -617,19 +617,19 @@ public class MysticSpellCraftGui {
 					} else {
 						color = 0x60FFFFFF;
 					}
-					matrixStackIn.push();
+					matrixStackIn.pushPose();
 					matrixStackIn.translate(slotPos.getX(), slotPos.getY(), 300);
 					RenderFuncs.drawGradientRect(matrixStackIn, 0, POS_SLOT_RUNES_WIDTH/4, POS_SLOT_RUNES_WIDTH, POS_SLOT_RUNES_WIDTH,
 							0x00FFFFFF, 0x00FFFFFF, // top colors
 							color, color // bottom colors
 						);
-					matrixStackIn.pop();
+					matrixStackIn.popPose();
 				}
 			}
 		}
 		
 		protected void drawRuneCellBackground(MatrixStack matrixStackIn, int width, int height, boolean isModified) {
-			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
+			Minecraft.getInstance().getTextureManager().bind(TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
 					TEX_RUNESLOT_HOFFSET, TEX_RUNESLOT_VOFFSET, TEX_RUNESLOT_WIDTH, TEX_RUNESLOT_HEIGHT,
 					width, height,
@@ -638,7 +638,7 @@ public class MysticSpellCraftGui {
 		}
 		
 		protected void drawRuneSpacerBackground(MatrixStack matrixStackIn, int width, int height, boolean animate) {
-			Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
+			Minecraft.getInstance().getTextureManager().bind(TEXT);
 			if (animate) {
 				final int frameTimeMS = 500;
 				final int animFrame = (int) (System.currentTimeMillis() % (frameTimeMS * TEX_RUNESPACER_ANIM_COUNT)) / frameTimeMS;

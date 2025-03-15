@@ -19,7 +19,7 @@ public class RainbowItemColor implements IItemColor {
 		if (index == this.tintIndex) {
 			final Minecraft mc = Minecraft.getInstance();
 			final float period = 20 * 60;
-			final float time = mc.player.ticksExisted + mc.getRenderPartialTicks();
+			final float time = mc.player.tickCount + mc.getFrameTime();
 			final float prog = ((time % period) / period);
 			return 0xFF000000 | Color.HSBtoRGB(prog, .8f, 1f);
 		}

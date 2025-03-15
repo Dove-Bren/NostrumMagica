@@ -27,10 +27,10 @@ public class PlantBossBrambleEntity extends Entity {
 	
 	public static final String ID = "entity_plant_boss.bramble";
 
-	protected static final DataParameter<Float> WIDTH = EntityDataManager.<Float>createKey(PlantBossBrambleEntity.class, DataSerializers.FLOAT);
-	protected static final DataParameter<Float> DEPTH = EntityDataManager.<Float>createKey(PlantBossBrambleEntity.class, DataSerializers.FLOAT);
-	protected static final DataParameter<Float> HEIGHT = EntityDataManager.<Float>createKey(PlantBossBrambleEntity.class, DataSerializers.FLOAT);
-	protected static final DataParameter<Direction> FACING = EntityDataManager.<Direction>createKey(PlantBossBrambleEntity.class, DataSerializers.DIRECTION);
+	protected static final DataParameter<Float> WIDTH = EntityDataManager.<Float>defineId(PlantBossBrambleEntity.class, DataSerializers.FLOAT);
+	protected static final DataParameter<Float> DEPTH = EntityDataManager.<Float>defineId(PlantBossBrambleEntity.class, DataSerializers.FLOAT);
+	protected static final DataParameter<Float> HEIGHT = EntityDataManager.<Float>defineId(PlantBossBrambleEntity.class, DataSerializers.FLOAT);
+	protected static final DataParameter<Direction> FACING = EntityDataManager.<Direction>defineId(PlantBossBrambleEntity.class, DataSerializers.DIRECTION);
 	
 	protected PlantBossEntity plant;
 	protected float distance;
@@ -53,28 +53,28 @@ public class PlantBossBrambleEntity extends Entity {
 	}
 	
 	@Override
-	protected void registerData() {
+	protected void defineSynchedData() {
 		//super.registerData();
-		this.dataManager.register(WIDTH, 5f);
-		this.dataManager.register(DEPTH, .5f);
-		this.dataManager.register(HEIGHT, 5f);
-		this.dataManager.register(FACING, Direction.SOUTH);
+		this.entityData.define(WIDTH, 5f);
+		this.entityData.define(DEPTH, .5f);
+		this.entityData.define(HEIGHT, 5f);
+		this.entityData.define(FACING, Direction.SOUTH);
 	}
 	
 	public float getBrambleWidth() {
-		return this.dataManager.get(WIDTH);
+		return this.entityData.get(WIDTH);
 	}
 	
 	public float getBrambleDepth() {
-		return this.dataManager.get(DEPTH);
+		return this.entityData.get(DEPTH);
 	}
 	
 	public float getBrambleHeight() {
-		return this.dataManager.get(HEIGHT);
+		return this.entityData.get(HEIGHT);
 	}
 	
 	public Direction getFacing() {
-		return this.dataManager.get(FACING);
+		return this.entityData.get(FACING);
 	}
 	
 	protected void setDims(float width, float depth, float height) {
@@ -84,19 +84,19 @@ public class PlantBossBrambleEntity extends Entity {
 		
 		boolean change = false;
 		
-		if (world.isRemote) {
+		if (level.isClientSide) {
 			change = true; // Just adjust BB
 		} else {
 			if (this.getBrambleWidth() != width) {
-				this.dataManager.set(WIDTH, width);
+				this.entityData.set(WIDTH, width);
 				change = true;
 			}
 			if (this.getBrambleDepth() != depth) {
-				this.dataManager.set(DEPTH, depth);
+				this.entityData.set(DEPTH, depth);
 				change = true;
 			}
 			if (this.getBrambleHeight() != height) {
-				this.dataManager.set(HEIGHT, height);
+				this.entityData.set(HEIGHT, height);
 				change = true;
 			}
 		}
@@ -109,28 +109,28 @@ public class PlantBossBrambleEntity extends Entity {
 //					old.minY + height,
 //					old.minZ + depth
 //					));
-			this.recalculateSize();
+			this.refreshDimensions();
 		}
 	}
 	
 	public void setMotion(Direction direction, float distance) {
-		this.dataManager.set(FACING, direction);
+		this.entityData.set(FACING, direction);
 		this.distance = distance;
 		
-		this.startPos = this.getPosition();
+		this.startPos = this.blockPosition();
 	}
 	
 	@Override
-	public void notifyDataManagerChange(DataParameter<?> key) {
-		super.notifyDataManagerChange(key);
-		if (this.world != null && this.world.isRemote) {
+	public void onSyncedDataUpdated(DataParameter<?> key) {
+		super.onSyncedDataUpdated(key);
+		if (this.level != null && this.level.isClientSide) {
 			if (key == WIDTH
 					|| key == HEIGHT
 					|| key == DEPTH) {
 				this.setDims(this.getBrambleWidth(), this.getBrambleDepth(), this.getBrambleHeight());
-			} else if (key == FACING && this.world.isRemote) {
+			} else if (key == FACING && this.level.isClientSide) {
 				// Adjust width/depth to rotate if not moving n/s
-				final Direction dir = this.dataManager.get(FACING);
+				final Direction dir = this.entityData.get(FACING);
 				if (dir == Direction.WEST || dir == Direction.EAST) {
 					final float w = this.getBrambleWidth();
 					final float d = this.getBrambleDepth();
@@ -141,36 +141,36 @@ public class PlantBossBrambleEntity extends Entity {
 	}
 	
 	@Override
-	public boolean writeUnlessRemoved(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundNBT compound) {
 		return false;
 	}
 	
 	@Override
-	public void readAdditional(CompoundNBT compound) {
+	public void readAdditionalSaveData(CompoundNBT compound) {
 		//super.readEntityFromNBT(compound);
 	}
 	
 	@Override
-	public void writeAdditional(CompoundNBT compound) {
+	public void addAdditionalSaveData(CompoundNBT compound) {
     	//super.writeEntityToNBT(compound);
 	}
 	
 	@Override
-	public boolean canBeCollidedWith() {
+	public boolean isPickable() {
 		return true;
 	}
 	
 	@Override
-	public float getCollisionBorderSize() {
+	public float getPickRadius() {
 		return 1f;
 	}
 	
 	protected void onImpact(LivingEntity entity) {
 		if (entity != this.plant && !entity.equals(this.plant)) {
-			entity.removePotionEffect(NostrumEffects.rooted);
-			entity.attackEntityAsMob(this);
-			entity.attackEntityFrom(new BrambleDamageSource(this.plant), 6f);
-			entity.applyKnockback(1f, (double)MathHelper.sin(this.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(this.rotationYaw * 0.017453292F)));
+			entity.removeEffect(NostrumEffects.rooted);
+			entity.doHurtTarget(this);
+			entity.hurt(new BrambleDamageSource(this.plant), 6f);
+			entity.knockback(1f, (double)MathHelper.sin(this.yRot * 0.017453292F), (double)(-MathHelper.cos(this.yRot * 0.017453292F)));
 		}
 	}
 	
@@ -179,23 +179,23 @@ public class PlantBossBrambleEntity extends Entity {
 		super.tick();
 		
 		if (this.getFacing() != null) {
-			this.setRotation(this.getFacing().getHorizontalAngle(), 0f);
+			this.setRot(this.getFacing().toYRot(), 0f);
 		}
 		
-		if (!world.isRemote) {
+		if (!level.isClientSide) {
 			// Move if given a direction
 			if (this.getFacing() != null) {
-				if (startPos.distanceSq(this.getPosX(), this.getPosY(), this.getPosZ(), true) > this.distance * this.distance) {
+				if (startPos.distSqr(this.getX(), this.getY(), this.getZ(), true) > this.distance * this.distance) {
 					this.remove();
 				}
 				
-				Vector3d motion = Vector3d.copy(this.getFacing().getDirectionVec())
+				Vector3d motion = Vector3d.atLowerCornerOf(this.getFacing().getNormal())
 						.scale(.2)
 						;
-				this.setPositionAndUpdate(getPosX() + motion.x, getPosY() + motion.y, getPosZ() + motion.z);
+				this.teleportTo(getX() + motion.x, getY() + motion.y, getZ() + motion.z);
 			}
 			
-			List<Entity> collidedEnts = world.getEntitiesInAABBexcluding(this, this.getBoundingBox(), (ent) -> {
+			List<Entity> collidedEnts = level.getEntities(this, this.getBoundingBox(), (ent) -> {
 				return ent instanceof LivingEntity;
 			});
 			
@@ -213,12 +213,12 @@ public class PlantBossBrambleEntity extends Entity {
 		final float h = this.getBrambleHeight();
 		final float d = turned ? this.getBrambleWidth() : this.getBrambleDepth();
 		this.entityBBOverride = new AxisAlignedBB(
-				this.getPosX() - (w/2f),
-				this.getPosY(),
-				this.getPosZ() - (d/2f),
-				this.getPosX() + (w/2f),
-				this.getPosY() + h,
-				this.getPosZ() + (d/2f)
+				this.getX() - (w/2f),
+				this.getY(),
+				this.getZ() - (d/2f),
+				this.getX() + (w/2f),
+				this.getY() + h,
+				this.getZ() + (d/2f)
 				);
 	}
 	
@@ -229,7 +229,7 @@ public class PlantBossBrambleEntity extends Entity {
 	}
 
 	@Override
-	public IPacket<?> createSpawnPacket() {
+	public IPacket<?> getAddEntityPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 	
@@ -240,9 +240,9 @@ public class PlantBossBrambleEntity extends Entity {
 		}
 		
 		@Override
-		public ITextComponent getDeathMessage(LivingEntity entityLivingBaseIn) {
+		public ITextComponent getLocalizedDeathMessage(LivingEntity entityLivingBaseIn) {
 	        String untranslated = "death.attack.plantboss.bramble";
-	        return new TranslationTextComponent(untranslated, new Object[] {entityLivingBaseIn.getDisplayName(), this.damageSourceEntity.getDisplayName()});
+	        return new TranslationTextComponent(untranslated, new Object[] {entityLivingBaseIn.getDisplayName(), this.entity.getDisplayName()});
 	    }
 	}
 }

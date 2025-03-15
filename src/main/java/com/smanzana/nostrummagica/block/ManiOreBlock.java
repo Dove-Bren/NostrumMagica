@@ -15,8 +15,8 @@ public class ManiOreBlock extends OreBlock {
 	
 	
 	public ManiOreBlock() {
-		super(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(2.0f, 30.f)
+		super(Block.Properties.of(Material.STONE)
+				.strength(2.0f, 30.f)
 				.sound(SoundType.STONE)
 				.harvestTool(ToolType.PICKAXE)
 				.harvestLevel(2)

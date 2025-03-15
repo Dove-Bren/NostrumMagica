@@ -43,54 +43,54 @@ public class RuneLibraryBlock extends Block {
 		FULL;
 
 		@Override
-		public String getString() {
+		public String getSerializedName() {
 			return name().toLowerCase();
 		}
 	}
 	
-	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
+	public static final DirectionProperty FACING = HorizontalBlock.FACING;
 	public static final EnumProperty<Fill> FILL = EnumProperty.create("fill", Fill.class);
 	
 	private static final double BB_DEPTH = 6.0 / 16.0;
 	private static final double BB_MARGIN = 0 / 16.0;
-	private static final VoxelShape AABB_N = Block.makeCuboidShape(16 * BB_MARGIN, 16 * 0, 16 * (1 - BB_DEPTH), 16 * (1 - BB_MARGIN), 16 * 1, 16 * 1);
-	private static final VoxelShape AABB_E = Block.makeCuboidShape(16 * 0, 16 * 0, 16 * BB_MARGIN, 16 * BB_DEPTH, 16 * 1, 16 * (1-BB_MARGIN));
-	private static final VoxelShape AABB_S = Block.makeCuboidShape(16 * BB_MARGIN, 16 * 0, 16 * 0, 16 * (1-BB_MARGIN), 16 * 1, 16 * BB_DEPTH);
-	private static final VoxelShape AABB_W = Block.makeCuboidShape(16 * (1 - BB_DEPTH), 16 * 0, 16 * BB_MARGIN, 16 * 1, 16 * 1, 16 * (1-BB_MARGIN));
+	private static final VoxelShape AABB_N = Block.box(16 * BB_MARGIN, 16 * 0, 16 * (1 - BB_DEPTH), 16 * (1 - BB_MARGIN), 16 * 1, 16 * 1);
+	private static final VoxelShape AABB_E = Block.box(16 * 0, 16 * 0, 16 * BB_MARGIN, 16 * BB_DEPTH, 16 * 1, 16 * (1-BB_MARGIN));
+	private static final VoxelShape AABB_S = Block.box(16 * BB_MARGIN, 16 * 0, 16 * 0, 16 * (1-BB_MARGIN), 16 * 1, 16 * BB_DEPTH);
+	private static final VoxelShape AABB_W = Block.box(16 * (1 - BB_DEPTH), 16 * 0, 16 * BB_MARGIN, 16 * 1, 16 * 1, 16 * (1-BB_MARGIN));
 	
 	public static final String ID = "rune_library";
 	
 	public RuneLibraryBlock() {
-		super(Block.Properties.create(Material.WOOD)
-				.hardnessAndResistance(2.5f, 2.5f)
+		super(Block.Properties.of(Material.WOOD)
+				.strength(2.5f, 2.5f)
 				.sound(SoundType.WOOD)
 				.harvestTool(ToolType.AXE)
-				.notSolid()
+				.noOcclusion()
 				);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(FILL, Fill.EMPTY));
+		this.registerDefaultState(this.stateDefinition.any().setValue(FILL, Fill.EMPTY));
 	}
 	
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		Direction side = context.getPlacementHorizontalFacing().getOpposite();
-		if (!this.canPlaceAt(context.getWorld(), context.getPos(), side)) {
+		Direction side = context.getHorizontalDirection().getOpposite();
+		if (!this.canPlaceAt(context.getLevel(), context.getClickedPos(), side)) {
 			// Rotate and find it
 			for (int i = 0; i < 3; i++) {
-				side = side.rotateY();
-				if (this.canPlaceAt(context.getWorld(), context.getPos(), side)) {
+				side = side.getClockWise();
+				if (this.canPlaceAt(context.getLevel(), context.getClickedPos(), side)) {
 					break;
 				}
 			}
 		}
 		
-		return this.getDefaultState()
-				.with(FACING, side);
+		return this.defaultBlockState()
+				.setValue(FACING, side);
 	}
 	
 	protected boolean canPlaceAt(IWorldReader worldIn, BlockPos pos, Direction side) {
-		BlockState state = worldIn.getBlockState(pos.offset(side.getOpposite()));
-		if (state == null || !(state.isSolidSide(worldIn, pos.offset(side.getOpposite()), side.getOpposite()))) {
+		BlockState state = worldIn.getBlockState(pos.relative(side.getOpposite()));
+		if (state == null || !(state.isFaceSturdy(worldIn, pos.relative(side.getOpposite()), side.getOpposite()))) {
 			return false;
 		}
 		
@@ -98,8 +98,8 @@ public class RuneLibraryBlock extends Block {
 	}
 	
 	@Override
-	public boolean isValidPosition(BlockState state, IWorldReader world, BlockPos pos) {
-		for (Direction side : FACING.getAllowedValues()) {
+	public boolean canSurvive(BlockState state, IWorldReader world, BlockPos pos) {
+		for (Direction side : FACING.getPossibleValues()) {
 			if (canPlaceAt(world, pos, side)) {
 				return true;
 			}
@@ -109,23 +109,23 @@ public class RuneLibraryBlock extends Block {
 	}
 	
 	@Override
-	public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		Direction myFacing = state.get(FACING);
+	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		Direction myFacing = state.getValue(FACING);
 		if (!this.canPlaceAt(worldIn, currentPos, myFacing)) { // should check passed in facing and only re-check if wall we're on changed but I can't remember if facing is wall we're on or the opposite
-			return Blocks.AIR.getDefaultState();
+			return Blocks.AIR.defaultBlockState();
 		}
 		
 		return state;
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(FACING).add(FILL);
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		RuneLibraryTileEntity te = (RuneLibraryTileEntity) worldIn.getTileEntity(pos);
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		RuneLibraryTileEntity te = (RuneLibraryTileEntity) worldIn.getBlockEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(player, RuneLibraryGui.RuneLibraryContainer.Make(te));
 		
 		return ActionResultType.SUCCESS;
@@ -142,21 +142,21 @@ public class RuneLibraryBlock extends Block {
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			destroy(world, pos, state);
-			world.removeTileEntity(pos);
+			world.removeBlockEntity(pos);
 		}
 	}
 	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		switch (state.get(FACING)) {
+		switch (state.getValue(FACING)) {
 		case NORTH:
 		case UP:
 		case DOWN:
@@ -172,20 +172,20 @@ public class RuneLibraryBlock extends Block {
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
-		TileEntity ent = world.getTileEntity(pos);
+		TileEntity ent = world.getBlockEntity(pos);
 		if (ent == null || !(ent instanceof RuneLibraryTileEntity))
 			return;
 		
 		RuneLibraryTileEntity putter = (RuneLibraryTileEntity) ent;
 		IInventory inv = putter.getInventory();
-		for (int i = 0; i < inv.getSizeInventory(); i++) {
-			ItemStack item = inv.getStackInSlot(i);
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			ItemStack item = inv.getItem(i);
 			if (!item.isEmpty()) {
 				double x, y, z;
 				x = pos.getX() + .5;
 				y = pos.getY() + .5;
 				z = pos.getZ() + .5;
-				world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
+				world.addFreshEntity(new ItemEntity(world, x, y, z, item.copy()));
 			}
 		}
 	}

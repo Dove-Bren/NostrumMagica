@@ -26,7 +26,7 @@ public class SelfShape extends InstantShape {
 
 	public static final String ID = "self";
 	
-	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.MANI_DUST, 1)));
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.of(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.MANI_DUST, 1)));
 	
 	public SelfShape() {
 		this(ID);

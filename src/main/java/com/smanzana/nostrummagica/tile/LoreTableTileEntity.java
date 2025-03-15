@@ -83,19 +83,19 @@ public class LoreTableTileEntity extends TileEntity implements ITickableTileEnti
 	
 	public void setProgress(float progress) {
 		this.progress = progress;
-		if (world != null && !world.isRemote) {
-			world.addBlockEvent(pos, this.getBlockState().getBlock(), 0, PROGRESS_TO_INT(progress));
+		if (level != null && !level.isClientSide) {
+			level.blockEvent(worldPosition, this.getBlockState().getBlock(), 0, PROGRESS_TO_INT(progress));
 		}
 	}
 	
 	private void dirty() {
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		markDirty();
+		level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+		setChanged();
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		if (nbt == null)
 			nbt = new CompoundNBT();
@@ -112,15 +112,15 @@ public class LoreTableTileEntity extends TileEntity implements ITickableTileEnti
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		if (nbt == null)
 			return;
 		
 		this.progress = nbt.getFloat("progress");
 		if (nbt.contains("item", NBT.TAG_COMPOUND))
-			this.item = ItemStack.read(nbt.getCompound("item"));
+			this.item = ItemStack.of(nbt.getCompound("item"));
 		else
 			this.item = ItemStack.EMPTY;
 		
@@ -134,7 +134,7 @@ public class LoreTableTileEntity extends TileEntity implements ITickableTileEnti
 	public void tick() {
 		ticksExisted++;
 		
-		if (world != null && !world.isRemote) {
+		if (level != null && !level.isClientSide) {
 			if (!item.isEmpty() && lorekey == null) {
 				progress += 1f / (30f * 20f); // 30 seconds
 				if (ticksExisted % 5 == 0) {
@@ -144,8 +144,8 @@ public class LoreTableTileEntity extends TileEntity implements ITickableTileEnti
 				if (progress >= 1f) {
 					if (item.getItem() instanceof ILoreTagged) {
 						this.lorekey = ((ILoreTagged) item.getItem()).getLoreKey();
-						NostrumMagicaSounds.DAMAGE_ICE.play(world,
-								pos.getX(), pos.getY(), pos.getZ());
+						NostrumMagicaSounds.DAMAGE_ICE.play(level,
+								worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
 					}
 				}
 			}
@@ -161,8 +161,8 @@ public class LoreTableTileEntity extends TileEntity implements ITickableTileEnti
 	}
 	
 	@Override
-	public boolean receiveClientEvent(int id, int type) {
-		if (world != null && world.isRemote) {
+	public boolean triggerEvent(int id, int type) {
+		if (level != null && level.isClientSide) {
 			if (id == 0) {
 				this.progress = INT_TO_PROGRESS(type);
 				return true;

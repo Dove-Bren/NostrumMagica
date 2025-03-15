@@ -27,8 +27,8 @@ public class DungeonBlock extends Block {
 	public final Type type;
 	
 	public DungeonBlock(Type type) {
-		super(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		super(Block.Properties.of(Material.STONE)
+				.strength(-1.0F, 3600000.8F)
 				.noDrops()
 				.sound(SoundType.STONE)
 				);

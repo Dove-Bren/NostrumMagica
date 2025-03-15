@@ -124,8 +124,8 @@ public class TomeWorkshopScreen extends Screen {
 	public void tick() {
 		if (playerSlotSelected != -1) {
 			// Make sure same tome is in place. Otherwise, reset
-			ItemStack inSlot = playerInv.getStackInSlot(playerSlotSelected);
-			if (!ItemStack.areItemsEqual(playerStackSelected, inSlot)) {
+			ItemStack inSlot = playerInv.getItem(playerSlotSelected);
+			if (!ItemStack.isSame(playerStackSelected, inSlot)) {
 				resetInventorySelection();
 				return;
 			}
@@ -267,7 +267,7 @@ public class TomeWorkshopScreen extends Screen {
 				this.pageIdx = 0; // Reset page
 			}
 			playerSlotSelected = slotIdx;
-			playerStackSelected = playerInv.getStackInSlot(slotIdx);
+			playerStackSelected = playerInv.getItem(slotIdx);
 		}
 		for (PretendInventorySlot slot : this.inventoryWidgets) {
 			slot.setSelected(slot.slotIdx == playerSlotSelected);
@@ -383,7 +383,7 @@ public class TomeWorkshopScreen extends Screen {
 			return 0;
 		}
 		
-		final int room = POS_LIBRARY_HEIGHT / spellLibraryWidgets.get(0).getHeightRealms();
+		final int room = POS_LIBRARY_HEIGHT / spellLibraryWidgets.get(0).getHeight();
 		return Math.max(0, spellLibraryWidgets.size() - room);
 	}
 	
@@ -567,21 +567,21 @@ public class TomeWorkshopScreen extends Screen {
 		final Minecraft mc = Minecraft.getInstance();
 		
 		// Render library buttons first so they go under the gui
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(getGuiLeft(), getGuiTop(), 0);
 		RenderFuncs.drawRect(matrixStackIn, POS_LIBRARY_HOFFSET - 1, POS_LIBRARY_VOFFSET - 1,
 				POS_LIBRARY_HOFFSET - 1 + POS_LIBRARY_WIDTH, POS_LIBRARY_VOFFSET - 1 + POS_LIBRARY_HEIGHT,
 				0xFF303030);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		for (SpellLibraryPane pane : this.spellLibraryWidgets) {
 			pane.render(matrixStackIn, mouseX, mouseY, partialTicks);
 		}
 		
 		// Render background
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(getGuiLeft(), getGuiTop(), 0);
 		{
-			mc.textureManager.bindTexture(TEXT);
+			mc.textureManager.bind(TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, TEXT_GUI_HOFFSET, TEXT_GUI_VOFFSET, TEXT_GUI_WIDTH, TEXT_GUI_HEIGHT, TEXT_GUI_WIDTH, TEXT_GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
 			
 			if (this.isValidSelection(playerStackSelected)) {
@@ -594,28 +594,28 @@ public class TomeWorkshopScreen extends Screen {
 				
 				if (this.spellLibraryWidgets.isEmpty()) {
 					final String message = "No Spells";
-					final int messageLen = mc.fontRenderer.getStringWidth(message);
+					final int messageLen = mc.font.width(message);
 					final int x = POS_LIBRARY_HOFFSET + (POS_LIBRARY_WIDTH/2) + (-messageLen / 2);
-					final int y = POS_LIBRARY_VOFFSET + (POS_LIBRARY_HEIGHT/2) + (-mc.fontRenderer.FONT_HEIGHT/2);
-					mc.fontRenderer.drawString(matrixStackIn, message, x, y, 0xFFFFFFFF);
+					final int y = POS_LIBRARY_VOFFSET + (POS_LIBRARY_HEIGHT/2) + (-mc.font.lineHeight/2);
+					mc.font.draw(matrixStackIn, message, x, y, 0xFFFFFFFF);
 				}
 				
 				if (this.spellSlotWidgets.isEmpty()) {
 					final String message = "No Slots";
-					final int messageLen = mc.fontRenderer.getStringWidth(message);
+					final int messageLen = mc.font.width(message);
 					final int x = POS_SLOTS_HOFFSET + (POS_SLOTS_WIDTH/2) + (-messageLen / 2);
-					final int y = POS_SLOTS_VOFFSET + (POS_SLOTS_HEIGHT/2) + (-mc.fontRenderer.FONT_HEIGHT/2);
-					mc.fontRenderer.drawString(matrixStackIn, message, x, y, 0xFFFFFFFF);
+					final int y = POS_SLOTS_VOFFSET + (POS_SLOTS_HEIGHT/2) + (-mc.font.lineHeight/2);
+					mc.font.draw(matrixStackIn, message, x, y, 0xFFFFFFFF);
 				}
 				
 				// Draw labels
 				String label = "Spell Library";
-				int labelLen = mc.fontRenderer.getStringWidth(label);
-				mc.fontRenderer.drawString(matrixStackIn, label, POS_LIBRARY_HOFFSET + (POS_LIBRARY_WIDTH/2) + (-labelLen/2), POS_LIBRARY_VOFFSET - (2 + mc.fontRenderer.FONT_HEIGHT), 0xFFDDDDDD);
+				int labelLen = mc.font.width(label);
+				mc.font.draw(matrixStackIn, label, POS_LIBRARY_HOFFSET + (POS_LIBRARY_WIDTH/2) + (-labelLen/2), POS_LIBRARY_VOFFSET - (2 + mc.font.lineHeight), 0xFFDDDDDD);
 				
 				label = "Spell Pages";
-				labelLen = mc.fontRenderer.getStringWidth(label);
-				mc.fontRenderer.drawString(matrixStackIn, label, POS_SLOTS_HOFFSET + (POS_SLOTS_WIDTH/2) + (-labelLen/2), POS_SLOTS_VOFFSET - (2 + mc.fontRenderer.FONT_HEIGHT), 0xFFDDDDDD);
+				labelLen = mc.font.width(label);
+				mc.font.draw(matrixStackIn, label, POS_SLOTS_HOFFSET + (POS_SLOTS_WIDTH/2) + (-labelLen/2), POS_SLOTS_VOFFSET - (2 + mc.font.lineHeight), 0xFFDDDDDD);
 			} else {
 				// Patch texture hole where library goes
 				RenderFuncs.drawRect(matrixStackIn, POS_LIBRARY_HOFFSET - 1, POS_LIBRARY_VOFFSET - 1,
@@ -623,17 +623,17 @@ public class TomeWorkshopScreen extends Screen {
 						TEXT_BACKGROUND_COLOR);
 				
 				final String message = "Select A Tome";
-				final int messageLen = mc.fontRenderer.getStringWidth(message);
+				final int messageLen = mc.font.width(message);
 				int x = (this.gui_width / 2) - 70;
-				int y = (60 + mc.fontRenderer.FONT_HEIGHT/2) - 20;
+				int y = (60 + mc.font.lineHeight/2) - 20;
 				RenderFuncs.drawRect(matrixStackIn, x, y, x + 140, y + 40, 0xFF303030);
 				
 				x = (this.gui_width / 2) - (messageLen / 2);
 				y = 60;//(this.gui_height / 2) - (mc.fontRenderer.FONT_HEIGHT/2);
-				mc.fontRenderer.drawString(matrixStackIn, message, x, y, 0xFFFFFFFF);
+				mc.font.draw(matrixStackIn, message, x, y, 0xFFFFFFFF);
 			}
 		}
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 		// Render remaining buttons
 		for (PretendInventorySlot slot: this.inventoryWidgets) {
@@ -648,8 +648,8 @@ public class TomeWorkshopScreen extends Screen {
 			this.rightFlip.render(matrixStackIn, mouseX, mouseY, partialTicks);
 			
 			final String pageNum = (this.pageIdx+1) + "";
-			final int pageNumLen = mc.fontRenderer.getStringWidth(pageNum);
-			mc.fontRenderer.drawString(matrixStackIn, pageNum, getGuiLeft() + POS_PAGENUM_HOFFSET - (pageNumLen / 2), getGuiTop() + POS_PAGENUM_VOFFSET, 0xFFAAAAAA);
+			final int pageNumLen = mc.font.width(pageNum);
+			mc.font.draw(matrixStackIn, pageNum, getGuiLeft() + POS_PAGENUM_HOFFSET - (pageNumLen / 2), getGuiTop() + POS_PAGENUM_VOFFSET, 0xFFAAAAAA);
 		}
 		
 		// Render foregrounds
@@ -684,15 +684,15 @@ public class TomeWorkshopScreen extends Screen {
 		
 		// Draw info
 		int y = 0;
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(iconLen + 3, 1, 0);
 		matrixStackIn.scale(.5f, .5f, 1f);
-		mc.fontRenderer.drawString(matrixStackIn, TextFormatting.BOLD + name, 0, y, 0xFF000000);
-		y += mc.fontRenderer.FONT_HEIGHT;
-		mc.fontRenderer.drawString(matrixStackIn, "Mana: " + spell.getManaCost(), 0, y, 0xFF202020);
-		y += mc.fontRenderer.FONT_HEIGHT;
-		mc.fontRenderer.drawString(matrixStackIn, "Weight: " + spell.getWeight(), 0, y, 0xFF202020);
-		matrixStackIn.pop();
+		mc.font.draw(matrixStackIn, TextFormatting.BOLD + name, 0, y, 0xFF000000);
+		y += mc.font.lineHeight;
+		mc.font.draw(matrixStackIn, "Mana: " + spell.getManaCost(), 0, y, 0xFF202020);
+		y += mc.font.lineHeight;
+		mc.font.draw(matrixStackIn, "Weight: " + spell.getWeight(), 0, y, 0xFF202020);
+		matrixStackIn.popPose();
 	}
 	
 	protected void renderItemTooltip(MatrixStack matrixStackIn, ItemStack stack, int x, int y) {
@@ -734,7 +734,7 @@ public class TomeWorkshopScreen extends Screen {
 		@Override
 		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(x, y, 0);
 			
 			if (selected) {
@@ -742,7 +742,7 @@ public class TomeWorkshopScreen extends Screen {
 			}
 			
 			// Draw background
-			mc.textureManager.bindTexture(TEXT);
+			mc.textureManager.bind(TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 					TEXT_LIBPANEL_HOFFSET, TEXT_LIBPANEL_VOFFSET,
 					TEXT_LIBPANEL_WIDTH, TEXT_LIBPANEL_HEIGHT,
@@ -764,7 +764,7 @@ public class TomeWorkshopScreen extends Screen {
 				RenderFuncs.drawRect(matrixStackIn, 1, 1, this.width - 1 , this.height - 1, slotHighlightColor);
 			}
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		public void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
@@ -792,7 +792,7 @@ public class TomeWorkshopScreen extends Screen {
 			// Dupe what's in Widget to handle right-clicks.
 			// button==0 is left click
 			if (button == 1 && this.clicked(mouseX, mouseY)) {
-				this.playDownSound(Minecraft.getInstance().getSoundHandler());
+				this.playDownSound(Minecraft.getInstance().getSoundManager());
 				this.onRightClick(mouseX, mouseY);
 				return true;
 			} else {
@@ -821,11 +821,11 @@ public class TomeWorkshopScreen extends Screen {
 		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(x, y, 0);
 			
 			// Draw background
-			mc.textureManager.bindTexture(TEXT);
+			mc.textureManager.bind(TEXT);
 			if (this.spell == null) {
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 						TEXT_SLOTEMPTY_HOFFSET, TEXT_SLOTEMPTY_VOFFSET,
@@ -855,7 +855,7 @@ public class TomeWorkshopScreen extends Screen {
 				RenderFuncs.drawRect(matrixStackIn, 1, 1, this.width - 1 , this.height - 1, slotHighlightColor);
 			}
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		public void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
@@ -888,9 +888,9 @@ public class TomeWorkshopScreen extends Screen {
 		
 		@Override
 		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(this.x, this.y, 0);
-			ItemStack slotStack = this.inventory.getStackInSlot(this.slotIdx);
+			ItemStack slotStack = this.inventory.getItem(this.slotIdx);
 			if (!slotStack.isEmpty()) {
 				RenderFuncs.RenderGUIItem(slotStack, matrixStackIn);
 			}
@@ -911,12 +911,12 @@ public class TomeWorkshopScreen extends Screen {
 				final int slotHighlightColor = -2130706433; // copied from ContainerScreen
 				RenderFuncs.drawRect(matrixStackIn, 0, 0, this.width -2 , this.height - 2, slotHighlightColor);
 			}
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		public void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			if (this.isHovered) {
-				ItemStack slotStack = this.inventory.getStackInSlot(this.slotIdx);
+				ItemStack slotStack = this.inventory.getItem(this.slotIdx);
 				if (!slotStack.isEmpty()) {
 					screen.renderItemTooltip(matrixStackIn, slotStack, mouseX, mouseY);
 				}
@@ -953,11 +953,11 @@ public class TomeWorkshopScreen extends Screen {
 		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(x, y, 0);
 			
 			// Draw background
-			mc.textureManager.bindTexture(TEXT);
+			mc.textureManager.bind(TEXT);
 			if (this.isHovered() || pressed) {
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 					TEXT_SCROLLBAR_HIGH_HOFFSET, TEXT_SCROLLBAR_HIGH_VOFFSET,
@@ -972,7 +972,7 @@ public class TomeWorkshopScreen extends Screen {
 						TEXT_WIDTH, TEXT_HEIGHT);
 			}
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 	}
 	
@@ -1003,11 +1003,11 @@ public class TomeWorkshopScreen extends Screen {
 				disabled = previewIdx < 0 || previewIdx >= numPages;
 			}
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(x, y, 0);
 			
 			// Draw background
-			mc.textureManager.bindTexture(TEXT);
+			mc.textureManager.bind(TEXT);
 			if (disabled) {
 				
 			} else {
@@ -1042,7 +1042,7 @@ public class TomeWorkshopScreen extends Screen {
 				}
 			}
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 	}
 	

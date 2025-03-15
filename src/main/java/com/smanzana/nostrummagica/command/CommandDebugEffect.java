@@ -22,7 +22,7 @@ public class CommandDebugEffect {
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
 				Commands.literal("nostrumdebugeffect")
-					.requires(s -> s.hasPermissionLevel(2))
+					.requires(s -> s.hasPermission(2))
 					.then(Commands.argument("effect", StringArgumentType.string())
 						.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "effect")))
 						)
@@ -31,7 +31,7 @@ public class CommandDebugEffect {
 	}
 
 	private static final int execute(CommandContext<CommandSource> context, final String effectName) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().asPlayer();
+		ServerPlayerEntity player = context.getSource().getPlayerOrException();
 		
 		SpecialEffect effect;
 		try {
@@ -46,7 +46,7 @@ public class CommandDebugEffect {
 		
 		EffectData data = NostrumMagica.magicEffectProxy.getData(player, effect);
 		if (data == null) {
-			context.getSource().sendFeedback(new StringTextComponent("Player is not under that effect"), true);
+			context.getSource().sendSuccess(new StringTextComponent("Player is not under that effect"), true);
 		} else {
 			String result = "Effect found with element {"
 					+ (data.getElement() == null ? "NULL" : data.getElement().getName())
@@ -55,7 +55,7 @@ public class CommandDebugEffect {
 					+ "}, and count {"
 					+ data.getCount()
 					+ "}";
-			context.getSource().sendFeedback(new StringTextComponent(result), true);
+			context.getSource().sendSuccess(new StringTextComponent(result), true);
 		}
 		
 //		if (!(sender.getCommandSenderEntity() instanceof PlayerEntity)) {

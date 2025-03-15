@@ -51,12 +51,12 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	public void setTriggerOffset(BlockPos offset, boolean isWorldGen) {
 		triggerOffset = offset;
 		if (!isWorldGen) {
-			this.markDirty();
+			this.setChanged();
 		}
 	}
 	
 	public void setTriggerPosition(int x, int y, int z) {
-		this.setTriggerOffset(new BlockPos(x - pos.getX(), y - pos.getY(), z - pos.getZ()));
+		this.setTriggerOffset(new BlockPos(x - worldPosition.getX(), y - worldPosition.getY(), z - worldPosition.getZ()));
 	}
 	
 	public BlockPos getTriggerOffset() {
@@ -70,29 +70,29 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	protected void doTrigger(BlockState state) {
 		
 		if (triggerOffset != null) {
-			state = world.getBlockState(pos.add(this.triggerOffset));
+			state = level.getBlockState(worldPosition.offset(this.triggerOffset));
 			if (state.getBlock() instanceof ITriggeredBlock) {
-				((ITriggeredBlock) state.getBlock()).trigger(world, pos.add(triggerOffset), state, pos);
+				((ITriggeredBlock) state.getBlock()).trigger(level, worldPosition.offset(triggerOffset), state, worldPosition);
 			}
 			triggerOffset = null;
 		}
 	}
 	
 	protected void updateBlockState() {
-		world.setBlockState(pos, this.getBlockState().with(MatchSpawnerBlock.TRIGGERED, true), 3);
+		level.setBlock(worldPosition, this.getBlockState().setValue(MatchSpawnerBlock.TRIGGERED, true), 3);
 	}
 	
 	protected void spawnMatch(BlockState state) {
-		entity = NostrumBlocks.matchSpawner.spawn(world, pos, state, NostrumMagica.rand);
+		entity = NostrumBlocks.matchSpawner.spawn(level, worldPosition, state, NostrumMagica.rand);
 		//world.notifyBlockUpdate(pos, state, state, 2);
 		//world.addBlockEvent(pos, state.getBlock(), 9, 0);
 		updateBlockState();
-		this.markDirty();
+		this.setChanged();
 	}
 	
 	protected boolean shouldSpawnMatch(BlockState state) {
-		for (PlayerEntity player : ((ServerWorld) world).getPlayers()) {
-			if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) < MatchSpawnerBlock.SPAWN_DIST_SQ) {
+		for (PlayerEntity player : ((ServerWorld) level).players()) {
+			if (!player.isSpectator() && !player.isCreative() && player.distanceToSqr(worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5) < MatchSpawnerBlock.SPAWN_DIST_SQ) {
 				return true;
 			}
 		}
@@ -104,7 +104,7 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	protected void majorTick(BlockState state) {
 		if (unlinkedEntID != null) {
 			// Need to find our entity!
-			@Nullable Entity foundEnt = Entities.FindEntity(world, unlinkedEntID);
+			@Nullable Entity foundEnt = Entities.FindEntity(level, unlinkedEntID);
 			if (foundEnt != null && foundEnt instanceof LivingEntity) {
 				this.entity = (LivingEntity) foundEnt;
 				unlinkedEntID = null;
@@ -120,7 +120,7 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 				NostrumMagica.logger.warn("Trigger spawner failed to find spawned entity and is giving up.");
 				unlinkedEntID = null;
 				this.doTrigger(state);
-				world.removeBlock(pos, false);
+				level.removeBlock(worldPosition, false);
 			}
 		} else if (entity == null) {
 			if (shouldSpawnMatch(state)) {
@@ -129,35 +129,35 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 			}
 		} else {
 			if (!entity.isAlive()) {
-				NostrumMagicaSounds.AMBIENT_WOOSH2.play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+				NostrumMagicaSounds.AMBIENT_WOOSH2.play(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
 				this.doTrigger(state);
-				world.removeBlock(pos, false);
+				level.removeBlock(worldPosition, false);
 			}
 		}
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		if (triggerOffset != null) {
 			nbt.put(NBT_TRIGGER_OFFSET, NBTUtil.writeBlockPos(triggerOffset));
 		}
 		if (entity != null) {
-			nbt.putUniqueId(NBT_ENTITY_ID, entity.getUniqueID());
+			nbt.putUUID(NBT_ENTITY_ID, entity.getUUID());
 		} else if (this.unlinkedEntID != null) {
-			nbt.putUniqueId(NBT_ENTITY_ID, this.unlinkedEntID);
+			nbt.putUUID(NBT_ENTITY_ID, this.unlinkedEntID);
 		}
 		
 		return nbt;
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
-		if (nbt.hasUniqueId(NBT_ENTITY_ID)) {
-			this.unlinkedEntID = nbt.getUniqueId(NBT_ENTITY_ID);
+		if (nbt.hasUUID(NBT_ENTITY_ID)) {
+			this.unlinkedEntID = nbt.getUUID(NBT_ENTITY_ID);
 		}
 		
 		if (nbt.contains(NBT_TRIGGER_OFFSET, NBT.TAG_LONG)) {

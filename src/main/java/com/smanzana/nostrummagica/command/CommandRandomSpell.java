@@ -31,7 +31,7 @@ public class CommandRandomSpell {
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
 				Commands.literal("randomspell")
-					.requires(s -> s.hasPermissionLevel(2))
+					.requires(s -> s.hasPermission(2))
 					.then(Commands.argument("name", StringArgumentType.string())
 						.then(Commands.argument("cost", IntegerArgumentType.integer(0)).then(Commands.argument("weight", IntegerArgumentType.integer(0)))
 								.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "name"), IntegerArgumentType.getInteger(ctx, "cost"), IntegerArgumentType.getInteger(ctx, "weight")))
@@ -47,7 +47,7 @@ public class CommandRandomSpell {
 	}
 	
 	private static final int execute(CommandContext<CommandSource> context, String name, int cost, int weight) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().asPlayer();
+		ServerPlayerEntity player = context.getSource().getPlayerOrException();
 		
 		if (name == null || name.isEmpty()) {
 			name = "Random Spell";
@@ -55,7 +55,7 @@ public class CommandRandomSpell {
 		
 		final Spell spell = CreateRandomSpell(name, null, cost, weight);
 		ItemStack stack = SpellScroll.create(spell);
-		player.inventory.addItemStackToInventory(stack);
+		player.inventory.add(stack);
 		
 		return 0;
 	}

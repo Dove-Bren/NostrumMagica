@@ -89,33 +89,33 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 	public List<ITextComponent> getDetails(List<ITextComponent> lines) {
 		if (weightModifier != 0) {
 			lines.add(new TranslationTextComponent("spellcraftmod.weight", (weightModifier < 0 ? "" : "+"), weightModifier)
-					.mergeStyle(weightModifier < 0 ? STYLE_GOOD : STYLE_BAD));
+					.withStyle(weightModifier < 0 ? STYLE_GOOD : STYLE_BAD));
 		}
 		if (manaRateModifier != 0) {
 			final int manaPerc = (int) (manaRateModifier * 100);
 			lines.add(new TranslationTextComponent("spellcraftmod.mana", (manaRateModifier < 0 ? "" : "+"), manaPerc)
-					.mergeStyle(manaRateModifier < 0 ? STYLE_GOOD : STYLE_BAD));
+					.withStyle(manaRateModifier < 0 ? STYLE_GOOD : STYLE_BAD));
 		}
 		if (efficiencyModifier != 0) {
 			final int effPerc = (int) (efficiencyModifier * 100);
 			lines.add(new TranslationTextComponent("spellcraftmod.efficiency", (efficiencyModifier < 0 ? "" : "+"), effPerc)
-					.mergeStyle(elementCountModifier > 0 ? STYLE_GOOD : STYLE_BAD));
+					.withStyle(elementCountModifier > 0 ? STYLE_GOOD : STYLE_BAD));
 		}
 		if (elementCountModifier != 0) {
 			lines.add(new TranslationTextComponent("spellcraftmod.elementcount", (elementCountModifier < 0 ? "" : "+"), elementCountModifier)
-					.mergeStyle(elementCountModifier > 0 ? STYLE_GOOD : STYLE_BAD));
+					.withStyle(elementCountModifier > 0 ? STYLE_GOOD : STYLE_BAD));
 		}
 		if (elementOverride != null) {
 			lines.add(new TranslationTextComponent("spellcraftmod.override.element", elementOverride.getName())
-					.mergeStyle(STYLE_OVERRIDE));
+					.withStyle(STYLE_OVERRIDE));
 		}
 		if (alterationOverride != null) {
 			lines.add(new TranslationTextComponent("spellcraftmod.override.alteration", alterationOverride.getName())
-					.mergeStyle(STYLE_OVERRIDE));
+					.withStyle(STYLE_OVERRIDE));
 		}
 		if (shapeOverride != null) {
 			lines.add(new TranslationTextComponent("spellcraftmod.override.shape", shapeOverride.getDisplayName())
-					.mergeStyle(STYLE_OVERRIDE));
+					.withStyle(STYLE_OVERRIDE));
 		}
 		
 		return lines;

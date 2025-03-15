@@ -33,7 +33,7 @@ public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(HookShotEntity entity) {
+	public ResourceLocation getTextureLocation(HookShotEntity entity) {
 		return HOOK_TEXTURE;
 	}
 	
@@ -54,7 +54,7 @@ public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 		float rly;
 		float rlz;
 		boolean texFlip = false;
-		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		final Matrix4f transform = matrixStackIn.last().pose();
 		
 //		// Define first two vertices
 //		// Note: UV is always the top here, but when going through the list, flips back and forth.
@@ -65,27 +65,27 @@ public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 		// Broke down into two cases instead of generalizing to make common case easier. Is this slower or faster?
 		for (int i = 0; i < wholeSegments + 1; i++) {
 			vl = (texFlip ? 0 : 1);
-			rlx = ((i) * perSeg.getX());
-			rly = ((i) * perSeg.getY());
-			rlz = ((i) * perSeg.getZ());
+			rlx = ((i) * perSeg.x());
+			rly = ((i) * perSeg.y());
+			rlz = ((i) * perSeg.z());
 			
 			if (i == wholeSegments) {
 				// last piece which is likely a partial piece
 				vh = (float) (texFlip ? partialSegment : (1.0 - partialSegment));
-				rhx = ((i + partialSegment) * perSeg.getX());
-				rhy = ((i + partialSegment) * perSeg.getY());
-				rhz = ((i + partialSegment) * perSeg.getZ());
+				rhx = ((i + partialSegment) * perSeg.x());
+				rhy = ((i + partialSegment) * perSeg.y());
+				rhz = ((i + partialSegment) * perSeg.z());
 			} else {
 				vh = (texFlip ? 1 : 0);
-				rhx = ((i + 1) * perSeg.getX());
-				rhy = ((i + 1) * perSeg.getY());
-				rhz = ((i + 1) * perSeg.getZ());
+				rhx = ((i + 1) * perSeg.x());
+				rhy = ((i + 1) * perSeg.y());
+				rhz = ((i + 1) * perSeg.z());
 			}
 			
-			wr.pos(transform, rlx - (cordOffset.getX() / 2), rly - (cordOffset.getY() / 2), rlz - (cordOffset.getZ() / 2)).tex(0, vl).endVertex();
-			wr.pos(transform, rlx + (cordOffset.getX() / 2), rly + (cordOffset.getY() / 2), rlz + (cordOffset.getZ() / 2)).tex(1, vl).endVertex();
-			wr.pos(transform, rhx + (cordOffset.getX() / 2), rhy + (cordOffset.getY() / 2), rhz + (cordOffset.getZ() / 2)).tex(1, vh).endVertex();
-			wr.pos(transform, rhx - (cordOffset.getX() / 2), rhy - (cordOffset.getY() / 2), rhz - (cordOffset.getZ() / 2)).tex(0, vh).endVertex();
+			wr.vertex(transform, rlx - (cordOffset.x() / 2), rly - (cordOffset.y() / 2), rlz - (cordOffset.z() / 2)).uv(0, vl).endVertex();
+			wr.vertex(transform, rlx + (cordOffset.x() / 2), rly + (cordOffset.y() / 2), rlz + (cordOffset.z() / 2)).uv(1, vl).endVertex();
+			wr.vertex(transform, rhx + (cordOffset.x() / 2), rhy + (cordOffset.y() / 2), rhz + (cordOffset.z() / 2)).uv(1, vh).endVertex();
+			wr.vertex(transform, rhx - (cordOffset.x() / 2), rhy - (cordOffset.y() / 2), rhz - (cordOffset.z() / 2)).uv(0, vh).endVertex();
 			texFlip = !texFlip;
 		}
 	}
@@ -96,17 +96,17 @@ public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 		final float chainWidth = .1f;
 		final LivingEntity shooter = entity.getCaster();
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		
 		// First, render chain
 		if (shooter != null) {
-			Vector3d offset = Projectiles.getVectorForRotation(shooter.rotationPitch - 90f, shooter.rotationYawHead + 90f).scale(.1);
+			Vector3d offset = Projectiles.getVectorForRotation(shooter.xRot - 90f, shooter.yHeadRot + 90f).scale(.1);
 			final Vector3d diff = shooter.getEyePosition(partialTicks).add(offset).subtract(entity.getEyePosition(partialTicks));
 			final float totalLength = (float) diff.distanceTo(new Vector3d(0,0,0));
 			final float segments = totalLength / texLen;
 			final Vector3d perSegD = diff.scale(1.0/segments);
-			final Vector3f cordOffset = new Vector3f(perSegD.normalize().scale(chainWidth).rotateYaw(90f));
-			final Vector3f cordVOffset = new Vector3f(perSegD.normalize().scale(chainWidth).rotatePitch(90f));
+			final Vector3f cordOffset = new Vector3f(perSegD.normalize().scale(chainWidth).yRot(90f));
+			final Vector3f cordVOffset = new Vector3f(perSegD.normalize().scale(chainWidth).xRot(90f));
 			final Vector3f perSeg = new Vector3f(perSegD);
 			
 			// Want some sort of width
@@ -120,10 +120,10 @@ public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 		}
 		
 		// then, render hook
-		IVertexBuilder buffer = bufferIn.getBuffer(model.getRenderType(this.getEntityTexture(entity)));
-		model.render(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+		IVertexBuilder buffer = bufferIn.getBuffer(model.renderType(this.getTextureLocation(entity)));
+		model.renderToBuffer(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 }

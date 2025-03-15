@@ -34,6 +34,6 @@ public class TierRequirement implements IRequirement{
 	@Override
 	public List<ITextComponent> getDescription(PlayerEntity player) {
 		return Lists.newArrayList(new TranslationTextComponent("info.requirement.tier", 
-				tier.getName().mergeStyle(TextFormatting.DARK_PURPLE)));
+				tier.getName().withStyle(TextFormatting.DARK_PURPLE)));
 	}
 }

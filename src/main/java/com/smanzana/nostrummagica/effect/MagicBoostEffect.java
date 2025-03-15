@@ -21,10 +21,10 @@ public class MagicBoostEffect extends Effect {
 	public MagicBoostEffect() {
 		super(EffectType.BENEFICIAL, 0xFF47FFAF);
 		
-		this.addAttributesModifier(NostrumAttributes.magicDamage, POTENCY_UUID, 50.D, AttributeModifier.Operation.ADDITION);
+		this.addAttributeModifier(NostrumAttributes.magicDamage, POTENCY_UUID, 50.D, AttributeModifier.Operation.ADDITION);
 	}
 	
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return false; // No tick effects
 	}
 	

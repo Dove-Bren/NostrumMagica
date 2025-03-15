@@ -44,7 +44,7 @@ public class ElementMasteryRequirement implements IRequirement{
 	public List<ITextComponent> getDescription(PlayerEntity player) {
 		return Lists.newArrayList(new TranslationTextComponent("info.requirement.element",
 					level.getName(),
-					new StringTextComponent(element.getName()).mergeStyle(TextFormatting.DARK_RED)
+					new StringTextComponent(element.getName()).withStyle(TextFormatting.DARK_RED)
 				));
 	}
 }

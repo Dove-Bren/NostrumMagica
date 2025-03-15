@@ -52,7 +52,7 @@ public class CombatTrialFire extends CombatTrialStaged {
 				// Make it large boi
 				CompoundNBT customTag = new CompoundNBT();
 				customTag.putInt("Size", 4);
-				ent.readAdditional(customTag);
+				ent.readAdditionalSaveData(customTag);
 			} else if (ent instanceof WilloEntity) {
 				((WilloEntity) ent).setElement(EMagicElement.FIRE);
 			} else if (ent instanceof KoidEntity) {

@@ -44,16 +44,16 @@ public class ProgressionDoorBlock extends MagicDoorBlock {
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
-		if (worldIn.isRemote)
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+		if (worldIn.isClientSide)
 			return ActionResultType.SUCCESS;
 		
 		BlockPos master = this.getMasterPos(worldIn, state, pos);
-		if (master != null && worldIn.getTileEntity(master) != null) {
+		if (master != null && worldIn.getBlockEntity(master) != null) {
 			
 			if (playerIn.isCreative()) {
-				ProgressionDoorTileEntity te = (ProgressionDoorTileEntity) worldIn.getTileEntity(master);
-				ItemStack heldItem = playerIn.getHeldItem(hand);
+				ProgressionDoorTileEntity te = (ProgressionDoorTileEntity) worldIn.getBlockEntity(master);
+				ItemStack heldItem = playerIn.getItemInHand(hand);
 				if (!heldItem.isEmpty() && heldItem.getItem() instanceof SpellRune) {
 					te.require(SpellRune.toComponentWrapper(heldItem));
 					return ActionResultType.SUCCESS;
@@ -69,10 +69,10 @@ public class ProgressionDoorBlock extends MagicDoorBlock {
 			}
 			
 			List<ITextComponent> missingDepStrings = new LinkedList<>();
-			if (!((ProgressionDoorTileEntity) worldIn.getTileEntity(master)).meetsRequirements(playerIn, missingDepStrings)) {
-				playerIn.sendMessage(new TranslationTextComponent("info.door.missing.intro"), Util.DUMMY_UUID);
+			if (!((ProgressionDoorTileEntity) worldIn.getBlockEntity(master)).meetsRequirements(playerIn, missingDepStrings)) {
+				playerIn.sendMessage(new TranslationTextComponent("info.door.missing.intro"), Util.NIL_UUID);
 				for (ITextComponent text : missingDepStrings) {
-					playerIn.sendMessage(text, Util.DUMMY_UUID);
+					playerIn.sendMessage(text, Util.NIL_UUID);
 				}
 				NostrumMagicaSounds.CAST_FAIL.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 			} else {

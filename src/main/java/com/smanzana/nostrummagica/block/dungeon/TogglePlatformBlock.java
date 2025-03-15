@@ -39,33 +39,33 @@ public class TogglePlatformBlock extends Block implements ITriggeredBlock {
 	public static final BooleanProperty ON = BooleanProperty.create("on");
 	
 	public TogglePlatformBlock() {
-		super(Block.Properties.create(Material.GLASS)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		super(Block.Properties.of(Material.GLASS)
+				.strength(-1.0F, 3600000.8F)
 				.sound(SoundType.GLASS)
-				.notSolid()
+				.noOcclusion()
 				.noDrops()
 				);
 		
-		this.setDefaultState(this.getDefaultState().with(ON, true));
+		this.registerDefaultState(this.defaultBlockState().setValue(ON, true));
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		super.fillStateContainer(builder);
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
 		builder.add(ON);
 	}
 	
 	public void setEnabled(World world, BlockPos pos, BlockState state, boolean enabled) {
-		world.setBlockState(pos, state.with(ON, enabled), 3);
+		world.setBlock(pos, state.setValue(ON, enabled), 3);
 	}
 	
 	public boolean isEnabled(BlockState state) {
-		return state.get(ON);
+		return state.getValue(ON);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
+	public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
 		return isEnabled(state)
 				&& adjacentBlockState.getBlock() instanceof TogglePlatformBlock
 				&& ((TogglePlatformBlock) adjacentBlockState.getBlock()).isEnabled(adjacentBlockState);
@@ -74,13 +74,13 @@ public class TogglePlatformBlock extends Block implements ITriggeredBlock {
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
-		if (!isEnabled(state) && context != ISelectionContext.dummy()) {
+		if (!isEnabled(state) && context != ISelectionContext.empty()) {
 			if (context.getEntity() == null || !(context.getEntity() instanceof PlayerEntity) || !((PlayerEntity) context.getEntity()).isCreative()) {
 				return VoxelShapes.empty();
 			}
 		}
 		
-		return VoxelShapes.fullCube();
+		return VoxelShapes.block();
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -101,7 +101,7 @@ public class TogglePlatformBlock extends Block implements ITriggeredBlock {
 	// GetHowMuchLightGoesThrough?? Not sure.
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public float getAmbientOcclusionLightValue(BlockState state, IBlockReader worldIn, BlockPos pos) {
+	public float getShadeBrightness(BlockState state, IBlockReader worldIn, BlockPos pos) {
 		return 1.0F;
 	}
 	
@@ -110,7 +110,7 @@ public class TogglePlatformBlock extends Block implements ITriggeredBlock {
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		if (!playerIn.isCreative()) {
 			return ActionResultType.PASS;
 		}
@@ -119,11 +119,11 @@ public class TogglePlatformBlock extends Block implements ITriggeredBlock {
 			return ActionResultType.PASS;
 		}
 		
-		if (worldIn.isRemote) {
+		if (worldIn.isClientSide) {
 			return ActionResultType.SUCCESS;
 		}
 		
-		if (playerIn.isSneaking()) {
+		if (playerIn.isShiftKeyDown()) {
 			// Emulate a trigger and spread
 			trigger(worldIn, pos, state, new BlockPos(0, 0, 0));
 		} else {
@@ -140,7 +140,7 @@ public class TogglePlatformBlock extends Block implements ITriggeredBlock {
 
 	@Override
 	public void trigger(World world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
-		if (!world.isRemote()) {
+		if (!world.isClientSide()) {
 			WorldUtil.WalkConnectedBlocks(world, blockPos, new IBlockWalker() {
 				@Override
 				public boolean canVisit(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos,

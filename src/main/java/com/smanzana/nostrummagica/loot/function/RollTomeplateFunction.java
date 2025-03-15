@@ -33,12 +33,12 @@ public class RollTomeplateFunction extends LootFunction {
 	}
 	
 	@Override
-	public LootFunctionType getFunctionType() {
+	public LootFunctionType getType() {
 		return NostrumLoot.FUNCTION_ROLL_TOMEPLATE;
 	}
 	
 	@Override
-	public ItemStack doApply(ItemStack stack, LootContext context) {
+	public ItemStack run(ItemStack stack, LootContext context) {
 		ItemStack newStack = stack.copy();
 		
 		// +1 to max when calculating range so that (0, 3) becomes {0, 1, 2, 3} instead of {0, 1, 2}.
@@ -67,10 +67,10 @@ public class RollTomeplateFunction extends LootFunction {
 
 		@Override
 		public RollTomeplateFunction deserialize(JsonObject object, JsonDeserializationContext context, ILootCondition[] conditionsIn) {
-			final int capacityMin = JSONUtils.getInt(object, "capacity_min", 0);
-			final int capacityMax = JSONUtils.getInt(object, "capacity_max", 10);
-			final int slotMin = JSONUtils.getInt(object, "slot_min", 1);
-			final int slotMax = JSONUtils.getInt(object, "slot_max", 5);
+			final int capacityMin = JSONUtils.getAsInt(object, "capacity_min", 0);
+			final int capacityMax = JSONUtils.getAsInt(object, "capacity_max", 10);
+			final int slotMin = JSONUtils.getAsInt(object, "slot_min", 1);
+			final int slotMax = JSONUtils.getAsInt(object, "slot_max", 5);
 			
 			if (capacityMin > capacityMax) {
 				throw new JsonSyntaxException("capacity_min(" + capacityMin + ") cannot be greater than capacity_max(" + capacityMax + ")");

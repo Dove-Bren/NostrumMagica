@@ -57,7 +57,7 @@ public class DelayShape extends SpellShape {
 	}
 	
 	private static final String ID = "delay";
-	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.SKY_ASH, 1)));
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.of(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.SKY_ASH, 1)));
 	
 	public static final SpellShapeProperty<Integer> DELAY = new IntSpellShapeProperty("delay", 10, 30, 60, 120, 300);
 	
@@ -98,7 +98,7 @@ public class DelayShape extends SpellShape {
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
-			costs = NonNullList.from(ItemStack.EMPTY,
+			costs = NonNullList.of(ItemStack.EMPTY,
 				ItemStack.EMPTY,
 				new ItemStack(Items.REDSTONE),
 				new ItemStack(Items.IRON_INGOT),

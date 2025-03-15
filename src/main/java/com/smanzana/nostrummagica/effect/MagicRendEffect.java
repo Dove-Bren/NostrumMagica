@@ -19,7 +19,7 @@ public class MagicRendEffect extends Effect {
 	
 	public MagicRendEffect() {
 		super(EffectType.HARMFUL, 0xFFE36338);
-		this.addAttributesModifier(NostrumAttributes.magicResist, MOD_UUID, -20D, AttributeModifier.Operation.ADDITION);
+		this.addAttributeModifier(NostrumAttributes.magicResist, MOD_UUID, -20D, AttributeModifier.Operation.ADDITION);
 	}
 	
 	@OnlyIn(Dist.CLIENT)

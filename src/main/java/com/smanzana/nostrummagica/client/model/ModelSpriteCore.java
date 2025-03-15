@@ -50,7 +50,7 @@ public class ModelSpriteCore extends ModelBaked<SpriteEntity> {
 	}
 
 	@Override
-	public void setRotationAngles(SpriteEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setupAnim(SpriteEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {
 		
 		final int intervalsPer = 2;
@@ -85,6 +85,6 @@ public class ModelSpriteCore extends ModelBaked<SpriteEntity> {
 		final float frac = (float) (Math.PI * (2.0/8.0)); // (2 * Math.pi) / 8
 		
 		// This is Z because it's tilted on it's side in the obj?
-		arms.rotateAngleZ = frac * (interval);
+		arms.zRot = frac * (interval);
 	}
 }

@@ -25,12 +25,12 @@ public class ItemStacks {
 	}
 	
 	public static final <T extends LivingEntity> ItemStack damageItem(@Nonnull ItemStack stack, T entity, Hand hand, int damage) {
-		stack.damageItem(damage, entity, playerIn -> playerIn.sendBreakAnimation(hand));
+		stack.hurtAndBreak(damage, entity, playerIn -> playerIn.broadcastBreakEvent(hand));
 		return stack.isEmpty() ? ItemStack.EMPTY : stack;
 	}
 	
 	public static final <T extends LivingEntity> ItemStack damageEquippedArmor(@Nonnull ItemStack stack, T entity, EquipmentSlotType slot, int damage) {
-		stack.damageItem(damage, entity, playerIn -> playerIn.sendBreakAnimation(slot));
+		stack.hurtAndBreak(damage, entity, playerIn -> playerIn.broadcastBreakEvent(slot));
 		return stack.isEmpty() ? ItemStack.EMPTY : stack;
 	}
 

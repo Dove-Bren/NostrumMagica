@@ -30,7 +30,7 @@ public class MinecoloniesUtils {
 		}
 		
 		if (ent instanceof PlayerEntity) {
-			return IMinecoloniesAPI.getInstance().getColonyManager().getIColonyByOwner(ent.world, ent.getUniqueID());
+			return IMinecoloniesAPI.getInstance().getColonyManager().getIColonyByOwner(ent.level, ent.getUUID());
 		}
 		
 		return null;

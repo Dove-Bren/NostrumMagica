@@ -21,7 +21,7 @@ public class ManaArmorListener {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onEntityDamaged(LivingDamageEvent e) {
 		final Entity ent = e.getEntity();
-		if (ent == null || ent.getEntityWorld() == null || ent.getEntityWorld().isRemote() || e.isCanceled()) {
+		if (ent == null || ent.getCommandSenderWorld() == null || ent.getCommandSenderWorld().isClientSide() || e.isCanceled()) {
 			return;
 		}
 		
@@ -40,7 +40,7 @@ public class ManaArmorListener {
 	@SubscribeEvent
 	public void onEntityDeath(LivingDeathEvent e) {
 		final Entity ent = e.getEntity();
-		if (ent == null || ent.getEntityWorld() == null || ent.getEntityWorld().isRemote() || e.isCanceled()) {
+		if (ent == null || ent.getCommandSenderWorld() == null || ent.getCommandSenderWorld().isClientSide() || e.isCanceled()) {
 			return;
 		}
 		

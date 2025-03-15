@@ -111,18 +111,18 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 			}
 			
 			// Find any other eligible entities around them
-			List<Entity> entities = world.getEntitiesInAABBexcluding(null, 
-					new AxisAlignedBB(center.getPosX() - radius,
-								center.getPosY() - radius,
-								center.getPosZ() - radius,
-								center.getPosX() + radius,
-								center.getPosY() + radius,
-								center.getPosZ() + radius),
+			List<Entity> entities = world.getEntities((Entity) null, 
+					new AxisAlignedBB(center.getX() - radius,
+								center.getY() - radius,
+								center.getZ() - radius,
+								center.getX() + radius,
+								center.getY() + radius,
+								center.getZ() + radius),
 					(ent) -> {
 						return ent != null && NostrumMagica.resolveLivingEntity(ent) != null;
 					});
 			Collections.sort(entities, (a, b) -> {
-				return (int) (a.getDistanceSq(center) - b.getDistanceSq(center));
+				return (int) (a.distanceToSqr(center) - b.distanceToSqr(center));
 			});
 			
 			// Note: Could do this filtering inside the entity iteration. Just filtering to living is probably okay.
@@ -138,7 +138,7 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 				}
 				
 				// Check actual distance
-				if (Math.abs(living.getDistanceSq(center)) > radiusSq) {
+				if (Math.abs(living.distanceToSqr(center)) > radiusSq) {
 					// since things are sorted, any after this are bad
 					break;
 				}
@@ -197,7 +197,7 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 		double radius = 7.0;
 		World world = location.world;
 		if (world == null)
-			world = state.getSelf().getEntityWorld();
+			world = state.getSelf().getCommandSenderWorld();
 		int arc = getMaxArcs(params) + 1; // +1 to include center
 
 		Map<LivingEntity, List<LivingEntity>> entLinks = new HashMap<>();
@@ -212,18 +212,18 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 			} else {
 				// Find nearest start entity
 				final Vector3d center = location.hitPosition;
-				List<Entity> entities = world.getEntitiesInAABBexcluding(null, 
-						new AxisAlignedBB(center.getX() - radius,
-									center.getY() - radius,
-									center.getZ() - radius,
-									center.getX() + radius,
-									center.getY() + radius,
-									center.getZ() + radius),
+				List<Entity> entities = world.getEntities((Entity) null, 
+						new AxisAlignedBB(center.x() - radius,
+									center.y() - radius,
+									center.z() - radius,
+									center.x() + radius,
+									center.y() + radius,
+									center.z() + radius),
 						(ent) -> {
 							return ent != null && NostrumMagica.resolveLivingEntity(ent) != null;
 						});
 				Collections.sort(entities, (a, b) -> {
-					return (int) (a.getDistanceSq(center) - b.getDistanceSq(center));
+					return (int) (a.distanceToSqr(center) - b.distanceToSqr(center));
 				});
 				
 				// First element is shortest distance
@@ -243,7 +243,7 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
-		NonNullList<ItemStack> list = NonNullList.from(ItemStack.EMPTY,
+		NonNullList<ItemStack> list = NonNullList.of(ItemStack.EMPTY,
 			ReagentItem.CreateStack(ReagentType.SKY_ASH, 1),
 			ReagentItem.CreateStack(ReagentType.MANDRAKE_ROOT, 1)
 		);
@@ -256,13 +256,13 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (JUMP_COSTS == null) {
-			JUMP_COSTS = NonNullList.from(ItemStack.EMPTY, 
+			JUMP_COSTS = NonNullList.of(ItemStack.EMPTY, 
 				ItemStack.EMPTY,
 				new ItemStack(Items.STRING),
 				new ItemStack(Items.GOLD_INGOT),
 				new ItemStack(Items.ENDER_PEARL)
 			);
-			LOCK_COSTS = NonNullList.from(ItemStack.EMPTY, 
+			LOCK_COSTS = NonNullList.of(ItemStack.EMPTY, 
 					ItemStack.EMPTY,
 					new ItemStack(Items.COMPASS)
 				);
@@ -302,7 +302,7 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 		// Add link links between all links that wind up showing up
 		ChainTriggerData data = this.getTargetData(state, entity, location, pitch, yaw, properties, characteristics);
 		if (data.targets != null) {
-			final float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
+			final float partialTicks = Minecraft.getInstance().getFrameTime();
 			for (LivingEntity source : data.targets) {
 				for (LivingEntity target : data.targets) {
 					if (source == target) {
@@ -311,8 +311,8 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 					
 					final List<LivingEntity> affected = data.entLinks.get(source);
 					if (affected != null && affected.contains(target)) {
-						final Vector3d sourcePos = source.func_242282_l(partialTicks).add(0, source.getHeight() / 2, 0);
-						final Vector3d targetPos = target.func_242282_l(partialTicks).add(0, target.getHeight() / 2, 0);
+						final Vector3d sourcePos = source.getPosition(partialTicks).add(0, source.getBbHeight() / 2, 0);
+						final Vector3d targetPos = target.getPosition(partialTicks).add(0, target.getBbHeight() / 2, 0);
 						builder.add(new SpellShapePreviewComponent.Line(sourcePos, targetPos));
 					}
 				}

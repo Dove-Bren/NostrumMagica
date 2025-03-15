@@ -23,13 +23,13 @@ public class ClientEffectVfxRenderMessage {
 
 	public static void handle(ClientEffectVfxRenderMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
-		Minecraft.getInstance().runAsync(() -> {
-			final World world = NostrumMagica.instance.proxy.getPlayer().world;
+		Minecraft.getInstance().submit(() -> {
+			final World world = NostrumMagica.instance.proxy.getPlayer().level;
 			LivingEntity caster, target;
 			caster = target = null;
 			
 			if (message.caster != null) {
-				caster = world.getPlayerByUuid(message.caster);
+				caster = world.getPlayerByUUID(message.caster);
 			}
 			
 			if (message.target != null) {
@@ -41,7 +41,7 @@ public class ClientEffectVfxRenderMessage {
 				return;
 			}
 			
-			NostrumMagica.instance.proxy.spawnSpellEffectVfx(NostrumMagica.instance.proxy.getPlayer().world, 
+			NostrumMagica.instance.proxy.spawnSpellEffectVfx(NostrumMagica.instance.proxy.getPlayer().level, 
 					message.effect,
 					caster, message.casterPos, target, message.targetPos);
 		});
@@ -57,8 +57,8 @@ public class ClientEffectVfxRenderMessage {
 			LivingEntity caster, Vector3d casterPos,
 			LivingEntity target, Vector3d targetPos,
 			SpellEffectPart effect) {
-		this(caster == null ? null : caster.getUniqueID(), casterPos,
-				target == null ? null : target.getUniqueID(), targetPos,
+		this(caster == null ? null : caster.getUUID(), casterPos,
+				target == null ? null : target.getUUID(), targetPos,
 				effect);
 	}
 	
@@ -81,7 +81,7 @@ public class ClientEffectVfxRenderMessage {
 		final SpellEffectPart effect;
 		
 		if (buf.readBoolean()) {
-			caster = buf.readUniqueId();
+			caster = buf.readUUID();
 		} else {
 			caster = null;
 		}
@@ -93,7 +93,7 @@ public class ClientEffectVfxRenderMessage {
 		}
 		
 		if (buf.readBoolean()) {
-			target = buf.readUniqueId();
+			target = buf.readUUID();
 		} else {
 			target = null;
 		}
@@ -104,7 +104,7 @@ public class ClientEffectVfxRenderMessage {
 			targetPos = null;
 		}
 		
-		effect = SpellEffectPart.FromNBT(buf.readCompoundTag());
+		effect = SpellEffectPart.FromNBT(buf.readNbt());
 		
 		return new ClientEffectVfxRenderMessage(
 				caster, casterPos, target, targetPos,
@@ -115,7 +115,7 @@ public class ClientEffectVfxRenderMessage {
 	public static void encode(ClientEffectVfxRenderMessage msg, PacketBuffer buf) {
 		buf.writeBoolean(msg.caster != null);
 		if (msg.caster != null) {
-			buf.writeUniqueId(msg.caster);
+			buf.writeUUID(msg.caster);
 		}
 		
 		buf.writeBoolean(msg.casterPos != null);
@@ -127,7 +127,7 @@ public class ClientEffectVfxRenderMessage {
 		
 		buf.writeBoolean(msg.target != null);
 		if (msg.target != null) {
-			buf.writeUniqueId(msg.target);
+			buf.writeUUID(msg.target);
 		}
 		
 		buf.writeBoolean(msg.targetPos != null);
@@ -137,7 +137,7 @@ public class ClientEffectVfxRenderMessage {
 			buf.writeDouble(msg.targetPos.z);
 		}
 		
-		buf.writeCompoundTag(msg.effect.toNBT(null));
+		buf.writeNbt(msg.effect.toNBT(null));
 	}
 
 }

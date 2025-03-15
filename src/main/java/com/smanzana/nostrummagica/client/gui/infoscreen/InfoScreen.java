@@ -170,7 +170,7 @@ public class InfoScreen extends StackableScreen {
 		}
 		
 		// Mask out any partial buttons or buttons that are above button line, since we support scrolling
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(0, 0, 500);
 		if (scrollY > 0) {
 			RenderFuncs.drawRect(matrixStackIn, 0, 0, width, POS_SUBSCREEN_VOFFSET, 0xFF000000);
@@ -179,7 +179,7 @@ public class InfoScreen extends StackableScreen {
 		for (int i = 0; i < this.tabs.size(); ++i) {
 			((AbstractButton)this.tabs.get(i)).render(matrixStackIn, mouseX, mouseY, partialTicks);
 		}
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 
 //		for (int j = 0; j < this.labelList.size(); ++j) {
 //			((GuiLabel)this.labelList.get(j)).drawLabel(this.minecraft, mouseX, mouseY);
@@ -385,7 +385,7 @@ public class InfoScreen extends StackableScreen {
             		tint = .75f;
             	}
                 
-                minecraft.getTextureManager().bindTexture(background);
+                minecraft.getTextureManager().bind(background);
                 RenderSystem.enableBlend();
                 RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, 0,
                 		TEXT_BUTTON_TAB_VOFFSET, TEXT_BUTTON_TAB_WIDTH, TEXT_BUTTON_TAB_WIDTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
@@ -406,16 +406,16 @@ public class InfoScreen extends StackableScreen {
     			&& mouseX <= this.x + this.width
     			&& mouseY <= this.y + this.height) {
     			Minecraft minecraft = Minecraft.getInstance();
-    			matrixStackIn.push();
+    			matrixStackIn.pushPose();
     			matrixStackIn.translate(0, 0, 500);
     			GuiUtils.drawHoveringText(matrixStackIn, desc,
     					mouseX,
     					mouseY,
-    					minecraft.getMainWindow().getWidth(),
-    					minecraft.getMainWindow().getHeight(),
+    					minecraft.getWindow().getScreenWidth(),
+    					minecraft.getWindow().getScreenHeight(),
     					100,
-    					minecraft.fontRenderer);
-    			matrixStackIn.pop();
+    					minecraft.font);
+    			matrixStackIn.popPose();
     		}
     	}
 

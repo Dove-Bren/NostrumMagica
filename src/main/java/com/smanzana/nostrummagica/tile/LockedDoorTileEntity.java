@@ -47,13 +47,13 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	private void dirty() {
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		markDirty();
+		level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+		setChanged();
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.put(NBT_LOCK, lockKey.asNBT());
 		nbt.putString(NBT_COLOR, color.name());
@@ -62,8 +62,8 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		if (nbt == null)
 			return;
@@ -78,25 +78,25 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 	
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
 	protected void checkBlockState() {
-		boolean worldUnlockable = world.getBlockState(pos).get(LockedDoorBlock.UNLOCKABLE);
+		boolean worldUnlockable = level.getBlockState(worldPosition).getValue(LockedDoorBlock.UNLOCKABLE);
 		boolean tileUnlockable = AutoDungeons.GetWorldKeys().hasKey(lockKey); 
 		if (worldUnlockable != tileUnlockable) {
-			world.setBlockState(pos, world.getBlockState(pos).with(LockedDoorBlock.UNLOCKABLE, tileUnlockable), 3);
+			level.setBlock(worldPosition, level.getBlockState(worldPosition).setValue(LockedDoorBlock.UNLOCKABLE, tileUnlockable), 3);
 		}
 	}
 
@@ -104,7 +104,7 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 	public void tick() {
 		ticksExisted++;
 		
-		if (world != null && !world.isRemote()) {
+		if (level != null && !level.isClientSide()) {
 			if (ticksExisted % 20 == 0) {
 				checkBlockState();
 			}
@@ -117,22 +117,22 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 				) {
 			unlock();
 		} else {
-			player.sendMessage(new TranslationTextComponent("info.locked_door.nokey"), Util.DUMMY_UUID);
-			NostrumMagicaSounds.HOOKSHOT_TICK.play(player.world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+			player.sendMessage(new TranslationTextComponent("info.locked_door.nokey"), Util.NIL_UUID);
+			NostrumMagicaSounds.HOOKSHOT_TICK.play(player.level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
 		}
 	}
 	
 	protected void unlock() {
-		BlockState state = world.getBlockState(pos);
-		((LockedDoorBlock) state.getBlock()).clearDoor(world, pos, state);
+		BlockState state = level.getBlockState(worldPosition);
+		((LockedDoorBlock) state.getBlock()).clearDoor(level, worldPosition, state);
 		
 		final double flySpeed = .125;
-		NostrumParticles.WARD.spawn(world, new SpawnParams(
-				50, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, .75,
+		NostrumParticles.WARD.spawn(level, new SpawnParams(
+				50, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5, .75,
 				40, 10,
 				new Vector3d(0, .1, 0), new Vector3d(flySpeed, flySpeed / 2, flySpeed)
 				).gravity(.075f));
-		NostrumMagicaSounds.LORE.play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+		NostrumMagicaSounds.LORE.play(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
 	}
 	
 	@Override
@@ -180,19 +180,19 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 	private BlockPos bottomStash = null;
 	public BlockPos getBottomCenterPos() {
 		if (bottomStash == null) {
-			bottomStash = LockedDoorBlock.FindBottomCenterPos(getWorld(), getPos());
+			bottomStash = LockedDoorBlock.FindBottomCenterPos(getLevel(), getBlockPos());
 		}
 		return bottomStash;
 	}
 	
 	public Direction getFace() {
-		return this.getBlockState().get(LockedDoorBlock.HORIZONTAL_FACING);
+		return this.getBlockState().getValue(LockedDoorBlock.FACING);
 	}
 	
 	private MutableBoundingBox boundsStach = null;
 	public MutableBoundingBox getDoorBounds() {
 		if (boundsStach == null) {
-			boundsStach = LockedDoorBlock.FindDisplayBounds(getWorld(), getPos());
+			boundsStach = LockedDoorBlock.FindDisplayBounds(getLevel(), getBlockPos());
 		}
 		return boundsStach;
 	}

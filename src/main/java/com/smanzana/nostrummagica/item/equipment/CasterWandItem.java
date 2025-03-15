@@ -63,19 +63,19 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	private static final String NBT_SPELL = "spell";
 	
 	public CasterWandItem() {
-		super(ItemTier.WOOD, 2, -2.4F, NostrumItems.PropEquipment().rarity(Rarity.UNCOMMON).maxDamage(300));
+		super(ItemTier.WOOD, 2, -2.4F, NostrumItems.PropEquipment().rarity(Rarity.UNCOMMON).durability(300));
 		MinecraftForge.EVENT_BUS.addListener(CasterWandItem::onSpellCast);
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 		builder.putAll(multimap);
 
 		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
-            builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 4, AttributeModifier.Operation.ADDITION));
-            builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
+            builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 4, AttributeModifier.Operation.ADDITION));
+            builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
 		}
 		
 		if (equipmentSlot == EquipmentSlotType.MAINHAND || equipmentSlot == EquipmentSlotType.OFFHAND) {
@@ -112,7 +112,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	}
 	
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
 		if (repair.isEmpty()) {
 			return false;
 		} else {
@@ -122,18 +122,18 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		final @Nullable Spell spell = getSpell(stack);
 		if (spell != null) {
-			tooltip.add(new TranslationTextComponent("info.caster_wand.spell", spell.getName()).mergeStyle(TextFormatting.GOLD));
+			tooltip.add(new TranslationTextComponent("info.caster_wand.spell", spell.getName()).withStyle(TextFormatting.GOLD));
 		} else {
 			tooltip.add(new TranslationTextComponent("info.caster_wand.nospell"));
 		}
 		
 		tooltip.add(StringTextComponent.EMPTY);
-		tooltip.add(new TranslationTextComponent("info.caster_wand.desc").mergeStyle(TextFormatting.GRAY));
-		tooltip.add(new StringTextComponent(" -2 Spell Weight").mergeStyle(TextFormatting.DARK_GREEN));
+		tooltip.add(new TranslationTextComponent("info.caster_wand.desc").withStyle(TextFormatting.GRAY));
+		tooltip.add(new StringTextComponent(" -2 Spell Weight").withStyle(TextFormatting.DARK_GREEN));
 	}
 	
 	protected void setSpell(ItemStack wand, @Nullable Spell spell) {
@@ -242,16 +242,16 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	protected void fireChargedWeapon(World worldIn, LivingEntity playerIn, Hand hand, ItemStack stack) {
 		@Nullable Spell spell = this.getSpell(stack);
 		if (spell != null) {
-			if (worldIn.isRemote()) {
+			if (worldIn.isClientSide()) {
 				if (SpellCasting.CheckToolCast(spell, playerIn, stack).succeeded) {
 					ItemStacks.damageItem(stack, playerIn, hand, 1);
 				} else {
 					for (int i = 0; i < 15; i++) {
 						double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
 						double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
-						playerIn.world
+						playerIn.level
 							.addParticle(ParticleTypes.LARGE_SMOKE,
-									playerIn.getPosX() + offsetx, playerIn.getPosY(), playerIn.getPosZ() + offsetz,
+									playerIn.getX() + offsetx, playerIn.getY(), playerIn.getZ() + offsetz,
 									0, -.5, 0);
 						
 					}
@@ -277,7 +277,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	public void onFinishCastFromTool(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
 		if (caster instanceof PlayerEntity) {
 			NostrumMagica.instance.proxy.sendMana((PlayerEntity) caster);
-			((PlayerEntity) caster).getCooldownTracker().setCooldown(stack.getItem(), 20);
+			((PlayerEntity) caster).getCooldowns().addCooldown(stack.getItem(), 20);
 		}
 	}
 	
@@ -286,10 +286,10 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 		// Notice and respond any time any spell is cast.
 		// Note that our spell caster handler will have put in a smaller one already, so this will replace it.
 		final SpellCastResult result = event.getCastResult();
-		if (result.succeeded && result.caster != null && result.caster instanceof PlayerEntity && NostrumMagica.getMagicWrapper(result.caster) != null && !result.caster.getShouldBeDead()) {
+		if (result.succeeded && result.caster != null && result.caster instanceof PlayerEntity && NostrumMagica.getMagicWrapper(result.caster) != null && !result.caster.isDeadOrDying()) {
 			if (!NostrumMagica.getMagicWrapper(result.caster).hasSkill(NostrumSkills.Spellcasting_ToolCooldown)) {
 				final int cooldownTicks = SpellCasting.CalculateSpellCooldown(result);
-				((PlayerEntity) result.caster).getCooldownTracker().setCooldown(NostrumItems.casterWand, cooldownTicks);
+				((PlayerEntity) result.caster).getCooldowns().addCooldown(NostrumItems.casterWand, cooldownTicks);
 			}
 		}
 	}

@@ -26,23 +26,23 @@ public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?
 	
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
 	protected void dirty() {
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		markDirty();
+		level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+		setChanged();
 	}
 	
 	protected abstract E makeTriggerEntity(World world, double x, double y, double z);
@@ -63,22 +63,22 @@ public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?
 	
 	@Override
 	public void tick() {
-		if (world.isRemote) {
+		if (level.isClientSide) {
 			return;
 		}
 		
 		if (shouldHaveProxy()) {
 			// Create entity here if it doesn't exist
 			Vector3d offset = this.getEntityOffset();
-			if (triggerEntity == null || !triggerEntity.isAlive() || triggerEntity.world != this.world
-					|| triggerEntity.getDistanceSq(pos.getX() + offset.getX(), pos.getY() + offset.getY(), pos.getZ() + offset.getZ()) > 1.5) {
+			if (triggerEntity == null || !triggerEntity.isAlive() || triggerEntity.level != this.level
+					|| triggerEntity.distanceToSqr(worldPosition.getX() + offset.x(), worldPosition.getY() + offset.y(), worldPosition.getZ() + offset.z()) > 1.5) {
 				// Entity is dead OR is too far away
 				if (triggerEntity != null && !triggerEntity.isAlive()) {
 					triggerEntity.remove();
 				}
 				
-				triggerEntity = makeTriggerEntity(this.getWorld(), pos.getX() + offset.getX(), pos.getY() + offset.getY(), pos.getZ() + offset.getZ());
-				world.addEntity(triggerEntity);
+				triggerEntity = makeTriggerEntity(this.getLevel(), worldPosition.getX() + offset.x(), worldPosition.getY() + offset.y(), worldPosition.getZ() + offset.z());
+				level.addFreshEntity(triggerEntity);
 			}
 		} else {
 			if (this.triggerEntity != null) {
@@ -89,14 +89,14 @@ public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		return nbt;
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 	}
 }

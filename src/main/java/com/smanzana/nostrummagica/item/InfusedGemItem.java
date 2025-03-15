@@ -119,19 +119,19 @@ public class InfusedGemItem extends Item implements ILoreTagged, IEnchantableIte
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
+	public ActionResultType useOn(ItemUseContext context) {
 		//if (worldIn.isRemote)
 			//return ActionResultType.SUCCESS;
 		
 		final PlayerEntity playerIn = context.getPlayer();
-		final BlockPos pos = context.getPos();
-		final @Nonnull ItemStack stack = context.getItem();
-		final World worldIn = context.getWorld();
+		final BlockPos pos = context.getClickedPos();
+		final @Nonnull ItemStack stack = context.getItemInHand();
+		final World worldIn = context.getLevel();
 		BlockState state = worldIn.getBlockState(pos);
 		if (state.getBlock() == null)
 			return ActionResultType.PASS;
 		
-		TileEntity te = worldIn.getTileEntity(pos);
+		TileEntity te = worldIn.getBlockEntity(pos);
 		if (state.getBlock() instanceof CandleBlock) {
 			if (!(te instanceof CandleTileEntity))
 				return ActionResultType.PASS;

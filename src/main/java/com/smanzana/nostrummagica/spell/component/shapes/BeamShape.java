@@ -36,7 +36,7 @@ public class BeamShape extends InstantShape {
 	public static final String ID = "beam";
 	public static final float BEAM_RANGE = 15.0f;
 	
-	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.MANI_DUST, 1),
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.of(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.MANI_DUST, 1),
 			ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1)));
 	
 	public static final SpellShapeProperty<Boolean> HIT_AIR = new BooleanSpellShapeProperty("hit_air");
@@ -63,7 +63,7 @@ public class BeamShape extends InstantShape {
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
-			costs = NonNullList.from(ItemStack.EMPTY,
+			costs = NonNullList.of(ItemStack.EMPTY,
 				ItemStack.EMPTY,
 				new ItemStack(Items.DRAGON_BREATH)
 				);
@@ -156,7 +156,7 @@ public class BeamShape extends InstantShape {
 		final Vector3d from = location.shooterPosition;
 		final Vector3d dir = RayTrace.directionFromAngles(pitch, yaw);
 		final Vector3d maxDist = from.add(dir.normalize().scale(BEAM_RANGE));
-		builder.add(new SpellShapePreviewComponent.AoELine(from.add(0, -.25, 0).add(Vector3d.fromPitchYaw(pitch, yaw+90).scale(.1f)), maxDist, 3f));
+		builder.add(new SpellShapePreviewComponent.AoELine(from.add(0, -.25, 0).add(Vector3d.directionFromRotation(pitch, yaw+90).scale(.1f)), maxDist, 3f));
 		return super.addToPreview(builder, state, entity, location, pitch, yaw, properties, characteristics);
 	}
 

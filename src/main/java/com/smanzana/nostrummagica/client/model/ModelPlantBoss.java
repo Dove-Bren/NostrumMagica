@@ -14,24 +14,24 @@ public class ModelPlantBoss extends EntityModel<PlantBossEntity> {
 	// private ModelRenderer centerTree;
 	
 	public ModelPlantBoss() {
-		this.textureHeight = 256;
-		this.textureWidth = 256;
+		this.texHeight = 256;
+		this.texWidth = 256;
 		body = new ModelRenderer(this, 0, 0);
 		body.addBox(-24f, -24f, -24f, 48, 48, 48);
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		body.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);;
 	}
 	
 	@Override
-	public void setLivingAnimations(PlantBossEntity entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
-		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTicks);
+	public void prepareMobModel(PlantBossEntity entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
+		super.prepareMobModel(entityIn, limbSwing, limbSwingAmount, partialTicks);
 	}
 
 	@Override
-	public void setRotationAngles(PlantBossEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setupAnim(PlantBossEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {
 		// TODO Auto-generated method stub
 		

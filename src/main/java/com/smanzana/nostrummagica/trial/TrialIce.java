@@ -37,10 +37,10 @@ public class TrialIce extends WorldTrial {
 			if (e.getSource() != DamageSource.DROWN)
 				return;
 			
-			Vector3d pos = e.getEntityLiving().getPositionVec();
-			Biome biome = e.getEntityLiving().world.getBiome(
+			Vector3d pos = e.getEntityLiving().position();
+			Biome biome = e.getEntityLiving().level.getBiome(
 					new BlockPos(pos.x, pos.y, pos.z));
-			RegistryKey<Biome> biomeKey = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, biome.getRegistryName());
+			RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName());
 			
 			if (!BiomeDictionary.hasType(biomeKey, Type.COLD))
 				return;

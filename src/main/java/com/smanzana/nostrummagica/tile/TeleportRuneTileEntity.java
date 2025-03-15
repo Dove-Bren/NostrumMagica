@@ -66,7 +66,7 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 		if (target == null) {
 			this.teleOffset = null;
 		} else {
-			this.teleOffset = target.subtract(pos);
+			this.teleOffset = target.subtract(worldPosition);
 		}
 		flush(isWorldGen);
 	}
@@ -81,22 +81,22 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
-	public CompoundNBT write(CompoundNBT compound) {
-		super.write(compound);
+	public CompoundNBT save(CompoundNBT compound) {
+		super.save(compound);
 		
 		if (teleOffset != null) {
 			compound.put(NBT_OFFSET, NBTUtil.writeBlockPos(teleOffset));
@@ -105,8 +105,8 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 		return compound;
 	}
 	
-	public void read(BlockState state, CompoundNBT compound) {
-		super.read(state, compound);
+	public void load(BlockState state, CompoundNBT compound) {
+		super.load(state, compound);
 		
 		teleOffset = null;
 		if (compound.contains(NBT_OFFSET, NBT.TAG_LONG)) {
@@ -118,9 +118,9 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	}
 	
 	protected void flush(boolean isWorldGen) {
-		if (!isWorldGen && world != null && !world.isRemote) {
-			BlockState state = world.getBlockState(pos);
-			world.notifyBlockUpdate(pos, state, state, 2);
+		if (!isWorldGen && level != null && !level.isClientSide) {
+			BlockState state = level.getBlockState(worldPosition);
+			level.sendBlockUpdated(worldPosition, state, state, 2);
 		}
 	}
 	
@@ -137,7 +137,7 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	
 	@Override
 	public void tick() {
-		if (world != null && !world.isRemote()) {
+		if (level != null && !level.isClientSide()) {
 			for (Entity ent : scanForEntities()) {
 				entityOnTileTick(ent);
 			}
@@ -145,13 +145,13 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	}
 	
 	protected Collection<Entity> scanForEntities() {
-		return world.getEntitiesInAABBexcluding(null, VoxelShapes.fullCube().getBoundingBox().offset(pos), (e) -> { return true; });
+		return level.getEntities((Entity) null, VoxelShapes.block().bounds().move(worldPosition), (e) -> { return true; });
 	}
 	
 	protected void entityOnTileTick(Entity entity) {
 		// If no charge yet, play startup effects
 		if (!hasEntityCharge(entity)) {
-			world.playSound(null, pos, SoundEvents.BLOCK_PORTAL_TRIGGER, SoundCategory.BLOCKS, 1f, (4f / (float) TELEPORT_CHARGE_TIME));
+			level.playSound(null, worldPosition, SoundEvents.PORTAL_TRIGGER, SoundCategory.BLOCKS, 1f, (4f / (float) TELEPORT_CHARGE_TIME));
 		}
 		
 		incrEntityCharge(entity);
@@ -163,7 +163,7 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 			final double rx = NostrumMagica.rand.nextFloat() - .5f;
 			final double rz = NostrumMagica.rand.nextFloat() - .5f;
 			
-			((ServerWorld) world).spawnParticle(ParticleTypes.DRAGON_BREATH, pos.getX() + .5 + rx, pos.getY(), pos.getZ() + .5 + rz, count,
+			((ServerWorld) level).sendParticles(ParticleTypes.DRAGON_BREATH, worldPosition.getX() + .5 + rx, worldPosition.getY(), worldPosition.getZ() + .5 + rz, count,
 					0, .25, 0, NostrumMagica.rand.nextFloat());
 		}
 	}
@@ -179,26 +179,26 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 			return;
 		}
 		
-		BlockPos target = pos.add(offset);
+		BlockPos target = worldPosition.offset(offset);
 		
 		NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entityIn, target.getX() + .5, target.getY() + .1, target.getZ() + .5, null);
 		if (!event.isCanceled()) {
 		
-			entityIn.lastTickPosX = entityIn.prevPosX = target.getX() + .5;
-			entityIn.lastTickPosY = entityIn.prevPosY = target.getY() + .005;
-			entityIn.lastTickPosZ = entityIn.prevPosZ = target.getZ() + .5;
+			entityIn.xOld = entityIn.xo = target.getX() + .5;
+			entityIn.yOld = entityIn.yo = target.getY() + .005;
+			entityIn.zOld = entityIn.zo = target.getZ() + .5;
 			
-			if (!world.isRemote) {
+			if (!level.isClientSide) {
 				NostrumMagica.playerListener.registerTimer((type, entity, data) -> {
 					//Event type, LivingEntity entity, T data
-					entityIn.setPositionAndUpdate(target.getX() + .5, target.getY() + .005, target.getZ() + .5);
+					entityIn.teleportTo(target.getX() + .5, target.getY() + .005, target.getZ() + .5);
 		
 					double dx = target.getX() + .5;
 					double dy = target.getY() + 1;
 					double dz = target.getZ() + .5;
 					for (int i = 0; i < 10; i++) {
 						
-						((ServerWorld) world).spawnParticle(ParticleTypes.DRAGON_BREATH,
+						((ServerWorld) level).sendParticles(ParticleTypes.DRAGON_BREATH,
 								dx,
 								dy,
 								dz,
@@ -209,7 +209,7 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 								.1
 								);
 					}
-					NostrumMagicaSounds.DAMAGE_ENDER.play(world, dx, dy, dz);
+					NostrumMagicaSounds.DAMAGE_ENDER.play(level, dx, dy, dz);
 					return true;
 				}, 1, 0);
 			}
@@ -218,31 +218,31 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	
 	protected static final void setEntityInCooldown(Entity ent) {
 		synchronized(EntityChargeMap) {
-			EntityChargeMap.put(ent.getUniqueID(), -40);
+			EntityChargeMap.put(ent.getUUID(), -40);
 		}
 	}
 	
 	protected static final void incrEntityCharge(Entity ent) {
 		synchronized(EntityChargeMap) {
-			final Integer charge = EntityChargeMap.get(ent.getUniqueID());
+			final Integer charge = EntityChargeMap.get(ent.getUUID());
 			if (charge != null && charge < 0) {
 				// in cooldown, so avoid doing anything and let it come back up at the same pace
 			} else {
 				final int newCharge = (charge == null ? 0 : charge) + 2; // 2 because every tick we decay
-				EntityChargeMap.put(ent.getUniqueID(), newCharge);
+				EntityChargeMap.put(ent.getUUID(), newCharge);
 			}
 		}
 	}
 	
 	protected static final boolean hasEntityCharge(Entity ent) {
 		synchronized(EntityChargeMap) {
-			return EntityChargeMap.containsKey(ent.getUniqueID());
+			return EntityChargeMap.containsKey(ent.getUUID());
 		}
 	}
 	
 	protected static final int getEntityCharge(Entity ent) {
 		synchronized(EntityChargeMap) {
-			final Integer val = EntityChargeMap.get(ent.getUniqueID());
+			final Integer val = EntityChargeMap.get(ent.getUUID());
 			return val == null ? 0 : val;
 		}
 	}

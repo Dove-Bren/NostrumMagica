@@ -65,16 +65,16 @@ public class BurstShape extends InstantShape implements ISelectableShape {
 			double radiusEnts = getRadius(param) + .5;
 			final Vector3d center = location.hitPosition;
 		
-			for (Entity entity : location.world.getEntitiesWithinAABBExcludingEntity(null, 
-					new AxisAlignedBB(center.getX() - radiusEnts,
-							center.getY() - radiusEnts,
-							center.getZ() - radiusEnts,
-							center.getX() + radiusEnts,
-							center.getY() + radiusEnts,
-							center.getZ() + radiusEnts))) {
+			for (Entity entity : location.world.getEntities(null, 
+					new AxisAlignedBB(center.x() - radiusEnts,
+							center.y() - radiusEnts,
+							center.z() - radiusEnts,
+							center.x() + radiusEnts,
+							center.y() + radiusEnts,
+							center.z() + radiusEnts))) {
 				LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
 				if (living != null)
-					if (Math.abs(entity.getPositionVec().distanceTo(new Vector3d(center.getX(), center.getY(), center.getZ()))) <= radiusEnts)
+					if (Math.abs(entity.position().distanceTo(new Vector3d(center.x(), center.y(), center.z()))) <= radiusEnts)
 						ret.add(living);
 			}
 		}
@@ -95,10 +95,10 @@ public class BurstShape extends InstantShape implements ISelectableShape {
 						int yRadius = innerRadius - Math.abs(j);
 						// 0 means just that cell. Otherwise, +- n
 						if (yRadius == 0) {
-							list.add(new SpellLocation(location.world, centerBlock.add(i, j, 0)));
+							list.add(new SpellLocation(location.world, centerBlock.offset(i, j, 0)));
 						} else {
 							for (int k = -yRadius; k <= yRadius; k++) {
-								list.add(new SpellLocation(location.world, centerBlock.add(i, j, k)));
+								list.add(new SpellLocation(location.world, centerBlock.offset(i, j, k)));
 							}
 						}
 					}
@@ -112,7 +112,7 @@ public class BurstShape extends InstantShape implements ISelectableShape {
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
-		NonNullList<ItemStack> list = NonNullList.from(ItemStack.EMPTY,
+		NonNullList<ItemStack> list = NonNullList.of(ItemStack.EMPTY,
 			ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
 			ReagentItem.CreateStack(ReagentType.MANDRAKE_ROOT, 1)
 		);
@@ -124,7 +124,7 @@ public class BurstShape extends InstantShape implements ISelectableShape {
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
-			costs = NonNullList.from(ItemStack.EMPTY, 
+			costs = NonNullList.of(ItemStack.EMPTY, 
 				ItemStack.EMPTY,
 				new ItemStack(Blocks.REDSTONE_BLOCK, 1),
 				new ItemStack(NostrumItems.crystalSmall),

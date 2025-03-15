@@ -29,31 +29,31 @@ public class StayHomeGoal<T extends CreatureEntity> extends Goal {
 		this.maxDistSq = maxDistSq;
 		this.speed = speedIn;
 		this.rand = new Random();
-		this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
+		this.setFlags(EnumSet.of(Goal.Flag.MOVE));
 	}
 
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		if (filter != null) {
 			if (!filter.apply(this.creature)) {
 				return false;
 			}
 		}
 		
-		BlockPos home = creature.getHomePosition();
+		BlockPos home = creature.getRestrictCenter();
 		if (home == null) {
 			return false;
 		}
 		
-		return creature.getPositionVec().squareDistanceTo(home.getX(), home.getY(), home.getZ()) > this.maxDistSq;
+		return creature.position().distanceToSqr(home.getX(), home.getY(), home.getZ()) > this.maxDistSq;
 	}
 	
 	/**
 	 * Execute a one shot task or start executing a continuous task
 	 */
-	public void startExecuting()
+	public void start()
 	{
-		BlockPos home = creature.getHomePosition();
+		BlockPos home = creature.getRestrictCenter();
 		if (home != null) {
 			// Try and find a place to move
 			Vector3d targ = null;
@@ -67,7 +67,7 @@ public class StayHomeGoal<T extends CreatureEntity> extends Goal {
 						home.getX() + (Math.cos(angle) * dist),
 						home.getY() + (Math.cos(tilt) * dist),
 						home.getZ() + (Math.sin(angle) * dist));
-				if (!creature.world.isAirBlock(new BlockPos(targ.x, targ.y, targ.z))) {
+				if (!creature.level.isEmptyBlock(new BlockPos(targ.x, targ.y, targ.z))) {
 					targ = null;
 				}
 			} while (targ == null && attempts > 0);
@@ -77,15 +77,15 @@ public class StayHomeGoal<T extends CreatureEntity> extends Goal {
 			}
 			
 			//this.creature.getNavigator().tryMoveToXYZ(targ.xCoord, targ.yCoord, targ.zCoord, this.speed);
-			this.creature.getMoveHelper().setMoveTo(targ.x, targ.y, targ.z, this.speed);
+			this.creature.getMoveControl().setWantedPosition(targ.x, targ.y, targ.z, this.speed);
 		}
 	}
 
 	/**
 	 * Returns whether an in-progress Goal should continue executing
 	 */
-	public boolean shouldContinueExecuting() {
-		MovementController mover = creature.getMoveHelper();
-		return mover.isUpdating() && ((mover.getX() - creature.getPosX()) + (mover.getY() - creature.getPosY()) + (mover.getZ() - creature.getPosZ()) > 2);
+	public boolean canContinueToUse() {
+		MovementController mover = creature.getMoveControl();
+		return mover.hasWanted() && ((mover.getWantedX() - creature.getX()) + (mover.getWantedY() - creature.getY()) + (mover.getWantedZ() - creature.getZ()) > 2);
 	}
 }

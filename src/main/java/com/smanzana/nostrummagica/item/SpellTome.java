@@ -234,9 +234,9 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
-		if (worldIn.isRemote)
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		final @Nonnull ItemStack itemStackIn = playerIn.getItemInHand(hand);
+		if (worldIn.isClientSide)
 			NostrumMagica.instance.proxy.openBook(playerIn, this, itemStackIn);
 		
 		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
@@ -753,7 +753,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		// height 40
 		// width 110
-		String title = stack.getDisplayName().getString();
+		String title = stack.getHoverName().getString();
 		int level = getLevel(stack);
 		List<Spell> spells = getSpellLibrary(stack);
 		int spellCount = (spells != null && !spells.isEmpty() ? spells.size() : 0);
@@ -890,7 +890,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		List<SpellTomeEnhancementWrapper> enhances = getEnhancements(stack);
 		if (enhances != null && !enhances.isEmpty()) {
 			for (SpellTomeEnhancementWrapper enhance : enhances) {
@@ -904,7 +904,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	@Override
 	public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
 		super.inventoryTick(stack, worldIn, entityIn, itemSlot, isSelected);
-		if (!worldIn.isRemote()) {
+		if (!worldIn.isClientSide()) {
 			getTomeID(stack); // Prompt ID generation
 		}
 	}
@@ -915,7 +915,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	 * @param sp
 	 */
 	public static void doSpecialCastEffects(ItemStack tome, PlayerEntity sp) {
-		if (sp.world.isRemote)
+		if (sp.level.isClientSide)
 			return;
 		
 		while (true) {
@@ -937,7 +937,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	private static void doLevelup(ItemStack tome, PlayerEntity player) {
-		player.sendMessage(new TranslationTextComponent("info.tome.levelup", new Object[0]), Util.DUMMY_UUID);
+		player.sendMessage(new TranslationTextComponent("info.tome.levelup", new Object[0]), Util.NIL_UUID);
 		int mods = getModifications(tome);
 		setModifications(tome, ++mods);
 		int level = getLevel(tome);
@@ -963,8 +963,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	@Override
-	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-		if (this.isInGroup(group)) {
+	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+		if (this.allowdedIn(group)) {
 			ItemStack stack = new ItemStack(this);
 			setCapacityBonus(stack, 5);
 			setSlots(stack, 1);
@@ -998,8 +998,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			return false;
 		
 		if (!hasRoom(tome, spell)) {
-			if (!player.world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.tome.full"), Util.DUMMY_UUID);
+			if (!player.level.isClientSide) {
+				player.sendMessage(new TranslationTextComponent("info.tome.full"), Util.NIL_UUID);
 			}
 			return false;
 		}

@@ -30,28 +30,28 @@ public class DungeonLauncherBlock extends DirectionalBlock implements ITriggered
 	public static final String ID = "launcher";
 	
 	public DungeonLauncherBlock() {
-		super(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		super(Block.Properties.of(Material.STONE)
+				.strength(-1.0F, 3600000.8F)
 				.sound(SoundType.STONE)
 				);
 	}
 	
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(FACING, context.getNearestLookingDirection().getOpposite());
+		return this.defaultBlockState().setValue(FACING, context.getNearestLookingDirection().getOpposite());
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(FACING);
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		if (!player.isCreative()) {
 			return ActionResultType.PASS;
 		}
-		DungeonLauncherTileEntity te = (DungeonLauncherTileEntity) worldIn.getTileEntity(pos);
+		DungeonLauncherTileEntity te = (DungeonLauncherTileEntity) worldIn.getBlockEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(player, LauncherBlockGui.LauncherBlockContainer.Make(te));
 		
 		return ActionResultType.SUCCESS;
@@ -68,40 +68,40 @@ public class DungeonLauncherBlock extends DirectionalBlock implements ITriggered
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			destroy(world, pos, state);
-			world.removeTileEntity(pos);
+			world.removeBlockEntity(pos);
 		}
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
-		TileEntity ent = world.getTileEntity(pos);
+		TileEntity ent = world.getBlockEntity(pos);
 		if (ent == null || !(ent instanceof DungeonLauncherTileEntity))
 			return;
 		
 		DungeonLauncherTileEntity putter = (DungeonLauncherTileEntity) ent;
 		IInventory inv = putter.getInventory();
-		for (int i = 0; i < inv.getSizeInventory(); i++) {
-			ItemStack item = inv.getStackInSlot(i);
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			ItemStack item = inv.getItem(i);
 			if (!item.isEmpty()) {
 				double x, y, z;
 				x = pos.getX() + .5;
 				y = pos.getY() + .5;
 				z = pos.getZ() + .5;
-				world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
+				world.addFreshEntity(new ItemEntity(world, x, y, z, item.copy()));
 			}
 		}
 	}
 
 	@Override
 	public void trigger(World world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
-		DungeonLauncherTileEntity te = (DungeonLauncherTileEntity) world.getTileEntity(blockPos);
+		DungeonLauncherTileEntity te = (DungeonLauncherTileEntity) world.getBlockEntity(blockPos);
 		te.trigger();
 	}
 }

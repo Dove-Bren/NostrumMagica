@@ -70,7 +70,7 @@ public class AetheriaProxy {
 	
 	protected Item.Properties propAetheria() {
 		return new Item.Properties()
-				.group(APIProxy.creativeTab);
+				.tab(APIProxy.creativeTab);
 	}
 	
 	@SubscribeEvent

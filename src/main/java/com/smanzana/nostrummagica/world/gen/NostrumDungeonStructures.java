@@ -19,7 +19,7 @@ public abstract class NostrumDungeonStructures {
 		}
 		
 		@Override
-		protected boolean /*hasStartAt*/ func_230363_a_(ChunkGenerator generator, BiomeProvider biomeProvider, long seed, SharedSeedRandom rand, int x, int z, Biome biome, ChunkPos pos, NoFeatureConfig config) {
+		protected boolean /*hasStartAt*/ isFeatureChunk(ChunkGenerator generator, BiomeProvider biomeProvider, long seed, SharedSeedRandom rand, int x, int z, Biome biome, ChunkPos pos, NoFeatureConfig config) {
 			rand.setSeed((long)(x ^ z << 4) ^ seed);
 			return rand.nextInt(2) < 1;
 		}
@@ -32,7 +32,7 @@ public abstract class NostrumDungeonStructures {
 		}
 		
 		@Override
-		protected boolean /*hasStartAt*/ func_230363_a_(ChunkGenerator generator, BiomeProvider biomeProvider, long seed, SharedSeedRandom rand, int x, int z, Biome biome, ChunkPos pos, NoFeatureConfig config) {
+		protected boolean /*hasStartAt*/ isFeatureChunk(ChunkGenerator generator, BiomeProvider biomeProvider, long seed, SharedSeedRandom rand, int x, int z, Biome biome, ChunkPos pos, NoFeatureConfig config) {
 			// Spawn a portal shrine somewhere in the 32x32 chunks around 0
 //			if (x == (int) ((seed & (0x1F << 14)) >> 14) - 16
 //					&& z == (int) ((seed & (0x1F << 43)) >> 43) - 16) {
@@ -52,7 +52,7 @@ public abstract class NostrumDungeonStructures {
 		}
 
 		@Override
-		protected boolean /*hasStartAt*/ func_230363_a_(ChunkGenerator generator, BiomeProvider biomeProvider, long seed, SharedSeedRandom rand, int x, int z, Biome biome, ChunkPos pos, NoFeatureConfig config) {
+		protected boolean /*hasStartAt*/ isFeatureChunk(ChunkGenerator generator, BiomeProvider biomeProvider, long seed, SharedSeedRandom rand, int x, int z, Biome biome, ChunkPos pos, NoFeatureConfig config) {
 			rand.setSeed((long)(x ^ z << 4) ^ seed);
 			return rand.nextInt(2) < 1;
 		}

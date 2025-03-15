@@ -43,18 +43,18 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 	public MatchSpawnerBlock() {
 		super();
 		
-		this.setDefaultState(this.getDefaultState().with(TRIGGERED, false));
+		this.registerDefaultState(this.defaultBlockState().setValue(TRIGGERED, false));
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		super.fillStateContainer(builder);
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
 		builder.add(TRIGGERED);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean isSideInvisible(BlockState blockState, BlockState adjacentState, Direction side) {
+	public boolean skipRendering(BlockState blockState, BlockState adjacentState, Direction side) {
 //		if (!NostrumMagica.instance.proxy.getPlayer().isCreative()) {
 //			return true; // I guess just only in creative?
 ////			TileEntity te = blockAccess.getTileEntity(pos);
@@ -77,8 +77,8 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
-		if (worldIn.isRemote) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+		if (worldIn.isClientSide) {
 			return ActionResultType.SUCCESS;
 		}
 		
@@ -86,7 +86,7 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 			return ActionResultType.SUCCESS;
 		}
 		
-		TileEntity te = worldIn.getTileEntity(pos);
+		TileEntity te = worldIn.getBlockEntity(pos);
 		if (te == null || !(te instanceof MatchSpawnerTileEntity)) {
 			return ActionResultType.SUCCESS;
 		}
@@ -94,9 +94,9 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 		MatchSpawnerTileEntity ent = (MatchSpawnerTileEntity) te;
 		
 		if (playerIn.isCreative()) {
-			ItemStack heldItem = playerIn.getHeldItem(hand);
+			ItemStack heldItem = playerIn.getItemInHand(hand);
 			if (heldItem.isEmpty()) {
-				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.get(MOB).getString()), Util.DUMMY_UUID);
+				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.getValue(MOB).getSerializedName()), Util.NIL_UUID);
 			} else if (heldItem.getItem() instanceof EssenceItem) {
 				Type type = null;
 				switch (EssenceItem.findType(heldItem)) {
@@ -123,26 +123,26 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 					break;
 				}
 				
-				worldIn.setBlockState(pos, state.with(MOB, type));
+				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, type));
 			} else if (NostrumTags.Items.DragonWing.contains(heldItem.getItem())) {
-				worldIn.setBlockState(pos, state.with(MOB, Type.DRAGON_RED));
+				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, Type.DRAGON_RED));
 			} else if (heldItem.getItem() == Items.SUGAR_CANE) {
-				worldIn.setBlockState(pos, state.with(MOB, Type.PLANT_BOSS));
+				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, Type.PLANT_BOSS));
 			} else if (heldItem.getItem() instanceof PositionCrystal) {
 				BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
-				if (heldPos != null && DimensionUtils.DimEquals(PositionCrystal.getDimension(heldItem), worldIn.getDimensionKey())) {
+				if (heldPos != null && DimensionUtils.DimEquals(PositionCrystal.getDimension(heldItem), worldIn.dimension())) {
 					ent.setTriggerPosition(heldPos.getX(), heldPos.getY(), heldPos.getZ());
 					NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 				}
 				return ActionResultType.SUCCESS;
 			} else if (heldItem.getItem() instanceof EnderEyeItem) {
-				BlockPos loc = (ent.getTriggerOffset() == null ? null : ent.getTriggerOffset().toImmutable().add(pos));
+				BlockPos loc = (ent.getTriggerOffset() == null ? null : ent.getTriggerOffset().immutable().offset(pos));
 				if (loc != null) {
 					BlockState atState = worldIn.getBlockState(loc);
 					if (atState != null && atState.getBlock() instanceof ITriggeredBlock) {
-						playerIn.setPositionAndUpdate(loc.getX(), loc.getY(), loc.getZ());
+						playerIn.teleportTo(loc.getX(), loc.getY(), loc.getZ());
 					} else {
-						playerIn.sendMessage(new StringTextComponent("Not pointed at valid triggered block!"), Util.DUMMY_UUID);
+						playerIn.sendMessage(new StringTextComponent("Not pointed at valid triggered block!"), Util.NIL_UUID);
 					}
 				}
 			}

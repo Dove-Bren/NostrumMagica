@@ -29,18 +29,18 @@ public class RenderCursedGlassTrigger extends RenderSwitchTrigger {
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(SwitchTriggerEntity entity) {
-		return super.getEntityTexture(entity);
+	public ResourceLocation getTextureLocation(SwitchTriggerEntity entity) {
+		return super.getTextureLocation(entity);
 	}
 	
 	@Override
-	protected boolean canRenderName(SwitchTriggerEntity entity) {
-		return super.canRenderName(entity);
+	protected boolean shouldShowName(SwitchTriggerEntity entity) {
+		return super.shouldShowName(entity);
 	}
 	
 	@Override
-	protected void renderName(SwitchTriggerEntity entityIn, ITextComponent displayNameIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		super.renderName(entityIn, displayNameIn, matrixStackIn, bufferIn, packedLightIn);
+	protected void renderNameTag(SwitchTriggerEntity entityIn, ITextComponent displayNameIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+		super.renderNameTag(entityIn, displayNameIn, matrixStackIn, bufferIn, packedLightIn);
 		
 		final SwitchBlockTileEntity raw = entityIn.getLinkedTileEntity();
 		if (raw == null || !(raw instanceof CursedGlassTileEntity)) {
@@ -91,17 +91,17 @@ public class RenderCursedGlassTrigger extends RenderSwitchTrigger {
 		
 		// Render damage indicator
 		if (!te.isBroken()) {
-			model.render(matrixStackIn, bufferIn.getBuffer(RenderTypeLookup.func_239220_a_(Blocks.AIR.getDefaultState(), false)), packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+			model.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderTypeLookup.getRenderType(Blocks.AIR.defaultBlockState(), false)), packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 			
 			final float[] color = ColorUtil.ARGBToColor(te.getRequiredElement() == null ? 0xFFFFFFFF : te.getRequiredElement().getColor());
 			final float glowPeriod = 20 * 3;
-			final float glowProg = ((entityIn.ticksExisted + partialTicks) % glowPeriod) / glowPeriod;
+			final float glowProg = ((entityIn.tickCount + partialTicks) % glowPeriod) / glowPeriod;
 			
 			final float glow = .5f + (.25f * (float) Math.sin(glowProg * Math.PI * 2));
 			
 			model.renderDecal(matrixStackIn, bufferIn, packedLightIn, OverlayTexture.NO_OVERLAY, color[0], color[1], color[2], color[3] * glow);
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 1.5, 0);
 			matrixStackIn.scale(3f, 3f, 3f);
 			matrixStackIn.scale(.99f, .99f, .99f);
@@ -112,11 +112,11 @@ public class RenderCursedGlassTrigger extends RenderSwitchTrigger {
 			// ModelBakery.DESTROY_RENDER_TYPES.get(k3)
 			if (damageProg > 0f) {
 				final int renderIdx = (int) Math.max(0, Math.min(9, damageProg * 10));
-				IVertexBuilder buffer = bufferIn.getBuffer(ModelBakery.DESTROY_RENDER_TYPES.get(renderIdx));
+				IVertexBuilder buffer = bufferIn.getBuffer(ModelBakery.DESTROY_TYPES.get(renderIdx));
 				RenderFuncs.drawUnitCube(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 			}
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 	}
 	

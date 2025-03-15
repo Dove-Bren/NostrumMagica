@@ -187,7 +187,7 @@ public class ClientProxy extends CommonProxy {
 				return;
 			ItemStack tome = NostrumMagica.getCurrentTome(mc.player);
 			if (!tome.isEmpty()) {
-				if (bindingScroll.isKeyDown()) {
+				if (bindingScroll.isDown()) {
 					wheel = (wheel > 0 ? -1 : 1);
 					int index = SpellTome.incrementPageIndex(tome, wheel);
 					if (index != -1) {
@@ -203,42 +203,42 @@ public class ClientProxy extends CommonProxy {
 	@SubscribeEvent
 	public void onKey(KeyInputEvent event) {
 		final Minecraft mc = Minecraft.getInstance();
-		if (bindingCast1.isPressed()) {
+		if (bindingCast1.consumeClick()) {
 			doCast(0);
-		} else if (bindingCast2.isPressed()) {
+		} else if (bindingCast2.consumeClick()) {
 			doCast(1);
-		} else if (bindingCast3.isPressed()) {
+		} else if (bindingCast3.consumeClick()) {
 			doCast(2);
-		} else if (bindingCast4.isPressed()) {
+		} else if (bindingCast4.consumeClick()) {
 			doCast(3);
-		} else if (bindingCast5.isPressed()) {
+		} else if (bindingCast5.consumeClick()) {
 			doCast(4);
-		} else if (bindingInfo.isPressed()) {
+		} else if (bindingInfo.consumeClick()) {
 			PlayerEntity player = mc.player;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null)
 				return;
-			Minecraft.getInstance().displayGuiScreen(new InfoScreen(attr, (String) null));
+			Minecraft.getInstance().setScreen(new InfoScreen(attr, (String) null));
 //			player.openGui(NostrumMagica.instance,
 //					NostrumGui.infoscreenID, player.world, 0, 0, 0);
-		} else if (mc.gameSettings.keyBindJump.isPressed()) {
+		} else if (mc.options.keyJump.consumeClick()) {
 			PlayerEntity player = mc.player;
-			if (player.isPassenger() && player.getRidingEntity() instanceof TameRedDragonEntity) {
-				((DragonEntity) player.getRidingEntity()).dragonJump();
-			} else if (player.isPassenger() && player.getRidingEntity() instanceof ArcaneWolfEntity) {
-				((ArcaneWolfEntity) player.getRidingEntity()).wolfJump();
+			if (player.isPassenger() && player.getVehicle() instanceof TameRedDragonEntity) {
+				((DragonEntity) player.getVehicle()).dragonJump();
+			} else if (player.isPassenger() && player.getVehicle() instanceof ArcaneWolfEntity) {
+				((ArcaneWolfEntity) player.getVehicle()).wolfJump();
 			}
-		} else if (bindingBladeCast.isPressed()) {
+		} else if (bindingBladeCast.consumeClick()) {
 			PlayerEntity player = mc.player;
-			if (player.getCooledAttackStrength(0.5F) > .95) {
-				player.resetCooldown();
+			if (player.getAttackStrengthScale(0.5F) > .95) {
+				player.resetAttackStrengthTicker();
 				//player.swingArm(Hand.MAIN_HAND);
 				doBladeCast();
 			}
 			
-		} else if (bindingHUD.isPressed()) {
+		} else if (bindingHUD.consumeClick()) {
 			this.overlayRenderer.toggleHUD();
-		} else if (bindingShapeHelp.isPressed()) {
+		} else if (bindingShapeHelp.consumeClick()) {
 			this.spellshapeRenderer.toggle();
 		}
 	}
@@ -271,9 +271,9 @@ public class ClientProxy extends CommonProxy {
 				for (int i = 0; i < 15; i++) {
 					double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
 					double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
-					player.world
+					player.level
 						.addParticle(ParticleTypes.LARGE_SMOKE,
-								player.getPosX() + offsetx, player.getPosY(), player.getPosZ() + offsetz,
+								player.getX() + offsetx, player.getY(), player.getZ() + offsetz,
 								0, -.5, 0);
 					
 				}
@@ -286,7 +286,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void syncPlayer(ServerPlayerEntity player) {
-		if (player.world.isRemote)
+		if (player.level.isClientSide)
 			return;
 		
 		super.syncPlayer(player);
@@ -311,7 +311,7 @@ public class ClientProxy extends CommonProxy {
 			existing.copy(override);
 			
 			// If we're on a screen that cares, refresh it
-			if (mc.currentScreen instanceof MirrorGui) {
+			if (mc.screen instanceof MirrorGui) {
 				//((MirrorGui) mc.currentScreen).refresh();
 			}
 			
@@ -351,12 +351,12 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void openBook(PlayerEntity player, GuiBook book, Object userdata) {
-		Minecraft.getInstance().displayGuiScreen(book.getScreen(userdata));
+		Minecraft.getInstance().setScreen(book.getScreen(userdata));
 	}
 	
 	@Override
 	public void openContainer(PlayerEntity player, IPackedContainerProvider provider) {
-		if (!player.world.isRemote) {
+		if (!player.level.isClientSide) {
 			super.openContainer(player, provider);
 		}
 		; // On client, do nothing
@@ -364,30 +364,30 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void openSpellScreen(Spell spell) {
-		Minecraft.getInstance().displayGuiScreen(new ScrollScreen(spell));
+		Minecraft.getInstance().setScreen(new ScrollScreen(spell));
 	}
 	
 	@Override
 	public void openMirrorScreen() {
 		final PlayerEntity player = getPlayer();
-		if (player.world.isRemote()) {
-			Minecraft.getInstance().displayGuiScreen((Screen) new MirrorGui(player));
+		if (player.level.isClientSide()) {
+			Minecraft.getInstance().setScreen((Screen) new MirrorGui(player));
 		}
 	}
 	
 	@Override
 	public void openObeliskScreen(World world, BlockPos pos) {
-		if (world.isRemote()) {
-			ObeliskTileEntity te = (ObeliskTileEntity) world.getTileEntity(pos);
-			Minecraft.getInstance().displayGuiScreen(new ObeliskScreen(te));
+		if (world.isClientSide()) {
+			ObeliskTileEntity te = (ObeliskTileEntity) world.getBlockEntity(pos);
+			Minecraft.getInstance().setScreen(new ObeliskScreen(te));
 		}
 	}
 	
 	@Override
 	public void openTomeWorkshopScreen() {
 		final PlayerEntity player = getPlayer();
-		if (player.world.isRemote()) {
-			Minecraft.getInstance().displayGuiScreen(new TomeWorkshopScreen(player));
+		if (player.level.isClientSide()) {
+			Minecraft.getInstance().setScreen(new TomeWorkshopScreen(player));
 		}
 	}
 	
@@ -396,15 +396,15 @@ public class ClientProxy extends CommonProxy {
 		final PlayerEntity player = mc.player;
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
-			player.sendMessage(new StringTextComponent("Could not find magic wrapper for player"), Util.DUMMY_UUID);
+			player.sendMessage(new StringTextComponent("Could not find magic wrapper for player"), Util.NIL_UUID);
 		} else {
-			mc.displayGuiScreen(new InfoScreen(attr, tag));
+			mc.setScreen(new InfoScreen(attr, tag));
 		}
 	}
 	
 	@Override
 	public void sendSpellDebug(PlayerEntity player, ITextComponent comp) {
-		if (!player.world.isRemote) {
+		if (!player.level.isClientSide) {
 			super.sendSpellDebug(player, comp);
 		}
 		;
@@ -412,7 +412,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public String getTranslation(String key) {
-		return I18n.format(key, new Object[0]).trim();
+		return I18n.get(key, new Object[0]).trim();
 	}
 	
 	@Override
@@ -441,7 +441,7 @@ public class ClientProxy extends CommonProxy {
 			LivingEntity target,
 			Vector3d targetPos,
 			SpellEffectPart part) {
-		ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
+		ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.position() : targetPos,
 				new ClientEffectFormFlat(ClientEffectIcon.ARROWD, 0, 0, 0),
 				3L * 500L, 6);
 		
@@ -502,7 +502,7 @@ public class ClientProxy extends CommonProxy {
 				(source, sourcePos, targetIn, targetPosIn, properties, characteristics) -> {
 					final float radius = NostrumSpellShapes.Ring.getOuterRadius(properties);
 					
-					ClientEffect effect = new ClientEffectMirrored(targetPosIn == null ? targetIn.getPositionVec() : targetPosIn,
+					ClientEffect effect = new ClientEffectMirrored(targetPosIn == null ? targetIn.position() : targetPosIn,
 							new ClientEffectFormFlat(ClientEffectIcon.TING1, 0, 0, 0),
 							1L * 500L, 6);
 					
@@ -520,8 +520,8 @@ public class ClientProxy extends CommonProxy {
 		// triggers (that have them)
 		renderer.registerEffect(NostrumSpellShapes.Beam,
 				(source, sourcePos, target, targetPos, properties, characteristics) -> {
-					ClientEffect effect = new ClientEffectBeam(sourcePos == null ? source.getPositionVec() : sourcePos,
-							targetPos == null ? target.getPositionVec() : targetPos,
+					ClientEffect effect = new ClientEffectBeam(sourcePos == null ? source.position() : sourcePos,
+							targetPos == null ? target.position() : targetPos,
 							500L);
 					
 					//if (target != null)
@@ -582,7 +582,7 @@ public class ClientProxy extends CommonProxy {
 		
 		renderer.registerEffect(NostrumSpellShapes.OnHealth,
 				(source, sourcePos, target, targetPos, properties, characteristics) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.position() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 							1000L, 4);
 					
@@ -601,7 +601,7 @@ public class ClientProxy extends CommonProxy {
 		
 		renderer.registerEffect(NostrumSpellShapes.OnMana,
 				(source, sourcePos, target, targetPos, properties, characteristics) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.position() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 							1000L, 4);
 					
@@ -620,7 +620,7 @@ public class ClientProxy extends CommonProxy {
 		
 		renderer.registerEffect(NostrumSpellShapes.OnFood,
 				(source, sourcePos, target, targetPos, properties, characteristics) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.position() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 							1000L, 4);
 					
@@ -639,7 +639,7 @@ public class ClientProxy extends CommonProxy {
 		
 		renderer.registerEffect(NostrumSpellShapes.Proximity,
 				(source, sourcePos, target, targetPos, properties, characteristics) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.position() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							2L * 1000L, 5);
 					
@@ -688,7 +688,7 @@ public class ClientProxy extends CommonProxy {
 		
 		renderer.registerEffect(EAlteration.INFLICT,
 				(source, sourcePos, target, targetPos, part) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.position() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.ARROWD, 0, 0, 0),
 							3L * 500L, 6);
 					
@@ -710,7 +710,7 @@ public class ClientProxy extends CommonProxy {
 
 		renderer.registerEffect(EAlteration.RESIST,
 				(source, sourcePos, target, targetPos, part) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.position() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.ARROWU, 0, 0, 0),
 							3L * 500L, 6);
 					
@@ -732,7 +732,7 @@ public class ClientProxy extends CommonProxy {
 
 		renderer.registerEffect(EAlteration.GROWTH,
 				(source, sourcePos, target, targetPos, part) -> {
-					ClientEffect effect = new ClientEffectEchoed(targetPos == null ? target.getPositionVec() : targetPos, 
+					ClientEffect effect = new ClientEffectEchoed(targetPos == null ? target.position() : targetPos, 
 							new ClientEffectMirrored(new Vector3d(0,0,0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING3, 0, 0, 0),
 							2L * 1000L, 4), 2L * 1000L, 5, .2f);
@@ -758,12 +758,12 @@ public class ClientProxy extends CommonProxy {
 					boolean isShield = false;
 					if (part.getElement() == EMagicElement.EARTH || part.getElement() == EMagicElement.ICE) {
 						// Special ones for shields!
-						effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
+						effect = new ClientEffectMirrored(targetPos == null ? target.position() : targetPos,
 								new ClientEffectFormBasic(ClientEffectIcon.SHIELD, 0, 0, 0),
 								3L * 500L, 5);
 						isShield = true;
 					} else {
-						effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
+						effect = new ClientEffectMirrored(targetPos == null ? target.position() : targetPos,
 								new ClientEffectFormFlat(ClientEffectIcon.TING5, 0, 0, 0),
 								3L * 500L, 10);
 					}
@@ -793,7 +793,7 @@ public class ClientProxy extends CommonProxy {
 
 		renderer.registerEffect(EAlteration.ENCHANT,
 				(source, sourcePos, target, targetPos, part) -> {
-					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVec() : targetPos).add(0, 1, 0),
+					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.position() : targetPos).add(0, 1, 0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							3L * 500L, 6, new Vector3f(1, 0, 0));
 					
@@ -816,7 +816,7 @@ public class ClientProxy extends CommonProxy {
 				(source, sourcePos, target, targetPos, part) -> {
 					// TODO physical breaks stuff. Lots of particles. Should we return null here?
 					
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.position() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							1L * 500L, 6);
 					
@@ -839,7 +839,7 @@ public class ClientProxy extends CommonProxy {
 
 		renderer.registerEffect(EAlteration.SUMMON,
 				(source, sourcePos, target, targetPos, part) -> {
-					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.getPositionVec() : targetPos,
+					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.position() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING1, 0, 0, 0),
 							1L * 500L, 6);
 					
@@ -864,7 +864,7 @@ public class ClientProxy extends CommonProxy {
 
 		renderer.registerEffect(EAlteration.RUIN,
 				(source, sourcePos, target, targetPos, part) -> {
-					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.getPositionVec() : targetPos).add(0, 1, 0),
+					ClientEffect effect = new ClientEffectMirrored((targetPos == null ? target.position() : targetPos).add(0, 1, 0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),
 							2L * 500L, 6, new Vector3f(.5f, .5f, 0));
 					
@@ -893,11 +893,11 @@ public class ClientProxy extends CommonProxy {
 			LivingEntity target, Vector3d targetPos,
 			SpellCharacteristics characteristics) {
 		if (world == null && target != null) {
-			world = target.world;
+			world = target.level;
 		}
 		
 		if (world != null) {
-			if (!world.isRemote) {
+			if (!world.isClientSide) {
 				super.spawnSpellShapeVfx(world, shape, properties, caster, casterPos, target, targetPos, characteristics);
 				return;
 			}
@@ -916,11 +916,11 @@ public class ClientProxy extends CommonProxy {
 			LivingEntity caster, Vector3d casterPos,
 			LivingEntity target, Vector3d targetPos) {
 		if (world == null && target != null) {
-			world = target.world;
+			world = target.level;
 		}
 		
 		if (world != null) {
-			if (!world.isRemote) {
+			if (!world.isClientSide) {
 				super.spawnSpellEffectVfx(world, effect, caster, casterPos, target, targetPos);
 				return;
 			}
@@ -945,22 +945,22 @@ public class ClientProxy extends CommonProxy {
 		if (ClientProxy.shownText == false && ModConfig.config.displayLoginText()
 				&& event.getEntity() == Minecraft.getInstance().player) {
 			final Minecraft mc = Minecraft.getInstance();
-			final String translated = I18n.format(this.bindingInfo.getTranslationKey());
+			final String translated = I18n.get(this.bindingInfo.saveString());
 			mc.player.sendMessage(
 					new TranslationTextComponent("info.nostrumwelcome.text", new Object[]{
 							translated
-					}), Util.DUMMY_UUID);
+					}), Util.NIL_UUID);
 			ClientProxy.shownText = true;
 		}
 		
-		if (event.getWorld() != null && event.getWorld().isRemote() && event.getEntity() instanceof PlayerEntity) {
+		if (event.getWorld() != null && event.getWorld().isClientSide() && event.getEntity() instanceof PlayerEntity) {
 			NostrumMagica.instance.proxy.requestStats((PlayerEntity) event.getEntity());
 		}
 	}
 	
 	@Override
 	public void sendMana(PlayerEntity player) {
-		if (player.world.isRemote) {
+		if (player.level.isClientSide) {
 			return;
 		}
 		
@@ -969,7 +969,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void sendPlayerStatSync(PlayerEntity player) {
-		if (player.world.isRemote()) {
+		if (player.level.isClientSide()) {
 			return;
 		}
 		
@@ -978,7 +978,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void sendManaArmorCapability(PlayerEntity player) {
-		if (player.world.isRemote) {
+		if (player.level.isClientSide) {
 			return;
 		}
 		
@@ -987,7 +987,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void sendSpellCraftingCapability(PlayerEntity player) {
-		if (player.world.isRemote()) {
+		if (player.level.isClientSide()) {
 			return;
 		}
 		
@@ -1013,7 +1013,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void playRitualEffect(World world, BlockPos pos, EMagicElement element,
 			ItemStack center, @Nullable List<ItemStack> extras, List<ItemStack> reagents, ItemStack output) {
-		if (world.isRemote) {
+		if (world.isClientSide) {
 			return;
 		}
 		
@@ -1027,7 +1027,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public boolean attemptBlockTeleport(Entity entity, BlockPos pos) {
 		// Check if this is a logical server op, since integrated still will call this version
-		if (!entity.getEntityWorld().isRemote()) {
+		if (!entity.getCommandSenderWorld().isClientSide()) {
 			return super.attemptBlockTeleport(entity, pos);
 		}
 		
@@ -1042,7 +1042,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public boolean hasIntegratedServer() {
-		return Minecraft.getInstance().isIntegratedServerRunning();
+		return Minecraft.getInstance().isLocalServer();
 	}
 	
 	public SelectionRenderer getSelectionRenderer() {
@@ -1051,12 +1051,12 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public boolean attemptPlayerInteract(PlayerEntity player, World world, BlockPos pos, Hand hand, BlockRayTraceResult hit) {
-		if (!player.world.isRemote()) {
+		if (!player.level.isClientSide()) {
 			return super.attemptPlayerInteract(player, world, pos, hand, hit);
 		}
 		
 		final Minecraft mc = Minecraft.getInstance();
-		return mc.playerController.func_217292_a((ClientPlayerEntity) player, (ClientWorld) world, hand, hit)
+		return mc.gameMode.useItemOn((ClientPlayerEntity) player, (ClientWorld) world, hand, hit)
 				!= ActionResultType.PASS;
 	}
 }

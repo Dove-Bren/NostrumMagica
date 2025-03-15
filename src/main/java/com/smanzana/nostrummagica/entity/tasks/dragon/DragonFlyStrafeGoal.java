@@ -7,6 +7,8 @@ import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class DragonFlyStrafeGoal<T extends DragonEntity> extends Goal {
 
 	protected final T dragon;
@@ -19,37 +21,37 @@ public class DragonFlyStrafeGoal<T extends DragonEntity> extends Goal {
 	public DragonFlyStrafeGoal(T dragon, float maxDistance) {
 		this.dragon = dragon;
 		this.maxAttackDistance = maxDistance * maxDistance;
-		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+		this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 	
 	@Override
-	public boolean isPreemptible() {
+	public boolean isInterruptable() {
 		return true;
 	}
 	
 	@Override
-	public boolean shouldExecute() {
-		return dragon.getAttackTarget() != null;
+	public boolean canUse() {
+		return dragon.getTarget() != null;
 	}
 	
 	@Override
-	public boolean shouldContinueExecuting() {
-		return shouldExecute();
+	public boolean canContinueToUse() {
+		return canUse();
 	}
 	
 	@Override
-	public void startExecuting() {
-		super.startExecuting();
+	public void start() {
+		super.start();
 	}
 	
 	@Override
 	public void tick() {
-		LivingEntity entitylivingbase = this.dragon.getAttackTarget();
+		LivingEntity entitylivingbase = this.dragon.getTarget();
 
         if (entitylivingbase != null)
         {
-            double d0 = this.dragon.getDistanceSq(entitylivingbase.getPosX(), entitylivingbase.getBoundingBox().minY, entitylivingbase.getPosZ());
-            boolean flag = this.dragon.getEntitySenses().canSee(entitylivingbase);
+            double d0 = this.dragon.distanceToSqr(entitylivingbase.getX(), entitylivingbase.getBoundingBox().minY, entitylivingbase.getZ());
+            boolean flag = this.dragon.getSensing().canSee(entitylivingbase);
             boolean flag1 = this.seeTime > 0;
 
             if (flag != flag1)
@@ -68,23 +70,23 @@ public class DragonFlyStrafeGoal<T extends DragonEntity> extends Goal {
 
             if (d0 <= (double)this.maxAttackDistance && this.seeTime >= 20)
             {
-                this.dragon.getNavigator().clearPath();
+                this.dragon.getNavigation().stop();
                 ++this.strafingTime;
             }
             else
             {
-                this.dragon.getNavigator().tryMoveToEntityLiving(entitylivingbase, 1);
+                this.dragon.getNavigation().moveTo(entitylivingbase, 1);
                 this.strafingTime = -1;
             }
 
             if (this.strafingTime >= 20)
             {
-                if ((double)this.dragon.getRNG().nextFloat() < 0.3D)
+                if ((double)this.dragon.getRandom().nextFloat() < 0.3D)
                 {
                     this.strafingClockwise = !this.strafingClockwise;
                 }
 
-                if ((double)this.dragon.getRNG().nextFloat() < 0.3D)
+                if ((double)this.dragon.getRandom().nextFloat() < 0.3D)
                 {
                     this.strafingBackwards = !this.strafingBackwards;
                 }
@@ -103,12 +105,12 @@ public class DragonFlyStrafeGoal<T extends DragonEntity> extends Goal {
                     //this.strafingBackwards = true;
                 }
 
-                this.dragon.getMoveHelper().strafe(this.strafingBackwards ? -0.5F : 0.5F, this.strafingClockwise ? 0.5F : -0.5F);
-                this.dragon.faceEntity(entitylivingbase, 30.0F, 30.0F);
+                this.dragon.getMoveControl().strafe(this.strafingBackwards ? -0.5F : 0.5F, this.strafingClockwise ? 0.5F : -0.5F);
+                this.dragon.lookAt(entitylivingbase, 30.0F, 30.0F);
             }
             else
             {
-                this.dragon.getLookController().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
+                this.dragon.getLookControl().setLookAt(entitylivingbase, 30.0F, 30.0F);
             }
         }
 	}

@@ -115,8 +115,8 @@ public class ManaArmor implements IManaArmor {
 	}
 	
 	protected void spawnEffects(Entity hurtEntity, DamageSource source, float originalAmount, float finalAmount) {
-		NostrumParticles.WARD.spawn(hurtEntity.world, new NostrumParticles.SpawnParams(
-				4, hurtEntity.getPosX(), hurtEntity.getPosY() + (hurtEntity.getHeight()/2), hurtEntity.getPosZ(), .75, 30, 0,
+		NostrumParticles.WARD.spawn(hurtEntity.level, new NostrumParticles.SpawnParams(
+				4, hurtEntity.getX(), hurtEntity.getY() + (hurtEntity.getBbHeight()/2), hurtEntity.getZ(), .75, 30, 0,
 				Vector3d.ZERO, new Vector3d(.0, -.01, .0)
 				//hurtEntity.getEntityId()
 				)
@@ -136,8 +136,8 @@ public class ManaArmor implements IManaArmor {
 	
 	protected void spawnBreakEffects(Entity hurtEntity) {
 		NostrumMagicaSounds.SHIELD_BREAK.play(hurtEntity);
-		NostrumParticles.WARD.spawn(hurtEntity.world, new NostrumParticles.SpawnParams(
-				20, hurtEntity.getPosX(), hurtEntity.getPosY() + (hurtEntity.getHeight()/2), hurtEntity.getPosZ(), .75, 30, 0,
+		NostrumParticles.WARD.spawn(hurtEntity.level, new NostrumParticles.SpawnParams(
+				20, hurtEntity.getX(), hurtEntity.getY() + (hurtEntity.getBbHeight()/2), hurtEntity.getZ(), .75, 30, 0,
 				new Vector3d(.0, -.01, .0), new Vector3d(.01, 0, .01) 
 				//hurtEntity.getEntityId()
 				)

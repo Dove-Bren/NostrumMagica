@@ -52,7 +52,7 @@ public class SpellRequestReplyMessage {
 		
 		for (int i = 0; i < spellCount; i++) {
 			int spellID = buf.readVarInt();
-			CompoundNBT tag = buf.readCompoundTag();
+			CompoundNBT tag = buf.readNbt();
 			Spell spell = Spell.fromNBT(tag, spellID);
 			
 			if (spell != null) {
@@ -69,7 +69,7 @@ public class SpellRequestReplyMessage {
 		
 		for (Spell spell : msg.spells) {
 			buf.writeVarInt(spell.getRegistryID());
-			buf.writeCompoundTag(spell.toNBT());
+			buf.writeNbt(spell.toNBT());
 		}
 	}
 

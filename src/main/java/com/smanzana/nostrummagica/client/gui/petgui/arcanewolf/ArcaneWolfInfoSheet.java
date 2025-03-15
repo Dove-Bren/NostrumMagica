@@ -48,7 +48,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 
 	@Override
 	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
-		FontRenderer fonter = mc.fontRenderer;
+		FontRenderer fonter = mc.font;
 		int x = 0;
 		int y = 5;
 		int w;
@@ -58,7 +58,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		final int goodDataColor = 0xFFA0FFA0;
 		final int badDataColor = 0xFFFFA0A0;
 		final int capabilityColor = 0xFFFFA0FF;
-		final int h = fonter.FONT_HEIGHT;
+		final int h = fonter.lineHeight;
 		final int smallMargin = 2;
 		final int mediumMargin = 3;
 		final int largeMargin = 7;
@@ -67,55 +67,55 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		
 		str = TextFormatting.BOLD + "Attributes" + TextFormatting.RESET;
 		x = 5;
-		fonter.drawString(matrixStackIn, str, x, y, categoryColor);
+		fonter.draw(matrixStackIn, str, x, y, categoryColor);
 		
 		x = 10;
 		y += h + mediumMargin;
 		
 		{
 			str = "Health: ";
-			w = fonter.getStringWidth(str);
+			w = fonter.width(str);
 			
-			fonter.drawString(matrixStackIn, str, x, y, labelColor);
+			fonter.draw(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
-			fonter.drawString(matrixStackIn, "" + (int) wolf.getMaxHealth(), x, y, dataColor);
+			fonter.draw(matrixStackIn, "" + (int) wolf.getMaxHealth(), x, y, dataColor);
 			y += h + smallMargin;
 		}
 		
 		x = 10;
 		{
 			str = "Mana: ";
-			w = fonter.getStringWidth(str);
+			w = fonter.width(str);
 			
-			fonter.drawString(matrixStackIn, str, x, y, labelColor);
+			fonter.draw(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
-			fonter.drawString(matrixStackIn, "" + wolf.getMaxMana(), x, y, dataColor);
+			fonter.draw(matrixStackIn, "" + wolf.getMaxMana(), x, y, dataColor);
 			y += h + smallMargin;
 		}
 		
 		x = 10;
 		{
 			str = "Mana Regen: ";
-			w = fonter.getStringWidth(str);
+			w = fonter.width(str);
 			
-			fonter.drawString(matrixStackIn, str, x, y, labelColor);
+			fonter.draw(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
-			fonter.drawString(matrixStackIn, String.format("%.2f Mana/Sec", wolf.getManaRegen()), x, y, dataColor);
+			fonter.draw(matrixStackIn, String.format("%.2f Mana/Sec", wolf.getManaRegen()), x, y, dataColor);
 			y += h + smallMargin;
 		}
 		
 		x = 10;
 		{
 			str = "Type: ";
-			w = fonter.getStringWidth(str);
+			w = fonter.width(str);
 			
-			fonter.drawString(matrixStackIn, str, x, y, labelColor);
+			fonter.draw(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
-			fonter.drawString(matrixStackIn, I18n.format("info.wolf_type." + wolf.getElementalType().getNameKey() + ".name"), x, y, dataColor);
+			fonter.draw(matrixStackIn, I18n.get("info.wolf_type." + wolf.getElementalType().getNameKey() + ".name"), x, y, dataColor);
 			y += h + smallMargin;
 		}
 		
@@ -124,20 +124,20 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		
 		str = TextFormatting.BOLD + "Training" + TextFormatting.RESET;
 		x = 5;
-		fonter.drawString(matrixStackIn, str, x, y, categoryColor);
+		fonter.draw(matrixStackIn, str, x, y, categoryColor);
 		y += h + mediumMargin;
 		
 		final EMagicElement training = wolf.getTrainingElement();
 		x = 10;
 		{
 			str = "Currently Training: ";
-			w = fonter.getStringWidth(str);
+			w = fonter.width(str);
 			
-			fonter.drawString(matrixStackIn, str, x, y, labelColor);
+			fonter.draw(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
 			
-			fonter.drawString(matrixStackIn, training == null ? "Nothing" : training.getName(), x, y, dataColor);
+			fonter.draw(matrixStackIn, training == null ? "Nothing" : training.getName(), x, y, dataColor);
 			y += h + smallMargin;
 		}
 		
@@ -145,9 +145,9 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 			x = 10;
 			{
 				str = "Mastery: ";
-				w = fonter.getStringWidth(str);
+				w = fonter.width(str);
 				
-				fonter.drawString(matrixStackIn, str, x, y, labelColor);
+				fonter.draw(matrixStackIn, str, x, y, labelColor);
 				x += w;
 				
 				final String mastery;
@@ -162,19 +162,19 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 				case 3:
 					mastery = "Master";
 				}
-				fonter.drawString(matrixStackIn, mastery, x, y, dataColor);
+				fonter.draw(matrixStackIn, mastery, x, y, dataColor);
 				y += h + smallMargin;
 			}
 			
 			x = 10;
 			{
 				str = "Progress: ";
-				w = fonter.getStringWidth(str);
+				w = fonter.width(str);
 				
-				fonter.drawString(matrixStackIn, str, x, y, labelColor);
+				fonter.draw(matrixStackIn, str, x, y, labelColor);
 				x += w;
 				
-				fonter.drawString(matrixStackIn, wolf.getTrainingXP() + " / " + wolf.getMaxTrainingXP(), x, y, dataColor);
+				fonter.draw(matrixStackIn, wolf.getTrainingXP() + " / " + wolf.getMaxTrainingXP(), x, y, dataColor);
 				y += h + smallMargin;
 			}
 		}
@@ -184,20 +184,20 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		
 		str = TextFormatting.BOLD + "Movement" + TextFormatting.RESET;
 		x = 5;
-		fonter.drawString(matrixStackIn, str, x, y, categoryColor);
+		fonter.draw(matrixStackIn, str, x, y, categoryColor);
 		y += h + mediumMargin;
 		
 		x = 10;
 		{
 			str = "Jumps: ";
-			w = fonter.getStringWidth(str);
+			w = fonter.width(str);
 			
-			fonter.drawString(matrixStackIn, str, x, y, labelColor);
+			fonter.draw(matrixStackIn, str, x, y, labelColor);
 			x += w;
 			
 			int jumps = 1 + wolf.getBonusJumps();
 			
-			fonter.drawString(matrixStackIn, "" + jumps, x, y, jumps > 1 ? goodDataColor : badDataColor);
+			fonter.draw(matrixStackIn, "" + jumps, x, y, jumps > 1 ? goodDataColor : badDataColor);
 			y += h + smallMargin;
 		}
 		
@@ -205,7 +205,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		
 		str = TextFormatting.BOLD + "Capabilities" + TextFormatting.RESET;
 		x = 5;
-		fonter.drawString(matrixStackIn, str, x, y, categoryColor);
+		fonter.draw(matrixStackIn, str, x, y, categoryColor);
 		y += h + mediumMargin;
 		
 		// Hackily create widgets first time we're rendered so that this logic only exists in one place
@@ -213,14 +213,14 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		x = 10;
 		{
 			str = "Rideable";
-			fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
+			fonter.draw(matrixStackIn, str, x, y, capabilityColor);
 			
 			if (widgetCollection != null) {
-				Vector4f dims = new Vector4f(fonter.getStringWidth(str), fonter.FONT_HEIGHT, 0, 0);
-				dims.transform(matrixStackIn.getLast().getMatrix());
+				Vector4f dims = new Vector4f(fonter.width(str), fonter.lineHeight, 0, 0);
+				dims.transform(matrixStackIn.last().pose());
 				
-				final int widgetWidth = (int) dims.getX();
-				final int widgetHeight = (int) dims.getY();
+				final int widgetWidth = (int) dims.x();
+				final int widgetHeight = (int) dims.y();
 				final String key = "Can be ridden upon, and is even strong enough to jump!";
 				widgetCollection.add(new CapabilityTooltip(new StringTextComponent(key), x, y, widgetWidth, widgetHeight));
 			}
@@ -232,15 +232,15 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 			if (wolf.hasWolfCapability(cap)) {
 				x = 10;
 				{
-					str = I18n.format("info.tamed_arcane_wolf.capability." + cap.getKey());
-					fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
+					str = I18n.get("info.tamed_arcane_wolf.capability." + cap.getKey());
+					fonter.draw(matrixStackIn, str, x, y, capabilityColor);
 					
 					if (widgetCollection != null) {
-						Vector4f dims = new Vector4f(fonter.getStringWidth(str), fonter.FONT_HEIGHT, 0, 0);
-						dims.transform(matrixStackIn.getLast().getMatrix());
+						Vector4f dims = new Vector4f(fonter.width(str), fonter.lineHeight, 0, 0);
+						dims.transform(matrixStackIn.last().pose());
 						
-						final int widgetWidth = (int) dims.getX();
-						final int widgetHeight = (int) dims.getY();
+						final int widgetWidth = (int) dims.x();
+						final int widgetHeight = (int) dims.y();
 						final String key = "info.tamed_arcane_wolf.capability." + cap.getKey() + ".desc";
 						widgetCollection.add(new CapabilityTooltip(new TranslationTextComponent(key), x, y, widgetWidth, widgetHeight));
 					}
@@ -298,7 +298,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		
 		public void drawOverlay(Minecraft mc, MatrixStack matrixStackIn, int sheetWidth, int sheetHeight, int mouseX, int mouseY) {
 			if (this.isHovered()) {
-				GuiUtils.drawHoveringText(matrixStackIn, Arrays.asList(this.tooltip), mouseX, mouseY, sheetWidth, sheetHeight, -1, mc.fontRenderer);
+				GuiUtils.drawHoveringText(matrixStackIn, Arrays.asList(this.tooltip), mouseX, mouseY, sheetWidth, sheetHeight, -1, mc.font);
 			}
 		}
 	}

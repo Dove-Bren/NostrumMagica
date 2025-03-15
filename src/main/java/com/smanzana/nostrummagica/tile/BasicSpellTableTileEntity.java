@@ -44,7 +44,7 @@ public class BasicSpellTableTileEntity extends TileEntity implements ISpellCraft
 	
 	protected BasicSpellTableTileEntity(TileEntityType<? extends BasicSpellTableTileEntity> type) {
 		super(type);
-		slots = new ItemStack[getSizeInventory()];
+		slots = new ItemStack[getContainerSize()];
 		for (int i = 0; i < slots.length; i++)
 			slots[i] = ItemStack.EMPTY;
 	}
@@ -68,71 +68,71 @@ public class BasicSpellTableTileEntity extends TileEntity implements ISpellCraft
 	}
 	
 	@Override
-	public int getSizeInventory() {
+	public int getContainerSize() {
 		return 4;
 	}
 
 	@Override
-	public @Nonnull ItemStack getStackInSlot(int index) {
-		if (index < 0 || index >= getSizeInventory())
+	public @Nonnull ItemStack getItem(int index) {
+		if (index < 0 || index >= getContainerSize())
 			return ItemStack.EMPTY;
 		
 		return slots[index];
 	}
 
 	@Override
-	public ItemStack decrStackSize(int index, int count) {
-		if (index < 0 || index >= getSizeInventory() || slots[index].isEmpty())
+	public ItemStack removeItem(int index, int count) {
+		if (index < 0 || index >= getContainerSize() || slots[index].isEmpty())
 			return ItemStack.EMPTY;
 		
 		ItemStack stack = slots[index].split(count);
-		this.markDirty();
+		this.setChanged();
 		
 		return stack;
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(int index) {
-		if (index < 0 || index >= getSizeInventory())
+	public ItemStack removeItemNoUpdate(int index) {
+		if (index < 0 || index >= getContainerSize())
 			return ItemStack.EMPTY;
 		
 		ItemStack stack = slots[index];
 		slots[index] = ItemStack.EMPTY;
 		
-		this.markDirty();
+		this.setChanged();
 		return stack;
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, @Nonnull ItemStack stack) {
-		if (index < 0 || index >= getSizeInventory())
+	public void setItem(int index, @Nonnull ItemStack stack) {
+		if (index < 0 || index >= getContainerSize())
 			return;
 		
 		slots[index] = stack;
-		this.markDirty();
+		this.setChanged();
 	}
 
 	@Override
-	public int getInventoryStackLimit() {
+	public int getMaxStackSize() {
 		return 64;
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
+	public boolean stillValid(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(PlayerEntity player) {
+	public void startOpen(PlayerEntity player) {
 	}
 
 	@Override
-	public void closeInventory(PlayerEntity player) {
+	public void stopOpen(PlayerEntity player) {
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int index, @Nonnull ItemStack stack) {
-		if (index < 0 || index >= getSizeInventory())
+	public boolean canPlaceItem(int index, @Nonnull ItemStack stack) {
+		if (index < 0 || index >= getContainerSize())
 			return false;
 		
 		if (stack.isEmpty())
@@ -150,22 +150,22 @@ public class BasicSpellTableTileEntity extends TileEntity implements ISpellCraft
 	}
 
 	@Override
-	public void clear() {
-		for (int i = 0; i < getSizeInventory(); i++)
-			removeStackFromSlot(i);
+	public void clearContent() {
+		for (int i = 0; i < getContainerSize(); i++)
+			removeItemNoUpdate(i);
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		CompoundNBT compound = new CompoundNBT();
 		
-		for (int i = 0; i < getSizeInventory(); i++) {
-			if (getStackInSlot(i).isEmpty())
+		for (int i = 0; i < getContainerSize(); i++) {
+			if (getItem(i).isEmpty())
 				continue;
 			
 			CompoundNBT tag = new CompoundNBT();
-			compound.put(i + "", getStackInSlot(i).write(tag));
+			compound.put(i + "", getItem(i).save(tag));
 		}
 		
 		if (nbt == null)
@@ -176,14 +176,14 @@ public class BasicSpellTableTileEntity extends TileEntity implements ISpellCraft
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_INV, NBT.TAG_COMPOUND))
 			return;
 		
 		CompoundNBT items = nbt.getCompound(NBT_INV);
-		for (String key : items.keySet()) {
+		for (String key : items.getAllKeys()) {
 			int id;
 			try {
 				id = Integer.parseInt(key);
@@ -192,19 +192,19 @@ public class BasicSpellTableTileEntity extends TileEntity implements ISpellCraft
 				continue;
 			}
 			
-			ItemStack stack = ItemStack.read(items.getCompound(key));
-			this.setInventorySlotContents(id, stack);
+			ItemStack stack = ItemStack.of(items.getCompound(key));
+			this.setItem(id, stack);
 		}
 	}
 	
 	@Override
 	public Spell craft(PlayerEntity crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
-		ItemStack stack = this.getStackInSlot(0);
+		ItemStack stack = this.getItem(0);
 		if (stack.isEmpty() || !(stack.getItem() instanceof BlankScroll)) {
 			return null;
 		}
 		
-		SpellCraftContext context = new SpellCraftContext(crafter, this.world, this.pos);
+		SpellCraftContext context = new SpellCraftContext(crafter, this.level, this.worldPosition);
 		Spell spell = SpellCreationGui.SpellCreationContainer.craftSpell(
 				context, pattern, name, iconIndex, this, crafter, null, null, null, true);
 		
@@ -240,8 +240,8 @@ public class BasicSpellTableTileEntity extends TileEntity implements ISpellCraft
 	}
 	
 	public @Nullable IInventory getExtraInventory() {
-		for (BlockPos checkPos : new BlockPos[] {pos.up(), pos.north(), pos.east(), pos.south(), pos.west(), pos.down(), pos.up().north(), pos.up().south(), pos.up().east(), pos.up().west(), pos.north().east(), pos.north().west(), pos.south().east(), pos.south().west()}) {
-			@Nullable TileEntity te = world.getTileEntity(checkPos);
+		for (BlockPos checkPos : new BlockPos[] {worldPosition.above(), worldPosition.north(), worldPosition.east(), worldPosition.south(), worldPosition.west(), worldPosition.below(), worldPosition.above().north(), worldPosition.above().south(), worldPosition.above().east(), worldPosition.above().west(), worldPosition.north().east(), worldPosition.north().west(), worldPosition.south().east(), worldPosition.south().west()}) {
+			@Nullable TileEntity te = level.getBlockEntity(checkPos);
 			if (te != null && te instanceof RuneLibraryTileEntity) {
 				return ((RuneLibraryTileEntity) te).getInventory();
 			}

@@ -29,8 +29,8 @@ public class SpellTomePageCombineRecipe extends SpecialRecipe {
 		SpellTomeEnhancement enhancement = null;
 		int count = 0;
 		
-		for (int i = 0; i < inv.getSizeInventory(); i++) {
-			ItemStack stack = inv.getStackInSlot(i);
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			ItemStack stack = inv.getItem(i);
 			if (stack.isEmpty())
 				continue;
 			
@@ -59,13 +59,13 @@ public class SpellTomePageCombineRecipe extends SpecialRecipe {
 	}
 
 	@Override
-	public ItemStack getCraftingResult(CraftingInventory inv) {
+	public ItemStack assemble(CraftingInventory inv) {
 		SpellTomeEnhancement enhancement = null;
 		int sum = 0;
 		int count = 0;
 		
-		for (int i = 0; i < inv.getSizeInventory(); i++) {
-			ItemStack stack = inv.getStackInSlot(i);
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			ItemStack stack = inv.getItem(i);
 			if (stack.isEmpty())
 				continue;
 			
@@ -104,17 +104,17 @@ public class SpellTomePageCombineRecipe extends SpecialRecipe {
 	}
 
 	@Override
-	public ItemStack getRecipeOutput() {
+	public ItemStack getResultItem() {
 		return SpellTomePage.Create(SpellTomeEnhancement.EFFICIENCY, 1);
 	}
 
 	@Override
 	public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
-		return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+		return NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
 	}
 
 	@Override
-	public boolean canFit(int width, int height) {
+	public boolean canCraftInDimensions(int width, int height) {
 		return width * height >= 2;
 	}
 	

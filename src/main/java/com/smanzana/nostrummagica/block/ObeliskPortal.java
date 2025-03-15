@@ -24,11 +24,11 @@ public class ObeliskPortal extends TeleportationPortalBlock {
 	public static final String ID = "obelisk_portal";
 	
 	public ObeliskPortal() {
-		super(Block.Properties.create(Material.LEAVES)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		super(Block.Properties.of(Material.LEAVES)
+				.strength(-1.0F, 3600000.8F)
 				.noDrops()
-				.setLightLevel((state) -> 14)
-				.notSolid()
+				.lightLevel((state) -> 14)
+				.noOcclusion()
 				);
 	}
 	
@@ -48,14 +48,14 @@ public class ObeliskPortal extends TeleportationPortalBlock {
 	
 	@Override
 	protected void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn) {
-		TileEntity te = worldIn.getTileEntity(portalPos.down());
+		TileEntity te = worldIn.getBlockEntity(portalPos.below());
 		if (te != null && te instanceof ObeliskTileEntity) {
 			ObeliskTileEntity ent = (ObeliskTileEntity) te;
 			if (ent.deductForTeleport(ent.getCurrentTarget())) {
 				super.teleportEntity(worldIn, portalPos, entityIn);
 			} else {
 				if (entityIn instanceof PlayerEntity) {
-					((PlayerEntity) entityIn).sendMessage(new TranslationTextComponent("info.obelisk.aetherfail"), Util.DUMMY_UUID);
+					((PlayerEntity) entityIn).sendMessage(new TranslationTextComponent("info.obelisk.aetherfail"), Util.NIL_UUID);
 				}
 			}
 		}
@@ -83,12 +83,12 @@ public class ObeliskPortal extends TeleportationPortalBlock {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		pos = getMaster(state, pos); // find master
 		
-		BlockState parentState = worldIn.getBlockState(pos.down());
+		BlockState parentState = worldIn.getBlockState(pos.below());
 		if (parentState != null && parentState.getBlock() instanceof ObeliskBlock) {
-			parentState.getBlock().onBlockActivated(parentState, worldIn, pos.down(), player, handIn, hit);
+			parentState.getBlock().use(parentState, worldIn, pos.below(), player, handIn, hit);
 		}
 		
 		return ActionResultType.SUCCESS;

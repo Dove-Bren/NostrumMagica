@@ -63,10 +63,10 @@ public class MagicCutterShape extends SpellShape implements ISelectableShape {
 			// Do a little more work of getting a good vector for things
 			// that aren't players
 			final Vector3d dir;
-			if (caster instanceof MobEntity && ((MobEntity) caster).getAttackTarget() != null) {
+			if (caster instanceof MobEntity && ((MobEntity) caster).getTarget() != null) {
 				MobEntity ent = (MobEntity) caster  ;
-				dir = ent.getAttackTarget().getPositionVec().add(0.0, ent.getHeight() / 2.0, 0.0)
-						.subtract(caster.getPosX(), caster.getPosY() + caster.getEyeHeight(), caster.getPosZ());
+				dir = ent.getTarget().position().add(0.0, ent.getBbHeight() / 2.0, 0.0)
+						.subtract(caster.getX(), caster.getY() + caster.getEyeHeight(), caster.getZ());
 			} else {
 				dir = Projectiles.getVectorForRotation(pitch, yaw);
 			}
@@ -78,7 +78,7 @@ public class MagicCutterShape extends SpellShape implements ISelectableShape {
 					dir,
 					5.0f, PROJECTILE_RANGE);
 			
-			world.addEntity(projectile);
+			world.addFreshEntity(projectile);
 		}
 
 		@Override
@@ -95,7 +95,7 @@ public class MagicCutterShape extends SpellShape implements ISelectableShape {
 				onProjectileHit(new SpellLocation(world, this.pos));
 			}
 			else if (NostrumMagica.resolveLivingEntity(entity) == null) {
-				onProjectileHit(new SpellLocation(entity.world, entity.getPosition()));
+				onProjectileHit(new SpellLocation(entity.level, entity.blockPosition()));
 			} else if (hitEnts) {
 				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, 1f, true);
 			}
@@ -114,7 +114,7 @@ public class MagicCutterShape extends SpellShape implements ISelectableShape {
 	
 	private static final String ID = "cutter";
 	private static final double PROJECTILE_RANGE = 50.0;
-	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.SKY_ASH, 1)));
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.of(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.SKY_ASH, 1)));
 	
 	protected MagicCutterShape(String key) {
 		super(key);
@@ -183,27 +183,27 @@ public class MagicCutterShape extends SpellShape implements ISelectableShape {
 		final boolean hitBlocks = affectsBlocks(properties);
 		final Vector3d dir;
 		final LivingEntity self = state.getSelf();
-		if (self instanceof MobEntity && ((MobEntity) self).getAttackTarget() != null) {
+		if (self instanceof MobEntity && ((MobEntity) self).getTarget() != null) {
 			MobEntity ent = (MobEntity) self  ;
-			dir = ent.getAttackTarget().getPositionVec().add(0.0, ent.getHeight() / 2.0, 0.0)
-					.subtract(self.getPosX(), self.getPosY() + self.getEyeHeight(), self.getPosZ());
+			dir = ent.getTarget().position().add(0.0, ent.getBbHeight() / 2.0, 0.0)
+					.subtract(self.getX(), self.getY() + self.getEyeHeight(), self.getZ());
 		} else {
 			dir = Projectiles.getVectorForRotation(pitch, yaw);
 		}
 		
 		RayTraceResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, dir, (float) PROJECTILE_RANGE, hitEnts ? new RayTrace.OtherLiving(state.getSelf()) : e -> false);
 		if (trace.getType() == RayTraceResult.Type.BLOCK && hitBlocks) {
-			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), Vector3d.copyCentered(RayTrace.blockPosFromResult(trace))));
+			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), Vector3d.atCenterOf(RayTrace.blockPosFromResult(trace))));
 			state.trigger(null, Lists.newArrayList(new SpellLocation(location.world, trace)));
 			return true;
 		} else if (trace.getType() == RayTraceResult.Type.ENTITY && RayTrace.livingFromRaytrace(trace) != null && hitEnts) {
 			final LivingEntity living = RayTrace.livingFromRaytrace(trace);
-			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), living.getPositionVec().add(0, living.getHeight() / 2, 0)));
+			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), living.position().add(0, living.getBbHeight() / 2, 0)));
 			state.trigger(Lists.newArrayList(living), null);
 			return true;
 		} else {
 			final Vector3d dest = location.shooterPosition.add(dir.normalize().scale(PROJECTILE_RANGE));
-			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), new Vector3d((int) dest.getX() + .5, (int) dest.getY() + .5, (int) dest.getZ() + .5)));
+			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), new Vector3d((int) dest.x() + .5, (int) dest.y() + .5, (int) dest.z() + .5)));
 			return true;
 		}
 	}

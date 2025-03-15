@@ -12,6 +12,8 @@ import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.player.PlayerEntity;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class SpellAttackGoal<T extends MobEntity> extends Goal {
 	
 	
@@ -41,12 +43,12 @@ public class SpellAttackGoal<T extends MobEntity> extends Goal {
 		this.predicate = predicate;
 		
 		if (castTime > 0) {
-			this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+			this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 		}
 	}
 	
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		this.attackTicks = Math.max(0, this.attackTicks-1);
 		
 		if (!entity.isAlive())
@@ -56,25 +58,25 @@ public class SpellAttackGoal<T extends MobEntity> extends Goal {
 			return false;
 		}
 		
-		if (needsTarget && (entity.getAttackTarget() == null || !entity.getAttackTarget().isAlive()))
+		if (needsTarget && (entity.getTarget() == null || !entity.getTarget().isAlive()))
 			return false;
 		
-		if (needsTarget && !entity.getEntitySenses().canSee(entity.getAttackTarget())){
+		if (needsTarget && !entity.getSensing().canSee(entity.getTarget())){
 			return false;
 		}
 		
-		if (needsTarget && entity.getAttackTarget() instanceof PlayerEntity) {
-			PlayerEntity player = (PlayerEntity) entity.getAttackTarget();
+		if (needsTarget && entity.getTarget() instanceof PlayerEntity) {
+			PlayerEntity player = (PlayerEntity) entity.getTarget();
 			if (player.isCreative() || player.isSpectator()) {
 				return false;
 			}
 		}
 		
-		return (this.attackTicks == 0 && (odds <= 0 || entity.getRNG().nextInt(odds) == 0));
+		return (this.attackTicks == 0 && (odds <= 0 || entity.getRandom().nextInt(odds) == 0));
 	}
 	
 	@Override
-	public boolean shouldContinueExecuting() {
+	public boolean canContinueToUse() {
 		return castTicks < castTime;
 	}
 	
@@ -82,12 +84,12 @@ public class SpellAttackGoal<T extends MobEntity> extends Goal {
 		if (spells == null || spells.length == 0)
 			return null;
 		
-		return spells[entity.getRNG().nextInt(spells.length)];
+		return spells[entity.getRandom().nextInt(spells.length)];
 	}
 	
 	protected @Nullable LivingEntity getTarget() {
-		if (needsTarget && null != entity.getAttackTarget()) {
-			return entity.getAttackTarget();
+		if (needsTarget && null != entity.getTarget()) {
+			return entity.getTarget();
 		}
 		
 		return null;
@@ -105,21 +107,21 @@ public class SpellAttackGoal<T extends MobEntity> extends Goal {
 		}
 		
 		LivingEntity target = getTarget();
-		@Nullable LivingEntity oldTarget = entity.getAttackTarget();
+		@Nullable LivingEntity oldTarget = entity.getTarget();
 		if (target != null) {
-			entity.faceEntity(target, 360f, 180f);
-			entity.setAttackTarget(target);
+			entity.lookAt(target, 360f, 180f);
+			entity.setTarget(target);
 		}
 		
 		deductMana(spell, entity);
 		spell.cast(entity, 1);
 		attackTicks = this.delay;
-		entity.setAttackTarget(oldTarget);
+		entity.setTarget(oldTarget);
 	}
 
 	@Override
-	public void startExecuting() {
-		super.startExecuting();
+	public void start() {
+		super.start();
 		castTicks = 0;
 	}
 	
@@ -129,7 +131,7 @@ public class SpellAttackGoal<T extends MobEntity> extends Goal {
 		
 		LivingEntity target = getTarget();
 		if (target != null) {
-			this.entity.faceEntity(getTarget(), 360f, 180);
+			this.entity.lookAt(getTarget(), 360f, 180);
 		}
 		
 		castTicks++;

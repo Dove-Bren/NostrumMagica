@@ -37,27 +37,27 @@ public class RenderWisp extends EntityRenderer<WispEntity> {
 			int packedOverlayIn, float red, float green, float blue, float alpha, float partialTicks) {
 		// Render orb twice: one at full transparency, and again larger and more translucent (for a glow)
 		final float ticks = 3 * 20;
-		final float frac = (((float) entityIn.ticksExisted + partialTicks) % ticks) / ticks;
+		final float frac = (((float) entityIn.tickCount + partialTicks) % ticks) / ticks;
 		final float adjustedScale = (float) (Math.sin(frac * Math.PI * 2) * .05) + .5f;
-		final float yOffset = entityIn.getHeight() / 2;
+		final float yOffset = entityIn.getBbHeight() / 2;
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		//GlStateManager.rotatef(-90f, 1f, 0f, 0f);
 		matrixStackIn.translate(0, yOffset, 0);
 		
 		// For inner orb, make it 40% the base size but perfectly opaque
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.scale(.3f, .3f, .3f);
-		orbModel.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha * .8f);
-		matrixStackIn.pop();
+		orbModel.renderToBuffer(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha * .8f);
+		matrixStackIn.popPose();
 		
 		// For outer orb, make (0x30/0xFF)% as bright and scale up
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.scale(adjustedScale, adjustedScale, adjustedScale);
-		orbModel.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha * .1875f);
-		matrixStackIn.pop();
+		orbModel.renderToBuffer(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha * .1875f);
+		matrixStackIn.popPose();
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	@Override
@@ -68,36 +68,36 @@ public class RenderWisp extends EntityRenderer<WispEntity> {
 		
 		//renderModel(entityIn, matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, color[0], color[1], color[2], color[3], partialTicks);
 		final float ticks = 3 * 20;
-		final float frac = (((float) entityIn.ticksExisted + partialTicks) % ticks) / ticks;
+		final float frac = (((float) entityIn.tickCount + partialTicks) % ticks) / ticks;
 		final float adjustedScale = (float) (Math.sin(frac * Math.PI * 2) * .05) + .5f;
-		final float yOffset = entityIn.getHeight() / 2;
+		final float yOffset = entityIn.getBbHeight() / 2;
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		//GlStateManager.rotatef(-90f, 1f, 0f, 0f);
 		matrixStackIn.translate(0, yOffset, 0);
 		
 		// For inner orb, make it 40% the base size but perfectly opaque
-		buffer = bufferIn.getBuffer(RenderType.getEntityCutout(getEntityTexture(entityIn)));
-		matrixStackIn.push();
+		buffer = bufferIn.getBuffer(RenderType.entityCutout(getTextureLocation(entityIn)));
+		matrixStackIn.pushPose();
 		matrixStackIn.scale(.3f, .3f, .3f);
-		orbModel.render(matrixStackIn, buffer, packedLightIn, packedOverlayIn, color[0], color[1], color[2], color[3]);
-		matrixStackIn.pop();
+		orbModel.renderToBuffer(matrixStackIn, buffer, packedLightIn, packedOverlayIn, color[0], color[1], color[2], color[3]);
+		matrixStackIn.popPose();
 		
 		// For outer orb, make (0x30/0xFF)% as bright and scale up
-		buffer = bufferIn.getBuffer(this.orbModel.getRenderType(getEntityTexture(entityIn)));
-		matrixStackIn.push();
+		buffer = bufferIn.getBuffer(this.orbModel.renderType(getTextureLocation(entityIn)));
+		matrixStackIn.pushPose();
 		matrixStackIn.scale(adjustedScale, adjustedScale, adjustedScale);
-		orbModel.render(matrixStackIn, buffer, packedLightIn, packedOverlayIn, color[0], color[1], color[2], color[3] * .1875f);
-		matrixStackIn.pop();
+		orbModel.renderToBuffer(matrixStackIn, buffer, packedLightIn, packedOverlayIn, color[0], color[1], color[2], color[3] * .1875f);
+		matrixStackIn.popPose();
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public ResourceLocation getEntityTexture(WispEntity entity) {
-		return AtlasTexture.LOCATION_BLOCKS_TEXTURE;
+	public ResourceLocation getTextureLocation(WispEntity entity) {
+		return AtlasTexture.LOCATION_BLOCKS;
 	}
 	
 }

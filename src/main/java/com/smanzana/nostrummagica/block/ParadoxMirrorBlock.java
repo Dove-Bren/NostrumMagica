@@ -57,21 +57,21 @@ import net.minecraftforge.common.util.Constants.NBT;
  */
 public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 	
-	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
+	public static final DirectionProperty FACING = HorizontalBlock.FACING;
 	private static final double BB_DEPTH = 2.0 / 16.0;
 	private static final double BB_MARGIN = 1.0 / 16.0;
-	private static final VoxelShape AABB_N = Block.makeCuboidShape(16 * BB_MARGIN, 16 * 0, 16 * (1 - BB_DEPTH), 16 * (1 - BB_MARGIN), 16 * 1, 16 * 1);
-	private static final VoxelShape AABB_E = Block.makeCuboidShape(16 * 0, 16 * 0, 16 * BB_MARGIN, 16 * BB_DEPTH, 16 * 1, 16 * (1-BB_MARGIN));
-	private static final VoxelShape AABB_S = Block.makeCuboidShape(16 * BB_MARGIN, 16 * 0, 16 * 0, 16 * (1-BB_MARGIN), 16 * 1, 16 * BB_DEPTH);
-	private static final VoxelShape AABB_W = Block.makeCuboidShape(16 * (1 - BB_DEPTH), 16 * 0, 16 * BB_MARGIN, 16 * 1, 16 * 1, 16 * (1-BB_MARGIN));
+	private static final VoxelShape AABB_N = Block.box(16 * BB_MARGIN, 16 * 0, 16 * (1 - BB_DEPTH), 16 * (1 - BB_MARGIN), 16 * 1, 16 * 1);
+	private static final VoxelShape AABB_E = Block.box(16 * 0, 16 * 0, 16 * BB_MARGIN, 16 * BB_DEPTH, 16 * 1, 16 * (1-BB_MARGIN));
+	private static final VoxelShape AABB_S = Block.box(16 * BB_MARGIN, 16 * 0, 16 * 0, 16 * (1-BB_MARGIN), 16 * 1, 16 * BB_DEPTH);
+	private static final VoxelShape AABB_W = Block.box(16 * (1 - BB_DEPTH), 16 * 0, 16 * BB_MARGIN, 16 * 1, 16 * 1, 16 * (1-BB_MARGIN));
 	
 	private static final String NBT_LINKED_POS = "linked_pos";
 	
 	public static final String ID = "paradox_mirror";
 	
 	public ParadoxMirrorBlock() {
-		super(Block.Properties.create(Material.IRON)
-				.hardnessAndResistance(.5f, 0f)
+		super(Block.Properties.of(Material.METAL)
+				.strength(.5f, 0f)
 				.sound(SoundType.GLASS)
 				);
 	}
@@ -79,24 +79,24 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
 		//return this.getDefaultState().with(FACING, placer.getHorizontalFacing().getOpposite());
-		Direction side = context.getPlacementHorizontalFacing().getOpposite();
-		if (!this.canPlaceAt(context.getWorld(), context.getPos(), side)) {
+		Direction side = context.getHorizontalDirection().getOpposite();
+		if (!this.canPlaceAt(context.getLevel(), context.getClickedPos(), side)) {
 			// Rotate and find it
 			for (int i = 0; i < 3; i++) {
-				side = side.rotateY();
-				if (this.canPlaceAt(context.getWorld(), context.getPos(), side)) {
+				side = side.getClockWise();
+				if (this.canPlaceAt(context.getLevel(), context.getClickedPos(), side)) {
 					break;
 				}
 			}
 		}
 		
-		return this.getDefaultState()
-				.with(FACING, side);
+		return this.defaultBlockState()
+				.setValue(FACING, side);
 	}
 	
 	protected boolean canPlaceAt(IWorldReader worldIn, BlockPos pos, Direction side) {
-		BlockState state = worldIn.getBlockState(pos.offset(side.getOpposite()));
-		if (state == null || !(state.isSolidSide(worldIn, pos.offset(side.getOpposite()), side.getOpposite()))) {
+		BlockState state = worldIn.getBlockState(pos.relative(side.getOpposite()));
+		if (state == null || !(state.isFaceSturdy(worldIn, pos.relative(side.getOpposite()), side.getOpposite()))) {
 			return false;
 		}
 		
@@ -104,8 +104,8 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean isValidPosition(BlockState state, IWorldReader world, BlockPos pos) {
-		for (Direction side : FACING.getAllowedValues()) {
+	public boolean canSurvive(BlockState state, IWorldReader world, BlockPos pos) {
+		for (Direction side : FACING.getPossibleValues()) {
 			if (canPlaceAt(world, pos, side)) {
 				return true;
 			}
@@ -115,23 +115,23 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 	}
 	
 	@Override
-	public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		Direction myFacing = state.get(FACING);
+	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		Direction myFacing = state.getValue(FACING);
 		if (!this.canPlaceAt(worldIn, currentPos, myFacing)) { // should check passed in facing and only re-check if wall we're on changed but I can't remember if facing is wall we're on or the opposite
-			return Blocks.AIR.getDefaultState();
+			return Blocks.AIR.defaultBlockState();
 		}
 		
 		return state;
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(FACING);
 	}
 	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		switch (state.get(FACING)) {
+		switch (state.getValue(FACING)) {
 		case NORTH:
 		case UP:
 		case DOWN:
@@ -147,21 +147,21 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return true;
     }
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		
-		if (worldIn.isRemote) {
+		if (worldIn.isClientSide) {
 			return ActionResultType.SUCCESS;
 		}
 		
 		ParadoxMirrorTileEntity mirror = getTileEntity(worldIn, pos);
 		if (mirror != null) {
 			
-			@Nonnull ItemStack held = playerIn.getHeldItem(hand);
+			@Nonnull ItemStack held = playerIn.getItemInHand(hand);
 			if (held.isEmpty()) {
 				return ActionResultType.FAIL;
 			}
@@ -171,7 +171,7 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 				BlockPos heldPos = PositionCrystal.getBlockPosition(held);
 				if (heldPos != null && !heldPos.equals(pos)) {
 					mirror.setLinkedPosition(heldPos);
-					playerIn.sendMessage(new TranslationTextComponent("info.generic.block_linked"), Util.DUMMY_UUID);
+					playerIn.sendMessage(new TranslationTextComponent("info.generic.block_linked"), Util.NIL_UUID);
 				}
 				return ActionResultType.SUCCESS; // true even if crystal doesn't have position
 			}
@@ -180,7 +180,7 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 				// If we have an item, return true even if mirror is on cooldown
 				if (mirror.tryPushItem(held)) {
 					// Item was pushed! Remove from hand!
-					playerIn.setHeldItem(hand, ItemStack.EMPTY);
+					playerIn.setItemInHand(hand, ItemStack.EMPTY);
 					return ActionResultType.SUCCESS;
 				}
 			}
@@ -201,19 +201,19 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			destroy(worldIn, pos, state);
 		}
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
-		world.removeTileEntity(pos);
+		world.removeBlockEntity(pos);
 	}
 	
 	@Override
@@ -222,7 +222,7 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 		ItemStack drop = new ItemStack(this);
 		BlockPos linkedPos = null;
 		
-		TileEntity te = builder.get(LootParameters.BLOCK_ENTITY);
+		TileEntity te = builder.getOptionalParameter(LootParameters.BLOCK_ENTITY);
 		if (te != null && te instanceof ParadoxMirrorTileEntity) {
 			linkedPos = ((ParadoxMirrorTileEntity) te).getLinkedPosition();
 		}
@@ -241,8 +241,8 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 	}
 	
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-		super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+	public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+		super.setPlacedBy(worldIn, pos, state, placer, stack);
 		
 		// Read linked position off of item stack, if present
 		CompoundNBT tag = stack.getTag();
@@ -268,7 +268,7 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 	}
 	
 	protected @Nullable ParadoxMirrorTileEntity getTileEntity(IWorldReader world, BlockPos pos) {
-		TileEntity ent = world.getTileEntity(pos);
+		TileEntity ent = world.getBlockEntity(pos);
 		if (ent == null || !(ent instanceof ParadoxMirrorTileEntity))
 			return null;
 		
@@ -277,7 +277,7 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		if (stack.isEmpty() || !stack.hasTag() || !stack.getTag().contains(NBT_LINKED_POS, NBT.TAG_COMPOUND))
 			return;
 		
@@ -286,7 +286,7 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 		if (pos == null)
 			return;
 		
-		tooltip.add(new StringTextComponent("<" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ">").mergeStyle(TextFormatting.GREEN));
+		tooltip.add(new StringTextComponent("<" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ">").withStyle(TextFormatting.GREEN));
 	}
 
 	@Override

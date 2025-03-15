@@ -23,8 +23,8 @@ public class ModelDragonEgg extends EntityModel<DragonEggEntity> {
 		main = new ModelRenderer(this, 0, 0);
 		int y = 28;
 		
-		main.setTextureSize(textureWidth, textureHeight);
-		main.setRotationPoint(0, 20, 0);
+		main.setTexSize(textureWidth, textureHeight);
+		main.setPos(0, 20, 0);
 		addCyl(y--, 1, 2);
 		addCyl(y--, 1, 4);
 		addCyl(y--, 1, 5);
@@ -42,7 +42,7 @@ public class ModelDragonEgg extends EntityModel<DragonEggEntity> {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, IVertexBuilder buffer,
+	public void renderToBuffer(MatrixStack matrixStack, IVertexBuilder buffer,
             int light, int overlay, float red, float green, float blue, float alpha) {
 		
 		// Tint based on how cold it is
@@ -51,14 +51,14 @@ public class ModelDragonEgg extends EntityModel<DragonEggEntity> {
 		blue *= 1f - (coldScale * .1f);
 		
 		final float modelScale = 0.5f;
-		matrixStack.push();
+		matrixStack.pushPose();
 		matrixStack.scale(modelScale, modelScale, modelScale);
 		main.render(matrixStack, buffer, light, overlay, red, green, blue, alpha);
-		matrixStack.pop();
+		matrixStack.popPose();
 	}
 
 	@Override
-	public void setRotationAngles(DragonEggEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setupAnim(DragonEggEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {
 		// TODO Auto-generated method stub
 		

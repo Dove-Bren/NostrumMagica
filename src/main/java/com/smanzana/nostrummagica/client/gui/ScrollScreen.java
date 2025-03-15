@@ -86,13 +86,13 @@ public class ScrollScreen extends Screen {
 		final int listXOffset = 25;
 		
 		//RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-		Minecraft.getInstance().getTextureManager().bindTexture(background);
+		Minecraft.getInstance().getTextureManager().bind(background);
 		
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
 				1f, 1f, 1f, 1f);
 		
-		final int nameWidth = this.font.getStringWidth(this.name);
-		this.font.drawString(matrixStackIn, this.name, leftOffset + (TEXT_BACK_WIDTH / 2) - (nameWidth / 2), topOffset + titleYOffset, color);
+		final int nameWidth = this.font.width(this.name);
+		this.font.draw(matrixStackIn, this.name, leftOffset + (TEXT_BACK_WIDTH / 2) - (nameWidth / 2), topOffset + titleYOffset, color);
 		
 		if (this.icon != null) {
 			final int iconLen = 32;
@@ -104,16 +104,16 @@ public class ScrollScreen extends Screen {
 		}
 		
 		final String weightStr = "Weight: " + spell.getWeight();
-		final int weightWidth = this.font.getStringWidth(weightStr);
-		this.font.drawString(matrixStackIn, "Cost: " + spell.getManaCost(), leftOffset + statXOffset, topOffset + statYOffset, 0xFF000000);
-		this.font.drawString(matrixStackIn, weightStr, leftOffset + statXWidth - (weightWidth), topOffset + statYOffset, 0xFF000000);
+		final int weightWidth = this.font.width(weightStr);
+		this.font.draw(matrixStackIn, "Cost: " + spell.getManaCost(), leftOffset + statXOffset, topOffset + statYOffset, 0xFF000000);
+		this.font.draw(matrixStackIn, weightStr, leftOffset + statXWidth - (weightWidth), topOffset + statYOffset, 0xFF000000);
 		
-		RenderFuncs.drawRect(matrixStackIn, leftOffset + statXOffset - 2, topOffset + statYOffset + font.FONT_HEIGHT,
-				leftOffset + statXWidth + 2, topOffset + statYOffset + font.FONT_HEIGHT + 2, 0xFF000000);
+		RenderFuncs.drawRect(matrixStackIn, leftOffset + statXOffset - 2, topOffset + statYOffset + font.lineHeight,
+				leftOffset + statXWidth + 2, topOffset + statYOffset + font.lineHeight + 2, 0xFF000000);
 		
 		int i = 0;
 		for (String line : this.components) {
-			this.font.drawString(matrixStackIn, line, leftOffset + listXOffset, topOffset + listYOffset + (i * this.font.FONT_HEIGHT + 2), 0xFF000000);
+			this.font.draw(matrixStackIn, line, leftOffset + listXOffset, topOffset + listYOffset + (i * this.font.lineHeight + 2), 0xFF000000);
 			i++;
 		}
 		

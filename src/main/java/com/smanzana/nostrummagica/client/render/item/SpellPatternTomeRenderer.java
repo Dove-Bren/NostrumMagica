@@ -36,29 +36,29 @@ public class SpellPatternTomeRenderer extends ItemStackTileEntityRenderer {
 	
 	protected void renderBase(ItemStack stack, ItemCameraTransforms.TransformType transform, MatrixStack matrixStack, IRenderTypeBuffer bufferIn, int combinedLight, int combinedOverlay) {
 		final IBakedModel model = this.getBaseModel(stack, transform);
-		final RenderType baseRenderType = RenderTypeLookup.func_239219_a_(stack, true);
+		final RenderType baseRenderType = RenderTypeLookup.getRenderType(stack, true);
 		
-		matrixStack.push();
+		matrixStack.pushPose();
 		//matrixStack.scale(1.0F, -1.0F, -1.0F);
-		IVertexBuilder buffer = ItemRenderer.getEntityGlintVertexBuilder(bufferIn, baseRenderType, false, stack.hasEffect());
+		IVertexBuilder buffer = ItemRenderer.getFoilBufferDirect(bufferIn, baseRenderType, false, stack.hasFoil());
 		RenderFuncs.RenderModel(matrixStack, buffer, model, combinedLight, combinedOverlay, 1f, 1f, 1f, 1f);
-		matrixStack.pop();
+		matrixStack.popPose();
 	}
 	
 	protected void renderIcon(SpellCraftPattern pattern, ItemStack stack, ItemCameraTransforms.TransformType transform, MatrixStack matrixStack, IRenderTypeBuffer bufferIn, int combinedLight, int combinedOverlay) {
 		@Nullable ISpellCraftPatternRenderer renderer = ISpellCraftPatternRenderer.GetRenderer(pattern);
 		if (renderer != null) {
-			matrixStack.push();
+			matrixStack.pushPose();
 			matrixStack.scale(1.0F, -1.0F, -1.0F);
 			matrixStack.scale(1f/16f, 1f/16f, 1f/16f);
 			matrixStack.translate(3, -12, -8.75);
 			renderer.drawPatternIcon(matrixStack, pattern, bufferIn, 8, 8, 1f, 1f, 1f, 1f);
-			matrixStack.pop();
+			matrixStack.popPose();
 		}
 	}
 	
 	@Override
-	public void func_239207_a_(ItemStack stack, ItemCameraTransforms.TransformType transform, MatrixStack matrixStack, IRenderTypeBuffer bufferIn, int combinedLight, int combinedOverlay) {
+	public void renderByItem(ItemStack stack, ItemCameraTransforms.TransformType transform, MatrixStack matrixStack, IRenderTypeBuffer bufferIn, int combinedLight, int combinedOverlay) {
 		this.renderBase(stack, transform, matrixStack, bufferIn, combinedLight, combinedOverlay);
 		
 		@Nullable SpellCraftPattern pattern = ((SpellPatternTome) stack.getItem()).getPattern(stack);

@@ -62,7 +62,7 @@ public class OnDamageShape extends SpellShape {
 			NostrumMagica.playerListener.registerTimer(this, 0, 20 * duration);
 			
 			if (SetTrigger(entity, this)) {
-				NostrumMagica.magicEffectProxy.applyOnHitEffect(entity, entity.ticksExisted, 20 * duration);
+				NostrumMagica.magicEffectProxy.applyOnHitEffect(entity, entity.tickCount, 20 * duration);
 			}
 		}
 		
@@ -85,7 +85,7 @@ public class OnDamageShape extends SpellShape {
 					expired = true;
 					if (this.entity instanceof PlayerEntity) {
 						PlayerEntity player = (PlayerEntity) this.entity;
-						player.sendMessage(new TranslationTextComponent("modification.damaged_duration.expire"), Util.DUMMY_UUID);
+						player.sendMessage(new TranslationTextComponent("modification.damaged_duration.expire"), Util.NIL_UUID);
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_DAMAGE, this.entity);
 					}
 				}
@@ -98,7 +98,7 @@ public class OnDamageShape extends SpellShape {
 	private static final Map<UUID, OnDamageShapeInstance> ActiveMap = new HashMap<>();
 	
 	private static final boolean SetTrigger(LivingEntity entity, @Nullable OnDamageShapeInstance trigger) {
-		OnDamageShapeInstance existing = ActiveMap.put(entity.getUniqueID(), trigger);
+		OnDamageShapeInstance existing = ActiveMap.put(entity.getUUID(), trigger);
 		if (existing != null && existing != trigger) {
 			existing.expired = true;
 		}
@@ -106,7 +106,7 @@ public class OnDamageShape extends SpellShape {
 	}
 	
 	private static final String ID = "hit";
-	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.SPIDER_SILK, 1),
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.of(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.SPIDER_SILK, 1),
 			ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1)));
 	
 	public static final SpellShapeProperty<Integer> DURATION = new IntSpellShapeProperty("delay", 20, 30, 40, 60, 300);
@@ -153,7 +153,7 @@ public class OnDamageShape extends SpellShape {
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
-			costs = NonNullList.from(ItemStack.EMPTY,
+			costs = NonNullList.of(ItemStack.EMPTY,
 				ItemStack.EMPTY,
 				new ItemStack(Items.REDSTONE),
 				new ItemStack(Items.IRON_INGOT),

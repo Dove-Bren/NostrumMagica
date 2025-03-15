@@ -33,8 +33,8 @@ public class PutterBlock extends Block {
 	public static final String ID = "putter";
 	
 	public PutterBlock() {
-		super(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(3.5f, 3.5f)
+		super(Block.Properties.of(Material.STONE)
+				.strength(3.5f, 3.5f)
 				.sound(SoundType.STONE)
 				.harvestTool(ToolType.PICKAXE)
 				.harvestLevel(1)
@@ -43,17 +43,17 @@ public class PutterBlock extends Block {
 	
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(FACING, context.getNearestLookingDirection().getOpposite());
+		return this.defaultBlockState().setValue(FACING, context.getNearestLookingDirection().getOpposite());
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(FACING);
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		PutterBlockTileEntity te = (PutterBlockTileEntity) worldIn.getTileEntity(pos);
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		PutterBlockTileEntity te = (PutterBlockTileEntity) worldIn.getBlockEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(player, PutterBlockGui.PutterBlockContainer.Make(te));
 		
 		return ActionResultType.SUCCESS;
@@ -70,33 +70,33 @@ public class PutterBlock extends Block {
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			destroy(world, pos, state);
-			world.removeTileEntity(pos);
+			world.removeBlockEntity(pos);
 		}
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
-		TileEntity ent = world.getTileEntity(pos);
+		TileEntity ent = world.getBlockEntity(pos);
 		if (ent == null || !(ent instanceof PutterBlockTileEntity))
 			return;
 		
 		PutterBlockTileEntity putter = (PutterBlockTileEntity) ent;
 		IInventory inv = putter.getInventory();
-		for (int i = 0; i < inv.getSizeInventory(); i++) {
-			ItemStack item = inv.getStackInSlot(i);
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			ItemStack item = inv.getItem(i);
 			if (!item.isEmpty()) {
 				double x, y, z;
 				x = pos.getX() + .5;
 				y = pos.getY() + .5;
 				z = pos.getZ() + .5;
-				world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
+				world.addFreshEntity(new ItemEntity(world, x, y, z, item.copy()));
 			}
 		}
 	}

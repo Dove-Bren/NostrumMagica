@@ -35,25 +35,25 @@ public class DragonEgg extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		final World worldIn = context.getWorld();
-		final BlockPos pos = context.getPos();
+	public ActionResultType useOn(ItemUseContext context) {
+		final World worldIn = context.getLevel();
+		final BlockPos pos = context.getClickedPos();
 		final PlayerEntity playerIn = context.getPlayer();
 		
-		if (worldIn.isRemote)
+		if (worldIn.isClientSide)
 			return ActionResultType.SUCCESS;
 		
 		if (pos == null)
 			return ActionResultType.PASS;
 		
-		BlockPos.Mutable checkPos = new BlockPos.Mutable().setPos(pos);
+		BlockPos.Mutable checkPos = new BlockPos.Mutable().set(pos);
 		checkPos.setY(checkPos.getY() + 1);
-		if (!worldIn.isAirBlock(checkPos)) {
+		if (!worldIn.isEmptyBlock(checkPos)) {
 			return ActionResultType.PASS;
 		}
 		
 		checkPos.setY(checkPos.getY() + 1);
-		if (!worldIn.isAirBlock(checkPos)) {
+		if (!worldIn.isEmptyBlock(checkPos)) {
 			return ActionResultType.PASS;
 		}
 		
@@ -64,19 +64,19 @@ public class DragonEgg extends Item implements ILoreTagged {
 //		worldIn.spawnEntityInWorld(dragon);
 		
 		DragonEggEntity egg = new DragonEggEntity(NostrumEntityTypes.dragonEgg, worldIn, playerIn, TameRedDragonEntity.rollRandomStats());
-		egg.setPosition(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
-		egg.onInitialSpawn((ServerWorld) worldIn, worldIn.getDifficultyForLocation(pos), SpawnReason.EVENT, null, null);
-		worldIn.addEntity(egg);
+		egg.setPos(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
+		egg.finalizeSpawn((ServerWorld) worldIn, worldIn.getCurrentDifficultyAt(pos), SpawnReason.EVENT, null, null);
+		worldIn.addFreshEntity(egg);
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (attr != null) {
 			attr.giveFullLore(egg.getLoreTag());
 		}
 		
-		playerIn.sendMessage(new TranslationTextComponent("info.egg.place"), Util.DUMMY_UUID);
+		playerIn.sendMessage(new TranslationTextComponent("info.egg.place"), Util.NIL_UUID);
 		
 		if (!playerIn.isCreative()) {
-			context.getItem().shrink(1);
+			context.getItemInHand().shrink(1);
 		}
 		
 		return ActionResultType.SUCCESS;

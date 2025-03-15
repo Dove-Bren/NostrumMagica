@@ -310,54 +310,54 @@ public class NostrumItems {
 	
 	public static Item.Properties PropBase() {
 		return new Item.Properties()
-				.group(NostrumMagica.creativeTab)
+				.tab(NostrumMagica.creativeTab)
 				;
 	}
 	
 	public static Item.Properties PropLowStack() {
 		return PropBase()
-				.maxStackSize(16);
+				.stacksTo(16);
 	}
 	
 	public static Item.Properties PropUnstackable() {
 		return PropBase()
-				.maxStackSize(1);
+				.stacksTo(1);
 	}
 	
 	public static Item.Properties PropEquipmentBase() {
 		return new Item.Properties()
-				.group(NostrumMagica.equipmentTab);
+				.tab(NostrumMagica.equipmentTab);
 	}
 	
 	public static Item.Properties PropEquipment() {
 		return PropEquipmentBase()
-				.maxStackSize(1)
+				.stacksTo(1)
 				;
 	}
 	
 	public static Item.Properties PropTomeBase() {
 		return new Item.Properties()
-				.group(NostrumMagica.enhancementTab);
+				.tab(NostrumMagica.enhancementTab);
 	}
 	
 	public static Item.Properties PropTomeUnstackable() {
 		return PropTomeBase()
-				.maxStackSize(1);
+				.stacksTo(1);
 	}
 	
 	public static Item.Properties PropRuneBase() {
 		return new Item.Properties()
-				.group(NostrumMagica.runeTab);
+				.tab(NostrumMagica.runeTab);
 	}
 	
 	public static Item.Properties PropDungeonBase() {
 		return new Item.Properties()
-				.group(NostrumMagica.dungeonTab);
+				.tab(NostrumMagica.dungeonTab);
 	}
 	
 	public static Item.Properties PropDungeonUnstackable() {
 		return PropDungeonBase()
-				.maxStackSize(1);
+				.stacksTo(1);
 	}
 	
 	private static final void register(IForgeRegistry<Item> registry, Item item) {
@@ -588,9 +588,9 @@ public class NostrumItems {
     	register(registry, new ThanosStaff().setRegistryName(ThanosStaff.ID));
     	register(registry, new WarlockSword().setRegistryName(WarlockSword.ID));
     	register(registry, new WorldKeyItem().setRegistryName(WorldKeyItem.ID));
-    	register(registry, new FillItem(() -> NostrumBlocks.dungeonAir.getDefaultState(), false).setRegistryName(FillItem.ID_AIR_ALL));
-    	register(registry, new FillItem(() -> Blocks.WATER.getDefaultState(), false).setRegistryName(FillItem.ID_WATER_ALL));
-    	register(registry, new FillItem(() -> Blocks.WATER.getDefaultState(), true).setRegistryName(FillItem.ID_WATER_DOWN));
+    	register(registry, new FillItem(() -> NostrumBlocks.dungeonAir.defaultBlockState(), false).setRegistryName(FillItem.ID_AIR_ALL));
+    	register(registry, new FillItem(() -> Blocks.WATER.defaultBlockState(), false).setRegistryName(FillItem.ID_WATER_ALL));
+    	register(registry, new FillItem(() -> Blocks.WATER.defaultBlockState(), true).setRegistryName(FillItem.ID_WATER_DOWN));
     	register(registry, new MageBlade().setRegistryName(MageBlade.ID));
     	register(registry, new AspectedFireWeapon().setRegistryName(AspectedFireWeapon.ID));
     	register(registry, new AspectedPhysicalWeapon().setRegistryName(AspectedPhysicalWeapon.ID));

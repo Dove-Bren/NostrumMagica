@@ -56,17 +56,17 @@ public class TextWidget extends MoveableObscurableWidget {
 	@Override
 	public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		final Minecraft mc = this.parent.getMinecraft();
-		final FontRenderer font = mc.fontRenderer;
+		final FontRenderer font = mc.font;
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(this.x, this.y, 0);
 		matrixStackIn.scale(scale, scale, 1f);
-		final int textWidth = font.func_243245_a(this.text.func_241878_f());
-		font.func_243248_b(matrixStackIn, this.text, centered ? -(textWidth/2) : 0, 0, color);
-		matrixStackIn.pop();
+		final int textWidth = font.width(this.text.getVisualOrderText());
+		font.draw(matrixStackIn, this.text, centered ? -(textWidth/2) : 0, 0, color);
+		matrixStackIn.popPose();
 		
 		final int actingWidth = (int) (textWidth * scale);
-		final int actingHeight = (int) (font.FONT_HEIGHT * scale);
+		final int actingHeight = (int) (font.lineHeight * scale);
 		final int actingX = centered ? (this.x - (textWidth/2)) : this.x;
 		this.isHovered = mouseX >= actingX && mouseY >= this.y && mouseX < actingX + actingWidth && mouseY < this.y + actingHeight;
 	}
@@ -74,10 +74,10 @@ public class TextWidget extends MoveableObscurableWidget {
 	@Override
 	public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 		if (this.isHovered() && this.tooltip != null) {
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 100);
-			parent.func_243308_b(matrixStackIn, tooltip, mouseX, mouseY);
-			matrixStackIn.pop();
+			parent.renderComponentTooltip(matrixStackIn, tooltip, mouseX, mouseY);
+			matrixStackIn.popPose();
 		}
 	}
 }

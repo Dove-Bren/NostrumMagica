@@ -8,6 +8,6 @@ public class BonusJumpAttribute extends RangedAttribute {
 	
 	public BonusJumpAttribute(String name) {
 		super(name, 0, 0D, 20.0D);
-		this.setShouldWatch(true);
+		this.setSyncable(true);
 	}
 }

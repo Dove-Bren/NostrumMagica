@@ -20,7 +20,7 @@ public class EffectGemRenderer extends EffectBubbleRenderer {
 	}
 	
 	public EffectGemRenderer(float yExtraOffset, Effect effect) {
-		this(yExtraOffset + GetDefaultOffset(effect.getEffectType()), GetDefaultOrbit(effect.getEffectType()), GetDefaultOrbitOffset(effect), effect.getLiquidColor());
+		this(yExtraOffset + GetDefaultOffset(effect.getCategory()), GetDefaultOrbit(effect.getCategory()), GetDefaultOrbitOffset(effect), effect.getColor());
 	}
 	
 	public EffectGemRenderer(Effect effect) {

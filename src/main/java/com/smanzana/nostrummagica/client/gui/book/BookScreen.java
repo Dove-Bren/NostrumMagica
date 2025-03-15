@@ -162,7 +162,7 @@ public class BookScreen extends Screen {
 	public void render(MatrixStack matrixStackIn, int parWidth, int parHeight, float p_73863_3_) {
 
 		RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-		Minecraft.getInstance().getTextureManager().bindTexture(background);
+		Minecraft.getInstance().getTextureManager().bind(background);
 		
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - TEXT_HEIGHT) / 2;
@@ -235,7 +235,7 @@ public class BookScreen extends Screen {
 	public void renderTooltipLines(MatrixStack matrixStackIn, List<String> lines, int x, int y) {
 		List<ITextProperties> text = new ArrayList<>(lines.size());
 		for (String raw : lines) {
-			text.add(ITextProperties.func_240652_a_(raw));
+			text.add(ITextProperties.of(raw));
 		}
 		this.renderWrappedToolTip(matrixStackIn, text, x, y, font);
 	}
@@ -322,7 +322,7 @@ public class BookScreen extends Screen {
                       && parY < y + height);
 
                 RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-                Minecraft.getInstance().getTextureManager().bindTexture(background);
+                Minecraft.getInstance().getTextureManager().bind(background);
                 int textureX = 0;
                 int textureY = 223;
 
@@ -369,7 +369,7 @@ public class BookScreen extends Screen {
                       && parY < y + height);
 
         		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                Minecraft.getInstance().getTextureManager().bindTexture(background);
+                Minecraft.getInstance().getTextureManager().bind(background);
                 int textureX = 48;
                 int textureY = 221;
 
@@ -384,7 +384,7 @@ public class BookScreen extends Screen {
         }
         
         public void playPressSound(SoundHandler soundHandlerIn) {
-        	soundHandlerIn.play(SimpleSound.master(NostrumMagicaSounds.UI_TICK.getEvent(), 1.0F));
+        	soundHandlerIn.play(SimpleSound.forUI(NostrumMagicaSounds.UI_TICK.getEvent(), 1.0F));
         }
 
 		@Override
@@ -401,8 +401,8 @@ public class BookScreen extends Screen {
 	 */
 	public static void makePagesFrom(List<IBookPage> pages, String input) {
 		Minecraft mc = Minecraft.getInstance();
-		FontRenderer fonter = mc.fontRenderer;
-		final int maxLines = (PAGE_HEIGHT / (LinedTextPage.LINE_HEIGHT_EXTRA + fonter.FONT_HEIGHT)) - 1;
+		FontRenderer fonter = mc.font;
+		final int maxLines = (PAGE_HEIGHT / (LinedTextPage.LINE_HEIGHT_EXTRA + fonter.lineHeight)) - 1;
 		String lines[];
 		int count;
 		StringBuffer buffer = new StringBuffer();
@@ -433,7 +433,7 @@ public class BookScreen extends Screen {
 					else
 						word = input.substring(0, pos + (newline ? 0 : 1));
 					
-					int width = fonter.getStringWidth(word);
+					int width = fonter.width(word);
 					if (length > 0 && length + width > PAGE_WIDTH) {
 						lines[count++] = buffer.toString();
 						buffer = new StringBuffer();

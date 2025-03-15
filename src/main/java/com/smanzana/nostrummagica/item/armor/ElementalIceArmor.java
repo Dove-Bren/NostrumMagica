@@ -54,8 +54,8 @@ public class ElementalIceArmor extends ElementalArmor {
 	}
 	
 	@Override
-	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-		if (this.isInGroup(group)) {
+	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+		if (this.allowdedIn(group)) {
 			items.add(new ItemStack(this));
 			
 			// Add an upgraded copy of true chestplates
@@ -72,11 +72,11 @@ public class ElementalIceArmor extends ElementalArmor {
 			return;
 		}
 		
-		if (event.getSource().getImmediateSource() instanceof SnowballEntity
-				&& event.getSource().getTrueSource() != null
-				&& event.getSource().getTrueSource() instanceof LivingEntity) {
+		if (event.getSource().getDirectEntity() instanceof SnowballEntity
+				&& event.getSource().getEntity() != null
+				&& event.getSource().getEntity() instanceof LivingEntity) {
 			// If shooter has full blizzard set...
-			final LivingEntity thrower = (LivingEntity) event.getSource().getTrueSource();
+			final LivingEntity thrower = (LivingEntity) event.getSource().getEntity();
 			final int blizzardCount = ElementalArmor.GetSetCount(thrower, EMagicElement.ICE, Type.MASTER);
 			if (blizzardCount == 4) {
 				// Either 'freeze' enemy, or heal ally
@@ -96,30 +96,30 @@ public class ElementalIceArmor extends ElementalArmor {
 						}
 					} else if (entity instanceof ArcaneWolfEntity) {
 						ArcaneWolfEntity wolf = (ArcaneWolfEntity) entity;
-						if (wolf.isTamed() && wolf.getOwner() == thrower) {
+						if (wolf.isTame() && wolf.getOwner() == thrower) {
 							wolf.addBond(1f);
 						}
 					}
 					
 					if (attr != null && attr.hasSkill(NostrumSkills.Ice_Adept)) {
 						if (NostrumMagica.rand.nextBoolean()) {
-							entity.addPotionEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1), 0));
+							entity.addEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1), 0));
 						}
 					}
-					event.getSource().getImmediateSource().remove();
+					event.getSource().getDirectEntity().remove();
 					event.setCanceled(true);
 					
-					NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
-							10, entity.getPosX(), entity.getPosY() + entity.getHeight()/2, entity.getPosZ(), 1,
+					NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
+							10, entity.getX(), entity.getY() + entity.getBbHeight()/2, entity.getZ(), 1,
 							40, 10,
-							entity.getEntityId()
+							entity.getId()
 							).gravity(true).color(EMagicElement.ICE.getColor()));
 				} else {
 					SpellDamage.DamageEntity(entity, EMagicElement.ICE, 1f, thrower);
-					entity.addPotionEffect(new EffectInstance(Effects.SLOWNESS, 20 * 15, 3));
+					entity.addEffect(new EffectInstance(Effects.MOVEMENT_SLOWDOWN, 20 * 15, 3));
 					
-					NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
-							10, entity.getPosX(), entity.getPosY() + entity.getHeight()/2, entity.getPosZ(), 0,
+					NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
+							10, entity.getX(), entity.getY() + entity.getBbHeight()/2, entity.getZ(), 0,
 							40, 10,
 							new Vector3d(0, .1, 0), new Vector3d(.1, .05, .1)
 							).gravity(true).color(EMagicElement.ICE.getColor()));

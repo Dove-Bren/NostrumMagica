@@ -32,11 +32,11 @@ public class ArcaneWolfBarrierGoal extends Goal {
 	}
 	
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		return wolf.isAlive()
-				&& !wolf.isSitting()
+				&& !wolf.isOrderedToSit()
 				&& wolf.getOwner() != null
-				&& wolf.ticksExisted >= cooldownTicks
+				&& wolf.tickCount >= cooldownTicks
 				&& wolf.getMana() >= manaCost
 				&& wolf.getElementalType() == ArcaneWolfElementalType.BARRIER;
 	}
@@ -45,7 +45,7 @@ public class ArcaneWolfBarrierGoal extends Goal {
 		LivingEntity owner = wolf.getOwner();
 		List<LivingEntity> tames = PetFuncs.GetTamedEntities(owner);
 		tames.add(owner);
-		tames.removeIf((e) -> { return e.getDistance(wolf) > 15;});
+		tames.removeIf((e) -> { return e.distanceTo(wolf) > 15;});
 		return tames;
 	}
 	
@@ -61,7 +61,7 @@ public class ArcaneWolfBarrierGoal extends Goal {
 		boolean applied = false;
 		
 		if (hasPhysical == hasMagical) {
-			doPhysical = wolf.getRNG().nextBoolean();
+			doPhysical = wolf.getRandom().nextBoolean();
 		} else {
 			doPhysical = !hasPhysical;
 		}
@@ -70,13 +70,13 @@ public class ArcaneWolfBarrierGoal extends Goal {
 			EffectInstance effect = new EffectInstance(NostrumEffects.physicalShield, 20 * 15, 0);
 			if (!hasPhysical) {
 				// Re-apply potion effect
-				target.addPotionEffect(effect);
+				target.addEffect(effect);
 				// Change out the amount though
 				NostrumMagica.magicEffectProxy.applyPhysicalShield(target, amtToAdd);
 				applied = true;
 			} else {
 				// Refresh potion effect
-				target.getActivePotionEffect(NostrumEffects.physicalShield).combine(effect);
+				target.getEffect(NostrumEffects.physicalShield).update(effect);
 				
 				if (currentPhysical.getAmt() < maxAmt) {
 					// Add 1 to current amount
@@ -88,13 +88,13 @@ public class ArcaneWolfBarrierGoal extends Goal {
 			EffectInstance effect = new EffectInstance(NostrumEffects.magicShield, 20 * 15, 0);
 			if (!hasMagical) {
 				// Re-apply potion effect
-				target.addPotionEffect(effect);
+				target.addEffect(effect);
 				// Change out the amount though
 				NostrumMagica.magicEffectProxy.applyMagicalShield(target, amtToAdd);
 				applied = true;
 			} else {
 				// Refresh potion effect
-				target.getActivePotionEffect(NostrumEffects.magicShield).combine(effect);
+				target.getEffect(NostrumEffects.magicShield).update(effect);
 				
 				if (currentMagical.getAmt() < maxAmt) {
 					// Add 1 to current amount
@@ -108,15 +108,15 @@ public class ArcaneWolfBarrierGoal extends Goal {
 	}
 	
 	@Override
-	public void startExecuting() {
+	public void start() {
 		boolean applied = false;
 		int backoff = 5;
 		List<LivingEntity> targets = this.getTargets(wolf);
 		for (LivingEntity target : targets) {
 			if (applyTo(wolf, target)) {
 				applied = true;
-				NostrumParticles.FILLED_ORB.spawn(wolf.world, new SpawnParams(
-						1, wolf.getPosX(), wolf.getPosY() + wolf.getHeight()/2, wolf.getPosZ(), 0, 40, 0, target.getEntityId()
+				NostrumParticles.FILLED_ORB.spawn(wolf.level, new SpawnParams(
+						1, wolf.getX(), wolf.getY() + wolf.getBbHeight()/2, wolf.getZ(), 0, 40, 0, target.getId()
 						).color(ArcaneWolfElementalType.BARRIER.getColor()));
 			}
 		}
@@ -125,7 +125,7 @@ public class ArcaneWolfBarrierGoal extends Goal {
 			wolf.addMana(-manaCost);
 			backoff = 20;
 		}
-		cooldownTicks = wolf.ticksExisted + backoff;
+		cooldownTicks = wolf.tickCount + backoff;
 	}
 
 }

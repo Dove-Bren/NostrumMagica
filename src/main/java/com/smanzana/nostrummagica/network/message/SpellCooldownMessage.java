@@ -27,13 +27,13 @@ public class SpellCooldownMessage {
 			return;
 		}
 		
-		Minecraft.getInstance().runAsync(() -> {
+		Minecraft.getInstance().submit(() -> {
 			if (message.spell == null) {
 				// Spell not found, so ignore
 				return;
 			}
 			
-			NostrumMagica.instance.getSpellCooldownTracker(player.world).overrideSpellCooldown(player, message.spell, message.cooldownTicks);
+			NostrumMagica.instance.getSpellCooldownTracker(player.level).overrideSpellCooldown(player, message.spell, message.cooldownTicks);
 		});
 	}
 		

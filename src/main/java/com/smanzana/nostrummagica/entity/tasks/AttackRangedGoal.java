@@ -11,6 +11,8 @@ import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.item.BowItem;
 import net.minecraft.util.Hand;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class AttackRangedGoal<T extends MobEntity> extends Goal
 {
 	protected final T entity;
@@ -29,7 +31,7 @@ public class AttackRangedGoal<T extends MobEntity> extends Goal
 		this.moveSpeedAmp = speedAmplifier;
 		this.attackCooldown = delay;
 		this.maxAttackDistance = maxDistance * maxDistance;
-		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+		this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 
 	public void setAttackCooldown(int cooldown) {
@@ -37,22 +39,22 @@ public class AttackRangedGoal<T extends MobEntity> extends Goal
 	}
 	
 	public boolean hasWeaponEquipped(T entity) {
-		return (!this.entity.getHeldItemMainhand().isEmpty() && this.entity.getHeldItemMainhand().getItem() instanceof BowItem)
-				|| (!this.entity.getHeldItemOffhand().isEmpty() && this.entity.getHeldItemOffhand().getItem() instanceof BowItem);
+		return (!this.entity.getMainHandItem().isEmpty() && this.entity.getMainHandItem().getItem() instanceof BowItem)
+				|| (!this.entity.getOffhandItem().isEmpty() && this.entity.getOffhandItem().getItem() instanceof BowItem);
 	}
 
 	/**
 	 * Returns whether the Goal should begin execution.
 	 */
-	public boolean shouldExecute() {
-		return this.entity.getAttackTarget() == null ? false : this.hasWeaponEquipped(entity);
+	public boolean canUse() {
+		return this.entity.getTarget() == null ? false : this.hasWeaponEquipped(entity);
 	}
 
 	/**
 	 * Returns whether an in-progress Goal should continue executing
 	 */
-	public boolean shouldContinueExecuting() {
-		return (this.shouldExecute() || !this.entity.getNavigator().noPath()) && this.hasWeaponEquipped(entity);
+	public boolean canContinueToUse() {
+		return (this.canUse() || !this.entity.getNavigation().isDone()) && this.hasWeaponEquipped(entity);
 	}
 	
 	/**
@@ -66,14 +68,14 @@ public class AttackRangedGoal<T extends MobEntity> extends Goal
 	 * Called when the target can attack if animation allowed. For skeleton's, this is 'using the bow' item
 	 */
 	protected void startAttackAnimation(T entity) {
-		entity.setActiveHand(Hand.MAIN_HAND);
+		entity.startUsingItem(Hand.MAIN_HAND);
 	}
 	
 	/**
 	 * Called after an attack is made. Note: the entity presumably still has a target. For skeletons, this is stopping 'using' the bow.
 	 */
 	protected void resetAttackAnimation(T entity) {
-		entity.resetActiveHand();
+		entity.stopUsingItem();
 	}
 	
 	/**
@@ -93,14 +95,14 @@ public class AttackRangedGoal<T extends MobEntity> extends Goal
 	}
 	
 	protected int getChargeTime(T entity) {
-		return entity.getItemInUseMaxCount();
+		return entity.getTicksUsingItem();
 	}
 
 	/**
 	 * Execute a one shot task or start executing a continuous task
 	 */
-	public void startExecuting() {
-		super.startExecuting();
+	public void start() {
+		super.start();
 		startAimAnimation(entity);
 		startedAttacking = false;
 	}
@@ -108,8 +110,8 @@ public class AttackRangedGoal<T extends MobEntity> extends Goal
 	/**
 	 * Resets the task
 	 */
-	public void resetTask() {
-		super.resetTask();
+	public void stop() {
+		super.stop();
 		this.seeTime = 0;
 		this.attackTime = -1;
 		resetAllAnimation(entity);
@@ -118,7 +120,7 @@ public class AttackRangedGoal<T extends MobEntity> extends Goal
 	public void attackTarget(T entity, LivingEntity target, int chargeCount) {
 		if (entity instanceof IRangedAttackMob) {
 			IRangedAttackMob mob = (IRangedAttackMob) this.entity;
-			mob.attackEntityWithRangedAttack(target, BowItem.getArrowVelocity(chargeCount));
+			mob.performRangedAttack(target, BowItem.getPowerForTime(chargeCount));
 		} else {
 			NostrumMagica.logger.error("EntityAIAttackRanged tried to attack, but provided entity has no attack");
 		}
@@ -129,11 +131,11 @@ public class AttackRangedGoal<T extends MobEntity> extends Goal
 	 * Updates the task
 	 */
 	public void tick() {
-		LivingEntity entitylivingbase = this.entity.getAttackTarget();
+		LivingEntity entitylivingbase = this.entity.getTarget();
 
 		if (entitylivingbase != null) {
-			double d0 = this.entity.getDistanceSq(entitylivingbase.getPosX(), entitylivingbase.getBoundingBox().minY, entitylivingbase.getPosZ());
-			boolean flag = this.entity.getEntitySenses().canSee(entitylivingbase);
+			double d0 = this.entity.distanceToSqr(entitylivingbase.getX(), entitylivingbase.getBoundingBox().minY, entitylivingbase.getZ());
+			boolean flag = this.entity.getSensing().canSee(entitylivingbase);
 			boolean flag1 = this.seeTime > 0;
 
 			if (flag != flag1) {
@@ -147,19 +149,19 @@ public class AttackRangedGoal<T extends MobEntity> extends Goal
 			}
 
 			if (d0 <= (double)this.maxAttackDistance && this.seeTime >= 20) {
-				this.entity.getNavigator().clearPath();
+				this.entity.getNavigation().stop();
 				++this.strafingTime;
 			} else {
-				this.entity.getNavigator().tryMoveToEntityLiving(entitylivingbase, this.moveSpeedAmp);
+				this.entity.getNavigation().moveTo(entitylivingbase, this.moveSpeedAmp);
 				this.strafingTime = -1;
 			}
 
 			if (this.strafingTime >= 20) {
-				if ((double)this.entity.getRNG().nextFloat() < 0.3D) {
+				if ((double)this.entity.getRandom().nextFloat() < 0.3D) {
 					this.strafingClockwise = !this.strafingClockwise;
 				}
 
-				if ((double)this.entity.getRNG().nextFloat() < 0.3D) {
+				if ((double)this.entity.getRandom().nextFloat() < 0.3D) {
 					this.strafingBackwards = !this.strafingBackwards;
 				}
 
@@ -173,10 +175,10 @@ public class AttackRangedGoal<T extends MobEntity> extends Goal
 					this.strafingBackwards = true;
 				}
 
-				this.entity.getMoveHelper().strafe(this.strafingBackwards ? -0.5F : 0.5F, this.strafingClockwise ? 0.5F : -0.5F);
-				this.entity.faceEntity(entitylivingbase, 30.0F, 30.0F);
+				this.entity.getMoveControl().strafe(this.strafingBackwards ? -0.5F : 0.5F, this.strafingClockwise ? 0.5F : -0.5F);
+				this.entity.lookAt(entitylivingbase, 30.0F, 30.0F);
 			} else {
-				this.entity.getLookController().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
+				this.entity.getLookControl().setLookAt(entitylivingbase, 30.0F, 30.0F);
 			}
 			
 			if (startedAttacking) {

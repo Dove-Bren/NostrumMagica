@@ -33,8 +33,8 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 	
 	public static final String ID = "entity_dragon_egg";
 	
-	protected static final DataParameter<Float> HEAT  = EntityDataManager.<Float>createKey(DragonEggEntity.class, DataSerializers.FLOAT);
-	protected static final DataParameter<Optional<UUID>> PLAYER  = EntityDataManager.<Optional<UUID>>createKey(DragonEggEntity.class, DataSerializers.OPTIONAL_UNIQUE_ID);
+	protected static final DataParameter<Float> HEAT  = EntityDataManager.<Float>defineId(DragonEggEntity.class, DataSerializers.FLOAT);
+	protected static final DataParameter<Optional<UUID>> PLAYER  = EntityDataManager.<Optional<UUID>>defineId(DragonEggEntity.class, DataSerializers.OPTIONAL_UUID);
 	
 	private static final String NBT_AGE_TIMER = "age";
 	private static final String NBT_DRAGON_TYPE = "spawn_type";
@@ -56,57 +56,57 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 		this(type, worldIn);
 		this.spawnData = spawnData;
 		
-		if (player != null && !worldIn.isRemote) {
-			this.setPlayerUUID(player.getUniqueID());
+		if (player != null && !worldIn.isClientSide) {
+			this.setPlayerUUID(player.getUUID());
 		}
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
+	protected void defineSynchedData() {
+		super.defineSynchedData();
 		
-		this.dataManager.register(HEAT, HEAT_MAX);
-		this.dataManager.register(PLAYER, Optional.<UUID>empty());
+		this.entityData.define(HEAT, HEAT_MAX);
+		this.entityData.define(PLAYER, Optional.<UUID>empty());
 	}
 
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		return MobEntity.func_233666_p_()
-				.createMutableAttribute(Attributes.MAX_HEALTH, 2D)
-				.createMutableAttribute(Attributes.ARMOR, 0D);
+		return MobEntity.createMobAttributes()
+				.add(Attributes.MAX_HEALTH, 2D)
+				.add(Attributes.ARMOR, 0D);
 	}
 	
 	
 	@Override
-	public void applyKnockback(float strenght, double xRatio, double zRatio) {
+	public void knockback(float strenght, double xRatio, double zRatio) {
 		return; // Do not get knocked around
 	}
 	
 	@Override
-	public boolean onLivingFall(float distance, float damageMultiplier) {
-		return this.attackEntityFrom(DamageSource.FALL, 9999f);
+	public boolean causeFallDamage(float distance, float damageMultiplier) {
+		return this.hurt(DamageSource.FALL, 9999f);
 	}
 	
 	@Override
-	public boolean canBePushed() {
+	public boolean isPushable() {
 		return false;
 	}
 	
 	@Override
-	public void applyEntityCollision(Entity entityIn) {
+	public void push(Entity entityIn) {
 		return;
 	}
 	
 	@Override
-	protected void collideWithEntity(Entity entity) {
+	protected void doPush(Entity entity) {
 		if (entity instanceof ITameDragon || entity instanceof PlayerEntity) {
 			
 		} else {
-			super.collideWithEntity(entity);
+			super.doPush(entity);
 		}
 	}
 	
 	@Override
-	protected void collideWithNearbyEntities() {
+	protected void pushEntities() {
 		
 	}
 	
@@ -116,15 +116,15 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 	}
 	
 	@Override
-	public void writeAdditional(CompoundNBT compound) {
-		super.writeAdditional(compound);
+	public void addAdditionalSaveData(CompoundNBT compound) {
+		super.addAdditionalSaveData(compound);
 		
 		compound.putFloat(NBT_HEAT, this.getHeat());
 		compound.putInt(NBT_AGE_TIMER, ageTimer);
 		
 		UUID playerID = getPlayerID();
 		if (playerID != null) {
-			compound.putUniqueId(NBT_PLAYER, getPlayerID());
+			compound.putUUID(NBT_PLAYER, getPlayerID());
 		}
 		
 		if (this.spawnData != null) {
@@ -136,8 +136,8 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 	}
 	
 	@Override
-	public void readAdditional(CompoundNBT compound) {
-		super.readAdditional(compound);
+	public void readAdditionalSaveData(CompoundNBT compound) {
+		super.readAdditionalSaveData(compound);
 		
 		if (compound.contains(NBT_HEAT)) {
 			this.setHeat(compound.getFloat(NBT_HEAT));
@@ -147,8 +147,8 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 			this.ageTimer = compound.getInt(NBT_AGE_TIMER);
 		}
 		
-		if (compound.hasUniqueId(NBT_PLAYER)) {
-			this.setPlayerUUID(compound.getUniqueId(NBT_PLAYER));
+		if (compound.hasUUID(NBT_PLAYER)) {
+			this.setPlayerUUID(compound.getUUID(NBT_PLAYER));
 		}
 		
 		if (compound.contains(NBT_DRAGON_TYPE)) {
@@ -158,17 +158,17 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 	}
 	
 	@Override
-	public void livingTick() {
-		super.livingTick();
+	public void aiStep() {
+		super.aiStep();
 		
 		if (this.isAlive() && !this.dead) {
-			if (!world.isRemote && this.ticksExisted > 20) {
+			if (!level.isClientSide && this.tickCount > 20) {
 				float heatLoss = .05f;
 				
-				if (world.isRainingAt(getPosition())) {
+				if (level.isRainingAt(blockPosition())) {
 					heatLoss = .1f;
-				} else if (world.getLight(this.getPosition()) > 8) {
-					if (world.getBlockState(getPosition().add(0, -1, 0)).getBlock() instanceof HayBlock) {
+				} else if (level.getMaxLocalRawBrightness(this.blockPosition()) > 8) {
+					if (level.getBlockState(blockPosition().offset(0, -1, 0)).getBlock() instanceof HayBlock) {
 						heatLoss = 0f;
 					}
 				}
@@ -178,10 +178,10 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 				if (this.getHeat() <= 0f) {
 					PlayerEntity player = this.getPlayer();
 					if (player != null) {
-						player.sendMessage(new TranslationTextComponent("info.egg.death.cold"), Util.DUMMY_UUID);
+						player.sendMessage(new TranslationTextComponent("info.egg.death.cold"), Util.NIL_UUID);
 					}
 					
-					this.attackEntityFrom(DamageSource.STARVE, 9999f);
+					this.hurt(DamageSource.STARVE, 9999f);
 				} else if (this.ageTimer-- <= 0) {
 					// HATCH
 					this.hatch();
@@ -195,26 +195,26 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 		PlayerEntity player = null;
 		
 		if (id != null) {
-			player = this.world.getPlayerByUuid(id);
+			player = this.level.getPlayerByUUID(id);
 		}
 		
 		return player;
 	}
 	
 	protected UUID getPlayerID() {
-		return dataManager.get(PLAYER).orElse(null);
+		return entityData.get(PLAYER).orElse(null);
 	}
 	
 	private void setPlayerUUID(UUID id) {
-		dataManager.set(PLAYER, Optional.ofNullable(id));
+		entityData.set(PLAYER, Optional.ofNullable(id));
 	}
 	
 	public float getHeat() {
-		return this.dataManager.get(HEAT);
+		return this.entityData.get(HEAT);
 	}
 	
 	protected void setHeat(float heat) {
-		this.dataManager.set(HEAT, Math.max(0, Math.min(HEAT_MAX, heat)));
+		this.entityData.set(HEAT, Math.max(0, Math.min(HEAT_MAX, heat)));
 	}
 	
 	public void heatUp() {
@@ -229,11 +229,11 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 	private void hatch() {
 		
 		if (this.spawnData != null) {
-			this.world.addEntity((LivingEntity) this.spawnData.spawnDragon(world, getPosX(), getPosY(), getPosZ()));
+			this.level.addFreshEntity((LivingEntity) this.spawnData.spawnDragon(level, getX(), getY(), getZ()));
 			
 			PlayerEntity player = this.getPlayer();
 			if (player != null) {
-				player.sendMessage(new TranslationTextComponent("info.egg.hatch"), Util.DUMMY_UUID);
+				player.sendMessage(new TranslationTextComponent("info.egg.hatch"), Util.NIL_UUID);
 			}
 		}
 		

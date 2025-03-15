@@ -62,19 +62,19 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 	private static final float STAB_RANGE = 3f;
 	
 	public SoulDagger() {
-		super(ItemTier.IRON, 3, -2.4F, NostrumItems.PropEquipment().maxDamage(500));
+		super(ItemTier.IRON, 3, -2.4F, NostrumItems.PropEquipment().durability(500));
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
         Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 
         if (equipmentSlot == EquipmentSlotType.MAINHAND)
         {
         	ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 			builder.putAll(multimap);
-            builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", 3, AttributeModifier.Operation.ADDITION));
-            builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -2D, AttributeModifier.Operation.ADDITION));
+            builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 3, AttributeModifier.Operation.ADDITION));
+            builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", -2D, AttributeModifier.Operation.ADDITION));
             multimap = builder.build();
         }
 
@@ -108,7 +108,7 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 	}
 	
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return !repair.isEmpty() && NostrumTags.Items.CrystalSmall.contains(repair.getItem());
     }
 
@@ -121,8 +121,8 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 //		tooltip.add("Magic Potency Bonus: 20%");
 		tooltip.add(new StringTextComponent("Mana Cost Reduction: 5%"));
 		tooltip.add(new TranslationTextComponent("item.nostrummagica.soul_dagger.desc"));
@@ -130,14 +130,14 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 	
 	@Override
 	protected void fireChargedWeapon(World worldIn, LivingEntity entityLiving, Hand hand, ItemStack stack) {
-		if (worldIn.isRemote()) {
+		if (worldIn.isClientSide()) {
 			return;
 		}
 		
 		// Do forward attack
 		//vfx
 		{
-			NostrumMagicaSounds.HEAVY_STRIKE.play(null, entityLiving.world, entityLiving.getPositionVec().add(0f, entityLiving.getEyeHeight(), 0).add(entityLiving.getLook(.5f)));
+			NostrumMagicaSounds.HEAVY_STRIKE.play(null, entityLiving.level, entityLiving.position().add(0f, entityLiving.getEyeHeight(), 0).add(entityLiving.getViewVector(.5f)));
 		}
 		// actual effects
 		{
@@ -154,7 +154,7 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 	}
 	
 	protected List<LivingEntity> findStabTargets(World worldIn, LivingEntity wielder, ItemStack dagger) {
-		RayTraceResult mop = RayTrace.raytrace(wielder.world, wielder, wielder.getEyePosition(.5f), wielder.getLook(.5f), STAB_RANGE, new RayTrace.OtherLiving(wielder));
+		RayTraceResult mop = RayTrace.raytrace(wielder.level, wielder, wielder.getEyePosition(.5f), wielder.getViewVector(.5f), STAB_RANGE, new RayTrace.OtherLiving(wielder));
 		if (mop == null || mop.getType() != RayTraceResult.Type.ENTITY) {
 			return new ArrayList<>();
 		} else {
@@ -169,11 +169,11 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 	}
 	
 	protected boolean doSpecialWolfStab(LivingEntity stabber, WolfEntity wolf, ItemStack dagger) {
-		if (wolf.getActivePotionEffect(NostrumEffects.nostrumTransformation) != null
+		if (wolf.getEffect(NostrumEffects.nostrumTransformation) != null
 				&& stabber instanceof PlayerEntity
-				&& wolf.isOwner(stabber)) {
+				&& wolf.isOwnedBy(stabber)) {
 			// Wolves get transformed into arcane wolves!
-			wolf.playSound(SoundEvents.ENTITY_WOLF_HOWL, 1f, 1f);
+			wolf.playSound(SoundEvents.WOLF_HOWL, 1f, 1f);
 			ArcaneWolfEntity.TransformWolf(wolf, (PlayerEntity) stabber);
 			return true;
 		}
@@ -228,26 +228,26 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 //				ClientEffectRenderer.instance().addEffect(effect);
 //			}
 //		}
-		NostrumMagica.instance.proxy.playPredefinedEffect(PredefinedEffect.SOUL_DAGGER_STAB, durationTicks, target.world, target);
+		NostrumMagica.instance.proxy.playPredefinedEffect(PredefinedEffect.SOUL_DAGGER_STAB, durationTicks, target.level, target);
 		
-		float damage = 6.0f + EnchantmentHelper.getModifierForCreature(dagger, target.getCreatureAttribute());
+		float damage = 6.0f + EnchantmentHelper.getDamageBonus(dagger, target.getMobType());
 		
 		final boolean hit;
 		if (attacker instanceof PlayerEntity) {
-			hit = target.attackEntityFrom(DamageSource.causePlayerDamage((PlayerEntity)attacker), damage);
+			hit = target.hurt(DamageSource.playerAttack((PlayerEntity)attacker), damage);
 		} else {
-			hit = target.attackEntityFrom(DamageSource.causeMobDamage(attacker), damage);
+			hit = target.hurt(DamageSource.mobAttack(attacker), damage);
 		}
 		
 		if (hit) {
-			target.hurtResistantTime = 0;
+			target.invulnerableTime = 0;
 			target.setInvulnerable(false);
 			
-			target.addPotionEffect(new EffectInstance(Effects.SLOWNESS, durationTicks, 6));
+			target.addEffect(new EffectInstance(Effects.MOVEMENT_SLOWDOWN, durationTicks, 6));
 			// Effects:
 			{
-				NostrumParticles.GLOW_ORB.spawn(attacker.world, new SpawnParams(
-						30, target.getPosX(), target.getPosY() + target.getHeight(), target.getPosZ(), .5, 60, 20,
+				NostrumParticles.GLOW_ORB.spawn(attacker.level, new SpawnParams(
+						30, target.getX(), target.getY() + target.getBbHeight(), target.getZ(), .5, 60, 20,
 						new Vector3d(0, .05, 0), new Vector3d(.1, 0, .1)
 						).color(.6f, .6f, 0f, 0f).dieOnTarget(true).gravity(.1f));
 			}
@@ -274,14 +274,14 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 					}
 					attrSelf.addMana(manaDrawn);
 					
-					NostrumParticles.FILLED_ORB.spawn(attacker.world, new SpawnParams(
-							50, target.getPosX(), target.getPosY() + target.getHeight(), target.getPosZ(), .5, 60, 0,
-							attacker.getEntityId()
+					NostrumParticles.FILLED_ORB.spawn(attacker.level, new SpawnParams(
+							50, target.getX(), target.getY() + target.getBbHeight(), target.getZ(), .5, 60, 0,
+							attacker.getId()
 							).color(1f, .4f, .8f, 1f).dieOnTarget(true));
 				}
 			}
 			
-			EffectInstance effect = attacker.getActivePotionEffect(NostrumEffects.soulVampire);
+			EffectInstance effect = attacker.getEffect(NostrumEffects.soulVampire);
 			if (effect != null && effect.getDuration() > 0) {
 				attacker.heal(damage);
 			}

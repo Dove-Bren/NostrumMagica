@@ -34,12 +34,12 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	public ParticleGlowOrb(ClientWorld worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
-		particleRed = red;
-		particleGreen = green;
-		particleBlue = blue;
-		particleAlpha = 0f;
+		rCol = red;
+		gCol = green;
+		bCol = blue;
+		alpha = 0f;
 		this.maxAlpha = alpha;
-		maxAge = lifetime;
+		lifetime = lifetime;
 		fixedRandom = -1f;
 	}
 	
@@ -48,7 +48,7 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	}
 	
 	public ParticleGlowOrb setGravityStrength(float strength) {
-		particleGravity = strength;
+		gravity = strength;
 		return this;
 	}
 	
@@ -66,17 +66,17 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	
 	public ParticleGlowOrb setMotion(double xVelocity, double yVelocity, double zVelocity,
 			double xJitter, double yJitter, double zJitter) {
-		this.motionX = xVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter; // +- jitter
-		this.motionY = yVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter;
-		this.motionZ = zVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter;
+		this.xd = xVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter; // +- jitter
+		this.yd = yVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter;
+		this.zd = zVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter;
 		return this;
 	}
 	
 	public ParticleGlowOrb setTarget(Entity ent) {
 		targetEntity = ent;
 		if (this.targetPos == null && ent != null) {
-			final double wRad = ent.getWidth() * 2; // double width
-			final double hRad = ent.getHeight();
+			final double wRad = ent.getBbWidth() * 2; // double width
+			final double hRad = ent.getBbHeight();
 			this.targetPos = new Vector3d(wRad * (NostrumMagica.rand.nextDouble() - .5),
 					hRad * (NostrumMagica.rand.nextDouble() - .5),
 					wRad * (NostrumMagica.rand.nextDouble() - .5));
@@ -155,20 +155,20 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 		
 		if (this.age < 20) {
 			// fade in in first second
-			this.particleAlpha = ((float) age / 20f);
-		} else if (this.age >= this.maxAge - 20f) {
+			this.alpha = ((float) age / 20f);
+		} else if (this.age >= this.lifetime - 20f) {
 			// Fade out in last second
-			this.particleAlpha = ((float) (maxAge - age) / 20f);
+			this.alpha = ((float) (lifetime - age) / 20f);
 		} else {
-			this.particleAlpha = 1f;
+			this.alpha = 1f;
 		}
 		
-		this.particleAlpha *= maxAlpha;
+		this.alpha *= maxAlpha;
 		
 		// If we orbit, this is the radius
 		final float orbitRadius = this.orbitRadius != 0 ? this.orbitRadius
 				: (this.targetEntity != null
-					? this.targetEntity.getWidth() * 2
+					? this.targetEntity.getBbWidth() * 2
 					: 1);
 		final double randomOrbitOffset = this.fixedRandom() * 2 * Math.PI;
 		
@@ -180,27 +180,27 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 					period = 20f;
 					//offset = targetPos == null ? Vector3d.ZERO : targetPos.rotateYaw((float) (Math.PI * 2 * ((float) age % period) / period))
 					offset = Vector3d.ZERO
-							.add(0, targetEntity.getHeight()/2, 0);
+							.add(0, targetEntity.getBbHeight()/2, 0);
 				} else if (this.entityBehavior == TargetBehavior.ORBIT) {
 					period = 20f;
 					final float rot = (float) ((Math.PI * 2 * ((float) age % period) / period) + randomOrbitOffset);
-					offset = (new Vector3d(orbitRadius, 0, 0)).rotateYaw((float) rot)
-							.add(0, (targetEntity.getHeight()/2) + (targetPos == null ? 0 : targetPos.y), 0);
+					offset = (new Vector3d(orbitRadius, 0, 0)).yRot((float) rot)
+							.add(0, (targetEntity.getBbHeight()/2) + (targetPos == null ? 0 : targetPos.y), 0);
 					
 					// do this better
-					if (this.particleGravity != 0f) {
+					if (this.gravity != 0f) {
 						if (targetPos == null) {
 							targetPos = Vector3d.ZERO;
 						}
-						targetPos = targetPos.add(0, -this.particleGravity, 0);
+						targetPos = targetPos.add(0, -this.gravity, 0);
 					}
 				} else {
 					throw new RuntimeException("Unsupported particle behavior");
 				}
-				Vector3d curVelocity = new Vector3d(this.motionX, this.motionY, this.motionZ);
-				Vector3d posDelta = targetEntity.getPositionVec()
+				Vector3d curVelocity = new Vector3d(this.xd, this.yd, this.zd);
+				Vector3d posDelta = targetEntity.position()
 						.add(offset.x, offset.y, offset.z)
-						.subtract(posX, posY, posZ);
+						.subtract(x, y, z);
 				Vector3d idealVelocity = posDelta.normalize().scale(.3);
 				this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 			}
@@ -211,18 +211,18 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 				finalTargetPos = targetPos.add(0, yOffset, 0);
 			} else {
 				// Make this rotate around based on offset
-				if (targetPos.subtract(posX, posY, posZ).length() <= orbitRadius) {
+				if (targetPos.subtract(x, y, z).length() <= orbitRadius) {
 					// Close enough to orbit
 					final double period = 20 * Math.max(1, orbitRadius / .5); // slow down the bigger the radius
 					final double rot = (Math.PI * 2 * ((float) age % period) / period) + randomOrbitOffset;
-					finalTargetPos = targetPos.add(new Vector3d(orbitRadius, yOffset, 0).rotateYaw((float) rot));
+					finalTargetPos = targetPos.add(new Vector3d(orbitRadius, yOffset, 0).yRot((float) rot));
 				} else {
 					finalTargetPos = targetPos.add(0, yOffset, 0);
 				}
 			}
 			
-			Vector3d curVelocity = new Vector3d(this.motionX, this.motionY, this.motionZ);
-			Vector3d posDelta = finalTargetPos.subtract(posX, posY, posZ);
+			Vector3d curVelocity = new Vector3d(this.xd, this.yd, this.zd);
+			Vector3d posDelta = finalTargetPos.subtract(x, y, z);
 			Vector3d idealVelocity = posDelta.normalize().scale(.3);
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 		}
@@ -244,7 +244,7 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 				particle = new ParticleGlowOrb(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime);
 				
 				if (params.targetEntID != null) {
-					particle.setTarget(world.getEntityByID(params.targetEntID));
+					particle.setTarget(world.getEntity(params.targetEntID));
 				}
 				if (params.targetPos != null) {
 					particle.setTarget(params.targetPos);
@@ -259,7 +259,7 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 				particle.setEntityBehavior(params.targetBehavior);
 				particle.setOrbitRadius(params.orbitRadius);
 				Minecraft mc = Minecraft.getInstance();
-				mc.particles.addEffect(particle);
+				mc.particleEngine.add(particle);
 			}
 			return particle;
 		}

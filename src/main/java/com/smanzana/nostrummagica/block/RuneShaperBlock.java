@@ -26,8 +26,8 @@ public class RuneShaperBlock extends Block {
 	public static final String ID = "rune_shaper";
 	
 	public RuneShaperBlock() {
-		super(Block.Properties.create(Material.WOOD)
-				.hardnessAndResistance(2.0f, 10.0f)
+		super(Block.Properties.of(Material.WOOD)
+				.strength(2.0f, 10.0f)
 				.sound(SoundType.WOOD)
 				.harvestTool(ToolType.AXE)
 				.harvestLevel(0)
@@ -35,13 +35,13 @@ public class RuneShaperBlock extends Block {
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 		return false;
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		RuneShaperTileEntity te = (RuneShaperTileEntity) worldIn.getTileEntity(pos);
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		RuneShaperTileEntity te = (RuneShaperTileEntity) worldIn.getBlockEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(player, RuneShaperGui.RuneShaperContainer.Make(te));
 		
 		return ActionResultType.SUCCESS;
@@ -58,30 +58,30 @@ public class RuneShaperBlock extends Block {
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			destroy(worldIn, pos, state);
-			worldIn.removeTileEntity(pos);
+			worldIn.removeBlockEntity(pos);
 		}
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
-		TileEntity ent = world.getTileEntity(pos);
+		TileEntity ent = world.getBlockEntity(pos);
 		if (ent == null || !(ent instanceof RuneShaperTileEntity))
 			return;
 		
 		RuneShaperTileEntity table = (RuneShaperTileEntity) ent;
-		for (int i = 0; i < table.getSizeInventory(); i++) {
-			if (table.getStackInSlot(i) != null) {
+		for (int i = 0; i < table.getContainerSize(); i++) {
+			if (table.getItem(i) != null) {
 				ItemEntity item = new ItemEntity(
 						world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
-						table.removeStackFromSlot(i));
-				world.addEntity(item);
+						table.removeItemNoUpdate(i));
+				world.addFreshEntity(item);
 			}
 		}
 		

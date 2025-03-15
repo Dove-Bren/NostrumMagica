@@ -50,7 +50,7 @@ public class SpellCraftPatternAutoRenderer implements ISpellCraftPatternRenderer
 			int height, float red, float green, float blue, float alpha) {
 		ResourceLocation texture = getTexture(pattern.getRegistryName());
 		
-		Minecraft.getInstance().getTextureManager().bindTexture(texture);
+		Minecraft.getInstance().getTextureManager().bind(texture);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 0, 0, 32, 32, width, height, 32, 32, red, green, blue, alpha);
 	}
 
@@ -59,7 +59,7 @@ public class SpellCraftPatternAutoRenderer implements ISpellCraftPatternRenderer
 			int height, float red, float green, float blue, float alpha) {
 		ResourceLocation texture = getTexture(pattern.getRegistryName());
 		
-		final IVertexBuilder buffer = bufferIn.getBuffer(RenderType.getEntityCutoutNoCull(texture));
+		final IVertexBuilder buffer = bufferIn.getBuffer(RenderType.entityCutoutNoCull(texture));
 		RenderFuncs.drawScaledCustomSizeModalRect(matrixStackIn, buffer, 0, 0, 0, 0, 32, 32, width, height, 32, 32, red, green, blue, alpha);
 	}
 

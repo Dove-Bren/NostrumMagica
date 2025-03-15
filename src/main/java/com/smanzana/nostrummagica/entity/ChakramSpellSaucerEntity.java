@@ -22,7 +22,7 @@ public class ChakramSpellSaucerEntity extends SpellSaucerEntity {
 	protected ChakramSpellSaucerEntity(EntityType<? extends ChakramSpellSaucerEntity> type, ISpellProjectileShape trigger, World world, LivingEntity shooter,
 			Vector3d from, Vector3d direction,
 			float speedFactor, double maxDistance) {
-		super(type, trigger, shooter.world, shooter, from, direction, speedFactor, maxDistance, -1);
+		super(type, trigger, shooter.level, shooter, from, direction, speedFactor, maxDistance, -1);
 //		direction = direction.normalize();
 //		
 //		this.setLocationAndAngles(fromX, fromY, fromZ, this.rotationYaw, this.rotationPitch);
@@ -57,14 +57,14 @@ public class ChakramSpellSaucerEntity extends SpellSaucerEntity {
 	public ChakramSpellSaucerEntity(ISpellProjectileShape trigger, World world, LivingEntity shooter,
 			Vector3d from, Vector3d direction,
 			float speedFactor, double maxDistance) {
-		super(NostrumEntityTypes.chakramSpellSaucer, trigger, shooter.world, shooter, from, direction, speedFactor, maxDistance, -1);
+		super(NostrumEntityTypes.chakramSpellSaucer, trigger, shooter.level, shooter, from, direction, speedFactor, maxDistance, -1);
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
 		
-		if (!world.isRemote) {
+		if (!level.isClientSide) {
 			
 			if (origin == null) {
 				// We got loaded...
@@ -78,7 +78,7 @@ public class ChakramSpellSaucerEntity extends SpellSaucerEntity {
 //			this.setMotion(this.getMotion().add(accel.x, accel.y, accel.z));
 //	        
 //			RayTraceResult raytraceresult = this.ticksInAir >= 25
-//						? ProjectileHelper.func_234618_a_(this, (ent) -> ent != this.shootingEntity)
+//						? ProjectileHelper.getHitResult(this, (ent) -> ent != this.shootingEntity)
 //						: null;
 //			
 //			// Also calc pitch and yaw

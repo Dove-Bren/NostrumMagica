@@ -32,17 +32,17 @@ public class VanillaEffectSyncMessage {
 		this.effect = effect;
 		this.instance = instance;
 		
-		if (instance != null && instance.getPotion() != effect) {
+		if (instance != null && instance.getEffect() != effect) {
 			throw new RuntimeException("Effect and instance effect do not match.");
 		}
 	}
 
 	public VanillaEffectSyncMessage(int entityID, @Nonnull EffectInstance effect) {
-		this(entityID, effect.getPotion(), effect);
+		this(entityID, effect.getEffect(), effect);
 	}
 
 	public VanillaEffectSyncMessage(Entity entity, @Nonnull EffectInstance effect) {
-		this(entity.getEntityId(), effect.getPotion(), effect);
+		this(entity.getId(), effect.getEffect(), effect);
 	}
 	
 	public VanillaEffectSyncMessage(int entityID, @Nonnull Effect effect) {
@@ -50,30 +50,30 @@ public class VanillaEffectSyncMessage {
 	}
 	
 	public VanillaEffectSyncMessage(Entity entity, @Nonnull Effect effect) {
-		this(entity.getEntityId(), effect, null);
+		this(entity.getId(), effect, null);
 	}
 
 	public static void handle(VanillaEffectSyncMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
 		ctx.get().enqueueWork(() -> {
 			final Minecraft mc = Minecraft.getInstance();
-			if (mc.world == null) {
+			if (mc.level == null) {
 				return;
 			}
 			
-			@Nullable Entity ent = mc.world.getEntityByID(message.entityID);
+			@Nullable Entity ent = mc.level.getEntity(message.entityID);
 			if (ent == null || !(ent instanceof LivingEntity)) {
 				return;
 			}
 			
 			LivingEntity living = (LivingEntity) ent;
 			if (message.instance == null) {
-				living.removePotionEffect(message.effect);
+				living.removeEffect(message.effect);
 			} else {
-				if (!living.addPotionEffect(message.instance)) {
+				if (!living.addEffect(message.instance)) {
 					// Force it
-					living.removePotionEffect(message.effect);
-					living.addPotionEffect(message.instance);
+					living.removeEffect(message.effect);
+					living.addEffect(message.instance);
 				}
 			}
 		});
@@ -82,7 +82,7 @@ public class VanillaEffectSyncMessage {
 	public static VanillaEffectSyncMessage decode(PacketBuffer buf) {
 		final int entityID = buf.readVarInt();
 		final int effectID = buf.readVarInt();
-		final Effect effect = Effect.get(effectID);
+		final Effect effect = Effect.byId(effectID);
 		if (effect == null) {
 			throw new RuntimeException("Unrecognized effect in sync message: " + effectID);
 		}

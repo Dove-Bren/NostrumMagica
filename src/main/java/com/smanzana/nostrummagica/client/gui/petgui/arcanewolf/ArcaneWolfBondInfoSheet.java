@@ -36,12 +36,12 @@ public class ArcaneWolfBondInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 	@Override
 	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
-		FontRenderer fonter = mc.fontRenderer;
+		FontRenderer fonter = mc.font;
 		int x = 0;
 		int y = 5;
 		final int infoColor = 0xFFFFFFFF;
 		final int capabilityColor = 0xFFFFA0FF;
-		final int h = fonter.FONT_HEIGHT;
+		final int h = fonter.lineHeight;
 		String str;
 		String untrans;
 		
@@ -57,7 +57,7 @@ public class ArcaneWolfBondInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 			}
 		}
 		
-		str = I18n.format(untrans, new Object[0]);
+		str = I18n.get(untrans, new Object[0]);
 		x = 5;
 		
 		RenderFuncs.drawSplitString(matrixStackIn, fonter, str, x, y, width - (x * 2), infoColor);
@@ -67,8 +67,8 @@ public class ArcaneWolfBondInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		
 		for (WolfBondCapability cap : capabilities) {
 			if (wolf.hasWolfCapability(cap)) {
-				str = I18n.format("info.tamed_arcane_wolf.capability." + cap.getKey());
-				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
+				str = I18n.get("info.tamed_arcane_wolf.capability." + cap.getKey());
+				fonter.draw(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			} else {
 				break;

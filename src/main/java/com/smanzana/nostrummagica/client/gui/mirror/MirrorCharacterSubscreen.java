@@ -66,16 +66,16 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 		// Set up sections
 		// Basic stats section
 		final Minecraft mc = Minecraft.getInstance();
-		final FontRenderer font = mc.fontRenderer;
+		final FontRenderer font = mc.font;
 		final Screen helper = parent.getGuiHelper();
 		final int leftMargin = guiLeft + 16;
 
 		int y = guiTop + 56;
 		parent.addWidget(new SectionLabel("Characteristics", font, leftMargin, y, width - 30, 20));
-		y += font.FONT_HEIGHT + 4;
+		y += font.lineHeight + 4;
 		{
 			final float scale = .5f;
-			final int yPer = (int) (font.FONT_HEIGHT * scale) + 1;
+			final int yPer = (int) (font.lineHeight * scale) + 1;
 			final int yTop = y;
 			int x = leftMargin + 4;
 			
@@ -101,10 +101,10 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 		
 		y = guiTop + 90;
 		parent.addWidget(new SectionLabel("Attributes", font, leftMargin, y, width - 30, 20));
-		y += font.FONT_HEIGHT + 4;
+		y += font.lineHeight + 4;
 		{
 			final float scale = .5f;
-			final int yPer = (int) (font.FONT_HEIGHT * scale) + 1;
+			final int yPer = (int) (font.lineHeight * scale) + 1;
 			final int yTop = y;
 			int x = leftMargin + 4;
 			
@@ -119,7 +119,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			};
 			
 			for (Attribute attribute : list) {
-				parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(I18n.format(attribute.getAttributeName()) + ": "), new LabeledWidget.TextValue(() -> String.format("%.1f%%", player.getAttribute(attribute).getValue())), x, y, width/2, yPer).scale(scale).tooltip(getAttribDesc(attribute)	));
+				parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(I18n.get(attribute.getDescriptionId()) + ": "), new LabeledWidget.TextValue(() -> String.format("%.1f%%", player.getAttribute(attribute).getValue())), x, y, width/2, yPer).scale(scale).tooltip(getAttribDesc(attribute)	));
 				y += yPer;
 			}
 			
@@ -138,17 +138,17 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			};
 			
 			for (Attribute attribute : list) {
-				parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(I18n.format(attribute.getAttributeName()) + ": "), new LabeledWidget.TextValue(() -> String.format("%.1f", (float) player.getAttribute(attribute).getValue())), x, y, width/2, yPer).scale(scale).tooltip(getAttribDesc(attribute)));
+				parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(I18n.get(attribute.getDescriptionId()) + ": "), new LabeledWidget.TextValue(() -> String.format("%.1f", (float) player.getAttribute(attribute).getValue())), x, y, width/2, yPer).scale(scale).tooltip(getAttribDesc(attribute)));
 				y += yPer;
 			}
 		}
 		
 		y = guiTop + 150;
 		parent.addWidget(new SectionLabel("Skills", font, leftMargin, y, width - 30, 20));
-		y += font.FONT_HEIGHT + 4;
+		y += font.lineHeight + 4;
 		{
 			final float scale = .5f;
-			final int yPer = (int) (font.FONT_HEIGHT * scale) + 1;
+			final int yPer = (int) (font.lineHeight * scale) + 1;
 			int x = leftMargin + 4;
 			
 			// First row: skillpoints
@@ -188,7 +188,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 	@Override
 	public void drawForeground(IMirrorScreen parent, MatrixStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
 		final Minecraft mc = Minecraft.getInstance();
-		final FontRenderer font = mc.fontRenderer;
+		final FontRenderer font = mc.font;
 		
 		// DRAW STATS
 		int y = 22;
@@ -197,28 +197,28 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 		String str;
 		
 		str = "Level " + attr.getLevel();
-		len = font.getStringWidth(str);
-		font.drawStringWithShadow(matrixStackIn, str, (width - len) / 2, y, 0xFFFFFFFF);
-		y += font.FONT_HEIGHT + 2;
+		len = font.width(str);
+		font.drawShadow(matrixStackIn, str, (width - len) / 2, y, 0xFFFFFFFF);
+		y += font.lineHeight + 2;
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(width/2, y, 0);
 		matrixStackIn.scale(.75f, .75f, 1f);
 		{
 			final String xp = String.format("%.02f%%", 100f * attr.getXP() / attr.getMaxXP());
-			int strWidth = font.getStringWidth(xp) / 2;
-			font.drawStringWithShadow(matrixStackIn, xp, -strWidth, 0, colorKey);
-			matrixStackIn.translate(0, font.FONT_HEIGHT + 2, 0);
+			int strWidth = font.width(xp) / 2;
+			font.drawShadow(matrixStackIn, xp, -strWidth, 0, colorKey);
+			matrixStackIn.translate(0, font.lineHeight + 2, 0);
 			
 			final String tier = attr.getTier().getRawName() + " Tier";
-			strWidth = font.getStringWidth(tier) / 2;
-			font.drawStringWithShadow(matrixStackIn, tier, -strWidth, 0, colorKey);
+			strWidth = font.width(tier) / 2;
+			font.drawShadow(matrixStackIn, tier, -strWidth, 0, colorKey);
 		}
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	protected List<ITextComponent> getAttribDesc(Attribute attrib) {
-		return TextUtils.GetTranslatedList(attrib.getAttributeName() + ".desc");
+		return TextUtils.GetTranslatedList(attrib.getDescriptionId() + ".desc");
 	}
 	
 	protected List<ITextComponent> getMiscDesc(String key) {
@@ -244,12 +244,12 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			final float scale = .75f;
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(x, y, 0);
-			RenderFuncs.drawRect(matrixStackIn, 0, (int) (font.FONT_HEIGHT * scale) + 2, this.width - 4, (int) (font.FONT_HEIGHT * scale) + 2 + 2, 0xFF888888);
+			RenderFuncs.drawRect(matrixStackIn, 0, (int) (font.lineHeight * scale) + 2, this.width - 4, (int) (font.lineHeight * scale) + 2 + 2, 0xFF888888);
 			matrixStackIn.scale(scale, scale, 1f);
-			font.drawString(matrixStackIn, label, 0, 0, 0xFFAAAAAA);
-			matrixStackIn.pop();
+			font.draw(matrixStackIn, label, 0, 0, 0xFFAAAAAA);
+			matrixStackIn.popPose();
 		}
 	}
 	

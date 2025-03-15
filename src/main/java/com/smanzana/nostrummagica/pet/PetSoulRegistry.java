@@ -71,7 +71,7 @@ public class PetSoulRegistry extends WorldSavedData {
 				nbt = new CompoundNBT();
 			}
 			
-			nbt.putUniqueId(NBT_ENTRY_WORLDID, worldID);
+			nbt.putUUID(NBT_ENTRY_WORLDID, worldID);
 			if (this.snapshot != null) {
 				nbt.put(NBT_ENTRY_SNAPSHOT, snapshot);
 			}
@@ -80,7 +80,7 @@ public class PetSoulRegistry extends WorldSavedData {
 		}
 		
 		public static SoulEntry FromNBT(CompoundNBT nbt) {
-			UUID worldID = nbt.hasUniqueId(NBT_ENTRY_WORLDID) ? nbt.getUniqueId(NBT_ENTRY_WORLDID) : null;
+			UUID worldID = nbt.hasUUID(NBT_ENTRY_WORLDID) ? nbt.getUUID(NBT_ENTRY_WORLDID) : null;
 			if (worldID == null) {
 				NostrumMagica.logger.warn("Failed to deserialize PetSoul key UUID!");
 				worldID = UUID.randomUUID();
@@ -107,13 +107,13 @@ public class PetSoulRegistry extends WorldSavedData {
 	}
 
 	@Override
-	public void read(CompoundNBT nbt) {
+	public void load(CompoundNBT nbt) {
 		synchronized(soulMap) {
 			soulMap.clear();
 			
 			// NBT has each entry in the map as a single element, where the key name
 			// is the stringified UUID key and the value is nbt-ified SoulEntries.
-			for (String key : nbt.keySet()) {
+			for (String key : nbt.getAllKeys()) {
 				UUID id = null;
 				try {
 					id = UUID.fromString(key);
@@ -139,7 +139,7 @@ public class PetSoulRegistry extends WorldSavedData {
 	}
 
 	@Override
-	public CompoundNBT write(CompoundNBT compound) {
+	public CompoundNBT save(CompoundNBT compound) {
 		synchronized(soulMap) {
 			for (Entry<UUID, SoulEntry> entry : soulMap.entrySet()) {
 				compound.put(
@@ -170,7 +170,7 @@ public class PetSoulRegistry extends WorldSavedData {
 			
 			soulMap.put(key, entry);
 		}
-		this.markDirty();
+		this.setDirty();
 		return entry.getWorldID();
 	}
 	
@@ -212,7 +212,7 @@ public class PetSoulRegistry extends WorldSavedData {
 		synchronized(soulMap) {
 			soulMap.remove(key);
 		}
-		this.markDirty();
+		this.setDirty();
 	}
 	
 	/**
@@ -236,7 +236,7 @@ public class PetSoulRegistry extends WorldSavedData {
 				entry.setWorldID(newWorldID);
 			}
 		}
-		this.markDirty();
+		this.setDirty();
 		return newWorldID;
 	}
 	
@@ -251,7 +251,7 @@ public class PetSoulRegistry extends WorldSavedData {
 			}
 			entry.setSnapshot(snapshot);
 		}
-		this.markDirty();
+		this.setDirty();
 	}
 	
 	public @Nullable CompoundNBT getPetSnapshot(IPetWithSoul pet) {

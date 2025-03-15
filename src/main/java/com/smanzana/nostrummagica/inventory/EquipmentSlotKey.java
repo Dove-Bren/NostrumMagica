@@ -16,13 +16,13 @@ public class EquipmentSlotKey implements IInventorySlotKey<LivingEntity> {
 
 	@Override
 	public ItemStack getHeldStack(LivingEntity entity) {
-		return entity.getItemStackFromSlot(this.slot);
+		return entity.getItemBySlot(this.slot);
 	}
 
 	@Override
 	public ItemStack setStack(LivingEntity entity, ItemStack newStack) {
 		ItemStack existing = getHeldStack(entity);
-		entity.setItemStackToSlot(slot, newStack);
+		entity.setItemSlot(slot, newStack);
 		return existing;
 	}
 

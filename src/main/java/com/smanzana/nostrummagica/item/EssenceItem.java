@@ -114,9 +114,9 @@ public class EssenceItem extends Item implements ILoreTagged, IEnchantableItem {
 			count = power + 1;
 			amt = 2; // non-matching essences don't get bonus damage
 		}
-		entity.removeActivePotionEffect(NostrumEffects.magicBuff);
+		entity.removeEffectNoUpdate(NostrumEffects.magicBuff);
 		NostrumMagica.magicEffectProxy.applyMagicBuff(entity, this.element, amt, count);
-		entity.addPotionEffect(new EffectInstance(NostrumEffects.magicBuff, 60 * 20, (int) (amt - 1)));
+		entity.addEffect(new EffectInstance(NostrumEffects.magicBuff, 60 * 20, (int) (amt - 1)));
 		return new Result(true, ItemStack.EMPTY);
 	}
 }

@@ -36,7 +36,7 @@ public enum EMagicTier {
 	public static final EMagicTier FromNBT(INBT nbt) {
 		StringNBT tag = (StringNBT) nbt;
 		try {
-			return EMagicTier.valueOf(tag.getString().toUpperCase());
+			return EMagicTier.valueOf(tag.getAsString().toUpperCase());
 		} catch (Exception e) {
 			
 		}

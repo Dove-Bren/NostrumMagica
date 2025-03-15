@@ -114,7 +114,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	public static final String ID = "entity_dragon_red";
 	
 	private static final DataParameter<Integer> DRAGON_PHASE =
-			EntityDataManager.<Integer>createKey(RedDragonEntity.class, DataSerializers.VARINT);
+			EntityDataManager.<Integer>defineId(RedDragonEntity.class, DataSerializers.INT);
 	
 	private static final String DRAGON_SERIAL_PHASE_TOK = "DragonPhase";
 
@@ -172,7 +172,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		}
 	}
 	
-	private final ServerBossInfo bossInfo = (ServerBossInfo)(new ServerBossInfo(this.getDisplayName(), BossInfo.Color.RED, BossInfo.Overlay.NOTCHED_10)).setDarkenSky(true);
+	private final ServerBossInfo bossInfo = (ServerBossInfo)(new ServerBossInfo(this.getDisplayName(), BossInfo.Color.RED, BossInfo.Overlay.NOTCHED_10)).setDarkenScreen(true);
 	
 	// AI. First array is indexed by the phase. Second is just a collection of tasks.
 	private Goal[][] flyingAI;
@@ -188,10 +188,10 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	
 	public RedDragonEntity(EntityType<? extends RedDragonEntity> type, World worldIn) {
 		super(type, worldIn);
-		this.stepHeight = 2;
-		this.ignoreFrustumCheck = true;
-		this.experienceValue = 1000;
-		this.noClip = false;
+		this.maxUpStep = 2;
+		this.noCulling = true;
+		this.xpReward = 1000;
+		this.noPhysics = false;
 		
 		bodyParts = new EnumMap<>(DragonBodyPartType.class);
 	}
@@ -205,11 +205,11 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	}
 	
 	private DragonPhase getPhase() {
-		return DragonPhase.values()[this.dataManager.get(DRAGON_PHASE).intValue()];
+		return DragonPhase.values()[this.entityData.get(DRAGON_PHASE).intValue()];
 	}
 	
 	private void setPhase(DragonPhase phase) {
-		this.dataManager.set(DRAGON_PHASE, phase.ordinal());
+		this.entityData.set(DRAGON_PHASE, phase.ordinal());
 	}
 	
 	private void onPhaseChange() {
@@ -223,7 +223,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		} else if (phase == DragonPhase.RAMPAGE_PHASE) {
 			NostrumMagicaSounds.DRAGON_DEATH.play(this);
 			// No convenience. Set up AI depending on if we're flying or not
-			if (!this.world.isRemote) {
+			if (!this.level.isClientSide) {
 				if (this.isFlying()) {
 					this.setFlyingAI();
 				} else {
@@ -234,8 +234,8 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	}
 	
 	@Override
-	public void notifyDataManagerChange(DataParameter<?> key) {
-		super.notifyDataManagerChange(key);
+	public void onSyncedDataUpdated(DataParameter<?> key) {
+		super.onSyncedDataUpdated(key);
 		if (key == DRAGON_PHASE) {
 			onPhaseChange();
 		}
@@ -370,19 +370,19 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		return RedDragonBaseEntity.BuildBaseRedDragonAttributes()
-	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.33D)
-	        .createMutableAttribute(Attributes.FLYING_SPEED, 3D)
-	        .createMutableAttribute(Attributes.MAX_HEALTH, 1000.0D)
-	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 15.0D)
-	        .createMutableAttribute(Attributes.ARMOR, 15.0D)
-	        .createMutableAttribute(Attributes.ATTACK_SPEED, 0.5D)
-	        .createMutableAttribute(Attributes.FOLLOW_RANGE, 64D);
+	        .add(Attributes.MOVEMENT_SPEED, 0.33D)
+	        .add(Attributes.FLYING_SPEED, 3D)
+	        .add(Attributes.MAX_HEALTH, 1000.0D)
+	        .add(Attributes.ATTACK_DAMAGE, 15.0D)
+	        .add(Attributes.ARMOR, 15.0D)
+	        .add(Attributes.ATTACK_SPEED, 0.5D)
+	        .add(Attributes.FOLLOW_RANGE, 64D);
     }
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
-		this.dataManager.register(DRAGON_PHASE, DragonPhase.GROUNDED_PHASE.ordinal());
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(DRAGON_PHASE, DragonPhase.GROUNDED_PHASE.ordinal());
 	}
 	
 	protected void spawnBodyParts() {
@@ -390,8 +390,8 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 			DragonBodyPart part = new DragonBodyPart(partType, this);
 			bodyParts.put(partType, part);
 			
-			part.setPosition(this.getPosX(), this.getPosY(), this.getPosZ());
-			this.world.addEntity(part);
+			part.setPos(this.getX(), this.getY(), this.getZ());
+			this.level.addFreshEntity(part);
 		}
 	}
 	
@@ -401,7 +401,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	}
 	
 	@Override
-	public boolean canDespawn(double nearestPlayer) {
+	public boolean removeWhenFarAway(double nearestPlayer) {
 		return false;
 	}
 	
@@ -410,30 +410,30 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	}
 	
 	@Override
-	public boolean isNonBoss() {
+	public boolean canChangeDimensions() {
 		return false;
 	}
 	
-	public void readAdditional(CompoundNBT compound) {
-		super.readAdditional(compound);
+	public void readAdditionalSaveData(CompoundNBT compound) {
+		super.readAdditionalSaveData(compound);
 
 		if (compound.contains(DRAGON_SERIAL_PHASE_TOK, NBT.TAG_ANY_NUMERIC)) {
         	int i = compound.getByte(DRAGON_SERIAL_PHASE_TOK);
             this.setPhase(DragonPhase.values()[i]);
         }
 		
-		if (!this.world.isRemote) {
+		if (!this.level.isClientSide) {
 			this.registerGoals(); // TODO this seems bad
 		}
 	}
 	
-	public void writeAdditional(CompoundNBT compound) {
-    	super.writeAdditional(compound);
+	public void addAdditionalSaveData(CompoundNBT compound) {
+    	super.addAdditionalSaveData(compound);
     	compound.putByte(DRAGON_SERIAL_PHASE_TOK, (byte)this.getPhase().ordinal());
 	}
 	
 	protected void updateParts() {
-		final float progress = getRotationYawHead();
+		final float progress = getYHeadRot();
 		final double rotRad = Math.PI * (progress / -180.0);
 		for (DragonBodyPartType type : DragonBodyPartType.values()) {
 			DragonBodyPart part = this.bodyParts.get(type);
@@ -443,11 +443,11 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 			}
 			
 			Vector3d offset = type.getPartOffset();
-			part.setLocationAndAngles(
-					this.getPosX() + (Math.cos(rotRad) * offset.x) + (Math.sin(rotRad) * offset.z),
-					this.getPosY() + offset.y,
-					this.getPosZ() + (Math.sin(rotRad) * offset.x) + (Math.cos(rotRad) * offset.z),
-					this.rotationYaw, this.rotationPitch);
+			part.moveTo(
+					this.getX() + (Math.cos(rotRad) * offset.x) + (Math.sin(rotRad) * offset.z),
+					this.getY() + offset.y,
+					this.getZ() + (Math.sin(rotRad) * offset.x) + (Math.cos(rotRad) * offset.z),
+					this.yRot, this.xRot);
 			part.tick();
 		}
 	}
@@ -456,7 +456,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	public void tick() {
 		super.tick();
 		
-		if (!this.world.isRemote() && this.bodyParts.get(DragonBodyPartType.BODY) == null) {
+		if (!this.level.isClientSide() && this.bodyParts.get(DragonBodyPartType.BODY) == null) {
 			spawnBodyParts();
 		}
 		
@@ -473,47 +473,47 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 			}
 		}
 		
-		if (world.isRemote) {
+		if (level.isClientSide) {
 			if (this.isFlying() && !this.getWingFlapping()) {
-				if ((this.getPosY() > this.prevPosY) || (this.getMotion().x + this.getMotion().z < .2)) {
-					this.flapWing(this.getMotion().x + this.getMotion().z < .2 ? .5f : 1f);
+				if ((this.getY() > this.yo) || (this.getDeltaMovement().x + this.getDeltaMovement().z < .2)) {
+					this.flapWing(this.getDeltaMovement().x + this.getDeltaMovement().z < .2 ? .5f : 1f);
 				}
 			}
 		}
 		
 		updateParts();
 		
-		if (this.world.isRemote && this.isCasting()) {
+		if (this.level.isClientSide && this.isCasting()) {
 //			NostrumParticles.FILLED_ORB.spawn(this.world, new NostrumParticles.SpawnParams(5,
 //					posX, posY + this.getHeight() / 2, posZ,
 //					5,
 //					30, 5,
 //					new Vector3d(0, .25, 0), Vector3d.ZERO)
 //					.color(0xFFFF0022));
-			NostrumParticles.FILLED_ORB.spawn(this.world, new NostrumParticles.SpawnParams(5,
-					getPosX(), getPosY() + this.getHeight() / 2, getPosZ(),
+			NostrumParticles.FILLED_ORB.spawn(this.level, new NostrumParticles.SpawnParams(5,
+					getX(), getY() + this.getBbHeight() / 2, getZ(),
 					5,
 					30, 5,
-					this.getEntityId())
+					this.getId())
 					.color(0xFFAA0022)
 					.dieOnTarget(true));
 		}
 	}
 	
 	@Override
-	protected void updateAITasks() {
-		super.updateAITasks();
+	protected void customServerAiStep() {
+		super.customServerAiStep();
 		
 		this.bossInfo.setPercent(this.getHealth() / this.getMaxHealth());
 	}
 	
-	public void addTrackingPlayer(ServerPlayerEntity player) {
-		super.addTrackingPlayer(player);
+	public void startSeenByPlayer(ServerPlayerEntity player) {
+		super.startSeenByPlayer(player);
 		this.bossInfo.addPlayer(player);
 	}
 
-	public void removeTrackingPlayer(ServerPlayerEntity player) {
-		super.removeTrackingPlayer(player);
+	public void stopSeenByPlayer(ServerPlayerEntity player) {
+		super.stopSeenByPlayer(player);
 		this.bossInfo.removePlayer(player);
 	}
 	
@@ -566,13 +566,13 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	@Override
 	public boolean attackEntityFromPart(MultiPartEntityPart<?> dragonPart, DamageSource source, float damage) {
 		// could take less or more damage from different sources in different parents
-		return this.attackEntityFrom(source, damage);
+		return this.hurt(source, damage);
 	}
 	
 	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount) {
-		if (!this.world.isRemote && source.getTrueSource() != null) {
-			Entity ent = source.getTrueSource();
+	public boolean hurt(DamageSource source, float amount) {
+		if (!this.level.isClientSide && source.getEntity() != null) {
+			Entity ent = source.getEntity();
 			if (ent instanceof LivingEntity && ent != this) {
 				this.shadowAttack.addToPool((LivingEntity) ent);
 				this.aggroTable.addDamage((LivingEntity) ent, amount);
@@ -581,21 +581,21 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 			this.evasionTask.reset();
 		}
 		
-		return super.attackEntityFrom(source, amount);
+		return super.hurt(source, amount);
 	}
 	
 	@Override
 	public void bite(LivingEntity target) {
 		super.bite(target);
 		
-		if (!this.world.isRemote) {
+		if (!this.level.isClientSide) {
 			this.evasionTask.reset();
 		}
 	}
 
 	@Override
 	public World getWorld() {
-		return this.world;
+		return this.level;
 	}
 	
 	@Override
@@ -605,8 +605,8 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	}
 	
 	@Override
-	public boolean canBeCollidedWith() {
-		return super.canBeCollidedWith();
+	public boolean isPickable() {
+		return super.isPickable();
 	}
 	
 	@Override
@@ -630,14 +630,14 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		}
 		
 		@Override
-		public void resetTask() {
-			super.resetTask();
+		public void stop() {
+			super.stop();
 			RedDragonEntity.this.setCasting(false);
 		}
 		
 		@Override
-		public void startExecuting() {
-			super.startExecuting();
+		public void start() {
+			super.start();
 			RedDragonEntity.this.setCasting(true);
 		}
 	}
@@ -646,7 +646,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		
 		public static final String ID = RedDragonEntity.ID + ".body_part";
 		
-		protected static final DataParameter<DragonBodyPartType> TYPE = EntityDataManager.createKey(DragonBodyPart.class, RedDragonBodyPartTypeSerializer.instance);
+		protected static final DataParameter<DragonBodyPartType> TYPE = EntityDataManager.defineId(DragonBodyPart.class, RedDragonBodyPartTypeSerializer.instance);
 		protected @Nullable RedDragonEntity parent;
 		
 		public DragonBodyPart(DragonBodyPartType type, RedDragonEntity parent) {
@@ -660,27 +660,27 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		}
 		
 		@Override
-		public void registerData() {
-			super.registerData();
-			this.dataManager.register(TYPE, DragonBodyPartType.BODY);
+		public void defineSynchedData() {
+			super.defineSynchedData();
+			this.entityData.define(TYPE, DragonBodyPartType.BODY);
 		}
 		
 		public DragonBodyPartType getDragonPart() {
-			return dataManager.get(TYPE);
+			return entityData.get(TYPE);
 		}
 		
 		protected void setType(DragonBodyPartType type) {
-			this.dataManager.set(TYPE, type);
+			this.entityData.set(TYPE, type);
 		}
 		
 		@Override
-		protected void readAdditional(CompoundNBT compound) {
-			super.readAdditional(compound);
+		protected void readAdditionalSaveData(CompoundNBT compound) {
+			super.readAdditionalSaveData(compound);
 		}
 
 		@Override
-		protected void writeAdditional(CompoundNBT compound) {
-			super.writeAdditional(compound);
+		protected void addAdditionalSaveData(CompoundNBT compound) {
+			super.addAdditionalSaveData(compound);
 		}
 	}
 

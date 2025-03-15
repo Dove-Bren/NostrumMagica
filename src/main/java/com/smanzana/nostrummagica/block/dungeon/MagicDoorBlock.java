@@ -40,12 +40,12 @@ import net.minecraft.world.server.ServerWorld;
 public abstract class MagicDoorBlock extends HorizontalBlock {
 	
 	protected static final BooleanProperty MASTER = BooleanProperty.create("master");
-	protected static final VoxelShape MIRROR_AABB_EW = Block.makeCuboidShape(6.4D, 0.0D, 0D,09.6D, 16D, 16D);
-	protected static final VoxelShape MIRROR_AABB_NS = Block.makeCuboidShape(0D, 0.0D, 6.4D, 16D, 16D, 9.6D);
+	protected static final VoxelShape MIRROR_AABB_EW = Block.box(6.4D, 0.0D, 0D,09.6D, 16D, 16D);
+	protected static final VoxelShape MIRROR_AABB_NS = Block.box(0D, 0.0D, 6.4D, 16D, 16D, 9.6D);
 
 	public MagicDoorBlock() {
-		this(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		this(Block.Properties.of(Material.STONE)
+				.strength(-1.0F, 3600000.8F)
 				.noDrops()
 				.sound(SoundType.STONE)
 				);
@@ -54,16 +54,16 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 	protected MagicDoorBlock(Block.Properties properties) {
 		super(properties);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, false).with(HORIZONTAL_FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(MASTER, false).setValue(FACING, Direction.NORTH));
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(MASTER, HORIZONTAL_FACING);
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(MASTER, FACING);
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
-		if (world.isRemote)
+		if (world.isClientSide)
 			return;
 		
 		if (state == null)
@@ -72,7 +72,7 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 		if (state == null)
 			return;
 		
-		if (state.get(MASTER)) {
+		if (state.getValue(MASTER)) {
 			// Cascade destroy to everything else
 			walkDoor(world, pos, state, (checkPos, checkState) -> {
 				world.destroyBlock(checkPos, false);
@@ -115,9 +115,9 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 					return false;
 				
 				// Also should be in line with door
-				final Direction facing = origState.get(HORIZONTAL_FACING);
-				return (pos.getX() == startPos.getX() || facing.getHorizontalIndex() % 2 == 0) // E/W vary on X
-						&& (pos.getZ() == startPos.getZ() || facing.getHorizontalIndex() % 2 != 0);
+				final Direction facing = origState.getValue(FACING);
+				return (pos.getX() == startPos.getX() || facing.get2DDataValue() % 2 == 0) // E/W vary on X
+						&& (pos.getZ() == startPos.getZ() || facing.get2DDataValue() % 2 != 0);
 						
 			}
 
@@ -178,46 +178,46 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 	}
 	
 	public BlockState getSlaveState(Direction facing) {
-		return this.getDefaultState().with(MASTER, false).with(HORIZONTAL_FACING, facing);
+		return this.defaultBlockState().setValue(MASTER, false).setValue(FACING, facing);
 	}
 	
 	public boolean isMaster(BlockState state) {
-		return state.get(MASTER);
+		return state.getValue(MASTER);
 	}
 
 
 	public BlockState getMaster(Direction facing) {
-		return this.getDefaultState().with(MASTER, true).with(HORIZONTAL_FACING, facing);
+		return this.defaultBlockState().setValue(MASTER, true).setValue(FACING, facing);
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			this.destroy(worldIn, pos, state);
-			worldIn.removeTileEntity(pos);
+			worldIn.removeBlockEntity(pos);
 		}
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return false;
     }
 	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		if (state.get(HORIZONTAL_FACING).getHorizontalIndex() % 2 != 0)
+		if (state.getValue(FACING).get2DDataValue() % 2 != 0)
 			return MIRROR_AABB_EW;
 		return MIRROR_AABB_NS;
 	}
 	
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		Direction enumfacing = context.getPlacementHorizontalFacing().getOpposite();
+		Direction enumfacing = context.getHorizontalDirection().getOpposite();
 		return getMaster(enumfacing);
 	}
 	
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+	public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		this.spawnDoor(worldIn, pos, state, null);
 	}
 	
@@ -229,9 +229,9 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 		
 		// Unwrap first iteration of loop for master
 		visited.add(masterBlock);
-		next.add(masterBlock.up());
-		next.add(masterBlock.down());
-		if (masterState.get(HORIZONTAL_FACING).getHorizontalIndex() % 2 != 0) {
+		next.add(masterBlock.above());
+		next.add(masterBlock.below());
+		if (masterState.getValue(FACING).get2DDataValue() % 2 != 0) {
 			next.add(masterBlock.north());
 			next.add(masterBlock.south());
 		} else {
@@ -247,20 +247,20 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 			
 			visited.add(cur);
 			
-			if (bounds != null && !bounds.isVecInside(cur)) {
+			if (bounds != null && !bounds.isInside(cur)) {
 				continue;
 			}
 			
-			if (!world.isAirBlock(cur))
+			if (!world.isEmptyBlock(cur))
 				continue;
 			
 			blocksLeft--;
 			
-			world.setBlockState(cur, getSlaveState(masterState.get(HORIZONTAL_FACING)), 3);
+			world.setBlock(cur, getSlaveState(masterState.getValue(FACING)), 3);
 			
-			next.add(cur.up());
-			next.add(cur.down());
-			if (masterState.get(HORIZONTAL_FACING).getHorizontalIndex() % 2 != 0) {
+			next.add(cur.above());
+			next.add(cur.below());
+			if (masterState.getValue(FACING).get2DDataValue() % 2 != 0) {
 				next.add(cur.north());
 				next.add(cur.south());
 			} else {
@@ -270,7 +270,7 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 		}
 	}
 	
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		return ActionResultType.PASS;
 	}
 	
@@ -282,11 +282,11 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 	public static final BlockPos FindBottomCenterPos(World world, BlockPos samplePos) {
 		// Master is at TE's pos... but is it the bottom block? And is it in center?
 		final BlockState startState = world.getBlockState(samplePos);
-		final Direction face = startState.get(MagicDoorBlock.HORIZONTAL_FACING);
+		final Direction face = startState.getValue(MagicDoorBlock.FACING);
 		final Block matchBlock = startState.getBlock();
 		
 		// Find bottom
-		BlockPos.Mutable cursor = new BlockPos.Mutable().setPos(samplePos);
+		BlockPos.Mutable cursor = new BlockPos.Mutable().set(samplePos);
 		cursor.move(Direction.DOWN, 1);
 		
 		while (cursor.getY() >= 0) {
@@ -304,27 +304,27 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 		// Now discover left and right
 		// Right:
 		while (true) {
-			cursor.move(face.rotateY());
+			cursor.move(face.getClockWise());
 			BlockState state = world.getBlockState(cursor);
 			if (state == null || state.getBlock() != matchBlock)
 				break;
 		}
 		
 		// Move back
-		cursor.move(face.rotateYCCW());
+		cursor.move(face.getCounterClockWise());
 		BlockPos rightPos = new BlockPos(cursor);
-		cursor.setPos(bottomPos);
+		cursor.set(bottomPos);
 		
 		// Left
 		while (true) {
-			cursor.move(face.rotateYCCW());
+			cursor.move(face.getCounterClockWise());
 			BlockState state = world.getBlockState(cursor);
 			if (state == null || state.getBlock() != matchBlock)
 				break;
 		}
 		
 		// Move back
-		cursor.move(face.rotateY());
+		cursor.move(face.getClockWise());
 		BlockPos leftPos = new BlockPos(cursor);
 		
 		return new BlockPos(
@@ -336,11 +336,11 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 	public static final MutableBoundingBox FindDisplayBounds(World world, BlockPos samplePos) {
 		// Master is at TE's pos... but is it the bottom block? And is it in center?
 		final BlockState startState = world.getBlockState(samplePos);
-		final Direction face = startState.get(MagicDoorBlock.HORIZONTAL_FACING);
+		final Direction face = startState.getValue(MagicDoorBlock.FACING);
 		final Block matchBlock = startState.getBlock();
 		
 		// Find bottom
-		BlockPos.Mutable cursor = new BlockPos.Mutable().setPos(samplePos);
+		BlockPos.Mutable cursor = new BlockPos.Mutable().set(samplePos);
 		cursor.move(Direction.DOWN, 1);
 		
 		while (cursor.getY() >= 0) {
@@ -358,14 +358,14 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 		// Now discover left and right
 		// Right:
 		while (true) {
-			cursor.move(face.rotateY());
+			cursor.move(face.getClockWise());
 			BlockState state = world.getBlockState(cursor);
 			if (state == null || state.getBlock() != matchBlock)
 				break;
 		}
 		
 		// Move back and record
-		cursor.move(face.rotateYCCW());
+		cursor.move(face.getCounterClockWise());
 		
 		// Find highest at this position
 		while (true) {
@@ -381,16 +381,16 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 		
 		
 		// Left
-		cursor.setPos(bottomPos);
+		cursor.set(bottomPos);
 		while (true) {
-			cursor.move(face.rotateYCCW());
+			cursor.move(face.getCounterClockWise());
 			BlockState state = world.getBlockState(cursor);
 			if (state == null || state.getBlock() != matchBlock)
 				break;
 		}
 		
 		// Move back and record
-		cursor.move(face.rotateY());
+		cursor.move(face.getClockWise());
 		
 		// Find highest at this position
 		while (true) {

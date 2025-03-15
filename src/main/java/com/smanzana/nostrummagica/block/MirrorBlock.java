@@ -27,30 +27,30 @@ import net.minecraftforge.common.ToolType;
 public class MirrorBlock extends HorizontalBlock {
 	
 	public static final String ID = "mirror_block";
-	protected static final VoxelShape MIRROR_AABB_EW = Block.makeCuboidShape(16 * 0.4D, 16 * 0.0D, 16 * 0.1D, 16 * 0.6D, 16 * 1.05D, 16 * 0.9D);
-	protected static final VoxelShape MIRROR_AABB_NS = Block.makeCuboidShape(16 * 0.1D, 16 * 0.0D, 16 * 0.4D, 16 * 0.9D, 16 * 1.05D, 16 * 0.6D);
+	protected static final VoxelShape MIRROR_AABB_EW = Block.box(16 * 0.4D, 16 * 0.0D, 16 * 0.1D, 16 * 0.6D, 16 * 1.05D, 16 * 0.9D);
+	protected static final VoxelShape MIRROR_AABB_NS = Block.box(16 * 0.1D, 16 * 0.0D, 16 * 0.4D, 16 * 0.9D, 16 * 1.05D, 16 * 0.6D);
 	
 	public MirrorBlock() {
-		super(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(4f, 20f)
+		super(Block.Properties.of(Material.STONE)
+				.strength(4f, 20f)
 				.sound(SoundType.STONE)
 				.harvestTool(ToolType.PICKAXE)
 				.harvestLevel(0)
-				.setLightLevel((state) -> 4)
+				.lightLevel((state) -> 4)
 				);
 	}
 	
 	@Override
 	@Nullable
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		Direction direction = context.getPlacementHorizontalFacing().getOpposite();
-		BlockPos blockpos = context.getPos();
-		BlockPos blockpos1 = blockpos.offset(direction);
-		return context.getWorld().getBlockState(blockpos1).isReplaceable(context) ? this.getDefaultState().with(HORIZONTAL_FACING, direction) : null;
+		Direction direction = context.getHorizontalDirection().getOpposite();
+		BlockPos blockpos = context.getClickedPos();
+		BlockPos blockpos1 = blockpos.relative(direction);
+		return context.getLevel().getBlockState(blockpos1).canBeReplaced(context) ? this.defaultBlockState().setValue(FACING, direction) : null;
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 		return false;
 	}
 	
@@ -70,19 +70,19 @@ public class MirrorBlock extends HorizontalBlock {
 //    }
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(HORIZONTAL_FACING);
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+		builder.add(FACING);
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		NostrumMagica.instance.proxy.openMirrorScreen();
 		return ActionResultType.SUCCESS;
 	}
 	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
-		if (state.get(HORIZONTAL_FACING).getHorizontalIndex() % 2 != 0)
+		if (state.getValue(FACING).get2DDataValue() % 2 != 0)
 			return MIRROR_AABB_EW;
 		return MIRROR_AABB_NS;
 	}

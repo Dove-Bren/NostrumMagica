@@ -27,14 +27,14 @@ import net.minecraftforge.common.ToolType;
 public class BasicSpellTableBlock extends Block implements ILoreTagged {
 	
 	public static final String ID = "spelltable_basic";
-	protected static final VoxelShape SHAPE = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 15.0D, 16.0D);
+	protected static final VoxelShape SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 15.0D, 16.0D);
 	
 	public BasicSpellTableBlock() {
-		this(Block.Properties.create(Material.WOOD)
-				.hardnessAndResistance(2.5f, 2.5f)
+		this(Block.Properties.of(Material.WOOD)
+				.strength(2.5f, 2.5f)
 				.sound(SoundType.WOOD)
 				.harvestTool(ToolType.AXE)
-				.notSolid()
+				.noOcclusion()
 				);
 	}
 	
@@ -49,15 +49,15 @@ public class BasicSpellTableBlock extends Block implements ILoreTagged {
 		if (state == null)
 			return;
 		
-		TileEntity ent = world.getTileEntity(pos);
-		if (!world.isRemote && ent != null) {
+		TileEntity ent = world.getBlockEntity(pos);
+		if (!world.isClientSide && ent != null) {
 			BasicSpellTableTileEntity table = (BasicSpellTableTileEntity) ent;
-			for (int i = 0; i < table.getSizeInventory(); i++) {
-				if (table.getStackInSlot(i) != null) {
+			for (int i = 0; i < table.getContainerSize(); i++) {
+				if (table.getItem(i) != null) {
 					ItemEntity item = new ItemEntity(
 							world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
-							table.removeStackFromSlot(i));
-					world.addEntity(item);
+							table.removeItemNoUpdate(i));
+					world.addFreshEntity(item);
 				}
 			}
 		}
@@ -74,24 +74,24 @@ public class BasicSpellTableBlock extends Block implements ILoreTagged {
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			this.destroy(world, pos, state);
-			world.removeTileEntity(pos);
+			world.removeBlockEntity(pos);
 		}
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
-		super.eventReceived(state, worldIn, pos, id, param);
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+	public boolean triggerEvent(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+		super.triggerEvent(state, worldIn, pos, id, param);
+        TileEntity tileentity = worldIn.getBlockEntity(pos);
+        return tileentity == null ? false : tileentity.triggerEvent(id, param);
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit) {
-		BasicSpellTableTileEntity te = (BasicSpellTableTileEntity) worldIn.getTileEntity(pos);
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit) {
+		BasicSpellTableTileEntity te = (BasicSpellTableTileEntity) worldIn.getBlockEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(playerIn, BasicSpellCraftGui.BasicSpellCraftContainer.Make(te));
 		
 		return ActionResultType.SUCCESS;

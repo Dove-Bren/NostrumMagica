@@ -94,14 +94,14 @@ public class ClientEffectRenderer {
 		}
 
 		Minecraft mc = Minecraft.getInstance();
-		final ActiveRenderInfo renderInfo = mc.gameRenderer.getActiveRenderInfo();
+		final ActiveRenderInfo renderInfo = mc.gameRenderer.getMainCamera();
 		MatrixStack stack = event.getMatrixStack();//RenderFuncs.makeNewMatrixStack(renderInfo);
 		
-		stack.push();
+		stack.pushPose();
 		
 //		 Set up render space. Effects want to render at absolute world positions,
 //		 so don't actually offset at all
-		Vector3d playerOffset = renderInfo.getProjectedView();
+		Vector3d playerOffset = renderInfo.getPosition();
 		//Vector3d playerOffset = mc.thePlayer.getPositionVec();
 		stack.translate(-playerOffset.x, -playerOffset.y, -playerOffset.z);
 		
@@ -116,7 +116,7 @@ public class ClientEffectRenderer {
 			}
 		}
 		
-		stack.pop();
+		stack.popPose();
 		
 	}
 	

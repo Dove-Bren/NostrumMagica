@@ -7,6 +7,8 @@ import com.smanzana.nostrummagica.entity.dragon.FlyingDragonEntity;
 
 import net.minecraft.entity.ai.goal.Goal;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class DragonTakeoffLandGoal extends Goal {
 	
 	private FlyingDragonEntity dragon;
@@ -15,11 +17,11 @@ public class DragonTakeoffLandGoal extends Goal {
 	public DragonTakeoffLandGoal(FlyingDragonEntity dragon) {
 		this.dragon = dragon;
 		
-		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+		this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 	
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		if (!dragon.isAlive())
 			return false;
 		
@@ -38,7 +40,7 @@ public class DragonTakeoffLandGoal extends Goal {
 	}
 
 	@Override
-	public boolean shouldContinueExecuting() {
+	public boolean canContinueToUse() {
 		return dragon.isFlightTransitioning();
 	}
 	
@@ -48,7 +50,7 @@ public class DragonTakeoffLandGoal extends Goal {
 	}
 	
 	@Override
-	public void startExecuting() {
+	public void start() {
 		if (dragon.isFlying()) {
 			dragon.startLanding();
 		} else {

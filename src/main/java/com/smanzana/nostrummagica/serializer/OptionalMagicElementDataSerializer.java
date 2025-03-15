@@ -20,26 +20,26 @@ public class OptionalMagicElementDataSerializer implements IDataSerializer<Optio
 	public void write(PacketBuffer buf, Optional<EMagicElement> value) {
 		buf.writeBoolean(value.isPresent());
 		if (value.isPresent()) {
-			buf.writeEnumValue(value.get());
+			buf.writeEnum(value.get());
 		}
 	}
 
 	@Override
 	public Optional<EMagicElement> read(PacketBuffer buf)  {
 		if (buf.readBoolean()) {
-			return Optional.of(buf.readEnumValue(EMagicElement.class));
+			return Optional.of(buf.readEnum(EMagicElement.class));
 		} else {
 			return Optional.empty();
 		}
 	}
 
 	@Override
-	public DataParameter<Optional<EMagicElement>> createKey(int id) {
+	public DataParameter<Optional<EMagicElement>> createAccessor(int id) {
 		return new DataParameter<>(id, this);
 	}
 
 	@Override
-	public Optional<EMagicElement> copyValue(Optional<EMagicElement> value) {
+	public Optional<EMagicElement> copy(Optional<EMagicElement> value) {
 		return Optional.ofNullable(value.orElse(null));
 	}
 }

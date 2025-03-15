@@ -15,6 +15,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import net.minecraft.item.Item.Properties;
+
 public class SilverMirrorItem extends HandheldMirrorItem implements ILoreTagged {
 
 	public static final String ID = "silver_mirror";

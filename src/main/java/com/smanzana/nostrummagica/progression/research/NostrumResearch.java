@@ -216,9 +216,9 @@ public class NostrumResearch {
 				attr.completeResearch(link);
 			}
 		}
-		if (!player.world.isRemote) {
-			NostrumMagicaSounds.SUCCESS_RESEARCH.play(player.world, player.getPosX(), player.getPosY(), player.getPosZ());
-			NostrumMagicaSounds.UI_RESEARCH.play(player.world, player.getPosX(), player.getPosY(), player.getPosZ());
+		if (!player.level.isClientSide) {
+			NostrumMagicaSounds.SUCCESS_RESEARCH.play(player.level, player.getX(), player.getY(), player.getZ());
+			NostrumMagicaSounds.UI_RESEARCH.play(player.level, player.getX(), player.getY(), player.getZ());
 		} else {
 			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
 		}
@@ -297,9 +297,9 @@ public class NostrumResearch {
 		
 		public Builder reference(Item item) {
 			if (item instanceof InfoScreenIndexed) {
-				return this.reference((InfoScreenIndexed) item, item.getTranslationKey());
+				return this.reference((InfoScreenIndexed) item, item.getDescriptionId());
 			} else if (item instanceof ILoreTagged) {
-				return this.reference(ILoreTagged.GetInfoKey((ILoreTagged) item), item.getTranslationKey());
+				return this.reference(ILoreTagged.GetInfoKey((ILoreTagged) item), item.getDescriptionId());
 			} else {
 				NostrumMagica.logger.error("Provided item reference does not extend the required interfaces (ILoreTagged or InfoScreenIndexed) and cannot be a reference");
 				return this;

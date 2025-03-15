@@ -85,28 +85,28 @@ public class SpellPatternTome extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
-		if (playerIn.isSneaking()) {
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		final @Nonnull ItemStack stack = playerIn.getItemInHand(hand);
+		if (playerIn.isShiftKeyDown()) {
 			return new ActionResult<ItemStack>(ActionResultType.PASS, stack);
 		}
 		
 		SpellCraftPattern pattern = this.getPattern(stack);
 		if (pattern == null) {
-			playerIn.sendMessage(new StringTextComponent("This pattern tome doesn't appear to have a pattern in it."), Util.DUMMY_UUID);
+			playerIn.sendMessage(new StringTextComponent("This pattern tome doesn't appear to have a pattern in it."), Util.NIL_UUID);
 			return new ActionResult<ItemStack>(ActionResultType.FAIL, stack);
 		}
 		
 		ISpellCrafting attr = NostrumMagica.getSpellCrafting(playerIn);
-		if (!worldIn.isRemote && attr != null) {
+		if (!worldIn.isClientSide && attr != null) {
 			if (attr.getKnownPatterns().contains(pattern)) {
-				playerIn.sendMessage(new TranslationTextComponent("info.pattern.already_know", pattern.getName()), Util.DUMMY_UUID);
+				playerIn.sendMessage(new TranslationTextComponent("info.pattern.already_know", pattern.getName()), Util.NIL_UUID);
 			} else {
 				attr.addPattern(pattern);
-				NostrumMagicaSounds.LORE.play(null, playerIn.world, playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ());
+				NostrumMagicaSounds.LORE.play(null, playerIn.level, playerIn.getX(), playerIn.getY(), playerIn.getZ());
 				stack.shrink(1);
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) playerIn);
-				playerIn.sendMessage(new TranslationTextComponent("info.pattern.learn", pattern.getName()), Util.DUMMY_UUID);
+				playerIn.sendMessage(new TranslationTextComponent("info.pattern.learn", pattern.getName()), Util.NIL_UUID);
 				
 			}
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
@@ -117,7 +117,7 @@ public class SpellPatternTome extends Item implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		SpellCraftPattern pattern = this.getPattern(stack);
 		if (pattern != null) {
 			tooltip.add(new TranslationTextComponent("info.pattern.usage", pattern.getName()));
@@ -125,8 +125,8 @@ public class SpellPatternTome extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-		if (this.isInGroup(group)) {
+	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+		if (this.allowdedIn(group)) {
 			
 			for (SpellCraftPattern pattern : SpellCraftPattern.GetAll()) {
 				ItemStack patternItem = new ItemStack(this);

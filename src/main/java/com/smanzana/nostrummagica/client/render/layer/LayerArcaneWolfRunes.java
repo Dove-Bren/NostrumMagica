@@ -27,9 +27,9 @@ public class LayerArcaneWolfRunes extends LayerRenderer<ArcaneWolfEntity, ModelA
 	public void render(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, ArcaneWolfEntity wolf, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		if (!wolf.isInvisible()) {
 			
-			final IVertexBuilder buffer = typeBuffer.getBuffer(RenderType.getEntityTranslucentCull(RUNE_LOC));
+			final IVertexBuilder buffer = typeBuffer.getBuffer(RenderType.entityTranslucentCull(RUNE_LOC));
 			final float brightPeriod = 40f;
-			final float brightness = .8f + .2f * (float) Math.sin(Math.PI * 2 * ((partialTicks + wolf.ticksExisted) % brightPeriod) / brightPeriod);
+			final float brightness = .8f + .2f * (float) Math.sin(Math.PI * 2 * ((partialTicks + wolf.tickCount) % brightPeriod) / brightPeriod);
 			final int ARGB = wolf.getRuneColor();
 			final float alpha = (float)((ARGB >> 24) & 0xFF) / 255f;
 			final float red = (float)((ARGB >> 16) & 0xFF) / 255f;
@@ -38,7 +38,7 @@ public class LayerArcaneWolfRunes extends LayerRenderer<ArcaneWolfEntity, ModelA
 			
 			//renderCopyCutoutModel?
 			// Might need to call setRotation stuff again?
-			wolfRenderer.getEntityModel().render(stack, buffer, packedLight, OverlayTexture.NO_OVERLAY, red * brightness, green * brightness, blue * brightness, alpha);
+			wolfRenderer.getModel().renderToBuffer(stack, buffer, packedLight, OverlayTexture.NO_OVERLAY, red * brightness, green * brightness, blue * brightness, alpha);
 		}
 	}
 }

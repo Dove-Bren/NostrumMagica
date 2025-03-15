@@ -10,6 +10,8 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class GolemTask extends Goal {
 
 	private static final Random rand = new Random();
@@ -36,7 +38,7 @@ public class GolemTask extends Goal {
 		meleeCooldown = 0;
 		rangeCooldown = 0;
 		auxCooldown = 0;
-		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+		this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 	
 	public void initStance(boolean melee, boolean range, boolean aux) {
@@ -46,11 +48,11 @@ public class GolemTask extends Goal {
 	}
 	
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		if (!golem.isAlive())
 			return false;
 		
-		if (golem.getAttackTarget() == null)
+		if (golem.getTarget() == null)
 			return false;
 		
 		LivingEntity owner = golem.getOwner();
@@ -59,7 +61,7 @@ public class GolemTask extends Goal {
 		
 		double distOwner = 0;
 		if (DimensionUtils.SameDimension(owner, golem)) {
-			distOwner = owner.getDistanceSq(golem);
+			distOwner = owner.distanceToSqr(golem);
 		}
 		
 		if (distOwner > 900.0) {
@@ -70,7 +72,7 @@ public class GolemTask extends Goal {
 	}
 
 	@Override
-	public boolean shouldContinueExecuting() {
+	public boolean canContinueToUse() {
 		return running;
 	}
 	
@@ -80,7 +82,7 @@ public class GolemTask extends Goal {
 	}
 	
 	@Override
-	public void startExecuting() {
+	public void start() {
 		meleeCooldown = 0;
 		rangeCooldown = 0;
 		strafeTime = 0;
@@ -126,7 +128,7 @@ public class GolemTask extends Goal {
 			owner = golem;
 		double distOwner = 0;
 		if (DimensionUtils.SameDimension(owner, golem)) {
-			distOwner = owner.getDistanceSq(golem);
+			distOwner = owner.distanceToSqr(golem);
 		}
 		
 		if (distOwner > 900.0) {
@@ -136,7 +138,7 @@ public class GolemTask extends Goal {
 		
 		boolean inMelee = false;
 		boolean inRange = false;
-		LivingEntity target = golem.getAttackTarget();
+		LivingEntity target = golem.getTarget();
 
 		boolean done = false;
 		boolean again = true;
@@ -158,7 +160,7 @@ public class GolemTask extends Goal {
 		}
 		
 		// Does not check done so we can do even when target is dead
-		if (aux && auxCooldown <= 0 && golem.ticksExisted > 100) {
+		if (aux && auxCooldown <= 0 && golem.tickCount > 100) {
 			// Can do aux skill if not in melee
 			if (!inMelee || ownerCritical) {
 				// Figure out who to do it to.
@@ -196,9 +198,9 @@ public class GolemTask extends Goal {
 		}
 
 		if (target != null && target.isAlive()) {
-			double distTarget = target.getPositionVec().distanceTo(golem.getPositionVec());
+			double distTarget = target.position().distanceTo(golem.position());
 			
-			double meleeRange = (double)(golem.getWidth() * 2.0F * golem.getWidth() * 2.0F);
+			double meleeRange = (double)(golem.getBbWidth() * 2.0F * golem.getBbWidth() * 2.0F);
 			if (distTarget < meleeRange) {
 				inMelee = true;
 			}
@@ -208,7 +210,7 @@ public class GolemTask extends Goal {
 			
 			if (!done && !inMelee && range && inRange && rangeCooldown <= 0) {
 				// Can we do a ranged attack?
-				if (golem.canEntityBeSeen(target)) {
+				if (golem.canSee(target)) {
 					golem.doRangeTask(target);
 					rangeCooldown = 20 * 3 * (1 + GolemTask.rand.nextInt(3));
 					done = true;
@@ -239,22 +241,22 @@ public class GolemTask extends Goal {
 			if (updateCooldown > 0)
         		updateCooldown--;
         	
-        	if (updateCooldown > 0 && !golem.getNavigator().noPath())
+        	if (updateCooldown > 0 && !golem.getNavigation().isDone())
     			return true;
 			
         	//golem.getNavigator().clearPath();
-			success = golem.getNavigator().tryMoveToEntityLiving(target, 1.0);
+			success = golem.getNavigation().moveTo(target, 1.0);
 			if (success) {
 				updateCooldown = 15;
 			}
 		} else if (range) {
 			
 			success = true;
-			double dist = golem.getDistanceSq(target.getPosX(), target.getBoundingBox().minY, target.getPosZ());
+			double dist = golem.distanceToSqr(target.getX(), target.getBoundingBox().minY, target.getZ());
 
-            if (dist <= RANGE_SQR - 25.0 && golem.canEntityBeSeen(target))
+            if (dist <= RANGE_SQR - 25.0 && golem.canSee(target))
             {
-            	golem.getNavigator().clearPath();
+            	golem.getNavigation().stop();
                 ++this.strafeTime;
             }
             else
@@ -263,22 +265,22 @@ public class GolemTask extends Goal {
             	if (updateCooldown > 0)
             		updateCooldown--;
             	
-            	if (updateCooldown > 0 && !golem.getNavigator().noPath())
+            	if (updateCooldown > 0 && !golem.getNavigation().isDone())
         			return true;
             	
-            	golem.getNavigator().clearPath();
-            	golem.getNavigator().tryMoveToEntityLiving(target, 1.0);
+            	golem.getNavigation().stop();
+            	golem.getNavigation().moveTo(target, 1.0);
                 this.updateCooldown = 5;
             }
 
             if (this.strafeTime >= 20)
             {
-                if ((double) golem.getRNG().nextFloat() < 0.3D)
+                if ((double) golem.getRandom().nextFloat() < 0.3D)
                 {
                     this.strafeClockwise = !this.strafeClockwise;
                 }
 
-                if ((double) golem.getRNG().nextFloat() < 0.3D)
+                if ((double) golem.getRandom().nextFloat() < 0.3D)
                 {
                     this.strafeBack = !this.strafeBack;
                 }
@@ -297,12 +299,12 @@ public class GolemTask extends Goal {
                     this.strafeBack = true;
                 }
 
-                golem.getMoveHelper().strafe(this.strafeBack ? -0.5F : 0.5F, this.strafeClockwise ? 0.5F : -0.5F);
-                golem.faceEntity(target, 30.0F, 30.0F);
+                golem.getMoveControl().strafe(this.strafeBack ? -0.5F : 0.5F, this.strafeClockwise ? 0.5F : -0.5F);
+                golem.lookAt(target, 30.0F, 30.0F);
             }
             else
             {
-            	golem.getLookController().setLookPositionWithEntity(target, 30.0F, 30.0F);
+            	golem.getLookControl().setLookAt(target, 30.0F, 30.0F);
             }
 			
 		}

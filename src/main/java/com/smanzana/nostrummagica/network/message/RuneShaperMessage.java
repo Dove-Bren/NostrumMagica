@@ -27,7 +27,7 @@ public class RuneShaperMessage {
 		ctx.get().setPacketHandled(true);
 		ctx.get().enqueueWork(() -> {
 			PlayerEntity sp = ctx.get().getSender();
-			World world = sp.world;
+			World world = sp.level;
 			
 			// Get the TE
 			BlockState state = world.getBlockState(message.pos);
@@ -36,12 +36,12 @@ public class RuneShaperMessage {
 				return;
 			}
 			
-			if (sp.openContainer == null || !(sp.openContainer instanceof RuneShaperGui.RuneShaperContainer)) {
+			if (sp.containerMenu == null || !(sp.containerMenu instanceof RuneShaperGui.RuneShaperContainer)) {
 				NostrumMagica.logger.warn("Got rune shaper message from a player who doesn't have a rune shaper container open");
 				return;
 			}
 			
-			((RuneShaperGui.RuneShaperContainer) sp.openContainer).handleSubmitAttempt(message.shape, message.property, message.propertyValueIdx);
+			((RuneShaperGui.RuneShaperContainer) sp.containerMenu).handleSubmitAttempt(message.shape, message.property, message.propertyValueIdx);
 		});
 	}
 
@@ -59,8 +59,8 @@ public class RuneShaperMessage {
 
 	public static RuneShaperMessage decode(PacketBuffer buf) {
 		final BlockPos pos = buf.readBlockPos();
-		final String shapeKey = buf.readString();
-		final String propName = buf.readString();
+		final String shapeKey = buf.readUtf();
+		final String propName = buf.readUtf();
 		final int idx = buf.readVarInt();
 		
 		final SpellShape shape = SpellShape.get(shapeKey);
@@ -78,8 +78,8 @@ public class RuneShaperMessage {
 
 	public static void encode(RuneShaperMessage msg, PacketBuffer buf) {
 		buf.writeBlockPos(msg.pos);
-		buf.writeString(msg.shape.getShapeKey());
-		buf.writeString(msg.property.getName());
+		buf.writeUtf(msg.shape.getShapeKey());
+		buf.writeUtf(msg.property.getName());
 		buf.writeVarInt(msg.propertyValueIdx);
 	}
 

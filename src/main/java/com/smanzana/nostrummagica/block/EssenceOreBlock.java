@@ -27,8 +27,8 @@ public class EssenceOreBlock extends OreBlock {
 	public static final String ID = "essore";
 	
 	public EssenceOreBlock() {
-		super(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(1.7f, 30.0f)
+		super(Block.Properties.of(Material.STONE)
+				.strength(1.7f, 30.0f)
 				.sound(SoundType.STONE)
 				.harvestTool(ToolType.PICKAXE)
 				.harvestLevel(3)
@@ -38,11 +38,11 @@ public class EssenceOreBlock extends OreBlock {
 	
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		final LootContext context = builder.withParameter(LootParameters.BLOCK_STATE, state).build(LootParameterSets.BLOCK);
+		final LootContext context = builder.withParameter(LootParameters.BLOCK_STATE, state).create(LootParameterSets.BLOCK);
 		final List<ItemStack> loot = new ArrayList<>();
 		final int fortune;
-		if (context.has(LootParameters.TOOL)) {
-			fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, context.get(LootParameters.TOOL));
+		if (context.hasParam(LootParameters.TOOL)) {
+			fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, context.getParamOrNull(LootParameters.TOOL));
 		} else {
 			 fortune = 0;
 		}

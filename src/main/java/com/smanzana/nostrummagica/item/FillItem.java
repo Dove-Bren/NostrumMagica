@@ -51,23 +51,23 @@ public class FillItem extends Item {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		tooltip.add(new StringTextComponent("For Creative Use"));
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		return super.onItemRightClick(worldIn, playerIn, hand);
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		return super.use(worldIn, playerIn, hand);
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		final World world = context.getWorld();
-		final BlockPos pos = context.getPos();
+	public ActionResultType useOn(ItemUseContext context) {
+		final World world = context.getLevel();
+		final BlockPos pos = context.getClickedPos();
 		final PlayerEntity player = context.getPlayer();
 		
-		if (world.isRemote)
+		if (world.isClientSide)
 			return ActionResultType.SUCCESS;
 		
 		if (pos == null)
@@ -75,12 +75,12 @@ public class FillItem extends Item {
 		
 		if (player == null || !player.isCreative()) {
 			if (player != null) {
-				player.sendMessage(new StringTextComponent("You must be in creative to use this item"), Util.DUMMY_UUID);
+				player.sendMessage(new StringTextComponent("You must be in creative to use this item"), Util.NIL_UUID);
 			}
 			return ActionResultType.SUCCESS;
 		}
 		
-		final BlockPos startPos = pos.offset(context.getFace());
+		final BlockPos startPos = pos.relative(context.getClickedFace());
 		fill(player, world, startPos);
 		
 		return ActionResultType.SUCCESS;
@@ -95,11 +95,11 @@ public class FillItem extends Item {
 	}
 	
 	protected void setState(PlayerEntity player, World world, BlockPos pos) {
-		world.setBlockState(pos, this.getFillState(), 3); // ? Different flags for speed?
+		world.setBlock(pos, this.getFillState(), 3); // ? Different flags for speed?
 	}
 	
 	protected boolean shouldFill(World world, BlockPos pos) {
-		return world.isAirBlock(pos);
+		return world.isEmptyBlock(pos);
 	}
 	
 	protected boolean canSpreadTo(BlockPos startPos, BlockPos checkPos) {
@@ -114,7 +114,7 @@ public class FillItem extends Item {
 			fillAndAdd(player, world, pos, context);
 		}
 		
-		player.sendMessage(new StringTextComponent("Filled " + context.count + " blocks"), Util.DUMMY_UUID);
+		player.sendMessage(new StringTextComponent("Filled " + context.count + " blocks"), Util.NIL_UUID);
 	}
 	
 	private static final class FillContext {
@@ -156,8 +156,8 @@ public class FillItem extends Item {
 			context.addNeighbor(pos.south());
 			context.addNeighbor(pos.east());
 			context.addNeighbor(pos.west());
-			context.addNeighbor(pos.down());
-			context.addNeighbor(pos.up()); // Context will enforce onlyDown if it applies
+			context.addNeighbor(pos.below());
+			context.addNeighbor(pos.above()); // Context will enforce onlyDown if it applies
 		}
 	}
 	

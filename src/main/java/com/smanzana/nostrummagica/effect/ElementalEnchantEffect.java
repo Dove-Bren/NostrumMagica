@@ -61,16 +61,16 @@ public class ElementalEnchantEffect extends Effect {
 		this.element = element;
 		
 		if (element == EMagicElement.PHYSICAL) {
-			this.addAttributesModifier(Attributes.ARMOR, GetModID(this.element), 2D, AttributeModifier.Operation.ADDITION);
+			this.addAttributeModifier(Attributes.ARMOR, GetModID(this.element), 2D, AttributeModifier.Operation.ADDITION);
 			for (EMagicElement weakElem : EMagicElement.values()) {
 				if (weakElem == EMagicElement.PHYSICAL) {
 					continue;
 				}
-				this.addAttributesModifier(NostrumAttributes.GetReduceAttribute(weakElem), GetModID(this.element), -.5D, AttributeModifier.Operation.ADDITION);
+				this.addAttributeModifier(NostrumAttributes.GetReduceAttribute(weakElem), GetModID(this.element), -.5D, AttributeModifier.Operation.ADDITION);
 			}
 		} else {
-			this.addAttributesModifier(NostrumAttributes.GetReduceAttribute(this.element), GetModID(this.element), 1D, AttributeModifier.Operation.ADDITION);
-			this.addAttributesModifier(NostrumAttributes.GetReduceAttribute(this.element.getOpposite()), GetModID(this.element), -1D, AttributeModifier.Operation.ADDITION);
+			this.addAttributeModifier(NostrumAttributes.GetReduceAttribute(this.element), GetModID(this.element), 1D, AttributeModifier.Operation.ADDITION);
+			this.addAttributeModifier(NostrumAttributes.GetReduceAttribute(this.element.getOpposite()), GetModID(this.element), -1D, AttributeModifier.Operation.ADDITION);
 		}
 	}
 	

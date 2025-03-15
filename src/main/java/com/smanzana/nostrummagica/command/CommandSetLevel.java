@@ -19,7 +19,7 @@ public class CommandSetLevel {
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
 				Commands.literal("nostrumlevel")
-					.requires(s -> s.hasPermissionLevel(2))
+					.requires(s -> s.hasPermission(2))
 					.then(Commands.argument("level", IntegerArgumentType.integer(0))
 							.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "level")))
 							)
@@ -27,11 +27,11 @@ public class CommandSetLevel {
 	}
 
 	private static final int execute(CommandContext<CommandSource> context, int level) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().asPlayer();
+		ServerPlayerEntity player = context.getSource().getPlayerOrException();
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
-			context.getSource().sendFeedback(new StringTextComponent("Could not find magic wrapper for player"), true);
+			context.getSource().sendSuccess(new StringTextComponent("Could not find magic wrapper for player"), true);
 			return 1;
 		}
 		

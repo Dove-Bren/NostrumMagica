@@ -30,7 +30,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(E entity) {
+	public ResourceLocation getTextureLocation(E entity) {
 		return TEX_BUBBLE;
 	}
 	
@@ -39,7 +39,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 	@Override
 	public void render(E entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		final Minecraft mc = Minecraft.getInstance();
-		if (entityIn.isInvisibleToPlayer(mc.player)) {
+		if (entityIn.isInvisibleTo(mc.player)) {
 			return;
 		}
 		
@@ -55,20 +55,20 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 		}
 		
 		final float[] color = {1f, 1f, 1f, 1f};
-		final float ticks = entityIn.ticksExisted + partialTicks;
+		final float ticks = entityIn.tickCount + partialTicks;
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(0, .5, 0);
 		
 		final float hoverPeriod = 80f;
 		final float hoverOffset = .05f * (float) Math.sin(((ticks % hoverPeriod) / hoverPeriod) * Math.PI * 2);
 		matrixStackIn.translate(0, hoverOffset, 0);
 		
-		matrixStackIn.rotate(this.renderManager.getCameraOrientation());
+		matrixStackIn.mulPose(this.entityRenderDispatcher.cameraOrientation());
 		//matrixStackIn.rotate(Vector3f.YP.rotationDegrees(180.0F));
 		
 		// Render symbol
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		{
 			final float glowPeriod = 40f;
 			float prog = (ticks%glowPeriod) / glowPeriod;
@@ -80,23 +80,23 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 
 			this.renderSymbol(entityIn, matrixStackIn, bufferIn, scale, glow, color, packedLightIn);
 		}
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 		// Render bubble
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		{
-			Matrix4f transform = matrixStackIn.getLast().getMatrix();
-			Matrix3f normal = matrixStackIn.getLast().getNormal();
+			Matrix4f transform = matrixStackIn.last().pose();
+			Matrix3f normal = matrixStackIn.last().normal();
 			IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.GetBlendedEntity(bubbleTex, true));
-			buffer.pos(transform, -0.5f, -.5f, 0.0f).color(color[0], color[1], color[2], color[3]).tex(0, 1f).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
-			buffer.pos(transform, 0.5f, -.5f, 0.0f).color(color[0], color[1], color[2], color[3]).tex(1f, 1f).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
-			buffer.pos(transform, 0.5f, .5f, 0.0f).color(color[0], color[1], color[2], color[3]).tex(1f, 0f).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
-			buffer.pos(transform, -0.5f, .5f, 0.0f).color(color[0], color[1], color[2], color[3]).tex(0f, 0f).overlay(OverlayTexture.NO_OVERLAY).lightmap(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
+			buffer.vertex(transform, -0.5f, -.5f, 0.0f).color(color[0], color[1], color[2], color[3]).uv(0, 1f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
+			buffer.vertex(transform, 0.5f, -.5f, 0.0f).color(color[0], color[1], color[2], color[3]).uv(1f, 1f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
+			buffer.vertex(transform, 0.5f, .5f, 0.0f).color(color[0], color[1], color[2], color[3]).uv(1f, 0f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
+			buffer.vertex(transform, -0.5f, .5f, 0.0f).color(color[0], color[1], color[2], color[3]).uv(0f, 0f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
 		}
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		//super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	protected static abstract class SpellComponentRender<E extends ShrineTriggerEntity<?>> extends RenderShrineTrigger<E> {
@@ -107,7 +107,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 		protected abstract SpellComponentIcon getIcon(E entity);
 		
 		protected void renderSymbol(E entityIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, float scale, float glow, float[] color, int packedLightIn) {
-			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180.0F));
+			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
 			matrixStackIn.scale(.75f, .75f, 1f);
 			matrixStackIn.scale(scale, scale, 1f);
 			matrixStackIn.translate(-.5, -.5, 0);
@@ -163,7 +163,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 		
 		@Override
 		protected void renderSymbol(ShrineTriggerEntity.Tier entityIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, float scale, float glow, float[] color, int packedLightIn) {
-			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180.0F));
+			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
 			matrixStackIn.scale(.75f, .75f, 1f);
 			matrixStackIn.scale(scale, scale, 1f);
 			matrixStackIn.translate(-.5, -.5, 0);

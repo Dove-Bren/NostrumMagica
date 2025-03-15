@@ -84,7 +84,7 @@ public class WorldUtil {
 			final int baseZ = (chunkZ << 4);
 
 			// Test that chunk is loaded
-			cursor.setPos(baseX, 1, baseZ);
+			cursor.set(baseX, 1, baseZ);
 			if (!NostrumMagica.isBlockLoaded(world, cursor)) {
 				continue;
 			}
@@ -102,12 +102,12 @@ public class WorldUtil {
 				final int z = (baseZ + iterZ);
 				final int y = iterY;
 				
-				if (y < 0 || y > world.getHeight()) {
+				if (y < 0 || y > world.getMaxBuildHeight()) {
 					continue;
 				}
 				
 				count++;
-				cursor.setPos(x, y, z);
+				cursor.set(x, y, z);
 				if (!scanner.scan(world, cursor)) {
 					return count;
 				}
@@ -184,8 +184,8 @@ public class WorldUtil {
 				break;
 			}
 			
-			checkAndAdd.accept(last.up());
-			checkAndAdd.accept(last.down());
+			checkAndAdd.accept(last.above());
+			checkAndAdd.accept(last.below());
 			checkAndAdd.accept(last.north());
 			checkAndAdd.accept(last.east());
 			checkAndAdd.accept(last.south());
@@ -277,13 +277,13 @@ public class WorldUtil {
 	 * @return
 	 */
 	public static final @Nonnull StructureStart<?> GetContainingStructure(ServerWorld world, BlockPos pos, Structure<?> structure, boolean insideCheck) {
-		return world.func_241112_a_().getStructureStart(pos, insideCheck, structure);
+		return world.structureFeatureManager().getStructureAt(pos, insideCheck, structure);
 	}
 	
 	public static final @Nullable StructurePiece GetContainingStructurePiece(ServerWorld world, BlockPos pos, Structure<?> structure, boolean insideCheck) {
-		return world.func_241112_a_().func_235011_a_(SectionPos.from(pos), structure).filter((start) -> {
-	         return start.getBoundingBox().isVecInside(pos);
-	      }).flatMap(start -> start.getComponents().stream()).filter(piece -> piece.getBoundingBox().isVecInside(pos))
+		return world.structureFeatureManager().startsForFeature(SectionPos.of(pos), structure).filter((start) -> {
+	         return start.getBoundingBox().isInside(pos);
+	      }).flatMap(start -> start.getPieces().stream()).filter(piece -> piece.getBoundingBox().isInside(pos))
 				.findFirst().orElse(null);
 	}
 	

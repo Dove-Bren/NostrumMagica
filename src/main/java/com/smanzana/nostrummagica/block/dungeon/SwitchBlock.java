@@ -39,21 +39,21 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  */
 public class SwitchBlock extends Block {
 	
-	protected static final VoxelShape SWITCH_BLOCK_AABB = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16D, 3.2D, 16D);
+	protected static final VoxelShape SWITCH_BLOCK_AABB = Block.box(0.0D, 0.0D, 0.0D, 16D, 3.2D, 16D);
 
 	public static final String ID = "switch_block";
 	
 	public SwitchBlock() {
-		super(Block.Properties.create(Material.BARRIER)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		super(Block.Properties.of(Material.BARRIER)
+				.strength(-1.0F, 3600000.8F)
 				.noDrops()
-				.setLightLevel((state) -> 8)
-				.notSolid()
+				.lightLevel((state) -> 8)
+				.noOcclusion()
 				);
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return true;
     }
 	
@@ -63,7 +63,7 @@ public class SwitchBlock extends Block {
 	}
 	
 	@Override
-	public int getOpacity(BlockState state, IBlockReader world, BlockPos pos) {
+	public int getLightBlock(BlockState state, IBlockReader world, BlockPos pos) {
 		return 0;
 	}
 	
@@ -74,7 +74,7 @@ public class SwitchBlock extends Block {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.INVISIBLE;
 	}
 	
@@ -89,17 +89,17 @@ public class SwitchBlock extends Block {
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
-		if (worldIn.isRemote || !playerIn.isCreative()) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+		if (worldIn.isClientSide || !playerIn.isCreative()) {
 			return ActionResultType.PASS;
 		}
 		
-		ItemStack heldItem = playerIn.getHeldItem(hand);
+		ItemStack heldItem = playerIn.getItemInHand(hand);
 		
 		if (!heldItem.isEmpty() && heldItem.getItem() instanceof PositionCrystal) {
 			BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
-			if (heldPos != null && DimensionUtils.DimEquals(PositionCrystal.getDimension(heldItem), worldIn.getDimensionKey())) {
-				TileEntity te = worldIn.getTileEntity(pos);
+			if (heldPos != null && DimensionUtils.DimEquals(PositionCrystal.getDimension(heldItem), worldIn.dimension())) {
+				TileEntity te = worldIn.getBlockEntity(pos);
 				if (te != null) {
 					SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
 					ent.offsetTo(heldPos);
@@ -108,20 +108,20 @@ public class SwitchBlock extends Block {
 			}
 			return ActionResultType.SUCCESS;
 		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof EnderEyeItem) {
-			TileEntity te = worldIn.getTileEntity(pos);
+			TileEntity te = worldIn.getBlockEntity(pos);
 			if (te != null) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
-				BlockPos loc = ent.getOffset().toImmutable().add(pos);
+				BlockPos loc = ent.getOffset().immutable().offset(pos);
 				BlockState atState = worldIn.getBlockState(loc);
 				if (atState != null && atState.getBlock() instanceof ITriggeredBlock) {
-					playerIn.setPositionAndUpdate(loc.getX(), loc.getY(), loc.getZ());
+					playerIn.teleportTo(loc.getX(), loc.getY(), loc.getZ());
 				} else {
-					playerIn.sendMessage(new StringTextComponent("Not pointed at valid triggered block!"), Util.DUMMY_UUID);
+					playerIn.sendMessage(new StringTextComponent("Not pointed at valid triggered block!"), Util.NIL_UUID);
 				}
 			}
 			return ActionResultType.SUCCESS;
 		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof SwordItem) {
-			TileEntity te = worldIn.getTileEntity(pos);
+			TileEntity te = worldIn.getBlockEntity(pos);
 			if (te != null) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
 				ent.setHitType(ent.getSwitchHitType() == SwitchBlockTileEntity.SwitchHitType.ANY ? SwitchBlockTileEntity.SwitchHitType.MAGIC : SwitchBlockTileEntity.SwitchHitType.ANY);
@@ -129,7 +129,7 @@ public class SwitchBlock extends Block {
 			}
 			return ActionResultType.SUCCESS;
 		} else if (heldItem.isEmpty() && hand == Hand.MAIN_HAND) {
-			TileEntity te = worldIn.getTileEntity(pos);
+			TileEntity te = worldIn.getBlockEntity(pos);
 			if (te != null) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
 				ent.setTriggerType(SwitchTriggerType.ONE_TIME);
@@ -137,7 +137,7 @@ public class SwitchBlock extends Block {
 			}
 			return ActionResultType.SUCCESS;
 		} else if (!heldItem.isEmpty() && heldItem.getItem() == Items.CLOCK) {
-			TileEntity te = worldIn.getTileEntity(pos);
+			TileEntity te = worldIn.getBlockEntity(pos);
 			if (te != null) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
 				if (ent.getSwitchTriggerType() == SwitchTriggerType.TIMED) {
@@ -150,7 +150,7 @@ public class SwitchBlock extends Block {
 			}
 			return ActionResultType.SUCCESS;
 		} else if (!heldItem.isEmpty() && heldItem.getItem() == Items.LEVER) {
-			TileEntity te = worldIn.getTileEntity(pos);
+			TileEntity te = worldIn.getBlockEntity(pos);
 			if (te != null) {
 				SwitchBlockTileEntity ent = (SwitchBlockTileEntity) te;
 				ent.setTriggerType(SwitchTriggerType.REPEATABLE);

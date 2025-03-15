@@ -13,8 +13,8 @@ public class RenderShadowDragonRed extends RenderDragonRed<ShadowRedDragonEntity
 	}
 	
 	@Override
-	protected void preRenderCallback(ShadowRedDragonEntity entityIn, MatrixStack matrixStackIn, float partialTicks) {
-		super.preRenderCallback(entityIn, matrixStackIn, partialTicks);
+	protected void scale(ShadowRedDragonEntity entityIn, MatrixStack matrixStackIn, float partialTicks) {
+		super.scale(entityIn, matrixStackIn, partialTicks);
 		
 		matrixStackIn.scale(.5f, .5f, .5f);
 	}

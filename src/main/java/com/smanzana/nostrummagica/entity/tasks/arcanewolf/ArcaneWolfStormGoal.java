@@ -15,6 +15,8 @@ import net.minecraft.entity.monster.CreeperEntity;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.server.ServerWorld;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class ArcaneWolfStormGoal extends Goal {
 
 	protected final ArcaneWolfEntity wolf;
@@ -32,71 +34,71 @@ public class ArcaneWolfStormGoal extends Goal {
 		
 		active = false;
 		
-		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+		this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 	
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		return wolf.isAlive()
-				&& !wolf.isSitting()
-				&& wolf.getAttackTarget() != null
-				&& wolf.ticksExisted >= cooldownTicks
+				&& !wolf.isOrderedToSit()
+				&& wolf.getTarget() != null
+				&& wolf.tickCount >= cooldownTicks
 				&& wolf.getMana() >= manaCost
 				&& wolf.getElementalType() == ArcaneWolfElementalType.STORM
-				&& !(wolf.getAttackTarget() instanceof CreeperEntity);
+				&& !(wolf.getTarget() instanceof CreeperEntity);
 	}
 	
 	@Override
-	public boolean shouldContinueExecuting() {
+	public boolean canContinueToUse() {
 		return this.active
 				&& this.activeTarget != null
 				&& this.activeTarget.isAlive();
 	}
 	
 	@Override
-	public boolean isPreemptible() {
+	public boolean isInterruptable() {
 		return false;
 	}
 	
 	@Override
-	public void resetTask() {
+	public void stop() {
 		final int backoff = 20 * 30;
-		cooldownTicks = wolf.ticksExisted + backoff;
+		cooldownTicks = wolf.tickCount + backoff;
 		active = false;
 		activeTarget = null;
 	}
 	
 	protected void launchEntity(ArcaneWolfEntity wolf, LivingEntity target) {
-		target.setVelocity(0, 1.5, 0);
+		target.lerpMotion(0, 1.5, 0);
 	}
 	
 	protected boolean shouldBlastEntity(ArcaneWolfEntity wolf, LivingEntity target) {
 		return target != null
 				&& target.isAlive()
-				&& target.getMotion().y < 0;
+				&& target.getDeltaMovement().y < 0;
 	}
 	
 	protected void blastEntity(ArcaneWolfEntity wolf, LivingEntity target) {
 		for (int i = 0; i < 2; i++) {
-			((ServerWorld) target.world).addEntity(
-					(new TameLightning(NostrumEntityTypes.tameLightning, target.world,
-							target.getPosX() + (wolf.getRNG().nextFloat()-.5f),
-							target.getPosY(),
-							target.getPosZ() + (wolf.getRNG().nextFloat()-.5f))
+			((ServerWorld) target.level).addFreshEntity(
+					(new TameLightning(NostrumEntityTypes.tameLightning, target.level,
+							target.getX() + (wolf.getRandom().nextFloat()-.5f),
+							target.getY(),
+							target.getZ() + (wolf.getRandom().nextFloat()-.5f))
 					).setEntityToIgnore(wolf));
 		}
 	}
 	
 	@Override
-	public void startExecuting() {
+	public void start() {
 		// Storm blasts the target upwards. After some time, it strikes them with several bolts of lighting!
 		// We'll do this by first shooting them upwards. As soon as they start falling again, we'll BLAST EM
 		this.active = true;
-		this.activeTarget = wolf.getAttackTarget();
+		this.activeTarget = wolf.getTarget();
 		wolf.addMana(-manaCost);
 		
 		launchEntity(wolf, this.activeTarget);
-		wolf.playSound(SoundEvents.ENTITY_WOLF_AMBIENT, 1f, .5f);
+		wolf.playSound(SoundEvents.WOLF_AMBIENT, 1f, .5f);
 	}
 	
 	@Override
@@ -105,10 +107,10 @@ public class ArcaneWolfStormGoal extends Goal {
 			blastEntity(wolf, this.activeTarget);
 			this.active = false; // Signal that we're done
 		}
-		if (wolf.ticksExisted % 25 == 0) {
-			wolf.playSound(SoundEvents.ENTITY_WOLF_GROWL, 1f, 1f);
+		if (wolf.tickCount % 25 == 0) {
+			wolf.playSound(SoundEvents.WOLF_GROWL, 1f, 1f);
 		}
-		wolf.faceEntity(this.activeTarget, 30f, 180f);
+		wolf.lookAt(this.activeTarget, 30f, 180f);
 	}
 
 }

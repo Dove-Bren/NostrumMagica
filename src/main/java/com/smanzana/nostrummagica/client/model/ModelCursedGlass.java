@@ -24,34 +24,34 @@ public class ModelCursedGlass extends EntityModel<CursedGlassTriggerEntity> {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		matrixStackIn.push();
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(-1.5, 0, -1.5);
 		matrixStackIn.scale(3f, 3f, 3f);
-		IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(Blocks.GLASS.getDefaultState());
+		IBakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(Blocks.GLASS.defaultBlockState());
 		RenderFuncs.RenderModel(matrixStackIn, buffer, model, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	public void renderDecal(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(0, 1.5, 0);
 		matrixStackIn.scale(3f, 3f, 3f);
 		matrixStackIn.scale(.99f, .99f, .99f);
 		
-		IVertexBuilder buffer = bufferIn.getBuffer(RenderType.getEntityTranslucent(TEX));
+		IVertexBuilder buffer = bufferIn.getBuffer(RenderType.entityTranslucent(TEX));
 		RenderFuncs.drawUnitCube(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	@Override
-	public void setLivingAnimations(CursedGlassTriggerEntity entityIn, float limbSwing, float limbSwingAmount, float partialTick) {
-		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTick);
+	public void prepareMobModel(CursedGlassTriggerEntity entityIn, float limbSwing, float limbSwingAmount, float partialTick) {
+		super.prepareMobModel(entityIn, limbSwing, limbSwingAmount, partialTick);
 	}
 
 	@Override
-	public void setRotationAngles(CursedGlassTriggerEntity entityIn, float limbSwing, float limbSwingAmount,
+	public void setupAnim(CursedGlassTriggerEntity entityIn, float limbSwing, float limbSwingAmount,
 			float ageInTicks, float netHeadYaw, float headPitch) {
 		;
 		

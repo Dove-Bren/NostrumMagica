@@ -20,7 +20,7 @@ public class CommandSetTier {
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
 				Commands.literal("nostrumtier")
-					.requires(s -> s.hasPermissionLevel(2))
+					.requires(s -> s.hasPermission(2))
 					.then(Commands.argument("tier", EnumArgument.enumArgument(EMagicTier.class))
 							.executes(ctx -> execute(ctx, ctx.getArgument("tier", EMagicTier.class)))
 							)
@@ -28,11 +28,11 @@ public class CommandSetTier {
 	}
 
 	private static final int execute(CommandContext<CommandSource> context, EMagicTier tier) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().asPlayer();
+		ServerPlayerEntity player = context.getSource().getPlayerOrException();
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
-			context.getSource().sendFeedback(new StringTextComponent("Could not find magic wrapper for player"), true);
+			context.getSource().sendSuccess(new StringTextComponent("Could not find magic wrapper for player"), true);
 			return 1;
 		}
 		

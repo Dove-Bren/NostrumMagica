@@ -81,13 +81,13 @@ public enum NostrumParticles {
 	}
 	
 	public static void Spawn(NostrumParticles type, World world, SpawnParams params) {
-		if (!world.isRemote) {
+		if (!world.isClientSide) {
 			NetworkHandler.sendToAllAround(new SpawnNostrumParticleMessage(type, params),
-					new TargetPoint(params.spawnX, params.spawnY, params.spawnZ, 50, world.getDimensionKey())
+					new TargetPoint(params.spawnX, params.spawnY, params.spawnZ, 50, world.dimension())
 					);
 		} else {
 			final Minecraft mc = Minecraft.getInstance();
-			if (mc.gameRenderer.getActiveRenderInfo().getProjectedView().squareDistanceTo(params.spawnX, params.spawnY, params.spawnZ)
+			if (mc.gameRenderer.getMainCamera().getPosition().distanceToSqr(params.spawnX, params.spawnY, params.spawnZ)
 					<  50 * 50) {
 				INostrumParticleFactory<?> factory = type.getFactory();
 				if (factory != null) {

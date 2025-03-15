@@ -45,11 +45,11 @@ public class NostrumOverworldDungeonTrack implements IMusicTrack {
 			return soundIntro;
 		} else {
 			if (startPos == null) {
-				this.startPos = player.getPosition();
+				this.startPos = player.blockPosition();
 				return soundLow;
 			}
 			
-			if (player.getDistanceSq(startPos.getX() + .5, startPos.getZ() + .5, startPos.getZ() + .5) > 144) {
+			if (player.distanceToSqr(startPos.getX() + .5, startPos.getZ() + .5, startPos.getZ() + .5) > 144) {
 				return soundHigh;
 			} else {
 				return soundLow;

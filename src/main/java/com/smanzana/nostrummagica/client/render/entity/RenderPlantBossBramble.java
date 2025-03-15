@@ -36,21 +36,21 @@ public class RenderPlantBossBramble extends EntityRenderer<PlantBossBrambleEntit
 		final float scale = (entityIn.getBrambleWidth() / 5f); // 5f is width of model before being stretched
 		
 		//this.mainModel = new ModelPlantBossBramble();
-		matrixStackIn.push();
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(180f - entityIn.rotationYaw));
+		matrixStackIn.pushPose();
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(180f - entityIn.yRot));
 		matrixStackIn.scale(-1, -1, 1);
 		matrixStackIn.scale(scale, 1, 1);
 		matrixStackIn.translate(0, -1.5f, 0);
 		matrixStackIn.scale((1f / 16f), (1f / 16f) * 1, (1f / 16f) * 1);
-		mainModel.render(matrixStackIn, bufferIn.getBuffer(mainModel.getRenderType(this.getEntityTexture(entityIn))), packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+		mainModel.renderToBuffer(matrixStackIn, bufferIn.getBuffer(mainModel.renderType(this.getTextureLocation(entityIn))), packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 	}
 	
 	@Override
-	public ResourceLocation getEntityTexture(PlantBossBrambleEntity entity) {
+	public ResourceLocation getTextureLocation(PlantBossBrambleEntity entity) {
 		return PLANT_BOSS_TEXTURE_BASE;
 	}
 	

@@ -28,9 +28,9 @@ public class SpellCraftingCapabilitySyncMessage {
 		ctx.get().setPacketHandled(true);
 		NostrumMagica.logger.info("Recieved Spell Crafting sync message from server");
 		
-		Minecraft.getInstance().runAsync(() -> {
+		Minecraft.getInstance().submit(() -> {
 			final Minecraft mc = Minecraft.getInstance();
-			@Nullable Entity ent = mc.player.getEntityWorld().getEntityByID(message.entID);
+			@Nullable Entity ent = mc.player.getCommandSenderWorld().getEntity(message.entID);
 			if (ent != null) {
 				NostrumMagica.instance.proxy.receiveSpellCraftingOverride(ent, message.stats);
 			}
@@ -44,7 +44,7 @@ public class SpellCraftingCapabilitySyncMessage {
 	private final ISpellCrafting stats;
 	
 	public SpellCraftingCapabilitySyncMessage(Entity ent, ISpellCrafting stats) {
-		this(ent.getEntityId(), stats);
+		this(ent.getId(), stats);
 	}
 	
 	public SpellCraftingCapabilitySyncMessage(int entID, ISpellCrafting stats) {
@@ -55,7 +55,7 @@ public class SpellCraftingCapabilitySyncMessage {
 	public static SpellCraftingCapabilitySyncMessage decode(PacketBuffer buf) {
 		ISpellCrafting stats = CAPABILITY.getDefaultInstance();
 		final int entID = buf.readVarInt();
-		CAPABILITY.getStorage().readNBT(CAPABILITY, stats, null, buf.readCompoundTag());
+		CAPABILITY.getStorage().readNBT(CAPABILITY, stats, null, buf.readNbt());
 		
 		return new SpellCraftingCapabilitySyncMessage(
 				entID,
@@ -65,7 +65,7 @@ public class SpellCraftingCapabilitySyncMessage {
 
 	public static void encode(SpellCraftingCapabilitySyncMessage msg, PacketBuffer buf) {
 		buf.writeVarInt(msg.entID);
-		buf.writeCompoundTag((CompoundNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, msg.stats, null));
+		buf.writeNbt((CompoundNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, msg.stats, null));
 	}
 
 }

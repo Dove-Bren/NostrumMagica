@@ -82,20 +82,20 @@ public class OutlineRenderer {
 	
 	protected void renderEntityOutline(MatrixStack matrixStackIn, Entity entity, Outline outline, float rotationYaw, float partialTicks) {
 		if (outlineBuffer == null) {
-			this.setupOutlineBuffers(Minecraft.getInstance().getRenderTypeBuffers().getBufferSource());
+			this.setupOutlineBuffers(Minecraft.getInstance().renderBuffers().bufferSource());
 		}
 		
 		outlineBuffer.color(outline.red, outline.green, outline.blue, outline.alpha);
-		Minecraft.getInstance().getRenderManager().renderEntityStatic(entity, 0, 0, 0, rotationYaw, partialTicks, matrixStackIn, outlineBuffer, 0xFFFFFFFF);
+		Minecraft.getInstance().getEntityRenderDispatcher().render(entity, 0, 0, 0, rotationYaw, partialTicks, matrixStackIn, outlineBuffer, 0xFFFFFFFF);
 	}
 	
 	private void forceRenderOutline(float partialTicks) {
 		Minecraft mc = Minecraft.getInstance();
-		final WorldRenderer worldRenderer = mc.worldRenderer;
-		final ShaderGroup outlineShader = ObfuscationReflectionHelper.getPrivateValue(WorldRenderer.class, worldRenderer, "field_174991_A");
+		final WorldRenderer worldRenderer = mc.levelRenderer;
+		final ShaderGroup outlineShader = ObfuscationReflectionHelper.getPrivateValue(WorldRenderer.class, worldRenderer, "entityEffect");
 		
-		outlineShader.render(partialTicks);
-		mc.getFramebuffer().bindFramebuffer(false);
+		outlineShader.process(partialTicks);
+		mc.getMainRenderTarget().bindWrite(false);
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.enableTexture(); // Rendering shaders disables texture but world renderer expects it to be enabled at this point for particles?
 	}
@@ -106,7 +106,7 @@ public class OutlineRenderer {
 			final LivingEntity entity = event.getEntity();
 			final MatrixStack matrixStackIn = event.getMatrixStack();
 			
-			if (Minecraft.getInstance().isEntityGlowing(entity)) {
+			if (Minecraft.getInstance().shouldEntityAppearGlowing(entity)) {
 				renderEntityDoingGlow = true; // Note that vanilla is doing glow rendering
 			}
 			
@@ -118,7 +118,7 @@ public class OutlineRenderer {
 				final float partialTicks = event.getPartialRenderTick();
 				renderRecurseMarker = true;
 				{
-					renderEntityOutline(matrixStackIn, entity, outline, entity.getYaw(partialTicks), partialTicks);
+					renderEntityOutline(matrixStackIn, entity, outline, entity.getViewYRot(partialTicks), partialTicks);
 					if (renderEntityDoingGlow) {
 						// Flush our outlines to the framebuffer since vanilla's going to render it
 						if (outlineBuffer != null) {

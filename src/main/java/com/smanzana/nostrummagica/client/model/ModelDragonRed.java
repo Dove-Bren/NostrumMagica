@@ -78,7 +78,7 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 	private float[] color;
 	
 	public ModelDragonRed(int color) {
-		super(RenderType::getEntityTranslucent);
+		super(RenderType::entityTranslucent);
 		
 		this.color = ColorUtil.ARGBToColor(color);
 		
@@ -86,7 +86,7 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 		
 		for (EDragonPart part : EDragonPart.values()) {
 			ModelRendererBakedWithOffset render = new ModelRendererBakedWithOffset(this, part.getLoc());
-			render.setTextureOffset(0, 0); // TODO add texture offsets?
+			render.texOffs(0, 0); // TODO add texture offsets?
 			// Set offset?
 			render.setOffsets((float) part.getX(), (float) part.getY(), (float) part.getZ());
 			//render.setRotationPoint((float) part.getX(), (float) part.getY(), (float) part.getZ());
@@ -120,7 +120,7 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 				
 				ResourceLocation loc = new ResourceLocation(NostrumMagica.MODID, part.getLocPrefix() + material.getSuffix() + "");
 				ModelRendererBakedWithOffset render = new ModelRendererBakedWithOffset(this, loc);
-				render.setTextureOffset(0, 0); // TODO add texture offsets?
+				render.texOffs(0, 0); // TODO add texture offsets?
 				render.setOffsets((float) part.getX(), (float) part.getY(), (float) part.getZ());
 				
 				if (part.parent == null) {
@@ -284,12 +284,12 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 	
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		// Update overlay visibility
 		for (DragonArmorKey key : overlays.keySet()) {
 			final ModelRendererBakedWithOffset renderer = overlays.get(key);
 			final EDragonOverlayMaterial material = overlayMaterial.get(key.part);
-			renderer.showModel = (material == key.material);
+			renderer.visible = (material == key.material);
 		}
 		
 		// Apply color supplied in constructor
@@ -301,15 +301,15 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 //		final float modelScale = 1.0f;// / 20.0f; // 16 pixels wide model to .8 blocks
 //		matrixStackIn.push();
 //		matrixStackIn.scale(modelScale, modelScale, modelScale);
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		this.baseRenderer.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 //		matrixStackIn.pop();
 	}
 	
 	@Override
-	public void setLivingAnimations(T entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
-		super.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTicks);
+	public void prepareMobModel(T entityIn, float limbSwing, float limbSwingAmount, float partialTicks) {
+		super.prepareMobModel(entityIn, limbSwing, limbSwingAmount, partialTicks);
 		float frac;
 		float weight;
 		
@@ -321,7 +321,7 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 		// Reset all rotations to 0
 		for (EDragonPart part : EDragonPart.values()) {
 			ModelRendererBakedWithOffset render = renderers.get(part);
-			render.rotateAngleX = render.rotateAngleY = render.rotateAngleZ = 0f;
+			render.xRot = render.yRot = render.zRot = 0f;
 		}
 		
 		ModelRendererBakedWithOffset wing_left = renderers.get(EDragonPart.WING_LEFT);
@@ -344,26 +344,26 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 			frac = dragon.getWingFlag(partialTicks);
 			weight = (float) Math.sin(frac * Math.PI * 2);
 			
-			wing_left.rotateAngleX = wing_left.rotateAngleY = 0f;
-			wing_left.rotateAngleZ = (weight * .8f);
-			wing_right.rotateAngleX = wing_right.rotateAngleY = 0f;
-			wing_right.rotateAngleZ = -(weight * .8f);
-			body.rotateAngleX = 0f;
+			wing_left.xRot = wing_left.yRot = 0f;
+			wing_left.zRot = (weight * .8f);
+			wing_right.xRot = wing_right.yRot = 0f;
+			wing_right.zRot = -(weight * .8f);
+			body.xRot = 0f;
 		} else if (casting) {
 			// Done in setRotationAngles because it's animated
 			//body.rotateAngleX = -.5f;
-		} else if (!dragon.isOnGround() && dragon.getMotion().y < -.62f) {
+		} else if (!dragon.isOnGround() && dragon.getDeltaMovement().y < -.62f) {
 			// Falling
 			float rotX = (float) (2 * Math.PI * 0.14);
 			float rotY = (float) (2 * Math.PI * -0.12);
 			float rotZ = (float) (2 * Math.PI * -0.05);
-			wing_left.rotateAngleX = rotX;
-			wing_left.rotateAngleY = rotY;
-			wing_left.rotateAngleZ = rotZ;
-			wing_right.rotateAngleX = rotX;
-			wing_right.rotateAngleY = -rotY;
-			wing_right.rotateAngleZ = -rotZ;
-			body.rotateAngleX = -.1f;
+			wing_left.xRot = rotX;
+			wing_left.yRot = rotY;
+			wing_left.zRot = rotZ;
+			wing_right.xRot = rotX;
+			wing_right.yRot = -rotY;
+			wing_right.zRot = -rotZ;
+			body.xRot = -.1f;
 		} else {
 			float rotX = (float) (2 * Math.PI * 0.168);
 			float rotY = (float) (2 * Math.PI * -0.2);
@@ -382,22 +382,22 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 				rotZ *= scale;
 			}
 			
-			wing_left.rotateAngleX = rotX;
-			wing_left.rotateAngleY = rotY;
-			wing_left.rotateAngleZ = rotZ;
-			wing_right.rotateAngleX = rotX;
-			wing_right.rotateAngleY = -rotY;
-			wing_right.rotateAngleZ = -rotZ;
-			body.rotateAngleX = 0f;
+			wing_left.xRot = rotX;
+			wing_left.yRot = rotY;
+			wing_left.zRot = rotZ;
+			wing_right.xRot = rotX;
+			wing_right.yRot = -rotY;
+			wing_right.zRot = -rotZ;
+			body.xRot = 0f;
 			
 			if (sitting) {
-				body.rotateAngleX = -0.3f;
+				body.xRot = -0.3f;
 			}
 		}
 	}
 	
 	@Override
-	public void setRotationAngles(T dragon, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void setupAnim(T dragon, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 		
 		float period;
 		float frac;
@@ -476,8 +476,8 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 		
 		
 		ModelRendererBakedWithOffset head = renderers.get(EDragonPart.HEAD);
-		head.rotateAngleY = (float) (netHeadYaw / -360f * 2 * Math.PI);
-		head.rotateAngleX = (float) (headPitch / 360f * 2 * Math.PI);
+		head.yRot = (float) (netHeadYaw / -360f * 2 * Math.PI);
+		head.xRot = (float) (headPitch / 360f * 2 * Math.PI);
 		
 		ModelRendererBakedWithOffset frontleg_left = renderers.get(EDragonPart.LEG_FRONT_LEFT);
 		ModelRendererBakedWithOffset frontleg_right = renderers.get(EDragonPart.LEG_FRONT_RIGHT);
@@ -500,46 +500,46 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 				progress = 1f;
 			}
 			
-			head.rotateAngleX = progress * .2f;
-			frontleg_left.rotateAngleX = progress * .80f;
-			frontleg_right.rotateAngleX = progress * .8125f;
-			backleg_left.rotateAngleX = backleg_right.rotateAngleX = 0f;
+			head.xRot = progress * .2f;
+			frontleg_left.xRot = progress * .80f;
+			frontleg_right.xRot = progress * .8125f;
+			backleg_left.xRot = backleg_right.xRot = 0f;
 			backleg_left.setOffsetY(progress * -.5f);
 			backleg_right.setOffsetY(progress * -.5f);
-			body.rotateAngleX = progress * -.5f;
+			body.xRot = progress * -.5f;
 			
 			if (!flying) {
 				float invProgress = 1 - progress;
 				float rotX = (float) (2 * Math.PI * 0.168);
 				float rotY = (float) (2 * Math.PI * 0.2);
 				float rotZ = (float) (2 * Math.PI * 0.05);
-				wing_left.rotateAngleX = invProgress * rotX;
-				wing_left.rotateAngleY = invProgress * rotY;
-				wing_left.rotateAngleZ = invProgress * rotZ;
-				wing_right.rotateAngleX = invProgress * rotX;
-				wing_right.rotateAngleY = invProgress * -rotY;
-				wing_right.rotateAngleZ = invProgress * -rotZ;
+				wing_left.xRot = invProgress * rotX;
+				wing_left.yRot = invProgress * rotY;
+				wing_left.zRot = invProgress * rotZ;
+				wing_right.xRot = invProgress * rotX;
+				wing_right.yRot = invProgress * -rotY;
+				wing_right.zRot = invProgress * -rotZ;
 			}
 		} else if (sitting) {
-			frontleg_left.rotateAngleX = .45f;
-			frontleg_right.rotateAngleX = .45f;
-			backleg_left.rotateAngleX = backleg_right.rotateAngleX = 0f;
+			frontleg_left.xRot = .45f;
+			frontleg_right.xRot = .45f;
+			backleg_left.xRot = backleg_right.xRot = 0f;
 			backleg_left.setOffsetY(-.5f);
 			backleg_right.setOffsetY(-.5f);
 		} else if (!flying && dragon.isOnGround()) {
-			frontleg_left.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
-			frontleg_right.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+			frontleg_left.xRot = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
+			frontleg_right.xRot = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
 			
 			limbSwingAmount *= .5;
-			backleg_left.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
-			backleg_right.rotateAngleX = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+			backleg_left.xRot = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
+			backleg_right.xRot = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
 		} else {
 			float ang = (float) (Math.PI * 2 * 0.12);
-			frontleg_left.rotateAngleX = frontleg_right.rotateAngleX = ang;
+			frontleg_left.xRot = frontleg_right.xRot = ang;
 			
 			ang = (float) (Math.PI * 2 * 0.15);
 			
-			backleg_left.rotateAngleX = backleg_right.rotateAngleX = ang;
+			backleg_left.xRot = backleg_right.xRot = ang;
 		}
 		
 		stateTime = now - dragon.getLastSlashTime();
@@ -547,7 +547,7 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 			float progress = (float) stateTime / (float) RedDragonEntity.ANIM_SLASH_DUR;
 			float ang = (float) Math.sin(progress * (float) (Math.PI * 2));
 			ang *= Math.PI * 2 * -.15;
-			frontleg_right.rotateAngleX += ang;
+			frontleg_right.xRot += ang;
 		}
 		
 		stateTime = now - dragon.getLastBiteTime();
@@ -555,7 +555,7 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 			float progress = (float) stateTime / (float) RedDragonEntity.ANIM_SLASH_DUR;
 			float ang = (float) Math.sin(progress * (float) (Math.PI * 2));
 			ang *= Math.PI * 2 * .1;
-			head.rotateAngleX += ang;
+			head.xRot += ang;
 		}
 		
 		ModelRendererBakedWithOffset tail = renderers.get(EDragonPart.TAIL);
@@ -565,7 +565,7 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 		weight = (float) Math.sin(frac * Math.PI * 2);
 		
 		float amt = (float) (weight * (.785398163397)) / 6; // 45degrees in radians
-		tail.rotateAngleY = amt;
+		tail.yRot = amt;
 		
 		for (EDragonOverlayMaterial mat : EDragonOverlayMaterial.values()) {
 			if (mat == EDragonOverlayMaterial.NONE) {
@@ -574,8 +574,8 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 			DragonArmorKey key = KeyPool.claim().set(EDragonArmorPart.HEAD, mat);
 			ModelRendererBakedWithOffset headArmor = overlays.get(key); //TODO why is this needed? It avoids allocating a key each time we access the map
 			
-			headArmor.rotateAngleY = head.rotateAngleY;
-			headArmor.rotateAngleX = head.rotateAngleX;
+			headArmor.yRot = head.yRot;
+			headArmor.xRot = head.xRot;
 			KeyPool.release(key);
 		}
 		

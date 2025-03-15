@@ -74,7 +74,7 @@ public class PositionToken extends PositionCrystal {
 			// Try to do actual recall
 			BlockPos pos = getBlockPosition(token);
 			// TODO: use stored dimension and support moving dimensions
-			if (NostrumMagica.attemptTeleport(new Location(worldIn, pos), playerIn, !playerIn.isSneaking(), NostrumMagica.rand.nextInt(32) == 0, playerIn)) {
+			if (NostrumMagica.attemptTeleport(new Location(worldIn, pos), playerIn, !playerIn.isShiftKeyDown(), NostrumMagica.rand.nextInt(32) == 0, playerIn)) {
 				// If success, take mana andreturn true
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn); // assumption: not null!
 				attr.addMana(-getManaCost(playerIn, worldIn, token));
@@ -88,31 +88,31 @@ public class PositionToken extends PositionCrystal {
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		final World worldIn = context.getWorld();
-		BlockPos pos = context.getPos();
+	public ActionResultType useOn(ItemUseContext context) {
+		final World worldIn = context.getLevel();
+		BlockPos pos = context.getClickedPos();
 		final PlayerEntity playerIn = context.getPlayer();
 		
-		if (worldIn.isRemote)
+		if (worldIn.isClientSide)
 			return ActionResultType.SUCCESS;
 		
-		if (pos == null || playerIn.isSneaking() || !playerIn.isCreative())
+		if (pos == null || playerIn.isShiftKeyDown() || !playerIn.isCreative())
 			return ActionResultType.PASS;
 		
 		BlockState state = worldIn.getBlockState(pos);
 		while (state.getBlock() instanceof ObeliskPortal) {
-			pos = pos.down();
+			pos = pos.below();
 			state = worldIn.getBlockState(pos);
 		}
-		setPosition(context.getItem(), DimensionUtils.GetDimension(playerIn), pos);
+		setPosition(context.getItemInHand(), DimensionUtils.GetDimension(playerIn), pos);
 		return ActionResultType.SUCCESS;
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		final @Nonnull ItemStack itemStackIn = playerIn.getItemInHand(hand);
 		if (PositionToken.hasRecallUnlocked(playerIn, worldIn, itemStackIn)) {
-			if (!worldIn.isRemote) {
+			if (!worldIn.isClientSide) {
 				doRecall(playerIn, worldIn, itemStackIn);
 			}
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
@@ -200,8 +200,8 @@ public class PositionToken extends PositionCrystal {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
 		if (hasRecallUnlocked(NostrumMagica.instance.proxy.getPlayer(), worldIn, stack)) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.instance.proxy.getPlayer());

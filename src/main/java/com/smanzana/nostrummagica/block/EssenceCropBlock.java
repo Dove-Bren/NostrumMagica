@@ -30,13 +30,13 @@ import net.minecraft.world.IBlockReader;
 public class EssenceCropBlock extends CropsBlock {
 
 	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
-	private static final VoxelShape[] AABB = new VoxelShape[] {Block.makeCuboidShape(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.165D, 16.0D), Block.makeCuboidShape(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.275D, 16.0D), Block.makeCuboidShape(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.275D, 16.0D), Block.makeCuboidShape(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.275D, 16.0D), Block.makeCuboidShape(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.7D, 16.0D), Block.makeCuboidShape(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.7D, 16.0D), Block.makeCuboidShape(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.7D, 16.0D), Block.makeCuboidShape(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.8D, 16.0D)};
+	private static final VoxelShape[] AABB = new VoxelShape[] {Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.165D, 16.0D), Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.275D, 16.0D), Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.275D, 16.0D), Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.275D, 16.0D), Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.7D, 16.0D), Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.7D, 16.0D), Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.7D, 16.0D), Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.8D, 16.0D)};
 
 	public static final String ID = "esscrop";
 	
 	public EssenceCropBlock() {
-		super(Block.Properties.create(Material.PLANTS)
-				.doesNotBlockMovement().tickRandomly().hardnessAndResistance(0f).sound(SoundType.CROP));
+		super(Block.Properties.of(Material.PLANT)
+				.noCollission().randomTicks().strength(0f).sound(SoundType.CROP));
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ public class EssenceCropBlock extends CropsBlock {
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(AGE);
 	}
 	
@@ -55,12 +55,12 @@ public class EssenceCropBlock extends CropsBlock {
 	}
 	
 	@Override
-	protected Item getSeedsItem() {
+	protected Item getBaseSeedId() {
 		return NostrumItems.reagentSeedEssence;
 	}
 	
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		return AABB[((Integer)state.get(this.getAgeProperty())).intValue()];
+		return AABB[((Integer)state.getValue(this.getAgeProperty())).intValue()];
 	}
 	
 	protected ItemStack getRandomEssence(Random rand) {
@@ -70,12 +70,12 @@ public class EssenceCropBlock extends CropsBlock {
 
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		final LootContext context = builder.withParameter(LootParameters.BLOCK_STATE, state).build(LootParameterSets.BLOCK);
+		final LootContext context = builder.withParameter(LootParameters.BLOCK_STATE, state).create(LootParameterSets.BLOCK);
 		final List<ItemStack> loot = new ArrayList<>();
         final int age = getAge(state);
         final int fortune;
-		if (context.has(LootParameters.TOOL)) {
-			fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, context.get(LootParameters.TOOL));
+		if (context.hasParam(LootParameters.TOOL)) {
+			fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, context.getParamOrNull(LootParameters.TOOL));
 		} else {
 			 fortune = 0;
 		}
@@ -97,7 +97,7 @@ public class EssenceCropBlock extends CropsBlock {
         	seedCount += 1 + (fortune / 3);
         }
         
-        loot.add(new ItemStack(this.getSeedsItem(), seedCount));
+        loot.add(new ItemStack(this.getBaseSeedId(), seedCount));
         return loot;
     }
 }

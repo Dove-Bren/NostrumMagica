@@ -19,7 +19,7 @@ public class BonusJumpEffect extends Effect {
 	
 	public BonusJumpEffect() {
 		super(EffectType.BENEFICIAL, 0xFFD1CDD6);
-		this.addAttributesModifier(NostrumAttributes.bonusJump, "d10d2bfa-1b89-47a0-ade5-5b4d1cc9c48d", 1, AttributeModifier.Operation.ADDITION);
+		this.addAttributeModifier(NostrumAttributes.bonusJump, "d10d2bfa-1b89-47a0-ade5-5b4d1cc9c48d", 1, AttributeModifier.Operation.ADDITION);
 	}
 	
 	@SubscribeEvent(priority = EventPriority.LOWEST)
@@ -29,7 +29,7 @@ public class BonusJumpEffect extends Effect {
 		}
 		
 		if (event.getDistance() > 0) {
-			EffectInstance effect = event.getEntityLiving().getActivePotionEffect(NostrumEffects.bonusJump);
+			EffectInstance effect = event.getEntityLiving().getEffect(NostrumEffects.bonusJump);
 			if (effect != null && effect.getDuration() > 0) {
 				// Reduce by 1.5 blocks per level, plus an additional .25 blocks per .1 jump velocity over normal.
 //				final float baseVelocity = 0.42F; // from LivingEntity

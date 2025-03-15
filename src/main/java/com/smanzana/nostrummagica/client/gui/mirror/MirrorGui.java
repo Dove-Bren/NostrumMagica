@@ -219,18 +219,18 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 	}
 	
 	private void drawLockedScreenBackground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK_CLOUD);
+		Minecraft.getInstance().getTextureManager().bind(RES_BACK_CLOUD);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 0, 0, TEX_WIDTH, TEX_HEIGHT, guiWidth, guiHeight, TEX_WIDTH, TEX_HEIGHT);
 		
 		int y = 0;
 		String str = "Magic Not Yet Unlocked";
-		int len = this.font.getStringWidth(str);
-		this.font.drawStringWithShadow(matrixStackIn, str, (this.guiWidth - len) / 2, guiHeight / 3, 0xFFFFFFFF);
+		int len = this.font.width(str);
+		this.font.drawShadow(matrixStackIn, str, (this.guiWidth - len) / 2, guiHeight / 3, 0xFFFFFFFF);
 		
-		y = font.FONT_HEIGHT + 2;
+		y = font.lineHeight + 2;
 		
-		len = this.font.getStringWidth(unlockPrompt);
-		this.font.drawString(matrixStackIn, unlockPrompt, (this.guiWidth - len) / 2, y + (guiHeight / 3), 0xFFDFD000);
+		len = this.font.width(unlockPrompt);
+		this.font.draw(matrixStackIn, unlockPrompt, (this.guiWidth - len) / 2, y + (guiHeight / 3), 0xFFDFD000);
 	}
 	
 	private void drawLockedScreenForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
@@ -275,9 +275,9 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 			      ];
 		}
 		SpellComponentIcon.get(element).draw(matrixStackIn, x, y, width, width, color[0], color[1], color[2], color[3]);
-		str = I18n.format("element.name", new Object[0]);
-		strLen = this.font.getStringWidth(str);
-		this.font.drawString(matrixStackIn, str, (x + width / 2) - strLen/2, y - (3 + this.font.FONT_HEIGHT), 0xFFFFFF);
+		str = I18n.get("element.name", new Object[0]);
+		strLen = this.font.width(str);
+		this.font.draw(matrixStackIn, str, (x + width / 2) - strLen/2, y - (3 + this.font.lineHeight), 0xFFFFFF);
 		
 		x += width + space;
 		RenderFuncs.drawRect(matrixStackIn, x - 2, y - 2, x + width + 2, y + width + 2, 0xA0000000);
@@ -292,9 +292,9 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 			      ];
 		}
 		SpellComponentIcon.get(shape).draw(matrixStackIn, x, y, width, width, color[0], color[1], color[2], color[3]);
-		str = I18n.format("shape.name", new Object[0]);
-		strLen = this.font.getStringWidth(str);
-		this.font.drawString(matrixStackIn, str, (x + width / 2) - strLen/2, y - (3 + this.font.FONT_HEIGHT), 0xFFFFFF);
+		str = I18n.get("shape.name", new Object[0]);
+		strLen = this.font.width(str);
+		this.font.draw(matrixStackIn, str, (x + width / 2) - strLen/2, y - (3 + this.font.lineHeight), 0xFFFFFF);
 	}
 	
 	private void drawResearchPages(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
@@ -303,7 +303,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 	}
 	
 	private void drawScreenBorder(MatrixStack matrixStackIn, float partialTicks) {
-		Minecraft.getInstance().getTextureManager().bindTexture(RES_BASE);
+		Minecraft.getInstance().getTextureManager().bind(RES_BASE);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 				TEX_FRAME_HOFFSET, TEX_FRAME_VOFFSET, TEX_FRAME_WIDTH, TEX_FRAME_HEIGHT,
 				guiWidth, guiHeight, TEX_WIDTH, TEX_HEIGHT);
@@ -317,18 +317,18 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		// Draw fade background first
 		RenderFuncs.drawRect(matrixStackIn, 0, 0, this.width, this.height, 0xDD000000);
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		
 		// Setup mask so only central area is drawn in
 		{
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 10);
 			RenderSystem.enableDepthTest();
 			RenderSystem.depthMask(true);
 			RenderSystem.colorMask(false, false, false, false);
 			RenderFuncs.drawRect(matrixStackIn, 0, 0, this.width, this.height, 0xFF000000);
 			RenderSystem.colorMask(true, true, true, true);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 			
 			RenderSystem.depthFunc(GL11.GL_GEQUAL);
 			RenderFuncs.drawRect(matrixStackIn, guiLeft(), guiTop(), guiLeft() + guiWidth, guiTop() + guiHeight, 0xFF000000);
@@ -342,7 +342,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 			
 			this.subscreen.drawBackground(this, matrixStackIn, guiWidth, guiHeight, mouseX, mouseY, partialTicks);
 		}
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 
 		if (unlocked) {
 			organizeTabs();
@@ -351,7 +351,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		
 		// Undo mask and allow free drawing again
 		{
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, -800);
 			RenderSystem.enableDepthTest();
 			RenderSystem.depthMask(true);
@@ -360,10 +360,10 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 			RenderFuncs.drawRect(matrixStackIn, 0, 0, width, height, 0xFF000000);
 			RenderSystem.colorMask(true, true, true, true);
 			RenderSystem.depthFunc(GL11.GL_LEQUAL);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(leftOffset, topOffset, 150);
 		
 //		// Black out surrounding screen
@@ -381,7 +381,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 			
 			this.subscreen.drawForeground(this, matrixStackIn, guiWidth, guiHeight, mouseX, mouseY, partialTicks);
 		}
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 		for (Widget widget : this.buttons) {
 			// Hacky
@@ -392,10 +392,10 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		}
 		
 		if (unlocked && currentInfoScreen != null) {
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 500);
 			drawResearchPages(matrixStackIn, mouseX, mouseY, partialTicks);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 
@@ -477,7 +477,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 	@Override
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		// Super gets the first widget at pos and only call it on it. Do the normal iteration that mouseClicked does instead instead.
-		for(IGuiEventListener iguieventlistener : this.getEventListeners()) {
+		for(IGuiEventListener iguieventlistener : this.children()) {
 			if (iguieventlistener.mouseReleased(mouseX, mouseY, button)) {
 				this.setDragging(false);
 				return true;
@@ -499,7 +499,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
 		// Super gets the first widget at pos and only call it on it. Do the normal iteration that mouseClicked does instead instead.
-		for(IGuiEventListener iguieventlistener : this.getEventListeners()) {
+		for(IGuiEventListener iguieventlistener : this.children()) {
 			if (iguieventlistener.mouseScrolled(mouseX, mouseY, delta)) {
 				this.setDragging(false);
 				return true;
@@ -548,26 +548,26 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 					textureY = TEX_MAJORTAB_SEL_VOFFSET;
 				}
 				
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(0, 0, 10); // Hackily make sure to render on top of children widgets and the screen mask
 				
-				Minecraft.getInstance().getTextureManager().bindTexture(RES_BASE);
+				Minecraft.getInstance().getTextureManager().bind(RES_BASE);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 						textureX, textureY, TEX_MAJORTAB_WIDTH, TEX_MAJORTAB_HEIGHT, this.width, this.height, TEX_WIDTH, TEX_HEIGHT);
 				
 				// Now draw icon
 				RenderFuncs.RenderGUIItem(getSubscreen().getIcon(), matrixStackIn, x + (width - 16) / 2, y + (height - 16) / 2);
 				
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 		}
 		
 		@Override
 		public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			if (this.isHovered()) { 
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(0, 0, 250);
 				gui.renderTooltip(matrixStackIn, this.subscreen.getName(), mouseX, mouseY);
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 		}
 		
@@ -609,10 +609,10 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 				textureY = TEX_MINORTAB_SEL_VOFFSET;
 			}
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(x, y, 10); // Hackily make su re to render on top of children widgets
 			
-			Minecraft.getInstance().getTextureManager().bindTexture(RES_BASE);
+			Minecraft.getInstance().getTextureManager().bind(RES_BASE);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 					textureX, textureY, TEX_MINORTAB_WIDTH, TEX_MINORTAB_HEIGHT, this.width, this.height, TEX_WIDTH, TEX_HEIGHT);
 			
@@ -621,13 +621,13 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 			
 			// Draw new tab if there's something new
 			if (tab.hasNewEntry(gui, gui.subscreen)) {
-				Minecraft.getInstance().getTextureManager().bindTexture(RES_BASE);
+				Minecraft.getInstance().getTextureManager().bind(RES_BASE);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 						TEX_MINORTAB_NEW_HOFFSET, TEX_MINORTAB_NEW_VOFFSET, TEX_MINORTAB_NEW_WIDTH, TEX_MINORTAB_NEW_HEIGHT,
 						this.width, this.height, TEX_WIDTH, TEX_HEIGHT);
 			}
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		@Override

@@ -128,8 +128,8 @@ public class NostrumDimensionMapper extends WorldSavedData {
 	}
 
 	@Override
-	public void read(CompoundNBT nbt) {
-		for (String key : nbt.keySet()) {
+	public void load(CompoundNBT nbt) {
+		for (String key : nbt.getAllKeys()) {
 			UUID id;
 			
 			try {
@@ -151,7 +151,7 @@ public class NostrumDimensionMapper extends WorldSavedData {
 	}
 
 	@Override
-	public CompoundNBT write(CompoundNBT compound) {
+	public CompoundNBT save(CompoundNBT compound) {
 		int count = 0;
 		for (Entry<UUID, NostrumDimensionOffset> row : map.entrySet()) {
 			CompoundNBT tag = row.getValue().asNBT();
@@ -176,7 +176,7 @@ public class NostrumDimensionMapper extends WorldSavedData {
 			existing.bump();
 		}
 		map.put(id, existing);
-		this.markDirty();
+		this.setDirty();
 		
 		return existing;
 	}

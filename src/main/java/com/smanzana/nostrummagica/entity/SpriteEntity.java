@@ -66,7 +66,7 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 	
 	public static final String ID = "entity_sprite";
 
-	private static final DataParameter<Boolean> SPRITE_ANGRY = EntityDataManager.<Boolean>createKey(SpriteEntity.class, DataSerializers.BOOLEAN);
+	private static final DataParameter<Boolean> SPRITE_ANGRY = EntityDataManager.<Boolean>defineId(SpriteEntity.class, DataSerializers.BOOLEAN);
 	
 	private static Spell EARTH_ZAP = null;
 	
@@ -88,7 +88,7 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
         
         idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
         effectCooldown = 20 * 5;
-        this.experienceValue = 10;
+        this.xpReward = 10;
     }
 
     @Override
@@ -97,14 +97,14 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
     	
     	int priority = 1;
     	this.goalSelector.addGoal(priority++, new SpellAttackGoal<SpriteEntity>(this, 20, 4, true, (sprite) -> {
-    		return sprite.isAngry() && sprite.getAttackTarget() != null
-    				&& sprite.getAttackTarget().getDistanceSq(sprite) <= TouchShape.AI_TOUCH_RANGE * TouchShape.AI_TOUCH_RANGE;
+    		return sprite.isAngry() && sprite.getTarget() != null
+    				&& sprite.getTarget().distanceToSqr(sprite) <= TouchShape.AI_TOUCH_RANGE * TouchShape.AI_TOUCH_RANGE;
     	}, EARTH_ZAP));
         this.goalSelector.addGoal(priority++, new SwimGoal(this));
         this.goalSelector.addGoal(priority++, new FollowEntityGenericGoal<SpriteEntity>(this, 1D, 2f, 4f, false, null) {
         	@Override
         	protected LivingEntity getTarget(SpriteEntity entity) {
-        		return entity.getAttackTarget();
+        		return entity.getTarget();
         	}
         	
         	@Override
@@ -115,7 +115,7 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
         this.goalSelector.addGoal(priority++, new FollowEntityGenericGoal<SpriteEntity>(this, 1D, 6f, 10f, false, null) {
         	@Override
         	protected LivingEntity getTarget(SpriteEntity entity) {
-        		return entity.getAttackTarget();
+        		return entity.getTarget();
         	}
         });
         this.goalSelector.addGoal(priority++, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
@@ -125,17 +125,17 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
     }
 
     public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-    	return CreatureEntity.func_233666_p_()
-    		.createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.33D)
-    		.createMutableAttribute(Attributes.MAX_HEALTH, 40.0D)
-    		.createMutableAttribute(Attributes.ATTACK_DAMAGE, 2.0D)
-    		.createMutableAttribute(Attributes.ARMOR, 2.0D);
+    	return CreatureEntity.createMobAttributes()
+    		.add(Attributes.MOVEMENT_SPEED, 0.33D)
+    		.add(Attributes.MAX_HEALTH, 40.0D)
+    		.add(Attributes.ATTACK_DAMAGE, 2.0D)
+    		.add(Attributes.ARMOR, 2.0D);
     }
 
     @Override
     protected void playStepSound(BlockPos pos, BlockState blockIn)
     {
-        this.playSound(SoundEvents.ENTITY_HUSK_STEP, 0.15F, 1.0F);
+        this.playSound(SoundEvents.HUSK_STEP, 0.15F, 1.0F);
     }
 
     @Override
@@ -162,23 +162,23 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
     @Override
     protected float getStandingEyeHeight(Pose pose, EntitySize size)
     {
-        return this.getHeight() * 0.4F;
+        return this.getBbHeight() * 0.4F;
     }
 
     @Override
-    public boolean attackEntityAsMob(Entity entityIn)
+    public boolean doHurtTarget(Entity entityIn)
     {
-        boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
+        boolean flag = entityIn.hurt(DamageSource.mobAttack(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
 
         if (flag)
         {
-            this.applyEnchantments(this, entityIn);
+            this.doEnchantDamageEffects(this, entityIn);
         }
 
         return flag;
     }
 
-    public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
+    public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
         return ActionResultType.PASS;
     }
 
@@ -204,28 +204,28 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
         return target != this;
     }
 
-    public boolean canBeLeashedTo(PlayerEntity player)
+    public boolean canBeLeashed(PlayerEntity player)
     {
         return false;
     }
     
     private void applyEffect(LivingEntity entity) {
-    	entity.removePotionEffect(Effects.LEVITATION);
-    	entity.removePotionEffect(NostrumEffects.rooted);
+    	entity.removeEffect(Effects.LEVITATION);
+    	entity.removeEffect(NostrumEffects.rooted);
     	if (this.isAngry()) {
-    		entity.addPotionEffect(new EffectInstance(NostrumEffects.rooted, 20 * 10));
+    		entity.addEffect(new EffectInstance(NostrumEffects.rooted, 20 * 10));
 		} else {
 			final int finalDur = 20*10;
 			int dur = 20 * 1;
-			if (entity == this.getAttackTarget()) {
+			if (entity == this.getTarget()) {
 				dur = finalDur;
 			}
 			
-			entity.addPotionEffect(
+			entity.addEffect(
 				new EffectInstance(Effects.LEVITATION, dur)
 				);
 			if (entity instanceof PlayerEntity) {
-				this.addPotionEffect(
+				this.addEffect(
 						new EffectInstance(Effects.GLOWING, finalDur)
 					);
 			}
@@ -239,22 +239,22 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 		if (idleCooldown > 0) {
 			idleCooldown--;
 			if (idleCooldown == 0) {
-				if (this.getAttackTarget() == null)
+				if (this.getTarget() == null)
 					NostrumMagicaSounds.DAMAGE_EARTH.play(this);
 				idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10); 
 			}
 		}
 		
-		if (effectCooldown > 0 && !world.isRemote) {
+		if (effectCooldown > 0 && !level.isClientSide) {
 			effectCooldown--;
 			if (effectCooldown == 0) {
 				
 				// Lift up players in a large radius. Lift up other entities at a much smaller one
 				
 				// Non-players
-				AxisAlignedBB bb = new AxisAlignedBB(getPosX() - 6, getPosY() - 40, getPosZ() - 6,
-						getPosX() + 6, getPosY() + 40, getPosZ() + 6);
-				List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(this, bb);
+				AxisAlignedBB bb = new AxisAlignedBB(getX() - 6, getY() - 40, getZ() - 6,
+						getX() + 6, getY() + 40, getZ() + 6);
+				List<Entity> entities = level.getEntities(this, bb);
 				
 				for (Entity entity : entities) {
 					if (entity instanceof LivingEntity && !(entity instanceof SpriteEntity)) {
@@ -268,12 +268,12 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 				}
 				
 				// Players
-				for (PlayerEntity player : world.getPlayers()) {
+				for (PlayerEntity player : level.players()) {
 					if (player.isCreative() || player.isSpectator()) {
 						continue;
 					}
 					
-					if (player.getDistanceSq(this) <= EFFECT_DISTANCE_SQ) {
+					if (player.distanceToSqr(this) <= EFFECT_DISTANCE_SQ) {
 						applyEffect(player);
 					}
 				}
@@ -329,33 +329,33 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 	
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
+	protected void defineSynchedData() {
+		super.defineSynchedData();
 		
-		this.dataManager.register(SPRITE_ANGRY, false);
+		this.entityData.define(SPRITE_ANGRY, false);
 	}
 	
 	@Override
-	public void readAdditional(CompoundNBT compound) {
-		super.readAdditional(compound);
+	public void readAdditionalSaveData(CompoundNBT compound) {
+		super.readAdditionalSaveData(compound);
 		
-		this.dataManager.set(SPRITE_ANGRY, compound.getBoolean("angry"));
+		this.entityData.set(SPRITE_ANGRY, compound.getBoolean("angry"));
 	}
 
 	@Override
-	public void writeAdditional(CompoundNBT compound) {
-    	super.writeAdditional(compound);
+	public void addAdditionalSaveData(CompoundNBT compound) {
+    	super.addAdditionalSaveData(compound);
     	
     	compound.putBoolean("angry", this.isAngry());
 	}
 	
 	@Override
-	public boolean onLivingFall(float distance, float damageMulti) {
+	public boolean causeFallDamage(float distance, float damageMulti) {
 		return false; // No fall damage
 	}
 	
 	@Override
-	protected void updateFallState(double y, boolean onGround, BlockState stae, BlockPos pos) {
+	protected void checkFallDamage(double y, boolean onGround, BlockState stae, BlockPos pos) {
 		
 	}
 	
@@ -401,19 +401,19 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 //	}
 	
 	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount) {
+	public boolean hurt(DamageSource source, float amount) {
 		if (source.isProjectile()) {
 			amount *= 0.25f;
 		}
 		
-		boolean hurt = super.attackEntityFrom(source, amount);
+		boolean hurt = super.hurt(source, amount);
 		
 		if (hurt && !this.isAngry()) {
 			setAngry(true);
 			effectCooldown = 1; // Make next tick grou nd everyone again
 			
-			if (!this.world.isRemote) {
-				this.world.setEntityState(this, (byte) 6);
+			if (!this.level.isClientSide) {
+				this.level.broadcastEntityEvent(this, (byte) 6);
 			}
 		}
 		
@@ -423,33 +423,33 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 	private void playEffect(IParticleData particle) {
 		
 		for (int i = 0; i < 15; ++i) {
-			double d0 = this.rand.nextGaussian() * 0.02D;
-			double d1 = this.rand.nextGaussian() * 0.02D;
-			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.addParticle(particle, this.getPosX() + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.getPosY() + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.getPosZ() + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
+			double d0 = this.random.nextGaussian() * 0.02D;
+			double d1 = this.random.nextGaussian() * 0.02D;
+			double d2 = this.random.nextGaussian() * 0.02D;
+			this.level.addParticle(particle, this.getX() + (double)(this.random.nextFloat() * this.getBbWidth() * 2.0F) - (double)this.getBbWidth(), this.getY() + 0.5D + (double)(this.random.nextFloat() * this.getBbHeight()), this.getZ() + (double)(this.random.nextFloat() * this.getBbWidth() * 2.0F) - (double)this.getBbWidth(), d0, d1, d2);
 		}
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void handleStatusUpdate(byte id) {
+	public void handleEntityEvent(byte id) {
 		if (id == 6) {
 			playEffect(ParticleTypes.ANGRY_VILLAGER);
 		}
 	}
 	
 	public boolean isAngry() {
-		return this.dataManager.get(SPRITE_ANGRY);
+		return this.entityData.get(SPRITE_ANGRY);
 	}
 	
 	protected void setAngry(boolean angry) {
-		this.dataManager.set(SPRITE_ANGRY, angry);
+		this.entityData.set(SPRITE_ANGRY, angry);
 	}
 	
 	@Override
-	public float getBlockPathWeight(BlockPos pos, IWorldReader worldIn) {
+	public float getWalkTargetValue(BlockPos pos, IWorldReader worldIn) {
 		// Want to use dimension key but not available with IWorldReadyer
-		RegistryKey<Biome> biomeKey = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, worldIn.getBiome(pos).getRegistryName());
+		RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, worldIn.getBiome(pos).getRegistryName());
 		
 //		if (DimensionUtils.IsNether(worldIn.)) {
 //			return 0; // Nether is very bright
@@ -460,14 +460,14 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 		
 		// most monsters do 0.5 - worldIn.getBrightness(pos);
 		final float tolerance;
-		if (worldIn.getBlockState(pos).getMaterial() == Material.ORGANIC) { // ORGANIC is what grass blocks use
+		if (worldIn.getBlockState(pos).getMaterial() == Material.GRASS) { // ORGANIC is what grass blocks use
 			// Higher light tolerance
 			tolerance = 0.75f;
 		} else {
 			tolerance = .5f;
 		}
 		
-		return tolerance - worldIn.getLight(pos);
+		return tolerance - worldIn.getMaxLocalRawBrightness(pos);
 	}
 
 	@Override

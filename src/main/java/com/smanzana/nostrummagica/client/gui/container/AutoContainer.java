@@ -22,18 +22,18 @@ public abstract class AutoContainer extends Container {
 		super(type, windowId);
 		this.inventory = inventory;
 		if (inventory != null) {
-			this.trackIntArray(inventory);
+			this.addDataSlots(inventory);
 		}
 	}
 	
 	@Override
-	public void detectAndSendChanges() {
-		super.detectAndSendChanges();
+	public void broadcastChanges() {
+		super.broadcastChanges();
 	}
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void updateProgressBar(int id, int data) {
-		super.updateProgressBar(id, data);
+	public void setData(int id, int data) {
+		super.setData(id, data);
 	}
 }

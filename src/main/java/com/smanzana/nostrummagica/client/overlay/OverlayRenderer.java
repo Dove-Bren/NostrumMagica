@@ -160,9 +160,9 @@ public class OverlayRenderer extends AbstractGui {
 		
 		if (event.getType() == ElementType.CROSSHAIRS) {
 			if (ModConfig.config.displayHookshotCrosshair()) {
-				ItemStack hookshot = player.getHeldItemMainhand();
+				ItemStack hookshot = player.getMainHandItem();
 				if (hookshot.isEmpty() || !(hookshot.getItem() instanceof HookshotItem)) {
-					hookshot = player.getHeldItemOffhand();
+					hookshot = player.getOffhandItem();
 				}
 				
 				if (hookshot.isEmpty() || !(hookshot.getItem() instanceof HookshotItem)) {
@@ -170,8 +170,8 @@ public class OverlayRenderer extends AbstractGui {
 				}
 				
 				HookshotType type = HookshotItem.GetType(hookshot);
-				RayTraceResult result = RayTrace.raytrace(player.world, player, player.getEyePosition(event.getPartialTicks()),
-						player.rotationPitch, player.rotationYaw, (float) HookshotItem.GetMaxDistance(type),
+				RayTraceResult result = RayTrace.raytrace(player.level, player, player.getEyePosition(event.getPartialTicks()),
+						player.xRot, player.yRot, (float) HookshotItem.GetMaxDistance(type),
 						new Predicate<Entity>() {
 
 							@Override
@@ -189,7 +189,7 @@ public class OverlayRenderer extends AbstractGui {
 						hit = true;
 						entity = true;
 					} else if (result.getType() == Type.BLOCK) {
-						BlockState state = player.world.getBlockState(RayTrace.blockPosFromResult(result));
+						BlockState state = player.level.getBlockState(RayTrace.blockPosFromResult(result));
 						if (state != null && HookshotItem.CanBeHooked(type, state)) {
 							hit = true;
 						}
@@ -204,7 +204,7 @@ public class OverlayRenderer extends AbstractGui {
 			}
 		} else if (event.getType() == ElementType.ALL) {
 			// Before everything.
-			if (player.getActivePotionEffect(NostrumEffects.cursedFire) != null) {
+			if (player.getEffect(NostrumEffects.cursedFire) != null) {
 				renderCursedFireOverlay(event.getMatrixStack(), player, window);
 			}
 		}
@@ -226,7 +226,7 @@ public class OverlayRenderer extends AbstractGui {
 			}
 			
 			renderSpellSlide(matrixStackIn, player, window, attr);
-			renderReagentTracker(matrixStackIn, player, window, attr, mc.fontRenderer);
+			renderReagentTracker(matrixStackIn, player, window, attr, mc.font);
 			
 			if (mc.player.isCreative()
 					|| mc.player.isSpectator()) {
@@ -253,18 +253,18 @@ public class OverlayRenderer extends AbstractGui {
 		} else if (event.getType() == ElementType.CROSSHAIRS) {
 			//if (ModConfig.config.displayShieldHearts())
 			{
-				ItemStack held = player.getHeldItemMainhand();
-				if (held.isEmpty() || !(held.getItem() instanceof IRaytraceOverlay) || !((IRaytraceOverlay) held.getItem()).shouldTrace(player.world, player, held)) {
-					held = player.getHeldItemOffhand();
-					if (held.isEmpty() || !(held.getItem() instanceof IRaytraceOverlay) || !((IRaytraceOverlay) held.getItem()).shouldTrace(player.world, player, held)) {
+				ItemStack held = player.getMainHandItem();
+				if (held.isEmpty() || !(held.getItem() instanceof IRaytraceOverlay) || !((IRaytraceOverlay) held.getItem()).shouldTrace(player.level, player, held)) {
+					held = player.getOffhandItem();
+					if (held.isEmpty() || !(held.getItem() instanceof IRaytraceOverlay) || !((IRaytraceOverlay) held.getItem()).shouldTrace(player.level, player, held)) {
 						held = ItemStack.EMPTY;
 					}
 				}
 				
 				if (!held.isEmpty()) {
-					final double range = ((IRaytraceOverlay) held.getItem()).getTraceRange(player.world, player, held);
-					RayTraceResult result = RayTrace.raytraceApprox(player.world, player, player.getEyePosition(event.getPartialTicks()),
-							player.rotationPitch, player.rotationYaw, (float) range,
+					final double range = ((IRaytraceOverlay) held.getItem()).getTraceRange(player.level, player, held);
+					RayTraceResult result = RayTrace.raytraceApprox(player.level, player, player.getEyePosition(event.getPartialTicks()),
+							player.xRot, player.yRot, (float) range,
 							new Predicate<Entity>() {
 	
 								@Override
@@ -282,12 +282,12 @@ public class OverlayRenderer extends AbstractGui {
 		} else if (event.getType() == ElementType.POTION_ICONS) {
 			// TODO config option
 			{
-				final int nowTicks = player.ticksExisted;
+				final int nowTicks = player.tickCount;
 				int offsetX = 0;
 				EffectData data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_DAMAGE);
 				if (data != null) {
 					if (data.getAmt() == 0) {
-						data.amt(player.ticksExisted);
+						data.amt(player.tickCount);
 					}
 					float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
 					timer = 1f - timer;
@@ -297,7 +297,7 @@ public class OverlayRenderer extends AbstractGui {
 				data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_MANA);
 				if (data != null) {
 					if (data.getAmt() == 0) {
-						data.amt(player.ticksExisted);
+						data.amt(player.tickCount);
 					}
 					float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
 					timer = 1f - timer;
@@ -307,7 +307,7 @@ public class OverlayRenderer extends AbstractGui {
 				data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_HEALTH);
 				if (data != null) {
 					if (data.getAmt() == 0) {
-						data.amt(player.ticksExisted);
+						data.amt(player.tickCount);
 					}
 					float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
 					timer = 1f - timer;
@@ -317,7 +317,7 @@ public class OverlayRenderer extends AbstractGui {
 				data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_FOOD);
 				if (data != null) {
 					if (data.getAmt() == 0) {
-						data.amt(player.ticksExisted);
+						data.amt(player.tickCount);
 					}
 					float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
 					timer = 1f - timer;
@@ -326,30 +326,30 @@ public class OverlayRenderer extends AbstractGui {
 				}
 			}
 		} else if (event.getType() == ElementType.VIGNETTE) {
-			if (player == null || player.world == null) {
+			if (player == null || player.level == null) {
 				return;
 			}
 			
 			final int h = (int) player.getEyeHeight();
-			BlockState inBlock = player.world.getBlockState(new BlockPos(player.getPosX(), player.getPosY() + h, player.getPosZ()));
+			BlockState inBlock = player.level.getBlockState(new BlockPos(player.getX(), player.getY() + h, player.getZ()));
 			if (inBlock.getBlock() instanceof DungeonAirBlock) {
 				// Render dungeon air overlay
 				{
-					final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+					final Matrix4f transform = matrixStackIn.last().pose();
 					Tessellator tessellator = Tessellator.getInstance();
-					BufferBuilder bufferbuilder = tessellator.getBuffer();
+					BufferBuilder bufferbuilder = tessellator.getBuilder();
 					RenderSystem.enableBlend();
 					RenderSystem.disableTexture();
 					//GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 					RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 					final float depth = -91f;
 					bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
-					bufferbuilder.pos(transform, 0, event.getWindow().getScaledHeight(), depth).color(.3f, 0, .3f, .2f).endVertex();
-					bufferbuilder.pos(transform, event.getWindow().getScaledWidth(), event.getWindow().getScaledHeight(), depth).color(.3f, 0, .3f, .2f).endVertex();
-					bufferbuilder.pos(transform, event.getWindow().getScaledWidth(), 0, depth).color(.3f, 0, .3f, .2f).endVertex();
-					bufferbuilder.pos(transform, 0, 0, depth).color(.3f, 0, .3f, .2f).endVertex();
-					bufferbuilder.finishDrawing();
-					WorldVertexBufferUploader.draw(bufferbuilder);
+					bufferbuilder.vertex(transform, 0, event.getWindow().getGuiScaledHeight(), depth).color(.3f, 0, .3f, .2f).endVertex();
+					bufferbuilder.vertex(transform, event.getWindow().getGuiScaledWidth(), event.getWindow().getGuiScaledHeight(), depth).color(.3f, 0, .3f, .2f).endVertex();
+					bufferbuilder.vertex(transform, event.getWindow().getGuiScaledWidth(), 0, depth).color(.3f, 0, .3f, .2f).endVertex();
+					bufferbuilder.vertex(transform, 0, 0, depth).color(.3f, 0, .3f, .2f).endVertex();
+					bufferbuilder.end();
+					WorldVertexBufferUploader.end(bufferbuilder);
 					RenderSystem.enableTexture();
 				}
 			}
@@ -359,7 +359,7 @@ public class OverlayRenderer extends AbstractGui {
 	private void renderOrbsInternal(MatrixStack matrixStackIn, int whole, int pieces, int x, int y, float red, float green, float blue, float alpha) {
 		int i = 0;
 		Minecraft mc = Minecraft.getInstance();
-		mc.getTextureManager().bindTexture(GUI_ICONS);
+		mc.getTextureManager().bind(GUI_ICONS);
 		
 		for (; i < whole; i++) {
 			// Draw a single partle orb
@@ -383,12 +383,12 @@ public class OverlayRenderer extends AbstractGui {
 	}
 	
 	private void renderManaOrbs(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window, INostrumMagic attr) {
-		int hudXAnchor = window.getScaledWidth() / 2 + 89;
-		int hudYAnchor = window.getScaledHeight() - 49;
+		int hudXAnchor = window.getGuiScaledWidth() / 2 + 89;
+		int hudYAnchor = window.getGuiScaledHeight() - 49;
 		
 		hudYAnchor -= ModConfig.config.getManaSphereOffset() * 10;
 		
-		if (player.areEyesInFluid(FluidTags.WATER) || player.getAir() < player.getMaxAir()) {
+		if (player.isEyeInFluid(FluidTags.WATER) || player.getAirSupply() < player.getMaxAirSupply()) {
 			hudYAnchor -= 10;
 		}
 		
@@ -452,31 +452,31 @@ public class OverlayRenderer extends AbstractGui {
 			final float rot = ratio * 120.0f;
 			
 			Minecraft mc = Minecraft.getInstance();
-			mc.getTextureManager().bindTexture(GUI_ICONS);
+			mc.getTextureManager().bind(GUI_ICONS);
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, -.5f); // Behind
 			matrixStackIn.translate(hudXAnchor + wiggleOffset - 1, hudYAnchor + 3, 0);
 			
-			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(rot));
+			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(rot));
 			matrixStackIn.translate(-1, -10, 0);
 			//blit(0, 0, GUI_WING_SIZE, GUI_WING_OFFSETY, GUI_WING_SIZE, GUI_WING_SIZE, red, green, blue, alpha); // -10, 10, 
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, GUI_WING_SIZE,
 					GUI_WING_OFFSETY, -GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f,
 					1f, 1f, 1f, 1f - ratio);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, -.5f); // Behind
 			matrixStackIn.translate(hudXAnchor + wiggleOffset - 76, hudYAnchor + 3, 0);
 			
-			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(-rot));
+			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(-rot));
 			matrixStackIn.translate(-10, -10, 0);
 			//blit(0, 0, 0, offsetX, offsetY, width, height, texWidth, texHeight, red, green, blue, alpha); // -10, 10, 
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 0,
 					GUI_WING_OFFSETY, GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256,
 					1f, 1f, 1f, 1f - ratio);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 			
 			
 		}
@@ -504,8 +504,8 @@ public class OverlayRenderer extends AbstractGui {
 			Minecraft mc = Minecraft.getInstance();
 			int centerx = hudXAnchor - (5 * 8);
 			String str = totalMana + "/" + totalMaxMana;
-			int width = mc.fontRenderer.getStringWidth(str);
-			mc.fontRenderer.drawString(matrixStackIn,
+			int width = mc.font.width(str);
+			mc.font.draw(matrixStackIn,
 					str, centerx - width/2, hudYAnchor + 1, 0xFFFFFFFF);
 		}
 		
@@ -513,12 +513,12 @@ public class OverlayRenderer extends AbstractGui {
 	
 	private void renderManaBar(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window, INostrumMagic attr) {
 		Minecraft mc = Minecraft.getInstance();
-		int hudXAnchor = window.getScaledWidth() - (10 + GUI_BAR_WIDTH);
+		int hudXAnchor = window.getGuiScaledWidth() - (10 + GUI_BAR_WIDTH);
 		int hudYAnchor = 10 + (GUI_BAR_HEIGHT);
 		int displayHeight = (int) ((float) GUI_BAR_HEIGHT * Math.max(0f, Math.min(1f, (float) attr.getMana() / (float) attr.getMaxMana())));
 		
 		RenderSystem.enableBlend();
-		mc.getTextureManager().bindTexture(GUI_ICONS);
+		mc.getTextureManager().bind(GUI_ICONS);
 		this.blit(matrixStackIn, hudXAnchor, hudYAnchor - displayHeight, GUI_BAR_OFFSETX + GUI_BAR_WIDTH, (GUI_BAR_HEIGHT - displayHeight), GUI_BAR_WIDTH, displayHeight);
 		this.blit(matrixStackIn, hudXAnchor, hudYAnchor - GUI_BAR_HEIGHT, GUI_BAR_OFFSETX, 0, GUI_BAR_WIDTH, GUI_BAR_HEIGHT);
 		
@@ -529,22 +529,22 @@ public class OverlayRenderer extends AbstractGui {
 		RenderSystem.disableBlend();
 		
 		if (ModConfig.config.displayManaText()) {
-			FontRenderer fonter = mc.fontRenderer;
+			FontRenderer fonter = mc.font;
 			int centerx = hudXAnchor + (int) (.5 * GUI_BAR_WIDTH);
 			String str = "" + attr.getMana();
-			int width = fonter.getStringWidth(str);
-			fonter.drawString(matrixStackIn, 
+			int width = fonter.width(str);
+			fonter.draw(matrixStackIn, 
 					str, centerx - width/2, hudYAnchor - (int) (.66 * GUI_BAR_HEIGHT), 0xFFFFFFFF);
 			
 			str = "-";
-			width = fonter.getStringWidth(str);
-			fonter.drawString(matrixStackIn, 
-					str, centerx - width/2, hudYAnchor - ((int) (.66 * GUI_BAR_HEIGHT) - fonter.FONT_HEIGHT), 0xFFFFFFFF);
+			width = fonter.width(str);
+			fonter.draw(matrixStackIn, 
+					str, centerx - width/2, hudYAnchor - ((int) (.66 * GUI_BAR_HEIGHT) - fonter.lineHeight), 0xFFFFFFFF);
 			
 			str = "" + attr.getMaxMana();
-			width = fonter.getStringWidth(str);
-			fonter.drawString(matrixStackIn, 
-					str, centerx - width/2, hudYAnchor - ((int) (.66 * GUI_BAR_HEIGHT) - (2 * fonter.FONT_HEIGHT)), 0xFFFFFFFF);
+			width = fonter.width(str);
+			fonter.draw(matrixStackIn, 
+					str, centerx - width/2, hudYAnchor - ((int) (.66 * GUI_BAR_HEIGHT) - (2 * fonter.lineHeight)), 0xFFFFFFFF);
 		}
 	}
 	
@@ -557,36 +557,36 @@ public class OverlayRenderer extends AbstractGui {
 			SpellIcon.get(spell.getIconIndex()).render(mc, matrixStackIn, 1, 1, width-2, height-2);
 			
 			// Name
-			RenderFuncs.drawRect(matrixStackIn, 1, 1, width-1, (mc.fontRenderer.FONT_HEIGHT / 4) + 2, 0x80000000);
+			RenderFuncs.drawRect(matrixStackIn, 1, 1, width-1, (mc.font.lineHeight / 4) + 2, 0x80000000);
 			String name = spell.getName();
 			if (name.length() > 11) {
 				name = name.substring(0, 9) + "...";
 			}
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(width/2, 1, 0);
 			matrixStackIn.scale(.25f, .25f, 1f);
-			mc.fontRenderer.drawString(matrixStackIn, name, -mc.fontRenderer.getStringWidth(name)/2, 0, 0xFFFFFFFF);
-			matrixStackIn.pop();
+			mc.font.draw(matrixStackIn, name, -mc.font.width(name)/2, 0, 0xFFFFFFFF);
+			matrixStackIn.popPose();
 			
 			// Keybind
 			if (binding != null && binding.length() > 0) {
-				RenderFuncs.drawRect(matrixStackIn, 1, height-1, width-1, height - (mc.fontRenderer.FONT_HEIGHT / 4) -2, 0x80000000);
+				RenderFuncs.drawRect(matrixStackIn, 1, height-1, width-1, height - (mc.font.lineHeight / 4) -2, 0x80000000);
 				if (binding.length() > 11) {
 					binding = binding.substring(0, 9) + "...";
 				}
-				matrixStackIn.push();
-				matrixStackIn.translate(width/2, (height - mc.fontRenderer.FONT_HEIGHT/4) - 1, 0);
+				matrixStackIn.pushPose();
+				matrixStackIn.translate(width/2, (height - mc.font.lineHeight/4) - 1, 0);
 				matrixStackIn.scale(.25f, .25f, 1f);
-				mc.fontRenderer.drawString(matrixStackIn, binding, -mc.fontRenderer.getStringWidth(binding)/2, 0, 0xFFFFFFFF);
-				matrixStackIn.pop();
+				mc.font.draw(matrixStackIn, binding, -mc.font.width(binding)/2, 0, 0xFFFFFFFF);
+				matrixStackIn.popPose();
 			}
 			
 			// Fade if can't cast it?
 			
 			// Show cooldown
-			final SpellCooldown cooldown = NostrumMagica.instance.getSpellCooldownTracker(mc.player.world).getSpellCooldown(mc.player, spell);
-			if (cooldown != null && cooldown.endTicks > mc.player.ticksExisted) {
-				final float prog = Math.max(0f, (float) (mc.player.ticksExisted - cooldown.startTicks) / (cooldown.endTicks - cooldown.startTicks));
+			final SpellCooldown cooldown = NostrumMagica.instance.getSpellCooldownTracker(mc.player.level).getSpellCooldown(mc.player, spell);
+			if (cooldown != null && cooldown.endTicks > mc.player.tickCount) {
+				final float prog = Math.max(0f, (float) (mc.player.tickCount - cooldown.startTicks) / (cooldown.endTicks - cooldown.startTicks));
 				final int progPixels = (int) ((height-2) * prog);
 				RenderFuncs.drawRect(matrixStackIn, 1, 1 + progPixels, width-1, height-1, 0xDDDDDDDD);
 			}
@@ -616,7 +616,7 @@ public class OverlayRenderer extends AbstractGui {
 		}
 		
 		if (key != null) {
-			binding = key.func_238171_j_().getString();
+			binding = key.getTranslatedKeyMessage().getString();
 		}
 		return binding;
 	}
@@ -634,25 +634,25 @@ public class OverlayRenderer extends AbstractGui {
 			final int slideWidth = slotSize * slideWidthInSlots;
 			
 			// XP bar
-			RenderFuncs.drawRect(matrixStackIn, 0, window.getScaledHeight() - 4, slideWidth, window.getScaledHeight(), 0xFF000000);
-			RenderFuncs.drawRect(matrixStackIn, 1, window.getScaledHeight() - 3, slideWidth - 1, window.getScaledHeight() - 1, 0xFF808080);
+			RenderFuncs.drawRect(matrixStackIn, 0, window.getGuiScaledHeight() - 4, slideWidth, window.getGuiScaledHeight(), 0xFF000000);
+			RenderFuncs.drawRect(matrixStackIn, 1, window.getGuiScaledHeight() - 3, slideWidth - 1, window.getGuiScaledHeight() - 1, 0xFF808080);
 			final int xpXOffset = Math.round((attr.getXP() / attr.getMaxXP()) * (slideWidth-2));
 			if (xpXOffset > 0) {
-				RenderFuncs.drawRect(matrixStackIn, 1, window.getScaledHeight() - 3, 1 + xpXOffset, window.getScaledHeight() - 1, 0xFFFFFF22);
+				RenderFuncs.drawRect(matrixStackIn, 1, window.getGuiScaledHeight() - 3, 1 + xpXOffset, window.getGuiScaledHeight() - 1, 0xFFFFFF22);
 			}
 			
 			// Spells
 			final int xOffset = (slideWidthInSlots > current.length) ? ((slideWidthInSlots - current.length) * slotSize) / 2 : 0;
-			final int yOffset = window.getScaledHeight() - slideHeight;
+			final int yOffset = window.getGuiScaledHeight() - slideHeight;
 			if (slideWidthInSlots > current.length) {
-				RenderFuncs.drawGradientRect(matrixStackIn, 0, yOffset + (slideHeight/4), slideWidth, window.getScaledHeight() - 4,
+				RenderFuncs.drawGradientRect(matrixStackIn, 0, yOffset + (slideHeight/4), slideWidth, window.getGuiScaledHeight() - 4,
 						0x00000000, 0x00000000, 0x80000000, 0x80000000);
 			}
 			for (int i = 0; i < current.length; i++) {
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(xOffset + (i * slotSize), yOffset, 0);
 				renderSpellLoadoutSlot(matrixStackIn, current[i], getBindingForSlot(i), slotSize, slotSize);
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 		}
 	}
@@ -736,7 +736,7 @@ public class OverlayRenderer extends AbstractGui {
 			break;
 		case HOLD: {
 				ClientProxy proxy = (ClientProxy) NostrumMagica.instance.proxy;
-				if (!proxy.getHUDKey().isKeyDown()) {
+				if (!proxy.getHUDKey().isDown()) {
 					return;
 				}
 			}
@@ -772,25 +772,25 @@ public class OverlayRenderer extends AbstractGui {
 		if (offsetAuto) {
 			final int estimatedSpellSlideWidth = 16 * 5;
 			final int estimatedLeftTaken = estimatedSpellSlideWidth + 80 + width;
-			if (window.getScaledWidth()/2 < estimatedLeftTaken) {
+			if (window.getGuiScaledWidth()/2 < estimatedLeftTaken) {
 				xOffset = 0;
-				yOffset = window.getScaledHeight() - (height + 28);
+				yOffset = window.getGuiScaledHeight() - (height + 28);
 				hang = Direction.WEST;
 			} else {
 				xOffset = estimatedSpellSlideWidth + 10;
-				yOffset = window.getScaledHeight() - height;
+				yOffset = window.getGuiScaledHeight() - height;
 				hang = Direction.SOUTH;
 			}
 		} else {
 			if (configX == -1) {
-				xOffset = window.getScaledWidth() - width;
+				xOffset = window.getGuiScaledWidth() - width;
 			} else {
-				xOffset = configX > 0 ? configX : (window.getScaledWidth() - configX);
+				xOffset = configX > 0 ? configX : (window.getGuiScaledWidth() - configX);
 			}
 			if (configY == -1) {
-				yOffset = window.getScaledHeight() - height;
+				yOffset = window.getGuiScaledHeight() - height;
 			} else {
-				yOffset = configY > 0 ? configY : (window.getScaledHeight() - configY);
+				yOffset = configY > 0 ? configY : (window.getGuiScaledHeight() - configY);
 			}
 			
 			hang = configX == -1 ? Direction.EAST
@@ -811,7 +811,7 @@ public class OverlayRenderer extends AbstractGui {
 //			return (int) (existingAlpha * alpha * 255) << 24;
 //		};
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		if (fadeProg != 1f) {
 			switch (hang) {
 			case UP:
@@ -861,7 +861,7 @@ public class OverlayRenderer extends AbstractGui {
 				colorTL, colorTR,
 				colorBL, colorBR);
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(xOffset + margin, yOffset + margin, 0);
 		matrixStackIn.scale(.5f, .5f, 1f);
 		
@@ -873,10 +873,10 @@ public class OverlayRenderer extends AbstractGui {
 			final int color = (lastReagentsUsed.contains(type) ? 0xFFFFFF40 : 0xFFFFFFFF);
 			
 			RenderFuncs.RenderGUIItem(getReagentStack(type), matrixStackIn, x, y, -30);
-			fonter.drawString(matrixStackIn, lastReagentCounts.get(type) + "", x + 18, y + 5, color);
+			fonter.draw(matrixStackIn, lastReagentCounts.get(type) + "", x + 18, y + 5, color);
 		}
-		matrixStackIn.pop();
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
+		matrixStackIn.popPose();
 	}
 	
 	private void renderArmorOverlay(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window) {
@@ -894,13 +894,13 @@ public class OverlayRenderer extends AbstractGui {
 
         left_height += (healthRows * rowHeight);
         if (rowHeight != 10) left_height += 10 - rowHeight;
-        int left = window.getScaledWidth() / 2 - 91;
-        int top = window.getScaledHeight() - left_height;
+        int left = window.getGuiScaledWidth() / 2 - 91;
+        int top = window.getGuiScaledHeight() - left_height;
 		
-        matrixStackIn.push();
+        matrixStackIn.pushPose();
 		RenderSystem.enableBlend();
 		
-		int level = player.getTotalArmorValue();//ForgeHooks.getTotalArmorValue(player);
+		int level = player.getArmorValue();//ForgeHooks.getTotalArmorValue(player);
 		level -= 20;
 		
 		// Stretch the last 5 to 100% out to fill the whole bar
@@ -912,7 +912,7 @@ public class OverlayRenderer extends AbstractGui {
         }
 		
 		RenderSystem.disableBlend();
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	private void renderShieldOverlay(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window) {
@@ -929,16 +929,16 @@ public class OverlayRenderer extends AbstractGui {
 		
 		// Clone calc of left y offset, since it's not passed through
 		int left_height = 39;
-        int left = window.getScaledWidth() / 2 - 91;
-        int top = window.getScaledHeight() - left_height;
+        int left = window.getGuiScaledWidth() / 2 - 91;
+        int top = window.getGuiScaledHeight() - left_height;
         int whole = (int) Math.ceil(physical) / 2;
         boolean half = Math.ceil(physical) % 2 == 1;
         
         if (physical > 0 || magical > 0) {
         	Minecraft mc = Minecraft.getInstance();
-	        matrixStackIn.push();
+	        matrixStackIn.pushPose();
 			RenderSystem.enableBlend();
-			mc.getTextureManager().bindTexture(GUI_ICONS);
+			mc.getTextureManager().bind(GUI_ICONS);
 			
 	        for (int i = 0; i < whole; i++)
 	        {
@@ -953,7 +953,7 @@ public class OverlayRenderer extends AbstractGui {
 	        // Repeat for magic
 	        whole = (int) Math.ceil(magical) / 2;
 	        half = Math.ceil(magical) % 2 == 1;
-	        left = window.getScaledWidth() / 2 - 91;
+	        left = window.getGuiScaledWidth() / 2 - 91;
 	        
 	        for (int i = 0; i < whole; i++)
 	        {
@@ -967,7 +967,7 @@ public class OverlayRenderer extends AbstractGui {
 			
 //	        GlStateManager.color4f(1f, 1f, 1f, 1f);
 			RenderSystem.disableBlend();
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
         }
 	}
 	
@@ -976,7 +976,7 @@ public class OverlayRenderer extends AbstractGui {
 		final float green;
 		final float blue;
 		final float alpha;
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		RenderSystem.enableBlend();
 		if (entity) {
 			red = .8f;
@@ -990,15 +990,15 @@ public class OverlayRenderer extends AbstractGui {
 			alpha = .7f;
 		}
 		Minecraft mc = Minecraft.getInstance();
-		mc.getTextureManager().bindTexture(GUI_ICONS);
+		mc.getTextureManager().bind(GUI_ICONS);
 		
 		final int period = 30;
-		final float frac = (float) (player.world.getGameTime() % period) / period;
+		final float frac = (float) (player.level.getGameTime() % period) / period;
 		final double radius = 6.0 + 2.0 * (Math.sin(frac * Math.PI * 2));
 		
 		final float rotOffset;
 		if (entity) {
-			rotOffset = 360.0f * ((float) (player.world.getGameTime() % period) / period);
+			rotOffset = 360.0f * ((float) (player.level.getGameTime() % period) / period);
 		} else {
 			rotOffset = 0f;
 		}
@@ -1006,14 +1006,14 @@ public class OverlayRenderer extends AbstractGui {
 		
 		for (int i = 0; i < 3; i++) {
 			rot = rotOffset + (360.0f / 3) * i;
-			matrixStackIn.push();
-			matrixStackIn.translate(scaledResolution.getScaledWidth() / 2, scaledResolution.getScaledHeight() / 2, 0);
+			matrixStackIn.pushPose();
+			matrixStackIn.translate(scaledResolution.getGuiScaledWidth() / 2, scaledResolution.getGuiScaledHeight() / 2, 0);
 			
-			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(rot));
+			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(rot));
 			matrixStackIn.translate(0, -radius, 0);
 			
-			if (player.isSneaking()) {
-				matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180f));
+			if (player.isShiftKeyDown()) {
+				matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(180f));
 				matrixStackIn.translate(-GUI_HOOKSHOT_CROSSHAIR_WIDTH / 2, 0, 0);
 			} else {
 				matrixStackIn.translate(-GUI_HOOKSHOT_CROSSHAIR_WIDTH / 2, -GUI_HOOKSHOT_CROSSHAIR_WIDTH, 0);
@@ -1023,21 +1023,21 @@ public class OverlayRenderer extends AbstractGui {
 					GUI_HOOKSHOT_CROSSHAIR_OFFSETX, 0, GUI_HOOKSHOT_CROSSHAIR_WIDTH, GUI_HOOKSHOT_CROSSHAIR_WIDTH,
 					red, green, blue, alpha);
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		RenderSystem.disableBlend();
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	private void renderCrosshairTargetOverlay(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow scaledResolution) {
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		RenderSystem.enableBlend();
 		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 		Minecraft mc = Minecraft.getInstance();
-		mc.getTextureManager().bindTexture(GUI_ICONS);
+		mc.getTextureManager().bind(GUI_ICONS);
 		
-		matrixStackIn.translate(scaledResolution.getScaledWidth() / 2, scaledResolution.getScaledHeight() / 2, 0);
+		matrixStackIn.translate(scaledResolution.getGuiScaledWidth() / 2, scaledResolution.getGuiScaledHeight() / 2, 0);
 		
 		matrixStackIn.translate(-GUI_TARGET_CROSSHAIR_WIDTH / 2, -(GUI_TARGET_CROSSHAIR_WIDTH / 2), 0);
 		
@@ -1048,15 +1048,15 @@ public class OverlayRenderer extends AbstractGui {
 				.5f, .5f, .5f, .9f);
 		
 		RenderSystem.disableBlend();
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	private void renderContingencyShield(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow scaledResolution, int typeOffset, int xoffset, float timer) {
 		Minecraft mc = Minecraft.getInstance();
-		final int left = (scaledResolution.getScaledWidth() / 2 + 91) + 10 + (xoffset * GUI_CONTINGENCY_ICON_LENGTH);
-		final int top = scaledResolution.getScaledHeight() - (2 + GUI_CONTINGENCY_ICON_LENGTH);
+		final int left = (scaledResolution.getGuiScaledWidth() / 2 + 91) + 10 + (xoffset * GUI_CONTINGENCY_ICON_LENGTH);
+		final int top = scaledResolution.getGuiScaledHeight() - (2 + GUI_CONTINGENCY_ICON_LENGTH);
 		final float borderScale = 1.07f;
-		final BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+		final BufferBuilder buffer = Tessellator.getInstance().getBuilder();
 		final int width = GUI_CONTINGENCY_ICON_LENGTH; // for readability
 		final int height = GUI_CONTINGENCY_ICON_LENGTH; // for readability
 		
@@ -1064,18 +1064,18 @@ public class OverlayRenderer extends AbstractGui {
 			return;
 		}
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		RenderSystem.enableBlend();
 		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		mc.getTextureManager().bindTexture(GUI_ICONS);
+		mc.getTextureManager().bind(GUI_ICONS);
 		
 		matrixStackIn.translate(left, top, 0);
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(-.5f, -.5f, 0);
 		matrixStackIn.scale(borderScale, borderScale, borderScale);
 		{
-			final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+			final Matrix4f transform = matrixStackIn.last().pose();
 			buffer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR_TEX);
 			
 			final float uMin = ((float) (GUI_CONTINGENCY_ICON_OFFSETX + (3 * GUI_CONTINGENCY_ICON_LENGTH))) / 256f;
@@ -1095,33 +1095,33 @@ public class OverlayRenderer extends AbstractGui {
 			
 			// triangle fans. 1 per quarter. auto draw around
 			
-			buffer.pos(transform, width/2f, height/2f, 0).color(1f, .25f, .3f, 1f).tex((uMin + uMax) / 2f, (vMin + vMax) / 2f).endVertex();
+			buffer.vertex(transform, width/2f, height/2f, 0).color(1f, .25f, .3f, 1f).uv((uMin + uMax) / 2f, (vMin + vMax) / 2f).endVertex();
 			
 			for (int i = 0; i <= fullTris; i++) {
-				buffer.pos(transform, coords[i][0], coords[i][1], coords[i][2]).color(1f, .25f, .3f, 1f).tex(coords[i][3], coords[i][4]).endVertex();
+				buffer.vertex(transform, coords[i][0], coords[i][1], coords[i][2]).color(1f, .25f, .3f, 1f).uv(coords[i][3], coords[i][4]).endVertex();
 			}
 			
 			// draw partial
 			if (fullTris < 4) {
 				final float partial = (timer - (fullTris * .25f)) * 4;
 				buffer
-					.pos(transform, coords[fullTris][0] * (1f-partial) + coords[fullTris+1][0] * partial,
+					.vertex(transform, coords[fullTris][0] * (1f-partial) + coords[fullTris+1][0] * partial,
 						 coords[fullTris][1] * (1f-partial) + coords[fullTris+1][1] * partial,
 						 coords[fullTris][2] * (1f-partial) + coords[fullTris+1][2] * partial)
 					.color(1f, .25f, .3f, 1f)
-					.tex(coords[fullTris][3] * (1f-partial) + coords[fullTris+1][3] * partial,
+					.uv(coords[fullTris][3] * (1f-partial) + coords[fullTris+1][3] * partial,
 						 coords[fullTris][4] * (1f-partial) + coords[fullTris+1][4] * partial)
 					.endVertex();
 			}
 			
 			
-			Tessellator.getInstance().draw();
+			Tessellator.getInstance().end();
 		}
 		
 //		blit(0, 0,
 //				GUI_CONTINGENCY_ICON_OFFSETX + (3 * GUI_CONTINGENCY_ICON_LENGTH),
 //				GUI_CONTINGENCY_ICON_OFFSETY - GUI_CONTINGENCY_ICON_LENGTH, GUI_CONTINGENCY_ICON_LENGTH, GUI_CONTINGENCY_ICON_LENGTH);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 
 		RenderFuncs.blit(matrixStackIn, 0, 0,
 				GUI_CONTINGENCY_ICON_OFFSETX + (typeOffset * GUI_CONTINGENCY_ICON_LENGTH),
@@ -1129,29 +1129,29 @@ public class OverlayRenderer extends AbstractGui {
 				.5f, .5f, .5f, 1f);
 		
 		RenderSystem.disableBlend();
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	private void renderCursedFireOverlay(MatrixStack matrixStackIn, PlayerEntity player, MainWindow window) {
 		final Minecraft mc = Minecraft.getInstance();
-		final float width = window.getScaledWidth() / 2;
+		final float width = window.getGuiScaledWidth() / 2;
 		
-		matrixStackIn.push();
-		matrixStackIn.translate(window.getScaledWidth()*.2f, window.getScaledHeight() * .95f, -500);
+		matrixStackIn.pushPose();
+		matrixStackIn.translate(window.getGuiScaledWidth()*.2f, window.getGuiScaledHeight() * .95f, -500);
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.scale(width, width, 1);
-		CursedFireEffectRenderer.renderFire(matrixStackIn, mc.getRenderTypeBuffers().getBufferSource(), CursedFireEffectRenderer.TEX_FIRE_0.getSprite(), RenderFuncs.BrightPackedLight, 1f, 1f, 1f, 1f, 1f);
-		matrixStackIn.pop();
+		CursedFireEffectRenderer.renderFire(matrixStackIn, mc.renderBuffers().bufferSource(), CursedFireEffectRenderer.TEX_FIRE_0.sprite(), RenderFuncs.BrightPackedLight, 1f, 1f, 1f, 1f, 1f);
+		matrixStackIn.popPose();
 		
-		matrixStackIn.push();
-		matrixStackIn.translate(window.getScaledWidth()*.6f, 0, 0);
+		matrixStackIn.pushPose();
+		matrixStackIn.translate(window.getGuiScaledWidth()*.6f, 0, 0);
 		matrixStackIn.scale(width, width, 1);
-		CursedFireEffectRenderer.renderFire(matrixStackIn, mc.getRenderTypeBuffers().getBufferSource(), CursedFireEffectRenderer.TEX_FIRE_1.getSprite(), RenderFuncs.BrightPackedLight, 1f, 1f, 1f, 1f, 1f);
-		matrixStackIn.pop();
+		CursedFireEffectRenderer.renderFire(matrixStackIn, mc.renderBuffers().bufferSource(), CursedFireEffectRenderer.TEX_FIRE_1.sprite(), RenderFuncs.BrightPackedLight, 1f, 1f, 1f, 1f, 1f);
+		matrixStackIn.popPose();
 		
-		mc.getRenderTypeBuffers().getBufferSource().finish();
-		matrixStackIn.pop();
+		mc.renderBuffers().bufferSource().endBatch();
+		matrixStackIn.popPose();
 	}
 	
 	public void startManaWiggle(int wiggleCount) {
@@ -1175,7 +1175,7 @@ public class OverlayRenderer extends AbstractGui {
 	private static List<EquipmentSet> EquipmentSetCacheSets = new ArrayList<>();
 	
 	protected @Nullable List<EquipmentSet> GetSetsForItem(ItemStack stack) {
-		if (ItemStack.areItemStacksEqual(stack, EquipmentSetCacheKey)) {
+		if (ItemStack.matches(stack, EquipmentSetCacheKey)) {
 			return EquipmentSetCacheSets;
 		}
 		
@@ -1212,8 +1212,8 @@ public class OverlayRenderer extends AbstractGui {
 		final int maxCount = set.getFullSetCount();
 		final String countStr = (showFull ? " (Complete)" : String.format(" (%d/%d)", count, maxCount));
 		
-		lines.add(set.getName().deepCopy().mergeStyle(TextFormatting.DARK_PURPLE)
-				.append(new StringTextComponent(countStr).mergeStyle((showFull || count >= maxCount) ? TextFormatting.GOLD : TextFormatting.DARK_AQUA)));
+		lines.add(set.getName().copy().withStyle(TextFormatting.DARK_PURPLE)
+				.append(new StringTextComponent(countStr).withStyle((showFull || count >= maxCount) ? TextFormatting.GOLD : TextFormatting.DARK_AQUA)));
 
 		// If player is wearing the set, display bonuses
 		if (showFull || NostrumMagica.itemSetListener.getCurrentSets(player).contains(set)) {
@@ -1245,7 +1245,7 @@ public class OverlayRenderer extends AbstractGui {
 			
 			List<ITextComponent> extras = set.getExtraBonuses(showFull ? maxCount : count);
 			if (extras != null && !extras.isEmpty()) {
-				extras.forEach(t -> lines.add(t.deepCopy().mergeStyle(TextFormatting.DARK_AQUA)));
+				extras.forEach(t -> lines.add(t.copy().withStyle(TextFormatting.DARK_AQUA)));
 			}
 		}
 		return lines;
@@ -1257,33 +1257,33 @@ public class OverlayRenderer extends AbstractGui {
 		if (loreIsDeep != null) {
 			final Minecraft mc = Minecraft.getInstance();
 			final int u = (160 + (loreIsDeep ? 0 : 32));
-			mc.getTextureManager().bindTexture(GUI_ICONS);
+			mc.getTextureManager().bind(GUI_ICONS);
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 101); // items render z+100
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 8, 8, u, 0, 32, 32, 8, 8, 256, 256);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 	}
 	
 	private void renderEnchantableIcon(MatrixStack matrixStackIn) {
 		Minecraft mc = Minecraft.getInstance();
 		RenderSystem.enableBlend();
-		mc.getTextureManager().bindTexture(GUI_ICONS);
+		mc.getTextureManager().bind(GUI_ICONS);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 6, 6, 192, 32, 32, 32, 12, 12, 256, 256);
 	}
 	
 	private void renderConfigurableIcon(MatrixStack matrixStackIn) {
 		Minecraft mc = Minecraft.getInstance();
 		RenderSystem.enableBlend();
-		mc.getTextureManager().bindTexture(GUI_ICONS);
+		mc.getTextureManager().bind(GUI_ICONS);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 8, 8, 160, 32, 32, 32, 8, 8, 256, 256);
 	}
 	
 	private void renderTransmutableIcon(MatrixStack matrixStackIn) {
 		Minecraft mc = Minecraft.getInstance();
 		RenderSystem.enableBlend();
-		mc.getTextureManager().bindTexture(GUI_ICONS);
+		mc.getTextureManager().bind(GUI_ICONS);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 8, 8, 224, 32, 32, 32, 8, 8, 256, 256);
 	}
 	
@@ -1326,34 +1326,34 @@ public class OverlayRenderer extends AbstractGui {
 				hasFullLore = null;
 			}
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(event.getX() + event.getWidth() - 4, event.getY() + event.getHeight() - 6, 500);
 			renderLoreIcon(matrixStackIn, hasFullLore);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		// Enchantable?
 		if (SpellAction.isEnchantable(stack)) {
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(event.getX() + event.getWidth() - 8, event.getY() - 16, 500);
 			renderEnchantableIcon(matrixStackIn);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		// Configurable?
 		if (ModificationTableBlock.IsModifiable(stack)) {
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(event.getX() - 15, event.getY() + event.getHeight() - 8, 500);
 			renderConfigurableIcon(matrixStackIn);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		// Transmutable?
 		if (Transmutation.IsTransmutable(stack.getItem())) {
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(event.getX() - 15, event.getY() - 16, 500);
 			renderTransmutableIcon(matrixStackIn);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 	}
 		
@@ -1375,10 +1375,10 @@ public class OverlayRenderer extends AbstractGui {
 	}
 	
 	protected void renderRoots(MatrixStack matrixStackIn, LivingEntity entity) {
-		if (entity.ticksExisted % 4 == 0) {
+		if (entity.tickCount % 4 == 0) {
 			EffectData data = NostrumMagica.magicEffectProxy.getData(entity, SpecialEffect.ROOTED);
 			if (data != null && data.getCount() != 0) {
-				final ClientEffect effect = new ClientEffectAnimated(entity.getPositionVec(), 1000L,
+				final ClientEffect effect = new ClientEffectAnimated(entity.position(), 1000L,
 						new ClientEffect[] {
 							new ClientEffect(Vector3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_0, 0, 0, 0), 1500L),
 							new ClientEffect(Vector3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_1, 0, 0, 0), 1500L),
@@ -1435,8 +1435,8 @@ public class OverlayRenderer extends AbstractGui {
 		// Copy of what vanilla uses to figure out if it should render the render entity:
 		Minecraft mc = Minecraft.getInstance();
 		final boolean shouldRenderMe = (
-				mc.gameSettings.getPointOfView() != PointOfView.FIRST_PERSON
-				|| (mc.getRenderViewEntity() instanceof LivingEntity && ((LivingEntity)mc.getRenderViewEntity()).isSleeping())
+				mc.options.getCameraType() != PointOfView.FIRST_PERSON
+				|| (mc.getCameraEntity() instanceof LivingEntity && ((LivingEntity)mc.getCameraEntity()).isSleeping())
 				);
 		
 		if (!shouldRenderMe) {
@@ -1448,8 +1448,8 @@ public class OverlayRenderer extends AbstractGui {
 	@SubscribeEvent
 	public void onPlayerRender(RenderPlayerEvent.Pre event) {
 		if (LayerKoidHelm.ShouldRender(event.getPlayer())) {
-			event.getRenderer().getEntityModel().bipedHead.showModel = false;
-			event.getRenderer().getEntityModel().bipedBodyWear.showModel = false;
+			event.getRenderer().getModel().head.visible = false;
+			event.getRenderer().getModel().jacket.visible = false;
 		}
 	}
 	
@@ -1471,12 +1471,12 @@ public class OverlayRenderer extends AbstractGui {
 		Minecraft mc = Minecraft.getInstance();
 		if (event.getPlayer() != mc.player) {
 			// For other players, possibly do armor render ticks
-			for (@Nonnull ItemStack equipStack : event.getPlayer().getArmorInventoryList()) {
+			for (@Nonnull ItemStack equipStack : event.getPlayer().getArmorSlots()) {
 				if (equipStack.isEmpty() || !(equipStack.getItem() instanceof ElementalArmor)) {
 					continue;
 				}
 				
-				((ElementalArmor) equipStack.getItem()).onArmorTick(equipStack, event.getPlayer().world, event.getPlayer());
+				((ElementalArmor) equipStack.getItem()).onArmorTick(equipStack, event.getPlayer().level, event.getPlayer());
 			}
 		}
 	}
@@ -1487,15 +1487,15 @@ public class OverlayRenderer extends AbstractGui {
 			return;
 		}
 		
-		BlockState state = event.getInfo().getRenderViewEntity().world.getBlockState(RayTrace.blockPosFromResult(event.getTarget()));
+		BlockState state = event.getInfo().getEntity().level.getBlockState(RayTrace.blockPosFromResult(event.getTarget()));
 		if (state == null) {
 			return;
 		}
 		
 		// Dungeon Air wants no overlay
 		if (state.getBlock() instanceof DungeonAirBlock) {
-			if (!(event.getInfo().getRenderViewEntity() instanceof PlayerEntity)
-					|| ((PlayerEntity) event.getInfo().getRenderViewEntity()).isCreative()) {
+			if (!(event.getInfo().getEntity() instanceof PlayerEntity)
+					|| ((PlayerEntity) event.getInfo().getEntity()).isCreative()) {
 				event.setCanceled(true);
 				return;
 			}

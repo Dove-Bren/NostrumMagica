@@ -53,10 +53,10 @@ public class ClientEffectMirrored extends ClientEffect {
 			newDetail.green = detail.green;
 			newDetail.blue = detail.blue;
 			
-			matrixStackIn.push();
-			matrixStackIn.rotate(this.eulers.rotationDegrees(dAngle * (float) i));
+			matrixStackIn.pushPose();
+			matrixStackIn.mulPose(this.eulers.rotationDegrees(dAngle * (float) i));
 			super.drawForm(matrixStackIn, newDetail, mc, progress, partialTicks);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 	}

@@ -8,19 +8,21 @@ import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class SitGenericGoal<T extends CreatureEntity & ITameableEntity> extends Goal {
 	
 	private final T entity;
 
 	public SitGenericGoal(T entityIn) {
 		this.entity = entityIn;
-		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.JUMP));
+		this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.JUMP));
 	}
 
 	/**
 	 * Returns whether the Goal should begin execution.
 	 */
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		if (!this.entity.isEntityTamed()) {
 			return false;
 		} else if (this.entity.isInWater()) {
@@ -29,15 +31,15 @@ public class SitGenericGoal<T extends CreatureEntity & ITameableEntity> extends 
 			return false;
 		} else {
 			LivingEntity entitylivingbase = this.entity.getLivingOwner();
-			return entitylivingbase == null ? this.entity.isEntitySitting() : (this.entity.getDistanceSq(entitylivingbase) < 144.0D && entitylivingbase.getRevengeTarget() != null ? false : entity.isEntitySitting());
+			return entitylivingbase == null ? this.entity.isEntitySitting() : (this.entity.distanceToSqr(entitylivingbase) < 144.0D && entitylivingbase.getLastHurtByMob() != null ? false : entity.isEntitySitting());
 		}
 	}
 
 	/**
 	 * Execute a one shot task or start executing a continuous task
 	 */
-	public void startExecuting() {
-		this.entity.getNavigator().clearPath();
+	public void start() {
+		this.entity.getNavigation().stop();
 	}
 
 }

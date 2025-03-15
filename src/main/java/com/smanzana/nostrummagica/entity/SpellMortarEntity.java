@@ -25,24 +25,24 @@ public class SpellMortarEntity extends SpellProjectileEntity {
 			World world, Vector3d start, Vector3d velocity,
 			float speedFactor, double gravity) {
 		super(type, trigger, world, shooter, start, velocity, speedFactor, 1000);
-		this.accelerationX = 0; // Force custom acceleration
-		this.accelerationY = 0;
-		this.accelerationZ = 0;
-		this.setMotion(velocity); // Force our own velocity
+		this.xPower = 0; // Force custom acceleration
+		this.yPower = 0;
+		this.zPower = 0;
+		this.setDeltaMovement(velocity); // Force our own velocity
 		
 		this.gravity = gravity;
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
+	protected void defineSynchedData() {
+		super.defineSynchedData();
 	}
 	
 	@Override
 	public void tick() {
 		super.tick();
 		
-		if (!world.isRemote) {
+		if (!level.isClientSide) {
 			if (origin == null) {
 				// We got loaded...
 				this.remove();
@@ -50,7 +50,7 @@ public class SpellMortarEntity extends SpellProjectileEntity {
 			}
 			
 			// Gravity!
-			this.setMotion(this.getMotion().add(0, -gravity, 0));
+			this.setDeltaMovement(this.getDeltaMovement().add(0, -gravity, 0));
 		} 
 //		else {
 //			int color = getElement().getColor();
@@ -64,12 +64,12 @@ public class SpellMortarEntity extends SpellProjectileEntity {
 	}
 	
 	@Override
-	protected float getMotionFactor() {
+	protected float getInertia() {
 		return 1f; // no friction
 	}
 
 	@Override
-	protected void onImpact(RayTraceResult result) {
+	protected void onHit(RayTraceResult result) {
 //		if (world.isRemote)
 //			return;
 //		
@@ -90,29 +90,29 @@ public class SpellMortarEntity extends SpellProjectileEntity {
 //		} else if (result.getType() == RayTraceResult.Type.ENTITY) {
 //			final Entity entityHit = RayTrace.entFromRaytrace(result);
 //			if (filter == null || filter.apply(entityHit)) {
-//				if ((entityHit != this.func_234616_v_() && !this.func_234616_v_().isRidingOrBeingRiddenBy(entityHit))
+//				if ((entityHit != this.getOwner() && !this.getOwner().isRidingOrBeingRiddenBy(entityHit))
 //						|| this.ticksExisted > 20) {
 //					trigger.onProjectileHit(entityHit);
 //					this.remove();
 //				}
 //			}
 //		}
-		super.onImpact(result);
+		super.onHit(result);
 	}
 	
 	@Override
-	public boolean writeUnlessRemoved(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundNBT compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
     }
 	
 	@Override
-	protected boolean isFireballFiery() {
+	protected boolean shouldBurn() {
 		return false;
 	}
 	
 	@Override
-	protected IParticleData getParticle() {
+	protected IParticleData getTrailParticle() {
 		return ParticleTypes.WITCH;
 	}
 }

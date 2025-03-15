@@ -28,8 +28,8 @@ public class SpellDebugMessage {
 			return;
 		}
 		
-		Minecraft.getInstance().runAsync(() -> {
-			NostrumMagica.instance.proxy.getPlayer().sendMessage(message.comp, Util.DUMMY_UUID);
+		Minecraft.getInstance().submit(() -> {
+			NostrumMagica.instance.proxy.getPlayer().sendMessage(message.comp, Util.NIL_UUID);
 		});
 	}
 
@@ -43,11 +43,11 @@ public class SpellDebugMessage {
 	}
 
 	public static SpellDebugMessage decode(PacketBuffer buf) {
-		return new SpellDebugMessage(buf.readTextComponent());
+		return new SpellDebugMessage(buf.readComponent());
 	}
 
 	public static void encode(SpellDebugMessage msg, PacketBuffer buf) {
-		buf.writeTextComponent(msg.comp);
+		buf.writeComponent(msg.comp);
 	}
 
 }

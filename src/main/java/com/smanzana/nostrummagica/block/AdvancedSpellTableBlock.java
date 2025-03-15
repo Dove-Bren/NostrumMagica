@@ -25,11 +25,11 @@ public class AdvancedSpellTableBlock extends BasicSpellTableBlock {
 	public static final String ID = "spelltable_advanced";
 	
 	public AdvancedSpellTableBlock() {
-		super(Block.Properties.create(Material.WOOD)
-				.hardnessAndResistance(2.5f, 2.5f)
+		super(Block.Properties.of(Material.WOOD)
+				.strength(2.5f, 2.5f)
 				.sound(SoundType.WOOD)
 				.harvestTool(ToolType.AXE)
-				.notSolid()
+				.noOcclusion()
 				);
 	}
 	
@@ -39,8 +39,8 @@ public class AdvancedSpellTableBlock extends BasicSpellTableBlock {
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit) {
-		BasicSpellTableTileEntity te = (BasicSpellTableTileEntity) worldIn.getTileEntity(pos);
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit) {
+		BasicSpellTableTileEntity te = (BasicSpellTableTileEntity) worldIn.getBlockEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(playerIn, RedwoodSpellCraftGui.RedwoodContainer.Make(te));
 		
 		return ActionResultType.SUCCESS;

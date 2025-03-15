@@ -54,7 +54,7 @@ public class RuneBag extends Item implements ILoreTagged {
 				items.remove(pos + "");
 			else {
 				CompoundNBT compound = new CompoundNBT();
-				item.write(compound);
+				item.save(compound);
 				items.put(pos + "", compound);
 			}
 			
@@ -82,7 +82,7 @@ public class RuneBag extends Item implements ILoreTagged {
 			
 			CompoundNBT items = bag.getTag().getCompound(NBT_ITEMS);
 			if (items.contains(pos + "", NBT.TAG_COMPOUND))
-				return ItemStack.read(items.getCompound(pos + ""));
+				return ItemStack.of(items.getCompound(pos + ""));
 			else
 				return ItemStack.EMPTY;
 		}
@@ -140,30 +140,30 @@ public class RuneBag extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
 		int pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, Hand.MAIN_HAND);
-		ItemStack inHand = playerIn.getHeldItemMainhand();
+		ItemStack inHand = playerIn.getMainHandItem();
 		if (inHand.isEmpty()) {
-			inHand = playerIn.getHeldItemOffhand();
+			inHand = playerIn.getOffhandItem();
 			pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, Hand.OFF_HAND);
 		}
 		NostrumMagica.instance.proxy.openContainer(playerIn, RuneBagGui.BagContainer.Make(pos));
 		
-		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getHeldItem(hand));
+		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getItemInHand(hand));
     }
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		if (context.getPlayer().isSneaking()) {
+	public ActionResultType useOn(ItemUseContext context) {
+		if (context.getPlayer().isShiftKeyDown()) {
 			// If sneaking, try and do container fast add.
-			final BlockPos pos = context.getPos();
-			final TileEntity te = context.getWorld().getTileEntity(pos);
+			final BlockPos pos = context.getClickedPos();
+			final TileEntity te = context.getLevel().getBlockEntity(pos);
 			if (te != null) {
-				ItemStack[] contents = getItems(context.getItem());
-				if (Inventories.attemptAddToTile(new IterableInventoryWrapper(new ItemStackArrayWrapper(contents)), context.getWorld().getBlockState(pos), te, context.getFace())) {
+				ItemStack[] contents = getItems(context.getItemInHand());
+				if (Inventories.attemptAddToTile(new IterableInventoryWrapper(new ItemStackArrayWrapper(contents)), context.getLevel().getBlockState(pos), te, context.getClickedFace())) {
 					// Update contents
 					for (int i = 0; i < contents.length; i++) {
-						setItem(context.getItem(), contents[i], i);
+						setItem(context.getItemInHand(), contents[i], i);
 					}
 					return ActionResultType.SUCCESS;
 				}
@@ -172,7 +172,7 @@ public class RuneBag extends Item implements ILoreTagged {
 			// Fall through to default behavior if we fail
 		}
 		
-		return super.onItemUse(context);
+		return super.useOn(context);
 	}
 	
 	public static class RuneInventory extends Inventory {
@@ -188,7 +188,7 @@ public class RuneBag extends Item implements ILoreTagged {
 			
 			int i = 0;
 			for (ItemStack reg : RuneBag.getItems(stack)) {
-				this.setInventorySlotContents(i++, reg);
+				this.setItem(i++, reg);
 			}
 		}
 		
@@ -217,23 +217,23 @@ public class RuneBag extends Item implements ILoreTagged {
 	    }
 
 	    @Override
-	    public void markDirty() {
+	    public void setChanged() {
 	    	// Bleed our changes out to the itemstack
 	    	if (!stack.isEmpty()) {
-	    		for (int i = 0; i < this.getSizeInventory(); i++) {
-	    			RuneBag.setItem(stack, this.getStackInSlot(i), i);
+	    		for (int i = 0; i < this.getContainerSize(); i++) {
+	    			RuneBag.setItem(stack, this.getItem(i), i);
 	    		}
 	    	} else {
 	    		System.out.println("no item base");
 	    	}
 	    	
-	    	super.markDirty();
+	    	super.setChanged();
 	    }
 	    
 	    /**
 	     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
 	     */
-	    public int getInventoryStackLimit()
+	    public int getMaxStackSize()
 	    {
 	        return MAX_COUNT;
 	    }
@@ -242,7 +242,7 @@ public class RuneBag extends Item implements ILoreTagged {
 	     * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot. For
 	     * guis use Slot.isItemValid
 	     */
-	    public boolean isItemValidForSlot(int index, ItemStack stack)
+	    public boolean canPlaceItem(int index, ItemStack stack)
 	    {
 	        return stack.getItem() instanceof SpellRune;
 	    }

@@ -25,7 +25,7 @@ public class TileEntityManaArmorerRenderer extends TileEntityRenderer<ManaArmore
 	@Override
 	public void render(ManaArmorerTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
 			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
-		final BlockState state = NostrumBlocks.manaArmorerBlock.getDefaultState();
+		final BlockState state = NostrumBlocks.manaArmorerBlock.defaultBlockState();
 		
 		final double ticks = tileEntityIn.getTicksExisted() + partialTicks;
 		
@@ -39,9 +39,9 @@ public class TileEntityManaArmorerRenderer extends TileEntityRenderer<ManaArmore
 		// Rotate around y axis starting by not rotating until mana starts going
 		final float rProg = tileEntityIn.getRenderRotation(partialTicks) * 360f;
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(.5, 0, .5);
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rProg));
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(rProg));
 		matrixStackIn.translate(-.5, 0, -.5);
 		
 		matrixStackIn.translate(0, vAmt, 0);
@@ -50,13 +50,13 @@ public class TileEntityManaArmorerRenderer extends TileEntityRenderer<ManaArmore
 		// Instead, grab model and render manually
 		//RenderFuncs.RenderBlockState(state, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
 		{
-			final IVertexBuilder buffer = bufferIn.getBuffer(RenderTypeLookup.func_239220_a_(state, false));
-			BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-			IBakedModel ibakedmodel = dispatcher.getModelForState(state);
+			final IVertexBuilder buffer = bufferIn.getBuffer(RenderTypeLookup.getRenderType(state, false));
+			BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
+			IBakedModel ibakedmodel = dispatcher.getBlockModel(state);
 			RenderFuncs.RenderModel(matrixStackIn, buffer, ibakedmodel, combinedLightIn, combinedOverlayIn, 1f, 1f, 1f, 1f);
 		}
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 }

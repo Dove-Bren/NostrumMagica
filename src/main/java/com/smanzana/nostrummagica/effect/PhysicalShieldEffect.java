@@ -27,12 +27,12 @@ public class PhysicalShieldEffect extends Effect {
 	}
 	
 	@Override
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return duration % 10 == 0; // Every tick
 	}
 	
 	@Override
-	public void performEffect(LivingEntity entityLivingBaseIn, int amplifier) {
+	public void applyEffectTick(LivingEntity entityLivingBaseIn, int amplifier) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(entityLivingBaseIn);
 		if (attr != null && attr.hasSkill(NostrumSkills.Earth_Master)) {
 			entityLivingBaseIn.heal(.25f);
@@ -40,7 +40,7 @@ public class PhysicalShieldEffect extends Effect {
 	}
 	
 	@Override
-	public void applyAttributesModifiersToEntity(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
+	public void addAttributeModifiers(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
 		// Sneaky! We've just been applied
 		//NostrumMagica.specialEffectProxy
 		int armor = 4 * (amplifier + 1);
@@ -48,13 +48,13 @@ public class PhysicalShieldEffect extends Effect {
 		
 		NostrumMagicaSounds.SHIELD_APPLY.play(entity);
 		
-		super.applyAttributesModifiersToEntity(entity, attributeMap, amplifier);
+		super.addAttributeModifiers(entity, attributeMap, amplifier);
 	}
 	
 	@Override
-	public void removeAttributesModifiersFromEntity(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
+	public void removeAttributeModifiers(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
 		NostrumMagica.magicEffectProxy.remove(SpecialEffect.SHIELD_PHYSICAL, entityLivingBaseIn);
-		super.removeAttributesModifiersFromEntity(entityLivingBaseIn, attributeMapIn, amplifier);
+		super.removeAttributeModifiers(entityLivingBaseIn, attributeMapIn, amplifier);
     }
 	
 	@OnlyIn(Dist.CLIENT)

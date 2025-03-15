@@ -68,21 +68,21 @@ public enum NostrumPotions {
 		event.enqueueWork(() -> {
 			// Mana regen potion
 	    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(Potions.THICK),
-	    			Ingredient.fromTag(NostrumTags.Items.ReagentManiDust),
+	    			Ingredient.of(NostrumTags.Items.ReagentManiDust),
 	    			MakePotion(NostrumPotions.MANAREGEN.getType()));
 	    	
 	    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN.getType()),
-	    			Ingredient.fromTag(Tags.Items.DUSTS_REDSTONE),
+	    			Ingredient.of(Tags.Items.DUSTS_REDSTONE),
 	    			MakePotion(NostrumPotions.MANAREGEN_EXTENDED.getType()));
 	    	
 	    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN.getType()),
-	    			Ingredient.fromTag(Tags.Items.DUSTS_GLOWSTONE),
+	    			Ingredient.of(Tags.Items.DUSTS_GLOWSTONE),
 	    			MakePotion(NostrumPotions.MANAREGEN_STRONG.getType()));
 		});
 	}
 	
 	public static final ItemStack MakePotion(Potion potion) {
-		return PotionUtils.addPotionToItemStack(new ItemStack(Items.POTION), potion);
+		return PotionUtils.setPotion(new ItemStack(Items.POTION), potion);
 	}
 	
 	public static class PotionIngredient extends NBTIngredient {

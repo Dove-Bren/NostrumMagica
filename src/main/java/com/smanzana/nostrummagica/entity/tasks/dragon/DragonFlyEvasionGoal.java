@@ -10,6 +10,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.BlockPos;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class DragonFlyEvasionGoal extends Goal {
 	
 	private DragonEntity dragon;
@@ -18,13 +20,13 @@ public class DragonFlyEvasionGoal extends Goal {
 	
 	public DragonFlyEvasionGoal(DragonEntity dragon, double speedIn) {
 		this.dragon = dragon;
-		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+		this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 		
 		cooldown = 0;
 	}
 	
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		
 		// Check cooldown. If actually waiting, decrement and early out.
 		if (cooldown > 0) {
@@ -43,7 +45,7 @@ public class DragonFlyEvasionGoal extends Goal {
 			return false;
 		}
 		
-		target = this.dragon.getAttackTarget();
+		target = this.dragon.getTarget();
 		
 		if (target == null) {
 			return false;
@@ -53,7 +55,7 @@ public class DragonFlyEvasionGoal extends Goal {
 	}
 	
 	@Override
-	public boolean shouldContinueExecuting() {
+	public boolean canContinueToUse() {
 		boolean flying = false;
 		
 		if (this.dragon instanceof FlyingDragonEntity) {
@@ -64,7 +66,7 @@ public class DragonFlyEvasionGoal extends Goal {
 			return false;
 		}
 		
-		if (this.dragon.getNavigator().noPath()) {
+		if (this.dragon.getNavigation().isDone()) {
 			return false;
 		}
 		
@@ -72,23 +74,23 @@ public class DragonFlyEvasionGoal extends Goal {
 	}
 
 	@Override
-	public void startExecuting() {
+	public void start() {
 		
 		// Need to get a random spot around the player, and then try and path to that
-		Random random = this.dragon.getRNG();
+		Random random = this.dragon.getRandom();
 		double angle = random.nextDouble() * 2D * Math.PI;
 		double range = 24.0 + (8.0 * random.nextDouble());
-        double x = this.dragon.getPosX() + (range * Math.cos(angle));
-        double z = this.dragon.getPosZ() + (range * Math.sin(angle));
+        double x = this.dragon.getX() + (range * Math.cos(angle));
+        double z = this.dragon.getZ() + (range * Math.sin(angle));
         
         // Find y
         double y;
         {
-        	BlockPos.Mutable pos = new BlockPos.Mutable().setPos(this.dragon.getPosition());
+        	BlockPos.Mutable pos = new BlockPos.Mutable().set(this.dragon.blockPosition());
         	
         	// First, find the ground
     		while(pos.getY() > 0) {
-    			if (this.dragon.world.isAirBlock(pos)) {
+    			if (this.dragon.level.isEmptyBlock(pos)) {
     				pos.setY(pos.getY() - 1);
     			} else {
     				break;
@@ -98,11 +100,11 @@ public class DragonFlyEvasionGoal extends Goal {
     		// Next, find a place to path to a bit above the ground
     		// note: pos here instead is the top of the dragon, so we shift it up and look
     		// for a place that will fit the dragon
-    		pos.setY(pos.getY() + (int) Math.ceil(dragon.getHeight()));
+    		pos.setY(pos.getY() + (int) Math.ceil(dragon.getBbHeight()));
         	
     		int height = 15 + (random.nextInt(6) - 3);
         	for (int i = 0; i < height; i++) {
-        		if (this.dragon.world.isAirBlock(pos)) {
+        		if (this.dragon.level.isEmptyBlock(pos)) {
         			pos.setY(pos.getY() + 1);
         		} else {
         			pos.setY(pos.getY() - 1);
@@ -110,18 +112,18 @@ public class DragonFlyEvasionGoal extends Goal {
         		}
         	}
         	
-        	y = pos.getY() - (int) Math.ceil(dragon.getHeight());
+        	y = pos.getY() - (int) Math.ceil(dragon.getBbHeight());
         }
         
-        if (!dragon.getNavigator().tryMoveToXYZ(x, y, z, 1.0D)) {
-        	dragon.getMoveHelper().setMoveTo(x, y, z, 1.0D);
+        if (!dragon.getNavigation().moveTo(x, y, z, 1.0D)) {
+        	dragon.getMoveControl().setWantedPosition(x, y, z, 1.0D);
 		}
         
         this.cooldown = random.nextInt(20 * 4) + (20 * 3);
 	}
 	
 	@Override
-	public boolean isPreemptible() {
+	public boolean isInterruptable() {
 		return true;
 	}
 	

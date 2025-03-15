@@ -65,10 +65,10 @@ public class BubbleSprayShape extends SpellShape {
 			// Do a little more work of getting a good vector for things
 			// that aren't players
 			final Vector3d dir;
-			if (caster instanceof MobEntity && ((MobEntity) caster).getAttackTarget() != null) {
+			if (caster instanceof MobEntity && ((MobEntity) caster).getTarget() != null) {
 				MobEntity ent = (MobEntity) caster  ;
-				dir = ent.getAttackTarget().getPositionVec().add(0.0, ent.getHeight() / 2.0, 0.0)
-						.subtract(caster.getPosX(), caster.getPosY() + caster.getEyeHeight(), caster.getPosZ());
+				dir = ent.getTarget().position().add(0.0, ent.getBbHeight() / 2.0, 0.0)
+						.subtract(caster.getX(), caster.getY() + caster.getEyeHeight(), caster.getZ());
 			} else {
 				dir = Projectiles.getVectorForRotation(pitch, yaw);
 			}
@@ -88,9 +88,9 @@ public class BubbleSprayShape extends SpellShape {
 						thisRange, 1f,
 						(20 * 8) + (int) (rand.nextDouble() * 50));
 				
-				world.addEntity(bubble);
+				world.addFreshEntity(bubble);
 			}
-			NostrumMagicaSounds.BUBBLE_SPRAY.play(world, pos.getX(), pos.getY(), pos.getZ());
+			NostrumMagicaSounds.BUBBLE_SPRAY.play(world, pos.x(), pos.y(), pos.z());
 		}
 		
 		@Override
@@ -104,7 +104,7 @@ public class BubbleSprayShape extends SpellShape {
 				onProjectileHit(new SpellLocation(this.world, this.pos));
 			}
 			else if (null == NostrumMagica.resolveLivingEntity(entity)) {
-				onProjectileHit(new SpellLocation(entity.world, entity.getPosition()));
+				onProjectileHit(new SpellLocation(entity.level, entity.blockPosition()));
 			} else {
 				getState().trigger(Lists.newArrayList(NostrumMagica.resolveLivingEntity(entity)), null, .125f, true);
 			}
@@ -159,7 +159,7 @@ public class BubbleSprayShape extends SpellShape {
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.from(ItemStack.EMPTY,
+		return NonNullList.of(ItemStack.EMPTY,
 				ReagentItem.CreateStack(ReagentType.MANI_DUST, 1));
 	}
 
@@ -171,7 +171,7 @@ public class BubbleSprayShape extends SpellShape {
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (property == RANGE) {
-			return NonNullList.from(ItemStack.EMPTY,
+			return NonNullList.of(ItemStack.EMPTY,
 					ItemStack.EMPTY,
 					new ItemStack(Items.HONEY_BOTTLE),
 					new ItemStack(Items.HONEYCOMB),
@@ -179,7 +179,7 @@ public class BubbleSprayShape extends SpellShape {
 					new ItemStack(Items.HONEYCOMB_BLOCK));
 		}
 		if (property == COUNT) {
-			return NonNullList.from(ItemStack.EMPTY,
+			return NonNullList.of(ItemStack.EMPTY,
 					ItemStack.EMPTY,
 					new ItemStack(NostrumItems.crystalSmall),
 					new ItemStack(NostrumItems.resourceWispPebble),

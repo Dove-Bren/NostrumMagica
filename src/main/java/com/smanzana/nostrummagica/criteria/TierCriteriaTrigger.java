@@ -24,14 +24,14 @@ public class TierCriteriaTrigger extends AbstractCriterionTrigger<TierCriteriaTr
 	}
 	
 	@Override
-	public TierCriteriaTrigger.Instance deserializeTrigger(JsonObject json, EntityPredicate.AndPredicate entityPredicate, ConditionArrayParser conditionsParser) {
+	public TierCriteriaTrigger.Instance createInstance(JsonObject json, EntityPredicate.AndPredicate entityPredicate, ConditionArrayParser conditionsParser) {
 		final String tierKey = json.get("tier").getAsString();
 		final EMagicTier tier = EMagicTier.valueOf(tierKey.toUpperCase());
 		return new Instance(entityPredicate, tier);
 	}
 	
 	public void trigger(ServerPlayerEntity player, EMagicTier tier) {
-		this.triggerListeners(player, (instance) -> {
+		this.trigger(player, (instance) -> {
 			return instance.test(tier);
 		});
 	}
@@ -50,8 +50,8 @@ public class TierCriteriaTrigger extends AbstractCriterionTrigger<TierCriteriaTr
 		}
 		
 		@Override
-		public JsonObject serialize(ConditionArraySerializer conditions) {
-			JsonObject obj = super.serialize(conditions);
+		public JsonObject serializeToJson(ConditionArraySerializer conditions) {
+			JsonObject obj = super.serializeToJson(conditions);
 			obj.addProperty("tier", this.tier.name().toLowerCase());
 			return obj;
 		}

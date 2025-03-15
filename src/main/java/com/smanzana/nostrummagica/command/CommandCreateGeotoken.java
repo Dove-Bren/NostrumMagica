@@ -16,17 +16,17 @@ public class CommandCreateGeotoken  {
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
 				Commands.literal("spawngeotoken")
-					.requires(s -> s.hasPermissionLevel(2))
+					.requires(s -> s.hasPermission(2))
 					.executes(ctx -> execute(ctx))
 				);
 	}
 
 	private static final int execute(CommandContext<CommandSource> context) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().asPlayer();
+		ServerPlayerEntity player = context.getSource().getPlayerOrException();
 		
 		ItemStack stack = new ItemStack(NostrumItems.positionToken);
-		PositionToken.setPosition(stack, player.getEntityWorld().getDimensionKey(), player.getPosition());
-		player.inventory.addItemStackToInventory(stack);
+		PositionToken.setPosition(stack, player.getCommandSenderWorld().dimension(), player.blockPosition());
+		player.inventory.add(stack);
 		
 		return 0;
 	}

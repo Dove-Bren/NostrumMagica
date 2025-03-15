@@ -47,14 +47,14 @@ public class QuickMoveBagButton extends AbstractButton {
 			color[1] *= .8f;
 			color[2] *= .8f;
 		}
-		Minecraft.getInstance().getTextureManager().bindTexture(TEX);
+		Minecraft.getInstance().getTextureManager().bind(TEX);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, 0, 0, TEX_WIDTH, TEX_HEIGHT, width, height, TEX_WIDTH, TEX_HEIGHT, color[0], color[1], color[2], color[3]);
 	}
 
 	@Override
 	public void onPress() {
 		if (shouldBeClickable()) {
-			NetworkHandler.sendToServer(new QuickMoveBagMessage(this.screen.getContainer()));
+			NetworkHandler.sendToServer(new QuickMoveBagMessage(this.screen.getMenu()));
 		}
 	}
 	
@@ -68,17 +68,17 @@ public class QuickMoveBagButton extends AbstractButton {
 		int minY = Integer.MAX_VALUE;
 		int maxY = -1;
 		
-		for (Slot slot : screen.getContainer().inventorySlots) {
-			if (slot.inventory == this.player.inventory) {
+		for (Slot slot : screen.getMenu().slots) {
+			if (slot.container == this.player.inventory) {
 				final int slotIdx = slot.getSlotIndex();
-				if (PlayerInventory.isHotbar(slotIdx) || slotIdx >= 36) {
+				if (PlayerInventory.isHotbarSlot(slotIdx) || slotIdx >= 36) {
 					continue; // hotbar or armor slot
 				}
 				
-				minX = Math.min(minX, slot.xPos);
-				maxX = Math.max(maxX, slot.xPos);
-				minY = Math.min(minY, slot.yPos);
-				maxY = Math.max(maxY, slot.yPos);
+				minX = Math.min(minX, slot.x);
+				maxX = Math.max(maxX, slot.x);
+				minY = Math.min(minY, slot.y);
+				maxY = Math.max(maxY, slot.y);
 			}
 		}
 		
@@ -102,13 +102,13 @@ public class QuickMoveBagButton extends AbstractButton {
 	protected static final boolean ShouldBeClickable(PlayerEntity player, ContainerScreen<?> screen) {
 		boolean foundReagent = false;
 		boolean foundRune = false;
-		for (Slot slot : screen.getContainer().inventorySlots) {
-			if (slot.inventory != player.inventory
-					&& slot.getHasStack() && !slot.getStack().isEmpty()) {
-				if (!foundReagent && slot.getStack().getItem() instanceof ReagentItem) {
+		for (Slot slot : screen.getMenu().slots) {
+			if (slot.container != player.inventory
+					&& slot.hasItem() && !slot.getItem().isEmpty()) {
+				if (!foundReagent && slot.getItem().getItem() instanceof ReagentItem) {
 					foundReagent = true;
 				}
-				if (!foundRune && slot.getStack().getItem() instanceof SpellRune) {
+				if (!foundRune && slot.getItem().getItem() instanceof SpellRune) {
 					foundRune = true;
 				}
 			}
@@ -141,7 +141,7 @@ public class QuickMoveBagButton extends AbstractButton {
 			final Minecraft mc = Minecraft.getInstance();
 			PlayerEntity player = mc.player;
 			final ContainerScreen<?> screen = (ContainerScreen<?>) event.getGui();
-			if (ReagentAndRuneTransfer.ShouldAddTo(player, screen.getContainer())) {
+			if (ReagentAndRuneTransfer.ShouldAddTo(player, screen.getMenu())) {
 				// May have already added button.
 				QuickMoveBagButton button = null;
 				for (Widget w : event.getWidgetList()) {

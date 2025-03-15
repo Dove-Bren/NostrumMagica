@@ -30,21 +30,21 @@ public class MagicWallBlock extends BreakableBlock {
 	private static final int DECAY_TICKS = 25;
 	
 	public MagicWallBlock() {
-		super(Block.Properties.create(Material.PLANTS)
-				.hardnessAndResistance(.01f, 1.0f)
+		super(Block.Properties.of(Material.PLANT)
+				.strength(.01f, 1.0f)
 				.sound(SoundType.GLASS)
 				.noDrops()
-				.tickRandomly()
-				.notSolid()
+				.randomTicks()
+				.noOcclusion()
 				);
 		//this.setLightOpacity(2);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(DECAY, 0)
-				.with(LEVEL, 0));
+		this.registerDefaultState(this.stateDefinition.any().setValue(DECAY, 0)
+				.setValue(LEVEL, 0));
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return false;
     }
 	
@@ -54,7 +54,7 @@ public class MagicWallBlock extends BreakableBlock {
 //	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(DECAY, LEVEL);
 	}
 	
@@ -64,42 +64,42 @@ public class MagicWallBlock extends BreakableBlock {
 	 * @return
 	 */
 	public BlockState getState(int level) {
-		return getDefaultState().with(DECAY, 0)
-				.with(LEVEL, Math.max(Math.min(2, level - 1), 0));
+		return defaultBlockState().setValue(DECAY, 0)
+				.setValue(LEVEL, Math.max(Math.min(2, level - 1), 0));
 	}
 	
 	@Override
 	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
-			int decay = state.get(DECAY) + 1;
+			int decay = state.getValue(DECAY) + 1;
 			if (decay > 3) {
 				worldIn.removeBlock(pos, false);
 			} else {
-				worldIn.setBlockState(pos, state.with(DECAY, decay));
-				worldIn.getPendingBlockTicks().scheduleTick(pos, state.getBlock(), DECAY_TICKS);
+				worldIn.setBlockAndUpdate(pos, state.setValue(DECAY, decay));
+				worldIn.getBlockTicks().scheduleTick(pos, state.getBlock(), DECAY_TICKS);
 			}
     }
 	
 	@Override
 	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		
-		int level = state.get(LEVEL);
+		int level = state.getValue(LEVEL);
 		
 		if (level <= 0
 				|| (level >= 2 && !(context.getEntity() instanceof PlayerEntity))
 				|| (level == 1 && !(context.getEntity() instanceof ItemEntity))) {
-			return VoxelShapes.fullCube();
+			return VoxelShapes.block();
 		}
 		
 		return VoxelShapes.empty();
     }
 	
 	@Override
-	public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
-		worldIn.getPendingBlockTicks().scheduleTick(pos, state.getBlock(), DECAY_TICKS);
+	public void onPlace(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
+		worldIn.getBlockTicks().scheduleTick(pos, state.getBlock(), DECAY_TICKS);
 	}
 	
 	@Override
-	public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
 		//worldIn.getPendingBlockTicks().scheduleTick(currentPos, state.getBlock(), DECAY_TICKS);
 		return state;
 	}

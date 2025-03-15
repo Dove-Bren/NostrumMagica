@@ -33,8 +33,8 @@ public abstract class SpellLogModifier {
 		public Percentage(ESpellLogModifierType type, ITextComponent label, float modifier, TextFormatting negColor, TextFormatting posColor) {
 			super(type, label, modifier);
 			
-			description = label.deepCopy().append(new StringTextComponent(": ")).append(
-					new StringTextComponent(String.format("%+.0f%%", modifier * 100f)).mergeStyle(modifier <= 0 ? negColor : posColor)
+			description = label.copy().append(new StringTextComponent(": ")).append(
+					new StringTextComponent(String.format("%+.0f%%", modifier * 100f)).withStyle(modifier <= 0 ? negColor : posColor)
 				);
 		}
 
@@ -63,8 +63,8 @@ public abstract class SpellLogModifier {
 		public Flat(ESpellLogModifierType type, ITextComponent label, float modifier, TextFormatting negColor, TextFormatting posColor) {
 			super(type, label, modifier);
 			
-			description = label.deepCopy().append(new StringTextComponent(": ")).append(
-					new StringTextComponent(String.format("%+.1f", modifier)).mergeStyle(modifier <= 0 ? negColor : posColor)
+			description = label.copy().append(new StringTextComponent(": ")).append(
+					new StringTextComponent(String.format("%+.1f", modifier)).withStyle(modifier <= 0 ? negColor : posColor)
 				);
 		}
 

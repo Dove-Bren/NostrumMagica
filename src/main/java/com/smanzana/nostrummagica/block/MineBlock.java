@@ -37,36 +37,36 @@ public class MineBlock extends Block {
 	private static final double AABB_MIN = 0.0D;
 	private static final double AABB_MAX = 16.0D;
 	private static final double AABB_WIDTH = 0.01D;
-	private static final VoxelShape MINE_AABB_UP = Block.makeCuboidShape(AABB_MIN, AABB_MAX - AABB_WIDTH, AABB_MIN, AABB_MAX, AABB_MAX, AABB_MAX);
-	private static final VoxelShape MINE_AABB_DOWN = Block.makeCuboidShape(AABB_MIN, AABB_MIN, AABB_MIN, AABB_MAX, AABB_MIN + AABB_WIDTH, AABB_MAX);
-	private static final VoxelShape MINE_AABB_NORTH = Block.makeCuboidShape(AABB_MIN, AABB_MIN, AABB_MIN, AABB_MAX, AABB_MAX, AABB_MIN + AABB_WIDTH);
-	private static final VoxelShape MINE_AABB_SOUTH = Block.makeCuboidShape(AABB_MIN, AABB_MIN, AABB_MAX - AABB_WIDTH, AABB_MAX, AABB_MAX, AABB_MAX);
-	private static final VoxelShape MINE_AABB_EAST = Block.makeCuboidShape(AABB_MAX - AABB_WIDTH, AABB_MIN, AABB_MIN, AABB_MAX, AABB_MAX, AABB_MAX);
-	private static final VoxelShape MINE_AABB_WEST = Block.makeCuboidShape(AABB_MIN, AABB_MIN, AABB_MIN, AABB_MIN + AABB_WIDTH, AABB_MAX, AABB_MAX);
+	private static final VoxelShape MINE_AABB_UP = Block.box(AABB_MIN, AABB_MAX - AABB_WIDTH, AABB_MIN, AABB_MAX, AABB_MAX, AABB_MAX);
+	private static final VoxelShape MINE_AABB_DOWN = Block.box(AABB_MIN, AABB_MIN, AABB_MIN, AABB_MAX, AABB_MIN + AABB_WIDTH, AABB_MAX);
+	private static final VoxelShape MINE_AABB_NORTH = Block.box(AABB_MIN, AABB_MIN, AABB_MIN, AABB_MAX, AABB_MAX, AABB_MIN + AABB_WIDTH);
+	private static final VoxelShape MINE_AABB_SOUTH = Block.box(AABB_MIN, AABB_MIN, AABB_MAX - AABB_WIDTH, AABB_MAX, AABB_MAX, AABB_MAX);
+	private static final VoxelShape MINE_AABB_EAST = Block.box(AABB_MAX - AABB_WIDTH, AABB_MIN, AABB_MIN, AABB_MAX, AABB_MAX, AABB_MAX);
+	private static final VoxelShape MINE_AABB_WEST = Block.box(AABB_MIN, AABB_MIN, AABB_MIN, AABB_MIN + AABB_WIDTH, AABB_MAX, AABB_MAX);
 	
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
 	public static final IntegerProperty LEVEL = IntegerProperty.create("level", 0, 3);
 	
 	public MineBlock() {
-		super(Block.Properties.create(Material.CARPET)
-				.hardnessAndResistance(2f)
+		super(Block.Properties.of(Material.CLOTH_DECORATION)
+				.strength(2f)
 				.noDrops()
 				.harvestTool(ToolType.PICKAXE)
 				.harvestLevel(3)
-				.notSolid()
+				.noOcclusion()
 				);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP).with(LEVEL, 0));
+		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.UP).setValue(LEVEL, 0));
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(FACING, LEVEL);
 	}
 	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		switch (state.get(FACING)) {
+		switch (state.getValue(FACING)) {
 		case DOWN:
 			return MINE_AABB_DOWN;
 		case EAST:
@@ -84,31 +84,31 @@ public class MineBlock extends Block {
 	}
 	
 	@Override
-	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
-		return hasEnoughSolidSide(worldIn, pos.offset(state.get(FACING)), state.get(FACING).getOpposite());
+	public boolean canSurvive(BlockState state, IWorldReader worldIn, BlockPos pos) {
+		return canSupportCenter(worldIn, pos.relative(state.getValue(FACING)), state.getValue(FACING).getOpposite());
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		return facing == stateIn.get(FACING) && !this.isValidPosition(stateIn, worldIn, currentPos) ? Blocks.AIR.getDefaultState() : super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		return facing == stateIn.getValue(FACING) && !this.canSurvive(stateIn, worldIn, currentPos) ? Blocks.AIR.defaultBlockState() : super.updateShape(stateIn, facing, facingState, worldIn, currentPos, facingPos);
 	}
 	
 	@Override
-	public void harvestBlock(World worldIn, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
-		super.harvestBlock(worldIn, player, pos, state, te, stack);
+	public void playerDestroy(World worldIn, PlayerEntity player, BlockPos pos, BlockState state, @Nullable TileEntity te, ItemStack stack) {
+		super.playerDestroy(worldIn, player, pos, state, te, stack);
 		
 		// If player mined with Earth Pike, do full mine effect
-		if (!stack.isEmpty() && stack.getItem() instanceof AspectedEarthWeapon && !worldIn.isRemote()) {
-			doHarvestEffect(worldIn, player, pos, state.get(FACING), state.get(LEVEL), stack);
+		if (!stack.isEmpty() && stack.getItem() instanceof AspectedEarthWeapon && !worldIn.isClientSide()) {
+			doHarvestEffect(worldIn, player, pos, state.getValue(FACING), state.getValue(LEVEL), stack);
 		}
 	}
 	
 	@Override
-	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
-		if (!worldIn.isRemote()) {
+	public void entityInside(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
+		if (!worldIn.isClientSide()) {
 			if (entityIn instanceof LivingEntity) {
-				doEntityEffect(worldIn, (LivingEntity) entityIn, state.get(LEVEL), pos);
+				doEntityEffect(worldIn, (LivingEntity) entityIn, state.getValue(LEVEL), pos);
 				worldIn.destroyBlock(pos, false);
 			}
 		}
@@ -116,9 +116,9 @@ public class MineBlock extends Block {
 	
 	protected void doHarvestEffect(World world, PlayerEntity player, BlockPos pos, Direction face, int level, ItemStack stack) {
 		if (level == 0) {
-			HarvestUtil.WalkVein(world, pos.offset(face), (walkWorld, walkPos, depth, state) -> {
+			HarvestUtil.WalkVein(world, pos.relative(face), (walkWorld, walkPos, depth, state) -> {
 				//world.destroyBlock(walkPos, true);
-				((ServerPlayerEntity) player).interactionManager.tryHarvestBlock(walkPos);
+				((ServerPlayerEntity) player).gameMode.destroyBlock(walkPos);
 				return true;
 			});
 		} else {
@@ -196,19 +196,19 @@ public class MineBlock extends Block {
 				break;
 			}
 			
-			final BlockPos start = pos.toImmutable().offset(face);
+			final BlockPos start = pos.immutable().relative(face);
 			for (int x = xMin; x <= xMax; x++)
 			for (int y = yMin; y <= yMax; y++)
 			for (int z = zMin; z <= zMax; z++) {
-				((ServerPlayerEntity) player).interactionManager.tryHarvestBlock(start.add(x, y, z));
+				((ServerPlayerEntity) player).gameMode.destroyBlock(start.offset(x, y, z));
 			}
 		}
 	}
 
 	protected void doEntityEffect(World world, LivingEntity entity, int level, BlockPos pos) {
-		entity.addPotionEffect(new EffectInstance(NostrumEffects.lootLuck, 20 * 10, level / 2));
+		entity.addEffect(new EffectInstance(NostrumEffects.lootLuck, 20 * 10, level / 2));
 		EvokerFangsEntity fangs = new EvokerFangsEntity(world, pos.getX() + .5, pos.getY(), pos.getZ() + .5, 0, 0, null);
-		world.addEntity(fangs);
+		world.addFreshEntity(fangs);
 	}
 	
 }

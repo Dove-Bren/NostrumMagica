@@ -48,7 +48,7 @@ public class TriggerRepeaterTileEntity extends TileEntity implements IOrientedTi
 	
 	// Calculates the offset to the given pos and saves it
 	public void addTriggerPoint(BlockPos triggerPoint, boolean isWorldGen) {
-		this.addOffset(triggerPoint.subtract(this.getPos()), isWorldGen);
+		this.addOffset(triggerPoint.subtract(this.getBlockPos()), isWorldGen);
 	}
 	
 	public void addOffset(BlockPos offset, boolean isWorldGen) {
@@ -62,22 +62,22 @@ public class TriggerRepeaterTileEntity extends TileEntity implements IOrientedTi
 	
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
-	public CompoundNBT write(CompoundNBT compound) {
-		super.write(compound);
+	public CompoundNBT save(CompoundNBT compound) {
+		super.save(compound);
 		
 		ListNBT list = new ListNBT();
 		for (BlockPos offset : offsets) {
@@ -88,8 +88,8 @@ public class TriggerRepeaterTileEntity extends TileEntity implements IOrientedTi
 		return compound;
 	}
 	
-	public void read(BlockState state, CompoundNBT compound) {
-		super.read(state, compound);
+	public void load(BlockState state, CompoundNBT compound) {
+		super.load(state, compound);
 		
 		ListNBT list = compound.getList(NBT_OFFSET_LIST, NBT.TAG_COMPOUND);
 		offsets.clear();
@@ -99,9 +99,9 @@ public class TriggerRepeaterTileEntity extends TileEntity implements IOrientedTi
 	}
 	
 	protected void flush(boolean isWorldGen) {
-		if (!isWorldGen && world != null && !world.isRemote) {
-			BlockState state = world.getBlockState(pos);
-			world.notifyBlockUpdate(pos, state, state, 2);
+		if (!isWorldGen && level != null && !level.isClientSide) {
+			BlockState state = level.getBlockState(worldPosition);
+			level.sendBlockUpdated(worldPosition, state, state, 2);
 		}
 	}
 	
@@ -120,18 +120,18 @@ public class TriggerRepeaterTileEntity extends TileEntity implements IOrientedTi
 	
 	public void trigger(BlockPos triggerSource) {
 		for (BlockPos offset : this.offsets) {
-			final BlockPos target = this.pos.add(offset);
+			final BlockPos target = this.worldPosition.offset(offset);
 			if (target.equals(triggerSource)) {
 				continue;
 			}
 			
-			BlockState state = world.getBlockState(target);
+			BlockState state = level.getBlockState(target);
 			if (state == null || !(state.getBlock() instanceof ITriggeredBlock)) {
 				NostrumMagica.logger.debug("Non-triggerable block pointed to at " + target);
 				continue;
 			}
 			
-			((ITriggeredBlock) state.getBlock()).trigger(world, target, state, this.getPos());
+			((ITriggeredBlock) state.getBlock()).trigger(level, target, state, this.getBlockPos());
 		}
 	}
 	
@@ -140,11 +140,11 @@ public class TriggerRepeaterTileEntity extends TileEntity implements IOrientedTi
 		int count = 0;
 		while (it.hasNext()) {
 			BlockPos offset = it.next();
-			final BlockPos target = this.pos.add(offset);
-			final BlockState state = world.getBlockState(target);
+			final BlockPos target = this.worldPosition.offset(offset);
+			final BlockState state = level.getBlockState(target);
 			if (state == null || !(state.getBlock() instanceof ITriggeredBlock)) {
 				if (feedbackPlayer != null) {
-					feedbackPlayer.sendMessage(new StringTextComponent("Cleaning out offset " + offset), Util.DUMMY_UUID);
+					feedbackPlayer.sendMessage(new StringTextComponent("Cleaning out offset " + offset), Util.NIL_UUID);
 				}
 				it.remove();
 				count++;

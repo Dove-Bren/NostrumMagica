@@ -60,10 +60,10 @@ public final class NostrumLootHandler {
 	}
 
 	private LootPool getInjectPool(String entryName) {
-		return LootPool.builder()
-				.addEntry(TableLootEntry.builder(new ResourceLocation(NostrumMagica.MODID, "inject/" + entryName))
-						.weight(1))
-				.rolls(new RandomValueRange(1))
+		return LootPool.lootPool()
+				.add(TableLootEntry.lootTableReference(new ResourceLocation(NostrumMagica.MODID, "inject/" + entryName))
+						.setWeight(1))
+				.setRolls(new RandomValueRange(1))
 				.bonusRolls(0, 1)
 				.name("nostrum_inject_pool")
 		.build();

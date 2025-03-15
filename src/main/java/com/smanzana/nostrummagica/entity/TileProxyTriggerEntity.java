@@ -27,7 +27,7 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 		cacheEntity = null;
 		this.setNoGravity(true);
 		this.setInvulnerable(true);
-		this.enablePersistence();
+		this.setPersistenceRequired();
 	}
 	
 	@Override
@@ -36,31 +36,31 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 	}
 	
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		return MobEntity.func_233666_p_()
-				.createMutableAttribute(Attributes.MAX_HEALTH, 1D);
+		return MobEntity.createMobAttributes()
+				.add(Attributes.MAX_HEALTH, 1D);
 	}
 	
 	@Override
-	public void applyKnockback(float strenght, double xRatio, double zRatio) {
+	public void knockback(float strenght, double xRatio, double zRatio) {
 		return; // Do not get knocked around
 	}
 	
 	@Override
-	public boolean canBePushed() {
+	public boolean isPushable() {
 		return false;
 	}
 	
 	@Override
-	public void applyEntityCollision(Entity entityIn) {
+	public void push(Entity entityIn) {
 		return;
 	}
 	
-	protected void collideWithEntity(Entity entity) {
+	protected void doPush(Entity entity) {
 		;
 	}
 	
 	@Override
-	protected void collideWithNearbyEntities() {
+	protected void pushEntities() {
 		;
 	}
 	
@@ -74,8 +74,8 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 	}
 	
 	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount) {
-		if (this.world.isRemote()) {
+	public boolean hurt(DamageSource source, float amount) {
+		if (this.level.isClientSide()) {
 			return true;
 		}
 		
@@ -84,8 +84,8 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 			return false;
 		}
 		
-		@Nullable LivingEntity livingSource = (source.getTrueSource() != null && source.getTrueSource() instanceof LivingEntity)
-				? (LivingEntity) source.getTrueSource()
+		@Nullable LivingEntity livingSource = (source.getEntity() != null && source.getEntity() instanceof LivingEntity)
+				? (LivingEntity) source.getEntity()
 				: null;
 		if (canBeHitBy(livingSource)) {
 			te.trigger(livingSource, source, amount);
@@ -95,7 +95,7 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 	}
 	
 	protected BlockPos getCheckPos() {
-		return this.getPosition();
+		return this.blockPosition();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -103,11 +103,11 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 		final BlockPos checkPos = getCheckPos();
 		if (this.cachePos == null || this.cacheEntity == null || !checkPos.equals(cachePos) || cacheEntity.getTriggerEntity() != this) {
 			cacheEntity = null;
-			this.cachePos = checkPos.toImmutable();
-			TileEntity te = world.getTileEntity(cachePos);
+			this.cachePos = checkPos.immutable();
+			TileEntity te = level.getBlockEntity(cachePos);
 			if (te != null && te instanceof EntityProxiedTileEntity) {
 				E ent = (E) te;
-				if (world.isRemote || ent.getTriggerEntity() == this) {
+				if (level.isClientSide || ent.getTriggerEntity() == this) {
 					cacheEntity = ent;
 				}
 			}
@@ -117,15 +117,15 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 	}
 	
 	@Override
-	public void livingTick() {
-		super.livingTick();
+	public void aiStep() {
+		super.aiStep();
 		
 		setInvulnerable(false);
 		
 		if (this.isAlive() && !this.dead) {
-			if (!world.isRemote && this.ticksExisted > 20) {
+			if (!level.isClientSide && this.tickCount > 20) {
 				
-				if (this.ticksExisted % 20 == 0) {
+				if (this.tickCount % 20 == 0) {
 					// Clear cache every once in a while
 					this.cacheEntity = null;
 				}

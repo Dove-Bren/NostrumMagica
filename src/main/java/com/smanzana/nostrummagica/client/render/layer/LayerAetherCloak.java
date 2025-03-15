@@ -37,7 +37,7 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 	
 	protected static final IVertexBuilder GetBuffer(IRenderTypeBuffer typeBuffer, @Nullable RenderType type) {
 		if (type == null) {
-			type = Atlases.getTranslucentCullBlockType();
+			type = Atlases.translucentCullBlockSheet();
 		}
 		
 		return typeBuffer.getBuffer(type);
@@ -59,7 +59,7 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 	}
 	
 	public static @Nonnull ItemStack ShouldRender(LivingEntity player) {
-		Iterable<ItemStack> equipment = player.getArmorInventoryList();
+		Iterable<ItemStack> equipment = player.getArmorSlots();
 		for (ItemStack stack : equipment) {
 			if (!stack.isEmpty() && stack.getItem() instanceof ICapeProvider) {
 				if (((ICapeProvider) stack.getItem()).shouldRenderCape(player, stack)) {
@@ -72,8 +72,8 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 		if (player instanceof PlayerEntity) {
 			IInventory inventory = NostrumMagica.instance.curios.getCurios((PlayerEntity) player);
 			if (inventory != null) {
-				for (int i = 0; i < inventory.getSizeInventory(); i++) {
-					ItemStack stack = inventory.getStackInSlot(i);
+				for (int i = 0; i < inventory.getContainerSize(); i++) {
+					ItemStack stack = inventory.getItem(i);
 					if (!stack.isEmpty() && stack.getItem() instanceof ICapeProvider) {
 						if (((ICapeProvider) stack.getItem()).shouldRenderCape(player, stack)) {
 							return stack;
@@ -108,8 +108,8 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 //		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 		
 		final float objScale = .425f;
-		final boolean isFlying = player.isElytraFlying();
-		final boolean hasChestpiece = (!player.getItemStackFromSlot(EquipmentSlotType.CHEST).isEmpty());
+		final boolean isFlying = player.isFallFlying();
+		final boolean hasChestpiece = (!player.getItemBySlot(EquipmentSlotType.CHEST).isEmpty());
 		final @Nullable RenderType[] renderTypes = provider.getCapeRenderTypes(player, stack);
 		final ResourceLocation[] models = provider.getCapeModels(player, stack);
 		if (renderTypes != null && renderTypes.length != models.length) {
@@ -117,10 +117,10 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 		}
 		
 		// Get how 'forward' we're moving for cape rotation
-		Vector3d look = player.getLook(ageInTicks % 1f);
+		Vector3d look = player.getViewVector(ageInTicks % 1f);
 		double motionForward = look
 				.subtract(0, look.y, 0)
-				.dotProduct(new Vector3d(player.getMotion().x, 0, player.getMotion().z));
+				.dot(new Vector3d(player.getDeltaMovement().x, 0, player.getDeltaMovement().z));
 		float rot = -10f;
 		final float moveMaxRot = (!isFlying && motionForward > 0 ? -20f : 10f);
 		//final double yVelOverride = .25;
@@ -128,22 +128,22 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 				// Imagine your cape moving realisitically depending on if you were going up or down 
 				//(entityIn.getMotion().y < -yVelOverride ? -1f : (entityIn.getMotion().y > yVelOverride ? 1f : limbSwingAmount));
 		rot += (cloakAffectVelocity * moveMaxRot); // Add amount for how fast we're moving
-		if (player.isSneaking()) {
+		if (player.isShiftKeyDown()) {
 			rot -= 30;
 		}
 		
-		matrixStack.push();
+		matrixStack.pushPose();
 		matrixStack.translate(0.0F, 0.0F, 0.125F);
 		matrixStack.scale(-objScale, -objScale, objScale);
-		matrixStack.translate(0, player.isSneaking() ? -.3 : 0, hasChestpiece ? .15 : 0);
-		matrixStack.rotate(Vector3f.XP.rotationDegrees(rot));
+		matrixStack.translate(0, player.isShiftKeyDown() ? -.3 : 0, hasChestpiece ? .15 : 0);
+		matrixStack.mulPose(Vector3f.XP.rotationDegrees(rot));
 		
 		int index = 0;
 		for (ResourceLocation model : models) {
 			final IBakedModel bakedModel = GetModel(model);
 			final IVertexBuilder buffer = GetBuffer(typeBuffer, renderTypes == null ? null : renderTypes[index]);
 			
-			matrixStack.push();
+			matrixStack.pushPose();
 			
 			final int color = provider.getColor(player, stack, index);
 			
@@ -153,11 +153,11 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 			
 			renderCapeModel(player, provider, stack, bakedModel, matrixStack, buffer, packedLight, color);
 			
-			matrixStack.pop();
+			matrixStack.popPose();
 			index++;
 		}
 		//model.render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-		matrixStack.pop();
+		matrixStack.popPose();
 	}
 	
 	protected void renderCapeModel(AbstractClientPlayerEntity living, ICapeProvider provider, ItemStack stack, IBakedModel model,

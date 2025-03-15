@@ -46,7 +46,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	public static final String ID = "spell_scroll";
 	
 	public SpellScroll() {
-		super(NostrumItems.PropUnstackable().rarity(Rarity.UNCOMMON).maxDamage(100));
+		super(NostrumItems.PropUnstackable().rarity(Rarity.UNCOMMON).durability(100));
 		MinecraftForge.EVENT_BUS.addListener(SpellScroll::onSpellCast);
 	}
 	
@@ -55,19 +55,19 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final @Nonnull ItemStack itemStackIn = playerIn.getHeldItem(hand);
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		final @Nonnull ItemStack itemStackIn = playerIn.getItemInHand(hand);
 		
-		if (playerIn.isSneaking()) {
+		if (playerIn.isShiftKeyDown()) {
 			// Open scroll screen
 			final Spell spell = GetSpell(itemStackIn);
-			if (spell != null && worldIn.isRemote()) {
+			if (spell != null && worldIn.isClientSide()) {
 				NostrumMagica.instance.proxy.openSpellScreen(spell);
 			}
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		}
 		
-		if (worldIn.isRemote()) {
+		if (worldIn.isClientSide()) {
 			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
 		}
 		
@@ -94,12 +94,12 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 			
 			// Set cooldown directly even though event handler will have already set it.
 			// Using a scroll has more cooldown than noticing other spells being cast.
-			playerIn.getCooldownTracker().setCooldown(this.getItem(), SpellCasting.CalculateSpellCooldown(spell, playerIn, result.summary) * 2);
+			playerIn.getCooldowns().addCooldown(this.getItem(), SpellCasting.CalculateSpellCooldown(spell, playerIn, result.summary) * 2);
 			
 			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) playerIn);
 		}
 
-		if (itemStackIn.getDamage() > itemStackIn.getMaxDamage() // Old way, I think never happens?
+		if (itemStackIn.getDamageValue() > itemStackIn.getMaxDamage() // Old way, I think never happens?
 				|| itemStackIn.isEmpty()) {
 			// Going to break
 			NostrumMagica.instance.getSpellRegistry().evict(spell);
@@ -122,8 +122,8 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		nbt.putInt(NBT_DURABILITY, GetMaxUses(spell));
 		
 		itemStack.setTag(nbt);
-		itemStack.setDisplayName(new StringTextComponent(spell.getName()));
-		itemStack.addEnchantment(Enchantments.POWER, 1);
+		itemStack.setHoverName(new StringTextComponent(spell.getName()));
+		itemStack.enchant(Enchantments.POWER_ARROWS, 1);
 	}
 	
 	public static Spell GetSpell(ItemStack itemStack) {
@@ -230,7 +230,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		;
 	}
 	
@@ -262,7 +262,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		// Note that our r-click handler will actually replace this result with a larger one if it's a scroll that
 		// cast the spell.
 		final SpellCastResult result = event.getCastResult();
-		if (result.succeeded && result.caster != null && result.caster instanceof PlayerEntity && !result.caster.getShouldBeDead()) {
+		if (result.succeeded && result.caster != null && result.caster instanceof PlayerEntity && !result.caster.isDeadOrDying()) {
 			// Vulnerability: vanilla's tracker only returns us progress which means we can't REALLY check if our new
 			// cooldown time is going to be less than what's already there.
 			// If we blindly PUT, player's can get around long cooldowns by casting a short-cooldown spell after
@@ -273,8 +273,8 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 			// good time to let it be overriden.
 			
 			final int cooldownTicks = SpellCasting.CalculateSpellCooldown(result);
-			if (((PlayerEntity) result.caster).getCooldownTracker().getCooldown(NostrumItems.spellScroll, 0f) <= .25f) {
-				((PlayerEntity) result.caster).getCooldownTracker().setCooldown(NostrumItems.spellScroll, cooldownTicks);
+			if (((PlayerEntity) result.caster).getCooldowns().getCooldownPercent(NostrumItems.spellScroll, 0f) <= .25f) {
+				((PlayerEntity) result.caster).getCooldowns().addCooldown(NostrumItems.spellScroll, cooldownTicks);
 			}
 		}
 	}

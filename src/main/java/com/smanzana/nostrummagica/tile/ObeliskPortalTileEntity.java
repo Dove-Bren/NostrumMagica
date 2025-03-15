@@ -20,11 +20,11 @@ public class ObeliskPortalTileEntity extends TeleportationPortalTileEntity {
 	@Override
 	public @Nullable Location getTarget() {
 		// Defer to obelisk below us
-		TileEntity te = world.getTileEntity(pos.down());
+		TileEntity te = level.getBlockEntity(worldPosition.below());
 		if (te != null && te instanceof ObeliskTileEntity) {
 			Location target = ((ObeliskTileEntity) te).getCurrentTarget();
 			if (target != null) {
-				target = new Location(target.getPos().up(), target.getDimension()); // we 'target' the actual obelisk but don't want to tele them there!
+				target = new Location(target.getPos().above(), target.getDimension()); // we 'target' the actual obelisk but don't want to tele them there!
 			}
 			return target;
 		}
@@ -35,7 +35,7 @@ public class ObeliskPortalTileEntity extends TeleportationPortalTileEntity {
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public int getColor() {
-		TileEntity te = world.getTileEntity(pos.down());
+		TileEntity te = level.getBlockEntity(worldPosition.below());
 		if (te != null && te instanceof ObeliskTileEntity && ((ObeliskTileEntity) te).hasOverride()) {
 			return 0x0000FF50;
 		}

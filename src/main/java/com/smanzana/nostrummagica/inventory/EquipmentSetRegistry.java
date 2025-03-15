@@ -20,13 +20,13 @@ import net.minecraftforge.registries.RegistryBuilder;
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class EquipmentSetRegistry {
 
-	public static final RegistryKey<Registry<EquipmentSet>> KEY_REG_ITEMSETS = RegistryKey.getOrCreateRootKey(new ResourceLocation(NostrumMagica.MODID, "item_sets"));
+	public static final RegistryKey<Registry<EquipmentSet>> KEY_REG_ITEMSETS = RegistryKey.createRegistryKey(new ResourceLocation(NostrumMagica.MODID, "item_sets"));
 	
 	private static IForgeRegistry<EquipmentSet> REGISTRY;
 	
 	@SubscribeEvent
 	public static void createRegistry(RegistryEvent.NewRegistry event) {
-		REGISTRY = new RegistryBuilder<EquipmentSet>().setName(KEY_REG_ITEMSETS.getLocation()).setType(EquipmentSet.class).setMaxID(Integer.MAX_VALUE - 1)
+		REGISTRY = new RegistryBuilder<EquipmentSet>().setName(KEY_REG_ITEMSETS.location()).setType(EquipmentSet.class).setMaxID(Integer.MAX_VALUE - 1)
 			.disableSaving().create();
 	}
 	

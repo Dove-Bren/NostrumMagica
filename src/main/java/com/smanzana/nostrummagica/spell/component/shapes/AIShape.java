@@ -32,7 +32,7 @@ public class AIShape extends InstantShape {
 			SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		LivingEntity target = state.getCaster(); // defult to caster. That's what you get for using a trigger for AI!
 		if (state.getCaster() instanceof MobEntity) {
-			target = ((MobEntity) state.getCaster()).getAttackTarget();
+			target = ((MobEntity) state.getCaster()).getTarget();
 		}
 		
 		if (target != null) {

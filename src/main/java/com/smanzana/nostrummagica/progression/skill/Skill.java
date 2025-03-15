@@ -129,8 +129,8 @@ public class Skill {
 		
 		attr.addSkill(this);
 		
-		if (!player.world.isRemote)
-			NostrumMagicaSounds.SUCCESS_QUEST.play(player.world, player.getPosX(), player.getPosY(), player.getPosZ());
+		if (!player.level.isClientSide)
+			NostrumMagicaSounds.SUCCESS_QUEST.play(player.level, player.getX(), player.getY(), player.getZ());
 		else
 			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
 	}

@@ -61,12 +61,12 @@ public class RoomExtendedEntranceStaircase extends StaticRoom implements IStairc
 				"B RBB",
 				"BBBBB",
 				'B', (dark ? NostrumBlocks.dungeonBlock : NostrumBlocks.lightDungeonBlock),
-				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
+				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
 				' ', null,
-				'U', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.NORTH).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
-				'R', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
-				'D', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.SOUTH).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
-				'L', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.WEST).with(StairsBlock.HALF, Half.BOTTOM).with(StairsBlock.SHAPE, StairsShape.STRAIGHT)));
+				'U', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH).setValue(StairsBlock.HALF, Half.BOTTOM).setValue(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
+				'R', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST).setValue(StairsBlock.HALF, Half.BOTTOM).setValue(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
+				'D', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.SOUTH).setValue(StairsBlock.HALF, Half.BOTTOM).setValue(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
+				'L', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.WEST).setValue(StairsBlock.HALF, Half.BOTTOM).setValue(StairsBlock.SHAPE, StairsShape.STRAIGHT)));
 	}
 	
 	@Override
@@ -84,7 +84,7 @@ public class RoomExtendedEntranceStaircase extends StaticRoom implements IStairc
 			BlockState cur = world.getBlockState(pos);
 		
 			// Check if unbreakable...
-			if (cur != null && cur.getBlockHardness(world, pos) == -1)
+			if (cur != null && cur.getDestroySpeed(world, pos) == -1)
 				return false;
 		}
 		
@@ -116,7 +116,7 @@ public class RoomExtendedEntranceStaircase extends StaticRoom implements IStairc
 			if (spawn) {
 				super.spawn(world, new BlueprintLocation(cur, start.getFacing()), bounds, dungeonID);
 			}
-			cur = cur.add(0, stairHeight, 0);
+			cur = cur.offset(0, stairHeight, 0);
 			loops++;
 		}
 		
@@ -185,13 +185,13 @@ public class RoomExtendedEntranceStaircase extends StaticRoom implements IStairc
 		// Add staircase down to actual start
 		final int stairHeight = 4;
 		BlockPos.Mutable cursor = new BlockPos.Mutable();
-		cursor.setPos(start.getPos());
+		cursor.set(start.getPos());
 		for (int i = start.getPos().getY(); i < topPos.getY(); i+= stairHeight) {
 			cursor.setY(i);
 			if (bounds == null) {
 				bounds = super.getBounds(new BlueprintLocation(cursor, start.getFacing()));
 			} else {
-				bounds.expandTo(super.getBounds(new BlueprintLocation(cursor, start.getFacing())));
+				bounds.expand(super.getBounds(new BlueprintLocation(cursor, start.getFacing())));
 			}
 		}
 		

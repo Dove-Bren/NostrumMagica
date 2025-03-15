@@ -56,13 +56,13 @@ public class SingleSpawnerBlock extends Block {
 		;
 
 		@Override
-		public String getString() {
+		public String getSerializedName() {
 			return this.name().toLowerCase();
 		}
 		
 		@Override
 		public String toString() {
-			return this.getString();
+			return this.getSerializedName();
 		}
 	}
 	
@@ -72,38 +72,38 @@ public class SingleSpawnerBlock extends Block {
 	public static final String ID = "nostrum_spawner";
 	
 	public SingleSpawnerBlock() {
-		super(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		super(Block.Properties.of(Material.STONE)
+				.strength(-1.0F, 3600000.8F)
 				.sound(SoundType.STONE)
 				.harvestTool(ToolType.PICKAXE)
 				.harvestLevel(4)
 				.noDrops()
-				.doesNotBlockMovement()
+				.noCollission()
 				);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(MOB, Type.GOLEM_PHYSICAL));
+		this.registerDefaultState(this.stateDefinition.any().setValue(MOB, Type.GOLEM_PHYSICAL));
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(MOB);
 	}
 	
 	public BlockState getState(SingleSpawnerBlock.Type type) {
-		return getDefaultState().with(MOB, type);
+		return defaultBlockState().setValue(MOB, type);
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
 	@Override
 	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
-		if (!worldIn.isRemote())
+		if (!worldIn.isClientSide())
 		{
-			for (PlayerEntity player : worldIn.getPlayers()) {
-				if (!player.isSpectator() && !player.isCreative() && player.getDistanceSq(pos.getX() + .5, pos.getY(), pos.getZ() + .5) < SPAWN_DIST_SQ) {
+			for (PlayerEntity player : worldIn.players()) {
+				if (!player.isSpectator() && !player.isCreative() && player.distanceToSqr(pos.getX() + .5, pos.getY(), pos.getZ() + .5) < SPAWN_DIST_SQ) {
 					this.spawn(worldIn, pos, state, rand);
 					worldIn.removeBlock(pos, false);
 					return;
@@ -113,13 +113,13 @@ public class SingleSpawnerBlock extends Block {
 	}
 	
 	public MobEntity spawn(World world, BlockPos pos, BlockState state, Random rand) {
-		Type type = state.get(MOB);
+		Type type = state.getValue(MOB);
 		MobEntity entity = getEntity(type, world, pos);
 		
-		entity.enablePersistence();
-		entity.setPosition(pos.getX() + 0.5, pos.getY(), pos.getZ() + .5);
+		entity.setPersistenceRequired();
+		entity.setPos(pos.getX() + 0.5, pos.getY(), pos.getZ() + .5);
 		
-		world.addEntity(entity);
+		world.addFreshEntity(entity);
 		return entity;
 	}
 	
@@ -189,8 +189,8 @@ public class SingleSpawnerBlock extends Block {
 //	}
 
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
-		if (worldIn.isRemote) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+		if (worldIn.isClientSide) {
 			return ActionResultType.SUCCESS;
 		}
 		
@@ -198,15 +198,15 @@ public class SingleSpawnerBlock extends Block {
 			return ActionResultType.SUCCESS;
 		}
 		
-		TileEntity te = worldIn.getTileEntity(pos);
+		TileEntity te = worldIn.getBlockEntity(pos);
 		if (te == null || !(te instanceof SingleSpawnerTileEntity)) {
 			return ActionResultType.SUCCESS;
 		}
 		
 		if (playerIn.isCreative()) {
-			ItemStack heldItem = playerIn.getHeldItem(hand);
+			ItemStack heldItem = playerIn.getItemInHand(hand);
 			if (heldItem.isEmpty()) {
-				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.get(MOB).getString()), Util.DUMMY_UUID);
+				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.getValue(MOB).getSerializedName()), Util.NIL_UUID);
 			} else if (heldItem.getItem() instanceof EssenceItem) {
 				Type type = null;
 				switch (EssenceItem.findType(heldItem)) {
@@ -233,11 +233,11 @@ public class SingleSpawnerBlock extends Block {
 					break;
 				}
 				
-				worldIn.setBlockState(pos, state.with(MOB, type));
+				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, type));
 			} else if (NostrumTags.Items.DragonWing.contains(heldItem.getItem())) {
-				worldIn.setBlockState(pos, state.with(MOB, Type.DRAGON_RED));
+				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, Type.DRAGON_RED));
 			} else if (heldItem.getItem() == Items.SUGAR_CANE) {
-				worldIn.setBlockState(pos, state.with(MOB, Type.PLANT_BOSS));
+				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, Type.PLANT_BOSS));
 			}
 			return ActionResultType.SUCCESS;
 		}

@@ -111,7 +111,7 @@ public class ProximityShape extends SpellShape {
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.from(ItemStack.EMPTY,
+		return NonNullList.of(ItemStack.EMPTY,
 				ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1),
 				ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1));
 	}
@@ -132,7 +132,7 @@ public class ProximityShape extends SpellShape {
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
-			costs = NonNullList.from(ItemStack.EMPTY,
+			costs = NonNullList.of(ItemStack.EMPTY,
 				ItemStack.EMPTY,
 				new ItemStack(Items.IRON_INGOT),
 				new ItemStack(Items.GOLD_INGOT),

@@ -26,31 +26,31 @@ public class TableOfContentsPage implements IClickableBookPage {
 	public void draw(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
 		widthCache = width;
 		xCache = xoffset;
-		fontHeightCache = fonter.FONT_HEIGHT;
+		fontHeightCache = fonter.lineHeight;
 		
 		if (title) {
 			int x = xoffset + (width / 2);
-			x -= fonter.getStringWidth("Table Of Contents") / 2;
-			fonter.drawString(matrixStackIn, "Table Of Contents", x, yoffset + 5, 0xFF202020);
-			yoffset += 10 + (fonter.FONT_HEIGHT);
+			x -= fonter.width("Table Of Contents") / 2;
+			fonter.draw(matrixStackIn, "Table Of Contents", x, yoffset + 5, 0xFF202020);
+			yoffset += 10 + (fonter.lineHeight);
 		}
 		
 		yCache = yoffset;
 		
 		for (int i = 0; i < pages.length; i++) {
-			fonter.drawString(matrixStackIn, pages[i], xoffset, yoffset, 0xFF400070);
-			yoffset += fonter.FONT_HEIGHT + 2;
+			fonter.draw(matrixStackIn, pages[i], xoffset, yoffset, 0xFF400070);
+			yoffset += fonter.lineHeight + 2;
 		}
 	}
 
 	@Override
 	public void overlay(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
 		if (title) {
-			mouseY -= fonter.FONT_HEIGHT + 10;
+			mouseY -= fonter.lineHeight + 10;
 		}
-		int index = mouseY / (fonter.FONT_HEIGHT + 2);
+		int index = mouseY / (fonter.lineHeight + 2);
 		if (index < pages.length && index >= 0)
-			RenderFuncs.drawRect(matrixStackIn, xCache, yCache + (index * (fonter.FONT_HEIGHT + 2)) - 1, xCache + widthCache, yCache + (index * (fonter.FONT_HEIGHT + 2) + fonter.FONT_HEIGHT) - 1, 0x30000000);
+			RenderFuncs.drawRect(matrixStackIn, xCache, yCache + (index * (fonter.lineHeight + 2)) - 1, xCache + widthCache, yCache + (index * (fonter.lineHeight + 2) + fonter.lineHeight) - 1, 0x30000000);
 	}
 	
 	protected boolean onElementClick(BookScreen parent, int index, int button) {

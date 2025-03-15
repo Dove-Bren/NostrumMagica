@@ -23,12 +23,12 @@ public class CraftSpellCriteriaTrigger extends AbstractCriterionTrigger<CraftSpe
 	}
 	
 	@Override
-	public CraftSpellCriteriaTrigger.Instance deserializeTrigger(JsonObject json, EntityPredicate.AndPredicate entityPredicate, ConditionArrayParser conditionsParser) {
+	public CraftSpellCriteriaTrigger.Instance createInstance(JsonObject json, EntityPredicate.AndPredicate entityPredicate, ConditionArrayParser conditionsParser) {
 		return new Instance(entityPredicate);
 	}
 	
 	public void trigger(ServerPlayerEntity player) {
-		this.triggerListeners(player, (instance) -> {
+		this.trigger(player, (instance) -> {
 			return true;
 		});
 	}
@@ -40,8 +40,8 @@ public class CraftSpellCriteriaTrigger extends AbstractCriterionTrigger<CraftSpe
 		}
 		
 		@Override
-		public JsonObject serialize(ConditionArraySerializer conditions) {
-			JsonObject obj = super.serialize(conditions);
+		public JsonObject serializeToJson(ConditionArraySerializer conditions) {
+			JsonObject obj = super.serializeToJson(conditions);
 			return obj;
 		}
 		

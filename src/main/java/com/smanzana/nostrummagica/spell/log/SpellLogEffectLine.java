@@ -150,7 +150,7 @@ public abstract class SpellLogEffectLine {
 			super(base, total, modifiers);
 			this.effect = effect;
 
-			final ITextComponent effectName = effect.getDisplayName().deepCopy().mergeStyle(this.isHarmful() ? TextFormatting.RED : TextFormatting.DARK_BLUE);
+			final ITextComponent effectName = effect.getDisplayName().copy().withStyle(this.isHarmful() ? TextFormatting.RED : TextFormatting.DARK_BLUE);
 			name = new TranslationTextComponent("spelllog.status.name", effectName);
 			desc = new TranslationTextComponent("spelllog.status.desc", effectName, base, total);
 		}

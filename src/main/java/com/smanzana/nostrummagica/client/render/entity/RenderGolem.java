@@ -21,7 +21,7 @@ public class RenderGolem<T extends MagicGolemEntity> extends MobRenderer<T, Mode
 	}
 	
 	@Override
-	public ResourceLocation getEntityTexture(T entity) {
+	public ResourceLocation getTextureLocation(T entity) {
 		ResourceLocation loc = texCache.get(entity.getTextureKey());
 		if (loc == null) {
 			loc = new ResourceLocation(NostrumMagica.MODID,

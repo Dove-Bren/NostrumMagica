@@ -29,10 +29,10 @@ public class TeleportationPortalBlock extends PortalBlock  {
 	public static final String ID = "teleportation_portal";
 
 	public TeleportationPortalBlock() {
-		this(Block.Properties.create(Material.LEAVES)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		this(Block.Properties.of(Material.LEAVES)
+				.strength(-1.0F, 3600000.8F)
 				.noDrops()
-				.setLightLevel((state) -> 14)
+				.lightLevel((state) -> 14)
 				);
 	}
 	
@@ -65,7 +65,7 @@ public class TeleportationPortalBlock extends PortalBlock  {
 	@Override
 	protected void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn) {
 		entityIn.stopRiding();
-		entityIn.removePassengers();
+		entityIn.ejectPassengers();
 		
 		if (!entityIn.getPassengers().isEmpty()) {
 			return;
@@ -75,7 +75,7 @@ public class TeleportationPortalBlock extends PortalBlock  {
 			return;
 		}
 		
-		TileEntity te = worldIn.getTileEntity(portalPos);
+		TileEntity te = worldIn.getBlockEntity(portalPos);
 		if (te != null && te instanceof TeleportationPortalTileEntity) {
 			TeleportationPortalTileEntity ent = (TeleportationPortalTileEntity) te;
 			Location target = ent.getTarget();
@@ -87,27 +87,27 @@ public class TeleportationPortalBlock extends PortalBlock  {
 					if (!event.isCanceled()) {
 						worldIn.getChunk(target.getPos());
 						
-						entityIn.lastTickPosX = entityIn.prevPosX = target.getPos().getX() + .5;
-						entityIn.lastTickPosY = entityIn.prevPosY = target.getPos().getY() + .1;
-						entityIn.lastTickPosZ = entityIn.prevPosZ = target.getPos().getZ() + .5;
-						if (!worldIn.isRemote) {
+						entityIn.xOld = entityIn.xo = target.getPos().getX() + .5;
+						entityIn.yOld = entityIn.yo = target.getPos().getY() + .1;
+						entityIn.zOld = entityIn.zo = target.getPos().getZ() + .5;
+						if (!worldIn.isClientSide) {
 						
 						
 							if (entityIn instanceof ServerPlayerEntity) {
-								((ServerPlayerEntity) entityIn).connection.setPlayerLocation(event.getTargetX(), event.getTargetY(), event.getTargetZ(), entityIn.rotationYaw, entityIn.rotationPitch);
+								((ServerPlayerEntity) entityIn).connection.teleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), entityIn.yRot, entityIn.xRot);
 							} else {
-								entityIn.setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
+								entityIn.teleportTo(event.getTargetX(), event.getTargetY(), event.getTargetZ());
 							}
 							entityIn.fallDistance = 0;
 							//entityIn.velocityChanged = true;
-							((ServerWorld) worldIn).updateEntity(entityIn);
+							((ServerWorld) worldIn).tickNonPassenger(entityIn);
 								
 							// effects, sound, etc.
 							double x = event.getTargetX() + .5;
 							double y = event.getTargetY() + 1.4;
 							double z = event.getTargetZ() + .5;
 							NostrumMagicaSounds.DAMAGE_ENDER.play(worldIn, x, y, z);
-							((ServerWorld) worldIn).spawnParticle(ParticleTypes.DRAGON_BREATH,
+							((ServerWorld) worldIn).sendParticles(ParticleTypes.DRAGON_BREATH,
 									x,
 									y,
 									z,

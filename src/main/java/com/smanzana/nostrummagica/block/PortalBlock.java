@@ -42,32 +42,32 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 	protected static final BooleanProperty MASTER = BooleanProperty.create("master");
 	
 	public PortalBlock(Block.Properties properties) {
-		super(properties.doesNotBlockMovement());
-		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, false));
+		super(properties.noCollission());
+		this.registerDefaultState(this.stateDefinition.any().setValue(MASTER, false));
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return true;
     }
 	
 	@Override
-	public boolean isReplaceable(BlockState state, BlockItemUseContext context) {
+	public boolean canBeReplaced(BlockState state, BlockItemUseContext context) {
         return false;
     }
 	
 	@Override
-	public int getOpacity(BlockState state, IBlockReader world, BlockPos pos) {
+	public int getLightBlock(BlockState state, IBlockReader world, BlockPos pos) {
 		return 0;
 	}
 	
 	@Override
 	public VoxelShape getShape(BlockState blockState, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		return VoxelShapes.fullCube();
+		return VoxelShapes.block();
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(MASTER);
 	}
 	
@@ -82,7 +82,7 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 	}
 	
 	protected static BlockPos getPaired(BlockState state, BlockPos pos) {
-		return pos.offset(state.get(MASTER) ? Direction.UP : Direction.DOWN);
+		return pos.relative(state.getValue(MASTER) ? Direction.UP : Direction.DOWN);
 	}
 	
 	protected static BlockPos getMaster(BlockState state, BlockPos pos) {
@@ -95,40 +95,40 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.ENTITYBLOCK_ANIMATED;
 	}
 	
 	public BlockState getSlaveState() {
-		return this.getDefaultState().with(MASTER, false);
+		return this.defaultBlockState().setValue(MASTER, false);
 	}
 
 
 	public BlockState getMaster() {
-		return this.getDefaultState().with(MASTER, true);
+		return this.defaultBlockState().setValue(MASTER, true);
 	}
 	
 	public static boolean isMaster(BlockState state) {
-		return state.get(MASTER);
+		return state.getValue(MASTER);
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			this.destroy(world, pos, state);
-			world.removeTileEntity(pos);
+			world.removeBlockEntity(pos);
 		}
 	}
 	
 	@Override
-	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
-		if (!worldIn.isAirBlock(pos.up()))
+	public boolean canSurvive(BlockState state, IWorldReader worldIn, BlockPos pos) {
+		if (!worldIn.isEmptyBlock(pos.above()))
 			return false;
 		
-		if (worldIn.getTileEntity(pos) != null)
+		if (worldIn.getBlockEntity(pos) != null)
 			return false;
 		
-		if (worldIn.getTileEntity(pos.up()) != null)
+		if (worldIn.getBlockEntity(pos.above()) != null)
 			return false;
 		
 		return true;
@@ -140,11 +140,11 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 	}
 	
 	public void createPaired(World worldIn, BlockPos pos) {
-		worldIn.setBlockState(pos.up(), getSlaveState());
+		worldIn.setBlockAndUpdate(pos.above(), getSlaveState());
 	}
 	
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+	public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		// This method hopefully is ONLY called when placed manually in the world.
 		// Auto-create slave state
 		createPaired(worldIn, pos);
@@ -158,7 +158,7 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 		}
 		
 		if (rand.nextFloat() < .01f) {
-			worldIn.playSound((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D, NostrumMagicaSounds.PORTAL.getEvent(), SoundCategory.BLOCKS, 0.5F, rand.nextFloat() * 0.4F + 0.8F, false);
+			worldIn.playLocalSound((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D, NostrumMagicaSounds.PORTAL.getEvent(), SoundCategory.BLOCKS, 0.5F, rand.nextFloat() * 0.4F + 0.8F, false);
 		}
 		
 		// Create particles
@@ -226,15 +226,15 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 	public static final int TELEPORT_CHARGE_TIME = 3;
 	
 	@Override
-	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
+	public void entityInside(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
 		// This func is called many (4) times each frame (per logical side) for portals.
 		// First is during entity updates on the player, which happens for both blocks since both are collided.
 		// Second is when handling player movement.
-		if (!worldIn.isRemote() && ServerFrameEntities.contains(entityIn)) {
+		if (!worldIn.isClientSide() && ServerFrameEntities.contains(entityIn)) {
 			return;
 		}
 		
-		if (worldIn.isRemote() && ClientTeleportTickMark) {
+		if (worldIn.isClientSide() && ClientTeleportTickMark) {
 			return;
 		}
 		
@@ -245,12 +245,12 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 		boolean doTeleport = false;
 		final int maxChargeTicks = TELEPORT_CHARGE_TIME * 20;
 		final int cooldownTicks = -(TELEPORT_CHARGE_TIME * 5 * 20);
-		if (worldIn.isRemote()) {
+		if (worldIn.isClientSide()) {
 			// Clients manage their own entity.
 			if (entityIn == NostrumMagica.instance.proxy.getPlayer()) {
 				if (ClientTeleportCharge == 0) {
 					// First frame of charging
-					entityIn.playSound(SoundEvents.BLOCK_PORTAL_TRIGGER, 1f, (4f / (float) TELEPORT_CHARGE_TIME));
+					entityIn.playSound(SoundEvents.PORTAL_TRIGGER, 1f, (4f / (float) TELEPORT_CHARGE_TIME));
 				}
 				ClientTeleportCharge += 2; // + 2 because we decrement each tick, too
 				if (ClientTeleportCharge >= maxChargeTicks) {

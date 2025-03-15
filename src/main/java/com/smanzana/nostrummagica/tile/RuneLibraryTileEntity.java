@@ -26,12 +26,12 @@ public class RuneLibraryTileEntity extends TileEntity {
 		super(NostrumTileEntities.RuneLibraryType);
 		this.inventory = new Inventory(27) {
 			@Override
-			public boolean isItemValidForSlot(int index, ItemStack stack) {
+			public boolean canPlaceItem(int index, ItemStack stack) {
 				return stack.isEmpty() || stack.getItem() instanceof SpellRune;
 			}
 		};
 		this.inventory.addListener((inv) -> {
-			RuneLibraryTileEntity.this.markDirty();
+			RuneLibraryTileEntity.this.setChanged();
 			RuneLibraryTileEntity.this.refreshBlock();
 		});
 	}
@@ -40,15 +40,15 @@ public class RuneLibraryTileEntity extends TileEntity {
 		return inventory;
 	}
 	
-	protected RuneLibraryBlock.Fill getLevel() {
+	protected RuneLibraryBlock.Fill getFillLevel() {
 		int count = 0;
-		for (int i = 0; i < inventory.getSizeInventory(); i++) {
-			if (!inventory.getStackInSlot(i).isEmpty()) {
+		for (int i = 0; i < inventory.getContainerSize(); i++) {
+			if (!inventory.getItem(i).isEmpty()) {
 				count++;
 			}
 		}
 		
-		float prog = (float) count / (float) inventory.getSizeInventory();
+		float prog = (float) count / (float) inventory.getContainerSize();
 		if (prog >= .75f) {
 			return RuneLibraryBlock.Fill.FULL;
 		}
@@ -62,18 +62,18 @@ public class RuneLibraryTileEntity extends TileEntity {
 	}
 	
 	protected void refreshBlock() {
-		if (this.world != null) {
-			final RuneLibraryBlock.Fill now = getLevel();
+		if (this.level != null) {
+			final RuneLibraryBlock.Fill now = getFillLevel();
 			BlockState state = this.getBlockState();
-			if (state.get(RuneLibraryBlock.FILL) != now) {
-				world.setBlockState(getPos(), getBlockState().with(RuneLibraryBlock.FILL, now));
+			if (state.getValue(RuneLibraryBlock.FILL) != now) {
+				level.setBlockAndUpdate(getBlockPos(), getBlockState().setValue(RuneLibraryBlock.FILL, now));
 			}
 		}
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.put(NBT_INVENTORY, Inventories.serializeInventory(inventory));
 		
@@ -81,8 +81,8 @@ public class RuneLibraryTileEntity extends TileEntity {
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		if (nbt == null)
 			return;
@@ -100,12 +100,12 @@ public class RuneLibraryTileEntity extends TileEntity {
 
 					@Override
 					public int getSlots() {
-						return inventory.getSizeInventory();
+						return inventory.getContainerSize();
 					}
 
 					@Override
 					public ItemStack getStackInSlot(int slot) {
-						return inventory.getStackInSlot(slot);
+						return inventory.getItem(slot);
 					}
 
 					@Override
@@ -119,7 +119,7 @@ public class RuneLibraryTileEntity extends TileEntity {
 
 					@Override
 					public ItemStack extractItem(int slot, int amount, boolean simulate) {
-						ItemStack stack = inventory.getStackInSlot(slot);
+						ItemStack stack = inventory.getItem(slot);
 						if (stack.isEmpty()) {
 							return stack;
 						}
@@ -127,7 +127,7 @@ public class RuneLibraryTileEntity extends TileEntity {
 						stack = stack.copy();
 						ItemStack taken = stack.split(amount);
 						if (!simulate) {
-							inventory.setInventorySlotContents(slot, stack); // Set it back to dirty the inventory
+							inventory.setItem(slot, stack); // Set it back to dirty the inventory
 						}
 						
 						return taken;

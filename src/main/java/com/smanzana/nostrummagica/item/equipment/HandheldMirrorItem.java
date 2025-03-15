@@ -63,19 +63,19 @@ public abstract class HandheldMirrorItem extends Item implements IPositionHolder
 	protected boolean checkAndAddWarn(PlayerEntity player, RegistryKey<World> dimension, BlockPos pos) {
 		final WarnData existing = playerWarnings.get(player);
 		final boolean wasValid = existing != null
-								&& existing.ticks < player.ticksExisted
-								&& player.ticksExisted - existing.ticks < 60
+								&& existing.ticks < player.tickCount
+								&& player.tickCount - existing.ticks < 60
 								&& DimensionUtils.DimEquals(dimension, existing.dimension)
 								&& pos.equals(existing.pos)
 				;
 		
-		playerWarnings.put(player, new WarnData(player.ticksExisted, dimension, pos));
+		playerWarnings.put(player, new WarnData(player.tickCount, dimension, pos));
 		return wasValid;
 	}
 	
 	@Override
 	public boolean shouldRenderSelection(PlayerEntity player, ItemStack stack) {
-		return player.isSneaking() && DimensionUtils.InDimension(player, IPositionHolderItem.getDimension(stack));
+		return player.isShiftKeyDown() && DimensionUtils.InDimension(player, IPositionHolderItem.getDimension(stack));
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public abstract class HandheldMirrorItem extends Item implements IPositionHolder
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		RegistryKey<World> dim = IPositionHolderItem.getDimension(stack);
 		BlockPos pos = IPositionHolderItem.getBlockPosition(stack);
 		
@@ -106,26 +106,26 @@ public abstract class HandheldMirrorItem extends Item implements IPositionHolder
 		if (dimName == null)
 			dimName = "An Unknown Dimension";
 		
-		tooltip.add(new StringTextComponent("<" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ">").mergeStyle(TextFormatting.GREEN));
-		tooltip.add(new StringTextComponent(dimName).mergeStyle(TextFormatting.DARK_GREEN));
+		tooltip.add(new StringTextComponent("<" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ">").withStyle(TextFormatting.GREEN));
+		tooltip.add(new StringTextComponent(dimName).withStyle(TextFormatting.DARK_GREEN));
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		final World worldIn = context.getWorld();
-		final BlockPos pos = context.getPos();
+	public ActionResultType useOn(ItemUseContext context) {
+		final World worldIn = context.getLevel();
+		final BlockPos pos = context.getClickedPos();
 		final PlayerEntity playerIn = context.getPlayer();
-		final @Nonnull ItemStack stack = context.getItem();
+		final @Nonnull ItemStack stack = context.getItemInHand();
 		
 		if (pos == null)
 			return ActionResultType.PASS;
 		
-		if (!playerIn.isSneaking()) {
+		if (!playerIn.isShiftKeyDown()) {
 			//onItemRightClick(worldIn, playerIn, context.getHand());
 			return ActionResultType.PASS;
 		}
 		
-		if (worldIn.isRemote)
+		if (worldIn.isClientSide)
 			return ActionResultType.SUCCESS;
 		
 		if (!canStore(worldIn, pos)) {
@@ -133,9 +133,9 @@ public abstract class HandheldMirrorItem extends Item implements IPositionHolder
 		}
 		
 		// Warn player before setting position
-		if (!checkAndAddWarn(playerIn, worldIn.getDimensionKey(), pos)) {
+		if (!checkAndAddWarn(playerIn, worldIn.dimension(), pos)) {
 			// Warn
-			playerIn.sendMessage(new TranslationTextComponent("info.heldmirror.set_warning"), Util.DUMMY_UUID);
+			playerIn.sendMessage(new TranslationTextComponent("info.heldmirror.set_warning"), Util.NIL_UUID);
 		} else {
 			IPositionHolderItem.setPosition(stack, DimensionUtils.GetDimension(playerIn), pos);
 		}
@@ -144,8 +144,8 @@ public abstract class HandheldMirrorItem extends Item implements IPositionHolder
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		final @Nonnull ItemStack stack = playerIn.getItemInHand(hand);
 		
 		RegistryKey<World> dimension = IPositionHolderItem.getDimension(stack);
 		BlockPos pos = IPositionHolderItem.getBlockPosition(stack);

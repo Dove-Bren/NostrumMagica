@@ -57,9 +57,9 @@ public class TransmuteSourceJEIRenderer implements IIngredientRenderer<Transmuta
 		
 		Minecraft mc = Minecraft.getInstance();
 		RenderSystem.enableBlend();
-		if (alpha1 > 0) mc.fontRenderer.drawString(matrixStackIn, "?", xPosition + 10, yPosition + 3, 0x00FF0000 | alpha1 | 0x4000000);
-		if (alpha2 > 0) mc.fontRenderer.drawString(matrixStackIn, "?", xPosition + 1, yPosition + 1, 0x0000FF00 | alpha2 | 0x4000000);
-		if (alpha3 > 0) mc.fontRenderer.drawString(matrixStackIn, "?", xPosition + 5, yPosition + 8, 0x000000FF | alpha3 | 0x4000000);
+		if (alpha1 > 0) mc.font.draw(matrixStackIn, "?", xPosition + 10, yPosition + 3, 0x00FF0000 | alpha1 | 0x4000000);
+		if (alpha2 > 0) mc.font.draw(matrixStackIn, "?", xPosition + 1, yPosition + 1, 0x0000FF00 | alpha2 | 0x4000000);
+		if (alpha3 > 0) mc.font.draw(matrixStackIn, "?", xPosition + 5, yPosition + 8, 0x000000FF | alpha3 | 0x4000000);
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class TransmuteSourceJEIRenderer implements IIngredientRenderer<Transmuta
 
 	@Override
 	public FontRenderer getFontRenderer(Minecraft minecraft, TransmutationSource ingredient) {
-		return minecraft.fontRenderer;
+		return minecraft.font;
 	}
 	
 }

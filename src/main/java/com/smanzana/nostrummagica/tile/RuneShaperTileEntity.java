@@ -28,32 +28,32 @@ public class RuneShaperTileEntity extends TileEntity implements IInventory {
 	
 	public RuneShaperTileEntity() {
 		super(NostrumTileEntities.RuneShaperEntityType);
-		slots = new ItemStack[getSizeInventory()];
+		slots = new ItemStack[getContainerSize()];
 		for (int i = 0; i < slots.length; i++) {
 			slots[i] = ItemStack.EMPTY;
 		}
 	}
 	
 	public  @Nonnull ItemStack getRuneSlot() {
-		return this.getStackInSlot(0);
+		return this.getItem(0);
 	}
 	
 	@Override
-	public int getSizeInventory() {
+	public int getContainerSize() {
 		return 1;
 	}
 
 	@Override
-	public  @Nonnull ItemStack getStackInSlot(int index) {
-		if (index < 0 || index >= getSizeInventory())
+	public  @Nonnull ItemStack getItem(int index) {
+		if (index < 0 || index >= getContainerSize())
 			return ItemStack.EMPTY;
 		
 		return slots[index];
 	}
 
 	@Override
-	public @Nonnull ItemStack decrStackSize(int index, int count) {
-		if (index < 0 || index >= getSizeInventory() || slots[index].isEmpty())
+	public @Nonnull ItemStack removeItem(int index, int count) {
+		if (index < 0 || index >= getContainerSize() || slots[index].isEmpty())
 			return ItemStack.EMPTY;
 		
 		@Nonnull ItemStack stack;
@@ -64,53 +64,53 @@ public class RuneShaperTileEntity extends TileEntity implements IInventory {
 			stack = slots[index].split(count);
 		}
 		
-		this.markDirty();
+		this.setChanged();
 		
 		return stack;
 	}
 
 	@Override
-	public @Nonnull ItemStack removeStackFromSlot(int index) {
-		if (index < 0 || index >= getSizeInventory())
+	public @Nonnull ItemStack removeItemNoUpdate(int index) {
+		if (index < 0 || index >= getContainerSize())
 			return ItemStack.EMPTY;
 		
 		ItemStack stack = slots[index];
 		slots[index] = ItemStack.EMPTY;
 		
-		this.markDirty();
+		this.setChanged();
 		return stack;
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, @Nonnull ItemStack stack) {
-		if (!isItemValidForSlot(index, stack))
+	public void setItem(int index, @Nonnull ItemStack stack) {
+		if (!canPlaceItem(index, stack))
 			return;
 		
 		slots[index] = stack;
-		this.markDirty();
+		this.setChanged();
 	}
 
 	@Override
-	public int getInventoryStackLimit() {
+	public int getMaxStackSize() {
 		return 64;
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
+	public boolean stillValid(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(PlayerEntity player) {
+	public void startOpen(PlayerEntity player) {
 	}
 
 	@Override
-	public void closeInventory(PlayerEntity player) {
+	public void stopOpen(PlayerEntity player) {
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int index, @Nonnull ItemStack stack) {
-		if (index < 0 || index >= getSizeInventory())
+	public boolean canPlaceItem(int index, @Nonnull ItemStack stack) {
+		if (index < 0 || index >= getContainerSize())
 			return false;
 		
 		if (stack.isEmpty())
@@ -124,23 +124,23 @@ public class RuneShaperTileEntity extends TileEntity implements IInventory {
 	}
 
 	@Override
-	public void clear() {
-		for (int i = 0; i < getSizeInventory(); i++)
-			removeStackFromSlot(i);
+	public void clearContent() {
+		for (int i = 0; i < getContainerSize(); i++)
+			removeItemNoUpdate(i);
 	}
 	
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		CompoundNBT compound = new CompoundNBT();
 		
-		for (int i = 0; i < getSizeInventory(); i++) {
-			if (getStackInSlot(i).isEmpty())
+		for (int i = 0; i < getContainerSize(); i++) {
+			if (getItem(i).isEmpty())
 				continue;
 			
 			CompoundNBT tag = new CompoundNBT();
-			compound.put(i + "", getStackInSlot(i).write(tag));
+			compound.put(i + "", getItem(i).save(tag));
 		}
 		
 		if (nbt == null)
@@ -151,14 +151,14 @@ public class RuneShaperTileEntity extends TileEntity implements IInventory {
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_INV, NBT.TAG_COMPOUND))
 			return;
-		this.clear();
+		this.clearContent();
 		CompoundNBT items = nbt.getCompound(NBT_INV);
-		for (String key : items.keySet()) {
+		for (String key : items.getAllKeys()) {
 			int id;
 			try {
 				id = Integer.parseInt(key);
@@ -167,8 +167,8 @@ public class RuneShaperTileEntity extends TileEntity implements IInventory {
 				continue;
 			}
 			
-			ItemStack stack = ItemStack.read(items.getCompound(key));
-			this.setInventorySlotContents(id, stack);
+			ItemStack stack = ItemStack.of(items.getCompound(key));
+			this.setItem(id, stack);
 		}
 	}
 	
@@ -183,8 +183,8 @@ public class RuneShaperTileEntity extends TileEntity implements IInventory {
 	}
 
 	public IInventory getExtraInventory() {
-		for (BlockPos checkPos : new BlockPos[] {pos.up(), pos.north(), pos.east(), pos.south(), pos.west(), pos.down(), pos.up().north(), pos.up().south(), pos.up().east(), pos.up().west(), pos.north().east(), pos.north().west(), pos.south().east(), pos.south().west()}) {
-			@Nullable TileEntity te = world.getTileEntity(checkPos);
+		for (BlockPos checkPos : new BlockPos[] {worldPosition.above(), worldPosition.north(), worldPosition.east(), worldPosition.south(), worldPosition.west(), worldPosition.below(), worldPosition.above().north(), worldPosition.above().south(), worldPosition.above().east(), worldPosition.above().west(), worldPosition.north().east(), worldPosition.north().west(), worldPosition.south().east(), worldPosition.south().west()}) {
+			@Nullable TileEntity te = level.getBlockEntity(checkPos);
 			if (te != null && te instanceof RuneLibraryTileEntity) {
 				return ((RuneLibraryTileEntity) te).getInventory();
 			}

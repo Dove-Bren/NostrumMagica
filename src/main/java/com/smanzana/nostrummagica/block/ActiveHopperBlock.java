@@ -47,57 +47,57 @@ public class ActiveHopperBlock extends Block {
 	
 	public static final BooleanProperty ENABLED = BooleanProperty.create("enabled");
 	
-	private static final VoxelShape INPUT_SHAPE = Block.makeCuboidShape(0.0D, 10.0D, 0.0D, 16.0D, 16.0D, 16.0D);
-	private static final VoxelShape MIDDLE_SHAPE = Block.makeCuboidShape(4.0D, 4.0D, 4.0D, 12.0D, 10.0D, 12.0D);
+	private static final VoxelShape INPUT_SHAPE = Block.box(0.0D, 10.0D, 0.0D, 16.0D, 16.0D, 16.0D);
+	private static final VoxelShape MIDDLE_SHAPE = Block.box(4.0D, 4.0D, 4.0D, 12.0D, 10.0D, 12.0D);
 	private static final VoxelShape INPUT_MIDDLE_SHAPE = VoxelShapes.or(MIDDLE_SHAPE, INPUT_SHAPE);
-	private static final VoxelShape field_196326_A = VoxelShapes.combineAndSimplify(INPUT_MIDDLE_SHAPE, IHopper.INSIDE_BOWL_SHAPE, IBooleanFunction.ONLY_FIRST);
-	private static final VoxelShape DOWN_SHAPE = VoxelShapes.or(field_196326_A, Block.makeCuboidShape(6.0D, 0.0D, 6.0D, 10.0D, 4.0D, 10.0D));
-	private static final VoxelShape EAST_SHAPE = VoxelShapes.or(field_196326_A, Block.makeCuboidShape(12.0D, 4.0D, 6.0D, 16.0D, 8.0D, 10.0D));
-	private static final VoxelShape NORTH_SHAPE = VoxelShapes.or(field_196326_A, Block.makeCuboidShape(6.0D, 4.0D, 0.0D, 10.0D, 8.0D, 4.0D));
-	private static final VoxelShape SOUTH_SHAPE = VoxelShapes.or(field_196326_A, Block.makeCuboidShape(6.0D, 4.0D, 12.0D, 10.0D, 8.0D, 16.0D));
-	private static final VoxelShape WEST_SHAPE = VoxelShapes.or(field_196326_A, Block.makeCuboidShape(0.0D, 4.0D, 6.0D, 4.0D, 8.0D, 10.0D));
-	private static final VoxelShape DOWN_RAYTRACE_SHAPE = IHopper.INSIDE_BOWL_SHAPE;
-	private static final VoxelShape EAST_RAYTRACE_SHAPE = VoxelShapes.or(IHopper.INSIDE_BOWL_SHAPE, Block.makeCuboidShape(12.0D, 8.0D, 6.0D, 16.0D, 10.0D, 10.0D));
-	private static final VoxelShape NORTH_RAYTRACE_SHAPE = VoxelShapes.or(IHopper.INSIDE_BOWL_SHAPE, Block.makeCuboidShape(6.0D, 8.0D, 0.0D, 10.0D, 10.0D, 4.0D));
-	private static final VoxelShape SOUTH_RAYTRACE_SHAPE = VoxelShapes.or(IHopper.INSIDE_BOWL_SHAPE, Block.makeCuboidShape(6.0D, 8.0D, 12.0D, 10.0D, 10.0D, 16.0D));
-	private static final VoxelShape WEST_RAYTRACE_SHAPE = VoxelShapes.or(IHopper.INSIDE_BOWL_SHAPE, Block.makeCuboidShape(0.0D, 8.0D, 6.0D, 4.0D, 10.0D, 10.0D));
+	private static final VoxelShape BASE = VoxelShapes.join(INPUT_MIDDLE_SHAPE, IHopper.INSIDE, IBooleanFunction.ONLY_FIRST);
+	private static final VoxelShape DOWN_SHAPE = VoxelShapes.or(BASE, Block.box(6.0D, 0.0D, 6.0D, 10.0D, 4.0D, 10.0D));
+	private static final VoxelShape EAST_SHAPE = VoxelShapes.or(BASE, Block.box(12.0D, 4.0D, 6.0D, 16.0D, 8.0D, 10.0D));
+	private static final VoxelShape NORTH_SHAPE = VoxelShapes.or(BASE, Block.box(6.0D, 4.0D, 0.0D, 10.0D, 8.0D, 4.0D));
+	private static final VoxelShape SOUTH_SHAPE = VoxelShapes.or(BASE, Block.box(6.0D, 4.0D, 12.0D, 10.0D, 8.0D, 16.0D));
+	private static final VoxelShape WEST_SHAPE = VoxelShapes.or(BASE, Block.box(0.0D, 4.0D, 6.0D, 4.0D, 8.0D, 10.0D));
+	private static final VoxelShape DOWN_RAYTRACE_SHAPE = IHopper.INSIDE;
+	private static final VoxelShape EAST_RAYTRACE_SHAPE = VoxelShapes.or(IHopper.INSIDE, Block.box(12.0D, 8.0D, 6.0D, 16.0D, 10.0D, 10.0D));
+	private static final VoxelShape NORTH_RAYTRACE_SHAPE = VoxelShapes.or(IHopper.INSIDE, Block.box(6.0D, 8.0D, 0.0D, 10.0D, 10.0D, 4.0D));
+	private static final VoxelShape SOUTH_RAYTRACE_SHAPE = VoxelShapes.or(IHopper.INSIDE, Block.box(6.0D, 8.0D, 12.0D, 10.0D, 10.0D, 16.0D));
+	private static final VoxelShape WEST_RAYTRACE_SHAPE = VoxelShapes.or(IHopper.INSIDE, Block.box(0.0D, 8.0D, 6.0D, 4.0D, 10.0D, 10.0D));
 	
 	public static final String ID = "active_hopper";
 	
 	public ActiveHopperBlock() {
-		super(Block.Properties.create(Material.IRON)
-			.hardnessAndResistance(3f, 8f)
+		super(Block.Properties.of(Material.METAL)
+			.strength(3f, 8f)
 			.harvestTool(ToolType.PICKAXE).harvestLevel(2)
 			.sound(SoundType.METAL)
 		);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.DOWN).with(ENABLED, true));
+		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.DOWN).setValue(ENABLED, true));
 	}
 	
 	public static Direction GetFacing(BlockState state) {
-		return state.get(FACING);
+		return state.getValue(FACING);
 	}
 	
 	public static boolean GetEnabled(BlockState state) {
 		if (state != null && state.getBlock() instanceof ActiveHopperBlock) {
-			return state.get(ENABLED);
+			return state.getValue(ENABLED);
 		}
 		return false;
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(ENABLED, FACING);
 	}
 	
 	@Override
 	public BlockState rotate(BlockState state, Rotation rot) {
-		return state.with(FACING, rot.rotate(state.get(FACING)));
+		return state.setValue(FACING, rot.rotate(state.getValue(FACING)));
 	}
 	
 	@Override
 	public BlockState mirror(BlockState state, Mirror mirrorIn) {
-		return state.with(FACING, mirrorIn.mirror(state.get(FACING)));
+		return state.setValue(FACING, mirrorIn.mirror(state.getValue(FACING)));
 	}
 	
 	@Override
@@ -112,16 +112,16 @@ public class ActiveHopperBlock extends Block {
 	
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		Direction facing = context.getFace();
+		Direction facing = context.getClickedFace();
 		if (facing == Direction.UP) {
 			facing = Direction.DOWN;
 		}
-		return this.getDefaultState().with(FACING, facing);
+		return this.defaultBlockState().setValue(FACING, facing);
 	}
 	
 	
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		  switch((Direction)state.get(FACING)) {
+		  switch((Direction)state.getValue(FACING)) {
 		  case DOWN:
 			 return DOWN_SHAPE;
 		  case NORTH:
@@ -133,12 +133,12 @@ public class ActiveHopperBlock extends Block {
 		  case EAST:
 			 return EAST_SHAPE;
 		  default:
-			 return field_196326_A;
+			 return BASE;
 		  }
 	   }
 
-	   public VoxelShape getRaytraceShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
-		  switch((Direction)state.get(FACING)) {
+	   public VoxelShape getInteractionShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
+		  switch((Direction)state.getValue(FACING)) {
 		  case DOWN:
 			 return DOWN_RAYTRACE_SHAPE;
 		  case NORTH:
@@ -150,20 +150,20 @@ public class ActiveHopperBlock extends Block {
 		  case EAST:
 			 return EAST_RAYTRACE_SHAPE;
 		  default:
-			 return IHopper.INSIDE_BOWL_SHAPE;
+			 return IHopper.INSIDE;
 		  }
 	   }
 	
 	private void updateState(World worldIn, BlockPos pos, BlockState state) {
-		boolean flag = !worldIn.isBlockPowered(pos);
+		boolean flag = !worldIn.hasNeighborSignal(pos);
 
-		if (flag != ((Boolean)state.get(ENABLED)).booleanValue()) {
-			worldIn.setBlockState(pos, state.with(ENABLED, Boolean.valueOf(flag)), 3);
+		if (flag != ((Boolean)state.getValue(ENABLED)).booleanValue()) {
+			worldIn.setBlock(pos, state.setValue(ENABLED, Boolean.valueOf(flag)), 3);
 		}
 	}
 	
 	@Override
-	public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
+	public void onPlace(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
 		updateState(worldIn, pos, state);
 	}
 	
@@ -173,34 +173,34 @@ public class ActiveHopperBlock extends Block {
 	}
 	
 	@Override
-	public boolean hasComparatorInputOverride(BlockState state) {
+	public boolean hasAnalogOutputSignal(BlockState state) {
 		return true;
 	}
 	
 	@Override
-	public int getComparatorInputOverride(BlockState blockState, World worldIn, BlockPos pos) {
-		return Container.calcRedstone(worldIn.getTileEntity(pos));
+	public int getAnalogOutputSignal(BlockState blockState, World worldIn, BlockPos pos) {
+		return Container.getRedstoneSignalFromBlockEntity(worldIn.getBlockEntity(pos));
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
-			TileEntity tileentity = worldIn.getTileEntity(pos);
+			TileEntity tileentity = worldIn.getBlockEntity(pos);
 	
 			if (tileentity instanceof ActiveHopperTileEntity) {
-				InventoryHelper.dropInventoryItems(worldIn, pos, (ActiveHopperTileEntity)tileentity);
-				worldIn.updateComparatorOutputLevel(pos, this);
+				InventoryHelper.dropContents(worldIn, pos, (ActiveHopperTileEntity)tileentity);
+				worldIn.updateNeighbourForOutputSignal(pos, this);
 			}
 		}
 		
-		super.onReplaced(state, worldIn, pos, newState, isMoving);
+		super.onRemove(state, worldIn, pos, newState, isMoving);
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote) {
-			ActiveHopperTileEntity te = (ActiveHopperTileEntity) worldIn.getTileEntity(pos);
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (!worldIn.isClientSide) {
+			ActiveHopperTileEntity te = (ActiveHopperTileEntity) worldIn.getBlockEntity(pos);
 			NostrumMagica.instance.proxy.openContainer(player, ActiveHopperGui.ActiveHopperContainer.Make(te));
 		}
 		
@@ -208,7 +208,7 @@ public class ActiveHopperBlock extends Block {
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 }

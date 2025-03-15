@@ -32,7 +32,7 @@ public class KoidHelmet extends ArmorItem implements ILoreTagged {
 	protected Multimap<Attribute, AttributeModifier> attributes;
 
 	public KoidHelmet(Item.Properties properties) {
-		super(ArmorMaterial.TURTLE, EquipmentSlotType.HEAD, properties.maxDamage(100));
+		super(ArmorMaterial.TURTLE, EquipmentSlotType.HEAD, properties.durability(100));
 	}
 	
 	protected Multimap<Attribute, AttributeModifier> makeAttributes() {
@@ -49,17 +49,17 @@ public class KoidHelmet extends ArmorItem implements ILoreTagged {
 //	}
 	
 	@Override
-	public int getItemEnchantability() {
+	public int getEnchantmentValue() {
 		return 18; // not as much as gold but very good otherwise
 	}
 	
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
 		return !repair.isEmpty() && NostrumTags.Items.InfusedGem.contains(repair.getItem());
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		if (equipmentSlot == this.slot) {
 			if (attributes == null) {
 				attributes = this.makeAttributes();

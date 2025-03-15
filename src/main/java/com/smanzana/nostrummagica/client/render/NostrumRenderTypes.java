@@ -47,13 +47,13 @@ public class NostrumRenderTypes {
 	// Set up states that we use. Pull some from RenderState itself, and make some custom ones/ones not worth the effort to pull out.
 	//private static final RenderState.TextureState BLOCKATLAS_MIPMAP = new RenderState.TextureState(AtlasTexture.LOCATION_BLOCKS_TEXTURE, false, true);
 	
-	//private static final RenderState.TransparencyState LIGHTNING_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228512_d_");
-	private static final RenderState.TransparencyState TRANSLUCENT_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228515_g_");
-	//private static final RenderState.TransparencyState NO_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_228510_b_");
+	//private static final RenderState.TransparencyState LIGHTNING_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "LIGHTNING_TRANSPARENCY");
+	private static final RenderState.TransparencyState TRANSLUCENT_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "TRANSLUCENT_TRANSPARENCY");
+	//private static final RenderState.TransparencyState NO_TRANSPARENCY = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "NO_TRANSPARENCY");
 
-	private static final RenderState.LayerState VIEW_OFFSET_Z_LAYERING = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_239235_M_");
+	private static final RenderState.LayerState VIEW_OFFSET_Z_LAYERING = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "VIEW_OFFSET_Z_LAYERING");
 
-	private static final RenderState.TargetState ITEM_ENTITY_TARGET = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "field_241712_U_");
+	private static final RenderState.TargetState ITEM_ENTITY_TARGET = ObfuscationReflectionHelper.getPrivateValue(RenderState.class, null, "ITEM_ENTITY_TARGET");
 	
 	private static final RenderState.WriteMaskState WRITE_TO_DEPTH_AND_COLOR = new RenderState.WriteMaskState(true, true);
 	private static final RenderState.WriteMaskState WRITE_NO_DEPTH_BUT_COLOR = new RenderState.WriteMaskState(true, false);
@@ -82,7 +82,7 @@ public class NostrumRenderTypes {
 		RenderSystem.matrixMode(GL11.GL_TEXTURE);
 		RenderSystem.pushMatrix();
 		RenderSystem.loadIdentity();
-		final long ms = Util.milliTime();
+		final long ms = Util.getMillis();
 		final long ticks = ms / (1000/20); // whole ticks
 		final long remain = ms % (1000/20); // partial ticks in ms
 		
@@ -103,7 +103,7 @@ public class NostrumRenderTypes {
 		RenderSystem.matrixMode(GL11.GL_TEXTURE);
 		RenderSystem.pushMatrix();
 		RenderSystem.loadIdentity();
-		final long ms = Util.milliTime();
+		final long ms = Util.getMillis();
 		final long ticks = ms / (1000/20); // whole ticks
 		final long remain = ms % (1000/20); // partial ticks in ms
 		
@@ -124,157 +124,157 @@ public class NostrumRenderTypes {
 	    // Define render types
 		RenderType.State glState;
 		
-		glState = RenderType.State.getBuilder()
-				.texture(new RenderState.TextureState(RenderHookShot.CHAIN_TEXTURE, false, true))
-				.cull(NO_CULL)
-				.lightmap(NO_LIGHTING)
-				.layer(VIEW_OFFSET_Z_LAYERING)
-				.target(ITEM_ENTITY_TARGET)
-				.alpha(CUTOUT_ALPHA)
-			.build(false);
-		HOOKSHOT_CHAIN = RenderType.makeType(Name("hookshot_chain"), DefaultVertexFormats.POSITION_TEX, GL11.GL_QUADS, 128, glState);
+		glState = RenderType.State.builder()
+				.setTextureState(new RenderState.TextureState(RenderHookShot.CHAIN_TEXTURE, false, true))
+				.setCullState(NO_CULL)
+				.setLightmapState(NO_LIGHTING)
+				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
+				.setOutputState(ITEM_ENTITY_TARGET)
+				.setAlphaState(CUTOUT_ALPHA)
+			.createCompositeState(false);
+		HOOKSHOT_CHAIN = RenderType.create(Name("hookshot_chain"), DefaultVertexFormats.POSITION_TEX, GL11.GL_QUADS, 128, glState);
 		
-		glState = RenderType.State.getBuilder()
-				.texture(new RenderState.TextureState(LayerManaArmor.TEXTURE_ARMOR, true, false))
-				.transparency(TRANSLUCENT_TRANSPARENCY)
-				.lightmap(NO_LIGHTING)
-				.layer(VIEW_OFFSET_Z_LAYERING)
-				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
-				.texturing(MANAARMOR_GLINT)
+		glState = RenderType.State.builder()
+				.setTextureState(new RenderState.TextureState(LayerManaArmor.TEXTURE_ARMOR, true, false))
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+				.setLightmapState(NO_LIGHTING)
+				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
+				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+				.setTexturingState(MANAARMOR_GLINT)
 				// depth test?
-			.build(false);
-		MANA_ARMOR = RenderType.makeType(Name("manaarmor"), DefaultVertexFormats.ENTITY, GL11.GL_QUADS, 128, glState);
+			.createCompositeState(false);
+		MANA_ARMOR = RenderType.create(Name("manaarmor"), DefaultVertexFormats.NEW_ENTITY, GL11.GL_QUADS, 128, glState);
 		
-		glState = RenderType.State.getBuilder()
-				.texture(new RenderState.TextureState(SpellShapeRenderer.TEXTURE_BLOCK, true, false))
-				.transparency(TRANSLUCENT_TRANSPARENCY)
-				.lightmap(NO_LIGHTING)
-				.layer(VIEW_OFFSET_Z_LAYERING)
-				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
-				.texturing(SPELLSHAPE_TEXTURING)
+		glState = RenderType.State.builder()
+				.setTextureState(new RenderState.TextureState(SpellShapeRenderer.TEXTURE_BLOCK, true, false))
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+				.setLightmapState(NO_LIGHTING)
+				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
+				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+				.setTexturingState(SPELLSHAPE_TEXTURING)
 				// depth test?
-			.build(false);
-		SPELLSHAPE_QUADS = RenderType.makeType(Name("spellshape"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_QUADS, 128, glState);
+			.createCompositeState(false);
+		SPELLSHAPE_QUADS = RenderType.create(Name("spellshape"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_QUADS, 128, glState);
 		
-		glState = RenderType.State.getBuilder()
-				.texture(new RenderState.TextureState(SpellShapeRenderer.TEXTURE_FLOW, true, false))
-				.transparency(TRANSLUCENT_TRANSPARENCY)
-				.lightmap(NO_LIGHTING)
-				.layer(VIEW_OFFSET_Z_LAYERING)
-				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
-				.cull(NO_CULL)
+		glState = RenderType.State.builder()
+				.setTextureState(new RenderState.TextureState(SpellShapeRenderer.TEXTURE_FLOW, true, false))
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+				.setLightmapState(NO_LIGHTING)
+				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
+				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+				.setCullState(NO_CULL)
 				//.texturing(SPELLSHAPE_TEXTURING)
 				// depth test?
-			.build(false);
-		SPELLSHAPE_ORB_CHAIN = RenderType.makeType(Name("spellshape_chain"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_QUADS, 128, glState);
+			.createCompositeState(false);
+		SPELLSHAPE_ORB_CHAIN = RenderType.create(Name("spellshape_chain"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_QUADS, 128, glState);
 		
-		glState = RenderType.State.getBuilder()
+		glState = RenderType.State.builder()
 				//.texture(new RenderState.TextureState(SpellShapeRenderer.TEXTURE_FLOW, true, false))
-				.transparency(TRANSLUCENT_TRANSPARENCY)
-				.lightmap(NO_LIGHTING)
-				.layer(VIEW_OFFSET_Z_LAYERING)
-				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
-				.texturing(SPELLSHAPE_TEXTURING)
-				.line(LINE_3)
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+				.setLightmapState(NO_LIGHTING)
+				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
+				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+				.setTexturingState(SPELLSHAPE_TEXTURING)
+				.setLineState(LINE_3)
 				// depth test?
-			.build(false);
-		SPELLSHAPE_LINES = RenderType.makeType(Name("spellshape_lines"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_LINES, 32, glState);
+			.createCompositeState(false);
+		SPELLSHAPE_LINES = RenderType.create(Name("spellshape_lines"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_LINES, 32, glState);
 		
-		glState = RenderType.State.getBuilder()
+		glState = RenderType.State.builder()
 				//.texture(new RenderState.TextureState(SpellShapeRenderer.TEXTURE_FLOW, true, false))
-				.transparency(TRANSLUCENT_TRANSPARENCY)
-				.lightmap(NO_LIGHTING)
-				.layer(VIEW_OFFSET_Z_LAYERING)
-				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
-				.texturing(SPELLSHAPE_TEXTURING)
-				.line(LINE_10)
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+				.setLightmapState(NO_LIGHTING)
+				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
+				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+				.setTexturingState(SPELLSHAPE_TEXTURING)
+				.setLineState(LINE_10)
 				// depth test?
-			.build(false);
-		SPELLSHAPE_LINES_THICK = RenderType.makeType(Name("spellshape_lines_thick"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_LINES, 32, glState);
+			.createCompositeState(false);
+		SPELLSHAPE_LINES_THICK = RenderType.create(Name("spellshape_lines_thick"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_LINES, 32, glState);
 		
-		glState = RenderType.State.getBuilder()
-				.texture(new RenderState.TextureState(ModelSwitchTrigger.TEXT, false, true))
-				.transparency(TRANSLUCENT_TRANSPARENCY)
-				.lightmap(NO_LIGHTING)
-				.layer(VIEW_OFFSET_Z_LAYERING)
-				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
-			.build(false);
-		SWITCH_TRIGGER_BASE = RenderType.makeType(Name("switch_trigger_base"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_TRIANGLES, 64, glState);
+		glState = RenderType.State.builder()
+				.setTextureState(new RenderState.TextureState(ModelSwitchTrigger.TEXT, false, true))
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+				.setLightmapState(NO_LIGHTING)
+				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
+				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+			.createCompositeState(false);
+		SWITCH_TRIGGER_BASE = RenderType.create(Name("switch_trigger_base"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_TRIANGLES, 64, glState);
 		
-		glState = RenderType.State.getBuilder()
-				.texture(new RenderState.TextureState(ModelSwitchTrigger.CAGE_TEXT, false, true))
-				.transparency(TRANSLUCENT_TRANSPARENCY)
-				.lightmap(NO_LIGHTING)
-				.layer(VIEW_OFFSET_Z_LAYERING)
+		glState = RenderType.State.builder()
+				.setTextureState(new RenderState.TextureState(ModelSwitchTrigger.CAGE_TEXT, false, true))
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+				.setLightmapState(NO_LIGHTING)
+				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
 				//.depthTest(DEPTH_EQUAL)
-				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
-			.build(false);
-		SWITCH_TRIGGER_CAGE = RenderType.makeType(Name("switch_trigger_cage"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_TRIANGLES, 64, glState);
+				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+			.createCompositeState(false);
+		SWITCH_TRIGGER_CAGE = RenderType.create(Name("switch_trigger_cage"), DefaultVertexFormats.POSITION_COLOR_TEX, GL11.GL_TRIANGLES, 64, glState);
 		
-		glState = RenderType.State.getBuilder()
-				.texture(new RenderState.TextureState(TileEntityPortalRenderer.TEX_LOC, false, true))
-				.transparency(TRANSLUCENT_TRANSPARENCY)
-				.lightmap(NO_LIGHTING)
-				.cull(NO_CULL)
-			.build(false);
-		NOSTRUM_PORTAL = RenderType.makeType(Name("nostrum_portal"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_TRIANGLES, 64, glState);
+		glState = RenderType.State.builder()
+				.setTextureState(new RenderState.TextureState(TileEntityPortalRenderer.TEX_LOC, false, true))
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+				.setLightmapState(NO_LIGHTING)
+				.setCullState(NO_CULL)
+			.createCompositeState(false);
+		NOSTRUM_PORTAL = RenderType.create(Name("nostrum_portal"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_TRIANGLES, 64, glState);
 		
-		glState = RenderType.State.getBuilder()
-				.texture(new RenderState.TextureState(TileEntityProgressionDoorRenderer.TEX_GEM_LOC, false, true))
-				.transparency(TRANSLUCENT_TRANSPARENCY)
-				.lightmap(LIGHTMAP_ENABLED)
-				.layer(VIEW_OFFSET_Z_LAYERING)
-				.writeMask(WRITE_TO_DEPTH_AND_COLOR)
-			.build(false);
-		PROGRESSION_DOOR_LOCK = RenderType.makeType(Name("prog_door_lock"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_TRIANGLES, 64, glState);
+		glState = RenderType.State.builder()
+				.setTextureState(new RenderState.TextureState(TileEntityProgressionDoorRenderer.TEX_GEM_LOC, false, true))
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+				.setLightmapState(LIGHTMAP_ENABLED)
+				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
+				.setWriteMaskState(WRITE_TO_DEPTH_AND_COLOR)
+			.createCompositeState(false);
+		PROGRESSION_DOOR_LOCK = RenderType.create(Name("prog_door_lock"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_TRIANGLES, 64, glState);
 		
 		
-		glState = RenderType.State.getBuilder()
-				.texture(new RenderState.TextureState(TileEntityLockedChestRenderer.TEXT_LOCK_LOC, false, true))
-				.transparency(TRANSLUCENT_TRANSPARENCY)
-				.lightmap(LIGHTMAP_ENABLED)
-				.cull(NO_CULL)
-			.build(false);
-		LOCKEDCHEST_LOCK = RenderType.makeType(Name("lockedchest_lock"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 32, glState);
+		glState = RenderType.State.builder()
+				.setTextureState(new RenderState.TextureState(TileEntityLockedChestRenderer.TEXT_LOCK_LOC, false, true))
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+				.setLightmapState(LIGHTMAP_ENABLED)
+				.setCullState(NO_CULL)
+			.createCompositeState(false);
+		LOCKEDCHEST_LOCK = RenderType.create(Name("lockedchest_lock"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 32, glState);
 		
-		glState = RenderType.State.getBuilder()
-				.texture(new RenderState.TextureState(TileEntityLockedChestRenderer.TEXT_CHAINLINK_LOC, false, true))
-				.transparency(TRANSLUCENT_TRANSPARENCY)
-				.lightmap(LIGHTMAP_ENABLED)
-				.cull(NO_CULL)
-				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
-			.build(false);
-		LOCKEDCHEST_CHAIN = RenderType.makeType(Name("lockedchest_chain"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 64, glState);
+		glState = RenderType.State.builder()
+				.setTextureState(new RenderState.TextureState(TileEntityLockedChestRenderer.TEXT_CHAINLINK_LOC, false, true))
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+				.setLightmapState(LIGHTMAP_ENABLED)
+				.setCullState(NO_CULL)
+				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+			.createCompositeState(false);
+		LOCKEDCHEST_CHAIN = RenderType.create(Name("lockedchest_chain"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 64, glState);
 		
-		glState = RenderType.State.getBuilder()
-				.transparency(TRANSLUCENT_TRANSPARENCY)
-				.lightmap(NO_LIGHTING)
-				.depthTest(NO_DEPTH)
-			.build(false);
-		WORLD_SELECT_HIGHLIGHT_CULL = RenderType.makeType(Name("WorldSelectCull"), DefaultVertexFormats.POSITION_COLOR, GL11.GL_QUADS, 16, glState);
+		glState = RenderType.State.builder()
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+				.setLightmapState(NO_LIGHTING)
+				.setDepthTestState(NO_DEPTH)
+			.createCompositeState(false);
+		WORLD_SELECT_HIGHLIGHT_CULL = RenderType.create(Name("WorldSelectCull"), DefaultVertexFormats.POSITION_COLOR, GL11.GL_QUADS, 16, glState);
 		
-		glState = RenderType.State.getBuilder()
-				.transparency(TRANSLUCENT_TRANSPARENCY)
-				.lightmap(NO_LIGHTING)
-				.depthTest(NO_DEPTH)
-				.cull(NO_CULL) // Previously only was no-cull if inside box
-			.build(false);
-		WORLD_SELECT_HIGHLIGHT = RenderType.makeType(Name("WorldSelect"), DefaultVertexFormats.POSITION_COLOR, GL11.GL_QUADS, 16, glState);
+		glState = RenderType.State.builder()
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+				.setLightmapState(NO_LIGHTING)
+				.setDepthTestState(NO_DEPTH)
+				.setCullState(NO_CULL) // Previously only was no-cull if inside box
+			.createCompositeState(false);
+		WORLD_SELECT_HIGHLIGHT = RenderType.create(Name("WorldSelect"), DefaultVertexFormats.POSITION_COLOR, GL11.GL_QUADS, 16, glState);
 	}
 	
 	public static final RenderType GetIconType(ResourceLocation texture) {
 		RenderType.State glState;
 		
-		glState = RenderType.State.getBuilder()
-				.texture(new RenderState.TextureState(texture, false, true))
-				.cull(NO_CULL)
-				.lightmap(LIGHTMAP_ENABLED)
-				.transparency(TRANSLUCENT_TRANSPARENCY)
+		glState = RenderType.State.builder()
+				.setTextureState(new RenderState.TextureState(texture, false, true))
+				.setCullState(NO_CULL)
+				.setLightmapState(LIGHTMAP_ENABLED)
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
 				//.layer(VIEW_OFFSET_Z_LAYERING)
 				//.target(ITEM_ENTITY_TARGET)
 				//.writeMask(WRITE_TO_DEPTH_AND_COLOR)
-			.build(false);
-		return RenderType.makeType(Name("flaticon"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 32, glState);
+			.createCompositeState(false);
+		return RenderType.create(Name("flaticon"), DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 32, glState);
 	}
 	
 	public static final RenderType GetBlendedEntity(ResourceLocation texture, boolean affectsOutline) {
@@ -292,22 +292,22 @@ public class NostrumRenderTypes {
 		
 		RenderSystem.defaultBlendFunc();
 		
-		glState = RenderType.State.getBuilder()
-				.texture(new RenderState.TextureState(texture, false, false))
-				.transparency(new RenderState.TransparencyState("translucent_transparency", () -> {
+		glState = RenderType.State.builder()
+				.setTextureState(new RenderState.TextureState(texture, false, false))
+				.setTransparencyState(new RenderState.TransparencyState("translucent_transparency", () -> {
 				      RenderSystem.enableBlend();
 				      RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 				   }, () -> {
 				      RenderSystem.disableBlend();
 				      RenderSystem.defaultBlendFunc();
 				   }))
-				.diffuseLighting(DIFFUSE_LIGHTING_ENABLED)
-				.alpha(DEFAULT_ALPHA).cull(NO_CULL)
-				.lightmap(LIGHTMAP_ENABLED)
-				.overlay(OVERLAY_ENABLED)
-				.writeMask(WRITE_NO_DEPTH_BUT_COLOR)
-			.build(affectsOutline);
-		return RenderType.makeType(Name("nostrum_blendedentity"), DefaultVertexFormats.ENTITY, GL11.GL_QUADS, 256, glState);
+				.setDiffuseLightingState(DIFFUSE_LIGHTING_ENABLED)
+				.setAlphaState(DEFAULT_ALPHA).setCullState(NO_CULL)
+				.setLightmapState(LIGHTMAP_ENABLED)
+				.setOverlayState(OVERLAY_ENABLED)
+				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+			.createCompositeState(affectsOutline);
+		return RenderType.create(Name("nostrum_blendedentity"), DefaultVertexFormats.NEW_ENTITY, GL11.GL_QUADS, 256, glState);
 	}
 	
 	public static final RenderType GetBlendedEntity(ResourceLocation texture) {

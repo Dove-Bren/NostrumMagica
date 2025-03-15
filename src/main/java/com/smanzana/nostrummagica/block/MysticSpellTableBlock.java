@@ -24,11 +24,11 @@ public class MysticSpellTableBlock extends BasicSpellTableBlock {
 	public static final String ID = "spelltable_mystic";
 	
 	public MysticSpellTableBlock() {
-		super(Block.Properties.create(Material.WOOD)
-				.hardnessAndResistance(2.5f, 2.5f)
+		super(Block.Properties.of(Material.WOOD)
+				.strength(2.5f, 2.5f)
 				.sound(SoundType.WOOD)
 				.harvestTool(ToolType.AXE)
-				.notSolid()
+				.noOcclusion()
 				);
 	}
 	
@@ -38,9 +38,9 @@ public class MysticSpellTableBlock extends BasicSpellTableBlock {
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit) {
 		
-		MysticSpellTableTileEntity te = (MysticSpellTableTileEntity) worldIn.getTileEntity(pos);
+		MysticSpellTableTileEntity te = (MysticSpellTableTileEntity) worldIn.getBlockEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(playerIn, MysticSpellCraftGui.MysticContainer.Make(te));
 		
 		return ActionResultType.SUCCESS;

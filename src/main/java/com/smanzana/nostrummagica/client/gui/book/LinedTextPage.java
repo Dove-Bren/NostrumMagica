@@ -24,8 +24,8 @@ public class LinedTextPage implements IBookPage {
 	@Override
 	public void draw(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
 		for (String line : text) {
-			fonter.drawString(matrixStackIn, line, xoffset, yoffset, 0x000000);
-			yoffset += fonter.FONT_HEIGHT + LINE_HEIGHT_EXTRA;
+			fonter.draw(matrixStackIn, line, xoffset, yoffset, 0x000000);
+			yoffset += fonter.lineHeight + LINE_HEIGHT_EXTRA;
 		}
 	}
 

@@ -15,12 +15,12 @@ public class MagicDirtBlock extends Block {
 	public static final String ID = "magic_dirt";
 	
 	public MagicDirtBlock() {
-		super(Block.Properties.create(Material.EARTH)
-				.hardnessAndResistance(.7f, 1.0f)
-				.sound(SoundType.GROUND)
+		super(Block.Properties.of(Material.DIRT)
+				.strength(.7f, 1.0f)
+				.sound(SoundType.GRAVEL)
 				.harvestTool(ToolType.SHOVEL)
 				.harvestLevel(1)
-				.tickRandomly()
+				.randomTicks()
 				);
 	}
 	
@@ -41,11 +41,11 @@ public class MagicDirtBlock extends Block {
 				for (BlockPos neighbor : neighbors) {
 					BlockState neighborState = worldIn.getBlockState(neighbor);
 					if (neighborState != null
-							&& neighborState.isSolid()
+							&& neighborState.canOcclude()
 							&& neighborState.getMaterial() != Material.AIR
 							&& neighborState.getBlock() != this
-							&& neighborState.getBlockHardness(worldIn, neighbor) <= 1) {
-						worldIn.setBlockState(neighbor, this.getDefaultState());
+							&& neighborState.getDestroySpeed(worldIn, neighbor) <= 1) {
+						worldIn.setBlockAndUpdate(neighbor, this.defaultBlockState());
 					}
 				}
 			}

@@ -30,22 +30,22 @@ import net.minecraft.world.World;
 public class LockedChestBlock extends HorizontalBlock {
 	
 	public static final String ID = "locked_chest";
-	public static DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
+	public static DirectionProperty FACING = HorizontalBlock.FACING;
 	public static BooleanProperty UNLOCKABLE = BooleanProperty.create("unlockable");
-	protected static final VoxelShape SHAPE = Block.makeCuboidShape(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
+	protected static final VoxelShape SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
 	
 	public LockedChestBlock() {
-		super(Block.Properties.create(Material.WOOD)
+		super(Block.Properties.of(Material.WOOD)
 				.sound(SoundType.WOOD)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+				.strength(-1.0F, 3600000.8F)
 				.noDrops()
 				);
 		
-		this.setDefaultState(this.getDefaultState().with(UNLOCKABLE, false));
+		this.registerDefaultState(this.defaultBlockState().setValue(UNLOCKABLE, false));
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(FACING, UNLOCKABLE);
 	}
 	
@@ -55,18 +55,18 @@ public class LockedChestBlock extends HorizontalBlock {
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 		return false;
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote()) {
-			LockedChestTileEntity chest = (LockedChestTileEntity) worldIn.getTileEntity(pos);
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (!worldIn.isClientSide()) {
+			LockedChestTileEntity chest = (LockedChestTileEntity) worldIn.getBlockEntity(pos);
 			
 			// Creative players can dye it
-			if (player.isCreative() && !player.getHeldItemMainhand().isEmpty() && player.getHeldItemMainhand().getItem() instanceof DyeItem) {
-				DyeItem dye = (DyeItem) player.getHeldItemMainhand().getItem();
+			if (player.isCreative() && !player.getMainHandItem().isEmpty() && player.getMainHandItem().getItem() instanceof DyeItem) {
+				DyeItem dye = (DyeItem) player.getMainHandItem().getItem();
 				chest.setColor(dye.getDyeColor());
 			} else {
 				chest.attemptUnlock(player);
@@ -87,36 +87,36 @@ public class LockedChestBlock extends HorizontalBlock {
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			// Skip dropping items if we're changing to a chest to avoid having to take a copy, change, and then
 			// use the copy in TileEntity logic
 			if (!(newState.getBlock() instanceof ChestBlock)) {
 				destroy(worldIn, pos, state);
 			}
-			worldIn.removeTileEntity(pos);
+			worldIn.removeBlockEntity(pos);
 		}
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
-		TileEntity ent = world.getTileEntity(pos);
+		TileEntity ent = world.getBlockEntity(pos);
 		if (ent == null || !(ent instanceof LockedChestTileEntity))
 			return;
 		
 		LockedChestTileEntity table = (LockedChestTileEntity) ent;
-		for (int i = 0; i < table.getSizeInventory(); i++) {
-			ItemStack item = table.getStackInSlot(i);
+		for (int i = 0; i < table.getContainerSize(); i++) {
+			ItemStack item = table.getItem(i);
 			if (!item.isEmpty()) {
 				double x, y, z;
 				x = pos.getX() + .5;
 				y = pos.getY() + .5;
 				z = pos.getZ() + .5;
-				world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
+				world.addFreshEntity(new ItemEntity(world, x, y, z, item.copy()));
 			}
 		}
 	}

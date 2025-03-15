@@ -27,7 +27,7 @@ public class CustomOutlineTypeBuffer implements IRenderTypeBuffer {
 	
 	public CustomOutlineTypeBuffer(IRenderTypeBuffer.Impl bufferIn, float red, float green, float blue, float alpha) {
 		this.bufferIn = bufferIn;
-		this.outlineBuffer = IRenderTypeBuffer.getImpl(new BufferBuilder(256));
+		this.outlineBuffer = IRenderTypeBuffer.immediate(new BufferBuilder(256));
 		
 		this.color(red, green, blue, alpha);
 	}
@@ -44,12 +44,12 @@ public class CustomOutlineTypeBuffer implements IRenderTypeBuffer {
 		// Very nearly a duplicate of OutlineLayerBuffer except we don't delegate to the original non-outline buffer.
 		// That means we ONLY render the outline, which is good in that we don't render the entity again.
 		
-		if (type.isColoredOutlineBuffer()) {
+		if (type.isOutline()) {
 	         IVertexBuilder ivertexbuilder2 = this.outlineBuffer.getBuffer(type);
 	         return new ColoredOutline(ivertexbuilder2, this.red, this.green, this.blue, this.alpha);
 	      } else {
 	         IVertexBuilder ivertexbuilder = this.bufferIn.getBuffer(type);
-	         Optional<RenderType> optional = type.getOutline();
+	         Optional<RenderType> optional = type.outline();
 	         if (optional.isPresent()) {
 	            IVertexBuilder ivertexbuilder1 = this.outlineBuffer.getBuffer(optional.get());
 	            ColoredOutline outlinelayerbuffer$coloredoutline = new ColoredOutline(ivertexbuilder1, this.red, this.green, this.blue, this.alpha);
@@ -61,7 +61,7 @@ public class CustomOutlineTypeBuffer implements IRenderTypeBuffer {
 	}
 	
 	public void finish() {
-		this.outlineBuffer.finish();
+		this.outlineBuffer.endBatch();
 	}
 	
 	protected static final class ColoredOutline extends DefaultColorVertexBuilder {
@@ -73,11 +73,11 @@ public class CustomOutlineTypeBuffer implements IRenderTypeBuffer {
 		final IVertexBuilder builder;
 		public ColoredOutline(IVertexBuilder builder, int red, int green, int blue, int alpha) {
 			this.builder = builder;
-			this.setDefaultColor(red, green, blue, alpha);
+			this.defaultColor(red, green, blue, alpha);
 		}
 
 		@Override
-		public IVertexBuilder pos(double x, double y, double z) {
+		public IVertexBuilder vertex(double x, double y, double z) {
 			this.x = x;
 			this.y = y;
 			this.z = z;
@@ -90,19 +90,19 @@ public class CustomOutlineTypeBuffer implements IRenderTypeBuffer {
 		}
 
 		@Override
-		public IVertexBuilder tex(float u, float v) {
+		public IVertexBuilder uv(float u, float v) {
 			this.u = u;
 			this.v = v;
 			return this;
 		}
 
 		@Override
-		public IVertexBuilder overlay(int u, int v) {
+		public IVertexBuilder overlayCoords(int u, int v) {
 			return this;
 		}
 
 		@Override
-		public IVertexBuilder lightmap(int u, int v) {
+		public IVertexBuilder uv2(int u, int v) {
 			return this;
 		}
 
@@ -111,12 +111,12 @@ public class CustomOutlineTypeBuffer implements IRenderTypeBuffer {
 			return this;
 		}
 
-		public void addVertex(float x, float y, float z, float red, float green, float blue, float alpha, float texU, float texV, int overlayUV, int lightmapUV, float normalX, float normalY, float normalZ) {
-			builder.pos((double)x, (double)y, (double)z).color(this.defaultRed, this.defaultGreen, this.defaultBlue, this.defaultAlpha).tex(texU, texV).endVertex();
+		public void vertex(float x, float y, float z, float red, float green, float blue, float alpha, float texU, float texV, int overlayUV, int lightmapUV, float normalX, float normalY, float normalZ) {
+			builder.vertex((double)x, (double)y, (double)z).color(this.defaultR, this.defaultG, this.defaultB, this.defaultA).uv(texU, texV).endVertex();
 		}
 
 		public void endVertex() {
-			builder.pos(this.x, this.y, this.z).color(this.defaultRed, this.defaultGreen, this.defaultBlue, this.defaultAlpha).tex(u, v).endVertex();
+			builder.vertex(this.x, this.y, this.z).color(this.defaultR, this.defaultG, this.defaultB, this.defaultA).uv(u, v).endVertex();
 		}
 	}
 

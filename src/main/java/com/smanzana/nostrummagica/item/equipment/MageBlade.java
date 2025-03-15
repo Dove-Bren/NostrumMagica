@@ -41,6 +41,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import com.smanzana.nostrummagica.item.IEnchantableItem.Result;
+
 public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment, IEnchantableItem {
 
 	public static final String ID = "mage_blade";
@@ -116,8 +118,8 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-		Multimap<Attribute, AttributeModifier> multimap = super.getAttributeModifiers(equipmentSlot);//HashMultimap.<String, AttributeModifier>create();
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+		Multimap<Attribute, AttributeModifier> multimap = super.getDefaultAttributeModifiers(equipmentSlot);//HashMultimap.<String, AttributeModifier>create();
 
 		if (equipmentSlot == EquipmentSlotType.MAINHAND || equipmentSlot == EquipmentSlotType.OFFHAND) {
 			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
@@ -156,7 +158,7 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 	}
 	
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
 		if (repair.isEmpty()) {
 			return false;
 		} else {
@@ -169,21 +171,21 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 		// We provide -10% reagent cost, +20% potency
 		summary.addReagentCost(-.1f);
 		//summary.addEfficiency(.2f);
-		ItemStacks.damageItem(stack, caster, caster.getHeldItem(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+		ItemStacks.damageItem(stack, caster, caster.getItemInHand(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		//tooltip.add("Magic Potency Bonus: 20%");
 		tooltip.add(new StringTextComponent("Reagent Cost Discount: 10%"));
 	}
 	
 	protected void doEffect(LivingEntity entity, EMagicElement element) {
-		NostrumParticles.GLOW_ORB.spawn(entity.world, new SpawnParams(
+		NostrumParticles.GLOW_ORB.spawn(entity.level, new SpawnParams(
 				3,
-				entity.getPosX(), entity.getPosY() + entity.getHeight(), entity.getPosZ(), 1, 30, 5,
+				entity.getX(), entity.getY() + entity.getBbHeight(), entity.getZ(), 1, 30, 5,
 				new Vector3d(0, -0.05, 0), null
 				).color(0x80000000 | (0x00FFFFFF & element.getColor())));
 		NostrumMagicaSounds.DAMAGE_FIRE.play(entity);
@@ -198,7 +200,7 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 	}
 	
 	@Override
-	public boolean hitEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 		// Add magic damage, but only if weapon cooldown is recovered
 		final EMagicElement elem = this.getElement(stack);
 		if (elem != null) {
@@ -206,10 +208,10 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 			//if (!(attacker instanceof PlayerEntity) || ((PlayerEntity)attacker).getCooledAttackStrength(0.5F) > .95)
 			{
 				target.setInvulnerable(false);
-				target.hurtResistantTime = 0;
+				target.invulnerableTime = 0;
 				SpellDamage.DamageEntity(target, elem, 4f, attacker);
 				
-				if (!target.world.isRemote()) {
+				if (!target.level.isClientSide()) {
 					doEffect(target, elem);
 					spendCharge(stack);
 					
@@ -220,7 +222,7 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 			}
 		}
 		
-		return super.hitEntity(stack, target, attacker);
+		return super.hurtEnemy(stack, target, attacker);
 	}
 
 	@Override

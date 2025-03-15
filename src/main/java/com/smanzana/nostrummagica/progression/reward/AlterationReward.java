@@ -24,7 +24,7 @@ public class AlterationReward implements IReward {
 	
 	@Override
 	public String getDescription() {
-		return I18n.format("reward.alteration." + alteration.name().toLowerCase(), new Object[0]);
+		return I18n.get("reward.alteration." + alteration.name().toLowerCase(), new Object[0]);
 	}
 	
 	public EAlteration getAlteration() {

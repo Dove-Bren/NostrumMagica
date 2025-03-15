@@ -36,7 +36,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 	public DungeonDoorBlock() {
 		super();
 
-		this.setDefaultState(this.getDefaultState().with(UNLOCKABLE, false));
+		this.registerDefaultState(this.defaultBlockState().setValue(UNLOCKABLE, false));
 	}
 	
 	@Override
@@ -48,22 +48,22 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote()) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+		if (!worldIn.isClientSide()) {
 			BlockPos master = this.getMasterPos(worldIn, state, pos);
 			if (master != null) {
-				DungeonDoorTileEntity door = (DungeonDoorTileEntity) worldIn.getTileEntity(master);
-				final ItemStack heldItem = playerIn.getHeldItem(hand);
+				DungeonDoorTileEntity door = (DungeonDoorTileEntity) worldIn.getBlockEntity(master);
+				final ItemStack heldItem = playerIn.getItemInHand(hand);
 				
-				if (playerIn.isCreative() && heldItem.isEmpty() && playerIn.isSneaking()) {
+				if (playerIn.isCreative() && heldItem.isEmpty() && playerIn.isShiftKeyDown()) {
 					// Try to take key from dungeon
 					DungeonRecord record = AutoDungeons.GetDungeonTracker().getDungeon(playerIn);
 					if (record != null) {
 						WorldKey key = door.isLarge() ? record.instance.getLargeKey() : record.instance.getSmallKey();
 						door.setWorldKey(key);
-						playerIn.sendMessage(new StringTextComponent("Set to dungeon key"), Util.DUMMY_UUID);
+						playerIn.sendMessage(new StringTextComponent("Set to dungeon key"), Util.NIL_UUID);
 					} else {
-						playerIn.sendMessage(new StringTextComponent("Not in a dungeon, so no key to set"), Util.DUMMY_UUID);
+						playerIn.sendMessage(new StringTextComponent("Not in a dungeon, so no key to set"), Util.NIL_UUID);
 					}
 					return ActionResultType.SUCCESS;
 				} else {
@@ -87,20 +87,20 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 		// DungeonChests run into an issue where LootUtil has already forced a chest TE to generate, and so our
 		// blockstate change here doesn't cause a TE refresh.
 		// So we're going to force it.
-		if (isWorldGen && worldIn.getTileEntity(start) != null && !(worldIn.getTileEntity(start) instanceof DungeonKeyChestTileEntity)) {
+		if (isWorldGen && worldIn.getBlockEntity(start) != null && !(worldIn.getBlockEntity(start) instanceof DungeonKeyChestTileEntity)) {
 			worldIn.removeBlock(start, false);
 		}
 		
 		BlockState state = this.getMaster(facing);
-		worldIn.setBlockState(start, state, 3);
+		worldIn.setBlock(start, state, 3);
 		this.spawnDoor(worldIn, start, state, bounds);
 		
-		DungeonDoorTileEntity door = (DungeonDoorTileEntity) worldIn.getTileEntity(start);
+		DungeonDoorTileEntity door = (DungeonDoorTileEntity) worldIn.getBlockEntity(start);
 		door.setWorldKey(pickDungeonKey(dungeon), WorldUtil.IsWorldGen(worldIn));
 	}
 	
 	public void overrideDungeonKey(IWorld worldIn, BlockPos masterPos, DungeonInstance dungeon) {
-		DungeonDoorTileEntity door = (DungeonDoorTileEntity) worldIn.getTileEntity(masterPos);
+		DungeonDoorTileEntity door = (DungeonDoorTileEntity) worldIn.getBlockEntity(masterPos);
 		if (door == null) {
 			System.out.println("No door where it said there would be! " + masterPos);
 			System.out.println("Instead, there is: " + worldIn.getBlockState(masterPos));
@@ -110,12 +110,12 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 	
 	@Override
 	public boolean isLargeDoor(BlockState state) {
-		return state.get(MASTER);
+		return state.getValue(MASTER);
 	}
 	
 	@Override
 	public void setKey(IWorld worldIn, BlockState state, BlockPos masterPos, WorldKey key, DungeonRoomInstance dungeon, @Nullable MutableBoundingBox bounds) {
-		DungeonDoorTileEntity door = (DungeonDoorTileEntity) worldIn.getTileEntity(masterPos);
+		DungeonDoorTileEntity door = (DungeonDoorTileEntity) worldIn.getBlockEntity(masterPos);
 		door.setWorldKey(key, WorldUtil.IsWorldGen(worldIn));
 	}
 	

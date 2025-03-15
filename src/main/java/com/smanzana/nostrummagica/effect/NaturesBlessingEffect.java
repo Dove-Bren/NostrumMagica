@@ -22,7 +22,7 @@ public class NaturesBlessingEffect extends Effect {
 		super(EffectType.BENEFICIAL, 0xFF38810D);
 	}
 	
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		if (duration <= 0)
 			return false;
 		
@@ -32,18 +32,18 @@ public class NaturesBlessingEffect extends Effect {
 	}
 
 	@Override
-	public void performEffect(LivingEntity entity, int amp) {
-		if (!entity.world.isRemote) {
+	public void applyEffectTick(LivingEntity entity, int amp) {
+		if (!entity.level.isClientSide) {
 			final float amt = 1; // Doesn't depend on amp
 			
-			if (entity.getHealth() < entity.getMaxHealth() && entity.getRNG().nextBoolean()) {
+			if (entity.getHealth() < entity.getMaxHealth() && entity.getRandom().nextBoolean()) {
 				// Health
 				entity.heal(amt);
 			} else {
 				// Food
 				if (entity instanceof PlayerEntity) {
 					PlayerEntity player = (PlayerEntity) entity;
-					player.getFoodStats().addStats((int) amt, 0);
+					player.getFoodData().eat((int) amt, 0);
 				} else if (entity instanceof AnimalEntity) {
 					((AnimalEntity) entity).setInLove(null);
 				}

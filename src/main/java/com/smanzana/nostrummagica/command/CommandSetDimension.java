@@ -20,19 +20,19 @@ public class CommandSetDimension {
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
 				Commands.literal("tpdm")
-					.requires(s -> s.hasPermissionLevel(2))
-					.then(Commands.argument("dimension", DimensionArgument.getDimension())
-							.executes(ctx -> execute(ctx, DimensionArgument.getDimensionArgument(ctx, "dimension")))
+					.requires(s -> s.hasPermission(2))
+					.then(Commands.argument("dimension", DimensionArgument.dimension())
+							.executes(ctx -> execute(ctx, DimensionArgument.getDimension(ctx, "dimension")))
 							)
 				);
 	}
 
 	private static final int execute(CommandContext<CommandSource> context, ServerWorld world) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().asPlayer();
+		ServerPlayerEntity player = context.getSource().getPlayerOrException();
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
-			context.getSource().sendFeedback(new StringTextComponent("Could not find magic wrapper for player"), true);
+			context.getSource().sendSuccess(new StringTextComponent("Could not find magic wrapper for player"), true);
 			return 1;
 		}
 		
@@ -43,7 +43,7 @@ public class CommandSetDimension {
 				if (DimensionUtils.IsSorceryDim(world)) {
 					// Teleporting TO sorcery dimension.
 					player.changeDimension(world, NostrumSorceryDimension.DimensionEntryTeleporter.INSTANCE);
-				} else if (DimensionUtils.IsOverworld(world) && DimensionUtils.IsSorceryDim(player.world)) {
+				} else if (DimensionUtils.IsOverworld(world) && DimensionUtils.IsSorceryDim(player.level)) {
 					// If coming FROM sorcery, use exit
 					player.changeDimension(world, NostrumSorceryDimension.DimensionReturnTeleporter.INSTANCE);
 				} else {
@@ -51,10 +51,10 @@ public class CommandSetDimension {
 					player.changeDimension(world);
 				}
 			} else {
-				context.getSource().sendFeedback(new StringTextComponent("That dimension doesn't seem to exist!"), true);
+				context.getSource().sendSuccess(new StringTextComponent("That dimension doesn't seem to exist!"), true);
 			}
 		} else {
-			context.getSource().sendFeedback(new StringTextComponent("You must be in creative to execute this command!"), true);
+			context.getSource().sendSuccess(new StringTextComponent("You must be in creative to execute this command!"), true);
 		}
 		
 		return 0;

@@ -28,7 +28,7 @@ public class AtFeetShape extends InstantShape {
 	public static final String ID = "feet";
 	public static final float TOUCH_RANGE = 3.0f;
 	
-	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.from(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.SKY_ASH, 1)));
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.of(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.SKY_ASH, 1)));
 	
 	public AtFeetShape() {
 		this(ID);
@@ -40,7 +40,7 @@ public class AtFeetShape extends InstantShape {
 
 	@Override
 	protected TriggerData getTargetData(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
-		return new TriggerData(null, Lists.newArrayList(new SpellLocation(location.world, state.getSelf().getPosition().down())));
+		return new TriggerData(null, Lists.newArrayList(new SpellLocation(location.world, state.getSelf().blockPosition().below())));
 	}
 
 	
@@ -86,7 +86,7 @@ public class AtFeetShape extends InstantShape {
 	
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
-		builder.add(new SpellShapePreviewComponent.Position(new SpellLocation(location.world, state.getSelf().getPosition().down())));
+		builder.add(new SpellShapePreviewComponent.Position(new SpellLocation(location.world, state.getSelf().blockPosition().below())));
 		return true;
 	}
 }

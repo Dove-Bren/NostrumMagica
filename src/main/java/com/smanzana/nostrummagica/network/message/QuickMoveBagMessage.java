@@ -22,12 +22,12 @@ public class QuickMoveBagMessage {
 		ServerPlayerEntity sp = ctx.get().getSender();
 		ctx.get().setPacketHandled(true);
 		ctx.get().enqueueWork(()-> {
-			if (sp.openContainer == null || sp.openContainer.windowId != message.containerID) {
+			if (sp.containerMenu == null || sp.containerMenu.containerId != message.containerID) {
 				NostrumMagica.logger.error("Recieved request to transfer reagents and runes, but for a container that isn't open (anymore?)");
-			} else if (!ReagentAndRuneTransfer.ShouldAddTo(sp, sp.openContainer)) {
+			} else if (!ReagentAndRuneTransfer.ShouldAddTo(sp, sp.containerMenu)) {
 				NostrumMagica.logger.error("Recieved request to transfer reagents and runes, but open container doesn't support it");
 			} else {
-				ReagentAndRuneTransfer.ProcessContainerItems(sp, sp.openContainer);
+				ReagentAndRuneTransfer.ProcessContainerItems(sp, sp.containerMenu);
 			}
 		});
 	}
@@ -39,7 +39,7 @@ public class QuickMoveBagMessage {
 	}
 	
 	public QuickMoveBagMessage(Container container) {
-		this(container.windowId);
+		this(container.containerId);
 	}
 	public static QuickMoveBagMessage decode(PacketBuffer buf) {
 		return new QuickMoveBagMessage(buf.readVarInt());

@@ -36,11 +36,11 @@ public class OutcomeModifyCenterItemGeneric implements IRitualOutcome {
 	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// If there's an altar, we'll enchant the item there
 		// Otherwise enchant the item the player has
-		AltarTileEntity altar = (AltarTileEntity) world.getTileEntity(center);
+		AltarTileEntity altar = (AltarTileEntity) world.getBlockEntity(center);
 		ItemStack centerItem = layout.getCenterItem(world, center);
 		if (recipe.getTier() == 0 || centerItem.isEmpty()) {
 			// enchant item on player
-			ItemStack item = player.getHeldItemMainhand();
+			ItemStack item = player.getMainHandItem();
 			if (item.isEmpty())
 				return;
 			

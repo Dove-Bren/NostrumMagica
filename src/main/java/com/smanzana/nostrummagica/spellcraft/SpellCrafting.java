@@ -41,7 +41,7 @@ public class SpellCrafting {
 		boolean foundElement = false;
 		boolean foundTerminalShape = false;
 		for (int i = startIdx; i < startIdx + slotCount; i++) {
-			stack = inventory.getStackInSlot(i);
+			stack = inventory.getItem(i);
 			if (stack.isEmpty()) {
 				break;
 			}
@@ -299,7 +299,7 @@ public class SpellCrafting {
 		int i;
 		for (i = 0; i < slotCount; i++) {
 			final int slotIdx = startIdx + i;
-			ItemStack stack = inventory.getStackInSlot(slotIdx);
+			ItemStack stack = inventory.getItem(slotIdx);
 			if (stack.isEmpty()) {
 				break;
 			}

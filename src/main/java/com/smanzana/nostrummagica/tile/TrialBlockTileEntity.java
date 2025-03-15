@@ -59,8 +59,8 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	@Override
-	public double getMaxRenderDistanceSquared() {
-		return super.getMaxRenderDistanceSquared();
+	public double getViewDistance() {
+		return super.getViewDistance();
 	}
 	
 	public void setElement(EMagicElement element) {
@@ -75,8 +75,8 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.put(NBT_ELEMENT, this.getElement().toNBT());
 		
@@ -84,18 +84,18 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		this.element = EMagicElement.FromNBT(nbt.get(NBT_ELEMENT));
 	}
 	
 	protected CombatTrial findTrial(EMagicElement element, @Nullable PlayerEntity starter) {
-		return CombatTrial.CreateForElement(element, (ServerWorld) this.world, this.pos, starter);
+		return CombatTrial.CreateForElement(element, (ServerWorld) this.level, this.worldPosition, starter);
 	}
 	
 	public void startTrial(@Nullable PlayerEntity starter) {
-		if (!world.isRemote()) {
+		if (!level.isClientSide()) {
 			this.startTrial(findTrial(this.getElement(), starter), starter);
 		}
 	}
@@ -121,15 +121,15 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 		NostrumMagicaSounds.LEVELUP.play((Entity) player);
 		// Message done in attr
 		//player.sendMessage(new TranslationTextComponent("info.element.mastery" + mastery.intValue(), new Object[] {this.element.getName()}));
-		TrialBlock.DoEffect(pos, player, this.getElement().getColor());
+		TrialBlock.DoEffect(worldPosition, player, this.getElement().getColor());
 	}
 	
 	protected void playStartEffects(PlayerEntity player) {
-		world.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.BLOCKS, 1f, 2f);
+		level.playSound(null, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), SoundEvents.WITHER_SPAWN, SoundCategory.BLOCKS, 1f, 2f);
 		
-		NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
+		NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
 				100,
-				pos.getX() + .5, pos.getY() + 1.25, pos.getZ() + .5, .1,
+				worldPosition.getX() + .5, worldPosition.getY() + 1.25, worldPosition.getZ() + .5, .1,
 				60, 10,
 				new Vector3d(0, .1, 0), new Vector3d(.1, .1, .1)
 				).gravity(.05f).color(this.getElement().getColor()));
@@ -195,8 +195,8 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	protected void spawnStartupWarning() {
-		((ServerWorld) world).addEntity(
-				(new TameLightning(NostrumEntityTypes.tameLightning, world, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5))
+		((ServerWorld) level).addFreshEntity(
+				(new TameLightning(NostrumEntityTypes.tameLightning, level, worldPosition.getX() + 0.5, worldPosition.getY() + 1, worldPosition.getZ() + 0.5))
 				);
 	}
 	
@@ -205,11 +205,11 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 			spawnStartupWarning();
 		}
 		
-		NostrumParticles.FILLED_ORB.spawn(world, new SpawnParams(
+		NostrumParticles.FILLED_ORB.spawn(level, new SpawnParams(
 				(60 - this.trialTicks) / 10,
-				pos.getX() + .5, pos.getY() + 1.25, pos.getZ() + .5, 5,
+				worldPosition.getX() + .5, worldPosition.getY() + 1.25, worldPosition.getZ() + .5, 5,
 				40, 10,
-				new Vector3d(pos.getX() + .5, pos.getY() + 1.25, pos.getZ() + .5)
+				new Vector3d(worldPosition.getX() + .5, worldPosition.getY() + 1.25, worldPosition.getZ() + .5)
 				).color(this.getElement().getColor()));
 	}
 	
@@ -233,7 +233,7 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 	@Override
 	public void tick() {
 		
-		if (!world.isRemote() && isTrialActive()) {
+		if (!level.isClientSide() && isTrialActive()) {
 			trialTick();
 			
 			if (activeTrial.isComplete()) {
@@ -245,23 +245,23 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 	
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
 	protected void dirty() {
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		markDirty();
+		level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+		setChanged();
 	}
 	
 }

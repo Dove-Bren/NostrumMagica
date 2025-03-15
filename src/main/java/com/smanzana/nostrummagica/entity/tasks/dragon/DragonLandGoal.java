@@ -8,39 +8,41 @@ import net.minecraft.entity.ai.controller.MovementController;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.BlockPos;
 
+import net.minecraft.entity.ai.goal.Goal.Flag;
+
 public class DragonLandGoal extends Goal {
 
 	private final DragonEntity dragon;
 	
 	public DragonLandGoal(DragonEntity dragon) {
 		this.dragon = dragon;
-		this.setMutexFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
+		this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
 	}
 	
 	@Override
-	public boolean isPreemptible() {
+	public boolean isInterruptable() {
 		return false;
 	}
 
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		
 		return dragon.isTryingToLand() && !dragon.isOnGround();
 	}
 	
 	@Override
-	public boolean shouldContinueExecuting() {
+	public boolean canContinueToUse() {
 		
 		if (dragon.isOnGround() || dragon.isInWater()) {
 			return false;
 		}
 		
-		MovementController MovementController = this.dragon.getMoveHelper();
-		if (!MovementController.isUpdating()) {
+		MovementController MovementController = this.dragon.getMoveControl();
+		if (!MovementController.hasWanted()) {
 			return false;
 		} else {
-			double dx = MovementController.getX() - this.dragon.getPosX();
-			double dz = MovementController.getZ() - this.dragon.getPosZ();
+			double dx = MovementController.getWantedX() - this.dragon.getX();
+			double dz = MovementController.getWantedZ() - this.dragon.getZ();
 			double dxz = dx * dx + dz * dz;
 			
 			// Keep running unless our XZ distance gets too big
@@ -49,12 +51,12 @@ public class DragonLandGoal extends Goal {
 	}
 	
 	@Override
-	public void startExecuting() {
+	public void start() {
 		
 		// Don't trust heightmap; just loop. Not that bad.
-		BlockPos.Mutable pos = new BlockPos.Mutable().setPos(dragon.getPosition());
+		BlockPos.Mutable pos = new BlockPos.Mutable().set(dragon.blockPosition());
 		while(pos.getY() > 0) {
-			if (dragon.world.isAirBlock(pos)) {
+			if (dragon.level.isEmptyBlock(pos)) {
 				pos.setY(pos.getY() - 1);
 			} else {
 				break;
@@ -62,13 +64,13 @@ public class DragonLandGoal extends Goal {
 		}
 		
 		double y = pos.getY();
-		double x = (Math.cos(dragon.rotationYaw) * 10.0);
-		double z = (Math.sin(dragon.rotationYaw) * 10.0);
+		double x = (Math.cos(dragon.yRot) * 10.0);
+		double z = (Math.sin(dragon.yRot) * 10.0);
 		x += pos.getX();
 		z += pos.getZ();
 		
-		if (!dragon.getNavigator().tryMoveToXYZ(x, y, z, 1.0D)) {
-			dragon.getMoveHelper().setMoveTo(x, y, z, 1.0D);
+		if (!dragon.getNavigation().moveTo(x, y, z, 1.0D)) {
+			dragon.getMoveControl().setWantedPosition(x, y, z, 1.0D);
 		}
 	}
 	

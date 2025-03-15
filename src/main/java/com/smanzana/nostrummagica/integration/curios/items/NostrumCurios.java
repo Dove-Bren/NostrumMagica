@@ -64,13 +64,13 @@ public class NostrumCurios {
 	
 	public static Item.Properties PropBase() {
 		return new Item.Properties()
-				.group(NostrumMagica.equipmentTab)
+				.tab(NostrumMagica.equipmentTab)
 				;
 	}
 	
 	public static Item.Properties PropCurio() {
 		return PropBase()
-				.maxStackSize(1)
+				.stacksTo(1)
 				;
 	}
 	

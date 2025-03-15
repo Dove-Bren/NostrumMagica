@@ -25,12 +25,12 @@ public class MagicShieldEffect extends Effect {
 	}
 	
 	@Override
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return duration > 0; // Every tick
 	}
 	
 	@Override
-	public void applyAttributesModifiersToEntity(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
+	public void addAttributeModifiers(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
 		// Sneaky! We've just been applied
 		//NostrumMagica.specialEffectProxy
 		int armor = 4 * (amplifier+1);
@@ -38,13 +38,13 @@ public class MagicShieldEffect extends Effect {
 		
 		NostrumMagicaSounds.SHIELD_APPLY.play(entity);
 		
-		super.applyAttributesModifiersToEntity(entity, attributeMap, amplifier);
+		super.addAttributeModifiers(entity, attributeMap, amplifier);
 	}
 	
 	@Override
-	public void removeAttributesModifiersFromEntity(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
+	public void removeAttributeModifiers(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
 		NostrumMagica.magicEffectProxy.remove(SpecialEffect.SHIELD_MAGIC, entityLivingBaseIn);
-		super.removeAttributesModifiersFromEntity(entityLivingBaseIn, attributeMapIn, amplifier);
+		super.removeAttributeModifiers(entityLivingBaseIn, attributeMapIn, amplifier);
     }
 	
 	@OnlyIn(Dist.CLIENT)

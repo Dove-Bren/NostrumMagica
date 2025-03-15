@@ -13,7 +13,7 @@ public class ElementXPBonusAttribute extends RangedAttribute implements IPercent
 	
 	public ElementXPBonusAttribute(EMagicElement elem, String name) {
 		super(name, 0, -100.0D, 500.0D);
-		this.setShouldWatch(true);
+		this.setSyncable(true);
 		this.element = elem;
 	}
 	

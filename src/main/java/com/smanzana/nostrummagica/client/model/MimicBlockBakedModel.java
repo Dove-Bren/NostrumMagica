@@ -34,7 +34,7 @@ public class MimicBlockBakedModel implements IBakedModel {
 	}
 	
 	public MimicBlockBakedModel() {
-		this(Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(NostrumBlocks.mimicFacade.getDefaultState()));
+		this(Minecraft.getInstance().getBlockRenderer().getBlockModel(NostrumBlocks.mimicFacade.defaultBlockState()));
 	}
 	
 	protected MimicBlock.MimicBlockData getNestedData(@Nullable IModelData data) {
@@ -72,7 +72,7 @@ public class MimicBlockBakedModel implements IBakedModel {
 //				}
 //			}
 			
-			nestedModel = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(nestedState);
+			nestedModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(nestedState);
 		}
 		
 		return nestedModel == null ? missing : nestedModel;
@@ -108,8 +108,8 @@ public class MimicBlockBakedModel implements IBakedModel {
 	////// Hardcoded things based on base undisguised model
 	// Couldn't I just override getBakedModel ?
 	@Override
-	public boolean isAmbientOcclusion() {
-		return this.undisguisedModel.isAmbientOcclusion();
+	public boolean useAmbientOcclusion() {
+		return this.undisguisedModel.useAmbientOcclusion();
 	}
 
 	@Override
@@ -118,13 +118,13 @@ public class MimicBlockBakedModel implements IBakedModel {
 	}
 
 	@Override
-	public boolean isBuiltInRenderer() {
-		return this.undisguisedModel.isBuiltInRenderer();
+	public boolean isCustomRenderer() {
+		return this.undisguisedModel.isCustomRenderer();
 	}
 	
 	@Override
-	public ItemCameraTransforms getItemCameraTransforms() {
-		return this.undisguisedModel.getItemCameraTransforms();
+	public ItemCameraTransforms getTransforms() {
+		return this.undisguisedModel.getTransforms();
 	}
 
 	@Override
@@ -139,12 +139,12 @@ public class MimicBlockBakedModel implements IBakedModel {
 	}
 	
 	@Override
-	public TextureAtlasSprite getParticleTexture() {
-		return undisguisedModel.getParticleTexture();
+	public TextureAtlasSprite getParticleIcon() {
+		return undisguisedModel.getParticleIcon();
 	}
 
 	@Override
-	public boolean isSideLit() {
+	public boolean usesBlockLight() {
 		return true; // I think this is "!guiLight" aka "is this lit like a block instead of flat like a GUI item?"
 	}
 }

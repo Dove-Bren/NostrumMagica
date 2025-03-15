@@ -21,14 +21,14 @@ public class EnchantedArmorStateUpdate {
 	public static void handle(EnchantedArmorStateUpdate message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
 		LivingEntity ent = (ctx.get().getDirection().getReceptionSide().isClient()
-				? (LivingEntity) NostrumMagica.instance.proxy.getPlayer().world.getEntityByID(message.entityID)
+				? (LivingEntity) NostrumMagica.instance.proxy.getPlayer().level.getEntity(message.entityID)
 						: ctx.get().getSender());
 		if (ent != null) {
 			ElementalArmor.HandleStateUpdate(message.state, ent, message.data);
 			if (ctx.get().getDirection().getReceptionSide().isServer()) {
 				// Bounce this update to everyone else
-				EnchantedArmorStateUpdate bouncedMessage = new EnchantedArmorStateUpdate(message.state, message.data, ent.getEntityId());
-				NetworkHandler.sendToDimension(bouncedMessage, ent.getEntityWorld().getDimensionKey());
+				EnchantedArmorStateUpdate bouncedMessage = new EnchantedArmorStateUpdate(message.state, message.data, ent.getId());
+				NetworkHandler.sendToDimension(bouncedMessage, ent.getCommandSenderWorld().dimension());
 			}
 		}
 	}
@@ -60,14 +60,14 @@ public class EnchantedArmorStateUpdate {
 
 	public static EnchantedArmorStateUpdate decode(PacketBuffer buf) {
 		return new EnchantedArmorStateUpdate(
-				buf.readEnumValue(ArmorState.class),
+				buf.readEnum(ArmorState.class),
 				buf.readBoolean(),
 				buf.readVarInt()
 				);
 	}
 
 	public static void encode(EnchantedArmorStateUpdate msg, PacketBuffer buf) {
-		buf.writeEnumValue(msg.state);
+		buf.writeEnum(msg.state);
 		buf.writeBoolean(msg.data);
 		buf.writeVarInt(msg.entityID);
 	}

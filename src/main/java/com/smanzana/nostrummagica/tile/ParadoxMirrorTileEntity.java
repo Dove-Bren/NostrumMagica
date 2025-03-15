@@ -67,15 +67,15 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 	
 	public Direction getFacing() {
-		BlockState state = getWorld().getBlockState(getPos());
-		return state.get(ParadoxMirrorBlock.FACING);
+		BlockState state = getLevel().getBlockState(getBlockPos());
+		return state.getValue(ParadoxMirrorBlock.FACING);
 	}
 	
 	private static final String NBT_LINKED_POS = "linked_pos";
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		if (linkedPosition != null) {
 			nbt.put(NBT_LINKED_POS, NBTUtil.writeBlockPos(linkedPosition));
@@ -87,8 +87,8 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		if (nbt == null)
 			return;
@@ -105,23 +105,23 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
 	private void dirty() {
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		markDirty();
+		level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+		setChanged();
 	}
 
 	@Override
@@ -143,7 +143,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	
 	@Override
 	public void tick() {
-		if (world != null && !world.isRemote) {
+		if (level != null && !level.isClientSide) {
 			checkItemEntityList(); // every tick
 			
 			if (cooldownTicks > 0) {
@@ -164,16 +164,16 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 			return null;
 		}
 		
-		if (!NostrumMagica.isBlockLoaded(getWorld(), pos)) {
+		if (!NostrumMagica.isBlockLoaded(getLevel(), pos)) {
 			return null;
 		}
 		
-		BlockState blockstate = getWorld().getBlockState(pos);
+		BlockState blockstate = getLevel().getBlockState(pos);
 		if (blockstate == null || blockstate.getBlock() != NostrumBlocks.paradoxMirror) {
 			return null;
 		}
 		
-		TileEntity te = getWorld().getTileEntity(pos);
+		TileEntity te = getLevel().getBlockEntity(pos);
 		if (te == null || !(te instanceof ParadoxMirrorTileEntity)) {
 			return null;
 		}
@@ -197,7 +197,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		@Nonnull ItemStack stack = entity.getItem();
 		entity.remove();
 		
-		remoteTile.receiveAndSpawnItem(stack, this.getPos());
+		remoteTile.receiveAndSpawnItem(stack, this.getBlockPos());
 		return true;
 	}
 	
@@ -205,7 +205,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		Iterator<ItemEntity> it = receivedEntities.iterator();
 		while (it.hasNext()) {
 			ItemEntity ent = it.next();
-			if (ent == null || !ent.isAlive() || ent.getDistanceSq(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) > 4) {
+			if (ent == null || !ent.isAlive() || ent.distanceToSqr(worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5) > 4) {
 				it.remove();
 			}
 		}
@@ -214,18 +214,18 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	public void receiveAndSpawnItem(@Nonnull ItemStack stack, BlockPos fromPos) {
 		Vector3d spawnLoc = getSpawnLocation();
 		Vector3d spawnVelocity = getSpawnVelocity();
-		ItemEntity entity = new ItemEntity(getWorld(), spawnLoc.x, spawnLoc.y, spawnLoc.z, stack);
-		entity.setMotion(spawnVelocity);
-		entity.velocityChanged = true;
+		ItemEntity entity = new ItemEntity(getLevel(), spawnLoc.x, spawnLoc.y, spawnLoc.z, stack);
+		entity.setDeltaMovement(spawnVelocity);
+		entity.hurtMarked = true;
 		
 		receivedEntities.add(entity);
-		getWorld().addEntity(entity);
+		getLevel().addFreshEntity(entity);
 		
 		playReceiveEffect(entity, fromPos);
 	}
 	
 	protected Vector3d getSpawnLocation() {
-		BlockPos pos = this.getPos();
+		BlockPos pos = this.getBlockPos();
 		double x = pos.getX() + .5;
 		double y = pos.getY() + .4;
 		double z = pos.getZ() + .5;
@@ -255,12 +255,12 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 	
 	protected Vector3d getSpawnVelocity() {
-		return Vector3d.copy(getFacing().getDirectionVec()).scale(.1);
+		return Vector3d.atLowerCornerOf(getFacing().getNormal()).scale(.1);
 	}
 	
 	protected @Nullable ItemEntity findNearbyItem() {
-		AxisAlignedBB bb = new AxisAlignedBB(0, 0, 0, 1, 1, 1).offset(this.getPos());
-		for (ItemEntity entity : world.getEntitiesWithinAABB(ItemEntity.class, bb)) {
+		AxisAlignedBB bb = new AxisAlignedBB(0, 0, 0, 1, 1, 1).move(this.getBlockPos());
+		for (ItemEntity entity : level.getEntitiesOfClass(ItemEntity.class, bb)) {
 			// Make sure entity isn't in the list of entities we've created
 			if (receivedEntities.contains(entity)) {
 				continue;
@@ -291,23 +291,23 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 			return false;
 		}
 		
-		remoteTile.receiveAndSpawnItem(stack, this.getPos());
+		remoteTile.receiveAndSpawnItem(stack, this.getBlockPos());
 		return true;
 	}
 	
 	protected void playReceiveEffect(ItemEntity entity, BlockPos fromPos) {
-		if (world.isRemote) {
+		if (level.isClientSide) {
 			return;
 		}
 		
 		Vector3d spawnPos = this.getSpawnLocation();
 		
-		NostrumParticles.GLOW_ORB.spawn(getWorld(), new SpawnParams(
+		NostrumParticles.GLOW_ORB.spawn(getLevel(), new SpawnParams(
 				2, // spawn count
 				spawnPos.x, spawnPos.y, spawnPos.z, // spawn position (center)
 				.2, // spawn position jitter
 				40, 20, // lifetime (base + jitter)
-				entity.getEntityId() // entity id to follow
+				entity.getId() // entity id to follow
 				).color(EMagicElement.ENDER.getColor()));
 		
 //		NostrumParticles.GLOW_ORB.spawn(getWorld(), new SpawnParams(

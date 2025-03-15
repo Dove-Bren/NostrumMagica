@@ -27,8 +27,8 @@ public class LoreTableBlock extends Block {
 	public static final String ID = "lore_table";
 	
 	public LoreTableBlock() {
-		super(Block.Properties.create(Material.WOOD)
-				.hardnessAndResistance(2.0f, 10.0f)
+		super(Block.Properties.of(Material.WOOD)
+				.strength(2.0f, 10.0f)
 				.sound(SoundType.WOOD)
 				.harvestTool(ToolType.AXE)
 				.harvestLevel(0)
@@ -36,14 +36,14 @@ public class LoreTableBlock extends Block {
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
 		return false;
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote()) {
-			LoreTableTileEntity te = (LoreTableTileEntity) worldIn.getTileEntity(pos);
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (!worldIn.isClientSide()) {
+			LoreTableTileEntity te = (LoreTableTileEntity) worldIn.getBlockEntity(pos);
 			NostrumMagica.instance.proxy.openContainer(player, LoreTableGui.LoreTableContainer.Make(te));
 		}
 		
@@ -52,10 +52,10 @@ public class LoreTableBlock extends Block {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
-		super.eventReceived(state, worldIn, pos, eventID, eventParam);
-		TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity == null ? false : tileentity.receiveClientEvent(eventID, eventParam);
+	public boolean triggerEvent(BlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
+		super.triggerEvent(state, worldIn, pos, eventID, eventParam);
+		TileEntity tileentity = worldIn.getBlockEntity(pos);
+        return tileentity == null ? false : tileentity.triggerEvent(eventID, eventParam);
 	}
 	
 	@Override
@@ -69,20 +69,20 @@ public class LoreTableBlock extends Block {
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			destroy(worldIn, pos, state);
-			worldIn.removeTileEntity(pos);
+			worldIn.removeBlockEntity(pos);
 		}
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
-		TileEntity ent = world.getTileEntity(pos);
+		TileEntity ent = world.getBlockEntity(pos);
 		if (ent == null || !(ent instanceof LoreTableTileEntity))
 			return;
 		
@@ -93,7 +93,7 @@ public class LoreTableBlock extends Block {
 			x = pos.getX() + .5;
 			y = pos.getY() + .5;
 			z = pos.getZ() + .5;
-			world.addEntity(new ItemEntity(world, x, y, z, item.copy()));
+			world.addFreshEntity(new ItemEntity(world, x, y, z, item.copy()));
 		}
 		
 	}

@@ -25,17 +25,17 @@ public class DungeonAirBlock extends BreakableBlock {
 	public static final String ID = "dungeon_air";
 	
 	public DungeonAirBlock() {
-		super(Block.Properties.create(Material.BARRIER)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		super(Block.Properties.of(Material.BARRIER)
+				.strength(-1.0F, 3600000.8F)
 				.noDrops()
-				.doesNotBlockMovement()
+				.noCollission()
 				);
 	}
 	
 	// GetHowMuchLightGoesThrough?? Not sure.
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public float getAmbientOcclusionLightValue(BlockState state, IBlockReader worldIn, BlockPos pos) {
+	public float getShadeBrightness(BlockState state, IBlockReader worldIn, BlockPos pos) {
 		return 1.0F;
 	}
 	
@@ -142,13 +142,13 @@ public class DungeonAirBlock extends BreakableBlock {
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
 		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
-		if (context != ISelectionContext.dummy()) {
+		if (context != ISelectionContext.empty()) {
 			if (context.getEntity() == null || !(context.getEntity() instanceof PlayerEntity) || !((PlayerEntity) context.getEntity()).isCreative()) {
 				return VoxelShapes.empty();
 			}
 		}
 		
-		return VoxelShapes.fullCube();
+		return VoxelShapes.block();
 	}
 	
 //	@Override

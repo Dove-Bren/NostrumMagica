@@ -67,9 +67,9 @@ public class MagicLightningGolemEntity extends MagicGolemEntity {
 		MagicLightningGolemEntity.init();
 		
 		// Pick a spell to do
-		LivingEntity targ = this.getAttackTarget();
+		LivingEntity targ = this.getTarget();
 		if (targ != target)
-			this.setAttackTarget(target);
+			this.setTarget(target);
 		
 		if (NostrumMagica.rand.nextFloat() <= 0.3f) {
 			spellRanged1.cast(this, 1.0f);
@@ -78,36 +78,36 @@ public class MagicLightningGolemEntity extends MagicGolemEntity {
 		}
 		
 		if (targ != target)
-			this.setAttackTarget(targ);
+			this.setTarget(targ);
 	}
 
 	@Override
 	public void doBuffTask(LivingEntity target) {
 		MagicLightningGolemEntity.init();
 		
-		LivingEntity targ = this.getAttackTarget();
+		LivingEntity targ = this.getTarget();
 		if (targ != target)
-			this.setAttackTarget(target);
+			this.setTarget(target);
 		
 		spellBuff.cast(this, 1.0f);
 		
 		if (targ != target)
-			this.setAttackTarget(targ);
+			this.setTarget(targ);
 	}
 
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
-		return target.getActivePotionEffect(NostrumEffects.magicResist) == null;
+		return target.getEffect(NostrumEffects.magicResist) == null;
 	}
 
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		return MagicGolemEntity.BuildBaseAttributes()
-	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.25D)
+	        .add(Attributes.MOVEMENT_SPEED, 0.25D)
 	
-	        .createMutableAttribute(Attributes.MAX_HEALTH, 14.0D)
+	        .add(Attributes.MAX_HEALTH, 14.0D)
 	
-	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 2.0D)
-	        .createMutableAttribute(Attributes.ARMOR, 6.0D);
+	        .add(Attributes.ATTACK_DAMAGE, 2.0D)
+	        .add(Attributes.ARMOR, 6.0D);
 	}
 
 	@Override
@@ -117,11 +117,11 @@ public class MagicLightningGolemEntity extends MagicGolemEntity {
 	
 	@Override
 	public void tick() {
-		if (world.isRainingAt(this.getPosition())) {
+		if (level.isRainingAt(this.blockPosition())) {
 			if (!this.getAttribute(Attributes.MOVEMENT_SPEED)
 					.hasModifier(MOVEMENT_STORM_MODIFIER)) {
 				this.getAttribute(Attributes.MOVEMENT_SPEED)
-					.applyPersistentModifier(MOVEMENT_STORM_MODIFIER);
+					.addPermanentModifier(MOVEMENT_STORM_MODIFIER);
 			}
 		} else {
 			if (this.getAttribute(Attributes.MOVEMENT_SPEED)

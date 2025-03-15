@@ -41,19 +41,19 @@ public class MysticAnchorBlock extends Block {
 	
 	public static final String ID = "mystic_anchor";
 	
-	protected static final VoxelShape SHAPE = Block.makeCuboidShape(5.0D, 0.0D, 5.0D, 11.0D, 20.0D, 11.0D);
+	protected static final VoxelShape SHAPE = Block.box(5.0D, 0.0D, 5.0D, 11.0D, 20.0D, 11.0D);
 	
 	public MysticAnchorBlock() {
-		super(Block.Properties.create(Material.ROCK)
+		super(Block.Properties.of(Material.STONE)
 				.sound(SoundType.STONE)
-				.hardnessAndResistance(1.5f)
+				.strength(1.5f)
 				.harvestLevel(1)
 				.harvestTool(ToolType.PICKAXE)
 				);
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return true;
     }
 	
@@ -85,15 +85,15 @@ public class MysticAnchorBlock extends Block {
 	protected BlockPos findTeleportSpot(World world, BlockPos myPos, Direction preferredDirection) {
 		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		for (int y = -1; y <= 1; y++) {
-			int preferredX = preferredDirection.getXOffset();
-			int preferredZ = preferredDirection.getZOffset();
+			int preferredX = preferredDirection.getStepX();
+			int preferredZ = preferredDirection.getStepZ();
 			
 			for (int x : new int[] {preferredX, 0, 0, 1, -1, 1, 1, -1, -1})
 			for (int z : new int[] {preferredZ, 1, -1, 0, 0, 1, -1, 1, -1})
 			{
-				cursor.setPos(x + myPos.getX(), y + myPos.getY(), z + myPos.getZ());
-				if (world.isAirBlock(cursor) && world.isAirBlock(cursor.up())) {
-					return cursor.toImmutable();
+				cursor.set(x + myPos.getX(), y + myPos.getY(), z + myPos.getZ());
+				if (world.isEmptyBlock(cursor) && world.isEmptyBlock(cursor.above())) {
+					return cursor.immutable();
 				}
 			}
 		}
@@ -103,25 +103,25 @@ public class MysticAnchorBlock extends Block {
 	
 	protected void teleportEntity(World world, BlockPos pos, Entity entity) {
 		if (DimensionUtils.InDimension(entity, world)) {
-			final Vector3d vecToEnt = entity.getPositionVec().subtract(new Vector3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5)).normalize();
-			final Direction dirToEnt = Direction.getFacingFromVector(vecToEnt.getX(), vecToEnt.getY(), vecToEnt.getZ());
+			final Vector3d vecToEnt = entity.position().subtract(new Vector3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5)).normalize();
+			final Direction dirToEnt = Direction.getNearest(vecToEnt.x(), vecToEnt.y(), vecToEnt.z());
 			BlockPos toPos = findTeleportSpot(world, pos, dirToEnt);
 			
 			// Special sauce to allow in sorcery dimension
 			{
-				entity.lastTickPosX = entity.prevPosX = toPos.getX() + .5;
-				entity.lastTickPosY = entity.prevPosY = toPos.getY() + .005;
-				entity.lastTickPosZ = entity.prevPosZ = toPos.getZ() + .5;
+				entity.xOld = entity.xo = toPos.getX() + .5;
+				entity.yOld = entity.yo = toPos.getY() + .005;
+				entity.zOld = entity.zo = toPos.getZ() + .5;
 			}
 			
-			entity.setPositionAndUpdate(toPos.getX() + .5, toPos.getY(), toPos.getZ() + .5);
-			((ServerWorld) world).spawnParticle(ParticleTypes.PORTAL, toPos.getX() + .5, toPos.getY() + NostrumMagica.rand.nextDouble() * 2.0D, toPos.getZ() + .5, 30, NostrumMagica.rand.nextGaussian(), 0.0D, NostrumMagica.rand.nextGaussian(), .1);
+			entity.teleportTo(toPos.getX() + .5, toPos.getY(), toPos.getZ() + .5);
+			((ServerWorld) world).sendParticles(ParticleTypes.PORTAL, toPos.getX() + .5, toPos.getY() + NostrumMagica.rand.nextDouble() * 2.0D, toPos.getZ() + .5, 30, NostrumMagica.rand.nextGaussian(), 0.0D, NostrumMagica.rand.nextGaussian(), .1);
 		}
 	}
 	
 	@Override
-	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
-		if (!worldIn.isRemote()) {
+	public void entityInside(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
+		if (!worldIn.isClientSide()) {
 			LivingEntity shooter = Projectiles.getShooter(entityIn);
 			if (shooter != null) {
 				teleportEntity(worldIn, pos, shooter);
@@ -130,8 +130,8 @@ public class MysticAnchorBlock extends Block {
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote()) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (!worldIn.isClientSide()) {
 			teleportEntity(worldIn, pos, player);
 		}
 		

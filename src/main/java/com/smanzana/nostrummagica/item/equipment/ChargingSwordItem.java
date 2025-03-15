@@ -57,13 +57,13 @@ public abstract class ChargingSwordItem extends SwordItem {
 	protected abstract void fireChargedWeapon(World worldIn, LivingEntity playerIn, Hand hand, ItemStack stack);
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final ItemStack held = playerIn.getHeldItem(hand);
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		final ItemStack held = playerIn.getItemInHand(hand);
 		
 		if (canCharge(worldIn, playerIn, hand, held)) {
 			// Don't do when sneaking so players can still use a shield
-			if (!playerIn.isSneaking()) {
-				playerIn.setActiveHand(hand);
+			if (!playerIn.isShiftKeyDown()) {
+				playerIn.startUsingItem(hand);
 				return new ActionResult<ItemStack>(ActionResultType.SUCCESS, held);
 			}
 		}
@@ -72,7 +72,7 @@ public abstract class ChargingSwordItem extends SwordItem {
 	}
 	
 	@Override
-	public UseAction getUseAction(ItemStack stack) {
+	public UseAction getUseAnimation(ItemStack stack) {
 		return UseAction.BOW;
 	}
 	
@@ -90,7 +90,7 @@ public abstract class ChargingSwordItem extends SwordItem {
 	}
 	
 	@Override
-	public void onPlayerStoppedUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft) {
+	public void releaseUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft) {
 		
 		// Only do something if enough time has passed
 		final int duration = stack.getUseDuration() - timeLeft;
@@ -98,13 +98,13 @@ public abstract class ChargingSwordItem extends SwordItem {
 			return;
 		}
 		
-		final Hand hand = entityLiving.getHeldItemMainhand() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND;
+		final Hand hand = entityLiving.getMainHandItem() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND;
 		fireChargedWeapon(worldIn, entityLiving, hand, stack);
 	}
 	
 	@Override
-	public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
-		final Hand hand = entityLiving.getHeldItemMainhand() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND;
+	public ItemStack finishUsingItem(ItemStack stack, World worldIn, LivingEntity entityLiving) {
+		final Hand hand = entityLiving.getMainHandItem() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND;
 		fireChargedWeapon(worldIn, entityLiving, hand, stack);
 		return stack;
 	}
@@ -114,13 +114,13 @@ public abstract class ChargingSwordItem extends SwordItem {
 		if (entityIn == null) {
 			return 0.0F;
 		} else {
-			return !(entityIn.getActiveItemStack().getItem() instanceof ChargingSwordItem) ? 0.0F : (float)(stack.getUseDuration() - entityIn.getItemInUseCount()) / ((ChargingSwordItem) stack.getItem()).getTotalChargeTime(stack);
+			return !(entityIn.getUseItem().getItem() instanceof ChargingSwordItem) ? 0.0F : (float)(stack.getUseDuration() - entityIn.getUseItemRemainingTicks()) / ((ChargingSwordItem) stack.getItem()).getTotalChargeTime(stack);
 		}
 	}
 
 	@OnlyIn(Dist.CLIENT)
 	public static final float ModelCharging(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
-		return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
+		return entityIn != null && entityIn.isUsingItem() && entityIn.getUseItem() == stack ? 1.0F : 0.0F;
 	}
 	
 }

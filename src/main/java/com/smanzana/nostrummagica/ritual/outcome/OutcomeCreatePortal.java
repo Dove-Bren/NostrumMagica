@@ -23,8 +23,8 @@ public class OutcomeCreatePortal implements IRitualOutcome {
 	@Override
 	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		
-		world.setBlockState(center.down(), NostrumBlocks.sorceryPortalSpawner.getDefaultState());
-		TileEntity te = world.getTileEntity(center.add(0, 0, 0));
+		world.setBlockAndUpdate(center.below(), NostrumBlocks.sorceryPortalSpawner.defaultBlockState());
+		TileEntity te = world.getBlockEntity(center.offset(0, 0, 0));
 		if (te == null || !(te instanceof AltarTileEntity))
 			return;
 		((AltarTileEntity) te).setItem(ItemStack.EMPTY);

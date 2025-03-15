@@ -49,7 +49,7 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 	public static final UUID MOD_RESIST_UUID = UUID.fromString("433CC363-4321-56AA-20AE-254BBB743ABB");
 	
 	public MirrorShield() {
-		this(NostrumItems.PropEquipment().rarity(Rarity.UNCOMMON).maxDamage(750));
+		this(NostrumItems.PropEquipment().rarity(Rarity.UNCOMMON).durability(750));
 	}
 	
 	protected MirrorShield(Item.Properties properties) {
@@ -58,7 +58,7 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
 		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 
 		if (equipmentSlot == EquipmentSlotType.OFFHAND) {
@@ -73,7 +73,7 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 	}
 	
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
 		if (repair.isEmpty()) {
 			return false;
 		} else {
@@ -82,7 +82,7 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
     }
 	
 	@Override
-	public UseAction getUseAction(ItemStack stack) {
+	public UseAction getUseAnimation(ItemStack stack) {
 		return UseAction.BLOCK;
 	}
 	
@@ -92,20 +92,20 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		playerIn.setActiveHand(hand);
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		playerIn.startUsingItem(hand);
 		
 		NostrumMagica.playerListener.registerMagicEffect(this, null);
 		
-		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getHeldItem(hand));
+		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getItemInHand(hand));
 	}
 
 	@Override
 	public boolean onEvent(Event type, LivingEntity entity, SpellActionListenerData data) {
 		
 		if (type == Event.MAGIC_EFFECT) {
-			if (entity.isActiveItemStackBlocking() && entity.getActiveItemStack().getItem() instanceof MirrorShield) {
-				ItemStacks.damageItem(entity.getActiveItemStack(), entity, entity.getActiveHand(), NostrumMagica.rand.nextInt(2) + 1);
+			if (entity.isBlocking() && entity.getUseItem().getItem() instanceof MirrorShield) {
+				ItemStacks.damageItem(entity.getUseItem(), entity, entity.getUsedItemHand(), NostrumMagica.rand.nextInt(2) + 1);
 				
 				// If there was a caster, reflect part of the spell back
 				if (data.caster != null && data.caster != entity) {
@@ -127,7 +127,7 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 
 	@Override
 	public String getLoreDisplayName() {
-		return I18n.format("lore." + getLoreKey() + ".name");
+		return I18n.get("lore." + getLoreKey() + ".name");
 	}
 
 	@Override
@@ -146,7 +146,7 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		return;
 	}
 	
@@ -164,7 +164,7 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 	@OnlyIn(Dist.CLIENT)
 	public static final float ModelBlocking(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
 		// Copied from vanilla
-		return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
+		return entityIn != null && entityIn.isUsingItem() && entityIn.getUseItem() == stack ? 1.0F : 0.0F;
 	}
 
 }

@@ -43,8 +43,8 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		if (!slot.isEmpty()) {
 			nbt.put(NBT_SLOT, slot.serializeNBT());
@@ -60,10 +60,10 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
-		slot = (nbt.contains(NBT_SLOT) ? ItemStack.read(nbt.getCompound(NBT_SLOT)) : ItemStack.EMPTY); // nulls if empty
+		slot = (nbt.contains(NBT_SLOT) ? ItemStack.of(nbt.getCompound(NBT_SLOT)) : ItemStack.EMPTY); // nulls if empty
 		customName = (nbt.contains(NBT_CUSTOMNAME) ? nbt.getString(NBT_CUSTOMNAME) : null);
 		transferCooldown = nbt.getInt(NBT_COOLDOWN);
 	}
@@ -77,12 +77,12 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 
 	@Override
-	public int getSizeInventory() {
+	public int getContainerSize() {
 		return NUM_SLOTS;
 	}
 
 	@Override
-	public @Nonnull ItemStack getStackInSlot(int index) {
+	public @Nonnull ItemStack getItem(int index) {
 		if (index != 0) {
 			return ItemStack.EMPTY;
 		}
@@ -91,7 +91,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 
 	@Override
-	public @Nonnull ItemStack decrStackSize(int index, int count) {
+	public @Nonnull ItemStack removeItem(int index, int count) {
 		if (index != 0 || slot.isEmpty()) {
 			return ItemStack.EMPTY;
 		}
@@ -100,84 +100,84 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		if (slot.getCount() <= 0) {
 			slot = ItemStack.EMPTY;
 		}
-		this.markDirty();
+		this.setChanged();
 		return ret;
 	}
 
 	@Override
-	public @Nonnull ItemStack removeStackFromSlot(int index) {
+	public @Nonnull ItemStack removeItemNoUpdate(int index) {
 		if (index != 0 || slot.isEmpty()) {
 			return ItemStack.EMPTY;
 		}
 		
 		ItemStack ret = slot;
 		slot = ItemStack.EMPTY;
-		this.markDirty();
+		this.setChanged();
 		return ret;
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, @Nonnull ItemStack stack) {
+	public void setItem(int index, @Nonnull ItemStack stack) {
 		if (index == 0) {
 			slot = stack;
-			this.markDirty();
+			this.setChanged();
 		}
 	}
 
 	@Override
-	public int getInventoryStackLimit() {
+	public int getMaxStackSize() {
 		return 64;
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
+	public boolean stillValid(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(PlayerEntity player) {
+	public void startOpen(PlayerEntity player) {
 		;
 	}
 
 	@Override
-	public void closeInventory(PlayerEntity player) {
+	public void stopOpen(PlayerEntity player) {
 		;
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int index, ItemStack stack) {
+	public boolean canPlaceItem(int index, ItemStack stack) {
 		return true;
 	}
 
 	@Override
-	public void clear() {
+	public void clearContent() {
 		if (!slot.isEmpty()) {
 			slot = ItemStack.EMPTY;
-			this.markDirty();
+			this.setChanged();
 		}
 	}
 
 	@Override
-	public double getXPos() {
-		return pos.getX() + .5;
+	public double getLevelX() {
+		return worldPosition.getX() + .5;
 	}
 
 	@Override
-	public double getYPos() {
-		return pos.getY() + .5;
+	public double getLevelY() {
+		return worldPosition.getY() + .5;
 	}
 
 	@Override
-	public double getZPos() {
-		return pos.getZ() + .5;
+	public double getLevelZ() {
+		return worldPosition.getZ() + .5;
 	}
 
 	@Override
 	public void tick() {
-		if (world != null && !world.isRemote) {
+		if (level != null && !level.isClientSide) {
 			this.transferCooldown--;
 			
-			if (!isOnTransferCooldown() && ActiveHopperBlock.GetEnabled(world.getBlockState(pos))) {
+			if (!isOnTransferCooldown() && ActiveHopperBlock.GetEnabled(level.getBlockState(worldPosition))) {
 				this.hopperTick();
 				this.setTransferCooldown(8); // same rate as vanilla
 			}
@@ -222,10 +222,10 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		if (slot.isEmpty()) {
 			// Error condition
 			slot = stack;
-			this.markDirty();
+			this.setChanged();
 		} else if (ItemStacks.stacksMatch(slot, stack)) {
 			slot.setCount(Math.min(slot.getMaxStackSize(), slot.getCount() + stack.getCount()));
-			this.markDirty();
+			this.setChanged();
 		}
 	}
 	
@@ -255,8 +255,8 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	
 	private boolean pushItems() {
 		// Inventory we want to push into is in direction FACING
-		final Direction direction = ActiveHopperBlock.GetFacing(world.getBlockState(pos));
-		@Nullable TileEntity te = world.getTileEntity(pos.offset(direction));
+		final Direction direction = ActiveHopperBlock.GetFacing(level.getBlockState(worldPosition));
+		@Nullable TileEntity te = level.getBlockEntity(worldPosition.relative(direction));
 		
 		if (te != null) {
 			if (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent()) {
@@ -270,9 +270,9 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 				
 				// Special cast for stupid chests :P
 				if (te instanceof ChestTileEntity) {
-					BlockState state = world.getBlockState(pos.offset(direction));
+					BlockState state = level.getBlockState(worldPosition.relative(direction));
 					if (state != null && state.getBlock() instanceof ChestBlock) {
-						inv = ChestBlock.getChestInventory((ChestBlock) state.getBlock(), state, world, pos.offset(direction), true);
+						inv = ChestBlock.getContainer((ChestBlock) state.getBlock(), state, level, worldPosition.relative(direction), true);
 					}
 				}
 				
@@ -281,7 +281,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		}
 		
 		final AxisAlignedBB captureBox = getCaptureBB(false);
-		for (Entity e : world.getEntitiesInAABBexcluding(null, captureBox, EntityPredicates.HAS_INVENTORY)) {
+		for (Entity e : level.getEntities((Entity) null, captureBox, EntityPredicates.CONTAINER_ENTITY_SELECTOR)) {
 			// Vanilla uses a random entity in the list. We'll just use the first.
 			return pushInto((IInventory) e, direction);
 		}
@@ -295,21 +295,21 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		if (inventory instanceof ISidedInventory) {
 			ISidedInventory sided = (ISidedInventory) inventory;
 			for (int insertIndex : sided.getSlotsForFace(direction.getOpposite())) {
-				if (!sided.canInsertItem(insertIndex, copyToInsert, direction.getOpposite())) {
+				if (!sided.canPlaceItemThroughFace(insertIndex, copyToInsert, direction.getOpposite())) {
 					continue;
 				}
 				
 				// Can insert. Would it fit?
-				@Nonnull ItemStack inSlot = sided.getStackInSlot(insertIndex);
+				@Nonnull ItemStack inSlot = sided.getItem(insertIndex);
 				if (inSlot.isEmpty()) {
-					sided.setInventorySlotContents(insertIndex, copyToInsert);
-					this.decrStackSize(0, 1);
+					sided.setItem(insertIndex, copyToInsert);
+					this.removeItem(0, 1);
 					return true;
 				}
 				
 				if (!inSlot.isStackable()
 						|| inSlot.getCount() >= inSlot.getMaxStackSize()
-						|| inSlot.getCount() >= sided.getInventoryStackLimit()) {
+						|| inSlot.getCount() >= sided.getMaxStackSize()) {
 					continue;
 				}
 				
@@ -318,13 +318,13 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 				}
 				
 				inSlot.setCount(inSlot.getCount()+1);
-				sided.setInventorySlotContents(insertIndex, inSlot);
-				this.decrStackSize(0, 1);
+				sided.setItem(insertIndex, inSlot);
+				this.removeItem(0, 1);
 				return true;
 			}
 		} else {
 			if (Inventories.addItem(inventory, copyToInsert).isEmpty()) {
-				this.decrStackSize(0, 1);
+				this.removeItem(0, 1);
 				return true;
 			}
 			
@@ -341,7 +341,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		@Nonnull ItemStack ret = ItemHandlerHelper.insertItem(handler, copyToInsert, true);
 		if (ret.isEmpty() || ret.getCount() == 0) {
 			ItemHandlerHelper.insertItem(handler, copyToInsert, false);
-			this.decrStackSize(0, 1);
+			this.removeItem(0, 1);
 			return true;
 		}
 		
@@ -350,8 +350,8 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	
 	private boolean pullItems() {
 		// We want to pull from opposite(FACING)
-		final Direction direction = ActiveHopperBlock.GetFacing(world.getBlockState(pos)).getOpposite();
-		@Nullable TileEntity te = world.getTileEntity(pos.offset(direction));
+		final Direction direction = ActiveHopperBlock.GetFacing(level.getBlockState(worldPosition)).getOpposite();
+		@Nullable TileEntity te = level.getBlockEntity(worldPosition.relative(direction));
 		
 		if (te != null) {
 			if (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).isPresent()) {
@@ -365,9 +365,9 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 				
 				// Special cast for stupid chests :P
 				if (te instanceof ChestTileEntity) {
-					BlockState state = world.getBlockState(pos.offset(direction));
+					BlockState state = level.getBlockState(worldPosition.relative(direction));
 					if (state != null && state.getBlock() instanceof ChestBlock) {
-						inv = ChestBlock.getChestInventory((ChestBlock) state.getBlock(), state, world, pos.offset(direction), true);
+						inv = ChestBlock.getContainer((ChestBlock) state.getBlock(), state, level, worldPosition.relative(direction), true);
 					}
 				}
 				return pullFrom(inv, direction);
@@ -375,7 +375,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		}
 		
 		final AxisAlignedBB captureBox = getCaptureBB(true);
-		for (Entity e : world.getEntitiesInAABBexcluding(null, captureBox, EntityPredicates.HAS_INVENTORY)) {
+		for (Entity e : level.getEntities((Entity) null, captureBox, EntityPredicates.CONTAINER_ENTITY_SELECTOR)) {
 			// Vanilla uses a random entity in the list. We'll just use the first.
 			return pullFrom((IInventory) e, direction);
 		}
@@ -387,12 +387,12 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		if (inventory instanceof ISidedInventory) {
 			ISidedInventory sided = (ISidedInventory) inventory;
 			for (int i : sided.getSlotsForFace(direction)) {
-				@Nonnull ItemStack inSlot = sided.getStackInSlot(i);
+				@Nonnull ItemStack inSlot = sided.getItem(i);
 				if (inSlot.isEmpty()) {
 					continue;
 				}
 				
-				if (!sided.canExtractItem(i, inSlot, direction)) {
+				if (!sided.canTakeItemThroughFace(i, inSlot, direction)) {
 					continue;
 				}
 				
@@ -400,13 +400,13 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 					continue;
 				}
 				
-				@Nonnull ItemStack pulled = sided.decrStackSize(i, 1);
+				@Nonnull ItemStack pulled = sided.removeItem(i, 1);
 				this.addStack(pulled);
 				return true;
 			}
 		} else {
-			for (int i = 0; i < inventory.getSizeInventory(); i++) {
-				@Nonnull ItemStack inSlot = inventory.getStackInSlot(i);
+			for (int i = 0; i < inventory.getContainerSize(); i++) {
+				@Nonnull ItemStack inSlot = inventory.getItem(i);
 				if (inSlot.isEmpty()) {
 					continue;
 				}
@@ -415,7 +415,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 					continue;
 				}
 				
-				ItemStack pulled = inventory.decrStackSize(i, 1);
+				ItemStack pulled = inventory.removeItem(i, 1);
 				this.addStack(pulled);
 				return true;
 			}
@@ -447,7 +447,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 	
 	private boolean captureNearbyItems() {
-		for (ItemEntity entity : world.getEntitiesWithinAABB(ItemEntity.class, getCaptureBB(true))) {
+		for (ItemEntity entity : level.getEntitiesOfClass(ItemEntity.class, getCaptureBB(true))) {
 			// try and pull from the stack
 			@Nonnull ItemStack stack = entity.getItem();
 			if (canPull(stack)) {
@@ -461,15 +461,15 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 	
 	private AxisAlignedBB getCaptureBB(boolean forPull) {
-		final Direction direction = ActiveHopperBlock.GetFacing(world.getBlockState(pos));
+		final Direction direction = ActiveHopperBlock.GetFacing(level.getBlockState(worldPosition));
 		
 		if (direction == Direction.DOWN) {
 			// Down has different collision so do a custom box
-			return new AxisAlignedBB(0, 0, 0, 1, 1, 1).offset(pos).expand(0, 1, 0);
+			return new AxisAlignedBB(0, 0, 0, 1, 1, 1).move(worldPosition).expandTowards(0, 1, 0);
 		}
 		
-		final BlockPos spot = forPull ? pos.offset(direction.getOpposite()) : pos.offset(direction);
-		return new AxisAlignedBB(0, 0, 0, 1, 1, 1).offset(spot);
+		final BlockPos spot = forPull ? worldPosition.relative(direction.getOpposite()) : worldPosition.relative(direction);
+		return new AxisAlignedBB(0, 0, 0, 1, 1, 1).move(spot);
 	}
 	
 	@Override
@@ -478,8 +478,8 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 
 	@Override
-	public boolean canInsertItem(int index, ItemStack itemStackIn, Direction side) {
-		final Direction direction = ActiveHopperBlock.GetFacing(world.getBlockState(pos));
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction side) {
+		final Direction direction = ActiveHopperBlock.GetFacing(level.getBlockState(worldPosition));
 		if (side == direction) {
 			// Coming in our output
 			return false;
@@ -489,8 +489,8 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 
 	@Override
-	public boolean canExtractItem(int index, ItemStack stack, Direction side) {
-		final Direction direction = ActiveHopperBlock.GetFacing(world.getBlockState(pos));
+	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction side) {
+		final Direction direction = ActiveHopperBlock.GetFacing(level.getBlockState(worldPosition));
 		if (side == direction.getOpposite()) {
 			// pulling from our mouth?
 			return false;

@@ -37,10 +37,10 @@ public class SpellCraftMessage {
 		final ServerPlayerEntity sp = ctx.get().getSender();
 		
 		ctx.get().enqueueWork(() -> {
-			World world = sp.world;
+			World world = sp.level;
 			
 			// Get the TE
-			TileEntity TE = world.getTileEntity(message.pos);
+			TileEntity TE = world.getBlockEntity(message.pos);
 			if (TE == null) {
 				NostrumMagica.logger.warn("Got craft message that didn't line up with a crafting table. This is a bug!");
 				return;
@@ -55,7 +55,7 @@ public class SpellCraftMessage {
 			
 			Spell spell = entity.craft(sp, entity.getSpellCraftingInventory(), message.name, message.iconIndex, message.craftPattern);
 			if (spell != null) {
-				NostrumMagicaSounds.UI_RESEARCH.play(TE.getWorld(), 
+				NostrumMagicaSounds.UI_RESEARCH.play(TE.getLevel(), 
 						message.pos.getX(), message.pos.getY(), message.pos.getZ());
 			
 				NetworkHandler.sendToAll(
@@ -84,13 +84,13 @@ public class SpellCraftMessage {
 	}
 
 	public static SpellCraftMessage decode(PacketBuffer buf) {
-		return new SpellCraftMessage(buf.readString(32767), buf.readBlockPos(), buf.readVarInt(),
+		return new SpellCraftMessage(buf.readUtf(32767), buf.readBlockPos(), buf.readVarInt(),
 				(buf.readBoolean() ? SpellCraftPattern.Get(buf.readResourceLocation()) : null)
 			);
 	}
 
 	public static void encode(SpellCraftMessage msg, PacketBuffer buf) {
-		buf.writeString(msg.name);
+		buf.writeUtf(msg.name);
 		buf.writeBlockPos(msg.pos);
 		buf.writeVarInt(msg.iconIndex);
 		if (msg.craftPattern == null) {

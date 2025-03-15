@@ -29,29 +29,29 @@ public class ModelGolem<T extends MagicGolemEntity> extends EntityModel<T> {
 		
 		head = new ModelRenderer(this, 0, 0);
 		head.addBox(-4, -5, -4, 8, 10, 8);
-		head.setTextureSize(textureWidth, textureHeight);
-		head.setRotationPoint(centerX, 5.0f, centerZ); // 34
+		head.setTexSize(textureWidth, textureHeight);
+		head.setPos(centerX, 5.0f, centerZ); // 34
 		
 		body1 = new ModelRenderer(this, 0, 0);
 		body1.addBox(-6, -3, -2, 16, 6, 10);
-		body1.setTextureSize(textureWidth, textureHeight);
-		body1.setRotationPoint(centerX, 26.0f, centerZ); // 24
+		body1.setTexSize(textureWidth, textureHeight);
+		body1.setPos(centerX, 26.0f, centerZ); // 24
 		
 		body2 = new ModelRenderer(this, 0, 0);
 		body2.addBox(-4, -4, -6, 10, 8, 8);
-		body2.setTextureSize(textureWidth, textureHeight);
-		body2.setRotationPoint(centerX, 17.0f, centerZ); // 14
+		body2.setTexSize(textureWidth, textureHeight);
+		body2.setPos(centerX, 17.0f, centerZ); // 14
 		
 		body3 = new ModelRenderer(this, 0, 0);
 		body3.addBox(-6, -2, -4, 8, 4, 8);
-		body3.setTextureSize(textureWidth, textureHeight);
-		body3.setRotationPoint(centerX, 34.0f, centerZ); // 10
+		body3.setTexSize(textureWidth, textureHeight);
+		body3.setPos(centerX, 34.0f, centerZ); // 10
 		
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		matrixStackIn.push();
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+		matrixStackIn.pushPose();
 		
 		float modelScale = 1.0f;// / 20.0f; // 16 pixels wide model to .8 blocks
 		matrixStackIn.scale(modelScale, modelScale * .5f, modelScale);
@@ -61,20 +61,20 @@ public class ModelGolem<T extends MagicGolemEntity> extends EntityModel<T> {
 		body2.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		body3.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	@Override
-	public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		float ticks = entityIn.ticksExisted;
+	public void setupAnim(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+		float ticks = entityIn.tickCount;
 		
 		float speedup = 1.0f;
-		if (((MagicGolemEntity) entityIn).getAttackTarget() != null)
+		if (((MagicGolemEntity) entityIn).getTarget() != null)
 			speedup = 2.0f;
 		
-		body1.rotateAngleY = ticks * -rate1 * speedup;
-		body2.rotateAngleY = ticks * rate2 * speedup;
-		body3.rotateAngleY = ticks * rate3 * speedup;
+		body1.yRot = ticks * -rate1 * speedup;
+		body2.yRot = ticks * rate2 * speedup;
+		body3.yRot = ticks * rate3 * speedup;
 	}
 	
 }

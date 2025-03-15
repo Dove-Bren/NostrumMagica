@@ -114,7 +114,7 @@ public class PlayerStat {
 		private final TextComponent name;
 		public EntityTypeStat(EntityType<?> type, ResourceLocation idBase) {
 			super(new ResourceLocation(idBase.getNamespace(), idBase.getPath() + "." + type.getRegistryName().getNamespace() + "." + type.getRegistryName().getPath()));
-			this.name = (TextComponent) ((TextComponent) type.getName().deepCopy()).append(new StringTextComponent(" ")).append(new TranslationTextComponent("stat." + idBase.getNamespace() + "." + idBase.getPath())); 
+			this.name = (TextComponent) ((TextComponent) type.getDescription().copy()).append(new StringTextComponent(" ")).append(new TranslationTextComponent("stat." + idBase.getNamespace() + "." + idBase.getPath())); 
 		}
 
 		@Override

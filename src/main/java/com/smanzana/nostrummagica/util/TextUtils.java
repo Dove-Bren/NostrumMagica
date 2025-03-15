@@ -15,7 +15,7 @@ public class TextUtils {
 	 * @return
 	 */
 	public static final List<ITextComponent> GetTranslatedList(String key, Object ... parameters) {
-		final String base = I18n.format(key, parameters);
+		final String base = I18n.get(key, parameters);
 		final String[] lines = base.split("\\|");
 		final List<ITextComponent> list = new ArrayList<>(lines.length);
 		for (String line : lines) {

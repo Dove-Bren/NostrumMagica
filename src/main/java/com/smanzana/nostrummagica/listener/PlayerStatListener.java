@@ -32,8 +32,8 @@ public class PlayerStatListener {
 		if (event.getSource() instanceof MagicDamageSource) {
 			MagicDamageSource source = (MagicDamageSource) event.getSource();
 			if (event.getAmount() > 0f) {
-				if (source.getTrueSource() != null && source.getTrueSource() instanceof PlayerEntity) {
-					PlayerStatTracker.Update((PlayerEntity) source.getTrueSource(), (stats) -> {
+				if (source.getEntity() != null && source.getEntity() instanceof PlayerEntity) {
+					PlayerStatTracker.Update((PlayerEntity) source.getEntity(), (stats) -> {
 						stats.addMagicDamageDealt(event.getAmount(), source.getElement());
 					});
 				}
@@ -58,8 +58,8 @@ public class PlayerStatListener {
 		if (event.isCanceled())
 			return;
 		
-		if (event.getSource() != null && event.getSource().getTrueSource() != null && event.getSource().getTrueSource() instanceof PlayerEntity) {
-			final PlayerEntity player = (PlayerEntity) event.getSource().getTrueSource();
+		if (event.getSource() != null && event.getSource().getEntity() != null && event.getSource().getEntity() instanceof PlayerEntity) {
+			final PlayerEntity player = (PlayerEntity) event.getSource().getEntity();
 			final LivingEntity killed = event.getEntityLiving();
 			PlayerStatTracker.Update(player, (stats) -> stats.incrStat(PlayerStat.EntityKills(killed.getType())));
 			
@@ -80,7 +80,7 @@ public class PlayerStatListener {
 	
 	@SubscribeEvent
 	public void onSpellEnd(SpellEffectEndEvent event) {
-		if (!event.getCaster().world.isRemote() && event.getCaster() instanceof PlayerEntity) {
+		if (!event.getCaster().level.isClientSide() && event.getCaster() instanceof PlayerEntity) {
 			final float damageTotalFinal = event.getSpellFinalResults().damageTotal;
 			PlayerStatTracker.Update((PlayerEntity) event.getCaster(), (stats) -> {
 				if (damageTotalFinal > 0) {

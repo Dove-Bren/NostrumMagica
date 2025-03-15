@@ -12,7 +12,7 @@ public class DragonEggFragment extends Item implements ILoreTagged {
 	public static final String ID = "dragon_egg_part";
 	
 	public DragonEggFragment() {
-		super(NostrumItems.PropBase().maxStackSize(3).rarity(Rarity.RARE));
+		super(NostrumItems.PropBase().stacksTo(3).rarity(Rarity.RARE));
 	}
 	
 	@Override

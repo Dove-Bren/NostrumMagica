@@ -34,7 +34,7 @@ public class RendEffect extends Effect {
 	
 	public RendEffect() {
 		super(EffectType.HARMFUL, 0xFFC7B5BE);
-		this.addAttributesModifier(Attributes.ARMOR, MOD_UUID, -2D, AttributeModifier.Operation.ADDITION);
+		this.addAttributeModifier(Attributes.ARMOR, MOD_UUID, -2D, AttributeModifier.Operation.ADDITION);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
@@ -53,29 +53,29 @@ public class RendEffect extends Effect {
 	public static void onEntityAttack(LivingAttackEvent event) {
 		if (event.getAmount() > 0f && !event.isCanceled()) {
 			// Is this an attack from an entity?
-			if (event.getSource().getTrueSource() != null
-					&& event.getSource().getTrueSource() instanceof LivingEntity) {
-				LivingEntity source = (LivingEntity) event.getSource().getTrueSource();
+			if (event.getSource().getEntity() != null
+					&& event.getSource().getEntity() instanceof LivingEntity) {
+				LivingEntity source = (LivingEntity) event.getSource().getEntity();
 				LivingEntity target = event.getEntityLiving();
-				EffectInstance effect = target.getActivePotionEffect(NostrumEffects.rend);
+				EffectInstance effect = target.getEffect(NostrumEffects.rend);
 				if (effect != null && effect.getDuration() > 0) {
 					// Check for explosive rend
 					INostrumMagic attr = NostrumMagica.getMagicWrapper(source);
 					if (attr != null && attr.hasSkill(NostrumSkills.Physical_Corrupt) && NostrumMagica.rand.nextInt(4) == 0) {
 						
 						// Spread
-						for (Entity ent : target.getEntityWorld().getEntitiesInAABBexcluding(target, target.getEntity().getBoundingBox().grow(10), (ent) -> ent instanceof LivingEntity && (NostrumMagica.IsSameTeam((LivingEntity) ent, target) || (ent instanceof MonsterEntity && target instanceof MonsterEntity)))) {
-							((LivingEntity) ent).addPotionEffect(new EffectInstance(NostrumEffects.rend, effect.getDuration(), effect.getAmplifier()));
+						for (Entity ent : target.getCommandSenderWorld().getEntities(target, target.getEntity().getBoundingBox().inflate(10), (ent) -> ent instanceof LivingEntity && (NostrumMagica.IsSameTeam((LivingEntity) ent, target) || (ent instanceof MonsterEntity && target instanceof MonsterEntity)))) {
+							((LivingEntity) ent).addEffect(new EffectInstance(NostrumEffects.rend, effect.getDuration(), effect.getAmplifier()));
 							
-							NostrumParticles.FILLED_ORB.spawn(target.world, new SpawnParams(
-									10, target.getPosX(), target.getPosY() + target.getHeight()/2, target.getPosZ(), 0,
+							NostrumParticles.FILLED_ORB.spawn(target.level, new SpawnParams(
+									10, target.getX(), target.getY() + target.getBbHeight()/2, target.getZ(), 0,
 									40, 10,
-									ent.getEntityId()
+									ent.getId()
 									).color(0xFFC7B5BE).dieOnTarget(true));
 						}
 						
-						NostrumParticles.FILLED_ORB.spawn(target.world, new SpawnParams(
-								50, target.getPosX(), target.getPosY() + target.getHeight()/2, target.getPosZ(), 0,
+						NostrumParticles.FILLED_ORB.spawn(target.level, new SpawnParams(
+								50, target.getX(), target.getY() + target.getBbHeight()/2, target.getZ(), 0,
 								30, 10,
 								new Vector3d(0, .1, 0), new Vector3d(.2, .05, .2)
 								).color(0xFFC7B5BE).gravity(true));

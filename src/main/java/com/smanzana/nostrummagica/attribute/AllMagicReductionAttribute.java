@@ -8,6 +8,6 @@ public class AllMagicReductionAttribute extends RangedAttribute {
 	
 	public AllMagicReductionAttribute(String name) {
 		super(name, 0, -20.0D, 20.0D);
-		this.setShouldWatch(true);
+		this.setSyncable(true);
 	}
 }

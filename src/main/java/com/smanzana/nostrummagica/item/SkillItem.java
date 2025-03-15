@@ -43,7 +43,7 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 	private final SkillFunc func;
 	
 	public SkillItem(Item.Properties properties, SkillFunc func) {
-		super(properties.maxStackSize(1));
+		super(properties.stacksTo(1));
 		this.func = func;
 	}
 	
@@ -85,16 +85,16 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final @Nonnull ItemStack stack = playerIn.getHeldItem(hand);
-		if (playerIn.isSneaking()) {
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		final @Nonnull ItemStack stack = playerIn.getItemInHand(hand);
+		if (playerIn.isShiftKeyDown()) {
 			return new ActionResult<ItemStack>(ActionResultType.PASS, stack);
 		}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
-		if (!worldIn.isRemote && attr != null && attr.isUnlocked()) {
+		if (!worldIn.isClientSide && attr != null && attr.isUnlocked()) {
 			if (this.func.award(playerIn, attr, stack)) {
-				NostrumMagicaSounds.LORE.play(null, playerIn.world, playerIn.getPosX(), playerIn.getPosY(), playerIn.getPosZ());
+				NostrumMagicaSounds.LORE.play(null, playerIn.level, playerIn.getX(), playerIn.getY(), playerIn.getZ());
 				stack.shrink(1);
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) playerIn);
 			}
@@ -106,9 +106,9 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		if (I18n.hasKey(getDescKey())) {
-			tooltip.add(new TranslationTextComponent(getDescKey()).mergeStyle(TextFormatting.BLUE));
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		if (I18n.exists(getDescKey())) {
+			tooltip.add(new TranslationTextComponent(getDescKey()).withStyle(TextFormatting.BLUE));
 		}
 	}
 	
@@ -116,7 +116,7 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 		public Mirror() {
 			super(NostrumItems.PropUnstackable().rarity(Rarity.EPIC), (player, attr, stack) -> {
 				attr.addSkillPoint();
-				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_MIRROR), Util.DUMMY_UUID);
+				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_MIRROR), Util.NIL_UUID);
 				return true;
 			});
 		}
@@ -126,11 +126,11 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 		public EnderPin() {
 			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
 				if (attr.hasEnhancedTeleport()) {
-					player.sendMessage(new TranslationTextComponent("info.skillitem.advtele.unlocked", new Object[0]), Util.DUMMY_UUID);
+					player.sendMessage(new TranslationTextComponent("info.skillitem.advtele.unlocked", new Object[0]), Util.NIL_UUID);
 					return false;
 				} else {
 					attr.unlockEnhancedTeleport();
-					player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_ENDER_PIN), Util.DUMMY_UUID);
+					player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_ENDER_PIN), Util.NIL_UUID);
 					return true;
 				}
 			});
@@ -141,7 +141,7 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 		public SmallScroll() {
 			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
 				attr.addResearchPoint();
-				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_SCROLL_SMALL), Util.DUMMY_UUID);
+				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_SCROLL_SMALL), Util.NIL_UUID);
 				return true;
 			});
 		}
@@ -153,7 +153,7 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 				attr.addResearchPoint();
 				attr.addResearchPoint();
 				attr.addResearchPoint();
-				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_SCROLL_LARGE), Util.DUMMY_UUID);
+				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_SCROLL_LARGE), Util.NIL_UUID);
 				return true;
 			});
 		}

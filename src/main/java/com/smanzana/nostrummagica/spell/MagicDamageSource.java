@@ -17,17 +17,17 @@ public class MagicDamageSource extends EntityDamageSource {
 		super("nostrummagic", source);
 		this.element = element;
 		
-		this.setDamageBypassesArmor();
-		this.setDamageAllowedInCreativeMode();
+		this.bypassArmor();
+		this.bypassInvul();
 	}
 	
 	@Override
-	public ITextComponent getDeathMessage(LivingEntity entityLivingBaseIn) {
+	public ITextComponent getLocalizedDeathMessage(LivingEntity entityLivingBaseIn) {
 		final String untranslated;
 		final ITextComponent extraName;
-		if (this.damageSourceEntity != null) {
+		if (this.entity != null) {
 			untranslated = "death.attack.magic.attacker." + element.name();
-			extraName = this.damageSourceEntity.getDisplayName();
+			extraName = this.entity.getDisplayName();
 		} else {
 			untranslated = "death.attack.magic." + element.name();
 			extraName = StringTextComponent.EMPTY;
@@ -40,12 +40,12 @@ public class MagicDamageSource extends EntityDamageSource {
 	}
 	
 	@Nullable
-	public Entity getTrueSource() {
-		return super.getTrueSource();
+	public Entity getEntity() {
+		return super.getEntity();
 	}
 	
 	@Nullable
-	public Entity getImmediateSource() {
-		return super.getImmediateSource();
+	public Entity getDirectEntity() {
+		return super.getDirectEntity();
 	}
 }

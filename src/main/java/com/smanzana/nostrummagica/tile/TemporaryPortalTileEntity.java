@@ -22,17 +22,17 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 	public TemporaryPortalTileEntity(Location target, long endticks) {
 		super(NostrumTileEntities.TemporaryPortalTileEntityType, target);
 		this.endticks = endticks;
-		this.markDirty();
+		this.setChanged();
 	}
 	
 	@Override
 	public void tick() {
-		if (world == null || world.isRemote) {
+		if (level == null || level.isClientSide) {
 			return;
 		}
 		
-		if (world.getGameTime() >= this.endticks) {
-			world.removeBlock(pos, false);
+		if (level.getGameTime() >= this.endticks) {
+			level.removeBlock(worldPosition, false);
 		}
 	}
 	
@@ -57,8 +57,8 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 	public float getOpacity() {
 		float opacity = .9f;
 		
-		if (world != null) {
-			final long now =  world.getGameTime();
+		if (level != null) {
+			final long now =  level.getGameTime();
 			final long FadeTicks = 20 * 5;
 			final long left = Math.max(0, endticks - now);
 			if (left < FadeTicks) {
@@ -75,15 +75,15 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT compound) {
-		super.read(state, compound);
+	public void load(BlockState state, CompoundNBT compound) {
+		super.load(state, compound);
 		
 		endticks = compound.getLong("EXPIRE");
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.putLong("EXPIRE", endticks);
 		

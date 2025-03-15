@@ -84,8 +84,8 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	public static final String ID = "entity_wisp";
 	
 	protected static final double MAX_WISP_DISTANCE_SQ = 144;
-	protected static final DataParameter<Optional<BlockPos>> HOME  = EntityDataManager.<Optional<BlockPos>>createKey(WispEntity.class, DataSerializers.OPTIONAL_BLOCK_POS);
-	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(WispEntity.class, MagicElementDataSerializer.instance);
+	protected static final DataParameter<Optional<BlockPos>> HOME  = EntityDataManager.<Optional<BlockPos>>defineId(WispEntity.class, DataSerializers.OPTIONAL_BLOCK_POS);
+	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>defineId(WispEntity.class, MagicElementDataSerializer.instance);
 	
 	public static final String LoreKey = "nostrum__wisp";
 	
@@ -98,8 +98,8 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	public WispEntity(EntityType<? extends WispEntity> type, World worldIn) {
 		super(type, worldIn);
 		this.setNoGravity(true);
-		this.moveController = new WispMoveHelper(this);
-		this.experienceValue = 5;
+		this.moveControl = new WispMoveHelper(this);
+		this.xpReward = 5;
 		
 		idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
 		perilTicks = 0;
@@ -108,16 +108,16 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	
 	public WispEntity(EntityType<? extends WispEntity> type, World worldIn, BlockPos homePos) {
 		this(type, worldIn);
-		this.setHomePosAndDistance(homePos, (int) MAX_WISP_DISTANCE_SQ);
+		this.restrictTo(homePos, (int) MAX_WISP_DISTANCE_SQ);
 		this.setHome(homePos);
-		this.experienceValue = 0;
+		this.xpReward = 0;
 	}
 	
 	protected void registerGoals() {
 		int priority = 1;
 		this.goalSelector.addGoal(priority++, new AIRandomFly(this));
 		this.goalSelector.addGoal(priority++, new SpellAttackGoal<WispEntity>(this, 20, 4, true, (wisp) -> {
-			return wisp.getAttackTarget() != null;
+			return wisp.getTarget() != null;
 		}, new Spell[0]){
 			@Override
 			public Spell pickSpell(Spell[] spells, WispEntity wisp) {
@@ -130,8 +130,8 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		}
 		
 		priority = 1;
-		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setCallsForHelp(WispEntity.class));
-		if (world != null && this.rand.nextBoolean() && DimensionUtils.IsNether(world)) {
+		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setAlertOthers(WispEntity.class));
+		if (level != null && this.random.nextBoolean() && DimensionUtils.IsNether(level)) {
 			this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, null));
 		} else {
 			this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<MonsterEntity>(this, MonsterEntity.class, 10, true, false, (mob) -> {
@@ -147,16 +147,16 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	}
 	
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes(){
-		return GolemEntity.func_233666_p_()
-			.createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.1D)
-			.createMutableAttribute(Attributes.MAX_HEALTH, 5.0D)
-			.createMutableAttribute(Attributes.ARMOR, 0.0D)
-			.createMutableAttribute(Attributes.FOLLOW_RANGE, 30.0)
-			.createMutableAttribute(NostrumAttributes.magicResist, 50.0D);
+		return GolemEntity.createMobAttributes()
+			.add(Attributes.MOVEMENT_SPEED, 0.1D)
+			.add(Attributes.MAX_HEALTH, 5.0D)
+			.add(Attributes.ARMOR, 0.0D)
+			.add(Attributes.FOLLOW_RANGE, 30.0)
+			.add(NostrumAttributes.magicResist, 50.0D);
 	}
 
 	protected void playStepSound(BlockPos pos, BlockState blockIn) {
-		this.playSound(SoundEvents.BLOCK_GLASS_STEP, 0.15F, 1.0F);
+		this.playSound(SoundEvents.GLASS_STEP, 0.15F, 1.0F);
 	}
 
 	protected SoundEvent getHurtSound(DamageSource source) {
@@ -175,25 +175,25 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	}
 
 	protected float getStandingEyeHeight(Pose pose, EntitySize size) {
-		return this.getHeight() * 0.5F;
+		return this.getBbHeight() * 0.5F;
 	}
 
-	public boolean attackEntityAsMob(Entity entityIn) {
-		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
+	public boolean doHurtTarget(Entity entityIn) {
+		boolean flag = entityIn.hurt(DamageSource.mobAttack(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
 
 		if (flag)
 		{
-			this.applyEnchantments(this, entityIn);
+			this.doEnchantDamageEffects(this, entityIn);
 		}
 
 		return flag;
 	}
 
-	public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
+	public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
 		return ActionResultType.PASS;
 	}
 
-	public boolean canBeLeashedTo(PlayerEntity player) {
+	public boolean canBeLeashed(PlayerEntity player) {
 		return false;
 	}
 	
@@ -204,24 +204,24 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		if (idleCooldown > 0) {
 			idleCooldown--;
 			if (idleCooldown == 0) {
-				if (this.getAttackTarget() == null) {
+				if (this.getTarget() == null) {
 					NostrumMagicaSounds.WISP_IDLE.play(this);
 				}
 				idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10); 
 			}
 		}
 		
-		if (!world.isRemote && this.getHome() == null && this.isAlive() && this.getHealth() > 0) {
-			if (perilLoc == null || !perilLoc.equals(getPosition())) {
+		if (!level.isClientSide && this.getHome() == null && this.isAlive() && this.getHealth() > 0) {
+			if (perilLoc == null || !perilLoc.equals(blockPosition())) {
 				BlockPos.Mutable cursor = new BlockPos.Mutable();
-				cursor.setPos(getPosition());
-				while (cursor.getY() > 0 && world.isAirBlock(cursor)) {
+				cursor.set(blockPosition());
+				while (cursor.getY() > 0 && level.isEmptyBlock(cursor)) {
 					cursor.move(Direction.DOWN);
 				}
 				
-				final int diff = (int) (getPosY()) - cursor.getY();
+				final int diff = (int) (getY()) - cursor.getY();
 				if (diff > 30) {
-					perilLoc = this.getPosition().toImmutable();
+					perilLoc = this.blockPosition().immutable();
 				}
 			}
 			
@@ -234,24 +234,24 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 						elem = this.defaultSpell.getPrimaryElement();
 					} else {
 						// else random
-						elem = EMagicElement.values()[rand.nextInt(EMagicElement.values().length)];
+						elem = EMagicElement.values()[random.nextInt(EMagicElement.values().length)];
 					}
 					
-					this.attackEntityFrom(DamageSource.DROWN, 4.0F);
+					this.hurt(DamageSource.DROWN, 4.0F);
 					if (!this.isAlive() || this.getHealth() <= 0) {
-						this.entityDropItem(EssenceItem.getEssence(elem, 1), 0);
+						this.spawnAtLocation(EssenceItem.getEssence(elem, 1), 0);
 					}
 				}
 			}
 		}
 		
-		if (world.isRemote) {
+		if (level.isClientSide) {
 			EMagicElement element = this.getElement();
 			if (element == null) element = EMagicElement.PHYSICAL;
 			int color = element.getColor();
-			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
-					1, getPosX(), getPosY() + getHeight()/2f, getPosZ(), 0, 40, 0,
-					new Vector3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025), null
+			NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
+					1, getX(), getY() + getBbHeight()/2f, getZ(), 0, 40, 0,
+					new Vector3d(random.nextFloat() * .05 - .025, random.nextFloat() * .05 - .025, random.nextFloat() * .05 - .025), null
 					).color(color));
 		}
 	}
@@ -302,52 +302,52 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
+	protected void defineSynchedData() {
+		super.defineSynchedData();
 		
-		this.dataManager.register(HOME, Optional.empty());
-		this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
+		this.entityData.define(HOME, Optional.empty());
+		this.entityData.define(ELEMENT, EMagicElement.PHYSICAL);
 	}
 	
 	protected void setHome(BlockPos home) {
-		this.dataManager.set(HOME, Optional.of(home));
-		this.setHomePosAndDistance(home, (int) MAX_WISP_DISTANCE_SQ);
+		this.entityData.set(HOME, Optional.of(home));
+		this.restrictTo(home, (int) MAX_WISP_DISTANCE_SQ);
 	}
 	
 	public BlockPos getHome() {
-		return this.dataManager.get(HOME).orElse(null);
+		return this.entityData.get(HOME).orElse(null);
 	}
 	
 	@Override
-	public void readAdditional(CompoundNBT compound) {
-		super.readAdditional(compound);
+	public void readAdditionalSaveData(CompoundNBT compound) {
+		super.readAdditionalSaveData(compound);
 		if (compound.contains("home", NBT.TAG_LONG)) {
-			setHome(BlockPos.fromLong(compound.getLong("home"))); // Warning: can break if save used across game versions
+			setHome(BlockPos.of(compound.getLong("home"))); // Warning: can break if save used across game versions
 		}
 	}
 	
 	@Override
-	public void writeAdditional(CompoundNBT compound) {
-		super.writeAdditional(compound);
+	public void addAdditionalSaveData(CompoundNBT compound) {
+		super.addAdditionalSaveData(compound);
 		
 		BlockPos homePos = this.getHome();
 		if (homePos != null) {
-			compound.putLong("home", homePos.toLong());
+			compound.putLong("home", homePos.asLong());
 		}
 	}
 	
 	@Override
-	public boolean writeUnlessRemoved(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundNBT compound) {
 		return false; // don't persist
 	}
 	
 	@Override
-	public boolean onLivingFall(float distance, float damageMulti) {
+	public boolean causeFallDamage(float distance, float damageMulti) {
 		return false; // No fall damage
 	}
 	
 	@Override
-	protected void updateFallState(double y, boolean onGround, BlockState stae, BlockPos pos) {
+	protected void checkFallDamage(double y, boolean onGround, BlockState stae, BlockPos pos) {
 		
 	}
 	
@@ -366,18 +366,18 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	}
 	
 	@Override
-	public boolean isWithinHomeDistanceFromPosition(BlockPos pos) {
+	public boolean isWithinRestriction(BlockPos pos) {
 		// MobEntity version assumes if distances is not -1 that home is not null
 		if (this.getHome() == null) {
 			return true;
 		} else {
-			return super.isWithinHomeDistanceFromPosition(pos);
+			return super.isWithinRestriction(pos);
 		}
 	}
 	
 	@Override
-	protected void dropSpecialItems(DamageSource source, int looting, boolean recentlyHitIn) {
-		super.dropSpecialItems(source, looting, recentlyHitIn);
+	protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHitIn) {
+		super.dropCustomDeathLoot(source, looting, recentlyHitIn);
 	}
 	
 //	protected void dropFewItems(boolean wasRecentlyHit, int lootingModifier) {
@@ -396,39 +396,39 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 //	}
 	
 	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount) {
+	public boolean hurt(DamageSource source, float amount) {
 		this.playEffect(ParticleTypes.CRIT);
-		return super.attackEntityFrom(source, amount);
+		return super.hurt(source, amount);
 	}
 	
 	private void playEffect(IParticleData particle) {
 		
 		for (int i = 0; i < 15; ++i) {
-			double d0 = this.rand.nextGaussian() * 0.02D;
-			double d1 = this.rand.nextGaussian() * 0.02D;
-			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.addParticle(particle, this.getPosX() + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.getPosY() + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.getPosZ() + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
+			double d0 = this.random.nextGaussian() * 0.02D;
+			double d1 = this.random.nextGaussian() * 0.02D;
+			double d2 = this.random.nextGaussian() * 0.02D;
+			this.level.addParticle(particle, this.getX() + (double)(this.random.nextFloat() * this.getBbWidth() * 2.0F) - (double)this.getBbWidth(), this.getY() + 0.5D + (double)(this.random.nextFloat() * this.getBbHeight()), this.getZ() + (double)(this.random.nextFloat() * this.getBbWidth() * 2.0F) - (double)this.getBbWidth(), d0, d1, d2);
 		}
 	}
 	
 	@Override
 	public EMagicElement getElement() {
-		return this.dataManager.get(ELEMENT);
+		return this.entityData.get(ELEMENT);
 	}
 	
 	protected void setElement(EMagicElement element) {
-		this.dataManager.set(ELEMENT, element);
+		this.entityData.set(ELEMENT, element);
 	}
 	
 	protected void pickElement() {
 		// Pick a random element
-		EMagicElement elem = EMagicElement.getRandom(getRNG());
+		EMagicElement elem = EMagicElement.getRandom(getRandom());
 		this.setElement(elem);
 	}
 	
 	protected Spell getDefaultSpell() {
 		init();
-		return getRandSpell(getRNG(), this.getElement());
+		return getRandSpell(getRandom(), this.getElement());
 	}
 	
 	protected Spell getSpellToUse() {
@@ -442,7 +442,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	}
 	
 	@Override
-	public int getMaxSpawnedInChunk() {
+	public int getMaxSpawnClusterSize() {
 		return 1;
 	}
 	
@@ -458,29 +458,29 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 
 		@Override
 		public void tick() {
-			if (this.action == MovementController.Action.MOVE_TO) {
-				double d0 = this.getX() - this.parentEntity.getPosX();
-				double d1 = this.getY() - this.parentEntity.getPosY();
-				double d2 = this.getZ() - this.parentEntity.getPosZ();
+			if (this.operation == MovementController.Action.MOVE_TO) {
+				double d0 = this.getWantedX() - this.parentEntity.getX();
+				double d1 = this.getWantedY() - this.parentEntity.getY();
+				double d2 = this.getWantedZ() - this.parentEntity.getZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				
 				if (d3 < 6) {
-					this.action = MovementController.Action.WAIT;
+					this.operation = MovementController.Action.WAIT;
 					return;
 				}
 
 				if (this.courseChangeCooldown-- <= 0) {
-					this.courseChangeCooldown += this.parentEntity.getRNG().nextInt(5) + 2;
+					this.courseChangeCooldown += this.parentEntity.getRandom().nextInt(5) + 2;
 					d3 = (double)MathHelper.sqrt(d3);
 
-					if (this.isNotColliding(this.getX(), this.getY(), this.getZ(), d3)) {
-						this.parentEntity.setMotion(this.parentEntity.getMotion().add(
+					if (this.isNotColliding(this.getWantedX(), this.getWantedY(), this.getWantedZ(), d3)) {
+						this.parentEntity.setDeltaMovement(this.parentEntity.getDeltaMovement().add(
 								d0 / d3 * 0.005D,
 								d1 / d3 * 0.005D,
 								d2 / d3 * 0.005D
 								));
 					} else {
-						this.action = MovementController.Action.WAIT;
+						this.operation = MovementController.Action.WAIT;
 					}
 				}
 			}
@@ -490,15 +490,15 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		 * Checks if entity bounding box is not colliding with terrain
 		 */
 		private boolean isNotColliding(double x, double y, double z, double p_179926_7_) {
-			double d0 = (x - this.parentEntity.getPosX()) / p_179926_7_;
-			double d1 = (y - this.parentEntity.getPosY()) / p_179926_7_;
-			double d2 = (z - this.parentEntity.getPosZ()) / p_179926_7_;
+			double d0 = (x - this.parentEntity.getX()) / p_179926_7_;
+			double d1 = (y - this.parentEntity.getY()) / p_179926_7_;
+			double d2 = (z - this.parentEntity.getZ()) / p_179926_7_;
 			AxisAlignedBB axisalignedbb = this.parentEntity.getBoundingBox();
 
 			for (int i = 1; (double)i < p_179926_7_; ++i) {
-				axisalignedbb = axisalignedbb.offset(d0, d1, d2);
+				axisalignedbb = axisalignedbb.move(d0, d1, d2);
 
-				if (!this.parentEntity.world.hasNoCollisions(this.parentEntity, axisalignedbb)) {
+				if (!this.parentEntity.level.noCollision(this.parentEntity, axisalignedbb)) {
 					return false;
 				}
 			}
@@ -512,20 +512,20 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	public void travel(Vector3d how) {
 		if (this.isInWater()) {
 			this.moveRelative(0.02F, how);
-			this.move(MoverType.SELF, this.getMotion());
-			this.setMotion(this.getMotion().scale(0.8));
+			this.move(MoverType.SELF, this.getDeltaMovement());
+			this.setDeltaMovement(this.getDeltaMovement().scale(0.8));
 		} else if (this.isInLava()) {
 			this.moveRelative(0.02F, how);
-			this.move(MoverType.SELF, this.getMotion());
-			this.setMotion(this.getMotion().scale(0.5));
+			this.move(MoverType.SELF, this.getDeltaMovement());
+			this.setDeltaMovement(this.getDeltaMovement().scale(0.5));
 		} else {
 			float f = 0.91F;
 
 			if (this.onGround) {
 				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
-				BlockPos underPos = new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()));
-				BlockState underState = this.world.getBlockState(underPos);
-				f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
+				BlockPos underPos = new BlockPos(MathHelper.floor(this.getX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getZ()));
+				BlockState underState = this.level.getBlockState(underPos);
+				f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
 			}
 
 			float f1 = 0.16277136F / (f * f * f);
@@ -534,39 +534,39 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 
 			if (this.onGround) {
 				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
-				BlockPos underPos = new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()));
-				BlockState underState = this.world.getBlockState(underPos);
-				f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
+				BlockPos underPos = new BlockPos(MathHelper.floor(this.getX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getZ()));
+				BlockState underState = this.level.getBlockState(underPos);
+				f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
 			}
 
-			this.move(MoverType.SELF, this.getMotion());
-			this.setMotion(this.getMotion().scale(f));
+			this.move(MoverType.SELF, this.getDeltaMovement());
+			this.setDeltaMovement(this.getDeltaMovement().scale(f));
 		}
 
-		this.prevLimbSwingAmount = this.limbSwingAmount;
-		double d1 = this.getPosX() - this.prevPosX;
-		double d0 = this.getPosZ() - this.prevPosZ;
+		this.animationSpeedOld = this.animationSpeed;
+		double d1 = this.getX() - this.xo;
+		double d0 = this.getZ() - this.zo;
 		float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 		if (f2 > 1.0F) {
 			f2 = 1.0F;
 		}
 
-		this.limbSwingAmount += (f2 - this.limbSwingAmount) * 0.4F;
-		this.limbSwing += this.limbSwingAmount;
+		this.animationSpeed += (f2 - this.animationSpeed) * 0.4F;
+		this.animationPosition += this.animationSpeed;
 	}
 
 	/**
 	 * returns true if this entity is by a ladder, false otherwise
 	 */
 	@Override
-	public boolean isOnLadder() {
+	public boolean onClimbable() {
 		return false;
 	}
 	
 	@Override
-	public boolean canSpawn(IWorld world, SpawnReason spawnReason) {
-		if (!super.canSpawn(world, spawnReason)) {
+	public boolean checkSpawnRules(IWorld world, SpawnReason spawnReason) {
+		if (!super.checkSpawnRules(world, spawnReason)) {
 			return false;
 		}
 		
@@ -574,24 +574,24 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	}
 	
 	public static boolean canSpawnExtraCheck(EntityType<WispEntity> type, IServerWorld world, SpawnReason reason, BlockPos pos, Random rand) {
-		AxisAlignedBB bb = new AxisAlignedBB(pos).grow(40);
-		if (DimensionUtils.IsOverworld(world.getWorld())) {
-			if (world.getLight(pos) > .75f) {
+		AxisAlignedBB bb = new AxisAlignedBB(pos).inflate(40);
+		if (DimensionUtils.IsOverworld(world.getLevel())) {
+			if (world.getMaxLocalRawBrightness(pos) > .75f) {
 				return false;
 			}
 	
-			List<WispEntity> wisps = world.getEntitiesWithinAABB(WispEntity.class, bb, null);
+			List<WispEntity> wisps = world.getEntitiesOfClass(WispEntity.class, bb, null);
 			return wisps.size() < 20;
 		} else {
 			// Nether has smaller pool, so make it harder to spawn there than simply using weight (cause a weight of 1 is still too large)
-			if (DimensionUtils.IsNether(world.getWorld())) {
+			if (DimensionUtils.IsNether(world.getLevel())) {
 				if (world.getDifficulty() == Difficulty.PEACEFUL || rand.nextInt(30) != 0 || pos.getY() > 120) {
 					return false;
 				}
 			}
 			
 			// Other dimensions, just check nearby wisp count
-			List<WispEntity> wisps = world.getEntitiesWithinAABB(WispEntity.class, bb, null);
+			List<WispEntity> wisps = world.getEntitiesOfClass(WispEntity.class, bb, null);
 			
 			return wisps.size() < 1;
 		}
@@ -602,21 +602,21 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 
 		public AIRandomFly(WispEntity wisp) {
 			this.parentEntity = wisp;
-			this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
+			this.setFlags(EnumSet.of(Goal.Flag.MOVE));
 		}
 
 		/**
 		 * Returns whether the Goal should begin execution.
 		 */
-		public boolean shouldExecute() {
-			MovementController MovementController = this.parentEntity.getMoveHelper();
+		public boolean canUse() {
+			MovementController MovementController = this.parentEntity.getMoveControl();
 
-			if (!MovementController.isUpdating()) {
+			if (!MovementController.hasWanted()) {
 				return true;
 			} else {
-				double d0 = MovementController.getX() - this.parentEntity.getPosX();
-				double d1 = MovementController.getY() - this.parentEntity.getPosY();
-				double d2 = MovementController.getZ() - this.parentEntity.getPosZ();
+				double d0 = MovementController.getWantedX() - this.parentEntity.getX();
+				double d1 = MovementController.getWantedY() - this.parentEntity.getY();
+				double d2 = MovementController.getWantedZ() - this.parentEntity.getZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				return d3 < 1.0D || d3 > 3600.0D;
 			}
@@ -626,19 +626,19 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		 * Returns whether an in-progress Goal should continue executing
 		 */
 		@Override
-		public boolean shouldContinueExecuting() {
+		public boolean canContinueToUse() {
 			return false;
 		}
 
 		/**
 		 * Execute a one shot task or start executing a continuous task
 		 */
-		public void startExecuting() {
-			Random random = this.parentEntity.getRNG();
-			double d0 = this.parentEntity.getPosX() + (double)((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
-			double d1 = this.parentEntity.getPosY() + (double)((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
-			double d2 = this.parentEntity.getPosZ() + (double)((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
-			this.parentEntity.getMoveHelper().setMoveTo(d0, d1, d2, 0.3D);
+		public void start() {
+			Random random = this.parentEntity.getRandom();
+			double d0 = this.parentEntity.getX() + (double)((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
+			double d1 = this.parentEntity.getY() + (double)((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
+			double d2 = this.parentEntity.getZ() + (double)((random.nextFloat() * 2.0F - 1.0F) * 16.0F);
+			this.parentEntity.getMoveControl().setWantedPosition(d0, d1, d2, 0.3D);
 		}
 	}
 	
@@ -917,20 +917,20 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		@Nullable EntityType<?> specialType = getSpecialTransformType(this.getElement(), element);
 		if (specialType != null) {
 			// Transform into the given entity
-			Entity ent = specialType.create(world);
-			ent.copyLocationAndAnglesFrom(this);
+			Entity ent = specialType.create(level);
+			ent.copyPosition(this);
 			if (this.hasCustomName()) {
 				ent.setCustomName(this.getCustomName());
 				ent.setCustomNameVisible(this.isCustomNameVisible());
 			}
-			world.addEntity(ent);
+			level.addFreshEntity(ent);
 			this.remove();
 			return true;
 		}
 		
 		if (element == this.getElement()) {
 			// Get a buff
-			this.addPotionEffect(new EffectInstance(NostrumEffects.magicBoost, 20 * 30, Math.max(0, power - 1)));
+			this.addEffect(new EffectInstance(NostrumEffects.magicBoost, 20 * 30, Math.max(0, power - 1)));
 		} else {
 			this.setElement(element);
 		}

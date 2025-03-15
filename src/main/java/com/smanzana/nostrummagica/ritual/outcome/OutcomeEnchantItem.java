@@ -30,26 +30,26 @@ public class OutcomeEnchantItem implements IRitualOutcome {
 	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// If there's an altar, we'll enchant the item there
 		// Otherwise enchant the item the player has
-		AltarTileEntity altar = (AltarTileEntity) world.getTileEntity(center);
+		AltarTileEntity altar = (AltarTileEntity) world.getBlockEntity(center);
 		final ItemStack centerItem = layout.getCenterItem(world, center);
 		if (recipe.getTier() == 0 || centerItem.isEmpty()) {
 			// enchant item on player
-			ItemStack item = player.getHeldItemMainhand();
+			ItemStack item = player.getMainHandItem();
 			if (item.isEmpty())
 				return;
 			
-			if (!enchantment.canApply(item)) {
+			if (!enchantment.canEnchant(item)) {
 				return;
 			}
 			
-			item.addEnchantment(enchantment, level);
+			item.enchant(enchantment, level);
 		} else {
-			if (!enchantment.canApply(centerItem)) {
+			if (!enchantment.canEnchant(centerItem)) {
 				altar.setItem(centerItem);
 				return;
 			}
 			
-			centerItem.addEnchantment(enchantment, level);
+			centerItem.enchant(enchantment, level);
 			altar.setItem(centerItem);
 		}
 	}
@@ -61,7 +61,7 @@ public class OutcomeEnchantItem implements IRitualOutcome {
 
 	@Override
 	public List<ITextComponent> getDescription() {
-		String name = I18n.format(enchantment.getName(), (Object[]) null);
+		String name = I18n.get(enchantment.getDescriptionId(), (Object[]) null);
 		String level = SpellPlate.toRoman(this.level);
 		return TextUtils.GetTranslatedList("ritual.outcome.enchant.desc",
 				new Object[] {name, level});

@@ -54,12 +54,12 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	private static final String NBT_ITEM = "item";
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		if (stack != ItemStack.EMPTY) {
 			CompoundNBT tag = new CompoundNBT();
-			tag = stack.write(tag);
+			tag = stack.save(tag);
 			nbt.put(NBT_ITEM, tag);
 		}
 		
@@ -67,8 +67,8 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		if (nbt == null)
 			return;
@@ -77,45 +77,45 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 			stack = ItemStack.EMPTY;
 		} else {
 			CompoundNBT tag = nbt.getCompound(NBT_ITEM);
-			stack = ItemStack.read(tag);
+			stack = ItemStack.of(tag);
 		}
 	}
 	
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
 	private void dirty() {
-		world.notifyBlockUpdate(this.getPos(), this.getBlockState(), this.getBlockState(), 3);
-		markDirty();
+		level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 3);
+		setChanged();
 	}
 
 	@Override
-	public int getSizeInventory() {
+	public int getContainerSize() {
 		return 1;
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int index) {
+	public ItemStack getItem(int index) {
 		if (index > 0)
 			return ItemStack.EMPTY;
 		return this.stack;
 	}
 
 	@Override
-	public ItemStack decrStackSize(int index, int count) {
+	public ItemStack removeItem(int index, int count) {
 		if (index > 0)
 			return ItemStack.EMPTY;
 		ItemStack ret = this.stack.split(count);
@@ -126,7 +126,7 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 
 	@Override
-	public ItemStack removeStackFromSlot(int index) {
+	public ItemStack removeItemNoUpdate(int index) {
 		if (index > 0)
 			return ItemStack.EMPTY;
 		ItemStack ret = this.stack;
@@ -136,7 +136,7 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, ItemStack stack) {
+	public void setItem(int index, ItemStack stack) {
 		if (index > 0)
 			return;
 		this.stack = stack;
@@ -144,32 +144,32 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 
 	@Override
-	public int getInventoryStackLimit() {
+	public int getMaxStackSize() {
 		return 1;
 	}
 
 	@Override
-	public boolean isUsableByPlayer(PlayerEntity player) {
+	public boolean stillValid(PlayerEntity player) {
 		return true;
 	}
 
 	@Override
-	public void openInventory(PlayerEntity player) {
+	public void startOpen(PlayerEntity player) {
 		;
 	}
 
 	@Override
-	public void closeInventory(PlayerEntity player) {
+	public void stopOpen(PlayerEntity player) {
 		;
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int index, ItemStack stack) {
+	public boolean canPlaceItem(int index, ItemStack stack) {
 		return index == 0;
 	}
 
 	@Override
-	public void clear() {
+	public void clearContent() {
 		this.stack = ItemStack.EMPTY;
 		dirty();
 	}
@@ -180,7 +180,7 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 
 	@Override
-	public boolean canInsertItem(int index, ItemStack itemStackIn, Direction direction) {
+	public boolean canPlaceItemThroughFace(int index, ItemStack itemStackIn, Direction direction) {
 		if (index != 0)
 			return false;
 		
@@ -188,7 +188,7 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 
 	@Override
-	public boolean canExtractItem(int index, ItemStack stack, Direction direction) {
+	public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
 		return index == 0 && !stack.isEmpty();
 	}
 
@@ -206,8 +206,8 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	public int acceptAetherInfuse(IAetherInfuserTileEntity source, int maxAether) {
 		final IAetherInfuserLens infusable = ((IAetherInfuserLens) stack.getItem());
 		final int leftover;
-		if (infusable.canAcceptAetherInfuse(stack, pos, source, maxAether)) {
-			leftover = infusable.acceptAetherInfuse(stack, pos, source, maxAether);
+		if (infusable.canAcceptAetherInfuse(stack, worldPosition, source, maxAether)) {
+			leftover = infusable.acceptAetherInfuse(stack, worldPosition, source, maxAether);
 		} else {
 			leftover = maxAether;
 		}

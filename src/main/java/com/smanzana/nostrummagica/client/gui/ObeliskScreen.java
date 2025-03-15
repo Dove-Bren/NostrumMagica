@@ -73,7 +73,7 @@ public class ObeliskScreen extends Screen {
 		this.tileEntity = tileEntity;
 		drawList = ModConfig.config.getObeliskList();
 		
-		errorString = I18n.format(NO_DEST_KEY, new Object[0]);
+		errorString = I18n.get(NO_DEST_KEY, new Object[0]);
 		this.floatingButtons = new ArrayList<>();
 		this.listButtons = new ArrayList<>();
 		this.listRemoveButtons = new ArrayList<>();
@@ -111,8 +111,8 @@ public class ObeliskScreen extends Screen {
 			float furthestDim = 1; // in blocks
 			for (NostrumObeliskTarget target: tileEntity.getTargets()) {
 				final BlockPos targPos = target.getLocation().getPos();
-				final int xDiff = Math.abs(targPos.getX() - tileEntity.getPos().getX());
-				final int yDiff = Math.abs(targPos.getZ() - tileEntity.getPos().getZ());
+				final int xDiff = Math.abs(targPos.getX() - tileEntity.getBlockPos().getX());
+				final int yDiff = Math.abs(targPos.getZ() - tileEntity.getBlockPos().getZ());
 				if (furthestDim < xDiff) {
 					furthestDim = xDiff;
 				}
@@ -133,10 +133,10 @@ public class ObeliskScreen extends Screen {
 		}
 		
 		float xDiv = this.drawList ? (2f/3f) : .5f;
-		this.xOffset = getScaled(tileEntity.getPos().getX()) - (int) (this.width * (xDiv));
-		this.yOffset = getScaled(tileEntity.getPos().getZ()) - (this.height / 2);
+		this.xOffset = getScaled(tileEntity.getBlockPos().getX()) - (int) (this.width * (xDiv));
+		this.yOffset = getScaled(tileEntity.getBlockPos().getZ()) - (this.height / 2);
 		
-		this.centralButton = new DestinationButton(this, 0, 0, new Location(tileEntity.getWorld(), tileEntity.getPos()), -1, true, false, "", true, false, null);
+		this.centralButton = new DestinationButton(this, 0, 0, new Location(tileEntity.getLevel(), tileEntity.getBlockPos()), -1, true, false, "", true, false, null);
 		
 		final Location selectedLoc = tileEntity.getCurrentTarget();
 		
@@ -159,7 +159,7 @@ public class ObeliskScreen extends Screen {
 			listY++;
 			
 			// Only add float button if in same dimension
-			if (DimensionUtils.DimEquals(tileEntity.getWorld().getDimensionKey(), target.getLocation().getDimension())) {
+			if (DimensionUtils.DimEquals(tileEntity.getLevel().dimension(), target.getLocation().getDimension())) {
 				DestinationButton button = new DestinationButton(this, 0, 0, target.getLocation(), index, false, false, target.getTitle(), valid, selected, this.centralButton);
 				floatingButtons.add(button);
 			}
@@ -190,7 +190,7 @@ public class ObeliskScreen extends Screen {
 	public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 
 		//GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-		Minecraft.getInstance().getTextureManager().bindTexture(background);
+		Minecraft.getInstance().getTextureManager().bind(background);
 		
 		double time = (float) ((double) System.currentTimeMillis() / 15000.0);
 		int panX = (int) (Math.sin(time) * TEXT_BACK_PAN);
@@ -222,13 +222,13 @@ public class ObeliskScreen extends Screen {
 			
 			int left = (this.width / 3) - 14;
 			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
-			Minecraft.getInstance().getTextureManager().bindTexture(background);
+			Minecraft.getInstance().getTextureManager().bind(background);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, left, 0, 42 + (mouseover ? 14 : 0), 78, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
 					1f, 1f, 1f, 1f);
 		} else {
 			int left = 0;
 			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
-			Minecraft.getInstance().getTextureManager().bindTexture(background);
+			Minecraft.getInstance().getTextureManager().bind(background);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, left, 0, 42 + (mouseover ? 14 : 0), 64, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
 					1f, 1f, 1f, 1f);
 		}
@@ -236,8 +236,8 @@ public class ObeliskScreen extends Screen {
 		//GlStateManager.color4f(1f, 1f, 1f, 1f);
 		//GlStateManager.enableBlend();
 		//GlStateManager.disableLighting();
-		this.font.drawString(matrixStackIn, "<" + xOffset + "," + yOffset + ">", 35, 5, 0xFFFFFFFF);
-		this.font.drawString(matrixStackIn, "Scale: " + this.scale, 35, 20, 0xFFFFFFFF);
+		this.font.draw(matrixStackIn, "<" + xOffset + "," + yOffset + ">", 35, 5, 0xFFFFFFFF);
+		this.font.draw(matrixStackIn, "Scale: " + this.scale, 35, 20, 0xFFFFFFFF);
 		
 		for (DestinationButton butt : listButtons) {
 			butt.render(matrixStackIn, mouseX, mouseY, partialTicks);
@@ -313,7 +313,7 @@ public class ObeliskScreen extends Screen {
 				for (RemoveButton butt : listRemoveButtons) {
 					butt.visible = drawList;
 				}
-				centralButton.playDownSound(this.mc.getSoundHandler());
+				centralButton.playDownSound(this.mc.getSoundManager());
 				this.updateButtons();
 				return true;
 			} else if (drawList && mouseX < this.width / 3) {
@@ -365,10 +365,10 @@ public class ObeliskScreen extends Screen {
 	}
 	
 	private void renderLine(MatrixStack matrixStackIn, DestinationButton center, DestinationButton other, float partialTicks) {
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		//GlStateManager.pushLightingAttributes();
 		matrixStackIn.translate(TEXT_ICON_LENGTH / 2, TEXT_ICON_LENGTH / 2, 0);
-		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		final Matrix4f transform = matrixStackIn.last().pose();
 		
 		final float red, green, blue, alpha;
 		final int segments;
@@ -400,7 +400,7 @@ public class ObeliskScreen extends Screen {
 		final float diffPerY = diffY / (segments-1);
 		
 		
-		BufferBuilder buf = Tessellator.getInstance().getBuffer();
+		BufferBuilder buf = Tessellator.getInstance().getBuilder();
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.lineWidth(3f);
@@ -424,14 +424,14 @@ public class ObeliskScreen extends Screen {
         		b = blue;
         	}
         	
-	        buf.pos(transform, X, Y, 0).color(r, g, b, alpha).endVertex();
+	        buf.vertex(transform, X, Y, 0).color(r, g, b, alpha).endVertex();
         }
-        Tessellator.getInstance().draw();
+        Tessellator.getInstance().end();
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
 		
 //        GlStateManager.popAttributes();
-        matrixStackIn.pop();
+        matrixStackIn.popPose();
 	}
 	
 	protected void onDestinationClicked(Button button) {
@@ -445,13 +445,13 @@ public class ObeliskScreen extends Screen {
 		if (!butt.isValid)
 			return;
 		
-		NostrumMagica.instance.proxy.setObeliskIndex(tileEntity.getPos(), butt.obeliskIndex);
-		Minecraft.getInstance().displayGuiScreen(null);
+		NostrumMagica.instance.proxy.setObeliskIndex(tileEntity.getBlockPos(), butt.obeliskIndex);
+		Minecraft.getInstance().setScreen(null);
 	}
 	
 	protected void onRemoveClicked(RemoveButton button) {
-		NostrumMagica.instance.proxy.removeObeliskIndex(tileEntity.getPos(), button.obeliskIndex);
-		Minecraft.getInstance().displayGuiScreen(null);
+		NostrumMagica.instance.proxy.removeObeliskIndex(tileEntity.getBlockPos(), button.obeliskIndex);
+		Minecraft.getInstance().setScreen(null);
 	}
 	
 	static class RemoveButton extends Button {
@@ -469,7 +469,7 @@ public class ObeliskScreen extends Screen {
 			final Minecraft mc = Minecraft.getInstance();
 			final float sat = (this.isHovered() ? 1f : .8f);
 			
-			mc.getTextureManager().bindTexture(background);
+			mc.getTextureManager().bind(background);
             RenderSystem.enableBlend();
             RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStack, x, y,
             		TEXT_REMOVE_BUTT_HOFFSET, TEXT_REMOVE_BUTT_VOFFSET,
@@ -561,7 +561,7 @@ public class ObeliskScreen extends Screen {
                 }
                 
                 
-                mc.getTextureManager().bindTexture(background);
+                mc.getTextureManager().bind(background);
                 RenderSystem.enableBlend();
                 RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, textureX,
         				textureY, TEXT_ICON_LENGTH, TEXT_ICON_LENGTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
@@ -570,39 +570,39 @@ public class ObeliskScreen extends Screen {
                 
                 if (!isCenter) {
                 	// Draw the name below
-                	FontRenderer fonter = mc.fontRenderer;
-                	int textWidth = fonter.getStringWidth(title);
+                	FontRenderer fonter = mc.font;
+                	int textWidth = fonter.width(title);
                 	int buttonWidth = TEXT_ICON_LENGTH;
                 	int color = isValid ? 0xB0B0B0 : 0xB05050;
                 	if (isListed) {
                 		// Draw to the right
-                		fonter.drawString(matrixStackIn, title, x + buttonWidth + 5, y + ((buttonWidth - fonter.FONT_HEIGHT + 1) / 2), color);
+                		fonter.draw(matrixStackIn, title, x + buttonWidth + 5, y + ((buttonWidth - fonter.lineHeight + 1) / 2), color);
                 		if (isSelected) {
-	                		matrixStackIn.push();
+	                		matrixStackIn.pushPose();
 	                		matrixStackIn.translate(x + (buttonWidth/2), y + buttonWidth - 1, 0);
 	                		matrixStackIn.scale(.5f, .5f, 1f);
-	                		fonter.drawString(matrixStackIn, "Active", -14, 0, color);
-	                		matrixStackIn.pop();
+	                		fonter.draw(matrixStackIn, "Active", -14, 0, color);
+	                		matrixStackIn.popPose();
                 		}
                 	} else {
                 		// Draw above
                 		int xPos = x + (buttonWidth / 2) - (textWidth / 2);
-                		fonter.drawString(matrixStackIn, title, xPos, y - (2 + fonter.FONT_HEIGHT), color);
+                		fonter.draw(matrixStackIn, title, xPos, y - (2 + fonter.lineHeight), color);
                 		
                 		if (isSelected) {
-	                		matrixStackIn.push();
+	                		matrixStackIn.pushPose();
 	                		matrixStackIn.translate(x + (buttonWidth/2), y - 2, 0);
 	                		matrixStackIn.scale(.5f, .5f, 1f);
-	                		fonter.drawString(matrixStackIn, "Active", -14, 0, color);
-	                		matrixStackIn.pop();
+	                		fonter.draw(matrixStackIn, "Active", -14, 0, color);
+	                		matrixStackIn.popPose();
                 		}
                 	}
                 } else {
                 	final String title = "This Obelisk";
-                	FontRenderer fonter = mc.fontRenderer;
-                	int textWidth = fonter.getStringWidth(title);
+                	FontRenderer fonter = mc.font;
+                	int textWidth = fonter.width(title);
                 	int xPos = x + (TEXT_ICON_LENGTH / 2) - (textWidth / 2);
-            		fonter.drawString(matrixStackIn, title, xPos, y - (2 + fonter.FONT_HEIGHT), 0xB0B0B0);
+            		fonter.draw(matrixStackIn, title, xPos, y - (2 + fonter.lineHeight), 0xB0B0B0);
                 }
                 
             }

@@ -12,7 +12,7 @@ import net.minecraft.entity.ai.goal.TargetGoal;
 
 public class OwnerHurtTargetGenericGoal<T extends CreatureEntity & ITameableEntity> extends TargetGoal {
 	
-	protected static final EntityPredicate CanAttack = new EntityPredicate().setLineOfSiteRequired().setUseInvisibilityCheck();
+	protected static final EntityPredicate CanAttack = new EntityPredicate().allowUnseeable().ignoreInvisibilityTesting();
 	protected T entityTameable;
 	protected LivingEntity theTarget;
 	private int timestamp;
@@ -20,14 +20,14 @@ public class OwnerHurtTargetGenericGoal<T extends CreatureEntity & ITameableEnti
 	public OwnerHurtTargetGenericGoal(T entityTameableIn) {
 		super(entityTameableIn, false);
 		this.entityTameable = entityTameableIn;
-		this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
+		this.setFlags(EnumSet.of(Goal.Flag.MOVE));
 	}
 
 	/**
 	 * Returns whether the Goal should begin execution.
 	 */
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		if (!this.entityTameable.isEntitySitting()) {
 			return false;
 		} else {
@@ -36,9 +36,9 @@ public class OwnerHurtTargetGenericGoal<T extends CreatureEntity & ITameableEnti
 			if (entitylivingbase == null) {
 				return false;
 			} else {
-				this.theTarget = entitylivingbase.getLastAttackedEntity();
-				int i = entitylivingbase.getLastAttackedEntityTime();
-				return i != this.timestamp && this.isSuitableTarget(this.theTarget, CanAttack);
+				this.theTarget = entitylivingbase.getLastHurtMob();
+				int i = entitylivingbase.getLastHurtMobTimestamp();
+				return i != this.timestamp && this.canAttack(this.theTarget, CanAttack);
 			}
 		}
 	}
@@ -47,14 +47,14 @@ public class OwnerHurtTargetGenericGoal<T extends CreatureEntity & ITameableEnti
 	 * Execute a one shot task or start executing a continuous task
 	 */
 	@Override
-	public void startExecuting() {
-		this.goalOwner.setAttackTarget(this.theTarget);
+	public void start() {
+		this.mob.setTarget(this.theTarget);
 		LivingEntity entitylivingbase = this.entityTameable.getLivingOwner();
 
 		if (entitylivingbase != null) {
-			this.timestamp = entitylivingbase.getRevengeTimer();
+			this.timestamp = entitylivingbase.getLastHurtByMobTimestamp();
 		}
 
-		super.startExecuting();
+		super.start();
 	}
 }

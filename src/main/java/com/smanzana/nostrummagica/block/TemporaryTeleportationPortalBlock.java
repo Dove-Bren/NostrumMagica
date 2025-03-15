@@ -26,10 +26,10 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 	public static final String ID = "limited_teleportation_portal";
 	
 	public TemporaryTeleportationPortalBlock() {
-		super(Block.Properties.create(Material.LEAVES)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		super(Block.Properties.of(Material.LEAVES)
+				.strength(-1.0F, 3600000.8F)
 				.noDrops()
-				.setLightLevel((state) -> 14)
+				.lightLevel((state) -> 14)
 				);
 	}
 	
@@ -49,12 +49,12 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 	
 	protected static void spawnPortal(World worldIn, BlockPos portalMaster, Location target, int duration) {
 		TemporaryPortalTileEntity te = new TemporaryPortalTileEntity(target, worldIn.getGameTime() + duration);
-		worldIn.setTileEntity(portalMaster, te);
+		worldIn.setBlockEntity(portalMaster, te);
 	}
 	
 	public static void spawn(World world, BlockPos at, Location target, int duration) {
 		BlockState state = NostrumBlocks.temporaryTeleportationPortal.getMaster();
-		world.setBlockState(at, state);
+		world.setBlockAndUpdate(at, state);
 		NostrumBlocks.temporaryTeleportationPortal.createPaired(world, at);
 		
 		spawnPortal(world, at, target, duration);
@@ -68,11 +68,11 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 		if (centerValid) {
 			// Try center and grow from there
 			next.add(center);
-			seen.add(center.up());
+			seen.add(center.above());
 		} else {
 			// avoid center location by unrolling surrounding blocks
 			seen.add(center);
-			seen.add(center.up());
+			seen.add(center.above());
 			next.add(center.north());
 			next.add(center.west());
 			next.add(center.east());
@@ -88,7 +88,7 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 			
 			// Less than here so the last visited are the exact border
 			if (lDist < radius) {
-				for (BlockPos pos : new BlockPos[]{loc.up(), loc.down(), loc.north(), loc.south(), loc.east(), loc.west()}) {
+				for (BlockPos pos : new BlockPos[]{loc.above(), loc.below(), loc.north(), loc.south(), loc.east(), loc.west()}) {
 					if (!seen.contains(pos) && !next.contains(pos)) {
 						next.add(pos);
 					}
@@ -100,8 +100,8 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 			}
 			
 			boolean pass = true;
-			for (BlockPos pos : new BlockPos[]{loc, loc.up()}) {
-				if (!world.isAirBlock(pos)) {
+			for (BlockPos pos : new BlockPos[]{loc, loc.above()}) {
+				if (!world.isEmptyBlock(pos)) {
 					BlockState state = world.getBlockState(loc);
 					if (!state.getMaterial().isReplaceable()) {
 						pass = false;
@@ -115,8 +115,8 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 			}
 			
 			// Check that it's on ground
-			BlockState ground = world.getBlockState(loc.down());
-			if (!ground.getMaterial().blocksMovement()) {
+			BlockState ground = world.getBlockState(loc.below());
+			if (!ground.getMaterial().blocksMotion()) {
 			//if (!ground.isSideSolid(world, loc.down(), Direction.UP)) {
 				continue;
 			}

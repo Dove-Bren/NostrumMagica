@@ -205,12 +205,12 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		return BulletSeedSpell;
 	}
 	
-	protected static final DataParameter<Float[]> LEAF_PITCHES = EntityDataManager.<Float[]>createKey(PlantBossEntity.class, FloatArraySerializer.instance);
-	protected static final DataParameter<Optional<EMagicElement>> WEAK_ELEMENT = EntityDataManager.<Optional<EMagicElement>>createKey(PlantBossEntity.class, OptionalMagicElementDataSerializer.instance);
-	protected static final DataParameter<PlantBossTreeType> TREE_TYPE = EntityDataManager.<PlantBossTreeType>createKey(PlantBossEntity.class, PlantBossTreeTypeSerializer.instance);
-	protected static final DataParameter<Optional<UUID>> BODY_ID = EntityDataManager.createKey(PlantBossEntity.class, DataSerializers.OPTIONAL_UNIQUE_ID);
+	protected static final DataParameter<Float[]> LEAF_PITCHES = EntityDataManager.<Float[]>defineId(PlantBossEntity.class, FloatArraySerializer.instance);
+	protected static final DataParameter<Optional<EMagicElement>> WEAK_ELEMENT = EntityDataManager.<Optional<EMagicElement>>defineId(PlantBossEntity.class, OptionalMagicElementDataSerializer.instance);
+	protected static final DataParameter<PlantBossTreeType> TREE_TYPE = EntityDataManager.<PlantBossTreeType>defineId(PlantBossEntity.class, PlantBossTreeTypeSerializer.instance);
+	protected static final DataParameter<Optional<UUID>> BODY_ID = EntityDataManager.defineId(PlantBossEntity.class, DataSerializers.OPTIONAL_UUID);
 	
-	private final ServerBossInfo bossInfo = (ServerBossInfo) new ServerBossInfo(this.getDisplayName(), BossInfo.Color.GREEN, BossInfo.Overlay.NOTCHED_10).setDarkenSky(true);
+	private final ServerBossInfo bossInfo = (ServerBossInfo) new ServerBossInfo(this.getDisplayName(), BossInfo.Color.GREEN, BossInfo.Overlay.NOTCHED_10).setDarkenScreen(true);
 	private final PlantBossLeafLimb[] limbs;
 	private final MultiPartEntityPart<PlantBossEntity>[] parts;
 	protected float eyeHeight;
@@ -237,21 +237,21 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	@SuppressWarnings("unchecked")
 	public PlantBossEntity(EntityType<? extends PlantBossEntity> type, World worldIn) {
 		super(type, worldIn);
-        this.ignoreFrustumCheck = true;
-        this.experienceValue = 1250;
-        this.entityCollisionReduction = 1f;
+        this.noCulling = true;
+        this.xpReward = 1250;
+        this.pushthrough = 1f;
 		
         this.parts = new MultiPartEntityPart[NumberOfLeaves + 1];
 		this.limbs = new PlantBossLeafLimb[NumberOfLeaves];
         
 		this.aggroTable = new AggroTable<>((ent) -> {
-			return PlantBossEntity.this.getEntitySenses().canSee(ent);
+			return PlantBossEntity.this.getSensing().canSee(ent);
 		});
 		
 		this.stateTasks = new EnumMap<>(BattleState.class);
 		fillStateTasks(this.stateTasks);
 		
-		this.eyeHeight = this.getHeight() * .85f;
+		this.eyeHeight = this.getBbHeight() * .85f;
 	}
 	
 	protected void fillStateTasks(Map<BattleState, BattleStateTask> map) {
@@ -287,23 +287,23 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
-		this.dataManager.register(LEAF_PITCHES, new Float[NumberOfLeaves]);
-		this.dataManager.register(WEAK_ELEMENT, Optional.empty());
-		this.dataManager.register(TREE_TYPE, PlantBossTreeType.NORMAL);
-		this.dataManager.register(BODY_ID, Optional.empty());
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(LEAF_PITCHES, new Float[NumberOfLeaves]);
+		this.entityData.define(WEAK_ELEMENT, Optional.empty());
+		this.entityData.define(TREE_TYPE, PlantBossTreeType.NORMAL);
+		this.entityData.define(BODY_ID, Optional.empty());
 	}
 	
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		return MobEntity.func_233666_p_()
-	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.00D)
-	        .createMutableAttribute(Attributes.MAX_HEALTH, 800.0D)
-	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 10.0D)
-	        .createMutableAttribute(Attributes.ARMOR, 18.0D)
-	        .createMutableAttribute(Attributes.ATTACK_SPEED, 0.5D)
-	        .createMutableAttribute(Attributes.FOLLOW_RANGE, 8D)
-	        .createMutableAttribute(Attributes.KNOCKBACK_RESISTANCE, 1.0);
+		return MobEntity.createMobAttributes()
+	        .add(Attributes.MOVEMENT_SPEED, 0.00D)
+	        .add(Attributes.MAX_HEALTH, 800.0D)
+	        .add(Attributes.ATTACK_DAMAGE, 10.0D)
+	        .add(Attributes.ARMOR, 18.0D)
+	        .add(Attributes.ATTACK_SPEED, 0.5D)
+	        .add(Attributes.FOLLOW_RANGE, 8D)
+	        .add(Attributes.KNOCKBACK_RESISTANCE, 1.0);
     }
 	
 	@Override
@@ -312,34 +312,34 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	@Override
-	public boolean canDespawn(double distanceToClosestPlayer) {
+	public boolean removeWhenFarAway(double distanceToClosestPlayer) {
 		return false;
 	}
 	
 	@Override
-	public boolean canAttack(EntityType<?> type) {
+	public boolean canAttackType(EntityType<?> type) {
 		return true;
 	}
 	
 	@Override
-	public boolean isNonBoss() {
+	public boolean canChangeDimensions() {
 		return false;
 	}
 	
 	@Override
-	public void readAdditional(CompoundNBT compound) {
-		super.readAdditional(compound);
+	public void readAdditionalSaveData(CompoundNBT compound) {
+		super.readAdditionalSaveData(compound);
 	}
 	
 	@Override
-	public void writeAdditional(CompoundNBT compound) {
-    	super.writeAdditional(compound);
+	public void addAdditionalSaveData(CompoundNBT compound) {
+    	super.addAdditionalSaveData(compound);
 	}
 	
 	protected void spawnLimbs() {
         bodyCache = new PlantBossBody(this);
         parts[0] = bodyCache;
-        dataManager.set(BODY_ID, Optional.of(bodyCache.getUniqueID()));
+        entityData.set(BODY_ID, Optional.of(bodyCache.getUUID()));
 		
 		for (int i = 0; i < NumberOfLeaves; i++) {
 			limbs[i] = new PlantBossLeafLimb(this, i);
@@ -349,15 +349,15 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		// Add children to world
 		for (MultiPartEntityPart<PlantBossEntity> part : this.parts) {
 			// Need to make sure to set a near-ish position for the entities or they may not be added tto the world
-			part.setPosition(this.getPosX(), this.getPosY(), this.getPosZ());
-			this.world.addEntity(part);
+			part.setPos(this.getX(), this.getY(), this.getZ());
+			this.level.addFreshEntity(part);
 		}
 	}
 	
 	protected void searchForBody() {
-		Optional<UUID> bodyID = this.dataManager.get(BODY_ID);
+		Optional<UUID> bodyID = this.entityData.get(BODY_ID);
 		if (bodyID.isPresent()) {
-			Entity e = Entities.FindEntity(this.world, bodyID.get());
+			Entity e = Entities.FindEntity(this.level, bodyID.get());
 			if (e != null && e instanceof PlantBossBody) {
 				bodyCache = (PlantBossBody) e;
 			}
@@ -370,14 +370,14 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 			final double limbRot = Math.PI * 2 * yawProg
 								//+ (this.rotationYawHead * Math.PI / 180.0) // don't rotate
 								;
-			final double radius = this.getBody().getWidth() * (limb.getLeafIndex() % 2 == 0 ? 1.25 : 1.5);
+			final double radius = this.getBody().getBbWidth() * (limb.getLeafIndex() % 2 == 0 ? 1.25 : 1.5);
 			
-			final double x = this.getPosX()
+			final double x = this.getX()
 					+ Math.cos(limbRot) * radius;
-			final double z = this.getPosZ() + Math.sin(limbRot) * radius;
+			final double z = this.getZ() + Math.sin(limbRot) * radius;
 			
 			final float pitch = calcTargetLeafPitch(limb);
-			limb.setLocationAndAngles(x, getPosY(), z, yawProg * 360f, pitch);
+			limb.moveTo(x, getY(), z, yawProg * 360f, pitch);
 			
 			this.setLeafPitch(limb.getLeafIndex(), pitch);
 		}
@@ -417,18 +417,18 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		//		new Vector3d(0, .2, 0), new Vector3d(.2, .1, .2)
 		//		).gravity(true).color(this.getTreeElement().getColor()));
 		
-		NostrumParticles.LIGHTNING_STATIC.spawn(this.world, new NostrumParticles.SpawnParams(
+		NostrumParticles.LIGHTNING_STATIC.spawn(this.level, new NostrumParticles.SpawnParams(
 				1,
-				this.getPosX(), this.getPosY() + this.getHeight() + 1, this.getPosZ(), 1,
+				this.getX(), this.getY() + this.getBbHeight() + 1, this.getZ(), 1,
 				40, 20,
 				new Vector3d(0, .05, 0), Vector3d.ZERO
 				).color(this.getTreeElement().getColor()));
 	}
 	
 	protected void spawnWardParticles(int count) {
-		NostrumParticles.WARD.spawn(this.world, new NostrumParticles.SpawnParams(
+		NostrumParticles.WARD.spawn(this.level, new NostrumParticles.SpawnParams(
 				count * 10,
-				this.getPosX(), this.getPosY() + (this.getHeight() / 2), this.getPosZ(), this.getWidth() * 1.5,
+				this.getX(), this.getY() + (this.getBbHeight() / 2), this.getZ(), this.getBbWidth() * 1.5,
 				40, 10,
 				new Vector3d(0, 0, 0), Vector3d.ZERO
 				));
@@ -436,9 +436,9 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	
 	protected void spawnWardParticles(@Nonnull Vector3d at, int count) {
 		// Calculate vector away from ent to where it got attacked
-		Vector3d bounceDir = at.subtract(this.getPositionVec()).normalize();
+		Vector3d bounceDir = at.subtract(this.position()).normalize();
 		
-		NostrumParticles.WARD.spawn(this.world, new NostrumParticles.SpawnParams(
+		NostrumParticles.WARD.spawn(this.level, new NostrumParticles.SpawnParams(
 				count * 5,
 				at.x, at.y, at.z, .25,
 				10, 5,
@@ -462,7 +462,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	public void onAddedToWorld() {
 		super.onAddedToWorld();
 		
-		if (!this.world.isRemote()) {
+		if (!this.level.isClientSide()) {
 			// Can't spawn here, as chunk we're in may not be finished loading
 			//spawnLimbs();
 		}
@@ -478,11 +478,11 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 //			part.tick();
 //		}
 		
-		this.rotationYawHead += .1f;
+		this.yHeadRot += .1f;
 		
 		curlTick();
 		
-		if (this.world.isRemote) {
+		if (this.level.isClientSide) {
 			if (this.bodyCache == null) {
 				searchForBody();
 			}
@@ -492,7 +492,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 				spawnLimbs();
 			}
 			
-			getBody().setLocationAndAngles(getPosX(), getPosY(), getPosZ(), rotationYaw, rotationPitch);
+			getBody().moveTo(getX(), getY(), getZ(), yRot, xRot);
 			positionLeaves(limbs);
 			this.tickStateMachine();
 		}
@@ -552,7 +552,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 			return null;
 		} else {
 			BattleState[][] sequences = getCurrentPhase().stateSequences;
-			return sequences[rand.nextInt(sequences.length)];
+			return sequences[random.nextInt(sequences.length)];
 		}
 	}
 	
@@ -570,27 +570,27 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	@Override
-	protected void updateAITasks() {
-		super.updateAITasks();
+	protected void customServerAiStep() {
+		super.customServerAiStep();
 		
 		this.bossInfo.setPercent(this.getHealth() / this.getMaxHealth());
 	}
 	
 	@Override
-	public void addTrackingPlayer(ServerPlayerEntity player) {
-		super.addTrackingPlayer(player);
+	public void startSeenByPlayer(ServerPlayerEntity player) {
+		super.startSeenByPlayer(player);
 		this.bossInfo.addPlayer(player);
 	}
 
 	@Override
-	public void removeTrackingPlayer(ServerPlayerEntity player) {
-		super.removeTrackingPlayer(player);
+	public void stopSeenByPlayer(ServerPlayerEntity player) {
+		super.stopSeenByPlayer(player);
 		this.bossInfo.removePlayer(player);
 	}
 	
 	@Override
-	public void notifyDataManagerChange(DataParameter<?> key) {
-		super.notifyDataManagerChange(key);
+	public void onSyncedDataUpdated(DataParameter<?> key) {
+		super.onSyncedDataUpdated(key);
 //		if (this.world != null && this.world.isRemote) {
 //			if (key == LEAF_PITCHES) {
 //				Float[] pitches = dataManager.get(LEAF_PITCHES);
@@ -651,7 +651,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	@Override
 	public boolean attackEntityFromPart(MultiPartEntityPart<?> plantPart, DamageSource source, float damage) {
 		if (plantPart == this.bodyCache || this.getWeakElement() != null) {
-			return this.attackEntityFrom(source, damage);
+			return this.hurt(source, damage);
 		} else {
 			// Leaves take no damage
 			return true; 
@@ -659,8 +659,8 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount) {
-		if (source.getTrueSource() == this) {
+	public boolean hurt(DamageSource source, float amount) {
+		if (source.getEntity() == this) {
 			return false;
 		}
 		
@@ -669,8 +669,8 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 			return false;
 		}
 		
-		if (source.getTrueSource() == null || !(source.getTrueSource() instanceof PlayerEntity)
-				|| !((PlayerEntity) source.getTrueSource()).isCreative()) {
+		if (source.getEntity() == null || !(source.getEntity() instanceof PlayerEntity)
+				|| !((PlayerEntity) source.getEntity()).isCreative()) {
 			amount = Math.min(amount, 10f);
 		}
 		
@@ -684,9 +684,9 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 			}
 			
 			if (element != this.getWeakElement()) {
-				if (!world.isRemote()) {
-					if (source.getDamageLocation() != null) {
-						 spawnWardParticles(source.getDamageLocation(), 1);
+				if (!level.isClientSide()) {
+					if (source.getSourcePosition() != null) {
+						 spawnWardParticles(source.getSourcePosition(), 1);
 					} else {
 						spawnWardParticles(1);
 					}
@@ -696,19 +696,19 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 			}
 		}
 		
-		if (!this.world.isRemote && source.getTrueSource() != null) {
-			Entity ent = source.getTrueSource();
+		if (!this.level.isClientSide && source.getEntity() != null) {
+			Entity ent = source.getEntity();
 			if (ent instanceof LivingEntity && ent != this) {
 				this.aggroTable.addDamage((LivingEntity) ent, amount);
 			}
 		}
 		
-		return super.attackEntityFrom(source, amount);
+		return super.hurt(source, amount);
 	}
 	
 	@Override
 	public World getWorld() {
-		return this.world;
+		return this.level;
 	}
 	
 	@Override
@@ -718,13 +718,13 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	@Override
-	public boolean canBeCollidedWith() {
+	public boolean isPickable() {
 		return false; // Wants parts to be collided with, not main entity
 		//return super.canBeCollidedWith();
 	}
 	
 	@Override
-	public boolean canBePushed() {
+	public boolean isPushable() {
 		return false;
 	}
 	
@@ -741,7 +741,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	@Override
-	protected void collideWithEntity(Entity entityIn) {
+	protected void doPush(Entity entityIn) {
 		if (entityIn == this || isPartOfMe(entityIn)) {
 			return;
 		}
@@ -762,14 +762,14 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	
 	// Get the leaf's intended pitch according to the sync'ed data manager list
 	protected float getLeafPitch(int index) {
-		Float[] pitches = this.dataManager.get(LEAF_PITCHES);
+		Float[] pitches = this.entityData.get(LEAF_PITCHES);
 		return (index < pitches.length &&  pitches[index] != null)
 				? pitches[index]
 				: 0f;
 	}
 	
 	protected void setLeafPitch(int index, float pitch) {
-		Float[] pitches = this.dataManager.get(LEAF_PITCHES);
+		Float[] pitches = this.entityData.get(LEAF_PITCHES);
 		if (pitches == null) {
 			pitches = new Float[NumberOfLeaves];
 			Arrays.fill(pitches, -1f);
@@ -777,7 +777,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		if (pitches[index] == null || pitches[index] != pitch) {
 			pitches = pitches.clone();
 			pitches[index] = pitch;
-			this.dataManager.set(LEAF_PITCHES, pitches);
+			this.entityData.set(LEAF_PITCHES, pitches);
 		}
 	}
 	
@@ -791,28 +791,28 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	public PlantBossTreeType getTreeType() {
-		return this.dataManager.get(TREE_TYPE);
+		return this.entityData.get(TREE_TYPE);
 	}
 	
 	protected void setTreeType(@Nonnull PlantBossTreeType type) {
-		this.dataManager.set(TREE_TYPE, type);
+		this.entityData.set(TREE_TYPE, type);
 	}
 	
 	protected @Nullable LivingEntity getRandomTarget() {
 		@Nullable LivingEntity target = aggroTable.getMainTarget();
 		if (target == null) {
 			// Just try nearby entities
-			AxisAlignedBB searchBox = this.getBoundingBox().grow(16, 8, 16);
-			List<Entity> ents = this.world.getEntitiesInAABBexcluding(this, searchBox, (e) -> {
+			AxisAlignedBB searchBox = this.getBoundingBox().inflate(16, 8, 16);
+			List<Entity> ents = this.level.getEntities(this, searchBox, (e) -> {
 				return (e instanceof LivingEntity)
 						&& (!(e instanceof PlayerEntity) || !((PlayerEntity) e).isCreative())
-						&& (this.canEntityBeSeen(e));
+						&& (this.canSee(e));
 				});
 			
 			if (ents.isEmpty()) {
 				target = null;
 			} else {
-				target = (LivingEntity) ents.get(this.rand.nextInt(ents.size()));
+				target = (LivingEntity) ents.get(this.random.nextInt(ents.size()));
 			}
 		}
 		
@@ -824,7 +824,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	protected boolean isStillTargetable(@Nonnull LivingEntity target) {
-		return this.getEntitySenses().canSee(target);
+		return this.getSensing().canSee(target);
 	}
 	
 	protected void setCasting(@Nullable Spell spell) {
@@ -843,30 +843,30 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		BlockPos.Mutable cursor = new BlockPos.Mutable();
 		int remaining;
 		
-		cursor.setPos(this.getPosX(), this.getPosY(), this.getPosZ()).move(Direction.DOWN);
+		cursor.set(this.getX(), this.getY(), this.getZ()).move(Direction.DOWN);
 		remaining = 20;
-		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
+		while (remaining-- > 0 && isArenaBlock(level.getBlockState(cursor))) {
 			cursor.move(Direction.NORTH);
 		}
 		final int minZ = cursor.getZ() + 1;
 		
-		cursor.setPos(this.getPosX(), this.getPosY(), this.getPosZ()).move(Direction.DOWN);
+		cursor.set(this.getX(), this.getY(), this.getZ()).move(Direction.DOWN);
 		remaining = 20;
-		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
+		while (remaining-- > 0 && isArenaBlock(level.getBlockState(cursor))) {
 			cursor.move(Direction.SOUTH);
 		}
 		final int maxZ = cursor.getZ() - 1;
 		
-		cursor.setPos(this.getPosX(), this.getPosY(), this.getPosZ()).move(Direction.DOWN);
+		cursor.set(this.getX(), this.getY(), this.getZ()).move(Direction.DOWN);
 		remaining = 20;
-		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
+		while (remaining-- > 0 && isArenaBlock(level.getBlockState(cursor))) {
 			cursor.move(Direction.EAST);
 		}
 		final int maxX = cursor.getX() - 1;
 		
-		cursor.setPos(this.getPosX(), this.getPosY(), this.getPosZ()).move(Direction.DOWN);
+		cursor.set(this.getX(), this.getY(), this.getZ()).move(Direction.DOWN);
 		remaining = 20;
-		while (remaining-- > 0 && isArenaBlock(world.getBlockState(cursor))) {
+		while (remaining-- > 0 && isArenaBlock(level.getBlockState(cursor))) {
 			cursor.move(Direction.WEST);
 		}
 		final int minX = cursor.getX() + 1;
@@ -902,7 +902,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 			return null;
 		}
 		
-		return pillars[rand.nextInt(pillars.length)];
+		return pillars[random.nextInt(pillars.length)];
 	}
 	
 	protected BlockPos[] scanForPillars() {
@@ -912,14 +912,14 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		for (int x = arenaMin.getX(); x <= arenaMax.getX(); x++)
 		for (int z = arenaMin.getZ(); z <= arenaMax.getZ(); z++) {
 			
-			if (Math.abs(x - (int) getPosX()) <= 4
-					&& Math.abs(z - (int) getPosZ()) <= 4) {
+			if (Math.abs(x - (int) getX()) <= 4
+					&& Math.abs(z - (int) getZ()) <= 4) {
 				continue;
 			}
 			
-			cursor.setPos(x, arenaMax.getY(), z);
-			if (isPillarCenter(world, cursor)) {
-				pillars.add(cursor.toImmutable());
+			cursor.set(x, arenaMax.getY(), z);
+			if (isPillarCenter(level, cursor)) {
+				pillars.add(cursor.immutable());
 			}
 		}
 		
@@ -933,7 +933,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		int[] zs = new int[] {-1, 0, 1};
 		for (int x : xs)
 		for (int z : zs) {
-			cursor.setPos(pos.getX() + (x),
+			cursor.set(pos.getX() + (x),
 					pos.getY(), 
 					pos.getZ() + (z)
 					);
@@ -962,7 +962,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	protected boolean isArenaBlock(FluidState state) {
-		return state.getFluid() instanceof PoisonWaterFluid;
+		return state.getType() instanceof PoisonWaterFluid;
 	}
 	
 	@Override
@@ -975,11 +975,11 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	
 	protected void setEyeHeight(float height) {
 		if (height <= 0) {
-			height = this.getHeight() * .85f;
+			height = this.getBbHeight() * .85f;
 		}
 		
 		this.eyeHeight = height;
-		this.recalculateSize(); // Prompts final parent field to refresh
+		this.refreshDimensions(); // Prompts final parent field to refresh
 	}
 	
 	protected void curlLeaves(int curlLength, boolean leaveFrontOpen) {
@@ -1002,20 +1002,20 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	protected void setWeakElement(@Nullable EMagicElement element) {
-		this.dataManager.set(WEAK_ELEMENT, Optional.ofNullable(element));
+		this.entityData.set(WEAK_ELEMENT, Optional.ofNullable(element));
 	}
 	
 	public @Nullable EMagicElement getWeakElement() {
-		return this.dataManager.get(WEAK_ELEMENT).orElse(null);
+		return this.entityData.get(WEAK_ELEMENT).orElse(null);
 	}
 	
 	protected void pushEntity(Entity e) {
-		Vector3d awayDir = e.getPositionVec().subtract(this.getPositionVec());
-		double dist = awayDir.lengthSquared();
+		Vector3d awayDir = e.position().subtract(this.position());
+		double dist = awayDir.lengthSqr();
 		double force = Math.min(.1, Math.max(.5, .1 * (16.0 / dist)));
 		
 		awayDir = awayDir.normalize().scale(force);
-		e.addVelocity(awayDir.x, awayDir.y, awayDir.z);
+		e.push(awayDir.x, awayDir.y, awayDir.z);
 	}
 	
 	public static class PlantBossBody extends MultiPartEntityPart<PlantBossEntity> {
@@ -1044,38 +1044,38 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		switch (side) {
 		default:
 		case NORTH:
-			start = new BlockPos((int) this.getPosX(), this.getPosY(), arenaMax.getZ() + 1);
+			start = new BlockPos((int) this.getX(), this.getY(), arenaMax.getZ() + 1);
 			width = dx;
 			dist = dz + 2;
 			break;
 		case SOUTH:
-			start = new BlockPos((int) this.getPosX(), this.getPosY(), arenaMin.getZ() - 1);
+			start = new BlockPos((int) this.getX(), this.getY(), arenaMin.getZ() - 1);
 			width = dx;
 			dist = dz + 2;
 			break;
 		case EAST:
-			start = new BlockPos(arenaMin.getX() - 1, this.getPosY(), (int) this.getPosZ());
+			start = new BlockPos(arenaMin.getX() - 1, this.getY(), (int) this.getZ());
 			width = dz;
 			dist = dx + 2;
 			break;
 		case WEST:
-			start = new BlockPos(arenaMax.getX() + 1, this.getPosY(), (int) this.getPosZ());
+			start = new BlockPos(arenaMax.getX() + 1, this.getY(), (int) this.getZ());
 			width = dz;
 			dist = dx + 2;
 			break;
 		}
 		
-		PlantBossBrambleEntity bramble = new PlantBossBrambleEntity(NostrumEntityTypes.plantBossBramble, world, this, width);
-		bramble.setPosition(start.getX() + .5, start.getY(), start.getZ() + .5);
+		PlantBossBrambleEntity bramble = new PlantBossBrambleEntity(NostrumEntityTypes.plantBossBramble, level, this, width);
+		bramble.setPos(start.getX() + .5, start.getY(), start.getZ() + .5);
 		bramble.setMotion(side, dist);
-		world.addEntity(bramble);
+		level.addFreshEntity(bramble);
 	}
 	
 	public static class PlantBossLeafLimb extends MultiPartEntityPart<PlantBossEntity> {
 		
 		public static final String ID = PlantBossEntity.ID + ".leaf";
 		
-		protected static final DataParameter<Integer> INDEX = EntityDataManager.createKey(PlantBossLeafLimb.class, DataSerializers.VARINT);
+		protected static final DataParameter<Integer> INDEX = EntityDataManager.defineId(PlantBossLeafLimb.class, DataSerializers.INT);
 
 		protected PlantBossEntity plant;
 		protected float effectivePitch;
@@ -1093,11 +1093,11 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		}
 		
 		public int getLeafIndex() {
-			return this.dataManager.get(INDEX);
+			return this.entityData.get(INDEX);
 		}
 		
 		protected void setLeafIndex(int index) {
-			this.dataManager.set(INDEX, index);
+			this.entityData.set(INDEX, index);
 		}
 		
 		public float getYawOffset() {
@@ -1111,7 +1111,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		}
 		
 		private void setPitch(float pitch) {
-			this.rotationPitch = pitch;
+			this.xRot = pitch;
 			this.effectivePitch = pitch;
 			
 			final double pitchDiffForTopRad = 0.152680255;
@@ -1127,9 +1127,9 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		private float heightCache = 0;
 		@Override
 		public AxisAlignedBB getBoundingBox() {
-			if (this.getWidth() != widthCache || this.getHeight() != heightCache) {
-				this.widthCache = getWidth();
-				this.heightCache = getHeight();
+			if (this.getBbWidth() != widthCache || this.getBbHeight() != heightCache) {
+				this.widthCache = getBbWidth();
+				this.heightCache = getBbHeight();
 				
 				// change BB to match pitch...
 				AxisAlignedBB bb = this.getBoundingBox();
@@ -1147,7 +1147,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		public void tick() {
 			super.tick();
 			
-			if (this.world != null && world.isRemote) {
+			if (this.level != null && level.isClientSide) {
 				if (this.plant == null) {
 					this.plant = this.getParent(); // Look up parent by ID
 				}
@@ -1164,14 +1164,14 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		}
 		
 		@Override
-		public boolean canBeCollidedWith() {
+		public boolean isPickable() {
 			return true;
 		}
 		
 		@Override
-		protected void registerData() {
-			super.registerData();
-			super.dataManager.register(INDEX, 0);
+		protected void defineSynchedData() {
+			super.defineSynchedData();
+			super.entityData.define(INDEX, 0);
 		}
 	}
 	
@@ -1226,7 +1226,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 				runTicks = 0;
 			} else if (durationTicks > 0) {
 				if (this.durationTicksJitter > 0) {
-					final int adj = parent.rand.nextInt(durationTicksJitter * 2) - durationTicksJitter;
+					final int adj = parent.random.nextInt(durationTicksJitter * 2) - durationTicksJitter;
 					runTicks = Math.max(0, this.durationTicks + adj);
 				} else {
 					runTicks = this.durationTicks;
@@ -1241,10 +1241,10 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		}
 		
 		protected final void doSpellCast(@Nonnull LivingEntity target, @Nonnull Spell spell, float castHeight) {
-			@Nullable LivingEntity oldTarget = parent.getAttackTarget();
+			@Nullable LivingEntity oldTarget = parent.getTarget();
 			if (target != null) {
-				parent.faceEntity(target, 360f, 180f);
-				parent.setAttackTarget(target);
+				parent.lookAt(target, 360f, 180f);
+				parent.setTarget(target);
 			}
 			
 			//deductMana(spell, entity);
@@ -1256,7 +1256,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 			if (castHeight > 0) {
 				parent.setEyeHeight(eyeHeight);
 			}
-			parent.setAttackTarget(oldTarget);
+			parent.setTarget(oldTarget);
 		}
 	}
 	
@@ -1305,7 +1305,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 			
 			// While idling, we sometimes cast spells
 			if (this.castTicks == 0
-					&& parent.rand.nextFloat() < castChance) {
+					&& parent.random.nextFloat() < castChance) {
 				Spell spell = chooseSpell();
 				LivingEntity target = parent.getRandomTarget();
 				if (spell != null && target != null) {
@@ -1325,7 +1325,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		
 		protected @Nullable Spell chooseSpell() {
 			return (spells != null && spells.length > 0)
-					? spells[parent.rand.nextInt(spells.length)]
+					? spells[parent.random.nextInt(spells.length)]
 					: null;
 		}
 		
@@ -1399,15 +1399,15 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 				if (pillar != null) {
 					// Face platform
 					{
-						double d0 = (pillar.getX() + .5) - parent.getPosX();
-						double d2 = (pillar.getZ() + .5) - parent.getPosZ();
-						double d1 = (pillar.getY() + 1) - (parent.getPosY() + parent.getEyeHeight());
+						double d0 = (pillar.getX() + .5) - parent.getX();
+						double d2 = (pillar.getZ() + .5) - parent.getZ();
+						double d1 = (pillar.getY() + 1) - (parent.getY() + parent.getEyeHeight());
 						
 						double d3 = (double)MathHelper.sqrt(d0 * d0 + d2 * d2);
 						float f = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
 						float f1 = (float)(-(MathHelper.atan2(d1, d3) * (180D / Math.PI)));
-						parent.rotationPitch = f1;
-						parent.rotationYaw = f;
+						parent.xRot = f1;
+						parent.yRot = f;
 					}
 					
 					doSpellCast(null, spell, -1);
@@ -1509,8 +1509,8 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 			super.update();
 			
 			final float yaw = getYaw(this.startingYaw, this.elapsedTicks, this.periodTicks);
-			parent.setRotationYawHead(yaw);
-			parent.setPositionAndRotation(parent.getPosX(), parent.getPosY(), parent.getPosZ(), yaw, 0);
+			parent.setYHeadRot(yaw);
+			parent.absMoveTo(parent.getX(), parent.getY(), parent.getZ(), yaw, 0);
 			//parent.setRotation(yaw, 0f);
 			
 			if (this.elapsedTicks % 5 == 0) {
@@ -1537,7 +1537,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		public void startTask() {
 			super.startTask();
 			
-			this.startingYaw = (parent.rotationYaw + parent.rand.nextFloat() * 360f) % 360f;
+			this.startingYaw = (parent.yRot + parent.random.nextFloat() * 360f) % 360f;
 			parent.curlLeaves(10, false); // want to be true but need to lower and raise leaves
 		}
 		
@@ -1568,7 +1568,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		
 		protected EMagicElement chooseElement() {
 			// Just random
-			return EMagicElement.values()[parent.rand.nextInt(EMagicElement.values().length)];
+			return EMagicElement.values()[parent.random.nextInt(EMagicElement.values().length)];
 		}
 		
 		@Override
@@ -1625,7 +1625,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		protected Direction getSpawnDirection() {
 			// Could remember which we did and not do the same again...
 			// but for now, just random
-			return Plane.HORIZONTAL.random(parent.rand);
+			return Plane.HORIZONTAL.getRandomDirection(parent.random);
 		}
 		
 		protected void spawnBramble(Direction direction) {

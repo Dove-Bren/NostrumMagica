@@ -41,18 +41,18 @@ public class RedstoneTriggerBlock extends TriggerRepeaterBlock {
 	
 	public RedstoneTriggerBlock() {
 		super();
-		this.setDefaultState(this.getDefaultState().with(POWERED, false).with(ONCE, false));
+		this.registerDefaultState(this.defaultBlockState().setValue(POWERED, false).setValue(ONCE, false));
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		super.fillStateContainer(builder);
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
 		builder.add(POWERED, ONCE);
 	}
 	
 	@Override
 	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
-		if (worldIn.isRemote() && NostrumMagica.instance.proxy.getPlayer() != null && NostrumMagica.instance.proxy.getPlayer().isCreative()) {
+		if (worldIn.isClientSide() && NostrumMagica.instance.proxy.getPlayer() != null && NostrumMagica.instance.proxy.getPlayer().isCreative()) {
 			worldIn.addParticle(ParticleTypes.BARRIER, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 0, 0, 0);
 		}
 	}
@@ -69,29 +69,29 @@ public class RedstoneTriggerBlock extends TriggerRepeaterBlock {
 
 	@Override
 	public void trigger(World world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
-		TileEntity te = world.getTileEntity(blockPos);
+		TileEntity te = world.getBlockEntity(blockPos);
 		if (te instanceof TriggerRepeaterTileEntity) {
 			((TriggerRepeaterTileEntity) te).trigger(triggerPos);
 		}
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote() && playerIn.isCreative()) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+		if (!worldIn.isClientSide() && playerIn.isCreative()) {
 		
-			ItemStack heldItem = playerIn.getHeldItem(hand);
+			ItemStack heldItem = playerIn.getItemInHand(hand);
 			
 			if (!heldItem.isEmpty() && heldItem.getItem() == Items.LEVER) {
 				// Toggle 'once'
-				final boolean newOnce = !state.get(ONCE);
-				worldIn.setBlockState(pos, state.with(ONCE, newOnce));
-				playerIn.sendMessage(new StringTextComponent("Changed to " + (newOnce ? "ONCE" : "REPEATABLE")), Util.DUMMY_UUID);
+				final boolean newOnce = !state.getValue(ONCE);
+				worldIn.setBlockAndUpdate(pos, state.setValue(ONCE, newOnce));
+				playerIn.sendMessage(new StringTextComponent("Changed to " + (newOnce ? "ONCE" : "REPEATABLE")), Util.NIL_UUID);
 				NostrumMagicaSounds.CAST_CONTINUE.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 				return ActionResultType.SUCCESS;
 			}
 		}
 		
-		return super.onBlockActivated(state, worldIn, pos, playerIn, hand, hit);
+		return super.use(state, worldIn, pos, playerIn, hand, hit);
 	}
 	
 	@Override
@@ -101,20 +101,20 @@ public class RedstoneTriggerBlock extends TriggerRepeaterBlock {
 	
 	@Override
 	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
-		if (!worldIn.isRemote()) {
-			final boolean isPowered = state.get(POWERED);
-			final boolean once = state.get(ONCE);
+		if (!worldIn.isClientSide()) {
+			final boolean isPowered = state.getValue(POWERED);
+			final boolean once = state.getValue(ONCE);
 			
-			final boolean worldPowered = worldIn.isBlockPowered(pos);
+			final boolean worldPowered = worldIn.hasNeighborSignal(pos);
 			if (!isPowered && worldPowered) {
 				// Regardless of once, turn on. We always respond to going from not powered to powered
-				worldIn.setBlockState(pos, state.with(POWERED, true));
+				worldIn.setBlockAndUpdate(pos, state.setValue(POWERED, true));
 				this.trigger(worldIn, pos, state, fromPos);
 				return;
 			}
 			
 			if (isPowered && !worldPowered && !once) {
-				worldIn.setBlockState(pos, state.with(POWERED, false));
+				worldIn.setBlockAndUpdate(pos, state.setValue(POWERED, false));
 			}
 		}
 	}

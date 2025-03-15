@@ -82,20 +82,20 @@ public class RingShape extends BurstShape {
 		double radiusEnts = outerRadius + .5;
 		final Vector3d centerPos = location.hitPosition;
 		
-		for (Entity entity : location.world.getEntitiesWithinAABBExcludingEntity(null, 
-				new AxisAlignedBB(centerPos.getX() - radiusEnts,
-						centerPos.getY() - radiusEnts,
-						centerPos.getZ() - radiusEnts,
-						centerPos.getX() + radiusEnts,
-						centerPos.getY() + radiusEnts,
-						centerPos.getZ() + radiusEnts))) {
+		for (Entity entity : location.world.getEntities(null, 
+				new AxisAlignedBB(centerPos.x() - radiusEnts,
+						centerPos.y() - radiusEnts,
+						centerPos.z() - radiusEnts,
+						centerPos.x() + radiusEnts,
+						centerPos.y() + radiusEnts,
+						centerPos.z() + radiusEnts))) {
 			LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
 			if (living != null) {
-				final Vector3d diff = entity.getPositionVec().subtract(centerPos);
-				final double distFlat = Math.sqrt(Math.abs(Math.pow(diff.getX(), 2)) + Math.abs(Math.pow(diff.getZ(), 2)));
+				final Vector3d diff = entity.position().subtract(centerPos);
+				final double distFlat = Math.sqrt(Math.abs(Math.pow(diff.x(), 2)) + Math.abs(Math.pow(diff.z(), 2)));
 				if (distFlat <= radiusEnts
 						&& distFlat >= innerRadius
-						&& Math.abs(entity.getPosY() - centerPos.getY()) <= (innerRadius + .5) // Flatter than a sphere
+						&& Math.abs(entity.getY() - centerPos.y()) <= (innerRadius + .5) // Flatter than a sphere
 					) {
 					ret.add(living);
 				}
@@ -122,7 +122,7 @@ public class RingShape extends BurstShape {
 					
 					int yRadius = 1;
 					for (int k = -yRadius; k <= yRadius; k++) {
-						list.add(new SpellLocation(location.world, center.add(i, k, j)));
+						list.add(new SpellLocation(location.world, center.offset(i, k, j)));
 					}
 				}
 				
@@ -134,7 +134,7 @@ public class RingShape extends BurstShape {
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
-		NonNullList<ItemStack> list = NonNullList.from(ItemStack.EMPTY,
+		NonNullList<ItemStack> list = NonNullList.of(ItemStack.EMPTY,
 			ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
 			ReagentItem.CreateStack(ReagentType.GINSENG, 1)
 		);
@@ -147,13 +147,13 @@ public class RingShape extends BurstShape {
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (INNER_COSTS == null) {
-			OUTER_COSTS = NonNullList.from(ItemStack.EMPTY, 
+			OUTER_COSTS = NonNullList.of(ItemStack.EMPTY, 
 				ItemStack.EMPTY,
 				new ItemStack(ReagentItem.GetItem(ReagentType.MANI_DUST)),
 				new ItemStack(Blocks.REDSTONE_BLOCK, 1),
 				new ItemStack(NostrumItems.crystalSmall)
 			);
-			INNER_COSTS = NonNullList.from(ItemStack.EMPTY, 
+			INNER_COSTS = NonNullList.of(ItemStack.EMPTY, 
 					ItemStack.EMPTY,
 					new ItemStack(Items.REDSTONE),
 					new ItemStack(ReagentItem.GetItem(ReagentType.MANI_DUST)),

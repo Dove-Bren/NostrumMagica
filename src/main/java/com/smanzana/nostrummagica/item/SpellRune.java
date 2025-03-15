@@ -163,9 +163,9 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
+	public ActionResultType useOn(ItemUseContext context) {
 		// Probably wnat this later
-		return super.onItemUse(context);
+		return super.useOn(context);
 	}
 	
 	protected abstract @Nullable SpellShapePart getSpellShapePart(ItemStack stack);
@@ -244,8 +244,8 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		
 		@Override
 		@OnlyIn(Dist.CLIENT)
-		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-			tooltip.add(new StringTextComponent("Element").mergeStyle(TextFormatting.DARK_GRAY));
+		public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+			tooltip.add(new StringTextComponent("Element").withStyle(TextFormatting.DARK_GRAY));
 			
 		}
 		
@@ -280,12 +280,12 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		
 		@Override
 		@OnlyIn(Dist.CLIENT)
-		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 			final boolean extra = Screen.hasShiftDown();
-			tooltip.add(new StringTextComponent("Alteration").mergeStyle(TextFormatting.AQUA));
+			tooltip.add(new StringTextComponent("Alteration").withStyle(TextFormatting.AQUA));
 			if (extra) {
-				tooltip.add(new StringTextComponent("Weight " + alteration.getWeight()).mergeStyle(TextFormatting.DARK_PURPLE));
-				tooltip.add(new StringTextComponent(alteration.getCost() + " Mana").mergeStyle(TextFormatting.GREEN));
+				tooltip.add(new StringTextComponent("Weight " + alteration.getWeight()).withStyle(TextFormatting.DARK_PURPLE));
+				tooltip.add(new StringTextComponent(alteration.getCost() + " Mana").withStyle(TextFormatting.GREEN));
 			}
 		}
 
@@ -331,25 +331,25 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		
 		@Override
 		@OnlyIn(Dist.CLIENT)
-		public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 			final boolean extra = Screen.hasShiftDown();
 			final @Nullable Container openContainer = (NostrumMagica.instance.proxy.getPlayer() != null)
-					? NostrumMagica.instance.proxy.getPlayer().openContainer : null;
+					? NostrumMagica.instance.proxy.getPlayer().containerMenu : null;
 			SpellShapeProperties params = getPieceShapeParam(stack);
-			tooltip.add(new StringTextComponent("Shape").mergeStyle(TextFormatting.DARK_RED));
+			tooltip.add(new StringTextComponent("Shape").withStyle(TextFormatting.DARK_RED));
 			if (shape.getAttributes(params).terminal) {
-				tooltip.add(new StringTextComponent("Terminal Shape").mergeStyle(TextFormatting.GRAY));
+				tooltip.add(new StringTextComponent("Terminal Shape").withStyle(TextFormatting.GRAY));
 			}
 			if (extra
 					|| (openContainer != null && openContainer instanceof SpellCreationGui.SpellCreationContainer)) {
-				tooltip.add(new StringTextComponent("Weight " + this.getShape().getWeight(params)).mergeStyle(TextFormatting.DARK_PURPLE));
-				tooltip.add(new StringTextComponent(this.getShape().getManaCost(params) + " Mana").mergeStyle(TextFormatting.GREEN));
+				tooltip.add(new StringTextComponent("Weight " + this.getShape().getWeight(params)).withStyle(TextFormatting.DARK_PURPLE));
+				tooltip.add(new StringTextComponent(this.getShape().getManaCost(params) + " Mana").withStyle(TextFormatting.GREEN));
 			}
 			
 			if (extra
 					|| (openContainer != null && openContainer instanceof RuneShaperGui.RuneShaperContainer)) {
 				if (!shape.getDefaultProperties().getProperties().isEmpty()) {
-					tooltip.add(new StringTextComponent("Rune Shaper Compatible").mergeStyle(TextFormatting.GOLD));
+					tooltip.add(new StringTextComponent("Rune Shaper Compatible").withStyle(TextFormatting.GOLD));
 				}
 			}
 

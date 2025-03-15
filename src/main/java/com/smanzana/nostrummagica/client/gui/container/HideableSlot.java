@@ -12,8 +12,8 @@ public class HideableSlot extends Slot {
 	}
 	
 	@Override
-	public boolean isEnabled() {
-		return !hidden && super.isEnabled();
+	public boolean isActive() {
+		return !hidden && super.isActive();
 	}
 	
 	public void setHidden(boolean hidden) {

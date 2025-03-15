@@ -34,51 +34,51 @@ import net.minecraftforge.common.ToolType;
 @SuppressWarnings("deprecation")
 public class MasterSpellTableBlock extends HorizontalBlock {
 	
-	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
+	public static final DirectionProperty FACING = HorizontalBlock.FACING;
 	private static final BooleanProperty MASTER = BooleanProperty.create("master");
 	
 	public static final String ID = "spelltable_master";
 	
 	public MasterSpellTableBlock() {
-		super(Block.Properties.create(Material.WOOD)
-				.hardnessAndResistance(3.0f, 15.0f)
+		super(Block.Properties.of(Material.WOOD)
+				.strength(3.0f, 15.0f)
 				.sound(SoundType.WOOD)
 				.harvestTool(ToolType.AXE)
 				.harvestLevel(1)
-				.notSolid()
+				.noOcclusion()
 				);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(MASTER, true)
-				.with(FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(MASTER, true)
+				.setValue(FACING, Direction.NORTH));
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return false;
     }
 	
 	@Override
 	@Nullable
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		Direction direction = context.getPlacementHorizontalFacing().getOpposite();
-		BlockPos blockpos = context.getPos();
-		BlockPos blockpos1 = blockpos.offset(direction);
-		return context.getWorld().getBlockState(blockpos1).isReplaceable(context) ? this.getSlaveState(direction) : null;
+		Direction direction = context.getHorizontalDirection().getOpposite();
+		BlockPos blockpos = context.getClickedPos();
+		BlockPos blockpos1 = blockpos.relative(direction);
+		return context.getLevel().getBlockState(blockpos1).canBeReplaced(context) ? this.getSlaveState(direction) : null;
 	}
 
 	@Override
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
-		super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-		if (!worldIn.isRemote) {
-			BlockPos blockpos = pos.offset(state.get(HORIZONTAL_FACING));
-			worldIn.setBlockState(blockpos, getMaster(state.get(HORIZONTAL_FACING).getOpposite()), 3);
-			worldIn.notifyNeighborsOfStateChange(pos, Blocks.AIR);
-			state.updateNeighbours(worldIn, pos, 3);
+	public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+		super.setPlacedBy(worldIn, pos, state, placer, stack);
+		if (!worldIn.isClientSide) {
+			BlockPos blockpos = pos.relative(state.getValue(FACING));
+			worldIn.setBlock(blockpos, getMaster(state.getValue(FACING).getOpposite()), 3);
+			worldIn.updateNeighborsAt(pos, Blocks.AIR);
+			state.updateNeighbourShapes(worldIn, pos, 3);
 		}
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(MASTER, FACING);
 	}
 	
@@ -89,16 +89,16 @@ public class MasterSpellTableBlock extends HorizontalBlock {
 		if (state == null)
 			return;
 		
-		if (state.get(MASTER)) {
-			TileEntity ent = world.getTileEntity(pos);
-			if (!world.isRemote && ent != null) {
+		if (state.getValue(MASTER)) {
+			TileEntity ent = world.getBlockEntity(pos);
+			if (!world.isClientSide && ent != null) {
 				SpellTableTileEntity table = (SpellTableTileEntity) ent;
-				for (int i = 0; i < table.getSizeInventory(); i++) {
-					if (table.getStackInSlot(i) != null) {
+				for (int i = 0; i < table.getContainerSize(); i++) {
+					if (table.getItem(i) != null) {
 						ItemEntity item = new ItemEntity(
 								world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
-								table.removeStackFromSlot(i));
-						world.addEntity(item);
+								table.removeItemNoUpdate(i));
+						world.addFreshEntity(item);
 					}
 				}
 			}
@@ -108,7 +108,7 @@ public class MasterSpellTableBlock extends HorizontalBlock {
 	}
 	
 	private BlockPos getPaired(BlockState state, BlockPos pos) {
-		return pos.offset(state.get(FACING));
+		return pos.relative(state.getValue(FACING));
 	}
 	
 //	private BlockPos getMaster(BlockState state, BlockPos pos) {
@@ -119,14 +119,14 @@ public class MasterSpellTableBlock extends HorizontalBlock {
 //	}
 	
 	public BlockState getSlaveState(Direction direction) {
-		return this.getDefaultState().with(MASTER, false)
-				.with(FACING, direction);
+		return this.defaultBlockState().setValue(MASTER, false)
+				.setValue(FACING, direction);
 	}
 
 
 	public BlockState getMaster(Direction enumfacing) {
-		return this.getDefaultState().with(MASTER, true)
-				.with(FACING, enumfacing);
+		return this.defaultBlockState().setValue(MASTER, true)
+				.setValue(FACING, enumfacing);
 	}
 	
 	@Override
@@ -136,35 +136,35 @@ public class MasterSpellTableBlock extends HorizontalBlock {
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-		if (state.get(MASTER))
+		if (state.getValue(MASTER))
 			return new SpellTableTileEntity();
 		
 		return null;
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			this.destroy(world, pos, state);
-			world.removeTileEntity(pos);
+			world.removeBlockEntity(pos);
 		}
 	}
 	
 	@Override
-	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
-		super.eventReceived(state, worldIn, pos, id, param);
-        TileEntity tileentity = worldIn.getTileEntity(pos);
-        return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
+	public boolean triggerEvent(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+		super.triggerEvent(state, worldIn, pos, id, param);
+        TileEntity tileentity = worldIn.getBlockEntity(pos);
+        return tileentity == null ? false : tileentity.triggerEvent(id, param);
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand handIn, BlockRayTraceResult hit) {
 		
-		if (state.get(MASTER) == false) {
-			pos = pos.offset(state.get(FACING));
+		if (state.getValue(MASTER) == false) {
+			pos = pos.relative(state.getValue(FACING));
 		}
 		
-		SpellTableTileEntity te = (SpellTableTileEntity) worldIn.getTileEntity(pos);
+		SpellTableTileEntity te = (SpellTableTileEntity) worldIn.getBlockEntity(pos);
 		NostrumMagica.instance.proxy.openContainer(playerIn, MasterSpellCreationGui.SpellCreationContainer.Make(te));
 		
 		return ActionResultType.SUCCESS;

@@ -10,6 +10,6 @@ public class AllElementXPBonusAttribute extends RangedAttribute implements IPerc
 
 	public AllElementXPBonusAttribute(String name) {
 		super(name, 0, -100.0D, 500.0D);
-		this.setShouldWatch(true);
+		this.setSyncable(true);
 	}
 }

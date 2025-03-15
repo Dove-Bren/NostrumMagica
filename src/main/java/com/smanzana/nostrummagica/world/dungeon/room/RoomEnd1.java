@@ -73,8 +73,8 @@ public class RoomEnd1 extends StaticRoom {
 				"XXXXXXXXX",
 				'X', NostrumBlocks.lightDungeonBlock,
 				'C', new StaticBlockState(Blocks.RED_CARPET),
-				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
-				'E', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.FACING, Direction.EAST)),
+				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
+				'E', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.EAST)),
 				'B', Blocks.BOOKSHELF,
 				' ', null,
 				'M', (withChest ? null : (withEnemy ? new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_PHYSICAL)) : null)));

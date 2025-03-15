@@ -28,7 +28,7 @@ public class NostrumSorceryBattleTrack implements IMusicTrack {
 
 	@Override
 	public boolean shouldPlay(ClientPlayerEntity player) {
-		if (player == null || player.world == null || !DimensionUtils.IsSorceryDim(DimensionUtils.GetDimension(player))) {
+		if (player == null || player.level == null || !DimensionUtils.IsSorceryDim(DimensionUtils.GetDimension(player))) {
 			return false;
 		}
 		

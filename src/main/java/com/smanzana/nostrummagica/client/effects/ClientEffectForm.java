@@ -55,14 +55,14 @@ public interface ClientEffectForm {
 	}
 	
 	public static int InferLightmap(MatrixStack matrixStackIn, Minecraft mc) {
-		if (mc.world != null) {
-			final Vector3d camera = mc.gameRenderer.getActiveRenderInfo().getProjectedView();
+		if (mc.level != null) {
+			final Vector3d camera = mc.gameRenderer.getMainCamera().getPosition();
 			// Get position from final transform on matrix stack
-			final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+			final Matrix4f transform = matrixStackIn.last().pose();
 			final Vector4f origin = new Vector4f(1, 1, 1, 1); // I think this is right...
 			origin.transform(transform);
-			final BlockPos pos = new BlockPos(camera.getX() + origin.getX(), camera.getY() + origin.getY(), camera.getZ() + origin.getZ());
-			return WorldRenderer.getCombinedLight(mc.world, pos);
+			final BlockPos pos = new BlockPos(camera.x() + origin.x(), camera.y() + origin.y(), camera.z() + origin.z());
+			return WorldRenderer.getLightColor(mc.level, pos);
 		} else {
 			return 0; // Same default as particle
 		}

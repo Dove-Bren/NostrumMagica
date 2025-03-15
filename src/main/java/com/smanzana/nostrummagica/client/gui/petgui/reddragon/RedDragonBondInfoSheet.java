@@ -33,12 +33,12 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<TameRedDragonEntity>
 	@Override
 	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
-		FontRenderer fonter = mc.fontRenderer;
+		FontRenderer fonter = mc.font;
 		int x = 0;
 		int y = 5;
 		final int infoColor = 0xFFFFFFFF;
 		final int capabilityColor = 0xFFFFA0FF;
-		final int h = fonter.FONT_HEIGHT;
+		final int h = fonter.lineHeight;
 		String str;
 		String untrans;
 		
@@ -60,7 +60,7 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<TameRedDragonEntity>
 			untrans = "info.tamed_dragon.red_bond.full";
 		}
 		
-		str = I18n.format(untrans, new Object[0]);
+		str = I18n.get(untrans, new Object[0]);
 		x = 5;
 		
 		RenderFuncs.drawSplitString(matrixStackIn, fonter, str, x, y, width - (x * 2), infoColor);
@@ -73,37 +73,37 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<TameRedDragonEntity>
 			if (bond >= TameRedDragonEntity.BOND_LEVEL_FOLLOW) {
 				str = "Follows";
 				
-				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
+				fonter.draw(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
 			if (bond >= TameRedDragonEntity.BOND_LEVEL_PLAYERS) {
 				str = "Respects Other Players";
 				
-				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
+				fonter.draw(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
 			if (bond >= TameRedDragonEntity.BOND_LEVEL_CHEST) {
 				str = "Can Hold Items";
 				
-				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
+				fonter.draw(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
 			if (bond >= TameRedDragonEntity.BOND_LEVEL_ALLOW_RIDE) {
 				str = "Rideable";
 				
-				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
+				fonter.draw(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
 			if (dragon.getCanUseMagic() && bond >= TameRedDragonEntity.BOND_LEVEL_MAGIC) {
 				str = "Spell Tactics";
 				
-				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
+				fonter.draw(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
 			if (dragon.getDragonMana() > 0 && bond >= TameRedDragonEntity.BOND_LEVEL_MANA ) {
 				str = "Dragon Mana Bond";
 				
-				fonter.drawString(matrixStackIn, str, x, y, capabilityColor);
+				fonter.draw(matrixStackIn, str, x, y, capabilityColor);
 				y += h + 2;
 			}
 		}

@@ -50,14 +50,14 @@ public class ClientEffectEchoed extends ClientEffect {
 			
 			float diff = (float) (i - center) * progDiff;
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			if (!this.modifiers.isEmpty())
 				for (ClientEffectModifier mod : modifiers) {
 					mod.apply(matrixStackIn, newDetail, progress + diff, partialTicks);
 				}
 			
 			effect.drawForm(matrixStackIn, newDetail, mc, progress + diff, partialTicks);
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 	}

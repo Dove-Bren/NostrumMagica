@@ -48,8 +48,8 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	private static final String NBT_TRIGGERED = "triggered";
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.put(NBT_KEY, this.key.asNBT());
 		nbt.putString(NBT_COLOR, this.color.name());
@@ -59,8 +59,8 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		this.key = WorldKey.fromNBT(nbt.getCompound(NBT_KEY));
 		try {
@@ -108,29 +108,29 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	@Override
 	protected KeySwitchTriggerEntity makeTriggerEntity(World world, double x, double y, double z) {
 		KeySwitchTriggerEntity ent = new KeySwitchTriggerEntity(NostrumEntityTypes.keySwitchTrigger, world);
-		ent.setPosition(x, y, z);
+		ent.setPos(x, y, z);
 		return ent;
 	}
 	
 	@Override
 	public void trigger(LivingEntity entity, DamageSource source, float damage) {
-		if (this.world.isRemote() || this.isTriggered()) {
+		if (this.level.isClientSide() || this.isTriggered()) {
 			return;
 		}
 		
 		this.setTriggered(true);
 		AutoDungeons.GetWorldKeys().addKey(getWorldKey());
-		world.setBlockState(pos, Blocks.AIR.getDefaultState());
+		level.setBlockAndUpdate(worldPosition, Blocks.AIR.defaultBlockState());
 
-		for (ServerPlayerEntity player : ((ServerWorld) world).getPlayers((p) -> {
-			return p.getDistanceSq(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5) < 900;
+		for (ServerPlayerEntity player : ((ServerWorld) level).getPlayers((p) -> {
+			return p.distanceToSqr(worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5) < 900;
 		})) {
-			player.sendMessage(new TranslationTextComponent("info.world_key.gotkey"), Util.DUMMY_UUID);
+			player.sendMessage(new TranslationTextComponent("info.world_key.gotkey"), Util.NIL_UUID);
 		}
 		
-		NostrumMagicaSounds.AMBIENT_WOOSH2.play(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
-		NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
-				30, pos.getX() + .5, pos.getY() + 1.5, pos.getZ() + .5, 0,
+		NostrumMagicaSounds.AMBIENT_WOOSH2.play(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
+		NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
+				30, worldPosition.getX() + .5, worldPosition.getY() + 1.5, worldPosition.getZ() + .5, 0,
 				50, 10,
 				Vector3d.ZERO, new Vector3d(.075, .05, .075)
 				).gravity(-.1f).color(this.getColor().getColorValue() | 0xAA000000));

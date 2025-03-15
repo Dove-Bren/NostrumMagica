@@ -51,12 +51,12 @@ public class TileEntityObeliskRenderer extends TileEntityRenderer<ObeliskTileEnt
 		rotY *= 360f;
 		rotX *= 360f;
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(.5, .5, .5);
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rotY));
-		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(rotX));
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(rotY));
+		matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(rotX));
 		RenderFuncs.RenderBlockState(state, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn); // Used to fetch custom model and render itself
-		RenderFuncs.RenderModel(matrixStackIn, bufferIn.getBuffer(RenderType.getCutoutMipped()), model, combinedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
-		matrixStackIn.pop();
+		RenderFuncs.RenderModel(matrixStackIn, bufferIn.getBuffer(RenderType.cutoutMipped()), model, combinedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+		matrixStackIn.popPose();
 	}
 }

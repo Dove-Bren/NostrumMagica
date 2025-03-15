@@ -61,21 +61,21 @@ public class MagicaFlowerBlock extends BushBlock {
 	public static final String ID_MIDNIGHT_IRIS = "midnight_iris";
 	public static final String ID_CRYSTABLOOM = "crystabloom_flower";
 	
-	protected static final VoxelShape SHAPE = Block.makeCuboidShape(5.0D, 0.0D, 5.0D, 11.0D, 10.0D, 11.0D);
+	protected static final VoxelShape SHAPE = Block.box(5.0D, 0.0D, 5.0D, 11.0D, 10.0D, 11.0D);
 	
 	public final Type type;
 	
 	public MagicaFlowerBlock(Type type) {
-		super(Block.Properties.create(Material.PLANTS)
-				.sound(SoundType.PLANT)
-				.tickRandomly()
-				.doesNotBlockMovement()
+		super(Block.Properties.of(Material.PLANT)
+				.sound(SoundType.GRASS)
+				.randomTicks()
+				.noCollission()
 				);
 		this.type = type;
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return true;
     }
 	
@@ -126,65 +126,65 @@ public class MagicaFlowerBlock extends BushBlock {
 				BlockPos.Mutable cursor = new BlockPos.Mutable();
 				boolean affected = false;
 				
-				cursor.setPos(groundPos.getX(), groundPos.getY(), groundPos.getZ());
-				if (this.isValidGround(worldIn.getBlockState(cursor), worldIn, cursor)) {
+				cursor.set(groundPos.getX(), groundPos.getY(), groundPos.getZ());
+				if (this.mayPlaceOn(worldIn.getBlockState(cursor), worldIn, cursor)) {
 					cursor.setY(cursor.getY() + 1);
-					if (worldIn.isAirBlock(cursor)) {
+					if (worldIn.isEmptyBlock(cursor)) {
 						affected = true;
-						worldIn.setBlockState(cursor, this.getDefaultState());
+						worldIn.setBlockAndUpdate(cursor, this.defaultBlockState());
 					}
 				}
 				
-				cursor.setPos(groundPos.getX() - 1, groundPos.getY(), groundPos.getZ());
-				if (this.isValidGround(worldIn.getBlockState(cursor), worldIn, cursor)) {
+				cursor.set(groundPos.getX() - 1, groundPos.getY(), groundPos.getZ());
+				if (this.mayPlaceOn(worldIn.getBlockState(cursor), worldIn, cursor)) {
 					cursor.setY(cursor.getY() + 1);
-					if (worldIn.isAirBlock(cursor)) {
+					if (worldIn.isEmptyBlock(cursor)) {
 						affected = true;
-						worldIn.setBlockState(cursor, this.getDefaultState());
+						worldIn.setBlockAndUpdate(cursor, this.defaultBlockState());
 					}
 				}
 				
-				cursor.setPos(groundPos.getX() + 1, groundPos.getY(), groundPos.getZ());
-				if (this.isValidGround(worldIn.getBlockState(cursor), worldIn, cursor)) {
+				cursor.set(groundPos.getX() + 1, groundPos.getY(), groundPos.getZ());
+				if (this.mayPlaceOn(worldIn.getBlockState(cursor), worldIn, cursor)) {
 					cursor.setY(cursor.getY() + 1);
-					if (worldIn.isAirBlock(cursor)) {
+					if (worldIn.isEmptyBlock(cursor)) {
 						affected = true;
-						worldIn.setBlockState(cursor, this.getDefaultState());
+						worldIn.setBlockAndUpdate(cursor, this.defaultBlockState());
 					}
 				}
 				
-				cursor.setPos(groundPos.getX(), groundPos.getY(), groundPos.getZ() - 1);
-				if (this.isValidGround(worldIn.getBlockState(cursor), worldIn, cursor)) {
+				cursor.set(groundPos.getX(), groundPos.getY(), groundPos.getZ() - 1);
+				if (this.mayPlaceOn(worldIn.getBlockState(cursor), worldIn, cursor)) {
 					cursor.setY(cursor.getY() + 1);
-					if (worldIn.isAirBlock(cursor)) {
+					if (worldIn.isEmptyBlock(cursor)) {
 						affected = true;
-						worldIn.setBlockState(cursor, this.getDefaultState());
+						worldIn.setBlockAndUpdate(cursor, this.defaultBlockState());
 					}
 				}
 				
-				cursor.setPos(groundPos.getX(), groundPos.getY(), groundPos.getZ() + 1);
-				if (this.isValidGround(worldIn.getBlockState(cursor), worldIn, cursor)) {
+				cursor.set(groundPos.getX(), groundPos.getY(), groundPos.getZ() + 1);
+				if (this.mayPlaceOn(worldIn.getBlockState(cursor), worldIn, cursor)) {
 					cursor.setY(cursor.getY() + 1);
-					if (worldIn.isAirBlock(cursor)) {
+					if (worldIn.isEmptyBlock(cursor)) {
 						affected = true;
-						worldIn.setBlockState(cursor, this.getDefaultState());
+						worldIn.setBlockAndUpdate(cursor, this.defaultBlockState());
 					}
 				}
 				
 				if (affected) {
-					worldIn.setBlockState(groundPos, Blocks.DIRT.getDefaultState());
+					worldIn.setBlockAndUpdate(groundPos, Blocks.DIRT.defaultBlockState());
 				}
 			}
 		}
 		
-		if (worldIn.isRemote) {
+		if (worldIn.isClientSide) {
 			
 		}
 	}
 	
 	@Override
-	protected boolean isValidGround(BlockState state, IBlockReader worldIn, BlockPos pos) {
-		boolean ret = super.isValidGround(state, worldIn, pos);
+	protected boolean mayPlaceOn(BlockState state, IBlockReader worldIn, BlockPos pos) {
+		boolean ret = super.mayPlaceOn(state, worldIn, pos);
 		if (!ret && state.getBlock() instanceof MagicDirtBlock) {
 			ret = true;
 		}

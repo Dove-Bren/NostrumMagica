@@ -8,11 +8,11 @@ import net.minecraft.world.server.TicketType;
 public class NostrumChunkLoader {
 	
 	public static void forceChunk(ServerWorld world, TicketType<BlockPos> ticket, BlockPos pos) {
-		world.getChunkProvider().registerTickingTicket(ticket, new ChunkPos(pos), 1, pos); // 1 chunk radius?
+		world.getChunkSource().registerTickingTicket(ticket, new ChunkPos(pos), 1, pos); // 1 chunk radius?
 	}
 	
 	public static void unforceChunk(ServerWorld world, TicketType<BlockPos> ticket, BlockPos pos) {
-		world.getChunkProvider().releaseTickingTicket(ticket, new ChunkPos(pos), 1, pos);
+		world.getChunkSource().releaseTickingTicket(ticket, new ChunkPos(pos), 1, pos);
 	}
 
 //	private static final String NBT_TICKET_BASE = "nostrum_chunk_ticket";

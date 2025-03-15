@@ -18,19 +18,19 @@ public class RenderLux extends MobRenderer<LuxEntity, ModelLux> {
 	
 	@Override
 	public void render(LuxEntity lux, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		this.entityModel = new ModelLux();
+		this.model = new ModelLux();
 		
-		matrixStackIn.push();
-		matrixStackIn.translate(0, (-lux.getHeight() / 4), 0);
+		matrixStackIn.pushPose();
+		matrixStackIn.translate(0, (-lux.getBbHeight() / 4), 0);
 		matrixStackIn.scale(.25f, .25f, .25f);
 		
 		super.render(lux, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(LuxEntity entity) {
+	public ResourceLocation getTextureLocation(LuxEntity entity) {
 		return new ResourceLocation(NostrumMagica.MODID, "textures/entity/sprite_core.png");
 	}
 	

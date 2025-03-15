@@ -31,8 +31,8 @@ public class ManaMessage {
 			return;
 		}
 		
-		Minecraft.getInstance().runAsync(() -> {
-			PlayerEntity realPlayer = player.world.getPlayerByUuid(message.uuid);
+		Minecraft.getInstance().submit(() -> {
+			PlayerEntity realPlayer = player.level.getPlayerByUUID(message.uuid);
 		
 			if (realPlayer == null) {
 				// Not in this world. Who cares
@@ -57,7 +57,7 @@ public class ManaMessage {
 	private final int mana;
 	
 	public ManaMessage(PlayerEntity player, int mana) {
-		this(player.getUniqueID(), mana);
+		this(player.getUUID(), mana);
 	}
 	
 	public ManaMessage(UUID uuid, int mana) {
@@ -66,11 +66,11 @@ public class ManaMessage {
 	}
 
 	public static ManaMessage decode(PacketBuffer buf) {
-		return new ManaMessage(buf.readUniqueId(), buf.readVarInt());
+		return new ManaMessage(buf.readUUID(), buf.readVarInt());
 	}
 
 	public static void encode(ManaMessage msg, PacketBuffer buf) {
-		buf.writeUniqueId(msg.uuid);
+		buf.writeUUID(msg.uuid);
 		buf.writeVarInt(msg.mana);
 	}
 

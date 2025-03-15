@@ -15,13 +15,13 @@ public class InventorySlotKey implements IInventorySlotKey<IInventory> {
 
 	@Override
 	public ItemStack getHeldStack(IInventory inventory) {
-		return inventory.getStackInSlot(slotIdx);
+		return inventory.getItem(slotIdx);
 	}
 
 	@Override
 	public ItemStack setStack(IInventory inventory, ItemStack newStack) {
 		ItemStack existing = getHeldStack(inventory);
-		inventory.setInventorySlotContents(slotIdx, newStack);
+		inventory.setItem(slotIdx, newStack);
 		return existing;
 	}
 

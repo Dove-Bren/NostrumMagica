@@ -35,6 +35,6 @@ public class SkillRequirement implements IRequirement{
 	@Override
 	public List<ITextComponent> getDescription(PlayerEntity player) {
 		return Lists.newArrayList(new TranslationTextComponent("info.requirement.spellknowledge", 
-				((TextComponent) skill.getName()).mergeStyle(TextFormatting.DARK_PURPLE)));
+				((TextComponent) skill.getName()).withStyle(TextFormatting.DARK_PURPLE)));
 	}
 }

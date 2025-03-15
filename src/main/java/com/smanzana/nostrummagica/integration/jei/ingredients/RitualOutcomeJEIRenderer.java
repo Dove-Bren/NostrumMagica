@@ -41,7 +41,7 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 	public void render(MatrixStack matrixStackIn, int xPosition, int yPosition, RitualOutcomeWrapper ingredient) {
 		if (ingredient == null)
 			return;
-		Minecraft.getInstance().getTextureManager().bindTexture(RITUAL_TEXTURE);
+		Minecraft.getInstance().getTextureManager().bind(RITUAL_TEXTURE);
 		ItemStack item = fetchItem(ingredient.getOutcome());
 		RenderSystem.enableBlend();
 		if (item != null) {
@@ -53,7 +53,7 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 					RITUAL_TEXT_TABLET_WIDTH,
 					RITUAL_TEXT_WIDTH, RITUAL_TEXT_HEIGHT);
 			
-			Minecraft.getInstance().getItemRenderer().renderItemIntoGUI(item, xPosition + 1, yPosition + 1);
+			Minecraft.getInstance().getItemRenderer().renderGuiItem(item, xPosition + 1, yPosition + 1);
 		} else {
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, xPosition,
 					yPosition,
@@ -74,13 +74,13 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 		if (item == null)
 			return ingredient.getOutcome().getDescription();
 		else
-			return Lists.newArrayList(item.getDisplayName());
+			return Lists.newArrayList(item.getHoverName());
 	}
 
 	@Override
 	public FontRenderer getFontRenderer(Minecraft minecraft, RitualOutcomeWrapper ingredient) {
 		if (ingredient == null)
-			return minecraft.fontRenderer;
+			return minecraft.font;
 		
 		FontRenderer render = null;
 		ItemStack stack = fetchItem(ingredient.getOutcome());
@@ -88,7 +88,7 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 			render = stack.getItem().getFontRenderer(stack);
 		
 		if (render == null)
-			render = minecraft.fontRenderer;
+			render = minecraft.font;
 		
 		return render;
 	}

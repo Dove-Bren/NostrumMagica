@@ -13,15 +13,15 @@ public class ModelLux extends EntityModel<LuxEntity> {
 	
 	public ModelLux() {
 		main = new ModelRenderer(this);
-		main.setTextureSize(64, 64);
+		main.setTexSize(64, 64);
 
-		main.rotationPointY = 0;
+		main.y = 0;
 		main.addBox(-2f, -16f, -2f, 4, 32, 4);
 		main.addBox(-4, -2, -4, 8, 4, 8);
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		main.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
 	
@@ -30,11 +30,11 @@ public class ModelLux extends EntityModel<LuxEntity> {
 	}
 
 	@Override
-	public void setRotationAngles(LuxEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+	public void setupAnim(LuxEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
 			float netHeadYaw, float headPitch) {
 		if (!entityIn.isRoosting()) {
-			final float angle = getSwingRot(entityIn.getSwingProgress(ageInTicks % 1f));
-			main.rotateAngleZ = angle;
+			final float angle = getSwingRot(entityIn.getAttackAnim(ageInTicks % 1f));
+			main.zRot = angle;
 		}
 		
 	}

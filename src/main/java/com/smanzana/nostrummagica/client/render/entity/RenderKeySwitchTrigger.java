@@ -35,28 +35,28 @@ public class RenderKeySwitchTrigger extends LivingRenderer<KeySwitchTriggerEntit
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(KeySwitchTriggerEntity entity) {
+	public ResourceLocation getTextureLocation(KeySwitchTriggerEntity entity) {
 		return CAGE_TEXT;
 	}
 	
 	@Override
-	protected boolean canRenderName(KeySwitchTriggerEntity entity) {
+	protected boolean shouldShowName(KeySwitchTriggerEntity entity) {
 		return entity.hasCustomName() || NostrumMagica.instance.proxy.getPlayer().isCreative();
 	}
 	
 	@Override
-	protected void renderName(KeySwitchTriggerEntity entityIn, ITextComponent displayNameIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	protected void renderNameTag(KeySwitchTriggerEntity entityIn, ITextComponent displayNameIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		final Minecraft mc = Minecraft.getInstance();
-		final double ticks = entityIn.world.getGameTime();
+		final double ticks = entityIn.level.getGameTime();
 		final String info;
 		boolean matches = false;
 		KeySwitchBlockTileEntity te = (KeySwitchBlockTileEntity) entityIn.getLinkedTileEntity();
 		if (te != null) {
 			if (te.getWorldKey() != null) {
 				WorldKey key = te.getWorldKey();
-				info = mc.player.isSneaking() ? key.toString() : key.toString().substring(0, 8);
+				info = mc.player.isShiftKeyDown() ? key.toString() : key.toString().substring(0, 8);
 				
-				final ItemStack held = mc.player.getHeldItemMainhand();
+				final ItemStack held = mc.player.getMainHandItem();
 				if ((held.getItem() instanceof WorldKeyItem && key.equals(((WorldKeyItem) held.getItem()).getKey(held)))) {
 					matches = true;
 				}
@@ -96,7 +96,7 @@ public class RenderKeySwitchTrigger extends LivingRenderer<KeySwitchTriggerEntit
 //			
 //			matrixStackIn.pop();
 //		}
-		RenderFuncs.drawNameplate(matrixStackIn, bufferIn, entityIn, info, this.getFontRendererFromRenderManager(), packedLightIn, yOffset, this.renderManager.info);
+		RenderFuncs.drawNameplate(matrixStackIn, bufferIn, entityIn, info, this.getFont(), packedLightIn, yOffset, this.entityRenderDispatcher.camera);
 	}
 	
 	@Override
@@ -104,7 +104,7 @@ public class RenderKeySwitchTrigger extends LivingRenderer<KeySwitchTriggerEntit
 		// Draw switch box, which is model passed to parent
 		final double spinIdle = 3.0; // seconds per turn
 		final double spinActivated = 3.0;
-		final double ticks = (partialTicks % 1) + entityIn.world.getGameTime();
+		final double ticks = (partialTicks % 1) + entityIn.level.getGameTime();
 		final KeySwitchBlockTileEntity te = (KeySwitchBlockTileEntity) entityIn.getLinkedTileEntity();
 		final boolean fast = (te != null && te.isTriggered());
 		final double period = (float) (20 * (fast ? spinActivated * 2 : spinIdle));
@@ -113,22 +113,22 @@ public class RenderKeySwitchTrigger extends LivingRenderer<KeySwitchTriggerEntit
 		final float bobAngle = (float) (2 * Math.PI * (ticks % 60 / 60));
 		final double bob = Math.sin(bobAngle) * .1;
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(0, bob, 0);
 		
-		matrixStackIn.push();
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(angle));
+		matrixStackIn.pushPose();
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(angle));
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 		// Draw key
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		// replicate the transforms from living rendere. Could be in preRenderCallback
 		matrixStackIn.translate(0, 1.5f, 0);
-		IVertexBuilder buffer = bufferIn.getBuffer(iconModel.getRenderType(KEY_TEXT));
-		iconModel.render(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
-		matrixStackIn.pop();
-		matrixStackIn.pop();
+		IVertexBuilder buffer = bufferIn.getBuffer(iconModel.renderType(KEY_TEXT));
+		iconModel.renderToBuffer(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+		matrixStackIn.popPose();
+		matrixStackIn.popPose();
 	}
 	
 }

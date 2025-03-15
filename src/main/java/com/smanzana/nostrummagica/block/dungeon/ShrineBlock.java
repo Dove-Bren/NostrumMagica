@@ -34,20 +34,20 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 	public static final String ID_SHAPE = "shape_shrine";
 	public static final String ID_TIER = "tier_shrine";
 	
-	protected static final VoxelShape BASE_AABB = Block.makeCuboidShape(16 * 0.3D, 16 * 0.0D, 16 * 0.3D, 16 * 0.7D, 7, 16 * 0.7D);
+	protected static final VoxelShape BASE_AABB = Block.box(16 * 0.3D, 16 * 0.0D, 16 * 0.3D, 16 * 0.7D, 7, 16 * 0.7D);
 	
 	protected ShrineBlock() {
-		super(Block.Properties.create(Material.BARRIER)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		super(Block.Properties.of(Material.BARRIER)
+				.strength(-1.0F, 3600000.8F)
 				.noDrops()
-				.notSolid()
-				.setLightLevel((state) -> 16)
+				.noOcclusion()
+				.lightLevel((state) -> 16)
 				);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
@@ -57,13 +57,13 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
 		
 		if (hand != Hand.MAIN_HAND || !playerIn.isCreative()) {
 			return ActionResultType.PASS;
 		}
 		
-		return handleConfigure(worldIn, pos, state, playerIn, playerIn.getHeldItem(hand));
+		return handleConfigure(worldIn, pos, state, playerIn, playerIn.getItemInHand(hand));
 	}
 	
 	/**
@@ -80,7 +80,7 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 	
 	@SuppressWarnings("unchecked")
 	protected @Nullable E getTileEntity(World world, BlockPos pos, BlockState state) {
-		TileEntity te = world.getTileEntity(pos);
+		TileEntity te = world.getBlockEntity(pos);
 		if (te == null || !(te instanceof ShrineTileEntity))
 			return null;
 		

@@ -40,7 +40,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 		final ItemStack centerItem = layout.getCenterItem(world, center);
 		
 		// Put the geogem back on the altar
-		( (AltarTileEntity) world.getTileEntity(center)).setItem(centerItem);
+		( (AltarTileEntity) world.getBlockEntity(center)).setItem(centerItem);
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (ModConfig.config.obeliskReqMagic() && (attr == null || !attr.isUnlocked()))
@@ -51,36 +51,36 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 		
 		BlockPos pos = PositionCrystal.getBlockPosition(centerItem);
 		if (pos == null) {
-			player.sendMessage(new TranslationTextComponent("info.teleport_obelisk.fail", new Object[0]), Util.DUMMY_UUID);
+			player.sendMessage(new TranslationTextComponent("info.teleport_obelisk.fail", new Object[0]), Util.NIL_UUID);
 			return;
 		}
 		
-		if (!world.isRemote) {
-			final BlockPos to = pos.up();
+		if (!world.isClientSide) {
+			final BlockPos to = pos.above();
 			final Location dest = new Location(world, to);
 			if (attr.hasEnhancedTeleport()) {
-				TileEntity te = world.getTileEntity(pos);
+				TileEntity te = world.getBlockEntity(pos);
 				if (te == null || !(te instanceof ObeliskTileEntity)) {
 					NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
-					player.sendMessage(new TranslationTextComponent("info.teleport_obelisk.fail"), Util.DUMMY_UUID);
+					player.sendMessage(new TranslationTextComponent("info.teleport_obelisk.fail"), Util.NIL_UUID);
 					return;
 				}
 				
 				ObeliskTileEntity obelisk = (ObeliskTileEntity) te;
-				BlockPos portal = TemporaryTeleportationPortalBlock.spawnNearby(world, center.up(), 4, true, dest, 20 * 30);
+				BlockPos portal = TemporaryTeleportationPortalBlock.spawnNearby(world, center.above(), 4, true, dest, 20 * 30);
 				if (portal != null) {
 					obelisk.setOverride(new Location(world, portal), 20 * 30);
 				}
 			} else {
 				// Validate obelisks
 				if (ObeliskTileEntity.IsObeliskPos(dest)) {
-					player.sendMessage(new TranslationTextComponent("info.obelisk.dne"), Util.DUMMY_UUID);
+					player.sendMessage(new TranslationTextComponent("info.obelisk.dne"), Util.NIL_UUID);
 					return;
 				}
 				
 				BlockPos targ = null;
-				for (BlockPos attempt : new BlockPos[]{to, to.up(), to.north(), to.north().east(), to.north().west(), to.east(), to.west(), to.south(), to.south().east(), to.south().west()}) {
-					if (player.attemptTeleport(attempt.getX() + .5, attempt.getY() + 1, attempt.getZ() + .5, false)) {
+				for (BlockPos attempt : new BlockPos[]{to, to.above(), to.north(), to.north().east(), to.north().west(), to.east(), to.west(), to.south(), to.south().east(), to.south().west()}) {
+					if (player.randomTeleport(attempt.getX() + .5, attempt.getY() + 1, attempt.getZ() + .5, false)) {
 						targ = attempt;
 						break;
 					}
@@ -88,7 +88,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 				if (targ != null) {
 					//doEffects(world, to);
 				} else {
-					player.sendMessage(new TranslationTextComponent("info.obelisk.noroom"), Util.DUMMY_UUID);
+					player.sendMessage(new TranslationTextComponent("info.obelisk.noroom"), Util.NIL_UUID);
 				}
 			}
 			
@@ -100,7 +100,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 				double dz = Math.sin(dirD) * dist;
 				ItemEntity drop = new ItemEntity(world, pos.getX() + .5 + dx, pos.getY() + 2, pos.getZ() + .5 + dz,
 						new ItemStack(NostrumItems.resourceEnderBristle));
-				world.addEntity(drop);
+				world.addFreshEntity(drop);
 				NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX() + .5, pos.getY() + 2, pos.getZ() + .5);
 			}
 		}

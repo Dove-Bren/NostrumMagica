@@ -28,7 +28,7 @@ public class NetUtils {
 	}
 	
 	public static PacketBuffer packDimension(PacketBuffer buffer, RegistryKey<World> dimension) {
-		buffer.writeResourceLocation(dimension.getLocation());
+		buffer.writeResourceLocation(dimension.location());
 		return buffer;
 	}
 	
@@ -45,9 +45,9 @@ public class NetUtils {
 	
 	protected static final List<Double> Vector3dPack(Vector3d vector) {
 		return ImmutableList.of(
-				vector.getX(),
-				vector.getY(),
-				vector.getZ()
+				vector.x(),
+				vector.y(),
+				vector.z()
 				);
 	}
 	
@@ -70,7 +70,7 @@ public class NetUtils {
 	}
 	
 	public static <K, V> Map<K, V> FromNBT(Map<K, V> mapToFill, CompoundNBT tag, Function<String, K> keyReader, Function<INBT, V> valueReader) {
-		for (String key : tag.keySet()) {
+		for (String key : tag.getAllKeys()) {
 			try {
 				K mapKey = keyReader.apply(key);
 				mapToFill.put(mapKey, valueReader.apply(tag.get(key)));

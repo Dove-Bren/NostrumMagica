@@ -27,47 +27,47 @@ public class RootedEffect extends Effect {
 	public RootedEffect() {
 		super(EffectType.HARMFUL, (new Color(100, 60, 25)).getRGB());
 		
-		this.addAttributesModifier(Attributes.MOVEMENT_SPEED, "ceea9fa1-aee7-4fe1-b8e8-e9b8cfc2f762", -.2, AttributeModifier.Operation.MULTIPLY_TOTAL);
+		this.addAttributeModifier(Attributes.MOVEMENT_SPEED, "ceea9fa1-aee7-4fe1-b8e8-e9b8cfc2f762", -.2, AttributeModifier.Operation.MULTIPLY_TOTAL);
 	}
 	
 	@Override
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return duration > 0; // Every tick
 	}
 	
 	@Override
-	public double getAttributeModifierAmount(int amplifier, AttributeModifier modifier) {
+	public double getAttributeModifierValue(int amplifier, AttributeModifier modifier) {
 		// Amp 0-2 have no slowness.
 		if (amplifier <= 2) {
 			return 0.0;
 		}
-		return super.getAttributeModifierAmount(amplifier-3, modifier);
+		return super.getAttributeModifierValue(amplifier-3, modifier);
 	}
 
 	@Override
-	public void performEffect(LivingEntity entity, int amp) {
+	public void applyEffectTick(LivingEntity entity, int amp) {
 		if (entity.isPassenger()) {
 			entity.stopRiding();
 		}
 
-		final Vector3d motion = entity.getMotion();
+		final Vector3d motion = entity.getDeltaMovement();
 		
 		if (motion.y > 0) {
-			entity.setMotion(motion.x, 0, motion.z);
+			entity.setDeltaMovement(motion.x, 0, motion.z);
 		}
 	}
 	
 	@Override
-	public void applyAttributesModifiersToEntity(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
+	public void addAttributeModifiers(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
 		// Sneaky! We've just been applied
 		NostrumMagica.magicEffectProxy.applyRootedEffect(entity);
-		super.applyAttributesModifiersToEntity(entity, attributeMap, amplifier);
+		super.addAttributeModifiers(entity, attributeMap, amplifier);
 	}
 	
 	@Override
-	public void removeAttributesModifiersFromEntity(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
+	public void removeAttributeModifiers(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
 		NostrumMagica.magicEffectProxy.remove(SpecialEffect.ROOTED, entityLivingBaseIn);
-		super.removeAttributesModifiersFromEntity(entityLivingBaseIn, attributeMapIn, amplifier);
+		super.removeAttributeModifiers(entityLivingBaseIn, attributeMapIn, amplifier);
     }
 	
 	@OnlyIn(Dist.CLIENT)

@@ -97,16 +97,16 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 	public static final String ID = "entity_willo";
 	
 	protected static final double MAX_WISP_DISTANCE_SQ = 144;
-	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(WilloEntity.class, MagicElementDataSerializer.instance);
-	protected static final DataParameter<WilloStatus> STATUS = EntityDataManager.<WilloStatus>createKey(WilloEntity.class, WilloStatusSerializer.instance);
+	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>defineId(WilloEntity.class, MagicElementDataSerializer.instance);
+	protected static final DataParameter<WilloStatus> STATUS = EntityDataManager.<WilloStatus>defineId(WilloEntity.class, WilloStatusSerializer.instance);
 	
 	private int idleCooldown;
 	
 	public WilloEntity(EntityType<? extends WilloEntity> type, World worldIn) {
 		super(type, worldIn);
 		this.setNoGravity(true);
-		this.moveController = new WispMoveHelper(this);
-		this.experienceValue = 20;
+		this.moveControl = new WispMoveHelper(this);
+		this.xpReward = 20;
 		
 		idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
 	}
@@ -114,7 +114,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 	protected void registerGoals() {
 		int priority = 1;
 		this.goalSelector.addGoal(priority++, new SpellAttackGoal<WilloEntity>(this, 20, 4, true, (willo) -> {
-			return willo.getAttackTarget() != null && willo.getStatus() != WilloStatus.PANIC;
+			return willo.getTarget() != null && willo.getStatus() != WilloStatus.PANIC;
 		}, new Spell[0]){
 			@Override
 			public Spell pickSpell(Spell[] spells, WilloEntity wisp) {
@@ -126,15 +126,15 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 			return WilloEntity.this.getStatus() == WilloStatus.PANIC;
 		}));
 		this.goalSelector.addGoal(priority++, new OrbitEntityGenericGoal<WilloEntity>(this, null, 3.0, 6 * 20, 2.0, 3 * 20, 2, (e) -> {
-			return e.getAttackTarget() != null
+			return e.getTarget() != null
 					&& WilloEntity.this.getStatus() == WilloStatus.AGGRO;
 		}, (e) -> {
-			return e.getAttackTarget() != null
+			return e.getTarget() != null
 					&& WilloEntity.this.getStatus() == WilloStatus.AGGRO;
 		}) {
 			@Override
 			protected LivingEntity getOrbitTarget() {
-				return WilloEntity.this.getAttackTarget();
+				return WilloEntity.this.getTarget();
 			}
 		});
 		this.goalSelector.addGoal(priority++, new AIRandomFly(this));
@@ -142,22 +142,22 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 		this.goalSelector.addGoal(priority++, new LookRandomlyGoal(this));
 		
 		priority = 1;
-		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setCallsForHelp(WilloEntity.class));
+		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setAlertOthers(WilloEntity.class));
 		this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, null));
 	}
 	
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		return MonsterEntity.func_234295_eP_()
-			.createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.2D)
-			.createMutableAttribute(Attributes.MAX_HEALTH, 10.0D)
-			.createMutableAttribute(Attributes.ARMOR, 4.0D)
-			.createMutableAttribute(Attributes.FOLLOW_RANGE, 30.0)
-			.createMutableAttribute(NostrumAttributes.magicResist, 0.0D);
+		return MonsterEntity.createMonsterAttributes()
+			.add(Attributes.MOVEMENT_SPEED, 0.2D)
+			.add(Attributes.MAX_HEALTH, 10.0D)
+			.add(Attributes.ARMOR, 4.0D)
+			.add(Attributes.FOLLOW_RANGE, 30.0)
+			.add(NostrumAttributes.magicResist, 0.0D);
 	}
 
 	protected void playStepSound(BlockPos pos, BlockState blockIn)
 	{
-		this.playSound(SoundEvents.BLOCK_GLASS_STEP, 0.15F, 1.0F);
+		this.playSound(SoundEvents.GLASS_STEP, 0.15F, 1.0F);
 	}
 
 	protected SoundEvent getHurtSound(DamageSource source)
@@ -180,26 +180,26 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 
 	protected float getStandingEyeHeight(Pose pose, EntitySize size)
 	{
-		return this.getHeight() * 0.5F;
+		return this.getBbHeight() * 0.5F;
 	}
 
-	public boolean attackEntityAsMob(Entity entityIn)
+	public boolean doHurtTarget(Entity entityIn)
 	{
-		boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
+		boolean flag = entityIn.hurt(DamageSource.mobAttack(this), (float)((int)this.getAttribute(Attributes.ATTACK_DAMAGE).getValue()));
 
 		if (flag)
 		{
-			this.applyEnchantments(this, entityIn);
+			this.doEnchantDamageEffects(this, entityIn);
 		}
 
 		return flag;
 	}
 
-	public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
+	public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
 		return ActionResultType.PASS;
 	}
 
-	public boolean canBeLeashedTo(PlayerEntity player) {
+	public boolean canBeLeashed(PlayerEntity player) {
 		return false;
 	}
 	
@@ -210,29 +210,29 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 		if (idleCooldown > 0) {
 			idleCooldown--;
 			if (idleCooldown == 0) {
-				if (this.getAttackTarget() == null) {
+				if (this.getTarget() == null) {
 					NostrumMagicaSounds.LUX_IDLE.play(this);
 				}
 				idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10); 
 			}
 		}
 		
-		if (this.getAttackTarget() != null) {
-			this.faceEntity(this.getAttackTarget(), 360f, 180f);
+		if (this.getTarget() != null) {
+			this.lookAt(this.getTarget(), 360f, 180f);
 		} else {
-			if (this.ticksExisted % 20 == 0 && this.getStatus() != WilloStatus.NEUTRAL) {
+			if (this.tickCount % 20 == 0 && this.getStatus() != WilloStatus.NEUTRAL) {
 				this.setStatus(WilloStatus.NEUTRAL);
 			}
 		}
 		
-		if (this.getStatus() == WilloStatus.PANIC && this.getRevengeTarget() != null) {
+		if (this.getStatus() == WilloStatus.PANIC && this.getLastHurtByMob() != null) {
 			// Up the time so we panic forever unless target is gone or we can't see them
-			if (this.getRevengeTarget().isAlive() && this.getEntitySenses().canSee(this.getRevengeTarget())) {
-				this.setRevengeTarget(this.getRevengeTarget()); // Refreshes timer to 100 ticks
+			if (this.getLastHurtByMob().isAlive() && this.getSensing().canSee(this.getLastHurtByMob())) {
+				this.setLastHurtByMob(this.getLastHurtByMob()); // Refreshes timer to 100 ticks
 			}
 		}
 		
-		if (world.isRemote) {
+		if (level.isClientSide) {
 //			EMagicElement element = this.getElement();
 //			int color = element.getColor();
 //			Vector3d offset = this.getVectorForRotation(0f, this.rotationYawHead).rotateYaw(rand.nextBoolean() ? 90f : -90f).scale(.5);
@@ -249,13 +249,13 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 			
 			EMagicElement element = this.getElement();
 			int color = element.getColor();
-			Vector3d offset = this.getVectorForRotation(0f, this.rotationYawHead).rotateYaw(rand.nextBoolean() ? 90f : -90f).scale(.5)
-					.scale(rand.nextFloat() * 3 + 1f);
-			NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
+			Vector3d offset = this.calculateViewVector(0f, this.yHeadRot).yRot(random.nextBoolean() ? 90f : -90f).scale(.5)
+					.scale(random.nextFloat() * 3 + 1f);
+			NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
 					1,
-					getPosX() + offset.x,
-					getPosY() + getHeight()/2f + offset.y,
-					getPosZ() + offset.z,
+					getX() + offset.x,
+					getY() + getBbHeight()/2f + offset.y,
+					getZ() + offset.z,
 					0, 40, 0,
 					//offset.scale(rand.nextFloat() * .2f),
 					new Vector3d(0, -.05, 0),
@@ -311,33 +311,33 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
+	protected void defineSynchedData() {
+		super.defineSynchedData();
 		
-		this.dataManager.register(STATUS, WilloStatus.NEUTRAL);
-		this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
+		this.entityData.define(STATUS, WilloStatus.NEUTRAL);
+		this.entityData.define(ELEMENT, EMagicElement.PHYSICAL);
 	}
 	
 	protected void setStatus(WilloStatus status) {
-		if (world.isRemote) {
+		if (level.isClientSide) {
 			return;
 		}
 		
-		this.dataManager.set(STATUS, status);
+		this.entityData.set(STATUS, status);
 	}
 	
 	public WilloStatus getStatus() {
-		return this.dataManager.get(STATUS);
+		return this.entityData.get(STATUS);
 	}
 	
 	@Override
-	public void readAdditional(CompoundNBT compound) {
-		super.readAdditional(compound);
+	public void readAdditionalSaveData(CompoundNBT compound) {
+		super.readAdditionalSaveData(compound);
 		if (compound.contains("element", NBT.TAG_STRING)) {
 			try {
-				this.dataManager.set(ELEMENT, EMagicElement.valueOf(compound.getString("element").toUpperCase()));
+				this.entityData.set(ELEMENT, EMagicElement.valueOf(compound.getString("element").toUpperCase()));
 			} catch (Exception e) {
-				this.dataManager.set(ELEMENT, EMagicElement.ICE);
+				this.entityData.set(ELEMENT, EMagicElement.ICE);
 			}
 		}
 //		if (compound.contains("status", NBT.TAG_STRING)) {
@@ -350,20 +350,20 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 	}
 	
 	@Override
-	public void writeAdditional(CompoundNBT compound) {
-		super.writeAdditional(compound);
+	public void addAdditionalSaveData(CompoundNBT compound) {
+		super.addAdditionalSaveData(compound);
 		
 		compound.putString("element", this.getElement().name());
 		//compound.putString("status", this.getStatus().name());
 	}
 	
 	@Override
-	public boolean onLivingFall(float distance, float damageMulti) {
+	public boolean causeFallDamage(float distance, float damageMulti) {
 		return false; // No fall damage
 	}
 	
 	@Override
-	protected void updateFallState(double y, boolean onGround, BlockState stae, BlockPos pos) {
+	protected void checkFallDamage(double y, boolean onGround, BlockState stae, BlockPos pos) {
 		
 	}
 	
@@ -382,32 +382,32 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 	}
 	
 	@Override
-	protected void dropSpecialItems(DamageSource source, int looting, boolean recentlyHitIn) {
-		super.dropSpecialItems(source, looting, recentlyHitIn);
+	protected void dropCustomDeathLoot(DamageSource source, int looting, boolean recentlyHitIn) {
+		super.dropCustomDeathLoot(source, looting, recentlyHitIn);
 		
 		if (recentlyHitIn) {
 			// In panic mode, drop elemental gems.
 			// In aggro mode, roll for mani gem.
 			if (this.getStatus() == WilloStatus.PANIC) {
 				final int count = 1 + (int) (Math.floor((float) looting / 2f));
-				this.entityDropItem(InfusedGemItem.getGem(this.getElement(), count));
+				this.spawnAtLocation(InfusedGemItem.getGem(this.getElement(), count));
 			} else if (this.getStatus() == WilloStatus.AGGRO) {
 				final float fltCount = .25f + (looting * .375f); // .25, .625, 1, 1.375
 				final int whole = (int) fltCount;
 				final float frac = fltCount - whole;
 				
 				if (whole > 0) {
-					this.entityDropItem(new ItemStack(NostrumItems.crystalSmall));
+					this.spawnAtLocation(new ItemStack(NostrumItems.crystalSmall));
 				}
-				if (this.rand.nextFloat() < frac) {
-					this.entityDropItem(new ItemStack(NostrumItems.crystalSmall));
+				if (this.random.nextFloat() < frac) {
+					this.spawnAtLocation(new ItemStack(NostrumItems.crystalSmall));
 				}
 			}
 		}
 	}
 	
 	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount) {
+	public boolean hurt(DamageSource source, float amount) {
 		// Aggro if physical or non-opposing element.
 		// Panic if opposing element and not already panicked.
 		
@@ -427,44 +427,44 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 			}
 			
 			this.playEffect(ParticleTypes.CRIT);
-			return super.attackEntityFrom(source, amount);
+			return super.hurt(source, amount);
 		} else if (source == DamageSource.IN_WALL
 				|| source == DamageSource.CRAMMING
 				|| source == DamageSource.DROWN
 				|| source == DamageSource.OUT_OF_WORLD
 				) {
-			return super.attackEntityFrom(source, amount);
+			return super.hurt(source, amount);
 		} else {
 			NostrumMagicaSounds.CAST_FAIL.play(this);
 			if (this.getStatus() == WilloStatus.NEUTRAL) {
 				this.setStatus(WilloStatus.AGGRO);
 			}
 			
-			return super.attackEntityFrom(source, 0f);
+			return super.hurt(source, 0f);
 		}
 	}
 	
 	private void playEffect(IParticleData particle) {
 		
 		for (int i = 0; i < 15; ++i) {
-			double d0 = this.rand.nextGaussian() * 0.02D;
-			double d1 = this.rand.nextGaussian() * 0.02D;
-			double d2 = this.rand.nextGaussian() * 0.02D;
-			this.world.addParticle(particle, this.getPosX() + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), this.getPosY() + 0.5D + (double)(this.rand.nextFloat() * this.getHeight()), this.getPosZ() + (double)(this.rand.nextFloat() * this.getWidth() * 2.0F) - (double)this.getWidth(), d0, d1, d2);
+			double d0 = this.random.nextGaussian() * 0.02D;
+			double d1 = this.random.nextGaussian() * 0.02D;
+			double d2 = this.random.nextGaussian() * 0.02D;
+			this.level.addParticle(particle, this.getX() + (double)(this.random.nextFloat() * this.getBbWidth() * 2.0F) - (double)this.getBbWidth(), this.getY() + 0.5D + (double)(this.random.nextFloat() * this.getBbHeight()), this.getZ() + (double)(this.random.nextFloat() * this.getBbWidth() * 2.0F) - (double)this.getBbWidth(), d0, d1, d2);
 		}
 	}
 	
 	@Override
 	public EMagicElement getElement() {
-		return this.dataManager.get(ELEMENT);
+		return this.entityData.get(ELEMENT);
 	}
 	
 	protected Spell getSpellToUse() {
 		init();
 		List<Spell> spells = defaultSpells.get(this.getElement());
 		int idx = (this.getStatus() == WilloStatus.NEUTRAL
-				? this.rand.nextInt(2)
-				: this.rand.nextInt(spells.size()));
+				? this.random.nextInt(2)
+				: this.random.nextInt(spells.size()));
 		return spells.get(idx);
 	}
 	
@@ -480,10 +480,10 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 
 		@Override
 		public void tick() {
-			if (this.action == MovementController.Action.MOVE_TO) {
-				double d0 = this.getX() - this.parentEntity.getPosX();
-				double d1 = this.getY() - this.parentEntity.getPosY();
-				double d2 = this.getZ() - this.parentEntity.getPosZ();
+			if (this.operation == MovementController.Action.MOVE_TO) {
+				double d0 = this.getWantedX() - this.parentEntity.getX();
+				double d1 = this.getWantedY() - this.parentEntity.getY();
+				double d2 = this.getWantedZ() - this.parentEntity.getZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 
 				d3 = (double)MathHelper.sqrt(d3);
@@ -512,23 +512,23 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 //				}
 				
 				if (Math.abs(d3) < .5) {
-					this.parentEntity.setMotion(Vector3d.ZERO);
-					this.action = MovementController.Action.WAIT;
+					this.parentEntity.setDeltaMovement(Vector3d.ZERO);
+					this.operation = MovementController.Action.WAIT;
 					return;
-				} else if (this.isNotColliding(this.getX(), this.getY(), this.getZ(), d3)) {
+				} else if (this.isNotColliding(this.getWantedX(), this.getWantedY(), this.getWantedZ(), d3)) {
 					float basespeed = (float) this.parentEntity.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
 					//speed *= 3f;
-					this.parentEntity.setMotion(
-							(d0 / d3) * basespeed * speed,
-							(d1 / d3) * basespeed  * speed,
-							(d2 / d3) * basespeed  * speed
+					this.parentEntity.setDeltaMovement(
+							(d0 / d3) * basespeed * speedModifier,
+							(d1 / d3) * basespeed  * speedModifier,
+							(d2 / d3) * basespeed  * speedModifier
 							);
 					
 					float f9 = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
-					this.mob.rotationYaw = this.limitAngle(this.mob.rotationYaw, f9, 90.0F);
+					this.mob.yRot = this.rotlerp(this.mob.yRot, f9, 90.0F);
 				} else if (courseChangeCooldown-- <= 0) {
-					courseChangeCooldown = this.parentEntity.getRNG().nextInt(5) + 10;
-					this.action = MovementController.Action.WAIT;
+					courseChangeCooldown = this.parentEntity.getRandom().nextInt(5) + 10;
+					this.operation = MovementController.Action.WAIT;
 				}
 			}
 		}
@@ -537,15 +537,15 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 		 * Checks if entity bounding box is not colliding with terrain
 		 */
 		private boolean isNotColliding(double x, double y, double z, double p_179926_7_) {
-			double d0 = (x - this.parentEntity.getPosX()) / p_179926_7_;
-			double d1 = (y - this.parentEntity.getPosY()) / p_179926_7_;
-			double d2 = (z - this.parentEntity.getPosZ()) / p_179926_7_;
+			double d0 = (x - this.parentEntity.getX()) / p_179926_7_;
+			double d1 = (y - this.parentEntity.getY()) / p_179926_7_;
+			double d2 = (z - this.parentEntity.getZ()) / p_179926_7_;
 			AxisAlignedBB axisalignedbb = this.parentEntity.getBoundingBox();
 
 			for (int i = 1; (double)i < p_179926_7_; ++i) {
-				axisalignedbb = axisalignedbb.offset(d0, d1, d2);
+				axisalignedbb = axisalignedbb.move(d0, d1, d2);
 
-				if (!this.parentEntity.world.hasNoCollisions(this.parentEntity, axisalignedbb)) {
+				if (!this.parentEntity.level.noCollision(this.parentEntity, axisalignedbb)) {
 					return false;
 				}
 			}
@@ -559,20 +559,20 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 		public void travel(Vector3d how) {
 			if (this.isInWater()) {
 				this.moveRelative(0.02F, how);
-				this.move(MoverType.SELF, this.getMotion());
-				this.setMotion(this.getMotion().scale(0.8));
+				this.move(MoverType.SELF, this.getDeltaMovement());
+				this.setDeltaMovement(this.getDeltaMovement().scale(0.8));
 			} else if (this.isInLava()) {
 				this.moveRelative(0.02F, how);
-				this.move(MoverType.SELF, this.getMotion());
-				this.setMotion(this.getMotion().scale(0.5));
+				this.move(MoverType.SELF, this.getDeltaMovement());
+				this.setDeltaMovement(this.getDeltaMovement().scale(0.5));
 			} else {
 				float f = 0.91F;
 
 				if (this.onGround) {
 					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
-					BlockPos underPos = new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()));
-					BlockState underState = this.world.getBlockState(underPos);
-					f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
+					BlockPos underPos = new BlockPos(MathHelper.floor(this.getX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getZ()));
+					BlockState underState = this.level.getBlockState(underPos);
+					f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
 				}
 
 				float f1 = 0.16277136F / (f * f * f);
@@ -581,44 +581,44 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 
 				if (this.onGround) {
 					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
-					BlockPos underPos = new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()));
-					BlockState underState = this.world.getBlockState(underPos);
-					f = underState.getBlock().getSlipperiness(underState, this.world, underPos, this) * 0.91F;
+					BlockPos underPos = new BlockPos(MathHelper.floor(this.getX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getZ()));
+					BlockState underState = this.level.getBlockState(underPos);
+					f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
 				}
 
-				this.move(MoverType.SELF, this.getMotion());
-				this.setMotion(this.getMotion().scale(f));
+				this.move(MoverType.SELF, this.getDeltaMovement());
+				this.setDeltaMovement(this.getDeltaMovement().scale(f));
 			}
 
-			this.prevLimbSwingAmount = this.limbSwingAmount;
-			double d1 = this.getPosX() - this.prevPosX;
-			double d0 = this.getPosZ() - this.prevPosZ;
+			this.animationSpeedOld = this.animationSpeed;
+			double d1 = this.getX() - this.xo;
+			double d0 = this.getZ() - this.zo;
 			float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 			if (f2 > 1.0F) {
 				f2 = 1.0F;
 			}
 
-			this.limbSwingAmount += (f2 - this.limbSwingAmount) * 0.4F;
-			this.limbSwing += this.limbSwingAmount;
+			this.animationSpeed += (f2 - this.animationSpeed) * 0.4F;
+			this.animationPosition += this.animationSpeed;
 		}
 
 	/**
 	 * returns true if this entity is by a ladder, false otherwise
 	 */
 	@Override
-	public boolean isOnLadder() {
+	public boolean onClimbable() {
 		return false;
 	}
 	
 	@Override
-	public boolean canSpawn(IWorld world, SpawnReason spawnReason) {
-		if (!super.canSpawn(world, spawnReason)) { // checks light level
+	public boolean checkSpawnRules(IWorld world, SpawnReason spawnReason) {
+		if (!super.checkSpawnRules(world, spawnReason)) { // checks light level
 			return false;
 		}
 		
 		// Want to use dimension key but not available with IWorldReadyer
-		RegistryKey<Biome> biomeKey = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, world.getBiome(this.getPosition()).getRegistryName());
+		RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, world.getBiome(this.blockPosition()).getRegistryName());
 		
 //		if (!DimensionUtils.IsOverworld(world) && !DimensionUtils.IsNether(world)) {
 //			return false;
@@ -636,26 +636,26 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 
 		public AIRandomFly(WilloEntity wisp) {
 			this.parentEntity = wisp;
-			this.setMutexFlags(EnumSet.of(Goal.Flag.MOVE));
+			this.setFlags(EnumSet.of(Goal.Flag.MOVE));
 		}
 
 		/**
 		 * Returns whether the Goal should begin execution.
 		 */
-		public boolean shouldExecute() {
+		public boolean canUse() {
 			
 			if (delayTicks-- > 0) {
 				return false;
 			}
 			
-			MovementController MovementController = this.parentEntity.getMoveHelper();
+			MovementController MovementController = this.parentEntity.getMoveControl();
 
-			if (!MovementController.isUpdating()) {
+			if (!MovementController.hasWanted()) {
 				return true;
 			} else {
-				double d0 = MovementController.getX() - this.parentEntity.getPosX();
-				double d1 = MovementController.getY() - this.parentEntity.getPosY();
-				double d2 = MovementController.getZ() - this.parentEntity.getPosZ();
+				double d0 = MovementController.getWantedX() - this.parentEntity.getX();
+				double d1 = MovementController.getWantedY() - this.parentEntity.getY();
+				double d2 = MovementController.getWantedZ() - this.parentEntity.getZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				return d3 < 1.0D || d3 > 3600.0D;
 			}
@@ -665,17 +665,17 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 		 * Returns whether an in-progress Goal should continue executing
 		 */
 		@Override
-		public boolean shouldContinueExecuting() {
+		public boolean canContinueToUse() {
 			return false;
 		}
 
 		/**
 		 * Execute a one shot task or start executing a continuous task
 		 */
-		public void startExecuting() {
-			Random random = this.parentEntity.getRNG();
-			final Vector3d center = (parentEntity.getAttackTarget() == null ? parentEntity.getPositionVec() : parentEntity.getAttackTarget().getPositionVec());
-			final float range = (parentEntity.getAttackTarget() == null ? 16f : 8f);
+		public void start() {
+			Random random = this.parentEntity.getRandom();
+			final Vector3d center = (parentEntity.getTarget() == null ? parentEntity.position() : parentEntity.getTarget().position());
+			final float range = (parentEntity.getTarget() == null ? 16f : 8f);
 			double d0 = center.x + (double)((random.nextFloat() * 2.0F - 1.0F) * range);
 			double d1 = center.y + (double)((random.nextFloat() * 2.0F - 1.0F) * range);
 			double d2 = center.z + (double)((random.nextFloat() * 2.0F - 1.0F) * range);
@@ -683,26 +683,26 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 			// Adjust to above ground
 			double height = random.nextInt(4) + 2;
 			BlockPos.Mutable cursor = new BlockPos.Mutable();
-			cursor.setPos(d0, d1, d2);
+			cursor.set(d0, d1, d2);
 			
-			while (cursor.getY() > 0 && parentEntity.world.isAirBlock(cursor)) {
+			while (cursor.getY() > 0 && parentEntity.level.isEmptyBlock(cursor)) {
 				cursor.move(Direction.DOWN);
 			}
 			
-			while (cursor.getY() < 255 && !parentEntity.world.isAirBlock(cursor)) {
+			while (cursor.getY() < 255 && !parentEntity.level.isEmptyBlock(cursor)) {
 				cursor.move(Direction.UP);
 			}
 			
 			// Try and move `height` up
 			for (int i = 0; i < height; i++) {
-				if (parentEntity.world.isAirBlock(cursor.up())) {
+				if (parentEntity.level.isEmptyBlock(cursor.above())) {
 					cursor.move(Direction.UP);
 				} else {
 					break;
 				}
 			}
 			
-			this.parentEntity.getMoveHelper().setMoveTo(
+			this.parentEntity.getMoveControl().setWantedPosition(
 					cursor.getX() + (d0 % 1.0),
 					cursor.getY() + (d1 % 1.0),
 					cursor.getZ() + (d2 % 1.0),
@@ -982,22 +982,22 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 	}
 	
 	public void setElement(EMagicElement element) {
-		dataManager.set(ELEMENT, element);
+		entityData.set(ELEMENT, element);
 	}
 	
 	@Override
 	@Nullable
-	public ILivingEntityData onInitialSpawn(IServerWorld world, DifficultyInstance difficulty, SpawnReason reason, @Nullable ILivingEntityData livingdata, @Nullable CompoundNBT dataTag) {
+	public ILivingEntityData finalizeSpawn(IServerWorld world, DifficultyInstance difficulty, SpawnReason reason, @Nullable ILivingEntityData livingdata, @Nullable CompoundNBT dataTag) {
 		final EMagicElement elem = EMagicElement.values()[NostrumMagica.rand.nextInt(EMagicElement.values().length)];
 		setElement(elem);
-		return super.onInitialSpawn(world, difficulty, reason, livingdata, dataTag);
+		return super.finalizeSpawn(world, difficulty, reason, livingdata, dataTag);
 	}
 	
 	public static boolean canSpawnExtraCheck(EntityType<WilloEntity> type, IServerWorld world, SpawnReason reason, BlockPos pos, Random rand) {
 		// Do extra checks in the nether, which has a smaller pool of spawns and so weight 1 is bigger than intended
 		
-		if (DimensionUtils.IsNether(world.getWorld())) {
-			return world.getDifficulty() != Difficulty.PEACEFUL && rand.nextInt(35) == 0 && canSpawnOn(type, world, reason, pos, rand);
+		if (DimensionUtils.IsNether(world.getLevel())) {
+			return world.getDifficulty() != Difficulty.PEACEFUL && rand.nextInt(35) == 0 && checkMobSpawnRules(type, world, reason, pos, rand);
 		} else {
 			return true;
 		}

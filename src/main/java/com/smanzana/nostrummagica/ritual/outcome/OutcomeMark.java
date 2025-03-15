@@ -27,7 +27,7 @@ public class OutcomeMark implements IRitualOutcome {
 		if (attr == null)
 			return;
 		
-		attr.setMarkLocation(DimensionUtils.GetDimension(player), player.getPosition());
+		attr.setMarkLocation(DimensionUtils.GetDimension(player), player.blockPosition());
 	}
 	
 	@Override

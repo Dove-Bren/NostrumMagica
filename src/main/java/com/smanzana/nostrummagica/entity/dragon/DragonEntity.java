@@ -104,26 +104,26 @@ public abstract class DragonEntity extends MonsterEntity {
 
 	@Override
     protected float getStandingEyeHeight(Pose pose, EntitySize size) {
-        return this.getHeight() * 0.95F;
+        return this.getBbHeight() * 0.95F;
     }
 
     @Override
-    public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand) {
+    public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand) {
         return ActionResultType.PASS;
     }
 
 	@Override
-    public boolean canBeLeashedTo(PlayerEntity player) {
+    public boolean canBeLeashed(PlayerEntity player) {
         return false;
     }
 
 	@Override
-	public boolean onLivingFall(float distance, float damageMulti) {
+	public boolean causeFallDamage(float distance, float damageMulti) {
 		return false; // No fall damage
 	}
 	
 	@Override
-	protected void updateFallState(double y, boolean onGround, BlockState stae, BlockPos pos) {
+	protected void checkFallDamage(double y, boolean onGround, BlockState stae, BlockPos pos) {
 		
 	}
 	
@@ -198,7 +198,7 @@ public abstract class DragonEntity extends MonsterEntity {
 			}
 		}
 		
-		public void clear() {
+		public void clearContent() {
 			slots.clear();
 			if (listener != null) {
 				listener.onChange(null, ItemStack.EMPTY, ItemStack.EMPTY);
@@ -227,14 +227,14 @@ public abstract class DragonEntity extends MonsterEntity {
 		}
 		
 		public void readFromNBT(CompoundNBT nbt) {
-			this.clear();
+			this.clearContent();
 			
 			ListNBT list = nbt.getList(NBT_LIST, NBT.TAG_COMPOUND);
 			for (int i = 0; i < list.size(); i++) {
 				CompoundNBT wrapper = list.getCompound(i);
 				try {
 					DragonEquipmentSlot slot = DragonEquipmentSlot.valueOf(wrapper.getString(NBT_SLOT).toUpperCase());
-					ItemStack stack = ItemStack.read(wrapper.getCompound(NBT_ITEM));
+					ItemStack stack = ItemStack.of(wrapper.getCompound(NBT_ITEM));
 					//this.setStackInSlot(slot, stack); Don't want to send updates to listener for each item
 					slots.put(slot, stack);
 				} catch (Exception e) {
@@ -254,7 +254,7 @@ public abstract class DragonEntity extends MonsterEntity {
 		}
 
 		@Override
-		public int getSizeInventory() {
+		public int getContainerSize() {
 			return DragonEquipmentSlot.values().length;
 		}
 		
@@ -263,12 +263,12 @@ public abstract class DragonEntity extends MonsterEntity {
 		}
 
 		@Override
-		public @Nonnull ItemStack getStackInSlot(int index) {
+		public @Nonnull ItemStack getItem(int index) {
 			return this.getStackInSlot(GETSLOT(index));
 		}
 
 		@Override
-		public @Nonnull ItemStack decrStackSize(int index, int count) {
+		public @Nonnull ItemStack removeItem(int index, int count) {
 			DragonEquipmentSlot slot = GETSLOT(index);
 			ItemStack inSlot = slots.get(slot);
 			ItemStack taken = ItemStack.EMPTY;
@@ -284,42 +284,42 @@ public abstract class DragonEntity extends MonsterEntity {
 		}
 
 		@Override
-		public @Nonnull ItemStack removeStackFromSlot(int index) {
+		public @Nonnull ItemStack removeItemNoUpdate(int index) {
 			return slots.remove(GETSLOT(index));
 		}
 
 		@Override
-		public void setInventorySlotContents(int index, ItemStack stack) {
+		public void setItem(int index, ItemStack stack) {
 			this.setStackInSlot(GETSLOT(index), stack);
 		}
 
 		@Override
-		public int getInventoryStackLimit() {
+		public int getMaxStackSize() {
 			return 1;
 		}
 
 		@Override
-		public void markDirty() {
+		public void setChanged() {
 			;
 		}
 
 		@Override
-		public boolean isUsableByPlayer(PlayerEntity player) {
+		public boolean stillValid(PlayerEntity player) {
 			return true;
 		}
 
 		@Override
-		public void openInventory(PlayerEntity player) {
+		public void startOpen(PlayerEntity player) {
 			;
 		}
 
 		@Override
-		public void closeInventory(PlayerEntity player) {
+		public void stopOpen(PlayerEntity player) {
 			;
 		}
 
 		@Override
-		public boolean isItemValidForSlot(int index, ItemStack stack) {
+		public boolean canPlaceItem(int index, ItemStack stack) {
 			if (stack.isEmpty()) {
 				return true;
 			}
@@ -355,7 +355,7 @@ public abstract class DragonEntity extends MonsterEntity {
 	}
 	
 	@Override
-	public @Nonnull ItemStack getItemStackFromSlot(EquipmentSlotType slot) {
+	public @Nonnull ItemStack getItemBySlot(EquipmentSlotType slot) {
 		// Adapt to dragon equipment slot system to take advantage of vanilla's equipment tracking
 		// and attribute system
 		final DragonEquipmentSlot dragonSlot = DragonEquipmentSlot.FindForSlot(slot);
@@ -363,12 +363,12 @@ public abstract class DragonEntity extends MonsterEntity {
 		if (dragonSlot != null) {
 			return getDragonEquipment(dragonSlot);
 		} else {		
-			return super.getItemStackFromSlot(slot);
+			return super.getItemBySlot(slot);
 		}
 	}
 	
 	protected static final MutableAttribute BuildBaseDragonAttributes() {
-		return MonsterEntity.func_234295_eP_();
+		return MonsterEntity.createMonsterAttributes();
 	}
 	
 }

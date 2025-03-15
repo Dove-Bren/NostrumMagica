@@ -40,6 +40,6 @@ public class LoreRequirement implements IRequirement{
 	@Override
 	public List<ITextComponent> getDescription(PlayerEntity player) {
 		return Lists.newArrayList(new TranslationTextComponent("info.requirement.lore", 
-				new StringTextComponent(lore.getLoreDisplayName()).mergeStyle(TextFormatting.DARK_BLUE)));
+				new StringTextComponent(lore.getLoreDisplayName()).withStyle(TextFormatting.DARK_BLUE)));
 	}
 }

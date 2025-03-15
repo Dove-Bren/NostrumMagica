@@ -25,7 +25,7 @@ public class RenderWillo extends MobRenderer<WilloEntity, ModelRenderShiv<WilloE
 	private ModelWillo mainModel;
 	
 	public RenderWillo(EntityRendererManager renderManagerIn, float scale) {
-		super(renderManagerIn, new ModelRenderShiv<WilloEntity>(RenderType::getEntityCutoutNoCull), .33f);
+		super(renderManagerIn, new ModelRenderShiv<WilloEntity>(RenderType::entityCutoutNoCull), .33f);
 		mainModel = new ModelWillo();
 	}
 	
@@ -60,14 +60,14 @@ public class RenderWillo extends MobRenderer<WilloEntity, ModelRenderShiv<WilloE
 			break;
 		}
 		
-		final Matrix4f transform = matrixStackIn.getLast().getMatrix();
-		final Matrix3f normal = matrixStackIn.getLast().getNormal();
+		final Matrix4f transform = matrixStackIn.last().pose();
+		final Matrix3f normal = matrixStackIn.last().normal();
 		
 		// North
-		buffer.pos(transform, .5f, .5f, 0f).color(red, green, blue, alpha).tex(umax,vmax).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, .5773f, .5773f, -.5773f).endVertex();
-		buffer.pos(transform, .5f, -.5f, 0f).color(red, green, blue, alpha).tex(umax,vmin).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, .5773f, -.5773f, -.5773f).endVertex();
-		buffer.pos(transform, -.5f, -.5f, 0f).color(red, green, blue, alpha).tex(umin,vmin).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, -.5773f, -.5773f, -.5773f).endVertex();
-		buffer.pos(transform, -.5f, .5f, 0f).color(red, green, blue, alpha).tex(umin,vmax).overlay(packedOverlayIn).lightmap(packedLightIn).normal(normal, -.5773f, .5773f, -.5773f).endVertex();
+		buffer.vertex(transform, .5f, .5f, 0f).color(red, green, blue, alpha).uv(umax,vmax).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, .5773f, .5773f, -.5773f).endVertex();
+		buffer.vertex(transform, .5f, -.5f, 0f).color(red, green, blue, alpha).uv(umax,vmin).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, .5773f, -.5773f, -.5773f).endVertex();
+		buffer.vertex(transform, -.5f, -.5f, 0f).color(red, green, blue, alpha).uv(umin,vmin).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, -.5773f, -.5773f, -.5773f).endVertex();
+		buffer.vertex(transform, -.5f, .5f, 0f).color(red, green, blue, alpha).uv(umin,vmax).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, -.5773f, .5773f, -.5773f).endVertex();
 		
 //		// South
 //		buffer.pos(-.5, .5, .01).tex(umin,vmax).normal(-.5773f, .5773f, .5773f).endVertex();
@@ -127,41 +127,41 @@ public class RenderWillo extends MobRenderer<WilloEntity, ModelRenderShiv<WilloE
 		
 		// GlStateManager.color4f(.65f, 1f, .7f, 1f);
 		final float rotPeriod = 6f * 20f;
-		final float time = partialTicks + entityIn.ticksExisted;
+		final float time = partialTicks + entityIn.tickCount;
 		final float rotX = 360f * (time % rotPeriod) / rotPeriod;
 		final float[] color = ColorUtil.ARGBToColor(entityIn.getElement().getColor());
 		
-		this.mainModel.setLivingAnimations(entityIn, 0, 0, partialTicks);
+		this.mainModel.prepareMobModel(entityIn, 0, 0, partialTicks);
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(0, 1.5f, 0);
-		matrixStackIn.translate(0, -entityIn.getHeight() / 2, 0);
+		matrixStackIn.translate(0, -entityIn.getBbHeight() / 2, 0);
 		
 		// Render main model body
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.scale(.25f, .25f, .25f);
-		this.mainModel.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		matrixStackIn.pop();
+		this.mainModel.renderToBuffer(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		matrixStackIn.popPose();
 		
 		// Render face inside main body
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.scale(.4f, .4f, .4f);
 		renderFace(entityIn, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red * .65f, green * 1f, blue * .7f, alpha);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 		// Render face inside main body
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.scale(.5f, .5f, .5f);
-		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(rotX));
+		matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(rotX));
 		renderCube(entityIn, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red * color[0], green * color[1], blue * color[2], alpha);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	@Override
 	public void render(WilloEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-		this.entityModel.setPayload((deferredStack, deferredBufferIn, deferredPackedLightIn, packedOverlayIn, red, green, blue, alpha) -> {
+		this.model.setPayload((deferredStack, deferredBufferIn, deferredPackedLightIn, packedOverlayIn, red, green, blue, alpha) -> {
 			// Could pass through bufferIn to allow access to different buffer types, but only need the base one
 			this.renderModels(entityIn, partialTicks, deferredStack, deferredBufferIn, deferredPackedLightIn, packedOverlayIn, red, green, blue, alpha);
 		});
@@ -177,7 +177,7 @@ public class RenderWillo extends MobRenderer<WilloEntity, ModelRenderShiv<WilloE
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(WilloEntity entity) {
+	public ResourceLocation getTextureLocation(WilloEntity entity) {
 		return RES_TEXT;
 	}
 	

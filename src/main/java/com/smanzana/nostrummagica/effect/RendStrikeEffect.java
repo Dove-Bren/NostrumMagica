@@ -21,7 +21,7 @@ public class RendStrikeEffect extends Effect {
 		super(EffectType.BENEFICIAL, 0xFF7B7B7B);
 	}
 	
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return false; // No tick effects
 	}
 	
@@ -29,15 +29,15 @@ public class RendStrikeEffect extends Effect {
 	public static void onEntityAttack(LivingAttackEvent event) {
 		if (event.getAmount() > 0f && !event.isCanceled()) {
 			// Is this an attack from an entity?
-			if (event.getSource().getTrueSource() != null
-					&& event.getSource().getTrueSource() instanceof LivingEntity) {
-				LivingEntity source = (LivingEntity) event.getSource().getTrueSource();
-				EffectInstance effect = source.getActivePotionEffect(NostrumEffects.rendStrike);
+			if (event.getSource().getEntity() != null
+					&& event.getSource().getEntity() instanceof LivingEntity) {
+				LivingEntity source = (LivingEntity) event.getSource().getEntity();
+				EffectInstance effect = source.getEffect(NostrumEffects.rendStrike);
 				if (effect != null && effect.getDuration() > 0) {
 					// Apply rend effect to target, and remove it from the source
 					EffectInstance rend = new EffectInstance(NostrumEffects.rend, 20 * 5, effect.getAmplifier());
-					event.getEntityLiving().addPotionEffect(rend);
-					source.removePotionEffect(NostrumEffects.rendStrike);
+					event.getEntityLiving().addEffect(rend);
+					source.removeEffect(NostrumEffects.rendStrike);
 					NostrumMagicaSounds.MELT_METAL.play(event.getEntityLiving());
 					
 					// And fall through and let event happen

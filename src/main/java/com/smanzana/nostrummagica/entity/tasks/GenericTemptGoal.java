@@ -20,15 +20,15 @@ public class GenericTemptGoal extends TemptGoal {
 		this.speed = speedIn;
 	}
 
-	protected boolean isTempting(ItemStack stack) {
-		return super.isTempting(stack);
+	protected boolean shouldFollowItem(ItemStack stack) {
+		return super.shouldFollowItem(stack);
 	}
 
 	protected void moveToclosestPlayer(CreatureEntity tempted, PlayerEntity player) {
-		if (this.creature.getDistanceSq(this.closestPlayer) < 6.25D) {
-			this.creature.getNavigator().clearPath();
+		if (this.mob.distanceToSqr(this.player) < 6.25D) {
+			this.mob.getNavigation().stop();
 		} else {
-			this.creature.getNavigator().tryMoveToEntityLiving(this.closestPlayer, this.speed);
+			this.mob.getNavigation().moveTo(this.player, this.speed);
 		}
 	}
 
@@ -37,7 +37,7 @@ public class GenericTemptGoal extends TemptGoal {
 	 */
 	@Override
 	public void tick() {
-		this.creature.getLookController().setLookPositionWithEntity(this.closestPlayer, (float)(this.creature.getHorizontalFaceSpeed() + 20), (float)this.creature.getVerticalFaceSpeed());
-		moveToclosestPlayer(creature, closestPlayer);
+		this.mob.getLookControl().setLookAt(this.player, (float)(this.mob.getMaxHeadYRot() + 20), (float)this.mob.getMaxHeadXRot());
+		moveToclosestPlayer(mob, player);
 	}
 }

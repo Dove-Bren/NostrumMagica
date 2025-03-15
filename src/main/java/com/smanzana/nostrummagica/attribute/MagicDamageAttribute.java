@@ -10,6 +10,6 @@ public class MagicDamageAttribute extends RangedAttribute implements IPercentage
 	
 	public MagicDamageAttribute(String name) {
 		super(name, 0, -100.0D, 1000.0D);
-		this.setShouldWatch(true);
+		this.setSyncable(true);
 	}
 }

@@ -122,7 +122,7 @@ public class MasterSpellCreationGui {
 			super(NostrumContainers.SpellCreationMaster, windowId);
 			this.inventory = tableInventory;
 			this.player = crafter;
-			this.pos = tableInventory.getPos();
+			this.pos = tableInventory.getBlockPos();
 			
 			spellErrorStrings = new LinkedList<>();
 			this.name = "";
@@ -130,14 +130,14 @@ public class MasterSpellCreationGui {
 			
 			this.addSlot(new Slot(inventory, 0, SLOT_MAIN_HOFFSET, SLOT_MAIN_VOFFSET) {
 				@Override
-				public boolean isItemValid(@Nonnull ItemStack stack) {
+				public boolean mayPlace(@Nonnull ItemStack stack) {
 					return (stack.isEmpty()
 							|| stack.getItem() instanceof BlankScroll);
 				}
 				
 				@Override
-				public void putStack(@Nonnull ItemStack stack) {
-					super.putStack(stack);
+				public void set(@Nonnull ItemStack stack) {
+					super.set(stack);
 					
 					validate();
 				}
@@ -150,7 +150,7 @@ public class MasterSpellCreationGui {
 				}
 				
 				@Override
-				public int getSlotStackLimit() {
+				public int getMaxStackSize() {
 					return 1;
 				}
 			});
@@ -172,13 +172,13 @@ public class MasterSpellCreationGui {
 				int y = REAGENT_BAG_VOFFSET;
 				this.addSlot(new Slot(inventory, i + inventory.getReagentSlotIndex(), x, y) {
 					@Override
-					public int getSlotStackLimit() {
+					public int getMaxStackSize() {
 						return 64;
 					}
 					
 					@Override
-					public void putStack(@Nonnull ItemStack stack) {
-						super.putStack(stack);
+					public void set(@Nonnull ItemStack stack) {
+						super.set(stack);
 						
 						validate();
 					}
@@ -206,7 +206,7 @@ public class MasterSpellCreationGui {
 			// isValid means there's something that can accept a spell
 			// in the tome slot. Is there?
 			isValid = false;
-			@Nonnull ItemStack stack = this.inventory.getStackInSlot(0);
+			@Nonnull ItemStack stack = this.inventory.getItem(0);
 			if (!stack.isEmpty() && stack.getItem() instanceof BlankScroll)
 				isValid = true;
 			
@@ -219,12 +219,12 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		public boolean canDragIntoSlot(Slot slotIn) {
-			return slotIn.inventory != this.inventory; // It's NOT bag inventory
+		public boolean canDragTo(Slot slotIn) {
+			return slotIn.container != this.inventory; // It's NOT bag inventory
 		}
 		
 		@Override
-		public boolean canInteractWith(PlayerEntity playerIn) {
+		public boolean stillValid(PlayerEntity playerIn) {
 			return true;
 		}
 		
@@ -237,11 +237,11 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
-			ItemStack ret = super.slotClick(slotId, dragType, clickTypeIn, player);
+		public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+			ItemStack ret = super.clicked(slotId, dragType, clickTypeIn, player);
 			
 			isValid = false;
-			ItemStack stack = this.inventory.getStackInSlot(0);
+			ItemStack stack = this.inventory.getItem(0);
 			if (!stack.isEmpty() && (stack.getItem() instanceof SpellTome || stack.getItem() instanceof BlankScroll))
 				isValid = true;
 			
@@ -249,17 +249,17 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
-			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
+		public ItemStack quickMoveStack(PlayerEntity playerIn, int fromSlot) {
+			Slot slot = (Slot) this.slots.get(fromSlot);
 			
-			if (slot != null && slot.getHasStack()) {
-				ItemStack cur = slot.getStack();
+			if (slot != null && slot.hasItem()) {
+				ItemStack cur = slot.getItem();
 				
-				if (slot.inventory == this.inventory) {
+				if (slot.container == this.inventory) {
 					// Trying to take from the table
 					ItemStack dupe = cur.copy();
-					if (playerIn.inventory.addItemStackToInventory(dupe)) {
-						slot.putStack(ItemStack.EMPTY);
+					if (playerIn.inventory.add(dupe)) {
+						slot.set(ItemStack.EMPTY);
 						slot.onTake(playerIn, dupe);
 					}
 				} else {
@@ -269,12 +269,12 @@ public class MasterSpellCreationGui {
 						
 						// Try to add to existing
 						for (int i = 0; i < inventory.getReagentSlotCount(); i++) {
-							ItemStack stack = inventory.getStackInSlot(i + inventory.getReagentSlotIndex());
+							ItemStack stack = inventory.getItem(i + inventory.getReagentSlotIndex());
 							if (stack.isEmpty() || stack.getItem() != cur.getItem())
 								continue;
 							Slot reagentSlot = this.getSlot(i + inventory.getReagentSlotIndex());
 							
-							int maxsize = Math.min(stack.getMaxStackSize(), reagentSlot.getSlotStackLimit());
+							int maxsize = Math.min(stack.getMaxStackSize(), reagentSlot.getMaxStackSize());
 							int room = maxsize - stack.getCount();
 							if (room >= cur.getCount()) {
 								stack.grow(cur.getCount());
@@ -291,35 +291,35 @@ public class MasterSpellCreationGui {
 						// If still ahve items, add to empty slots
 						if (!cur.isEmpty())
 						for (int i = 0; i < inventory.getReagentSlotCount(); i++) {
-							ItemStack stack = inventory.getStackInSlot(i + inventory.getReagentSlotIndex());
+							ItemStack stack = inventory.getItem(i + inventory.getReagentSlotIndex());
 							if (!stack.isEmpty())
 								continue;
 							Slot reagentSlot = this.getSlot(i + inventory.getReagentSlotIndex());
 							
-							int maxsize = reagentSlot.getSlotStackLimit();
+							int maxsize = reagentSlot.getMaxStackSize();
 							if (maxsize >= cur.getCount()) {
-								reagentSlot.putStack(cur.copy());
+								reagentSlot.set(cur.copy());
 								cur.setCount(0);
 							} else {
-								reagentSlot.putStack(cur.split(maxsize));
+								reagentSlot.set(cur.split(maxsize));
 							}
 							
 							if (cur.isEmpty())
 								break;
 						}
 					} else if (cur.getItem() instanceof BlankScroll) {
-						ItemStack existing = inventory.getStackInSlot(inventory.getScrollSlotIndex());
+						ItemStack existing = inventory.getItem(inventory.getScrollSlotIndex());
 						if (existing.isEmpty()) {
-							inventory.setInventorySlotContents(inventory.getScrollSlotIndex(),
+							inventory.setItem(inventory.getScrollSlotIndex(),
 									cur.split(1));
 							this.validate();
 						}
 					} else if (cur.getItem() instanceof SpellRune) {
 						// Only allow adding if blank scroll is in place
-						ItemStack scroll = inventory.getStackInSlot(inventory.getScrollSlotIndex());
+						ItemStack scroll = inventory.getItem(inventory.getScrollSlotIndex());
 						if (scroll.isEmpty() || !(scroll.getItem() instanceof BlankScroll)) {
 							// Do nothing
-						} else if (!inventory.getStackInSlot(inventory.getRuneSlotIndex() + inventory.getRuneSlotCount() - 1).isEmpty()) {
+						} else if (!inventory.getItem(inventory.getRuneSlotIndex() + inventory.getRuneSlotCount() - 1).isEmpty()) {
 							// If something's in last slot, we're full
 							// Table will naturally shift things down
 						} else {
@@ -337,10 +337,10 @@ public class MasterSpellCreationGui {
 							
 							if (add) {
 								int index = inventory.getRuneSlotIndex();
-								while (!inventory.getStackInSlot(index).isEmpty())
+								while (!inventory.getItem(index).isEmpty())
 									index++;
 								
-								inventory.setInventorySlotContents(index, cur.split(1));
+								inventory.setItem(index, cur.split(1));
 								//cur = ItemStack.EMPTY;
 								this.validate();
 							}
@@ -349,7 +349,7 @@ public class MasterSpellCreationGui {
 				}
 				
 				if (cur.isEmpty()) {
-					slot.putStack(ItemStack.EMPTY);
+					slot.set(ItemStack.EMPTY);
 				}
 			}
 			
@@ -413,7 +413,7 @@ public class MasterSpellCreationGui {
 				fail = true;
 			}
 
-			SpellCraftContext context = new SpellCraftContext(crafter, inventory.getWorld(), inventory.getPos());
+			SpellCraftContext context = new SpellCraftContext(crafter, inventory.getLevel(), inventory.getBlockPos());
 			List<String> rawSpellErrors = new ArrayList<>();
 			if (!SpellCrafting.CheckForValidRunes(context, inventory, 1, inventory.getReagentSlotIndex()-1, rawSpellErrors)) {
 				// Dump raw errors into output strings and return
@@ -484,7 +484,7 @@ public class MasterSpellCreationGui {
 		}
 		
 		public void setScroll(@Nonnull ItemStack item) {
-			this.inventory.setInventorySlotContents(0, item);
+			this.inventory.setItem(0, item);
 			isValid = false;
 		}
 
@@ -494,19 +494,19 @@ public class MasterSpellCreationGui {
 	// returns amount needed still. 0 means all that were needed are there
 	private static int takeReagent(SpellTableTileEntity inventory, ReagentType type, int count, boolean take) {
 		for (int i = inventory.getReagentSlotIndex(); i < inventory.getReagentSlotIndex() + inventory.getReagentSlotCount(); i++) {
-			@Nonnull ItemStack stack = inventory.getStackInSlot(i);
+			@Nonnull ItemStack stack = inventory.getItem(i);
 			if (stack.isEmpty())
 				continue;
 			
 			if (ReagentItem.FindType(stack) == type) {
 				if (stack.getCount() > count) {
 					if (take)
-						inventory.decrStackSize(i, count);
+						inventory.removeItem(i, count);
 					count = 0;
 				} else {
 					count -= stack.getCount();
 					if (take)
-						inventory.setInventorySlotContents(i, ItemStack.EMPTY);
+						inventory.setItem(i, ItemStack.EMPTY);
 				}
 				
 				if (count == 0)
@@ -541,7 +541,7 @@ public class MasterSpellCreationGui {
 			public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
 				float tint = 1f;
-				mc.getTextureManager().bindTexture(TEXT);
+				mc.getTextureManager().bind(TEXT);
 				if (mouseX >= this.x && mouseY >= this.y
 						&& mouseX <= this.x + this.width
 						&& mouseY <= this.y + this.height) {
@@ -570,16 +570,16 @@ public class MasterSpellCreationGui {
 		public SpellGui(SpellCreationContainer container, PlayerInventory playerInv, ITextComponent name) {
 			super(container, playerInv, name);
 			this.container = container;
-			this.xSize = GUI_WIDTH;
-			this.ySize = GUI_HEIGHT;
+			this.imageWidth = GUI_WIDTH;
+			this.imageHeight = GUI_HEIGHT;
 			final Minecraft mc = Minecraft.getInstance();
-			this.nameField = new TextFieldWidget(mc.fontRenderer, 0, 0, NAME_WIDTH, NAME_HEIGHT, new StringTextComponent(container.name));
-			this.nameField.setMaxStringLength(NAME_MAX);
+			this.nameField = new TextFieldWidget(mc.font, 0, 0, NAME_WIDTH, NAME_HEIGHT, new StringTextComponent(container.name));
+			this.nameField.setMaxLength(NAME_MAX);
 			this.nameField.setResponder((s) -> {
 				container.name = s;
 				container.validate();
 			});
-			this.nameField.setValidator((s) -> {
+			this.nameField.setFilter((s) -> {
 				// do this better? If it ends up sucking. Otherwise this is probably fine
 				return s.codePoints().allMatch(MasterSpellCreationGui::isValidChar);
 			});
@@ -595,8 +595,8 @@ public class MasterSpellCreationGui {
 			super.init();
 			
 			int extraMargin = 3;
-			final int horizontalMargin = ((width - xSize) / 2);
-			final int verticalMargin = (height - ySize) / 2;
+			final int horizontalMargin = ((width - imageWidth) / 2);
+			final int verticalMargin = (height - imageHeight) / 2;
 			final int spaceWidth = horizontalMargin - (2 * extraMargin); // amount of space to draw in
 			
 			final int perRow = spaceWidth / ICON_BUTTON_LENGTH;
@@ -621,11 +621,11 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
-			int horizontalMargin = (width - xSize) / 2;
-			int verticalMargin = (height - ySize) / 2;
+		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+			int horizontalMargin = (width - imageWidth) / 2;
+			int verticalMargin = (height - imageHeight) / 2;
 			
-			mc.getTextureManager().bindTexture(TEXT);
+			mc.getTextureManager().bind(TEXT);
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			int x = (width - MESSAGE_WIDTH) / 2;
@@ -647,28 +647,28 @@ public class MasterSpellCreationGui {
 				if (container.spellValid) {
 					String costStr = "Mana Cost: " + container.lastManaCost;
 					String weightStr = "Weight: " + container.lastWeight;
-					final int weightStrLen = mc.fontRenderer.getStringWidth(weightStr);
+					final int weightStrLen = mc.font.width(weightStr);
 					final int margin = 10;
 					
-					mc.fontRenderer.drawString(matrixStackIn, costStr, horizontalMargin + margin, verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
-					mc.fontRenderer.drawString(matrixStackIn, weightStr, horizontalMargin + xSize - (margin + weightStrLen), verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
+					mc.font.draw(matrixStackIn, costStr, horizontalMargin + margin, verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
+					mc.font.draw(matrixStackIn, weightStr, horizontalMargin + imageWidth - (margin + weightStrLen), verticalMargin + MANA_VOFFSET, 0xFFD3D3D3);
 				}
 			}
 			
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			
 			if (container.isValid) {
-				int horizontalMargin = (width - xSize) / 2;
-				int verticalMargin = (height - ySize) / 2;
+				int horizontalMargin = (width - imageWidth) / 2;
+				int verticalMargin = (height - imageHeight) / 2;
 				
 				if (!container.spellValid) {
 					
 					if (mouseX > horizontalMargin + STATUS_DISP_HOFFSET && mouseX <= horizontalMargin + STATUS_DISP_HOFFSET + STATUS_WIDTH
 						 && mouseY > verticalMargin + STATUS_DISP_VOFFSET && mouseY <= verticalMargin + STATUS_DISP_VOFFSET + STATUS_HEIGHT) {
-						this.func_243308_b(matrixStackIn, container.spellErrorStrings,
+						this.renderComponentTooltip(matrixStackIn, container.spellErrorStrings,
 								mouseX - horizontalMargin, mouseY - verticalMargin);
 					}
 				}
@@ -681,22 +681,22 @@ public class MasterSpellCreationGui {
 				if (mouseX >= horizontalMargin + SUBMIT_HOFFSET && mouseX <= horizontalMargin + SUBMIT_HOFFSET + SUBMIT_WIDTH && 
 						mouseY >= verticalMargin + SUBMIT_VOFFSET && mouseY <= verticalMargin + SUBMIT_VOFFSET + SUBMIT_HEIGHT) {
 					RenderFuncs.drawRect(matrixStackIn, SUBMIT_HOFFSET, SUBMIT_VOFFSET, SUBMIT_HOFFSET + SUBMIT_WIDTH, SUBMIT_VOFFSET + SUBMIT_HEIGHT, 0x40000000);
-					this.func_243308_b(matrixStackIn, container.reagentStrings,
+					this.renderComponentTooltip(matrixStackIn, container.reagentStrings,
 							mouseX - horizontalMargin, mouseY - verticalMargin);
 				}
 			}
 			
 			if (!container.isValid) {
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(0, 0, 500);
-				mc.getTextureManager().bindTexture(TEXT);
+				mc.getTextureManager().bind(TEXT);
 				RenderSystem.enableBlend();
 				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn,
 						(GUI_WIDTH - MESSAGE_WIDTH) / 2,
 						MESSAGE_DISPLAY_VOFFSET, MESSAGE_VALID_HOFFSET,
 						MESSAGE_VALID_VOFFSET, MESSAGE_WIDTH,
 						MESSAGE_HEIGHT, 256, 256);
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 			
 		}
@@ -711,8 +711,8 @@ public class MasterSpellCreationGui {
 			
 		@Override
 		public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-			int guiLeft = (width - xSize) / 2;
-			int guiTop = (height - ySize) / 2;
+			int guiLeft = (width - imageWidth) / 2;
+			int guiTop = (height - imageHeight) / 2;
 			
 			if (container.isValid) {
 				int left = guiLeft + NAME_HOFFSET;
@@ -743,7 +743,7 @@ public class MasterSpellCreationGui {
 											container.iconIndex
 											));
 									container.name = "";
-									this.nameField.setText("");
+									this.nameField.setValue("");
 									container.iconIndex = -1;
 								}
 							} else {
@@ -759,11 +759,11 @@ public class MasterSpellCreationGui {
 		@Override
 		public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
 			if (p_keyPressed_1_ == 256) {
-				this.mc.player.closeScreen();
+				this.mc.player.closeContainer();
 			}
 
 			// Copied from AnvilScreen
-			return !this.nameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) && !this.nameField.canWrite() ? super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : true;
+			return !this.nameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) && !this.nameField.canConsumeInput() ? super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_) : true;
 		}
 		
 		@Override
@@ -793,7 +793,7 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		public boolean isItemValid(@Nonnull ItemStack stack) {
+		public boolean mayPlace(@Nonnull ItemStack stack) {
 			// Can put the item in if:
 			// it's empty
 			// OR previous slot is not null (not the first trigger-only slot)
@@ -803,7 +803,7 @@ public class MasterSpellCreationGui {
 				return false;
 			
 			if (prev != null &&
-					!prev.getHasStack())
+					!prev.hasItem())
 				return false;
 			
 			if (stack.isEmpty())
@@ -822,14 +822,14 @@ public class MasterSpellCreationGui {
 		
 		@Override
 		@OnlyIn(Dist.CLIENT)
-		public boolean isEnabled() {
+		public boolean isActive() {
 			return (prev == null ||
-					prev.getHasStack());
+					prev.hasItem());
 		}
 		
 		@Override
-		public void putStack(@Nonnull ItemStack stack) {
-			super.putStack(stack);
+		public void set(@Nonnull ItemStack stack) {
+			super.set(stack);
 			
 			container.validate();
 		}
@@ -839,11 +839,11 @@ public class MasterSpellCreationGui {
 			// This is called AFTER things have been changed or swapped
 			// Which means we just look to see if we have an item.
 			// If not, take item from next
-			if (!this.getHasStack() && next != null && next.getHasStack()) {
+			if (!this.hasItem() && next != null && next.hasItem()) {
 				System.out.println("grabbing stack");
-				this.putStack(next.getStack().copy());
-				next.putStack(ItemStack.EMPTY);
-				next.onTake(playerIn, this.getStack());
+				this.set(next.getItem().copy());
+				next.set(ItemStack.EMPTY);
+				next.onTake(playerIn, this.getItem());
 			}
 
 			container.validate();
@@ -852,7 +852,7 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		public int getSlotStackLimit() {
+		public int getMaxStackSize() {
 			return 1;
 		}
 	}

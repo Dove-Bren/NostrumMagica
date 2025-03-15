@@ -52,7 +52,7 @@ public class ClientEffectRitual extends ClientEffect {
 	@Override
 	public void onStart() {
 		Minecraft mc = Minecraft.getInstance();
-		TileEntity te = mc.world.getTileEntity(new BlockPos(origin).down());
+		TileEntity te = mc.level.getBlockEntity(new BlockPos(origin).below());
 		if (te != null && te instanceof AltarTileEntity) {
 			((AltarTileEntity) te).hideItem(true);
 		}
@@ -61,7 +61,7 @@ public class ClientEffectRitual extends ClientEffect {
 	@Override
 	public void onEnd() {
 		Minecraft mc = Minecraft.getInstance();
-		TileEntity te = mc.world.getTileEntity(new BlockPos(origin).down());
+		TileEntity te = mc.level.getBlockEntity(new BlockPos(origin).below());
 		if (te != null && te instanceof AltarTileEntity) {
 			((AltarTileEntity) te).hideItem(false);
 		}
@@ -106,11 +106,11 @@ public class ClientEffectRitual extends ClientEffect {
 		final float scale = .75f;
 		//final float rotPeriod = .5f;
 		//final float rot = 360f * ((adjProgress % rotPeriod) / rotPeriod); // make rotate?
-		float rot = 360f * (float) ((double)(mc.world.getGameTime() % 200) / 200.0);
+		float rot = 360f * (float) ((double)(mc.level.getGameTime() % 200) / 200.0);
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(pos.x, pos.y, pos.z);
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rot));
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(rot));
 		
 		matrixStackIn.scale(scale, scale, scale);
 //		GlStateManager.enableBlend();
@@ -119,15 +119,15 @@ public class ClientEffectRitual extends ClientEffect {
 //		GlStateManager.enableAlphaTest();
 //		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-		RenderHelper.enableStandardItemLighting();
+		RenderHelper.turnBackOn();
 		
 		RenderFuncs.RenderWorldItem(stack, matrixStackIn);
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 		if (NostrumMagica.rand.nextBoolean()
 				&& NostrumMagica.rand.nextBoolean()) {
-			NostrumParticles.GLOW_ORB.spawn(mc.player.world, (new SpawnParams(
+			NostrumParticles.GLOW_ORB.spawn(mc.player.level, (new SpawnParams(
 					1, origin.x + pos.x, origin.y + pos.y - .15, origin.z + pos.z, .1, 15, 5,
 					new Vector3d(0, -.01, 0), null
 					)).color(.4f, .3f, .2f, .4f));
@@ -144,9 +144,9 @@ public class ClientEffectRitual extends ClientEffect {
 			final float rotPeriod = .5f;
 			final float rot = 360f * ((adjProgress % rotPeriod) / rotPeriod); // make rotate?
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(pos.x, pos.y, pos.z);
-			matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rot));
+			matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(rot));
 			
 			matrixStackIn.scale(scale, scale, scale);
 //			GlStateManager.enableBlend();
@@ -154,18 +154,18 @@ public class ClientEffectRitual extends ClientEffect {
 //			GlStateManager.disableLighting();
 //			GlStateManager.enableAlphaTest();
 //			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-			RenderHelper.enableStandardItemLighting();
+			RenderHelper.turnBackOn();
 			
 			RenderFuncs.RenderWorldItem(reagent, matrixStackIn);
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		if (
 				NostrumMagica.rand.nextBoolean()
 				)
 		{
-			NostrumParticles.GLOW_ORB.spawn(mc.player.world, (new SpawnParams(
+			NostrumParticles.GLOW_ORB.spawn(mc.player.level, (new SpawnParams(
 					1, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, 0, 45, 15,
 					new Vector3d(0, -.02, 0), null
 					)).color(.4f, .3f, .2f, .4f));
@@ -173,7 +173,7 @@ public class ClientEffectRitual extends ClientEffect {
 	}
 	
 	protected void drawRevealCloud(MatrixStack matrixStackIn, Minecraft mc, float adjProgress, float partialTicks, Vector3d pos) {
-		NostrumParticles.GLOW_ORB.spawn(mc.player.world, (new SpawnParams(
+		NostrumParticles.GLOW_ORB.spawn(mc.player.level, (new SpawnParams(
 				10, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, 0, 40, 20,
 				Vector3d.ZERO, new Vector3d(.1, .1, .1)
 				)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)));
@@ -273,13 +273,13 @@ public class ClientEffectRitual extends ClientEffect {
 				final double range = 4;
 				final Vector3d pos = Vector3d.ZERO;
 				if (adjProgress < .85f) {
-					NostrumParticles.FILLED_ORB.spawn(mc.player.world, (new SpawnParams(
+					NostrumParticles.FILLED_ORB.spawn(mc.player.level, (new SpawnParams(
 							4, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, range, 30, 20,
 							new Vector3d(0, .01, 0), new Vector3d(.1, .1, .1)
 							)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)));
 				} else {
 					final double yDiff = .35 + .5;
-					NostrumParticles.FILLED_ORB.spawn(mc.player.world, (new SpawnParams(
+					NostrumParticles.FILLED_ORB.spawn(mc.player.level, (new SpawnParams(
 							4, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, range, 20, 0,
 							origin.add(0, yDiff, 0)
 							)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)).dieOnTarget(true));
@@ -330,7 +330,7 @@ public class ClientEffectRitual extends ClientEffect {
 			{
 				final double range = 4;
 				final Vector3d pos = Vector3d.ZERO;
-				NostrumParticles.FILLED_ORB.spawn(mc.player.world, (new SpawnParams(
+				NostrumParticles.FILLED_ORB.spawn(mc.player.level, (new SpawnParams(
 						4, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, range, 30, 20,
 						origin.add(0, .35, 0)
 						)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)));

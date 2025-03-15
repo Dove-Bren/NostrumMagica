@@ -10,8 +10,8 @@ public class DungeonBarsBlock extends PaneBlock {
 	public static final String ID = "dungeon_bars";
 	
 	public DungeonBarsBlock() {
-		super(Block.Properties.create(Material.IRON)
-				.hardnessAndResistance(-1.0F, 3600000.8F)
+		super(Block.Properties.of(Material.METAL)
+				.strength(-1.0F, 3600000.8F)
 				.noDrops()
 				.sound(SoundType.METAL)
 				);

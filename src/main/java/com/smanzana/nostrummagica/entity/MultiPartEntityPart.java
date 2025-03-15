@@ -24,8 +24,8 @@ import net.minecraftforge.fml.network.NetworkHooks;
 
 public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity implements IMultiPartEntityPart<T> {
 	
-	protected static final DataParameter<Optional<UUID>> PARENT_ID = EntityDataManager.<Optional<UUID>>createKey(MultiPartEntityPart.class, DataSerializers.OPTIONAL_UNIQUE_ID);
-	protected static final DataParameter<String> PART_NAME = EntityDataManager.createKey(MultiPartEntityPart.class, DataSerializers.STRING);
+	protected static final DataParameter<Optional<UUID>> PARENT_ID = EntityDataManager.<Optional<UUID>>defineId(MultiPartEntityPart.class, DataSerializers.OPTIONAL_UUID);
+	protected static final DataParameter<String> PART_NAME = EntityDataManager.defineId(MultiPartEntityPart.class, DataSerializers.STRING);
 
 	protected EntitySize size;
 	protected int orphanTicks;
@@ -46,18 +46,18 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 	}
 	
 	public void init(@Nonnull T parent, String partName) {
-		this.dataManager.set(PARENT_ID, Optional.of(((Entity) parent).getUniqueID()));
-		this.dataManager.set(PART_NAME, partName);
+		this.entityData.set(PARENT_ID, Optional.of(((Entity) parent).getUUID()));
+		this.entityData.set(PART_NAME, partName);
 		
 		parentCache = parent;
 	}
 	
 	public String getPartName() {
-		return this.dataManager.get(PART_NAME);
+		return this.entityData.get(PART_NAME);
 	}
 	
 	public @Nullable UUID getParentID() {
-		return this.dataManager.get(PARENT_ID).orElse(null);
+		return this.entityData.get(PARENT_ID).orElse(null);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -65,8 +65,8 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 	public @Nullable T getParent() {
 		if (parentCache == null) {
 			UUID parentID = getParentID();
-			if (parentID != null && this.world != null) {
-				Entity e = Entities.FindEntity(this.world, parentID);
+			if (parentID != null && this.level != null) {
+				Entity e = Entities.FindEntity(this.level, parentID);
 				try {
 					parentCache = (T) e;
 				} catch (Exception exception) {
@@ -76,7 +76,7 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 			
 			if (parentCache != null) {
 				// Found parent for the first time!
-				if (world.isRemote()) {
+				if (level.isClientSide()) {
 					// Try to attach to parent
 					if (!parentCache.attachClientEntity(this)) {
 						// Parent claims we're not theirs.
@@ -92,44 +92,44 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 	}
 	
 	@Override
-	public boolean isEntityEqual(Entity entityIn) {
+	public boolean is(Entity entityIn) {
 		return entityIn == this || (getParent() != null && entityIn == this.getParent());
 	}
 	
 	@Override
-	protected void registerData() {
-		this.dataManager.register(PARENT_ID, Optional.empty());
-		this.dataManager.register(PART_NAME, "ENTITY_PART");
+	protected void defineSynchedData() {
+		this.entityData.define(PARENT_ID, Optional.empty());
+		this.entityData.define(PART_NAME, "ENTITY_PART");
 	}
 
 	@Override
-	protected void readAdditional(CompoundNBT compound) {
+	protected void readAdditionalSaveData(CompoundNBT compound) {
 		// This handles the initial spawn if the server entity has already changed values
 		final String name = compound.getString("name");
-		final UUID parentID = compound.hasUniqueId("parentID") ? compound.getUniqueId("parentID") : null;
-		this.dataManager.set(PARENT_ID, Optional.of(parentID));
-		this.dataManager.set(PART_NAME, name);
+		final UUID parentID = compound.hasUUID("parentID") ? compound.getUUID("parentID") : null;
+		this.entityData.set(PARENT_ID, Optional.of(parentID));
+		this.entityData.set(PART_NAME, name);
 	}
 
 	@Override
-	protected void writeAdditional(CompoundNBT compound) {
+	protected void addAdditionalSaveData(CompoundNBT compound) {
 		compound.putString("name", this.getPartName());
-		compound.putUniqueId("parentID", getParentID());
+		compound.putUUID("parentID", getParentID());
 	}
 	
 	@Override
-	public boolean writeUnlessRemoved(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundNBT compound) {
 		// Don't save! We generate each time
 		return false;
 	}
 
 	@Override
-	public IPacket<?> createSpawnPacket() {
+	public IPacket<?> getAddEntityPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 	
 	@Override
-	public boolean canBeCollidedWith() {
+	public boolean isPickable() {
 		return true;
 	}
 	
@@ -137,7 +137,7 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 	 * Called when the entity is attacked.
 	 */
 	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount) {
+	public boolean hurt(DamageSource source, float amount) {
 		if (this.getParent() == null) {
 			return false;
 		}
@@ -145,7 +145,7 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 	}
 	
 	@Override
-	public EntitySize getSize(Pose poseIn) {
+	public EntitySize getDimensions(Pose poseIn) {
 		return this.size;
 	}
 	
@@ -168,10 +168,10 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 	
 	public void setSize(EntitySize size) {
 		this.size = size;
-		this.recalculateSize();
+		this.refreshDimensions();
 	}
 	
 	public void setSize(float width, float height) {
-		this.setSize(EntitySize.flexible(width, height));
+		this.setSize(EntitySize.scalable(width, height));
 	}
 }

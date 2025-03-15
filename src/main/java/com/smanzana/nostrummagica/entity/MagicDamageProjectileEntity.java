@@ -35,7 +35,7 @@ public class MagicDamageProjectileEntity extends DamagingProjectileEntity {
 	
 	public static final String ID = "magic_projectile";
 	
-	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(MagicDamageProjectileEntity.class, MagicElementDataSerializer.instance);
+	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>defineId(MagicDamageProjectileEntity.class, MagicElementDataSerializer.instance);
 	protected float damage;
 
 	public MagicDamageProjectileEntity(EntityType<? extends DamagingProjectileEntity> type, World world) {
@@ -44,17 +44,17 @@ public class MagicDamageProjectileEntity extends DamagingProjectileEntity {
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
-		dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		entityData.define(ELEMENT, EMagicElement.PHYSICAL);
 	}
 
 	public EMagicElement getElement() {
-		return dataManager.get(ELEMENT);
+		return entityData.get(ELEMENT);
 	}
 
 	public void setElement(EMagicElement element) {
-		this.dataManager.set(ELEMENT, element);
+		this.entityData.set(ELEMENT, element);
 	}
 
 	public float getDamage() {
@@ -66,38 +66,38 @@ public class MagicDamageProjectileEntity extends DamagingProjectileEntity {
 	}
 	
 	@Override
-	public boolean writeUnlessRemoved(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundNBT compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
     }
 	
 	@Override
-	protected boolean isFireballFiery() {
+	protected boolean shouldBurn() {
 		return false;
 	}
 	
 	@Override
-	protected IParticleData getParticle() {
+	protected IParticleData getTrailParticle() {
 		return new NostrumParticleData(NostrumParticles.WARD.getType(), new SpawnParams(1, 0, 0, 0, 0, 1, 0, Vector3d.ZERO));
 	}
 	
 	@Override
-	public IPacket<?> createSpawnPacket() {
+	public IPacket<?> getAddEntityPacket() {
 		// Have to override and use forge to use with non-living Entity types even though parent defines
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 	
 	public @Nullable Entity getShooter() {
-		return super.func_234616_v_();
+		return super.getOwner();
 	}
 	
 	protected void doClientEffect() {
 		int color = getElement().getColor();
 		color = (0x19000000) | (color & 0x00FFFFFF);
-		NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
+		NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
 				2,
-				getPosX(), getPosY() + getHeight()/2f, getPosZ(), 0, 40, 0,
-				new Vector3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
+				getX(), getY() + getBbHeight()/2f, getZ(), 0, 40, 0,
+				new Vector3d(random.nextFloat() * .05 - .025, random.nextFloat() * .05, random.nextFloat() * .05 - .025), null
 			).color(color));
 	}
 	
@@ -105,23 +105,23 @@ public class MagicDamageProjectileEntity extends DamagingProjectileEntity {
 	public void tick() {
 		super.tick();
 		
-		if (world.isRemote()) {
+		if (level.isClientSide()) {
 			doClientEffect();
 		}
 	}
 	
 	@Override
-	protected boolean func_230298_a_(Entity entity) {
+	protected boolean canHitEntity(Entity entity) {
 		return this.canImpact(entity);
 	}
 	
 	public boolean canImpact(Entity entity) {
-		return this.getShooter() == null || ((!entity.equals(getShooter()) && !getShooter().isRidingSameEntity(entity)));
+		return this.getShooter() == null || ((!entity.equals(getShooter()) && !getShooter().isPassengerOfSameVehicle(entity)));
 	}
 	
 	@Override
-	protected void onEntityHit(EntityRayTraceResult result) {
-		if (!world.isRemote()) {
+	protected void onHitEntity(EntityRayTraceResult result) {
+		if (!level.isClientSide()) {
 			Entity entityHit = result.getEntity();
 			boolean canImpact = this.canImpact(entityHit);
 			if (canImpact && entityHit instanceof LivingEntity) {
@@ -132,8 +132,8 @@ public class MagicDamageProjectileEntity extends DamagingProjectileEntity {
 	}
 	
 	@Override
-	protected void func_230299_a_(BlockRayTraceResult result) {
-		if (!world.isRemote()) {
+	protected void onHitBlock(BlockRayTraceResult result) {
+		if (!level.isClientSide()) {
 			NostrumMagicaSounds.CAST_FAIL.play(this);
 			this.remove();
 		}

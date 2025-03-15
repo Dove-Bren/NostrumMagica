@@ -93,7 +93,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 				items.remove(pos + "");
 			else {
 				CompoundNBT compound = new CompoundNBT();
-				item.write(compound);
+				item.save(compound);
 				items.put(pos + "", compound);
 			}
 			
@@ -161,7 +161,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 			
 			CompoundNBT items = bag.getTag().getCompound(NBT_ITEMS);
 			if (items.contains(pos + "", NBT.TAG_COMPOUND))
-				return ItemStack.read(items.getCompound(pos + ""));
+				return ItemStack.of(items.getCompound(pos + ""));
 			else
 				return ItemStack.EMPTY;
 		}
@@ -219,36 +219,36 @@ public class ReagentBag extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
 		int pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, hand);
 		NostrumMagica.instance.proxy.openContainer(playerIn, ReagentBagGui.BagContainer.Make(pos));
 		
-		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getHeldItem(hand));
+		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getItemInHand(hand));
     }
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		if (context.getPlayer().isSneaking()) {
-			if (context.getWorld().isRemote()) {
+	public ActionResultType useOn(ItemUseContext context) {
+		if (context.getPlayer().isShiftKeyDown()) {
+			if (context.getLevel().isClientSide()) {
 				return ActionResultType.SUCCESS;
 			}
 			
 			// If sneaking, try and do container fast add.
-			final BlockPos pos = context.getPos();
-			final TileEntity te = context.getWorld().getTileEntity(pos);
+			final BlockPos pos = context.getClickedPos();
+			final TileEntity te = context.getLevel().getBlockEntity(pos);
 			if (te != null) {
 				
 				// First, check if it's a ritual setup and see about auto-inserting reagents
-				if (autoFillRitual(context.getWorld(), pos, te, context.getPlayer(), context.getItem())) {
+				if (autoFillRitual(context.getLevel(), pos, te, context.getPlayer(), context.getItemInHand())) {
 					return ActionResultType.SUCCESS;
 				}
 				
 				// If not that, try to insert into container
-				ItemStack[] contents = getItems(context.getItem());
-				if (Inventories.attemptAddToTile(new IterableInventoryWrapper(new ItemStackArrayWrapper(contents)), context.getWorld().getBlockState(pos), te, context.getFace())) {
+				ItemStack[] contents = getItems(context.getItemInHand());
+				if (Inventories.attemptAddToTile(new IterableInventoryWrapper(new ItemStackArrayWrapper(contents)), context.getLevel().getBlockState(pos), te, context.getClickedFace())) {
 					// Update contents
 					for (int i = 0; i < contents.length; i++) {
-						setItem(context.getItem(), contents[i], i);
+						setItem(context.getItemInHand(), contents[i], i);
 					}
 					return ActionResultType.SUCCESS;
 				}
@@ -257,7 +257,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 			// Fall through to default behavior if we fail
 		}
 		
-		return super.onItemUse(context);
+		return super.useOn(context);
 	}
 	
 	public static class ReagentInventory extends Inventory {
@@ -274,7 +274,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 			
 			int i = 0;
 			for (ItemStack reg : ReagentBag.getItems(stack)) {
-				this.setInventorySlotContents(i++, reg);
+				this.setItem(i++, reg);
 			}
 			
 			//this. = ReagentBag.getItems(stack);
@@ -290,17 +290,17 @@ public class ReagentBag extends Item implements ILoreTagged {
 	    	if (!(stack.getItem() instanceof ReagentItem))
 	    		return itemstack;
 
-	    	for (int i = 0; i < this.getSizeInventory(); ++i) {
-	            ItemStack itemstack1 = this.getStackInSlot(i);
+	    	for (int i = 0; i < this.getContainerSize(); ++i) {
+	            ItemStack itemstack1 = this.getItem(i);
 
 	            if (itemstack1.isEmpty()) {
-	                this.setInventorySlotContents(i, itemstack);
-	                this.markDirty();
+	                this.setItem(i, itemstack);
+	                this.setChanged();
 	                return ItemStack.EMPTY;
 	            }
 
-	            if (ItemStack.areItemsEqual(itemstack1, itemstack)) {
-	                int j = this.getInventoryStackLimit();
+	            if (ItemStack.isSame(itemstack1, itemstack)) {
+	                int j = this.getMaxStackSize();
 	                int k = Math.min(itemstack.getCount(), j - itemstack1.getCount());
 
 	                if (k > 0) {
@@ -308,7 +308,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	                    itemstack.shrink(k);
 
 	                    if (itemstack.getCount() <= 0) {
-	                        this.markDirty();
+	                        this.setChanged();
 	                        return ItemStack.EMPTY;
 	                    }
 	                }
@@ -316,30 +316,30 @@ public class ReagentBag extends Item implements ILoreTagged {
 	        }
 
 	        if (itemstack.getCount() != stack.getCount()) {
-	            this.markDirty();
+	            this.setChanged();
 	        }
 
 	        return itemstack;
 	    }
 
 	    @Override
-	    public void markDirty() {
+	    public void setChanged() {
 	    	// Bleed our changes out to the itemstack
 	    	if (!stack.isEmpty()) {
-	    		for (int i = 0; i < this.getSizeInventory(); i++) {
-	    			ReagentBag.setItem(stack, this.getStackInSlot(i), i);
+	    		for (int i = 0; i < this.getContainerSize(); i++) {
+	    			ReagentBag.setItem(stack, this.getItem(i), i);
 	    		}
 	    	} else {
 	    		System.out.println("no item base");
 	    	}
 	    	
-	    	super.markDirty();
+	    	super.setChanged();
 	    }
 	    
 	    /**
 	     * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended.
 	     */
-	    public int getInventoryStackLimit()
+	    public int getMaxStackSize()
 	    {
 	        return MAX_COUNT;
 	    }
@@ -348,7 +348,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	     * Returns true if automation is allowed to insert the given stack (ignoring stack size) into the given slot. For
 	     * guis use Slot.isItemValid
 	     */
-	    public boolean isItemValidForSlot(int index, ItemStack stack)
+	    public boolean canPlaceItem(int index, ItemStack stack)
 	    {
 	        return stack.getItem() instanceof ReagentItem;
 	    }
@@ -430,7 +430,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 			} else if (matches.size() > 1) {
 				// if full reagents aren't already out, give a nice message explaning what's going on
 				if (layout.getReagentItems(world, pos).size() < 4) {
-					player.sendMessage(new StringTextComponent("Matched multiple rituals. Filling for first. Use again to cycle."), Util.DUMMY_UUID);
+					player.sendMessage(new StringTextComponent("Matched multiple rituals. Filling for first. Use again to cycle."), Util.NIL_UUID);
 					match = matches.get(0);
 				} else {
 					// pull all reagents back to put fresh ones next. Figure out which recipe we're set up for.
@@ -486,7 +486,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 						return;
 					}
 					// Candle TE can exist or not
-					TileEntity candleTE = world.getTileEntity(candlePos);
+					TileEntity candleTE = world.getBlockEntity(candlePos);
 					if (candleTE != null && candleTE instanceof CandleTileEntity && ((CandleTileEntity) candleTE).getReagentType() != null) {
 						ReagentType type = ((CandleTileEntity) candleTE).getReagentType();
 						addItem(bag, ReagentItem.CreateStack(type, 1));
@@ -529,7 +529,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 								return;
 							}
 							// Candle TE can exist or not
-							TileEntity candleTE = world.getTileEntity(candlePos);
+							TileEntity candleTE = world.getBlockEntity(candlePos);
 							if (candleTE != null && candleTE instanceof CandleTileEntity && ((CandleTileEntity) candleTE).getReagentType() != null) {
 								return;
 							}
@@ -542,7 +542,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 					if (!found[0]) {
 						// Couldn't find candle, so... drop it?
 						ItemEntity item = new ItemEntity(world, pos.getX() + .5, pos.getY() + 1.5, pos.getZ() + .5, ReagentItem.CreateStack(missing, 1));
-						world.addEntity(item);
+						world.addFreshEntity(item);
 					}
 				}
 			}

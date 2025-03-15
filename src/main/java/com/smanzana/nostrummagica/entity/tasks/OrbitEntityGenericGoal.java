@@ -46,8 +46,8 @@ public class OrbitEntityGenericGoal<T extends MobEntity> extends Goal {
 	public OrbitEntityGenericGoal(T orbiter, LivingEntity target, double orbitDistance, double orbitPeriod, double assembleSpeed,
 			double ringWobbleSpeed, int ringWobbleBumps, Predicate<? super T> startFilter, Predicate<? super T> continueFilter) {
 		this.ent = orbiter;
-		this.theWorld = orbiter.world;
-		this.entMovementHelper = orbiter.getMoveHelper();
+		this.theWorld = orbiter.level;
+		this.entMovementHelper = orbiter.getMoveControl();
 		this.orbitTarget = target;
 		this.orbitDistance = orbitDistance;
 		this.orbitPeriod = orbitPeriod;
@@ -59,7 +59,7 @@ public class OrbitEntityGenericGoal<T extends MobEntity> extends Goal {
 		
 		cursor = new MutableVector3d(0, 0, 0);
 		
-		this.setMutexFlags(EnumSet.of(Goal.Flag.JUMP));
+		this.setFlags(EnumSet.of(Goal.Flag.JUMP));
 	}
 	
 	protected LivingEntity getOrbitTarget() {
@@ -69,7 +69,7 @@ public class OrbitEntityGenericGoal<T extends MobEntity> extends Goal {
 	/**
 	 * Returns whether the Goal should begin execution.
 	 */
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		LivingEntity entitylivingbase = this.getOrbitTarget();
 
 		if (entitylivingbase == null) {
@@ -79,15 +79,15 @@ public class OrbitEntityGenericGoal<T extends MobEntity> extends Goal {
 //		} else if (this.ent.getMoveHelper().isUpdating()
 //				&& ent.getDistanceSq(ent.getMoveHelper().getX(), ent.getMoveHelper().getY(), ent.getMoveHelper().getZ()) > 1.0) {
 //			return false;
-		} else if (!ent.world.equals(entitylivingbase.getEntityWorld())) {
+		} else if (!ent.level.equals(entitylivingbase.getCommandSenderWorld())) {
 			return false;
-		} else if (ent.getDistanceSq(entitylivingbase) > 1024) {
+		} else if (ent.distanceToSqr(entitylivingbase) > 1024) {
 			return false;
 		} else if (startPred != null && !startPred.apply(ent)) {
 			return false;
 		} else {
 			this.orbitTarget = entitylivingbase; // In case getOrbitTarget is overriden
-			this.theWorld = entitylivingbase.world;
+			this.theWorld = entitylivingbase.level;
 			return true;
 		}
 	}
@@ -95,12 +95,12 @@ public class OrbitEntityGenericGoal<T extends MobEntity> extends Goal {
 	/**
 	 * Returns whether an in-progress Goal should continue executing
 	 */
-	public boolean shouldContinueExecuting() {
+	public boolean canContinueToUse() {
 		// Only stop if something died, something changed worlds, or a continue pred was provided and returns false.
 		
 		if (		!ent.isAlive()
 				|| !orbitTarget.isAlive()
-				|| !ent.world.equals(orbitTarget.world)
+				|| !ent.level.equals(orbitTarget.level)
 				|| (continuePred != null && !continuePred.apply(ent))) {
 			return false;
 		}
@@ -111,7 +111,7 @@ public class OrbitEntityGenericGoal<T extends MobEntity> extends Goal {
 	/**
 	 * Execute a one shot task or start executing a continuous task
 	 */
-	public void startExecuting() {
+	public void start() {
 		// Figure out what our starting yaw is
 		offsetYaw = NostrumMagica.rand.nextFloat();
 	}
@@ -119,7 +119,7 @@ public class OrbitEntityGenericGoal<T extends MobEntity> extends Goal {
 	/**
 	 * Resets the task
 	 */
-	public void resetTask() {
+	public void stop() {
 		;
 	}
 
@@ -151,12 +151,12 @@ public class OrbitEntityGenericGoal<T extends MobEntity> extends Goal {
 	 * Updates the task
 	 */
 	public void tick() {
-		getPoint(cursor, orbitDistance, orbitPeriod, ent.ticksExisted, offsetYaw, ringWobbleBumps, ringWobbleSpeed);
-		if (ent.getDistanceSq(cursor.xCoord + orbitTarget.getPosX(), cursor.yCoord + orbitTarget.getPosY() + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.getPosZ())
+		getPoint(cursor, orbitDistance, orbitPeriod, ent.tickCount, offsetYaw, ringWobbleBumps, ringWobbleSpeed);
+		if (ent.distanceToSqr(cursor.xCoord + orbitTarget.getX(), cursor.yCoord + orbitTarget.getY() + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.getZ())
 				> 512) {
-			ent.setPosition(cursor.xCoord + orbitTarget.getPosX(), cursor.yCoord + orbitTarget.getPosY() + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.getPosZ());
+			ent.setPos(cursor.xCoord + orbitTarget.getX(), cursor.yCoord + orbitTarget.getY() + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.getZ());
 		} else {
-			ent.getMoveHelper().setMoveTo(cursor.xCoord + orbitTarget.getPosX(), cursor.yCoord + orbitTarget.getPosY() + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.getPosZ(), 2);
+			ent.getMoveControl().setWantedPosition(cursor.xCoord + orbitTarget.getX(), cursor.yCoord + orbitTarget.getY() + orbitTarget.getEyeHeight() + .75, cursor.zCoord + orbitTarget.getZ(), 2);
 		}
 	}
 	

@@ -15,7 +15,7 @@ public class CommandTestConfig {
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
 				Commands.literal("testconfig")
-					.requires(s -> s.hasPermissionLevel(2))
+					.requires(s -> s.hasPermission(2))
 					.then(Commands.argument("level", IntegerArgumentType.integer())
 							.executes(ctx -> execute(ctx, IntegerArgumentType.getInteger(ctx, "level")))
 							)

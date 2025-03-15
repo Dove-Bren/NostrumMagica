@@ -16,21 +16,21 @@ public final class WilloStatusSerializer implements IDataSerializer<WilloStatus>
 	
 	@Override
 	public void write(PacketBuffer buf, WilloStatus value) {
-		buf.writeEnumValue(value);
+		buf.writeEnum(value);
 	}
 
 	@Override
 	public WilloStatus read(PacketBuffer buf)  {
-		return buf.readEnumValue(WilloStatus.class);
+		return buf.readEnum(WilloStatus.class);
 	}
 
 	@Override
-	public DataParameter<WilloStatus> createKey(int id) {
+	public DataParameter<WilloStatus> createAccessor(int id) {
 		return new DataParameter<>(id, this);
 	}
 
 	@Override
-	public WilloStatus copyValue(WilloStatus value) {
+	public WilloStatus copy(WilloStatus value) {
 		return value;
 	}
 }

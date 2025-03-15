@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 public class SpellTeleportation {
 	
 	private static final boolean isPassable(World world, BlockPos pos) {
-		if (world.isAirBlock(pos))
+		if (world.isEmptyBlock(pos))
 			return true;
 		
 		BlockState state = world.getBlockState(pos);
@@ -24,7 +24,7 @@ public class SpellTeleportation {
 			return true;
 		if (state.getMaterial().isLiquid())
 			return true;
-		if (!state.getMaterial().blocksMovement())
+		if (!state.getMaterial().blocksMotion())
 			return true;
 		
 		return false;
@@ -32,24 +32,24 @@ public class SpellTeleportation {
 	
 	protected static final @Nullable Vector3d BlinkNoPassthrough(Entity entity, Vector3d source, Vector3d idealDestination) {
 		Vector3d dest = null;
-		RayTraceResult mop = entity.world.rayTraceBlocks(new RayTraceContext(source, idealDestination, BlockMode.COLLIDER, FluidMode.NONE, entity));
-		if (mop != null && mop.getHitVec().distanceTo(source) > 0.5) {
+		RayTraceResult mop = entity.level.clip(new RayTraceContext(source, idealDestination, BlockMode.COLLIDER, FluidMode.NONE, entity));
+		if (mop != null && mop.getLocation().distanceTo(source) > 0.5) {
 			// We got one
 			BlockPos pos;
 			if (mop.getType() == RayTraceResult.Type.BLOCK) {
-				SpellLocation hitLoc = new SpellLocation(entity.world, mop);
+				SpellLocation hitLoc = new SpellLocation(entity.level, mop);
 				pos = hitLoc.hitBlockPos;
 			} else {
-				pos = new BlockPos(mop.getHitVec()); 
+				pos = new BlockPos(mop.getLocation()); 
 			}
 			
 			// Adjust down 1 if it's clear but one above is not
-			if (isPassable(entity.world, pos) && !isPassable(entity.world, pos.add(0, 1, 0)) && isPassable(entity.world, pos.add(0, -1, 0))) {
-				pos = pos.down();
+			if (isPassable(entity.level, pos) && !isPassable(entity.level, pos.offset(0, 1, 0)) && isPassable(entity.level, pos.offset(0, -1, 0))) {
+				pos = pos.below();
 			}
 			
-			if (isPassable(entity.world, pos) && isPassable(entity.world, pos.add(0, 1, 0))) {
-				dest = Vector3d.copyCentered(pos);
+			if (isPassable(entity.level, pos) && isPassable(entity.level, pos.offset(0, 1, 0))) {
+				dest = Vector3d.atCenterOf(pos);
 			}
 		}
 		return dest;
@@ -99,8 +99,8 @@ public class SpellTeleportation {
 		bpos = new BlockPos(dest.x, dest.y, dest.z);
 		// If passthrough, see if we get lucky and ideal spot has space
 		if (passthrough
-			&& isPassable(entity.world, bpos)
-			&& isPassable(entity.world, bpos.add(0, 1, 0))) {
+			&& isPassable(entity.level, bpos)
+			&& isPassable(entity.level, bpos.offset(0, 1, 0))) {
 				// Whoo! Looks like we can teleport there!
 		} else {
 			if (passthrough) {

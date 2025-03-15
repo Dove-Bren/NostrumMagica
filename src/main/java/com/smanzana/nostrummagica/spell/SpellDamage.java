@@ -136,7 +136,7 @@ public class SpellDamage {
 
 	protected static final float GetPhysicalAttributeBonusNoMainhand(@Nullable LivingEntity caster) {
 		// Get raw amount
-		if (caster == null || !caster.getAttributeManager().hasAttributeInstance(Attributes.ATTACK_DAMAGE)) {
+		if (caster == null || !caster.getAttributes().hasAttribute(Attributes.ATTACK_DAMAGE)) {
 			return 0f;
 		}
 		
@@ -144,7 +144,7 @@ public class SpellDamage {
 		amt -= 1; // Players always have +1 attack
 		
 		// Reduce any from main-hand weapon, since that's given assuming it's used to attack
-		ItemStack held = caster.getHeldItemMainhand();
+		ItemStack held = caster.getMainHandItem();
 		if (!held.isEmpty()) {
 			final Multimap<Attribute, AttributeModifier> heldAttribs = held.getAttributeModifiers(EquipmentSlotType.MAINHAND);
 			if (heldAttribs != null && heldAttribs.containsKey(Attributes.ATTACK_DAMAGE)) {
@@ -162,14 +162,14 @@ public class SpellDamage {
 
 	protected static final float GetPhysicalAttributeBonusMainhand(@Nullable LivingEntity caster) {
 		// Get raw amount
-		if (caster == null || !caster.getAttributeManager().hasAttributeInstance(Attributes.ATTACK_DAMAGE)) {
+		if (caster == null || !caster.getAttributes().hasAttribute(Attributes.ATTACK_DAMAGE)) {
 			return 0f;
 		}
 		
 		double amt = 0;
 		
 		// Reduce any from main-hand weapon, since that's given assuming it's used to attack
-		ItemStack held = caster.getHeldItemMainhand();
+		ItemStack held = caster.getMainHandItem();
 		if (!held.isEmpty()) {
 			final Multimap<Attribute, AttributeModifier> heldAttribs = held.getAttributeModifiers(EquipmentSlotType.MAINHAND);
 			if (heldAttribs != null && heldAttribs.containsKey(Attributes.ATTACK_DAMAGE)) {
@@ -183,7 +183,7 @@ public class SpellDamage {
 	}
 	
 	protected static final float GetArmorModifier(LivingEntity target, final Damage damage) {
-		int i = 25 - target.getTotalArmorValue();
+		int i = 25 - target.getArmorValue();
 		return (float)i / 25f;
 	}
 	
@@ -223,8 +223,8 @@ public class SpellDamage {
 			}
 		} else {
 		
-			final int armor = target.getTotalArmorValue();
-			final boolean undead = target.isEntityUndead();
+			final int armor = target.getArmorValue();
+			final boolean undead = target.isInvertedHealAndHarm();
 			final boolean ender;
 			final boolean light;
 			final boolean flamy;
@@ -232,7 +232,7 @@ public class SpellDamage {
 			if (target instanceof EndermanEntity || target instanceof EndermiteEntity
 					|| target instanceof DragonEntity) {
 				// Ender status and immunity can be turned off with the disrupt status effect
-				EffectInstance effect = target.getActivePotionEffect(NostrumEffects.disruption);
+				EffectInstance effect = target.getEffect(NostrumEffects.disruption);
 				if (effect != null && effect.getDuration() > 0) {
 					ender = false;
 				} else {
@@ -242,16 +242,16 @@ public class SpellDamage {
 				ender = false;
 			}
 			
-			if (target.getHeight() < 1.5f || target instanceof EndermanEntity || target instanceof ShadowRedDragonEntity) {
+			if (target.getBbHeight() < 1.5f || target instanceof EndermanEntity || target instanceof ShadowRedDragonEntity) {
 				light = true;
-			} else if (magic != null && magic.hasSkill(NostrumSkills.Wind_Inflict) && target.getActivePotionEffect(Effects.POISON) != null) {
+			} else if (magic != null && magic.hasSkill(NostrumSkills.Wind_Inflict) && target.getEffect(Effects.POISON) != null) {
 				// Poisoned enemies count as light with wind inflict skill
 				light = true;
 			} else {
 				light = false;
 			}
 			
-			if (target.isImmuneToFire()) {
+			if (target.fireImmune()) {
 				flamy = true;
 			} else {
 				flamy = false;
@@ -266,7 +266,7 @@ public class SpellDamage {
 			}
 			
 			if (element == EMagicElement.EARTH && magic != null && magic.hasSkill(NostrumSkills.Earth_Adept)) {
-				EffectInstance strength = caster == null ? null : caster.getActivePotionEffect(Effects.STRENGTH);
+				EffectInstance strength = caster == null ? null : caster.getEffect(Effects.DAMAGE_BOOST);
 				if (strength != null) {
 					// Matches strength attribute boost
 					damage.baseFlat(NostrumSkills.Earth_Adept, 3 * (strength.getAmplifier() + 1));
@@ -303,7 +303,7 @@ public class SpellDamage {
 				} else {
 					damage.bonusScale("IceDamage", +.3f);
 				}
-				if (target.isBurning()) {
+				if (target.isOnFire()) {
 					damage.bonusScale("IceDamageOnBurning", +1f);
 				}
 				break;
@@ -328,7 +328,7 @@ public class SpellDamage {
 		}
 		
 		// TODO: make into attribute?
-		final @Nullable EffectInstance magicWeakness = caster == null ? null : caster.getActivePotionEffect(NostrumEffects.magicWeakness);
+		final @Nullable EffectInstance magicWeakness = caster == null ? null : caster.getEffect(NostrumEffects.magicWeakness);
 		if (magicWeakness != null && magicWeakness.getDuration() > 0) {
 			damage.finalFlat(NostrumSkills.Physical_Inflict, -2 * (magicWeakness.getAmplifier() + 1));
 		}
@@ -358,7 +358,7 @@ public class SpellDamage {
 	
 	public static final float DamageEntity(LivingEntity target, EMagicElement element, float base, float efficiency, @Nullable LivingEntity source, ISpellLogBuilder log) {
 		final float damage = CalculateDamage(source, target, base, efficiency, element, log);
-		target.attackEntityFrom(new MagicDamageSource(source, element), damage);
+		target.hurt(new MagicDamageSource(source, element), damage);
 		return damage;
 	}
 	

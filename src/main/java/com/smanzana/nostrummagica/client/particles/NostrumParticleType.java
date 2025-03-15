@@ -16,7 +16,7 @@ public class NostrumParticleType extends ParticleType<NostrumParticleData> {
 	}
 
 	@Override
-	public Codec<NostrumParticleData> func_230522_e_() {
+	public Codec<NostrumParticleData> codec() {
 		return NostrumParticleData.CODEC;
 	}
 

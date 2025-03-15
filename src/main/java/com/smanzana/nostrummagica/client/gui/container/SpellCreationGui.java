@@ -81,14 +81,14 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public boolean isItemValid(@Nonnull ItemStack stack) {
+			public boolean mayPlace(@Nonnull ItemStack stack) {
 				return (stack.isEmpty()
 						|| stack.getItem() instanceof BlankScroll);
 			}
 			
 			@Override
-			public void putStack(@Nonnull ItemStack stack) {
-				super.putStack(stack);
+			public void set(@Nonnull ItemStack stack) {
+				super.set(stack);
 				
 				container.validate();
 			}
@@ -100,7 +100,7 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public int getSlotStackLimit() {
+			public int getMaxStackSize() {
 				return 1;
 			}
 		}
@@ -122,7 +122,7 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public boolean isItemValid(@Nonnull ItemStack stack) {
+			public boolean mayPlace(@Nonnull ItemStack stack) {
 				// Can put the item in if:
 				// it's empty
 				// OR previous slot is not null (not the first trigger-only slot)
@@ -132,7 +132,7 @@ public class SpellCreationGui {
 					return false;
 				
 				if (prev != null &&
-						!prev.getHasStack())
+						!prev.hasItem())
 					return false;
 				
 				if (stack.isEmpty())
@@ -142,24 +142,24 @@ public class SpellCreationGui {
 					return false;
 				
 				if (SpellRune.isShape(stack)) {
-					return prev == null || SpellRune.isShape(prev.getStack());
+					return prev == null || SpellRune.isShape(prev.getItem());
 				}
 				if (SpellRune.isAlteration(stack)) {
-					return prev != null && SpellRune.isElement(prev.getStack());
+					return prev != null && SpellRune.isElement(prev.getItem());
 				}
 				return true;
 			}
 			
 			@Override
 			@OnlyIn(Dist.CLIENT)
-			public boolean isEnabled() {
+			public boolean isActive() {
 				return (prev == null ||
-						prev.getHasStack());
+						prev.hasItem());
 			}
 			
 			@Override
-			public void putStack(@Nonnull ItemStack stack) {
-				super.putStack(stack);
+			public void set(@Nonnull ItemStack stack) {
+				super.set(stack);
 				
 				container.validate();
 			}
@@ -169,10 +169,10 @@ public class SpellCreationGui {
 				// This is called AFTER things have been changed or swapped
 				// Which means we just look to see if we have an item.
 				// If not, take item from next
-				if (!this.getHasStack() && next != null && next.getHasStack()) {
-					this.putStack(next.getStack().copy());
-					next.putStack(ItemStack.EMPTY);
-					next.onTake(playerIn, this.getStack());
+				if (!this.hasItem() && next != null && next.hasItem()) {
+					this.set(next.getItem().copy());
+					next.set(ItemStack.EMPTY);
+					next.onTake(playerIn, this.getItem());
 				}
 
 				container.validate();
@@ -181,7 +181,7 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public int getSlotStackLimit() {
+			public int getMaxStackSize() {
 				return 1;
 			}
 		}
@@ -209,7 +209,7 @@ public class SpellCreationGui {
 			this.inventory = tableInventory;
 			this.player = crafter;
 			this.pos = tablePos;
-			this.context = new SpellCraftContext(crafter, crafter.world, pos);
+			this.context = new SpellCraftContext(crafter, crafter.level, pos);
 			
 			spellErrorStrings = new ArrayList<>();
 			reagentStrings = new ArrayList<>();
@@ -243,34 +243,34 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		public boolean canDragIntoSlot(Slot slotIn) {
-			return slotIn.inventory != this.inventory; // It's NOT bag inventory
+		public boolean canDragTo(Slot slotIn) {
+			return slotIn.container != this.inventory; // It's NOT bag inventory
 		}
 		
 		@Override
-		public boolean canInteractWith(PlayerEntity playerIn) {
+		public boolean stillValid(PlayerEntity playerIn) {
 			return true;
 		}
 		
 		@Override
-		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+		public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
 			checkScroll();
-			ItemStack ret = super.slotClick(slotId, dragType, clickTypeIn, player);
+			ItemStack ret = super.clicked(slotId, dragType, clickTypeIn, player);
 			return ret;
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
-			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
+		public ItemStack quickMoveStack(PlayerEntity playerIn, int fromSlot) {
+			Slot slot = (Slot) this.slots.get(fromSlot);
 			
-			if (slot != null && slot.getHasStack()) {
-				ItemStack cur = slot.getStack();
+			if (slot != null && slot.hasItem()) {
+				ItemStack cur = slot.getItem();
 				
-				if (slot.inventory == this.inventory) {
+				if (slot.container == this.inventory) {
 					// Trying to take from the table
 					ItemStack dupe = cur.copy();
-					if (playerIn.inventory.addItemStackToInventory(dupe)) {
-						slot.putStack(ItemStack.EMPTY);
+					if (playerIn.inventory.add(dupe)) {
+						slot.set(ItemStack.EMPTY);
 						slot.onTake(playerIn, dupe);
 					}
 				} else {
@@ -317,7 +317,7 @@ public class SpellCreationGui {
 				}
 				
 				if (cur.isEmpty()) {
-					slot.putStack(ItemStack.EMPTY);
+					slot.set(ItemStack.EMPTY);
 				}
 			}
 			
@@ -496,7 +496,7 @@ public class SpellCreationGui {
 				final int available = NostrumMagica.getReagentCount(crafter, type);
 				if (available < count) {
 					spellErrorStrings.add(new StringTextComponent("Need " + (count-available) + " more " + type.prettyName()));
-					reagentStrings.add(new StringTextComponent(count + " " + type.prettyName()).mergeStyle(TextFormatting.DARK_RED));
+					reagentStrings.add(new StringTextComponent(count + " " + type.prettyName()).withStyle(TextFormatting.DARK_RED));
 					fail = true;
 				} else {
 					reagentStrings.add(new StringTextComponent(count + " " + type.prettyName()));
@@ -658,7 +658,7 @@ public class SpellCreationGui {
 			public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
 				float tint = 1f;
-				mc.getTextureManager().bindTexture(TEXT_UTILS);
+				mc.getTextureManager().bind(TEXT_UTILS);
 				if (mouseX >= this.x && mouseY >= this.y
 						&& mouseX <= this.x + this.width
 						&& mouseY <= this.y + this.height) {
@@ -704,18 +704,18 @@ public class SpellCreationGui {
 			
 			@Override
 			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
-				if (!gui.getContainer().hasProblems()) {
-					gui.func_243308_b(matrixStackIn, gui.getContainer().getReagentStrings(), mouseX, mouseY);
+				if (!gui.getMenu().hasProblems()) {
+					gui.renderComponentTooltip(matrixStackIn, gui.getMenu().getReagentStrings(), mouseX, mouseY);
 				}
 			}
 			
 			@Override
 			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
-				mc.getTextureManager().bindTexture(TEXT_UTILS);
+				mc.getTextureManager().bind(TEXT_UTILS);
 				final int u, v, wu, hv;
 				final float tint;
-				if (!gui.getContainer().hasProblems()) {
+				if (!gui.getMenu().hasProblems()) {
 					u = TEXT_SUBMIT_HOFFSET;
 					v = TEXT_SUBMIT_VOFFSET;
 					wu = TEXT_SUBMIT_WIDTH;
@@ -736,10 +736,10 @@ public class SpellCreationGui {
 						);
 				
 				if (this.isHovered()) {
-					matrixStackIn.push();
+					matrixStackIn.pushPose();
 					matrixStackIn.translate(0, 0, 100);
 					this.renderToolTip(matrixStackIn, mouseX, mouseY);
-					matrixStackIn.pop();
+					matrixStackIn.popPose();
 				}
 			}
 		}
@@ -755,18 +755,18 @@ public class SpellCreationGui {
 			
 			@Override
 			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
-				if (gui.getContainer().hasProblems()) {
-					List<ITextComponent> problems = gui.getContainer().getProblems();
-					gui.func_243308_b(matrixStackIn, problems, mouseX, mouseY);
+				if (gui.getMenu().hasProblems()) {
+					List<ITextComponent> problems = gui.getMenu().getProblems();
+					gui.renderComponentTooltip(matrixStackIn, problems, mouseX, mouseY);
 				}
 			}
 			
 			@Override
 			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
-				mc.getTextureManager().bindTexture(TEXT_UTILS);
+				mc.getTextureManager().bind(TEXT_UTILS);
 				final int u, v, wu, hv;
-				if (this.gui.getContainer().hasProblems()) {
+				if (this.gui.getMenu().hasProblems()) {
 					u = TEXT_STATUS_BAD_HOFFSET;
 					v = TEXT_STATUS_BAD_VOFFSET;
 					wu = TEXT_STATUS_BAD_WIDTH;
@@ -784,10 +784,10 @@ public class SpellCreationGui {
 						);
 				
 				if (this.isHovered()) {
-					matrixStackIn.push();
+					matrixStackIn.pushPose();
 					matrixStackIn.translate(0, 0, 100);
 					this.renderToolTip(matrixStackIn, mouseX, mouseY);
-					matrixStackIn.pop();
+					matrixStackIn.popPose();
 				}
 			}
 		}
@@ -803,16 +803,16 @@ public class SpellCreationGui {
 			
 			@Override
 			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
-				final int weight = gui.getContainer().getCurrentWeight();
-				final int maxWeight = gui.getContainer().getMaxWeight();
+				final int weight = gui.getMenu().getCurrentWeight();
+				final int maxWeight = gui.getMenu().getMaxWeight();
 				gui.renderTooltip(matrixStackIn, new TranslationTextComponent("info.spellcraft.weight_tooltip", weight, maxWeight), mouseX, mouseY);
 			}
 			
 			@Override
 			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
-				final int weight = gui.getContainer().getCurrentWeight();
-				final int maxWeight = gui.getContainer().getMaxWeight();
+				final int weight = gui.getMenu().getCurrentWeight();
+				final int maxWeight = gui.getMenu().getMaxWeight();
 				
 				// Need to break up space better. Greedily taking up full height for icon
 				final int iconHeight = height;
@@ -823,7 +823,7 @@ public class SpellCreationGui {
 				final int meterBarWidth = meterWidth - 2;
 				final int meterBarHeight = 6;
 				
-				mc.getTextureManager().bindTexture(TEXT_UTILS);
+				mc.getTextureManager().bind(TEXT_UTILS);
 				
 				// Scale icon
 				final float[] scaleColor = ColorUtil.ARGBToColor(this.getScaleIconColor(weight, maxWeight));
@@ -848,17 +848,17 @@ public class SpellCreationGui {
 						meterXOffset + (meterWidth-meterBarWidth)/2 + meterPixels, y + (height + meterBarHeight)/2,
 						this.getMeterColor(weight, maxWeight));
 				
-				mc.getTextureManager().bindTexture(TEXT_UTILS);
+				mc.getTextureManager().bind(TEXT_UTILS);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, meterXOffset, meterYOffset,
 						TEXT_GUAGE_HOFFSET, TEXT_GUAGE_VOFFSET, TEXT_GUAGE_WIDTH, TEXT_GUAGE_HEIGHT,
 						meterWidth, meterHeight, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT
 						);
 				
 				if (this.isHovered()) {
-					matrixStackIn.push();
+					matrixStackIn.pushPose();
 					matrixStackIn.translate(0, 0, 100);
 					this.renderToolTip(matrixStackIn, mouseX, mouseY);
-					matrixStackIn.pop();
+					matrixStackIn.popPose();
 				}
 			}
 			
@@ -890,12 +890,12 @@ public class SpellCreationGui {
 			
 			@Override
 			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
-				final SpellCraftPattern pattern = gui.getContainer().getCraftPattern();
+				final SpellCraftPattern pattern = gui.getMenu().getCraftPattern();
 				if (pattern != null) {
 					List<ITextComponent> tooltip = new ArrayList<>(4);
 					tooltip.add(pattern.getName());
 					tooltip = pattern.addDescription(tooltip);
-					gui.func_243308_b(matrixStackIn, tooltip, mouseX, mouseY);
+					gui.renderComponentTooltip(matrixStackIn, tooltip, mouseX, mouseY);
 				}
 			}
 			
@@ -904,28 +904,28 @@ public class SpellCreationGui {
 				final Minecraft mc = Minecraft.getInstance();
 				
 				// Background
-				mc.getTextureManager().bindTexture(TEXT_UTILS);
+				mc.getTextureManager().bind(TEXT_UTILS);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, 
 						TEX_PATTERN_HOFFSET, TEX_PATTERN_VOFFSET, TEX_PATTERN_WIDTH, TEX_PATTERN_HEIGHT,
 						width, height,
 						TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT
 						);
 				
-				final SpellCraftPattern pattern = gui.getContainer().getCraftPattern();
+				final SpellCraftPattern pattern = gui.getMenu().getCraftPattern();
 				if (pattern != null) {
 					@Nullable ISpellCraftPatternRenderer renderer = ISpellCraftPatternRenderer.GetRenderer(pattern);
 					if (renderer != null) {
-						matrixStackIn.push();
+						matrixStackIn.pushPose();
 						matrixStackIn.translate(x + 1, y + 1, 0);
 						renderer.drawPatternIconInGui(matrixStackIn, pattern, this.width-2, this.height-2, 1f, 1f, 1f, 1f);
-						matrixStackIn.pop();
+						matrixStackIn.popPose();
 					}
 					
 					if (this.isHovered()) {
-						matrixStackIn.push();
+						matrixStackIn.pushPose();
 						matrixStackIn.translate(0, 0, 100);
 						this.renderToolTip(matrixStackIn, mouseX, mouseY);
-						matrixStackIn.pop();
+						matrixStackIn.popPose();
 					}
 				}
 			}
@@ -964,7 +964,7 @@ public class SpellCreationGui {
 			@Override
 			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 				if (tooltip != null) {
-					gui.func_243308_b(matrixStackIn, tooltip, mouseX, mouseY);
+					gui.renderComponentTooltip(matrixStackIn, tooltip, mouseX, mouseY);
 				}
 			}
 			
@@ -975,7 +975,7 @@ public class SpellCreationGui {
 
 				final int iconHeight = height;
 				final int iconWidth = iconHeight*2;
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(x + (width-iconWidth)/2, y, 0);
 				{
 					if (part.getAttributes().elementalBoost) {
@@ -984,7 +984,7 @@ public class SpellCreationGui {
 						gui.drawElementalPenalty(matrixStackIn, iconWidth, iconHeight, part.getEffect().getElement());
 					}
 				}
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 				
 				if (this.isHovered()) {
 					RenderFuncs.drawRect(matrixStackIn, x, y, x + width, y + height, 0x20FFFFFF);
@@ -1022,15 +1022,15 @@ public class SpellCreationGui {
 			private final @Nullable IHoverHandler onHover;
 			
 			public SpellPartBar(SpellGui<?> gui, Vector3i[] slots, int slotWidth, @Nullable IHoverHandler onHover) {
-				super(gui.getGuiLeft(), gui.guiTop, gui.xSize, gui.ySize, StringTextComponent.EMPTY);
+				super(gui.getGuiLeft(), gui.topPos, gui.imageWidth, gui.imageHeight, StringTextComponent.EMPTY);
 				this.gui = gui;
 				this.bars = new ArrayList<>(slots.length);
 				this.slots = slots;
 				this.slotWidth = slotWidth;
 				this.onHover = onHover;
 				
-				gui.getContainer().addListener((spell) -> {
-					this.refreshTo(gui.getContainer().parts);
+				gui.getMenu().addListener((spell) -> {
+					this.refreshTo(gui.getMenu().parts);
 				});
 			}
 			
@@ -1098,7 +1098,7 @@ public class SpellCreationGui {
 			}
 			
 			protected void renderBackground(MatrixStack matrixStackIn) {
-				Minecraft.getInstance().getTextureManager().bindTexture(TEXT_UTILS);
+				Minecraft.getInstance().getTextureManager().bind(TEXT_UTILS);
 				
 				// Note: hardcoding border size to be 4
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, TEX_INFPANEL_BORDER_TL_HOFFSET, TEX_INFPANEL_BORDER_TL_VOFFSET, TEX_INFPANEL_BORDER_TL_WIDTH, TEX_INFPANEL_BORDER_TL_HEIGHT, 4, 4, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT, red, green, blue, alpha);
@@ -1116,7 +1116,7 @@ public class SpellCreationGui {
 			
 			@Override
 			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(x, y, 0);
 				renderBackground(matrixStackIn);
 				
@@ -1125,26 +1125,26 @@ public class SpellCreationGui {
 					final int margin = 4;
 					int yOffset = 0;
 					for (Widget child : this.children) {
-						yOffset = Math.max(yOffset, (child.y + child.getHeightRealms()) - this.y);
+						yOffset = Math.max(yOffset, (child.y + child.getHeight()) - this.y);
 					}
 					
-					matrixStackIn.push();
+					matrixStackIn.pushPose();
 					matrixStackIn.translate(margin, 2 + yOffset, 0);
 					
 					content.render(matrixStackIn, width - (2 * margin), height - (yOffset + 2 * margin), partialTicks);
 					
-					matrixStackIn.pop();
+					matrixStackIn.popPose();
 				}
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 		}
 		
 		protected static final void drawScrollMessage(MatrixStack matrixStackIn, int width, int height, FontRenderer fonter) {
 			final String message = "Insert Blank Scroll";
-			final int msgWidth = fonter.getStringWidth(message);
+			final int msgWidth = fonter.width(message);
 			
 			RenderFuncs.drawRect(matrixStackIn, -width/2, -height/2, width/2, height/2, 0xDD000000);
-			fonter.drawString(matrixStackIn, message, -msgWidth / 2, -fonter.FONT_HEIGHT/2, 0xFFFFFFFF);
+			fonter.draw(matrixStackIn, message, -msgWidth / 2, -fonter.lineHeight/2, 0xFFFFFFFF);
 		}
 		
 		private T container;
@@ -1160,12 +1160,12 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
-			super.drawGuiContainerForegroundLayer(matrixStackIn, mouseX, mouseY);
+		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+			super.renderLabels(matrixStackIn, mouseX, mouseY);
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			;			
 		}
 		
@@ -1223,7 +1223,7 @@ public class SpellCreationGui {
 		}
 		
 		protected void drawElementalBoost(MatrixStack matrixStackIn, int width, int height, EMagicElement element) {
-			Minecraft.getInstance().getTextureManager().bindTexture(TEXT_UTILS);
+			Minecraft.getInstance().getTextureManager().bind(TEXT_UTILS);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 					TEX_BOOST_HOFFSET, TEX_BOOST_VOFFSET, TEX_BOOST_WIDTH, TEX_BOOST_HEIGHT,
 					width/2, height, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT);
@@ -1233,7 +1233,7 @@ public class SpellCreationGui {
 		}
 		
 		protected void drawElementalPenalty(MatrixStack matrixStackIn, int width, int height, EMagicElement element) {
-			Minecraft.getInstance().getTextureManager().bindTexture(TEXT_UTILS);
+			Minecraft.getInstance().getTextureManager().bind(TEXT_UTILS);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 					TEX_PENALTY_HOFFSET, TEX_PENALTY_VOFFSET, TEX_PENALTY_WIDTH, TEX_PENALTY_HEIGHT,
 					width/2, height, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT);
@@ -1244,41 +1244,41 @@ public class SpellCreationGui {
 		
 		protected final void renderSpellPanel(MatrixStack matrixStackIn, int width, int height, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
-			final FontRenderer fontRenderer = mc.fontRenderer;
-			final T container = this.getContainer();
+			final FontRenderer fontRenderer = mc.font;
+			final T container = this.getMenu();
 			final String summaryText = "Summary";
-			final int summaryTextWidth = fontRenderer.getStringWidth(summaryText);
-			fontRenderer.drawString(matrixStackIn, summaryText, (width - summaryTextWidth)/2, 0, 0xFF000000);
-			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+			final int summaryTextWidth = fontRenderer.width(summaryText);
+			fontRenderer.draw(matrixStackIn, summaryText, (width - summaryTextWidth)/2, 0, 0xFF000000);
+			matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
 			
 			matrixStackIn.scale(.5f, .5f, 1f);
 			
 			// Mana cost
-			fontRenderer.drawString(matrixStackIn, "Mana Cost: " + container.getManaCost(), 0, 0, 0xFF000000);
-			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+			fontRenderer.draw(matrixStackIn, "Mana Cost: " + container.getManaCost(), 0, 0, 0xFF000000);
+			matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
 			
 			// Weight
-			fontRenderer.drawString(matrixStackIn, "Weight: " + container.getCurrentWeight(), 0, 0, 0xFF000000);
-			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+			fontRenderer.draw(matrixStackIn, "Weight: " + container.getCurrentWeight(), 0, 0, 0xFF000000);
+			matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
 			
 			// Reagents
 			if (!container.getReagentStrings().isEmpty()) {
-				fontRenderer.drawString(matrixStackIn, "Reagents:", 0, 0, 0xFF000000);
-				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				fontRenderer.draw(matrixStackIn, "Reagents:", 0, 0, 0xFF000000);
+				matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
 				for (ITextComponent string : container.getReagentStrings()) {
-					fontRenderer.func_243248_b(matrixStackIn, string, 4, 0, 0xFF000000); //drawTextComponent()
-					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+					fontRenderer.draw(matrixStackIn, string, 4, 0, 0xFF000000); //drawTextComponent()
+					matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
 				}
 			}
 		}
 		
 		protected void renderModifierPanel(@Nullable ISpellCraftModifier modifier, MatrixStack matrixStackIn, int width, int height, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
-			final FontRenderer fontRenderer = mc.fontRenderer;
+			final FontRenderer fontRenderer = mc.font;
 			final String modifierText = "Modifier";
-			final int modifierTextWidth = fontRenderer.getStringWidth(modifierText);
-			fontRenderer.drawString(matrixStackIn, modifierText, ((width-8) - modifierTextWidth)/2, 0, 0xFF000000);
-			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+			final int modifierTextWidth = fontRenderer.width(modifierText);
+			fontRenderer.draw(matrixStackIn, modifierText, ((width-8) - modifierTextWidth)/2, 0, 0xFF000000);
+			matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
 			
 			matrixStackIn.scale(.5f, .5f, 1f);
 			
@@ -1286,38 +1286,38 @@ public class SpellCreationGui {
 				List<ITextComponent> lines = new ArrayList<>(4);
 				lines = modifier.getDetails(lines);
 				for (ITextComponent line : lines) {
-					fontRenderer.func_243248_b(matrixStackIn, line, 0, 0, 0xFF000000);
-					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT + 1, 0);
+					fontRenderer.draw(matrixStackIn, line, 0, 0, 0xFF000000);
+					matrixStackIn.translate(0, fontRenderer.lineHeight + 1, 0);
 				}
 			} else {
-				fontRenderer.drawString(matrixStackIn, "No Slot Modifier", 0, 0, 0xFF000000);
-				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				fontRenderer.draw(matrixStackIn, "No Slot Modifier", 0, 0, 0xFF000000);
+				matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
 			}
 		}
 		
 		protected void renderSpellPartPanel(SpellPartSummary part, MatrixStack matrixStackIn, int width, int height, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
-			final FontRenderer fontRenderer = mc.fontRenderer;
+			final FontRenderer fontRenderer = mc.font;
 			final String titleText = part.isError() ? "Error" : part.isShape() ? "Shape" : "Effect";
-			final int titleTextWidth = fontRenderer.getStringWidth(titleText);
-			matrixStackIn.push();
+			final int titleTextWidth = fontRenderer.width(titleText);
+			matrixStackIn.pushPose();
 			matrixStackIn.scale(.75f, .75f, 1f);
 			int subWidth = (int) (width / (.75f));
 			
-			fontRenderer.drawString(matrixStackIn, titleText, (subWidth - titleTextWidth)/2, 0, 0xFF000000);
-			matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+			fontRenderer.draw(matrixStackIn, titleText, (subWidth - titleTextWidth)/2, 0, 0xFF000000);
+			matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
 			
 			matrixStackIn.scale((.5f/.75f), (.5f/.75f), 1f);
 			subWidth = width * 2;
 			if (!part.isError()) {
 				
 				// Mana cost
-				fontRenderer.drawString(matrixStackIn, "Mana Cost: " + part.getMana(), 0, 0, 0xFF000000);
-				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				fontRenderer.draw(matrixStackIn, "Mana Cost: " + part.getMana(), 0, 0, 0xFF000000);
+				matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
 				
 				// Weight
-				fontRenderer.drawString(matrixStackIn, "Weight: " + part.getWeight(), 0, 0, 0xFF000000);
-				matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+				fontRenderer.draw(matrixStackIn, "Weight: " + part.getWeight(), 0, 0, 0xFF000000);
+				matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
 				
 				if (!part.isShape()) {
 					final SpellEffectPart effect = part.getEffect();
@@ -1327,8 +1327,8 @@ public class SpellCreationGui {
 						final int color = (effect.getPotency() > 1 ? 0xFF44EE66 : 
 							effect.getPotency() < 1f ? 0xFFCC4422
 									: 0xFF000000);
-						fontRenderer.drawString(matrixStackIn, String.format("Potency: %.0f%%", effect.getPotency() * 100f), 0, 0, color);
-						matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+						fontRenderer.draw(matrixStackIn, String.format("Potency: %.0f%%", effect.getPotency() * 100f), 0, 0, color);
+						matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
 					}
 					
 					
@@ -1347,18 +1347,18 @@ public class SpellCreationGui {
 						desc = action.getDescription().getString();
 					}
 					
-					int len = fontRenderer.getStringWidth(name);
-					fontRenderer.drawString(matrixStackIn, name,
+					int len = fontRenderer.width(name);
+					fontRenderer.draw(matrixStackIn, name,
 							(subWidth - len) / 2,
 							0,
 							0xFFFFFFFF);
-					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+					matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
 					
 					if (action != null) {
 						final SpellActionProperties props = action.getProperties();
 						final int iconWidth = 12;
 						final int iconHeight = 12;
-						matrixStackIn.push();
+						matrixStackIn.pushPose();
 						matrixStackIn.translate(subWidth / 2, 0, 0);
 						matrixStackIn.translate(-(4 + iconWidth), 0, 0);
 						
@@ -1375,7 +1375,7 @@ public class SpellCreationGui {
 							color = new float[] {.3f, .3f, .3f, .4f};
 						}
 						drawAffectBlock(matrixStackIn, iconWidth, iconHeight, color);
-						matrixStackIn.pop();
+						matrixStackIn.popPose();
 						
 						matrixStackIn.translate(0, iconHeight + 2, 0);
 					}
@@ -1393,18 +1393,18 @@ public class SpellCreationGui {
 					name = shape.getShape().getDisplayName().getString();
 					desc = shape.getShape().getDescription().getString();
 					
-					int len = fontRenderer.getStringWidth(name);
-					fontRenderer.drawString(matrixStackIn, name,
+					int len = fontRenderer.width(name);
+					fontRenderer.draw(matrixStackIn, name,
 							(subWidth - len) / 2,
 							0,
 							0xFFFFFFFF);
-					matrixStackIn.translate(0, fontRenderer.FONT_HEIGHT, 0);
+					matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
 					
 					{
 						final SpellShapeAttributes props = shape.getShape().getAttributes(shape.getProperties());
 						final int iconWidth = 12;
 						final int iconHeight = 12;
-						matrixStackIn.push();
+						matrixStackIn.pushPose();
 						matrixStackIn.translate(subWidth / 2, 0, 0);
 						matrixStackIn.translate(-(4 + iconWidth), 0, 0);
 						
@@ -1421,7 +1421,7 @@ public class SpellCreationGui {
 							color = new float[] {.3f, .3f, .3f, .4f};
 						}
 						drawAffectBlock(matrixStackIn, iconWidth, iconHeight, color);
-						matrixStackIn.pop();
+						matrixStackIn.popPose();
 						
 						matrixStackIn.translate(0, iconHeight + 2, 0);
 					}
@@ -1434,7 +1434,7 @@ public class SpellCreationGui {
 					matrixStackIn.translate(0, yUsed, 0);
 				}
 			}
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 	}
 }

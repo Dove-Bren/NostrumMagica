@@ -44,31 +44,31 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 	
 	@Override
 	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.pos, 3, this.getUpdateTag());
+		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
 	public CompoundNBT getUpdateTag() {
-		return this.write(new CompoundNBT());
+		return this.save(new CompoundNBT());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getNbtCompound());
+		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
 	protected void dirty() {
-		world.notifyBlockUpdate(pos, this.world.getBlockState(pos), this.world.getBlockState(pos), 3);
-		markDirty();
+		level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+		setChanged();
 	}
 	
 	private static final String NBT_KEY = "switch_key";
 	private static final String NBT_TRIGGERED = "triggered";
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.put(NBT_KEY, this.key.asNBT());
 		nbt.putBoolean(NBT_TRIGGERED, this.isTriggered());
@@ -77,8 +77,8 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		this.key = WorldKey.fromNBT(nbt.getCompound(NBT_KEY));
 		this.triggered = nbt.getBoolean(NBT_TRIGGERED);
@@ -122,52 +122,52 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 	public Vector3d getCenterOffset() {
 		final VoxelShape shape;
 		if (isLarge()) {
-			shape = ((DungeonKeyChestBlock.Large) this.getBlockState().getBlock()).getWholeShape(getBlockState(), world, pos, ISelectionContext.dummy());
+			shape = ((DungeonKeyChestBlock.Large) this.getBlockState().getBlock()).getWholeShape(getBlockState(), level, worldPosition, ISelectionContext.empty());
 		} else {
-			shape = this.getBlockState().getShape(world, pos);
+			shape = this.getBlockState().getShape(level, worldPosition);
 		}
 		return new Vector3d(
-				(shape.getEnd(Axis.X) - shape.getStart(Axis.X)) / 2 + shape.getStart(Axis.X),
-				shape.getEnd(Axis.Y),
-				(shape.getEnd(Axis.Z) - shape.getStart(Axis.Z)) / 2 + shape.getStart(Axis.Z)
+				(shape.max(Axis.X) - shape.min(Axis.X)) / 2 + shape.min(Axis.X),
+				shape.max(Axis.Y),
+				(shape.max(Axis.Z) - shape.min(Axis.Z)) / 2 + shape.min(Axis.Z)
 				);
 	}
 	
 	public void open(PlayerEntity player) {
-		if (this.world.isRemote() || this.isTriggered()) {
+		if (this.level.isClientSide() || this.isTriggered()) {
 			return;
 		}
 		
 		this.setTriggered(true);
 		AutoDungeons.GetWorldKeys().addKey(getWorldKey());
-		this.world.addBlockEvent(pos, getBlockState().getBlock(), 0, 0);
-		world.playSound(null, pos, SoundEvents.BLOCK_CHEST_OPEN, SoundCategory.BLOCKS, .5f, .8f);
+		this.level.blockEvent(worldPosition, getBlockState().getBlock(), 0, 0);
+		level.playSound(null, worldPosition, SoundEvents.CHEST_OPEN, SoundCategory.BLOCKS, .5f, .8f);
 		
 		NostrumMagicaSounds fanfare = isLarge() ? NostrumMagicaSounds.AMBIENT_WOOSH2 : NostrumMagicaSounds.AMBIENT_WOOSH3;
-		fanfare.play(world, pos);
+		fanfare.play(level, worldPosition);
 	}
 	
 	@Override
-	public boolean receiveClientEvent(int id, int type) {
+	public boolean triggerEvent(int id, int type) {
 		if (id == 0) {
-			if (this.world != null && this.world.isRemote()) {
-				openTicks = this.world.getGameTime();
+			if (this.level != null && this.level.isClientSide()) {
+				openTicks = this.level.getGameTime();
 				final boolean large = isLarge();
-				final Random rand = world.rand;
+				final Random rand = level.random;
 				final VoxelShape shape;
 				if (large) {
-					shape = ((DungeonKeyChestBlock.Large) this.getBlockState().getBlock()).getWholeShape(getBlockState(), world, pos, ISelectionContext.dummy());
+					shape = ((DungeonKeyChestBlock.Large) this.getBlockState().getBlock()).getWholeShape(getBlockState(), level, worldPosition, ISelectionContext.empty());
 				} else {
-					shape = this.getBlockState().getShape(world, pos);
+					shape = this.getBlockState().getShape(level, worldPosition);
 				}
-				final double x = pos.getX() + shape.getStart(Axis.X);
-				final double z = pos.getZ() + shape.getStart(Axis.Z);
-				final double y = pos.getY() + shape.getEnd(Axis.Y);
+				final double x = worldPosition.getX() + shape.min(Axis.X);
+				final double z = worldPosition.getZ() + shape.min(Axis.Z);
+				final double y = worldPosition.getY() + shape.max(Axis.Y);
 				for (int i = 0; i < (large ? 40 : 20); i++) {
-					final double xOffset = rand.nextFloat() * (shape.getEnd(Axis.X) - shape.getStart(Axis.X));
-					final double zOffset = rand.nextFloat() * (shape.getEnd(Axis.Z) - shape.getStart(Axis.Z));
+					final double xOffset = rand.nextFloat() * (shape.max(Axis.X) - shape.min(Axis.X));
+					final double zOffset = rand.nextFloat() * (shape.max(Axis.Z) - shape.min(Axis.Z));
 					
-					NostrumParticles.GLOW_ORB.spawn(this.world, new SpawnParams(
+					NostrumParticles.GLOW_ORB.spawn(this.level, new SpawnParams(
 							1, x + xOffset, y, z + zOffset, 0,
 							40, 20,
 							new Vector3d(0, .05, 0), new Vector3d(.005, .045, .005)
@@ -176,7 +176,7 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 			}
 			return true;
 		}
-		return super.receiveClientEvent(id, type);
+		return super.triggerEvent(id, type);
 	}
 	
 	public long getOpenTicks() {

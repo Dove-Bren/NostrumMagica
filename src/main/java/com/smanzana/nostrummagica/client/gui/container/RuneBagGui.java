@@ -76,14 +76,14 @@ public class RuneBagGui {
 				}
 			}
 			
-			this.bagIDStart = this.inventorySlots.size();
+			this.bagIDStart = this.slots.size();
 			
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 9; j++) {
 					
 					this.addSlot(new Slot(inventory, i * 9 + j, BAG_INV_HOFFSET + j * 18, BAG_INV_VOFFSET + i * 18) {
-						public boolean isItemValid(@Nonnull ItemStack stack) {
-					        return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
+						public boolean mayPlace(@Nonnull ItemStack stack) {
+					        return this.container.canPlaceItem(this.getSlotIndex(), stack);
 					    }
 					});
 				}
@@ -92,7 +92,7 @@ public class RuneBagGui {
 		
 		public static final BagContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
 			final int slot = buffer.readVarInt();
-			ItemStack stack = playerInv.getStackInSlot(slot);
+			ItemStack stack = playerInv.getItem(slot);
 			if (stack.isEmpty() || !(stack.getItem() instanceof RuneBag)) {
 				stack = new ItemStack(NostrumItems.runeBag);
 			}
@@ -101,7 +101,7 @@ public class RuneBagGui {
 		
 		public static final IPackedContainerProvider Make(int slot) {
 			return ContainerUtil.MakeProvider(ID, (windowId, playerInv, player) -> {
-				ItemStack stack = playerInv.getStackInSlot(slot);
+				ItemStack stack = playerInv.getItem(slot);
 				if (stack.isEmpty() || !(stack.getItem() instanceof RuneBag)) {
 					stack = new ItemStack(NostrumItems.runeBag);
 				}
@@ -112,27 +112,27 @@ public class RuneBagGui {
 		}
 		
 		@Override
-		public ItemStack transferStackInSlot(PlayerEntity playerIn, int fromSlot) {
+		public ItemStack quickMoveStack(PlayerEntity playerIn, int fromSlot) {
 			ItemStack prev = ItemStack.EMPTY;	
-			Slot slot = (Slot) this.inventorySlots.get(fromSlot);
-			IInventory inv = slot.inventory;
+			Slot slot = (Slot) this.slots.get(fromSlot);
+			IInventory inv = slot.container;
 			
-			if (slot.getHasStack()) {
-				ItemStack stack = slot.getStack();
+			if (slot.hasItem()) {
+				ItemStack stack = slot.getItem();
 				if (inv == inventory) {
 					// shift-click in bag
-					if (playerIn.inventory.addItemStackToInventory(stack.copy())) {
-						slot.putStack(ItemStack.EMPTY);
+					if (playerIn.inventory.add(stack.copy())) {
+						slot.set(ItemStack.EMPTY);
 					}
 				} else {
 					// shift-click in player inventory
 					ItemStack leftover = Inventories.addItem(inventory, stack);
-					slot.putStack(leftover);
+					slot.set(leftover);
 				}
 			}
 			
-			if (slot.getHasStack()) {
-				ItemStack cur = slot.getStack();
+			if (slot.hasItem()) {
+				ItemStack cur = slot.getItem();
 				prev = cur.copy();
 				
 				
@@ -149,9 +149,9 @@ public class RuneBagGui {
 				}**/
 				
 				if (cur.isEmpty()) {
-					slot.putStack(ItemStack.EMPTY);
+					slot.set(ItemStack.EMPTY);
 				} else {
-					slot.onSlotChanged();
+					slot.setChanged();
 				}
 				
 				if (cur.getCount() == prev.getCount()) {
@@ -164,17 +164,17 @@ public class RuneBagGui {
 		}
 		
 		@Override
-		public boolean canDragIntoSlot(Slot slotIn) {
-			return slotIn.inventory != this.inventory; // It's NOT bag inventory
+		public boolean canDragTo(Slot slotIn) {
+			return slotIn.container != this.inventory; // It's NOT bag inventory
 		}
 		
 		@Override
-		public boolean canInteractWith(PlayerEntity playerIn) {
+		public boolean stillValid(PlayerEntity playerIn) {
 			return true;
 		}
 		
 		@Override
-		public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+		public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
 			if (slotId < bagIDStart) {
 				if (slotId == bagPos) {
 					return ItemStack.EMPTY;
@@ -185,53 +185,53 @@ public class RuneBagGui {
 			PlayerInventory inventoryplayer = player.inventory;
 
 			if (clickTypeIn == ClickType.PICKUP && (dragType == 0 || dragType == 1)
-					&& slotId >= 0 && !inventoryplayer.getItemStack().isEmpty()) {
+					&& slotId >= 0 && !inventoryplayer.getCarried().isEmpty()) {
 
-				Slot slot7 = (Slot)this.inventorySlots.get(slotId);
+				Slot slot7 = (Slot)this.slots.get(slotId);
 
 				if (slot7 != null) {
-					ItemStack itemstack9 = slot7.getStack();
-					ItemStack itemstack12 = inventoryplayer.getItemStack();
+					ItemStack itemstack9 = slot7.getItem();
+					ItemStack itemstack12 = inventoryplayer.getCarried();
 
 					if (!itemstack9.isEmpty()) {
 						itemstack = itemstack9.copy();
 					}
 
 					if (itemstack9.isEmpty()) {
-						if (!itemstack12.isEmpty() && slot7.isItemValid(itemstack12)) {
+						if (!itemstack12.isEmpty() && slot7.mayPlace(itemstack12)) {
 							int l2 = dragType == 0 ? itemstack12.getCount() : 1;
 
-							if (l2 > slot7.getItemStackLimit(itemstack12)) {
-								l2 = slot7.getItemStackLimit(itemstack12);
+							if (l2 > slot7.getMaxStackSize(itemstack12)) {
+								l2 = slot7.getMaxStackSize(itemstack12);
 							}
 
-							slot7.putStack(itemstack12.split(l2));
+							slot7.set(itemstack12.split(l2));
 
 							if (itemstack12.isEmpty()) {
-								inventoryplayer.setItemStack(ItemStack.EMPTY);
+								inventoryplayer.setCarried(ItemStack.EMPTY);
 							}
 						}
-					} else if (slot7.canTakeStack(player)) {
+					} else if (slot7.mayPickup(player)) {
 						if (itemstack12.isEmpty()) {
 							if (!itemstack9.isEmpty()) {
 								int k2 = dragType == 0 ? itemstack9.getCount() : (itemstack9.getCount() + 1) / 2;
-								inventoryplayer.setItemStack(slot7.decrStackSize(k2));
+								inventoryplayer.setCarried(slot7.remove(k2));
 
 								if (itemstack9.isEmpty()) {
-									slot7.putStack(ItemStack.EMPTY);
+									slot7.set(ItemStack.EMPTY);
 								}
 
-								slot7.onTake(player, inventoryplayer.getItemStack());
+								slot7.onTake(player, inventoryplayer.getCarried());
 							} else {
-								slot7.putStack(ItemStack.EMPTY);
-								inventoryplayer.setItemStack(ItemStack.EMPTY);
+								slot7.set(ItemStack.EMPTY);
+								inventoryplayer.setCarried(ItemStack.EMPTY);
 							}
-						} else if (slot7.isItemValid(itemstack12)) {
-							if (itemstack9.getItem() == itemstack12.getItem() && ItemStack.areItemStackTagsEqual(itemstack9, itemstack12)) {
+						} else if (slot7.mayPlace(itemstack12)) {
+							if (itemstack9.getItem() == itemstack12.getItem() && ItemStack.tagMatches(itemstack9, itemstack12)) {
 								int j2 = dragType == 0 ? itemstack12.getCount() : 1;
 
-								if (j2 > slot7.getItemStackLimit(itemstack12) - itemstack9.getCount()) {
-									j2 = slot7.getItemStackLimit(itemstack12) - itemstack9.getCount();
+								if (j2 > slot7.getMaxStackSize(itemstack12) - itemstack9.getCount()) {
+									j2 = slot7.getMaxStackSize(itemstack12) - itemstack9.getCount();
 								}
 
 								//if (j2 > itemstack12.getMaxStackSize() - itemstack9.getCount()) {
@@ -241,46 +241,46 @@ public class RuneBagGui {
 								itemstack12.split(j2);
 
 								if (itemstack12.isEmpty()) {
-									inventoryplayer.setItemStack(ItemStack.EMPTY);
+									inventoryplayer.setCarried(ItemStack.EMPTY);
 								}
 
 								itemstack9.grow(j2);
-							} else if (itemstack12.getCount() <= slot7.getItemStackLimit(itemstack12)) {
-								slot7.putStack(itemstack12);
-								inventoryplayer.setItemStack(itemstack9);
+							} else if (itemstack12.getCount() <= slot7.getMaxStackSize(itemstack12)) {
+								slot7.set(itemstack12);
+								inventoryplayer.setCarried(itemstack9);
 							}
-						} else if (itemstack9.getItem() == itemstack12.getItem() && itemstack12.getMaxStackSize() > 1 && ItemStack.areItemStackTagsEqual(itemstack9, itemstack12)) {
+						} else if (itemstack9.getItem() == itemstack12.getItem() && itemstack12.getMaxStackSize() > 1 && ItemStack.tagMatches(itemstack9, itemstack12)) {
 							int i2 = itemstack9.getCount();
 
 							if (i2 > 0 && i2 + itemstack12.getCount() <= itemstack12.getMaxStackSize()) {
 								itemstack12.grow(i2);
-								itemstack9 = slot7.decrStackSize(i2);
+								itemstack9 = slot7.remove(i2);
 
 								if (itemstack9.isEmpty()) {
-									slot7.putStack(ItemStack.EMPTY);
+									slot7.set(ItemStack.EMPTY);
 								}
 
-								slot7.onTake(player, inventoryplayer.getItemStack());
+								slot7.onTake(player, inventoryplayer.getCarried());
 							}
 						}
 					}
 
-					slot7.onSlotChanged();
+					slot7.setChanged();
 				}
 	            
-				this.detectAndSendChanges();
+				this.broadcastChanges();
 				return itemstack;
 			} else {
-				return super.slotClick(slotId, dragType, clickTypeIn, player);
+				return super.clicked(slotId, dragType, clickTypeIn, player);
 			}
 	        
 		}
 		
 		public static boolean canAddItemToSlot(Slot slotIn, ItemStack stack, boolean stackSizeMatters) {
-			boolean flag = slotIn == null || !slotIn.getHasStack();
+			boolean flag = slotIn == null || !slotIn.hasItem();
 
-			if (slotIn != null && slotIn.getHasStack() && !stack.isEmpty() && stack.isItemEqual(slotIn.getStack()) && ItemStack.areItemStackTagsEqual(slotIn.getStack(), stack)){
-				flag |= slotIn.getStack().getCount() + (stackSizeMatters ? 0 : stack.getCount()) <= slotIn.getSlotStackLimit();
+			if (slotIn != null && slotIn.hasItem() && !stack.isEmpty() && stack.sameItem(slotIn.getItem()) && ItemStack.tagMatches(slotIn.getItem(), stack)){
+				flag |= slotIn.getItem().getCount() + (stackSizeMatters ? 0 : stack.getCount()) <= slotIn.getMaxStackSize();
 			}
 
 			return flag;
@@ -296,16 +296,16 @@ public class RuneBagGui {
 		public BagGui(BagContainer bag, PlayerInventory playerIn, ITextComponent name) {
 			super(bag, playerIn, name);
 			this.bag = bag;
-			this.xSize = GUI_WIDTH;
-			this.ySize = GUI_HEIGHT;
+			this.imageWidth = GUI_WIDTH;
+			this.imageHeight = GUI_HEIGHT;
 		}
 		
 		@Override
-		protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
-			int horizontalMargin = (width - xSize) / 2;
-			int verticalMargin = (height - ySize) / 2;
+		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+			int horizontalMargin = (width - imageWidth) / 2;
+			int verticalMargin = (height - imageHeight) / 2;
 			
-			mc.getTextureManager().bindTexture(TEXT);
+			mc.getTextureManager().bind(TEXT);
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			int guiU = 0;
@@ -320,8 +320,8 @@ public class RuneBagGui {
 					BUTTON_TEXT_VOFFSET, BUTTON_WIDTH,
 					BUTTON_WIDTH, 256, 256);
 			
-			int left = (width - xSize) / 2;
-			int top = (height - ySize) / 2;
+			int left = (width - imageWidth) / 2;
+			int top = (height - imageHeight) / 2;
 			
 			left += BUTTON_HOFFSET;
 			top += BUTTON_VOFFSET;
@@ -334,15 +334,15 @@ public class RuneBagGui {
 		}
 		
 		@Override
-		protected void drawGuiContainerForegroundLayer(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			// no labels
 			//super.drawGuiContainerForegroundLayer(matrixStackIn, mouseX, mouseY);
 		}
 			
 		@Override
 		public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-			int left = (width - xSize) / 2;
-			int top = (height - ySize) / 2;
+			int left = (width - imageWidth) / 2;
+			int top = (height - imageHeight) / 2;
 			
 			left += BUTTON_HOFFSET;
 			top += BUTTON_VOFFSET;

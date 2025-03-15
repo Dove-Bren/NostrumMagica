@@ -29,7 +29,7 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 	protected static final AxisAlignedBB _BoundingBox = new AxisAlignedBB(-.5, -.1, -.5, .5, .1, .5);
 	public static final double CYCLER_RADIUS = 1;
 	
-	protected static final DataParameter<Optional<UUID>> SHOOTER = EntityDataManager.<Optional<UUID>>createKey(CyclerSpellSaucerEntity.class, DataSerializers.OPTIONAL_UNIQUE_ID);
+	protected static final DataParameter<Optional<UUID>> SHOOTER = EntityDataManager.<Optional<UUID>>defineId(CyclerSpellSaucerEntity.class, DataSerializers.OPTIONAL_UUID);
 	
 	// Cycler:
 	private final int duration;
@@ -42,8 +42,8 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 		this.onBlocks = false;
 		this.dieOnImpact = false;
         this.setNoGravity(true);
-        this.setMotion(0, 0, 0);
-        this.accelerationX = this.accelerationY = this.accelerationZ = 0;
+        this.setDeltaMovement(0, 0, 0);
+        this.xPower = this.yPower = this.zPower = 0;
 	}
 	
 	protected CyclerSpellSaucerEntity(EntityType<? extends CyclerSpellSaucerEntity> type, MagicCyclerShapeInstance trigger, World world, LivingEntity shooter, float speed,
@@ -53,14 +53,14 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
         this.onBlocks = onBlocks;
         this.dieOnImpact = dieOnImpact;
         this.setNoGravity(true);
-        this.setMotion(0, 0, 0);
-        this.accelerationX = this.accelerationY = this.accelerationZ = 0;
+        this.setDeltaMovement(0, 0, 0);
+        this.xPower = this.yPower = this.zPower = 0;
         
-        this.setLocationAndAngles(shooter.getPosX(), shooter.getPosY(), shooter.getPosZ(), 0, 0);
-        this.setPosition(shooter.getPosX(), shooter.getPosY(), shooter.getPosZ());
+        this.moveTo(shooter.getX(), shooter.getY(), shooter.getZ(), 0, 0);
+        this.setPos(shooter.getX(), shooter.getY(), shooter.getZ());
         
         // Set up shooter as data parameter to communicate to client
-        this.dataManager.set(SHOOTER, Optional.ofNullable(shooter.getUniqueID()));
+        this.entityData.set(SHOOTER, Optional.ofNullable(shooter.getUUID()));
 	}
 	
 	public CyclerSpellSaucerEntity(World world, LivingEntity shooter, MagicCyclerShapeInstance trigger, float speed,
@@ -69,9 +69,9 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
-		this.dataManager.register(SHOOTER, Optional.<UUID>empty());
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		this.entityData.define(SHOOTER, Optional.<UUID>empty());
 	}
 	
 	
@@ -79,9 +79,9 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 		// Get shooter position
 		if (this.shootingEntity == null) {
 			// Try and do a fixup
-			UUID shooterID = this.dataManager.get(SHOOTER).orElse(null);
+			UUID shooterID = this.entityData.get(SHOOTER).orElse(null);
 			if (shooterID != null) {
-				Entity entity = Entities.FindEntity(world, shooterID);
+				Entity entity = Entities.FindEntity(level, shooterID);
 				
 				if (entity != null) {
 					this.shootingEntity = (LivingEntity) entity;
@@ -96,7 +96,7 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 			// Center vertically on the entity
 			y = (this.shootingEntity.getEyeHeight() / 2f);
 			final int ticksAround = 40;
-			float progress = (((float) (this.ticksExisted % ticksAround)) + partialTicks) / (float) ticksAround;
+			float progress = (((float) (this.tickCount % ticksAround)) + partialTicks) / (float) ticksAround;
 			double radians = progress * 2D * Math.PI;
 			
 			final double rotateDist = CYCLER_RADIUS; 
@@ -113,9 +113,9 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 		// Get shooter position
 		if (this.shootingEntity == null) {
 			// Try and do a fixup
-			UUID shooterID = this.dataManager.get(SHOOTER).orElse(null);
+			UUID shooterID = this.entityData.get(SHOOTER).orElse(null);
 			if (shooterID != null) {
-				Entity entity = Entities.FindEntity(world, shooterID);
+				Entity entity = Entities.FindEntity(level, shooterID);
 				
 				if (entity != null) {
 					this.shootingEntity = (LivingEntity) entity;
@@ -124,26 +124,26 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 		}
 		
 		if (this.shootingEntity != null) {
-			return this.shootingEntity.getPositionVec().add(this.getTargetOffsetLoc(partialTicks));
+			return this.shootingEntity.position().add(this.getTargetOffsetLoc(partialTicks));
 		}
 		
-		return this.getPositionVec();
+		return this.position();
 	}
 	
 	@Override
 	public void tick() {
 		super.tick();
 		
-		if (!world.isRemote) {
+		if (!level.isClientSide) {
 			
-			if (this.shootingEntity == null || this.ticksExisted >= duration) {
+			if (this.shootingEntity == null || this.tickCount >= duration) {
 				// Expired, or got loaded!
 				this.remove();
 				return;
 			}
 			
 			Vector3d pos = this.getTargetLoc(0f);
-			this.setPosition(pos.x, pos.y, pos.z);
+			this.setPos(pos.x, pos.y, pos.z);
 			
 //			Vector accel = this.getInstantVelocity();
 //	        
@@ -152,7 +152,7 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 //	        this.getMotion().y += accel.y;
 //	        this.getMotion().z += accel.z;
 			
-			List<Entity> collidedEnts = world.getEntitiesInAABBexcluding(this, this.getBoundingBox(), (ent) -> {
+			List<Entity> collidedEnts = level.getEntities(this, this.getBoundingBox(), (ent) -> {
 				return ent instanceof LivingEntity;
 			});
 			if (!collidedEnts.isEmpty()) {
@@ -163,7 +163,7 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 						continue;
 					}
 					
-					if (!e.isAlive() || e.noClip || !e.canBeCollidedWith()) {
+					if (!e.isAlive() || e.noPhysics || !e.isPickable()) {
 						continue;
 					}
 					
@@ -173,25 +173,25 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 				
 				if (ent != null) {
 					RayTraceResult bundledResult = new EntityRayTraceResult(collidedEnts.get(0));
-					this.onImpact(bundledResult);
+					this.onHit(bundledResult);
 				}
 			}
 			
 			// Also check for blocks, if we contact blocks
 			if (this.onBlocks) {
 				// Only trigger on non-air
-				BlockPos blockPos = new BlockPos(getPosX(), getPosY(), getPosZ()); // not using getPosition() since it adds .5 y 
+				BlockPos blockPos = new BlockPos(getX(), getY(), getZ()); // not using getPosition() since it adds .5 y 
 				RayTraceResult bundledResult = new BlockRayTraceResult(
-							this.getPositionVec(), Direction.UP, blockPos, false);
+							this.position(), Direction.UP, blockPos, false);
 					
-				this.onImpact(bundledResult);
+				this.onHit(bundledResult);
 			}
 		}
 	}
 	
 	@Override
 	public boolean canImpact(BlockPos pos) {
-		return onBlocks && !this.world.isAirBlock(pos) && this.world.getBlockState(pos).isOpaqueCube(world, pos) && super.canImpact(pos);
+		return onBlocks && !this.level.isEmptyBlock(pos) && this.level.getBlockState(pos).isSolidRender(level, pos) && super.canImpact(pos);
 	}
 	
 	@Override

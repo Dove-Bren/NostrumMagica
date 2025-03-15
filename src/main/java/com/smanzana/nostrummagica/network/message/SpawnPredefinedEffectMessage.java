@@ -33,7 +33,7 @@ public class SpawnPredefinedEffectMessage {
 			return;
 		}
 		
-		Entity ent = player.world.getEntityByID(message.entityID);
+		Entity ent = player.level.getEntity(message.entityID);
 		Vector3d offset = (ent != null ? Vector3d.ZERO : message.position);
 		
 		if (offset == null) {
@@ -74,7 +74,7 @@ public class SpawnPredefinedEffectMessage {
 		//final @Nullable Vector3d position;
 		//final int entityID;
 		
-		type = buf.readEnumValue(PredefinedEffect.class);
+		type = buf.readEnum(PredefinedEffect.class);
 		duration = buf.readVarInt();
 		dimension = NetUtils.unpackDimension(buf);
 		
@@ -86,7 +86,7 @@ public class SpawnPredefinedEffectMessage {
 	}
 
 	public static void encode(SpawnPredefinedEffectMessage msg, PacketBuffer buf) {
-		buf.writeEnumValue(msg.type);
+		buf.writeEnum(msg.type);
 		buf.writeVarInt(msg.duration);
 		NetUtils.packDimension(buf, msg.dimension);
 		

@@ -53,7 +53,7 @@ public abstract class OnMetricLevelShape extends SpellShape {
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
 		if (costs == null) {
-			costs = NonNullList.from(ItemStack.EMPTY,
+			costs = NonNullList.of(ItemStack.EMPTY,
 				ItemStack.EMPTY,
 				new ItemStack(Blocks.TRIPWIRE_HOOK),
 				new ItemStack(Items.REPEATER),

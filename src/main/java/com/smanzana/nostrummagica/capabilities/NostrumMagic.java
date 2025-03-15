@@ -456,7 +456,7 @@ public class NostrumMagic implements INostrumMagic {
 //			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
 //		}
 		
-		if (entity != null && entity instanceof PlayerEntity && !entity.world.isRemote) {
+		if (entity != null && entity instanceof PlayerEntity && !entity.level.isClientSide) {
 			NetworkHandler.sendTo(
 					new LoreMessage(tagged, this),
 					(ServerPlayerEntity) entity);
@@ -477,7 +477,7 @@ public class NostrumMagic implements INostrumMagic {
 //			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
 //		}
 		
-		if (entity != null && entity instanceof PlayerEntity && !entity.world.isRemote) {
+		if (entity != null && entity instanceof PlayerEntity && !entity.level.isClientSide) {
 			NetworkHandler.sendTo(
 					new LoreMessage(tagged, this),
 					(ServerPlayerEntity) entity);
@@ -522,10 +522,10 @@ public class NostrumMagic implements INostrumMagic {
 		elementalMastery.put(element, mastery);
 		
 		if (mastery != EElementalMastery.UNKNOWN) {
-			if (this.entity != null && !this.entity.world.isRemote
+			if (this.entity != null && !this.entity.level.isClientSide
 					&& this.entity instanceof PlayerEntity) {
 				PlayerEntity player = (PlayerEntity) this.entity;
-				player.sendMessage(new TranslationTextComponent("info.element_mastery." + mastery.getTranslationKey(), element.getName()), Util.DUMMY_UUID);
+				player.sendMessage(new TranslationTextComponent("info.element_mastery." + mastery.getTranslationKey(), element.getName()), Util.NIL_UUID);
 			}
 		}
 		

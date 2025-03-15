@@ -36,15 +36,15 @@ public class ManaArmorerBlock extends Block {
 	public static final String ID = "mana_armorer";
 
 	private static final double AABB_RADIUS = (4.0);
-	protected static final VoxelShape BASE_AABB = Block.makeCuboidShape(8 - AABB_RADIUS, 8 - AABB_RADIUS, 8 - AABB_RADIUS, 8 + AABB_RADIUS, 8 + AABB_RADIUS, 8 + AABB_RADIUS);
+	protected static final VoxelShape BASE_AABB = Block.box(8 - AABB_RADIUS, 8 - AABB_RADIUS, 8 - AABB_RADIUS, 8 + AABB_RADIUS, 8 + AABB_RADIUS, 8 + AABB_RADIUS);
 	
 	public ManaArmorerBlock() {
-		super(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(1.2f, 3.0f)
+		super(Block.Properties.of(Material.STONE)
+				.strength(1.2f, 3.0f)
 				.sound(SoundType.STONE)
 				.harvestTool(ToolType.PICKAXE)
 				.harvestLevel(1)
-				.notSolid()
+				.noOcclusion()
 				);
 	}
 	
@@ -55,7 +55,7 @@ public class ManaArmorerBlock extends Block {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.INVISIBLE;
 	}
 	
@@ -90,9 +90,9 @@ public class ManaArmorerBlock extends Block {
 //	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote) {
-			TileEntity te = worldIn.getTileEntity(pos);
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (!worldIn.isClientSide) {
+			TileEntity te = worldIn.getBlockEntity(pos);
 			if (te != null && te instanceof ManaArmorerTileEntity) {
 				ManaArmorerTileEntity armorer = (ManaArmorerTileEntity) te;
 				@Nullable IManaArmor playerArmor = NostrumMagica.getManaArmor(player);
@@ -100,7 +100,7 @@ public class ManaArmorerBlock extends Block {
 				if (playerArmor != null && playerArmor.hasArmor()) {
 					// Already have armor?
 					NostrumMagicaSounds.CAST_FAIL.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
-					player.sendMessage(new TranslationTextComponent("info.mana_armorer.already_have"), Util.DUMMY_UUID);
+					player.sendMessage(new TranslationTextComponent("info.mana_armorer.already_have"), Util.NIL_UUID);
 				} else if (armorer.isActive()) {
 					// If we're the active entity, stop it
 					// Otherwise, it's busy
@@ -108,7 +108,7 @@ public class ManaArmorerBlock extends Block {
 						armorer.stop();
 					} else {
 						NostrumMagicaSounds.CAST_FAIL.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
-						player.sendMessage(new TranslationTextComponent("info.mana_armorer.busy"), Util.DUMMY_UUID);
+						player.sendMessage(new TranslationTextComponent("info.mana_armorer.busy"), Util.NIL_UUID);
 					}
 				} else {
 					// Else become active with us
@@ -120,7 +120,7 @@ public class ManaArmorerBlock extends Block {
 						armorer.startEntity(player);
 					} else {
 						NostrumMagicaSounds.CAST_FAIL.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
-						player.sendMessage(new TranslationTextComponent("info.mana_armorer.locked"), Util.DUMMY_UUID);
+						player.sendMessage(new TranslationTextComponent("info.mana_armorer.locked"), Util.NIL_UUID);
 					}
 				}
 			}

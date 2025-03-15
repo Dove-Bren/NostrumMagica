@@ -56,14 +56,14 @@ public class ModelRendererBaked extends ModelRenderer {
 	
 	// Made public with AT :)
 	@Override
-	public void doRender(MatrixStack.Entry matrixEntryIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void compile(MatrixStack.Entry matrixEntryIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		checkAndLoadModel();
 		
 		// Render obj model
 		RenderFuncs.RenderModel(matrixEntryIn, bufferIn, bakedModel, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		
 		// Render boxes and children renderes that may have been set up
-		super.doRender(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		super.compile(matrixEntryIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}
 	
 //	protected boolean preRender(BufferBuilder buffer, float scale) {

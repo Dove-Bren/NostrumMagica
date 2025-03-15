@@ -32,7 +32,7 @@ public class OutcomeSpawnEntity implements IRitualOutcome {
 	
 	@Override
 	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
-		if (world.isRemote)
+		if (world.isClientSide)
 			return;
 		
 		float angle = 0f;
@@ -54,7 +54,7 @@ public class OutcomeSpawnEntity implements IRitualOutcome {
 
 	@Override
 	public List<ITextComponent> getDescription() {
-		String name = I18n.format(factory.getEntityName(), (Object[]) null);
+		String name = I18n.get(factory.getEntityName(), (Object[]) null);
 		return TextUtils.GetTranslatedList("ritual.outcome.spawn_entity.desc",
 				new Object[] {count, name});
 	}

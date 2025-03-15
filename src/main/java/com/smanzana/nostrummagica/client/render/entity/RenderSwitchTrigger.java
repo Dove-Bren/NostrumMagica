@@ -39,19 +39,19 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(SwitchTriggerEntity entity) {
+	public ResourceLocation getTextureLocation(SwitchTriggerEntity entity) {
 		return new ResourceLocation(NostrumMagica.MODID,
 				"textures/block/spawner.png"
 				);
 	}
 	
 	@Override
-	protected boolean canRenderName(SwitchTriggerEntity entity) {
+	protected boolean shouldShowName(SwitchTriggerEntity entity) {
 		return entity.hasCustomName() || NostrumMagica.instance.proxy.getPlayer().isCreative();
 	}
 	
 	@Override
-	protected void renderName(SwitchTriggerEntity entityIn, ITextComponent displayNameIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	protected void renderNameTag(SwitchTriggerEntity entityIn, ITextComponent displayNameIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		final String triggerInfo;
 		final String extraInfo;
 		SwitchBlockTileEntity te = entityIn.getLinkedTileEntity();
@@ -81,7 +81,7 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 	}
 	
 	protected void renderLivingLabel(Entity entityIn, String label, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, float yOffset) {
-		RenderFuncs.drawNameplate(matrixStackIn, bufferIn, entityIn, label, this.getFontRendererFromRenderManager(), packedLightIn, yOffset, this.renderManager.info);
+		RenderFuncs.drawNameplate(matrixStackIn, bufferIn, entityIn, label, this.getFont(), packedLightIn, yOffset, this.entityRenderDispatcher.camera);
 	}
 	
 	public ModelSwitchTrigger getEntityModel(SwitchTriggerEntity trigger) {
@@ -100,7 +100,7 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 	}
 	
 	protected float getAnimateTicks(SwitchTriggerEntity entityIn, float partialTicks) {
-		return entityIn.world.getGameTime() + partialTicks;
+		return entityIn.level.getGameTime() + partialTicks;
 	}
 	
 	protected boolean shouldRenderSwitch(SwitchTriggerEntity entityIn) {
@@ -162,7 +162,7 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 			// This doesn't work because the buffers happen to be the same under the hood, and causes an exception
 			// So isntead, render twice
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 	
 			
 			// also bob up and down
@@ -170,14 +170,14 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 			
 			
 			matrixStackIn.translate(0, 1f, 0); // Should this be earlier?
-			matrixStackIn.rotate(Vector3f.YP.rotationDegrees(spinAngle));
-			matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(turnAngle)); // GlStateManager.rotated(angle, 1, 0, 1); WAS x and z?
+			matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(spinAngle));
+			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(turnAngle)); // GlStateManager.rotated(angle, 1, 0, 1); WAS x and z?
 	
 			IVertexBuilder baseBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE);
-			model.render(matrixStackIn, baseBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
+			model.renderToBuffer(matrixStackIn, baseBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
 			IVertexBuilder cageBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_CAGE);
-			model.render(matrixStackIn, cageBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
-			matrixStackIn.pop();
+			model.renderToBuffer(matrixStackIn, cageBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+			matrixStackIn.popPose();
 		}
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn); // Nameplate
 	}

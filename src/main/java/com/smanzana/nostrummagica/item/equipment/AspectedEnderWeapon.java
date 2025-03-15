@@ -63,12 +63,12 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	private static final float MAX_BALL_DIST = 30;
 	
 	public AspectedEnderWeapon() {
-		super(ItemTier.GOLD, 5, -2.6F, NostrumItems.PropEquipment().maxDamage(1240));
+		super(ItemTier.GOLD, 5, -2.6F, NostrumItems.PropEquipment().durability(1240));
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot) {
-		return super.getAttributeModifiers(equipmentSlot);
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+		return super.getDefaultAttributeModifiers(equipmentSlot);
     }
 	
 	@Override
@@ -98,7 +98,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	}
 	
 	@Override
-	public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
 		if (repair.isEmpty()) {
 			return false;
 		} else {
@@ -110,26 +110,26 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	public void apply(LivingEntity caster, Spell spell, SpellCastSummary summary, ItemStack stack) {
 		// We provide -10% mana cost reduct
 		summary.addCostRate(-.1f);
-		ItemStacks.damageItem(stack, caster, caster.getHeldItem(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+		ItemStacks.damageItem(stack, caster, caster.getItemInHand(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		tooltip.add(new StringTextComponent("Mana Cost Discount: 10%"));
 	}
 	
 	protected void doCastEffect(LivingEntity target, Vector3d startPos, Vector3d endPos) {
-		if (target.world.isRemote) {
+		if (target.level.isClientSide) {
 			return;
 		}
 		
-		target.world.playSound(null, endPos.getX(), endPos.getY(), endPos.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.NEUTRAL, 1f, 1f);
-		target.world.playSound(null, startPos.getX(), startPos.getY(), startPos.getZ(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.NEUTRAL, 1f, 1f);
+		target.level.playSound(null, endPos.x(), endPos.y(), endPos.z(), SoundEvents.ENDERMAN_TELEPORT, SoundCategory.NEUTRAL, 1f, 1f);
+		target.level.playSound(null, startPos.x(), startPos.y(), startPos.z(), SoundEvents.ENDERMAN_TELEPORT, SoundCategory.NEUTRAL, 1f, 1f);
 		
 		for(int i = 0; i < 32; ++i) {
-			target.world.addParticle(ParticleTypes.PORTAL, endPos.getX(), endPos.getY() + NostrumMagica.rand.nextDouble() * 2.0D, endPos.getZ(), NostrumMagica.rand.nextGaussian(), 0.0D, NostrumMagica.rand.nextGaussian());
+			target.level.addParticle(ParticleTypes.PORTAL, endPos.x(), endPos.y() + NostrumMagica.rand.nextDouble() * 2.0D, endPos.z(), NostrumMagica.rand.nextGaussian(), 0.0D, NostrumMagica.rand.nextGaussian());
 		}
 		
 		Vector3d diff = endPos.subtract(startPos);
@@ -139,36 +139,36 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		for (int i = 0; i < intervals; i++) {
 			Vector3d offset = diff.scale((float) i/ (float) intervals);
 			final Vector3d pos = startPos.add(offset);
-			NostrumParticles.GLOW_ORB.spawn(target.world, new SpawnParams(
+			NostrumParticles.GLOW_ORB.spawn(target.level, new SpawnParams(
 					1,
 					pos.x, pos.y, pos.z, 0, 30, 5,
-					target.getEntityId()
+					target.getId()
 					).color(EMagicElement.ENDER.getColor()).dieOnTarget(true));
 		}
 	}
 	
 	protected Vector3d getCastPosition(LivingEntity caster) {
-		RayTraceResult result = RayTrace.raytrace(caster.world, caster, caster.getPositionVec().add(0, caster.getEyeHeight(), 0),
-				caster.rotationPitch, caster.rotationYaw, MAX_BALL_DIST, (ent) -> {
+		RayTraceResult result = RayTrace.raytrace(caster.level, caster, caster.position().add(0, caster.getEyeHeight(), 0),
+				caster.xRot, caster.yRot, MAX_BALL_DIST, (ent) -> {
 					return false; // Don't want entities
 				});
 		
 		if (result.getType() == RayTraceResult.Type.MISS) {
-			return caster.getPositionVec().add(0, caster.getEyeHeight(), 0).add(
-					caster.getLookVec().scale(MAX_BALL_DIST)
+			return caster.position().add(0, caster.getEyeHeight(), 0).add(
+					caster.getLookAngle().scale(MAX_BALL_DIST)
 					);
 		} else {
 			BlockRayTraceResult blockRes = (BlockRayTraceResult) result;
 			BlockPos pos = RayTrace.blockPosFromResult(result);
-			if (!caster.world.isAirBlock(pos)) {
-				pos = pos.offset(blockRes.getFace());
+			if (!caster.level.isEmptyBlock(pos)) {
+				pos = pos.relative(blockRes.getDirection());
 			}
 			return new Vector3d(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 		}
 	}
 	
 	protected @Nullable EnderRodBallEntity findNearestBall(LivingEntity caster) {
-		ServerWorld world = (ServerWorld) caster.world;
+		ServerWorld world = (ServerWorld) caster.level;
 		List<Entity> balls = world.getEntities(NostrumEntityTypes.enderRodBall, (e) -> {
 			return e != null
 					&& e instanceof EnderRodBallEntity
@@ -178,9 +178,9 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		EnderRodBallEntity closest = null;
 		double minDistSq = -1;
 		for (Entity ball : balls) {
-			if (closest == null || ball.getDistanceSq(caster) < minDistSq) {
+			if (closest == null || ball.distanceToSqr(caster) < minDistSq) {
 				closest = (EnderRodBallEntity) ball;
-				minDistSq = ball.getDistanceSq(caster);
+				minDistSq = ball.distanceToSqr(caster);
 			}
 		}
 		return closest;
@@ -196,30 +196,30 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		final boolean hasShield = attr != null && attr.hasSkill(NostrumSkills.Ender_Weapon);
 		if (hasBonus) {
 			int hurtCount = 0;
-			for (LivingEntity ent : Entities.GetEntities((ServerWorld) caster.world, (e) -> {
+			for (LivingEntity ent : Entities.GetEntities((ServerWorld) caster.level, (e) -> {
 				return e != null
 						&& !NostrumMagica.IsSameTeam(e, caster)
-						&& e.getDistance(ball) <= 5;
+						&& e.distanceTo(ball) <= 5;
 			})) {
 				doConsumeDamage(caster, ent);
 				hurtCount++;
 			}
 			
-			NostrumParticles.GLOW_ORB.spawn(ball.world, new SpawnParams(
+			NostrumParticles.GLOW_ORB.spawn(ball.level, new SpawnParams(
 					50,
-					ball.getPosX(), ball.getPosY() + ball.getHeight() / 2, ball.getPosZ(), .25, 50, 20,
+					ball.getX(), ball.getY() + ball.getBbHeight() / 2, ball.getZ(), .25, 50, 20,
 					new Vector3d(0, .1, 0), new Vector3d(.25, .05, .25)
 					).color(EMagicElement.ENDER.getColor()).gravity(true));
 			
 			if (hasShield && hurtCount > 0) {
 				// Apply effects if not present
-				final EffectInstance activePhysical = caster.getActivePotionEffect(NostrumEffects.physicalShield);
-				final EffectInstance activeMagic = caster.getActivePotionEffect(NostrumEffects.magicShield);
+				final EffectInstance activePhysical = caster.getEffect(NostrumEffects.physicalShield);
+				final EffectInstance activeMagic = caster.getEffect(NostrumEffects.magicShield);
 				if (activePhysical == null || activePhysical.getDuration() < 15 * 20) {
-					caster.addPotionEffect(new EffectInstance(NostrumEffects.physicalShield, 15 * 20, 0));
+					caster.addEffect(new EffectInstance(NostrumEffects.physicalShield, 15 * 20, 0));
 				}
 				if (activeMagic == null || activeMagic.getDuration() < 15 * 20) {
-					caster.addPotionEffect(new EffectInstance(NostrumEffects.magicShield, 15 * 20, 0));
+					caster.addEffect(new EffectInstance(NostrumEffects.magicShield, 15 * 20, 0));
 				}
 				
 				// Actually set amount
@@ -233,10 +233,10 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	}
 	
 	protected void teleportEntity(LivingEntity caster, LivingEntity entity, Vector3d pos) {
-		final Vector3d startPos = entity.getPositionVec();
-		NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entity, pos.getX(), pos.getY(), pos.getZ(), caster);
+		final Vector3d startPos = entity.position();
+		NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entity, pos.x(), pos.y(), pos.z(), caster);
 		if (!event.isCanceled()) {
-			entity.setPositionAndUpdate(event.getTargetX(), event.getTargetY(), event.getTargetZ());
+			entity.teleportTo(event.getTargetX(), event.getTargetY(), event.getTargetZ());
 			NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), caster, event.getPrev(), event.getTarget());
 		}
 		doCastEffect(entity, startPos, pos);
@@ -247,11 +247,11 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		if (ball != null) {
 			final boolean hasBonus = ElementalArmor.GetSetCount(caster, EMagicElement.ENDER, ElementalArmor.Type.MASTER) == 4;
 			
-			teleportEntity(caster, target, ball.getPositionVec());
+			teleportEntity(caster, target, ball.position());
 			consumeBall(caster, ball);
 			
 			if (hasBonus && !NostrumMagica.IsSameTeam(target, caster)) {
-				target.addPotionEffect(new EffectInstance(Effects.SLOWNESS, 20 * 3, 3));
+				target.addEffect(new EffectInstance(Effects.MOVEMENT_SLOWDOWN, 20 * 3, 3));
 			}
 			return true;
 		} else {
@@ -262,7 +262,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	protected boolean dislocateCaster(LivingEntity caster) {
 		@Nullable EnderRodBallEntity ball = findNearestBall(caster);
 		if (ball != null) {
-			teleportEntity(caster, caster, ball.getPositionVec());
+			teleportEntity(caster, caster, ball.position());
 			consumeBall(caster, ball);
 			return true;
 		} else {
@@ -280,8 +280,8 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		// Create a new ball where caster is looking
 		Vector3d pos = this.getCastPosition(caster);
 		ball = new EnderRodBallEntity(NostrumEntityTypes.enderRodBall, worldIn, caster);
-		ball.setPosition(pos.x, pos.y, pos.z);
-		worldIn.addEntity(ball);
+		ball.setPos(pos.x, pos.y, pos.z);
+		worldIn.addFreshEntity(ball);
 		
 		return true;
 	}
@@ -291,10 +291,10 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	}
 	
 	@Override
-	public ActionResultType itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
-		if (!playerIn.world.isRemote()) {
+	public ActionResultType interactLivingEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+		if (!playerIn.level.isClientSide()) {
 			if (castOnEntity(playerIn, target)) {
-				ItemStacks.damageItem(stack, playerIn, playerIn.getHeldItemMainhand() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+				ItemStacks.damageItem(stack, playerIn, playerIn.getMainHandItem() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
 			}
 		}
 		
@@ -302,8 +302,8 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	}
 	
 	@Override
-	public boolean hitEntity(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-		boolean ret = super.hitEntity(stack, target, attacker);
+	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+		boolean ret = super.hurtEnemy(stack, target, attacker);
 		if (ret) {
 			castOnEntity(attacker, target);
 		}
@@ -329,7 +329,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 
 	@Override
 	protected void fireChargedWeapon(World worldIn, LivingEntity playerIn, Hand hand, ItemStack stack) {
-		if (!worldIn.isRemote() && castRod(worldIn, playerIn)) {
+		if (!worldIn.isClientSide() && castRod(worldIn, playerIn)) {
 			ItemStacks.damageItem(stack, playerIn	, hand, 1);
 		}
 	}

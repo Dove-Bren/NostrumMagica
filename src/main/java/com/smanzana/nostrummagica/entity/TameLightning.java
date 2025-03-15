@@ -37,8 +37,8 @@ public class TameLightning extends LightningBoltEntity {
 
 	public TameLightning(EntityType<? extends TameLightning> type, World worldIn, double x, double y, double z) {
 		super(type, worldIn);
-		this.setPosition(x, y, z);
-		this.setEffectOnly(true);
+		this.setPos(x, y, z);
+		this.setVisualOnly(true);
 		this.lightningState = 2;
 	}
 	
@@ -48,13 +48,13 @@ public class TameLightning extends LightningBoltEntity {
 	}
 
 	public static void doEffect(LivingEntity entity) {
-		if (entity.world.isRemote) {
+		if (entity.level.isClientSide) {
 			return;
 		}
 		
-		NostrumParticles.LIGHTNING_STATIC.spawn(entity.world, new SpawnParams(
+		NostrumParticles.LIGHTNING_STATIC.spawn(entity.level, new SpawnParams(
 				3,
-				entity.getPosX(), entity.getPosY() + entity.getHeight(), entity.getPosZ(), 1, 30, 5,
+				entity.getX(), entity.getY() + entity.getBbHeight(), entity.getZ(), 1, 30, 5,
 				new Vector3d(0, -0.05, 0), null
 				).color(0x80000000 | (0x00FFFFFF & EMagicElement.LIGHTNING.getColor())));
 	}
@@ -65,28 +65,28 @@ public class TameLightning extends LightningBoltEntity {
 
 		--this.lightningState;
 
-		if (this.lightningState >= 0 && this.world instanceof ServerWorld) {
-			List<Entity> list = this.world.getEntitiesInAABBexcluding(this, new AxisAlignedBB(this.getPosX() - 3.0D, this.getPosY() - 3.0D, this.getPosZ() - 3.0D, this.getPosX() + 3.0D, this.getPosY() + 6.0D + 3.0D, this.getPosZ() + 3.0D),
+		if (this.lightningState >= 0 && this.level instanceof ServerWorld) {
+			List<Entity> list = this.level.getEntities(this, new AxisAlignedBB(this.getX() - 3.0D, this.getY() - 3.0D, this.getZ() - 3.0D, this.getX() + 3.0D, this.getY() + 6.0D + 3.0D, this.getZ() + 3.0D),
 					e -> e.isAlive() && !(e instanceof ItemEntity));
 
 			for (int i = 0; i < list.size(); ++i) {
 				Entity entity = (Entity)list.get(i);
 				if (ignoreEntity != entity && !net.minecraftforge.event.ForgeEventFactory.onEntityStruckByLightning(entity, this)) { 
-					entity.func_241841_a((ServerWorld) world, this); //onStruckByLightning(this);
+					entity.thunderHit((ServerWorld) level, this); //onStruckByLightning(this);
 					entity.setInvulnerable(false);
-					entity.hurtResistantTime = 0;
+					entity.invulnerableTime = 0;
 				}
 			}
 		}
 	}
 	
 	@Override
-	public SoundCategory getSoundCategory() {
+	public SoundCategory getSoundSource() {
 		return SoundCategory.WEATHER;
 	}
 
 	@Override
-	public IPacket<?> createSpawnPacket() {
+	public IPacket<?> getAddEntityPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 }

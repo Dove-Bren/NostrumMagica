@@ -47,7 +47,7 @@ public class ClientPurchaseResearchMessage {
 	}
 
 	public static ClientPurchaseResearchMessage decode(PacketBuffer buf) {
-		final String researchKey = buf.readString(32767);
+		final String researchKey = buf.readUtf(32767);
 		NostrumResearch research = NostrumResearch.lookup(researchKey);
 		if (research == null) {
 			throw new DecoderException("Failed to find nostrum research for " + researchKey);
@@ -57,7 +57,7 @@ public class ClientPurchaseResearchMessage {
 	}
 
 	public static void encode(ClientPurchaseResearchMessage msg, PacketBuffer buf) {
-		buf.writeString(msg.research.getKey());
+		buf.writeUtf(msg.research.getKey());
 	}
 
 }

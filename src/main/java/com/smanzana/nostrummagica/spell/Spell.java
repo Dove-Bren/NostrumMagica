@@ -104,7 +104,7 @@ public class Spell {
 			this.spell = spell;
 			this.log = log;
 			
-			this.startTicks = caster.world.getGameTime();
+			this.startTicks = caster.level.getGameTime();
 		}
 		
 		public int getIndex() {
@@ -127,7 +127,7 @@ public class Spell {
 			} else {
 				// Log the stage
 				final SpellShape stageShape = index == -1 ? null : this.spell.shapes.get(index).getShape();
-				this.log.stage(index + 1, stageShape, (int) (this.caster.world.getGameTime() - this.startTicks), targets, locations);
+				this.log.stage(index + 1, stageShape, (int) (this.caster.level.getGameTime() - this.startTicks), targets, locations);
 				
 				this.efficiency *= stageEfficiency;
 				index++;
@@ -185,7 +185,7 @@ public class Spell {
 		}
 		
 		protected void playContinueEffect(World world, Vector3d where) {
-			NostrumMagicaSounds.CAST_CONTINUE.play(world, where.getX(), where.getY(), where.getZ());
+			NostrumMagicaSounds.CAST_CONTINUE.play(world, where.x(), where.y(), where.z());
 		}
 		
 		protected void playContinueEffect(LivingEntity at) {
@@ -195,15 +195,15 @@ public class Spell {
 		protected void spawnShape(SpellShapePart shape, LivingEntity targ, World world, SpellLocation location) {
 			// instantiate trigger in world
 			if (world == null)
-				world = targ.world;
+				world = targ.level;
 			
 			if (location == null) {
 				location = new SpellLocation(targ);
 			}
 			
 			this.shapeInstance = shape.getShape().createInstance(this, targ, location,
-					(targ == null ? -90.0f : targ.rotationPitch),
-					(targ == null ? 0.0f : targ.rotationYaw),
+					(targ == null ? -90.0f : targ.xRot),
+					(targ == null ? 0.0f : targ.yRot),
 					shape.getProperties(), spell.getCharacteristics());
 			this.shapeInstance.spawn(caster);
 		}
@@ -216,8 +216,8 @@ public class Spell {
 		}
 		
 		protected void doFailEffect(World world, Vector3d pos) {
-			NostrumMagicaSounds.CAST_FAIL.play(world, pos.getX(), pos.getY(), pos.getZ());
-			((ServerWorld) world).spawnParticle(ParticleTypes.SMOKE, pos.getX(), pos.getY(), pos.getZ(), 10, 0, 0, 0, .05);
+			NostrumMagicaSounds.CAST_FAIL.play(world, pos.x(), pos.y(), pos.z());
+			((ServerWorld) world).sendParticles(ParticleTypes.SMOKE, pos.x(), pos.y(), pos.z(), 10, 0, 0, 0, .05);
 		}
 		
 		protected float getTargetEfficiencyBonus(LivingEntity caster, LivingEntity target, SpellEffectPart effect, SpellAction action, float base, ISpellLogBuilder log) {
@@ -225,10 +225,10 @@ public class Spell {
 			
 			if (effect.getElement() != EMagicElement.PHYSICAL) {
 				final Effect boostEffect = ElementalSpellBoostEffect.GetForElement(effect.getElement().getOpposite());
-				if (target.getActivePotionEffect(boostEffect) != null) {
-					final float amt = .25f * (1 + target.getActivePotionEffect(boostEffect).getAmplifier());
+				if (target.getEffect(boostEffect) != null) {
+					final float amt = .25f * (1 + target.getEffect(boostEffect).getAmplifier());
 					bonus += amt;
-					target.removePotionEffect(boostEffect);
+					target.removeEffect(boostEffect);
 					log.addGlobalModifier(NostrumSkills.Spellcasting_ElemLinger, amt, ESpellLogModifierType.BONUS_SCALE);
 				}
 			}
@@ -373,7 +373,7 @@ public class Spell {
 				if (first) {
 					if (!affectedEnts.isEmpty())
 					for (LivingEntity affected : affectedEnts) {
-						NostrumMagica.instance.proxy.spawnSpellEffectVfx(affected.world, part,
+						NostrumMagica.instance.proxy.spawnSpellEffectVfx(affected.level, part,
 								caster, null, affected, null);
 					}
 					
@@ -396,7 +396,7 @@ public class Spell {
 				if (attr != null && attr.hasSkill(NostrumSkills.Spellcasting_ElemLinger)) {
 					for (Entry<LivingEntity, EMagicElement> entry : entityLastElement.entrySet()) {
 						final Effect effect = ElementalSpellBoostEffect.GetForElement(entry.getValue());
-						entry.getKey().addPotionEffect(new EffectInstance(effect, 20 * 5, 0));
+						entry.getKey().addEffect(new EffectInstance(effect, 20 * 5, 0));
 					}
 				}
 			} else {
@@ -404,7 +404,7 @@ public class Spell {
 				// Mirror "ents, then if not positions" from above.
 				if (targets != null && !targets.isEmpty()) {
 					for (LivingEntity targ : targets) {
-						doFailEffect(targ.world, targ.getPositionVec().add(0, .2 + targ.getHeight(), 0));
+						doFailEffect(targ.level, targ.position().add(0, .2 + targ.getBbHeight(), 0));
 					}
 				} else if (locations != null && !locations.isEmpty()) {
 					for (SpellLocation pos : locations) {
@@ -477,14 +477,14 @@ public class Spell {
 			// Automatically add the target/targetPos to the preview if provided, though.
 			
 			if (world == null)
-				world = targ.world;
+				world = targ.level;
 			if (location == null) {
 				location = new SpellLocation(targ, this.partialTicks);
 			}
 			
 			shape.getShape().addToPreview(previewBuilder, this, targ, location,
-					(targ == null ? -90.0f : targ.rotationPitch),
-					(targ == null ? 0.0f : targ.rotationYaw),
+					(targ == null ? -90.0f : targ.xRot),
+					(targ == null ? 0.0f : targ.yRot),
 					shape.getProperties(), this.spell.getCharacteristics());
 		}
 		
@@ -652,7 +652,7 @@ public class Spell {
 	}
 	
 	public void cast(LivingEntity caster, float efficiency) {
-		if (!caster.getServer().isOnExecutionThread()) {
+		if (!caster.getServer().isSameThread()) {
 			throw new IllegalStateException("Can't cast spell on a thread other than the game thread");
 		}
 		
@@ -879,7 +879,7 @@ public class Spell {
 				return false;
 			}).name("frostbite");
 		case LIGHTNING:
-			return new SpellAction().status(Effects.SLOWNESS, (int) (duration * .7), amp)
+			return new SpellAction().status(Effects.MOVEMENT_SLOWDOWN, (int) (duration * .7), amp)
 					.status(NostrumEffects.immobilize, 30 + (10 * elementCount) , amp, (caster, target, eff) -> {
 						// Only apply with lightning inflict skill
 						INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
@@ -901,9 +901,9 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction().status(Effects.RESISTANCE, duration, amp).name("resistance");
+			return new SpellAction().status(Effects.DAMAGE_RESISTANCE, duration, amp).name("resistance");
 		case EARTH:
-			return new SpellAction().status(Effects.STRENGTH, duration, amp).name("strength");
+			return new SpellAction().status(Effects.DAMAGE_BOOST, duration, amp).name("strength");
 		case ENDER:
 			return new SpellAction().status(Effects.INVISIBILITY, duration, amp).name("invisibility");
 		case FIRE:
@@ -951,8 +951,8 @@ public class Spell {
 		case LIGHTNING:
 			return new SpellAction().pull(5 * elementCount, elementCount).name("pull");
 		case WIND:
-			return new SpellAction().status(Effects.SPEED, duration, amp)
-					.status(Effects.HASTE, duration, amp, (caster, target, eff) -> {
+			return new SpellAction().status(Effects.MOVEMENT_SPEED, duration, amp)
+					.status(Effects.DIG_SPEED, duration, amp, (caster, target, eff) -> {
 						// With the support skill, also give haste
 						INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 						if (attr != null && attr.hasSkill(NostrumSkills.Wind_Support)) {
@@ -1003,7 +1003,7 @@ public class Spell {
 		case ICE:
 			return new SpellAction().heal(4f * elementCount).name("heal");
 		case LIGHTNING:
-			return new SpellAction().status(Effects.JUMP_BOOST, duration, amp)
+			return new SpellAction().status(Effects.JUMP, duration, amp)
 					.status(NostrumEffects.bonusJump, duration, 0, (caster, target, eff) -> {
 						// With the growth skill, also give jump boost
 						INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);

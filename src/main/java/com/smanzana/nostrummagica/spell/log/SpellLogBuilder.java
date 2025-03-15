@@ -522,8 +522,8 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 	
 	protected ITextComponent makeSkillLabel(Skill skill) {
 		return new StringTextComponent("")
-			.append(new TranslationTextComponent("spelllogmod.nostrummagica.skill").mergeStyle(TextFormatting.GOLD))
-			.append(skill.getName().deepCopy());
+			.append(new TranslationTextComponent("spelllogmod.nostrummagica.skill").withStyle(TextFormatting.GOLD))
+			.append(skill.getName().copy());
 	}
 	
 }

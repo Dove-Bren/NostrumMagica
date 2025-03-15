@@ -10,6 +10,6 @@ public class MagicPotencyAttribute extends RangedAttribute implements IPercentag
 	
 	public MagicPotencyAttribute(String name) {
 		super(name, 0, -100.0D, 200.0D);
-		this.setShouldWatch(true);
+		this.setSyncable(true);
 	}
 }

@@ -16,21 +16,21 @@ public final class PlantBossTreeTypeSerializer implements IDataSerializer<PlantB
 	
 	@Override
 	public void write(PacketBuffer buf, PlantBossTreeType value) {
-		buf.writeEnumValue(value);
+		buf.writeEnum(value);
 	}
 
 	@Override
 	public PlantBossTreeType read(PacketBuffer buf)  {
-		return buf.readEnumValue(PlantBossTreeType.class);
+		return buf.readEnum(PlantBossTreeType.class);
 	}
 
 	@Override
-	public DataParameter<PlantBossTreeType> createKey(int id) {
+	public DataParameter<PlantBossTreeType> createAccessor(int id) {
 		return new DataParameter<>(id, this);
 	}
 
 	@Override
-	public PlantBossTreeType copyValue(PlantBossTreeType value) {
+	public PlantBossTreeType copy(PlantBossTreeType value) {
 		return value;
 	}
 }

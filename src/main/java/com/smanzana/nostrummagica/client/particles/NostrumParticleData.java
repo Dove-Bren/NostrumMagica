@@ -18,19 +18,21 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import net.minecraft.particles.IParticleData.IDeserializer;
+
 public class NostrumParticleData implements IParticleData {
 	
 	public static final IDeserializer<NostrumParticleData> DESERIALIZER = new IDeserializer<NostrumParticleData>() {
 
 		@Override
-		public NostrumParticleData deserialize(ParticleType<NostrumParticleData> particleTypeIn, StringReader reader)
+		public NostrumParticleData fromCommand(ParticleType<NostrumParticleData> particleTypeIn, StringReader reader)
 				throws CommandSyntaxException {
 			return new NostrumParticleData(particleTypeIn, new SpawnParams(1, 0, 0, 0, .5, 20, 0, new Vector3d(0, 1, 0), Vector3d.ZERO));
 		}
 
 		@Override
-		public NostrumParticleData read(ParticleType<NostrumParticleData> particleTypeIn, PacketBuffer buffer) {
-			SpawnParams params = SpawnParams.FromNBT(buffer.readCompoundTag());
+		public NostrumParticleData fromNetwork(ParticleType<NostrumParticleData> particleTypeIn, PacketBuffer buffer) {
+			SpawnParams params = SpawnParams.FromNBT(buffer.readNbt());
 			return new NostrumParticleData(particleTypeIn, params);
 		}
 		
@@ -68,13 +70,13 @@ public class NostrumParticleData implements IParticleData {
 	// This compliments serializer's read method.
 	// It does NOT work with toNBT() and fromNBT().
 	@Override
-	public void write(PacketBuffer buffer) {
-		buffer.writeCompoundTag(params.toNBT(null));
+	public void writeToNetwork(PacketBuffer buffer) {
+		buffer.writeNbt(params.toNBT(null));
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public String getParameters() {
+	public String writeToString() {
 		return Registry.PARTICLE_TYPE.getKey(this.getType()) + " " + "NOT SUPPORTED";
 	}
 	
@@ -94,7 +96,7 @@ public class NostrumParticleData implements IParticleData {
 	@SuppressWarnings("unchecked")
 	public static @Nullable NostrumParticleData fromNBT(CompoundNBT nbt) {
 		String typeName = nbt.getString("particleType");
-		ParticleType<?> type = ForgeRegistries.PARTICLE_TYPES.getValue(ResourceLocation.tryCreate(typeName));
+		ParticleType<?> type = ForgeRegistries.PARTICLE_TYPES.getValue(ResourceLocation.tryParse(typeName));
 		ParticleType<NostrumParticleData> particleType;
 		try {
 			particleType = (ParticleType<NostrumParticleData>) type;

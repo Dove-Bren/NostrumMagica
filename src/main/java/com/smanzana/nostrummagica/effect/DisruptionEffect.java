@@ -35,27 +35,27 @@ public class DisruptionEffect extends Effect {
 		super(EffectType.HARMFUL, 0xFF916F82);
 	}
 	
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return false; // Never ticks
 	}
 
 	@Override
-	public void applyAttributesModifiersToEntity(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
-		super.applyAttributesModifiersToEntity(entity, attributeMap, amplifier);
+	public void addAttributeModifiers(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
+		super.addAttributeModifiers(entity, attributeMap, amplifier);
 	}
 	
 	@Override
-	public void removeAttributesModifiersFromEntity(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
-		super.removeAttributesModifiersFromEntity(entityLivingBaseIn, attributeMapIn, amplifier);
+	public void removeAttributeModifiers(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
+		super.removeAttributeModifiers(entityLivingBaseIn, attributeMapIn, amplifier);
     }
 	
 	protected static boolean canDamage(LivingEntity entity) {
 		Integer lastTicks = lastDamage.get(entity);
-		return lastTicks == null || entity.ticksExisted - lastTicks >= 1;
+		return lastTicks == null || entity.tickCount - lastTicks >= 1;
 	}
 	
 	protected static void markDamaged(LivingEntity entity) {
-		lastDamage.put(entity, entity.ticksExisted);
+		lastDamage.put(entity, entity.tickCount);
 	}
 	
 	@SubscribeEvent
@@ -66,7 +66,7 @@ public class DisruptionEffect extends Effect {
 		if (!(event.getEntity() instanceof LivingEntity)) {
 			return;
 		}
-		if (event.getEntity().world.isRemote()) {
+		if (event.getEntity().level.isClientSide()) {
 			return;
 		}
 		if (event.getEntity() instanceof PlayerEntity && ((PlayerEntity) event.getEntity()).isCreative()) {
@@ -81,15 +81,15 @@ public class DisruptionEffect extends Effect {
 			cause = null;
 		}
 		
-		EffectInstance effect = living.getActivePotionEffect(NostrumEffects.disruption);
+		EffectInstance effect = living.getEffect(NostrumEffects.disruption);
 		if (effect != null && effect.getDuration() > 0) {
-			NostrumMagicaSounds.CAST_FAIL.play(living.world, living.getPosX(), living.getPosY(), living.getPosZ());
+			NostrumMagicaSounds.CAST_FAIL.play(living.level, living.getX(), living.getY(), living.getZ());
 			boolean damaged = false;
 			
 			@Nullable INostrumMagic causeAttr = cause == null ? null : NostrumMagica.getMagicWrapper(cause);
 			if (causeAttr != null && causeAttr.hasSkill(NostrumSkills.Ender_Corrupt)) {
 				// Do additional damage and don't cancel
-				living.hurtResistantTime = 0;
+				living.invulnerableTime = 0;
 				SpellDamage.DamageEntity(living, EMagicElement.ENDER, 4f + effect.getAmplifier(), cause);
 				damaged = true;
 			} else {
@@ -98,7 +98,7 @@ public class DisruptionEffect extends Effect {
 			
 			if (effect.getAmplifier() > 0 && canDamage(living)) {
 				// Damage, too
-				living.attackEntityFrom(DamageSource.DROWN, effect.getAmplifier());
+				living.hurt(DamageSource.DROWN, effect.getAmplifier());
 				damaged = true;
 			}
 			

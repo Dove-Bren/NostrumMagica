@@ -44,12 +44,12 @@ public class SimpleInventoryContainerlet {
 		this.width = width;
 		this.height = height;
 		this.title = title;
-		invBounds = MakeBounds(inventory.getSizeInventory(), x, y, width, height);
-		slots = new ArrayList<>(inventory.getSizeInventory());
+		invBounds = MakeBounds(inventory.getContainerSize(), x, y, width, height);
+		slots = new ArrayList<>(inventory.getContainerSize());
 		
 		final int cellsPerRow = Math.max(1, invBounds.getWidth() / SimpleInventoryContainerlet.POS_SLOT_WIDTH);
 		
-		for (int i = 0; i < inventory.getSizeInventory(); i++) {
+		for (int i = 0; i < inventory.getContainerSize(); i++) {
 			final int slotX = invBounds.getX() + 1 + ((i%cellsPerRow) * SimpleInventoryContainerlet.POS_SLOT_WIDTH);
 			final int slotY = invBounds.getY() + 1 + ((i/cellsPerRow) * SimpleInventoryContainerlet.POS_SLOT_WIDTH);
 			HideableSlot slot = factory.apply(inventory, i, slotX, slotY);
@@ -57,7 +57,7 @@ public class SimpleInventoryContainerlet {
 			container.accept(slot);
 		}
 		
-		this.spilloverRows = ((inventory.getSizeInventory() + cellsPerRow-1) / cellsPerRow)
+		this.spilloverRows = ((inventory.getContainerSize() + cellsPerRow-1) / cellsPerRow)
 				- (invBounds.getHeight() / SimpleInventoryContainerlet.POS_SLOT_WIDTH);
 	}
 	

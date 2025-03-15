@@ -13,24 +13,24 @@ public interface ISpellCraftingInventory extends IInventory {
 	public int getRuneSlotCount();
 	
 	public default ItemStack getScrollSlotContents() {
-		return this.getStackInSlot(getScrollSlotIndex());
+		return this.getItem(getScrollSlotIndex());
 	}
 	
 	public default ItemStack getRuneSlotContents(int runeIndex) {
-		return this.getStackInSlot(runeIndex + this.getRuneSlotStartingIndex());
+		return this.getItem(runeIndex + this.getRuneSlotStartingIndex());
 	}
 	
 	public default void setScrollSlotContents(ItemStack newStack) {
-		this.setInventorySlotContents(getScrollSlotIndex(), newStack);
+		this.setItem(getScrollSlotIndex(), newStack);
 	}
 	
 	public default void setRuneSlotContents(int runeIndex, ItemStack newStack) {
-		this.setInventorySlotContents(getRuneSlotStartingIndex() + runeIndex, newStack);
+		this.setItem(getRuneSlotStartingIndex() + runeIndex, newStack);
 	}
 	
 	public default void clearRunes() {
 		for (int i = 0; i < this.getRuneSlotCount(); i++) {
-			this.setInventorySlotContents(i + this.getRuneSlotStartingIndex(), ItemStack.EMPTY);
+			this.setItem(i + this.getRuneSlotStartingIndex(), ItemStack.EMPTY);
 		}
 	}
 	

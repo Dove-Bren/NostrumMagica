@@ -17,7 +17,7 @@ public class RenderDragonEgg extends MobRenderer<DragonEggEntity, ModelDragonEgg
 	}
 
 	@Override
-	public ResourceLocation getEntityTexture(DragonEggEntity entity) {
+	public ResourceLocation getTextureLocation(DragonEggEntity entity) {
 		
 		// TODO maybe swap out texture depending on type of dragon?
 		return new ResourceLocation(NostrumMagica.MODID,
@@ -29,7 +29,7 @@ public class RenderDragonEgg extends MobRenderer<DragonEggEntity, ModelDragonEgg
 	public void render(DragonEggEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
 		// Store on the model (instead of passing through as color D:) how cold the egg is
 		final float coldScale = 1f - (entityIn.getHeat() / DragonEggEntity.HEAT_MAX);
-		this.entityModel.setColdScale(coldScale);
+		this.model.setColdScale(coldScale);
 		
 		// Continue with render
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);

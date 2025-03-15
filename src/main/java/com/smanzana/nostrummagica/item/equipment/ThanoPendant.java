@@ -40,7 +40,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellEquipment {
 	public ThanoPendant() {
 		super(NostrumItems.PropEquipment()
 				.rarity(Rarity.UNCOMMON)
-				.maxDamage(MAX_THANOS_XP / THANOS_XP_PER));
+				.durability(MAX_THANOS_XP / THANOS_XP_PER));
 	}
 	
 	@Override
@@ -71,10 +71,10 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellEquipment {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		tooltip.add(new TranslationTextComponent("item.nostrummagica.info.thanos.desc"));
 		int charges = thanosGetWholeCharges(stack);
-		tooltip.add(new TranslationTextComponent("item.nostrummagica.info.thanos.charges", charges).mergeStyle(TextFormatting.GREEN));
+		tooltip.add(new TranslationTextComponent("item.nostrummagica.info.thanos.charges", charges).withStyle(TextFormatting.GREEN));
 	}
 
 	@Override
@@ -134,7 +134,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellEquipment {
 		
 		int count = thanosGetWholeCharges(stack);
 		int max = MAX_THANOS_XP / THANOS_XP_PER;
-		stack.setDamage(max - count);
+		stack.setDamageValue(max - count);
 	}
 	
 	public static int thanosGetXP(ItemStack stack) {

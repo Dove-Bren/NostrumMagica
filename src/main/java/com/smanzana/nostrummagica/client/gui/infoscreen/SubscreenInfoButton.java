@@ -43,7 +43,7 @@ public class SubscreenInfoButton extends InfoButton {
 			tint = .75f;
 		}
 		
-		Minecraft.getInstance().getTextureManager().bindTexture(InfoScreen.background);
+		Minecraft.getInstance().getTextureManager().bind(InfoScreen.background);
 		RenderSystem.enableBlend();
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, 0,
 				0, width,
@@ -56,7 +56,7 @@ public class SubscreenInfoButton extends InfoButton {
 		if (!icon.isEmpty()) {
 			int x = this.x + (width - itemLength) / 2;
 			int y = this.y + (height - itemLength) / 2;
-			Minecraft.getInstance().getItemRenderer().renderItemIntoGUI(icon, x, y);
+			Minecraft.getInstance().getItemRenderer().renderGuiItem(icon, x, y);
 		}
 	}
 	

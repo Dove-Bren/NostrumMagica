@@ -74,7 +74,7 @@ public class PlayerStats {
 		} else {
 			tag = nbt;
 		}
-		NetUtils.FromNBT(stats.stats, tag, (k) -> new PlayerStat(new ResourceLocation(k)), (n) -> ((FloatNBT) n).getFloat());
+		NetUtils.FromNBT(stats.stats, tag, (k) -> new PlayerStat(new ResourceLocation(k)), (n) -> ((FloatNBT) n).getAsFloat());
 		
 		return stats;
 	}

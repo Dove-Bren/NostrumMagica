@@ -51,8 +51,8 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	private static final String NBT_NO_SWITCH = "no_switch";
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.putFloat(NBT_REQUIRED_DAMAGE, this.requiredDamage);
 		if (this.requiredElement != null) {
@@ -64,8 +64,8 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		this.requiredDamage = nbt.getFloat(NBT_REQUIRED_DAMAGE);
 		if (nbt.contains(NBT_REQUIRED_ELEMENT)) {
@@ -150,7 +150,7 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	@Override
 	protected SwitchTriggerEntity makeTriggerEntity(World world, double x, double y, double z) {
 		CursedGlassTriggerEntity ent = new CursedGlassTriggerEntity(NostrumEntityTypes.cursedGlassTrigger, world);
-		ent.setPosition(x, y, z);
+		ent.setPos(x, y, z);
 		return ent;
 	}
 	
@@ -176,7 +176,7 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 			return 0f;
 		}
 		
-		final float diffTicks = (float) ((double) this.world.getGameTime() - ((double) this.lastDamageTicks + partialTicks)); 
+		final float diffTicks = (float) ((double) this.level.getGameTime() - ((double) this.lastDamageTicks + partialTicks)); 
 		if (diffTicks > 20f) {
 			return 0f;
 		}
@@ -228,23 +228,23 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 			damage = 0;
 		}
 		
-		if (this.world != null) {
-			this.world.addBlockEvent(getPos(), getBlockState().getBlock(), 0, damage < this.requiredDamage ? (int) Math.min(damage, Math.floor(this.requiredDamage)) : (int) damage);
+		if (this.level != null) {
+			this.level.blockEvent(getBlockPos(), getBlockState().getBlock(), 0, damage < this.requiredDamage ? (int) Math.min(damage, Math.floor(this.requiredDamage)) : (int) damage);
 		}
-		this.recordHitInternal(damage, (source.getTrueSource() != null && source.getTrueSource() instanceof LivingEntity)
-				? (LivingEntity) source.getTrueSource()
+		this.recordHitInternal(damage, (source.getEntity() != null && source.getEntity() instanceof LivingEntity)
+				? (LivingEntity) source.getEntity()
 				: null);
 	}
 	
 	protected void recordHitInternal(float damage, @Nullable LivingEntity attacker) {
 		this.lastDamage = damage;
 		this.lastAttacker = attacker;
-		this.lastDamageTicks = this.world.getGameTime();
+		this.lastDamageTicks = this.level.getGameTime();
 	}
 	
 	protected void doBreak() {
 		final BlockState state = this.getBlockState();
-		((CursedGlass) this.getBlockState().getBlock()).setBroken(world, pos, state);
+		((CursedGlass) this.getBlockState().getBlock()).setBroken(level, worldPosition, state);
 		
 		// VFX
 	}
@@ -267,19 +267,19 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	}
 	
 	@Override
-	public boolean receiveClientEvent(int id, int type) {
+	public boolean triggerEvent(int id, int type) {
 		if (id == 0) {
-			if (this.world != null && this.world.isRemote()) {
+			if (this.level != null && this.level.isClientSide()) {
 				recordHitInternal(type, null);
 			}
 			return true;
 		}
-		return super.receiveClientEvent(id, type);
+		return super.triggerEvent(id, type);
 	}
 	
 	@SubscribeEvent
 	public void onSpellEnd(SpellEffectEndEvent event) {
-		if (event.getCaster() != null && !event.getCaster().world.isRemote()) {
+		if (event.getCaster() != null && !event.getCaster().level.isClientSide()) {
 			// Was our entity affected?
 			@Nullable Map<EMagicElement, Float> damageMap = event.getSpellFinalResults().affectedEntities.get(this.getTriggerEntity());
 			if (damageMap != null) {

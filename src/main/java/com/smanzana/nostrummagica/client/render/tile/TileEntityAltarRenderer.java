@@ -24,17 +24,17 @@ public class TileEntityAltarRenderer extends TileEntityRenderer<AltarTileEntity>
 		if (item.isEmpty() || tileEntityIn.isHidingItem())
 			return;
 		
-		final float rot = 360f * (float) ((double)(tileEntityIn.getWorld().getGameTime() % 200) / 200.0); // Copied into ClientEffectRitual
+		final float rot = 360f * (float) ((double)(tileEntityIn.getLevel().getGameTime() % 200) / 200.0); // Copied into ClientEffectRitual
 		final float scale = .75f;
 		final float yoffset = (float) (.1f * (-.5f + Math.sin(((double) System.currentTimeMillis()) / 1000.0)));
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(.5, 1.25 + yoffset, .5);
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rot));
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(rot));
 		matrixStackIn.scale(scale, scale, scale);
 		
 		RenderFuncs.RenderWorldItem(item, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 }

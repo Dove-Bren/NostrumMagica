@@ -26,7 +26,7 @@ public class OutcomePotionEffect implements IRitualOutcome {
 	@Override
 	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// Apply effect to the player
-		player.addPotionEffect(new EffectInstance(effect)); // copy
+		player.addEffect(new EffectInstance(effect)); // copy
 	}
 	
 	@Override
@@ -36,7 +36,7 @@ public class OutcomePotionEffect implements IRitualOutcome {
 
 	@Override
 	public List<ITextComponent> getDescription() {
-		String name = I18n.format(effect.getEffectName(), (Object[]) null);
+		String name = I18n.get(effect.getDescriptionId(), (Object[]) null);
 		String display = SpellPlate.toRoman(effect.getAmplifier() + 1);
 		String secs = "" + (effect.getDuration() / 20);
 		

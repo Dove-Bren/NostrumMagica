@@ -46,7 +46,7 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 	}
 	
 	public static final String ID = "spell_projectile";
-	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>createKey(SpellProjectileEntity.class, MagicElementDataSerializer.instance);
+	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>defineId(SpellProjectileEntity.class, MagicElementDataSerializer.instance);
 	
 	// Generic projectile members
 	protected final ISpellProjectileShape trigger;
@@ -68,12 +68,12 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 			ISpellProjectileShape trigger, World world, LivingEntity shooter,
 			Vector3d origin, Vector3d direction,
 			float speedFactor, double maxDistance) {
-		super(type, origin.getX(), origin.getY(), origin.getZ(), 0, 0, 0, world);
+		super(type, origin.x(), origin.y(), origin.z(), 0, 0, 0, world);
 		Vector3d accel = getAccel(direction, speedFactor);
-		this.accelerationX = accel.x;
-		this.accelerationY = accel.y;
-		this.accelerationZ = accel.z;
-		this.setShooter(shooter);
+		this.xPower = accel.x;
+		this.yPower = accel.y;
+		this.zPower = accel.z;
+		this.setOwner(shooter);
 		
 		this.shootingEntity = shooter;
 		this.trigger = trigger;
@@ -87,10 +87,10 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 			LivingEntity shooter, float speedFactor, double maxDistance) {
 		this(type,
 				trigger,
-				shooter.world,
+				shooter.level,
 				shooter,
-				shooter.getPositionVec(),
-				shooter.getLookVec(),
+				shooter.position(),
+				shooter.getLookAngle(),
 				speedFactor, maxDistance
 				);
 	}
@@ -100,14 +100,14 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 	}
 
 	public SpellProjectileEntity(ISpellProjectileShape trigger,	LivingEntity shooter, Vector3d origin, Vector3d direction, float speedFactor, double maxDistance) {
-		this(NostrumEntityTypes.spellProjectile, trigger, shooter.world, shooter, origin, direction, speedFactor, maxDistance);
+		this(NostrumEntityTypes.spellProjectile, trigger, shooter.level, shooter, origin, direction, speedFactor, maxDistance);
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
+	protected void defineSynchedData() {
+		super.defineSynchedData();
 		
-		this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
+		this.entityData.define(ELEMENT, EMagicElement.PHYSICAL);
 	}
 	
 	public void setFilter(@Nullable Predicate<Entity> filter) {
@@ -116,7 +116,7 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public boolean isInRangeToRenderDist(double distance) {
+	public boolean shouldRenderAtSqrDistance(double distance) {
 		return distance <= 64 * 64 * 64;
 	}
 	
@@ -142,7 +142,7 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 	public boolean canImpact(Entity entity) {
 		return this.shootingEntity == null || (
 				(!entity.equals(shootingEntity)
-						&& !shootingEntity.isRidingSameEntity(entity)
+						&& !shootingEntity.isPassengerOfSameVehicle(entity)
 						));
 	}
 	
@@ -155,19 +155,19 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 		
 		// Proc mystic anchors if we hit one
 		final BlockPos selectedPos = location.selectedBlockPos;
-		BlockState state = world.getBlockState(selectedPos);
+		BlockState state = level.getBlockState(selectedPos);
 		if (state.getBlock() instanceof MysticAnchorBlock) {
-			state.onEntityCollision(world, selectedPos, this);
+			state.entityInside(level, selectedPos, this);
 		}
 	}
 	
 	protected void doClientEffect() {
 		int color = getElement().getColor();
 		color = (0x19000000) | (color & 0x00FFFFFF);
-		NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
+		NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
 				2,
-				getPosX(), getPosY() + getHeight()/2f, getPosZ(), 0, 40, 0,
-				new Vector3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
+				getX(), getY() + getBbHeight()/2f, getZ(), 0, 40, 0,
+				new Vector3d(random.nextFloat() * .05 - .025, random.nextFloat() * .05, random.nextFloat() * .05 - .025), null
 			).color(color));
 	}
 	
@@ -179,15 +179,15 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 	public void tick() {
 		super.tick();
 		
-		if (!world.isRemote()) {
+		if (!level.isClientSide()) {
 			if (origin == null) {
 				// We got loaded...
 				this.remove();
 				return;
 			}
 			// Can't avoid a SQR; tracking motion would require SQR, too to get path length
-			if (this.getPositionVec().squareDistanceTo(origin) > maxDistance) {
-				trigger.onProjectileEnd(this.getPositionVec());
+			if (this.position().distanceToSqr(origin) > maxDistance) {
+				trigger.onProjectileEnd(this.position());
 				this.onProjectileDeath();
 				this.remove();
 			}
@@ -197,17 +197,17 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 	}
 
 	@Override
-	protected void onImpact(RayTraceResult result) {
-		if (world.isRemote() || this.trigger == null)
+	protected void onHit(RayTraceResult result) {
+		if (level.isClientSide() || this.trigger == null)
 			return;
 		
 		if (result.getType() == RayTraceResult.Type.MISS) {
 			; // Do nothing
 		} else if (result.getType() == RayTraceResult.Type.BLOCK) {
-			BlockPos pos = ((BlockRayTraceResult) result).getPos();
+			BlockPos pos = ((BlockRayTraceResult) result).getBlockPos();
 			boolean canImpact = this.canImpact(pos);
 			if (canImpact) {
-				this.doImpact(new SpellLocation(world, result));
+				this.doImpact(new SpellLocation(level, result));
 				if (this.dieOnImpact(pos)) {
 					this.onProjectileDeath();
 					this.remove();
@@ -232,41 +232,41 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 	}
 	
 	@Override
-	public boolean writeUnlessRemoved(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundNBT compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
     }
 	
 	@Override
-	protected boolean isFireballFiery() {
+	protected boolean shouldBurn() {
 		return false;
 	}
 	
 	@Override
-	protected IParticleData getParticle() {
+	protected IParticleData getTrailParticle() {
 		return ParticleTypes.ENCHANT;
 	}
 	
 	public void setElement(EMagicElement element) {
-		this.dataManager.set(ELEMENT, element);
+		this.entityData.set(ELEMENT, element);
 	}
 	
 	public EMagicElement getElement() {
-		return this.dataManager.get(ELEMENT);
+		return this.entityData.get(ELEMENT);
 	}
 
 	@Override
-	public IPacket<?> createSpawnPacket() {
+	public IPacket<?> getAddEntityPacket() {
 		// Have to override and use forge to use with non-living Entity types even though parent defines
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 	
 	public @Nullable Entity getShooter() {
-		return super.func_234616_v_();
+		return super.getOwner();
 	}
 	
 	@Override
-	protected boolean func_230298_a_(Entity entity) {
+	protected boolean canHitEntity(Entity entity) {
 		return this.canImpact(entity);
 	}
 }

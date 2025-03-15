@@ -132,7 +132,7 @@ public class ScrollbarWidget extends Widget {
 	public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		final int xMargin = 2;
 		final int yMargin = 2;
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(x, y, 0);
 		
 		// Draw track
@@ -152,16 +152,16 @@ public class ScrollbarWidget extends Widget {
 			barPos = yMargin + getYForScroll(this.scroll);
 		}
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(xMargin, barPos, 0);
 		this.drawScrollbar(matrixStackIn, POS_SCROLLBAR_WIDTH, POS_SCROLLBAR_HEIGHT);
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 	}
 	
 	protected void drawScrollbar(MatrixStack matrixStackIn, int width, int height) {
-		Minecraft.getInstance().getTextureManager().bindTexture(TEXT);
+		Minecraft.getInstance().getTextureManager().bind(TEXT);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, TEX_SCROLLBAR_HOFFSET, TEX_SCROLLBAR_VOFFSET, TEX_SCROLLBAR_WIDTH, TEX_SCROLLBAR_HEIGHT, width, height, TEX_WIDTH, TEX_HEIGHT);
 	}
 	

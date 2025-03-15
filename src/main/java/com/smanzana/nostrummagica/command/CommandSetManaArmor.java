@@ -18,7 +18,7 @@ public class CommandSetManaArmor {
 	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
 		dispatcher.register(
 				Commands.literal("nostrummanaarmor")
-					.requires(s -> s.hasPermissionLevel(2))
+					.requires(s -> s.hasPermission(2))
 						.then(Commands.argument("engaged", BoolArgumentType.bool())
 								.then(Commands.argument("cost", IntegerArgumentType.integer(0))
 										.executes(ctx -> execute(ctx, BoolArgumentType.getBool(ctx, "engaged"), IntegerArgumentType.getInteger(ctx, "cost")))
@@ -29,11 +29,11 @@ public class CommandSetManaArmor {
 	}
 
 	private static final int execute(CommandContext<CommandSource> context, boolean engaged, int cost) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().asPlayer();
+		ServerPlayerEntity player = context.getSource().getPlayerOrException();
 		
 		IManaArmor attr = NostrumMagica.getManaArmor(player);
 		if (attr == null) {
-			context.getSource().sendFeedback(new StringTextComponent("Could not find mana armor wrapper"), true);
+			context.getSource().sendSuccess(new StringTextComponent("Could not find mana armor wrapper"), true);
 			return 1;
 		}
 		

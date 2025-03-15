@@ -36,37 +36,37 @@ public class CursedFireBlock extends FireBlock {
 	protected final float fireDamage;
 
 	public CursedFireBlock() {
-		super(Block.Properties.create(Material.FIRE, MaterialColor.TNT)
-				.doesNotBlockMovement()
-				.zeroHardnessAndResistance()
-				.setLightLevel((state) -> 15)
-				.sound(SoundType.CLOTH)
+		super(Block.Properties.of(Material.FIRE, MaterialColor.FIRE)
+				.noCollission()
+				.instabreak()
+				.lightLevel((state) -> 15)
+				.sound(SoundType.WOOL)
 			);
-		this.setDefaultState(this.getDefaultState().with(LEVEL, 0));
+		this.registerDefaultState(this.defaultBlockState().setValue(LEVEL, 0));
 		fireDamage = 1.5f;
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		super.fillStateContainer(builder);
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
 		builder.add(LEVEL);
 	}
 	
 	@Override
 	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
-		if (!state.isValidPosition(worldIn, pos)) {
+		if (!state.canSurvive(worldIn, pos)) {
 			worldIn.removeBlock(pos, false);
 			return;
 		}
-		worldIn.getPendingBlockTicks().scheduleTick(pos, this, 30 + worldIn.rand.nextInt(10));
+		worldIn.getBlockTicks().scheduleTick(pos, this, 30 + worldIn.random.nextInt(10));
 		
-		int age = state.get(AGE);
+		int age = state.getValue(AGE);
 		
 		// Add random age. Copied from base implementation.
 		int j = Math.min(15, age + rand.nextInt(3) / 2);
 		if (age != j) {
-			state = state.with(AGE, Integer.valueOf(j));
-			worldIn.setBlockState(pos, state, 4);
+			state = state.setValue(AGE, Integer.valueOf(j));
+			worldIn.setBlock(pos, state, 4);
 			age = j;
 		}
 		
@@ -77,25 +77,25 @@ public class CursedFireBlock extends FireBlock {
 	}
 	
 	protected float getDirectDamage(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
-		return this.fireDamage + (state.get(LEVEL) * .5f);
+		return this.fireDamage + (state.getValue(LEVEL) * .5f);
 	}
 	
 	@Override
-	public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
+	public void entityInside(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
 		//super.onEntityCollision(state, worldIn, pos, entityIn);
-		if (!entityIn.isImmuneToFire()) {
-			entityIn.setFire(8);
+		if (!entityIn.fireImmune()) {
+			entityIn.setSecondsOnFire(8);
 			
-			entityIn.attackEntityFrom(DamageSource.IN_FIRE, getDirectDamage(state, worldIn, pos, entityIn));
+			entityIn.hurt(DamageSource.IN_FIRE, getDirectDamage(state, worldIn, pos, entityIn));
 		}
 			
-		if (!worldIn.isRemote()) {
+		if (!worldIn.isClientSide()) {
 			if (entityIn instanceof LivingEntity) {
 				LivingEntity living = (LivingEntity) entityIn;
-				@Nullable EffectInstance instance = living.getActivePotionEffect(NostrumEffects.cursedFire);
+				@Nullable EffectInstance instance = living.getEffect(NostrumEffects.cursedFire);
 				final int duration = 20 * 1200;
 				if (instance == null || instance.getDuration() < (int) (duration * .8f)) {
-					living.addPotionEffect(new EffectInstance(
+					living.addEffect(new EffectInstance(
 							NostrumEffects.cursedFire,
 							duration,
 							0
@@ -107,21 +107,21 @@ public class CursedFireBlock extends FireBlock {
 	
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState();
+		return this.defaultBlockState();
 	}
 	
 	@Override
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		return this.isValidPosition(stateIn, worldIn, currentPos) ? stateIn : Blocks.AIR.getDefaultState();
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+		return this.canSurvive(stateIn, worldIn, currentPos) ? stateIn : Blocks.AIR.defaultBlockState();
 	}
 	
 	public BlockState GetWithLevel(int level) {
-		return this.getDefaultState().with(LEVEL, Math.max(0, Math.min(2, level)));
+		return this.defaultBlockState().setValue(LEVEL, Math.max(0, Math.min(2, level)));
 	}
 	
 	@Override
-	public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
-		return super.isValidPosition(state, worldIn, pos) || worldIn.getBlockState(pos.down()).getBlock() == this;
+	public boolean canSurvive(BlockState state, IWorldReader worldIn, BlockPos pos) {
+		return super.canSurvive(state, worldIn, pos) || worldIn.getBlockState(pos.below()).getBlock() == this;
 	}
 
 }

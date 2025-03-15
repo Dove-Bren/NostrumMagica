@@ -95,18 +95,18 @@ public class DragonSoulItem extends PetSoulItem {
 	}
 	
 	@Override
-	public ActionResultType itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+	public ActionResultType interactLivingEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
 		if (!playerIn.isCreative()) {
 			return ActionResultType.PASS;
 		}
 		
-		if (playerIn.world.isRemote) {
+		if (playerIn.level.isClientSide) {
 			return ActionResultType.SUCCESS;
 		}
 		
 		if (target instanceof TameRedDragonEntity) {
 			ItemStack newStack = MakeSoulItem((TameRedDragonEntity) target);
-			target.entityDropItem(newStack, 1);
+			target.spawnAtLocation(newStack, 1);
 			return ActionResultType.SUCCESS;
 		}
 		
@@ -114,18 +114,18 @@ public class DragonSoulItem extends PetSoulItem {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand hand) {
-		final ItemStack held = playerIn.getHeldItem(hand);
+	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+		final ItemStack held = playerIn.getItemInHand(hand);
 		if (getMana(held) >= getMaxMana(held)) {
 			return new ActionResult<ItemStack>(ActionResultType.PASS, held);
 		}
 		
-		playerIn.setActiveHand(hand);
+		playerIn.startUsingItem(hand);
 		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, held);
 	}
 	
 	@Override
-	public UseAction getUseAction(ItemStack stack) {
+	public UseAction getUseAnimation(ItemStack stack) {
 		return UseAction.BOW;
 	}
 	
@@ -135,8 +135,8 @@ public class DragonSoulItem extends PetSoulItem {
 	}
 	
 	@Override
-	public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
-		if (worldIn.isRemote) {
+	public ItemStack finishUsingItem(ItemStack stack, World worldIn, LivingEntity entityLiving) {
+		if (worldIn.isClientSide) {
 			return stack;
 		}
 		
@@ -155,29 +155,29 @@ public class DragonSoulItem extends PetSoulItem {
 	
 	@Override
 	public void onUsingTick(ItemStack stack, LivingEntity player, int count) {
-		if (player.world.isRemote) {
+		if (player.level.isClientSide) {
 			// On client, spawn particles
 			if (NostrumMagica.rand.nextBoolean()) {
 				Vector3d offset;
 				final float rotation;
 				final Minecraft mc = Minecraft.getInstance();
-				if (player == NostrumMagica.instance.proxy.getPlayer() && mc.gameSettings.getPointOfView() == PointOfView.FIRST_PERSON) {
+				if (player == NostrumMagica.instance.proxy.getPlayer() && mc.options.getCameraType() == PointOfView.FIRST_PERSON) {
 					offset = new Vector3d(-.1, player.getEyeHeight() -.05, .2);
-					rotation = -player.rotationYaw % 360f;
+					rotation = -player.yRot % 360f;
 				} else {
 					offset = new Vector3d(-.375, player.getEyeHeight() -.05, .825);
 					if (player == NostrumMagica.instance.proxy.getPlayer()) {
-						rotation = -player.renderYawOffset % 360f;
+						rotation = -player.yBodyRot % 360f;
 					} else {
-						rotation = -player.rotationYaw % 360f;
+						rotation = -player.yRot % 360f;
 					}
 				}
 				
 				final float rotRad = (float) ((rotation / 360f) * 2 * Math.PI);
-				offset = offset.rotateYaw(rotRad);
-				offset = offset.add(player.getPositionVec());
+				offset = offset.yRot(rotRad);
+				offset = offset.add(player.position());
 				// Need to adjust while watching to go to hand
-				NostrumParticles.FILLED_ORB.spawn(player.world, new SpawnParams(
+				NostrumParticles.FILLED_ORB.spawn(player.level, new SpawnParams(
 						1, offset.x, offset.y, offset.z, 1.0, 20, 0,
 						offset
 						).color(1f, .4f, .8f, 1f).dieOnTarget(true));
@@ -187,24 +187,24 @@ public class DragonSoulItem extends PetSoulItem {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
 		String name = getPetName(stack);
 		if (name == null || name.isEmpty()) {
 			name = "Unknown Pet";
 		}
-		tooltip.add(new StringTextComponent(name).mergeStyle(TextFormatting.DARK_RED));
-		tooltip.add(new StringTextComponent(getMana(stack) + " / " + getMaxMana(stack)).mergeStyle(TextFormatting.BLUE));
+		tooltip.add(new StringTextComponent(name).withStyle(TextFormatting.DARK_RED));
+		tooltip.add(new StringTextComponent(getMana(stack) + " / " + getMaxMana(stack)).withStyle(TextFormatting.BLUE));
 	}
 	
 	@Override
 	public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entityItem) {
-		if (entityItem.world.isRemote) {
+		if (entityItem.level.isClientSide) {
 			// Particles!
 			if (NostrumMagica.rand.nextBoolean()) {
-				NostrumParticles.GLOW_ORB.spawn(entityItem.world, new SpawnParams(
-						1, entityItem.getPosX(), entityItem.getPosY() + .5, entityItem.getPosZ(), .25, 30, 10,
+				NostrumParticles.GLOW_ORB.spawn(entityItem.level, new SpawnParams(
+						1, entityItem.getX(), entityItem.getY() + .5, entityItem.getZ(), .25, 30, 10,
 						new Vector3d(0, .05, 0), new Vector3d(.025, 0, .025)
 						).color(.3f, .6f, 0f, 0f));
 			}
@@ -279,7 +279,7 @@ public class DragonSoulItem extends PetSoulItem {
 	@Override
 	public boolean canSpawnEntity(World world, LivingEntity spawner, Vector3d pos, ItemStack stack) {
 		if (this.getMana(stack) < this.getMaxMana(stack)) {
-			spawner.sendMessage(new TranslationTextComponent("info.respawn_soulbound_dragon.fail.mana", new Object[0]), Util.DUMMY_UUID);
+			spawner.sendMessage(new TranslationTextComponent("info.respawn_soulbound_dragon.fail.mana", new Object[0]), Util.NIL_UUID);
 			return false;
 		}
 		

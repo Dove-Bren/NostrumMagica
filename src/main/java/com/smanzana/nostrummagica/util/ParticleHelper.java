@@ -28,7 +28,7 @@ public final class ParticleHelper {
 		} else {
 			// Vanilla uses the cmd/string interface...
 			nbt.putString(NBT_WRAPPER_TYPE, NBT_WRAPPER_TYPE_VANILLA);
-			nbt.putString(NBT_WRAPPER_DATA, data.getParameters());
+			nbt.putString(NBT_WRAPPER_DATA, data.writeToString());
 		}
 		
 		return nbt;
@@ -43,7 +43,7 @@ public final class ParticleHelper {
 		} else if (type.equalsIgnoreCase(NBT_WRAPPER_TYPE_VANILLA)) {
 			try {
 				// Copied from AreaEffectCloudEntity
-				data = ParticleArgument.parseParticle(new StringReader(nbt.getString(NBT_WRAPPER_DATA)));
+				data = ParticleArgument.readParticle(new StringReader(nbt.getString(NBT_WRAPPER_DATA)));
 			} catch (CommandSyntaxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

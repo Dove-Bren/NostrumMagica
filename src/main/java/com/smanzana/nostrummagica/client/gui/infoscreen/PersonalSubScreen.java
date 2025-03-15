@@ -49,7 +49,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			String desc;
 			if (attr.isUnlocked()) {
-				desc = I18n.format("info.discovery.spells", new Object[0]);
+				desc = I18n.get("info.discovery.spells", new Object[0]);
 			} else {
 				SpellShape shape = null;
 				EMagicElement element = null;
@@ -67,9 +67,9 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				}
 				
 				if (shape != null || element != null) {
-					desc = I18n.format("info.discovery.starting2", new Object[0]);
+					desc = I18n.get("info.discovery.starting2", new Object[0]);
 				} else {
-					desc = I18n.format("info.discovery.starting", new Object[0]);
+					desc = I18n.get("info.discovery.starting", new Object[0]);
 				}
 				
 				// Draw rotating icons
@@ -93,9 +93,9 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 					      ];
 				}
 				SpellComponentIcon.get(element).draw(matrixStackIn, drawx, drawy, iconWidth, iconWidth, color[0], color[1], color[2], color[3]);
-				str = I18n.format("element.name", new Object[0]);
-				strLen = mc.fontRenderer.getStringWidth(str);
-				mc.fontRenderer.drawString(matrixStackIn, str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.fontRenderer.FONT_HEIGHT), 0xFFFFFF);
+				str = I18n.get("element.name", new Object[0]);
+				strLen = mc.font.width(str);
+				mc.font.draw(matrixStackIn, str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.font.lineHeight), 0xFFFFFF);
 				
 				drawx += iconWidth + space;
 				RenderFuncs.drawRect(matrixStackIn, drawx - 2, drawy - 2, drawx + iconWidth + 2, drawy + iconWidth + 2, 0xA0000000);
@@ -110,17 +110,17 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 					      ];
 				}
 				SpellComponentIcon.get(shape).draw(matrixStackIn, drawx, drawy, iconWidth, iconWidth, color[0], color[1], color[2], color[3]);
-				str = I18n.format("shape.name", new Object[0]);
-				strLen = mc.fontRenderer.getStringWidth(str);
-				mc.fontRenderer.drawString(matrixStackIn, str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.fontRenderer.FONT_HEIGHT), 0xFFFFFF);
+				str = I18n.get("shape.name", new Object[0]);
+				strLen = mc.font.width(str);
+				mc.font.draw(matrixStackIn, str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.font.lineHeight), 0xFFFFFF);
 				
 			}
 			
-			RenderFuncs.drawSplitString(matrixStackIn, mc.fontRenderer, desc, x + 5, y + 20, width - 10, 0xFFFFFFFF);
+			RenderFuncs.drawSplitString(matrixStackIn, mc.font, desc, x + 5, y + 20, width - 10, 0xFFFFFFFF);
 			int len;
-			desc = I18n.format("info.discovery.name", (Object[])null);
-			len = mc.fontRenderer.getStringWidth(desc);
-			mc.fontRenderer.drawStringWithShadow(matrixStackIn, desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
+			desc = I18n.get("info.discovery.name", (Object[])null);
+			len = mc.font.width(desc);
+			mc.font.drawShadow(matrixStackIn, desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
 		}
 
 		@Override
@@ -144,18 +144,18 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			private int height;
 			
 			public StatLabel(String key, int x, int y) {
-				label = I18n.format(key + ".name", (Object[]) null) + ": ";
+				label = I18n.get(key + ".name", (Object[]) null) + ": ";
 				parseTooltip(key);
 				
 				Minecraft mc = Minecraft.getInstance();
-				this.width = mc.fontRenderer.getStringWidth(label);
-				this.height = mc.fontRenderer.FONT_HEIGHT;
+				this.width = mc.font.width(label);
+				this.height = mc.font.lineHeight;
 				this.x = x;
 				this.y = y;
 			}
 			
 			private void parseTooltip(String key) {
-				String raw = I18n.format(key + ".desc", (Object[]) null).trim();
+				String raw = I18n.get(key + ".desc", (Object[]) null).trim();
 				tooltip = new ArrayList<>();
 				int index = raw.indexOf('|');
 				while (index != -1) {
@@ -169,14 +169,14 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			}
 			
 			public void draw(MatrixStack matrixStackIn, Minecraft mc, int offsetx, int offsety, int width, int height) {
-				mc.fontRenderer.drawString(matrixStackIn, label, offsetx + x, offsety + y, 0xFFFFFFFF);
+				mc.font.draw(matrixStackIn, label, offsetx + x, offsety + y, 0xFFFFFFFF);
 			}
 			
 			public void drawOverlay(MatrixStack matrixStackIn, Minecraft mc, int offsetx, int offsety, int width, int height, int mouseX, int mouseY) {
 				if (mouseX >= offsetx + x && mouseX <= x + offsetx + this.width
 						&& mouseY >= offsety + y && mouseY <= y + offsety + this.height) {
-					GuiUtils.drawHoveringText(matrixStackIn, tooltip, mouseX, mouseY, width, height, 150, mc.fontRenderer);
-					RenderHelper.disableStandardItemLighting();
+					GuiUtils.drawHoveringText(matrixStackIn, tooltip, mouseX, mouseY, width, height, 150, mc.font);
+					RenderHelper.turnOff();
 				}
 			}
 			
@@ -248,11 +248,11 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			drawY = y + 20;
 			drawX = x + 20 + valueOffsetPrimary;
 			text = String.format("%2d", attr.getLevel());
-			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
+			mc.font.draw(matrixStackIn, text, drawX, drawY, color);
 			drawY += 15;
 			
 			//text = String.format("%d", attr.getTier().getName());
-			mc.fontRenderer.func_243248_b(matrixStackIn, attr.getTier().getName(), drawX, drawY, color);
+			mc.font.draw(matrixStackIn, attr.getTier().getName(), drawX, drawY, color);
 			drawY += 15;
 			
 			//text = String.format("3.1%f%%", );
@@ -260,26 +260,26 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			drawY = y + 20;
 			
 			text = String.format("%4d", attr.getMaxMana());
-			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
+			mc.font.draw(matrixStackIn, text, drawX, drawY, color);
 			drawY += 15;
 			
 			text = String.format("%+5.1f%%", attr.getManaModifier() * 100f);
-			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
+			mc.font.draw(matrixStackIn, text, drawX, drawY, color);
 			drawY += 15;
 			
 			text = String.format("%+5.1f%%", attr.getManaCostModifier() * 100f);
-			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
+			mc.font.draw(matrixStackIn, text, drawX, drawY, color);
 			drawY += 15;
 			
 			text = String.format("%+05.1f%%", attr.getManaRegenModifier() * 100f);
-			mc.fontRenderer.drawString(matrixStackIn, text, drawX, drawY, color);
+			mc.font.draw(matrixStackIn, text, drawX, drawY, color);
 			drawY += 15;
 			
 			String desc;
 			int len;
-			desc = I18n.format("info.stats.name", (Object[])null);
-			len = mc.fontRenderer.getStringWidth(desc);
-			mc.fontRenderer.drawStringWithShadow(matrixStackIn, desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
+			desc = I18n.get("info.stats.name", (Object[])null);
+			len = mc.font.width(desc);
+			mc.font.drawShadow(matrixStackIn, desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
 
 			
 			for (StatLabel label : labels) {
@@ -313,7 +313,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			drawX = x + 20;
 			drawY = y + 20;
 			
-			mc.fontRenderer.drawString(matrixStackIn, I18n.format("element.name", (Object[]) null) + "(s):",
+			mc.font.draw(matrixStackIn, I18n.get("element.name", (Object[]) null) + "(s):",
 					drawX, drawY, 0xFFFFFFFF);
 			drawY += 10;
 			
@@ -372,7 +372,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 //			drawY += 5 + iconWidth;
 //			drawX = x + 20;
 			
-			mc.fontRenderer.drawString(matrixStackIn, I18n.format("shape.name", (Object[]) null) + "(s):",
+			mc.font.draw(matrixStackIn, I18n.get("shape.name", (Object[]) null) + "(s):",
 					drawX, drawY, 0xFFFFFFFF);
 			drawY += 10;
 			
@@ -401,7 +401,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			drawY += 5 + iconWidth;
 			drawX = x + 20;
 			
-			mc.fontRenderer.drawString(matrixStackIn, I18n.format("alteration.name", (Object[]) null) + "(s):",
+			mc.font.draw(matrixStackIn, I18n.get("alteration.name", (Object[]) null) + "(s):",
 					drawX, drawY, 0xFFFFFFFF);
 			drawY += 10;
 			
@@ -430,13 +430,13 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			String desc;
 			int len;
-			desc = I18n.format("info.growth.name", (Object[])null);
-			len = mc.fontRenderer.getStringWidth(desc);
-			mc.fontRenderer.drawStringWithShadow(matrixStackIn, desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
+			desc = I18n.get("info.growth.name", (Object[])null);
+			len = mc.font.width(desc);
+			mc.font.drawShadow(matrixStackIn, desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
 			
 			if (tooltipText != null) {
-				GuiUtils.drawHoveringText(matrixStackIn, Lists.newArrayList(tooltipText), mouseX, mouseY, mc.getMainWindow().getScaledWidth(), mc.getMainWindow().getScaledHeight(), 200, mc.fontRenderer);
-				RenderHelper.disableStandardItemLighting();
+				GuiUtils.drawHoveringText(matrixStackIn, Lists.newArrayList(tooltipText), mouseX, mouseY, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), 200, mc.font);
+				RenderHelper.turnOff();
 			}
 		}
 
@@ -497,7 +497,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				}
 			}
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			matrixStackIn.translate(x + 5, y + 20, 0);
 			for (Header head : headers) {
 				head.draw(matrixStackIn, mc);
@@ -508,13 +508,13 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			for (Row row : rows) {
 				row.drawOverlay(matrixStackIn, mc, mouseX - (x + 5), mouseY - (y + 20));
 			}
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 			
 			String desc;
 			int len;
-			desc = I18n.format("info.exploration.name", (Object[])null);
-			len = mc.fontRenderer.getStringWidth(desc);
-			mc.fontRenderer.drawStringWithShadow(matrixStackIn, desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
+			desc = I18n.get("info.exploration.name", (Object[])null);
+			len = mc.font.width(desc);
+			mc.font.drawShadow(matrixStackIn, desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
 		}
 
 		@Override
@@ -535,13 +535,13 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			public void draw(MatrixStack matrixStackIn, Minecraft mc) {
 				final float ratio = .8f;
-				int len = mc.fontRenderer.getStringWidth(name);
+				int len = mc.font.width(name);
 				len = (int) (len * ratio);
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(x, y, 0);
 				matrixStackIn.scale(ratio, ratio, 1);
-				mc.fontRenderer.drawString(matrixStackIn, name, -len / 2, 0, 0xFFAAAAAA);
-				matrixStackIn.pop();
+				mc.font.draw(matrixStackIn, name, -len / 2, 0, 0xFFAAAAAA);
+				matrixStackIn.popPose();
 			}
 		}
 		
@@ -576,17 +576,17 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			public void draw(MatrixStack matrixStackIn, Minecraft mc) {
 				final float ratio = .5f;
-				int len = mc.fontRenderer.getStringWidth(alterationName + ": ");
-				this.width = (int) ((len + mc.fontRenderer.getStringWidth(name)) * ratio);
-				matrixStackIn.push();
+				int len = mc.font.width(alterationName + ": ");
+				this.width = (int) ((len + mc.font.width(name)) * ratio);
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(x, y, 0);
 				matrixStackIn.scale(ratio, ratio, 0);
-				mc.fontRenderer.drawString(matrixStackIn, alterationName + ": ",
+				mc.font.draw(matrixStackIn, alterationName + ": ",
 						0, 0, 0xFFFFFFFF);
 				int color = unlocked ? 0xFF00DD00 : 0xFF0040FF;
-				mc.fontRenderer.drawString(matrixStackIn, name,
+				mc.font.draw(matrixStackIn, name,
 						len, 0, color);
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 				
 				
 			}
@@ -597,9 +597,9 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				
 				final float ratio = .5f;
 				if (mouseX >= x && mouseY >= y
-						&& mouseX <= x + width && mouseY <= y + (int) (mc.fontRenderer.FONT_HEIGHT * ratio)) {
-					GuiUtils.drawHoveringText(matrixStackIn, Lists.newArrayList(new StringTextComponent(desc)), mouseX, mouseY, mc.getMainWindow().getScaledWidth(), mc.getMainWindow().getScaledHeight(), 200, mc.fontRenderer);
-					RenderHelper.disableStandardItemLighting();
+						&& mouseX <= x + width && mouseY <= y + (int) (mc.font.lineHeight * ratio)) {
+					GuiUtils.drawHoveringText(matrixStackIn, Lists.newArrayList(new StringTextComponent(desc)), mouseX, mouseY, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), 200, mc.font);
+					RenderHelper.turnOff();
 				}
 			}
 			

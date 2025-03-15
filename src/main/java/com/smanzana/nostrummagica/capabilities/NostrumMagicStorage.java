@@ -139,7 +139,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 				if (id == null) continue;
 				
 				compound = new CompoundNBT();
-				compound.putUniqueId(NBT_MOD_INTERNAL_ID, id);
+				compound.putUUID(NBT_MOD_INTERNAL_ID, id);
 				compound.putFloat(NBT_MOD_INTERNAL_VALUE, map.get(id));
 				list.add(compound);
 			}
@@ -153,7 +153,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 				if (id == null) continue;
 				
 				compound = new CompoundNBT();
-				compound.putUniqueId(NBT_MOD_INTERNAL_ID, id);
+				compound.putUUID(NBT_MOD_INTERNAL_ID, id);
 				compound.putFloat(NBT_MOD_INTERNAL_VALUE, map.get(id));
 				list.add(compound);
 			}
@@ -167,7 +167,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 				if (id == null) continue;
 				
 				compound = new CompoundNBT();
-				compound.putUniqueId(NBT_MOD_INTERNAL_ID, id);
+				compound.putUUID(NBT_MOD_INTERNAL_ID, id);
 				compound.putFloat(NBT_MOD_INTERNAL_VALUE, map.get(id));
 				list.add(compound);
 			}
@@ -181,7 +181,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 				if (id == null) continue;
 				
 				compound = new CompoundNBT();
-				compound.putUniqueId(NBT_MOD_INTERNAL_ID, id);
+				compound.putUUID(NBT_MOD_INTERNAL_ID, id);
 				compound.putInt(NBT_MOD_INTERNAL_VALUE, map.get(id));
 				list.add(compound);
 			}
@@ -210,7 +210,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			posTag.putInt("x", markPos.getX());
 			posTag.putInt("y", markPos.getY());
 			posTag.putInt("z", markPos.getZ());
-			nbt.putString(NBT_MARK_DIMENSION, instance.getMarkDimension().getLocation().toString());
+			nbt.putString(NBT_MARK_DIMENSION, instance.getMarkDimension().location().toString());
 			nbt.put(NBT_MARK_POS, posTag);
 		}
 		if (instance.hasEnhancedTeleport()) {
@@ -278,7 +278,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		final VanillaRespawnInfo respawnInfo = instance.getSavedRespawnInfo();
 		if (respawnInfo != null) {
-			nbt.putString(NBT_SAVEDRESPAWN_DIM, respawnInfo.dimension.getLocation().toString());
+			nbt.putString(NBT_SAVEDRESPAWN_DIM, respawnInfo.dimension.location().toString());
 			nbt.put(NBT_SAVEDRESPAWN_POS, NBTUtil.writeBlockPos(respawnInfo.pos));
 			nbt.putFloat(NBT_SAVEDRESPAWN_YAW, respawnInfo.yaw);
 			nbt.putBoolean(NBT_SAVEDRESPAWN_FORCE, respawnInfo.forced);
@@ -317,16 +317,16 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			);
 		
 		Map<EMagicElement, Integer> elementalSkillPoints = new EnumMap<>(EMagicElement.class);
-		NetUtils.FromNBT(elementalSkillPoints, EMagicElement.class, tag.getCompound(NBT_ELEMENTAL_SKILLPOINTS), (p) -> ((IntNBT) p).getInt());
+		NetUtils.FromNBT(elementalSkillPoints, EMagicElement.class, tag.getCompound(NBT_ELEMENTAL_SKILLPOINTS), (p) -> ((IntNBT) p).getAsInt());
 		instance.setElementalSkillPointMap(elementalSkillPoints);
 		
 		Map<EMagicElement, Integer> elementalXP = new EnumMap<>(EMagicElement.class);
-		NetUtils.FromNBT(elementalXP, EMagicElement.class, tag.getCompound(NBT_ELEMENTAL_XP), (p) -> ((IntNBT) p).getInt());
+		NetUtils.FromNBT(elementalXP, EMagicElement.class, tag.getCompound(NBT_ELEMENTAL_XP), (p) -> ((IntNBT) p).getAsInt());
 		instance.setElementalXPMap(elementalXP);
 			
 		// LORE
 		CompoundNBT compound = tag.getCompound(NBT_LORELEVELS);
-		for (String key : compound.keySet()) {
+		for (String key : compound.getAllKeys()) {
 			Integer level = compound.getInt(key);
 			instance.deserializeLore(key, level);
 		}
@@ -339,13 +339,13 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		// ELEMENTS
 		compound = tag.getCompound(NBT_MASTERED_ELEMENTS);
-		for (String key : compound.keySet()) {
+		for (String key : compound.getAllKeys()) {
 			EMagicElement elem = EMagicElement.valueOf(key);
 			instance.setElementalMastery(elem, EElementalMastery.fromNBT(compound.get(key)));
 		}
 		
 		compound = tag.getCompound(NBT_ELEMENT_TRIALS);
-		for (String key : compound.keySet()) {
+		for (String key : compound.getAllKeys()) {
 			boolean val = compound.getBoolean(key);
 			if (val) {
 				EMagicElement elem = EMagicElement.valueOf(key);
@@ -363,7 +363,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		// ALTERATIONS
 
 		compound = tag.getCompound(NBT_ALTERATIONS);
-		for (String key : compound.keySet()) {
+		for (String key : compound.getAllKeys()) {
 			boolean val = compound.getBoolean(key);
 			if (val) {
 				EAlteration elem = EAlteration.valueOf(key);
@@ -380,7 +380,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 					posTag.getInt("z")
 					);
 			String dimension = tag.getString(NBT_MARK_DIMENSION);
-			RegistryKey<World> dimKey = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, ResourceLocation.tryCreate(dimension));
+			RegistryKey<World> dimKey = RegistryKey.create(Registry.DIMENSION_REGISTRY, ResourceLocation.tryParse(dimension));
 			
 			instance.setMarkLocation(dimKey, location);
 		}
@@ -427,11 +427,11 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		if (tag.contains(NBT_SPELLKNOWLEDGE, NBT.TAG_COMPOUND)) {
 			compound = tag.getCompound(NBT_SPELLKNOWLEDGE);
-			for (String key : compound.keySet()) {
+			for (String key : compound.getAllKeys()) {
 				try {
 					EMagicElement elem = EMagicElement.valueOf(key);
 					CompoundNBT subtag = compound.getCompound(key);
-					for (String altKey : subtag.keySet()) {
+					for (String altKey : subtag.getAllKeys()) {
 						EAlteration alt;
 						if (altKey.equalsIgnoreCase("none"))
 							alt = null;
@@ -449,14 +449,14 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		if (tag.contains(NBT_SORCERYPORTAL_POS)) {
 			String dimName = tag.getString(NBT_SORCERYPORTAL_DIM);
-			RegistryKey<World> dim = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, ResourceLocation.tryCreate(dimName));
+			RegistryKey<World> dim = RegistryKey.create(Registry.DIMENSION_REGISTRY, ResourceLocation.tryParse(dimName));
 			instance.setSorceryPortalLocation(
 					dim,
 					NBTUtil.readBlockPos(tag.getCompound(NBT_SORCERYPORTAL_POS))); // Warning: can break if save used across game versions
 		}
 		
 		if (tag.contains(NBT_SAVEDRESPAWN_DIM)) {
-			final RegistryKey<World> dim = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(tag.getString(NBT_SAVEDRESPAWN_DIM)));
+			final RegistryKey<World> dim = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(tag.getString(NBT_SAVEDRESPAWN_DIM)));
 			final BlockPos pos = NBTUtil.readBlockPos(tag.getCompound(NBT_SAVEDRESPAWN_POS));
 			final float yaw = tag.getFloat(NBT_SAVEDRESPAWN_YAW);
 			final boolean forced = tag.getBoolean(NBT_SAVEDRESPAWN_FORCE);
@@ -476,7 +476,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			
 			for (int i = 0; i < tagList.size(); i++) {
 				CompoundNBT subtag = tagList.getCompound(i);
-				UUID id = subtag.getUniqueId(NBT_MOD_INTERNAL_ID);
+				UUID id = subtag.getUUID(NBT_MOD_INTERNAL_ID);
 				float val = subtag.getFloat(NBT_MOD_INTERNAL_VALUE);
 				if (id != null) {
 					modMana.put(id, val);
@@ -489,7 +489,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			
 			for (int i = 0; i < tagList.size(); i++) {
 				CompoundNBT subtag = tagList.getCompound(i);
-				UUID id = subtag.getUniqueId(NBT_MOD_INTERNAL_ID);
+				UUID id = subtag.getUUID(NBT_MOD_INTERNAL_ID);
 				int val = subtag.getInt(NBT_MOD_INTERNAL_VALUE);
 				if (id != null) {
 					modManaFlat.put(id, val);
@@ -502,7 +502,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			
 			for (int i = 0; i < tagList.size(); i++) {
 				CompoundNBT subtag = tagList.getCompound(i);
-				UUID id = subtag.getUniqueId(NBT_MOD_INTERNAL_ID);
+				UUID id = subtag.getUUID(NBT_MOD_INTERNAL_ID);
 				float val = subtag.getFloat(NBT_MOD_INTERNAL_VALUE);
 				if (id != null) {
 					modManaCost.put(id, val);
@@ -515,7 +515,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			
 			for (int i = 0; i < tagList.size(); i++) {
 				CompoundNBT subtag = tagList.getCompound(i);
-				UUID id = subtag.getUniqueId(NBT_MOD_INTERNAL_ID);
+				UUID id = subtag.getUUID(NBT_MOD_INTERNAL_ID);
 				float val = subtag.getFloat(NBT_MOD_INTERNAL_VALUE);
 				if (id != null) {
 					modManaRegen.put(id, val);

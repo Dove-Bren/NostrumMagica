@@ -24,7 +24,7 @@ public enum EElementalMastery {
 	public static EElementalMastery fromNBT(INBT nbt) {
 		try {
 			return EElementalMastery.valueOf(
-					((StringNBT) nbt).getString().toUpperCase()
+					((StringNBT) nbt).getAsString().toUpperCase()
 				);
 		} catch (Exception e) {
 			return EElementalMastery.NOVICE;

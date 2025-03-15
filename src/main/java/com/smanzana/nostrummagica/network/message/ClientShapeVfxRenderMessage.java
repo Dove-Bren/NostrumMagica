@@ -26,13 +26,13 @@ public class ClientShapeVfxRenderMessage {
 
 	public static void handle(ClientShapeVfxRenderMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
-		Minecraft.getInstance().runAsync(() -> {
-			final World world = NostrumMagica.instance.proxy.getPlayer().world;
+		Minecraft.getInstance().submit(() -> {
+			final World world = NostrumMagica.instance.proxy.getPlayer().level;
 			LivingEntity caster, target;
 			caster = target = null;
 			
 			if (message.caster != null) {
-				caster = world.getPlayerByUuid(message.caster);
+				caster = world.getPlayerByUUID(message.caster);
 			}
 			
 			if (message.target != null) {
@@ -44,7 +44,7 @@ public class ClientShapeVfxRenderMessage {
 				return;
 			}
 			
-			NostrumMagica.instance.proxy.spawnSpellShapeVfx(NostrumMagica.instance.proxy.getPlayer().world, 
+			NostrumMagica.instance.proxy.spawnSpellShapeVfx(NostrumMagica.instance.proxy.getPlayer().level, 
 					message.shape, message.properties,
 					caster, message.casterPos, target, message.targetPos,
 					message.characteristics);
@@ -65,8 +65,8 @@ public class ClientShapeVfxRenderMessage {
 			SpellShape shape,
 			SpellShapeProperties properties,
 			SpellCharacteristics characteristics) {
-		this(caster == null ? null : caster.getUniqueID(), casterPos,
-				target == null ? null : target.getUniqueID(), targetPos,
+		this(caster == null ? null : caster.getUUID(), casterPos,
+				target == null ? null : target.getUUID(), targetPos,
 				shape, properties, characteristics);
 	}
 	
@@ -95,7 +95,7 @@ public class ClientShapeVfxRenderMessage {
 		final SpellCharacteristics characteristics;
 		
 		if (buf.readBoolean()) {
-			caster = buf.readUniqueId();
+			caster = buf.readUUID();
 		} else {
 			caster = null;
 		}
@@ -107,7 +107,7 @@ public class ClientShapeVfxRenderMessage {
 		}
 		
 		if (buf.readBoolean()) {
-			target = buf.readUniqueId();
+			target = buf.readUUID();
 		} else {
 			target = null;
 		}
@@ -118,14 +118,14 @@ public class ClientShapeVfxRenderMessage {
 			targetPos = null;
 		}
 		
-		shape = SpellShape.get(buf.readString());
+		shape = SpellShape.get(buf.readUtf());
 		if (shape != null) {
-			properties = shape.getDefaultProperties().fromNBT(buf.readCompoundTag());
+			properties = shape.getDefaultProperties().fromNBT(buf.readNbt());
 		} else {
 			properties = new SpellShapeProperties();
 		}
 		
-		characteristics = SpellCharacteristics.FromNBT(buf.readCompoundTag());
+		characteristics = SpellCharacteristics.FromNBT(buf.readNbt());
 		
 		return new ClientShapeVfxRenderMessage(
 				caster, casterPos, target, targetPos,
@@ -136,7 +136,7 @@ public class ClientShapeVfxRenderMessage {
 	public static void encode(ClientShapeVfxRenderMessage msg, PacketBuffer buf) {
 		buf.writeBoolean(msg.caster != null);
 		if (msg.caster != null) {
-			buf.writeUniqueId(msg.caster);
+			buf.writeUUID(msg.caster);
 		}
 		
 		buf.writeBoolean(msg.casterPos != null);
@@ -148,7 +148,7 @@ public class ClientShapeVfxRenderMessage {
 		
 		buf.writeBoolean(msg.target != null);
 		if (msg.target != null) {
-			buf.writeUniqueId(msg.target);
+			buf.writeUUID(msg.target);
 		}
 		
 		buf.writeBoolean(msg.targetPos != null);
@@ -158,9 +158,9 @@ public class ClientShapeVfxRenderMessage {
 			buf.writeDouble(msg.targetPos.z);
 		}
 		
-		buf.writeString(msg.shape.getShapeKey());
-		buf.writeCompoundTag(msg.properties.toNBT());
-		buf.writeCompoundTag(msg.characteristics.toNBT());
+		buf.writeUtf(msg.shape.getShapeKey());
+		buf.writeNbt(msg.properties.toNBT());
+		buf.writeNbt(msg.characteristics.toNBT());
 	}
 
 }

@@ -39,6 +39,6 @@ public class StatRequirement implements IRequirement{
 		//final String amtString = String.format("%.2f / %.2f ", stats.getStat(stat), amount);
 		final String amtString = String.format("%.0f / %.0f ", stats.getStat(stat), amount);
 		return Lists.newArrayList(new StringTextComponent(amtString).append( 
-				stat.getName().mergeStyle(TextFormatting.BLUE)));
+				stat.getName().withStyle(TextFormatting.BLUE)));
 	}
 }

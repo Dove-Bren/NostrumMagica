@@ -49,7 +49,7 @@ public abstract class DragonGambittedSpellAttackGoal<T extends DragonEntity & IT
 	public abstract LivingEntity getTarget(T dragon);
 	
 	@Override
-	public boolean shouldExecute() {
+	public boolean canUse() {
 		this.attackTicks = Math.max(0, this.attackTicks-1);
 		
 		if (!dragon.isAlive())
@@ -63,12 +63,12 @@ public abstract class DragonGambittedSpellAttackGoal<T extends DragonEntity & IT
 			return false;
 		}
 		
-		if (!dragon.getEntitySenses().canSee(currentTarget)){
+		if (!dragon.getSensing().canSee(currentTarget)){
 			return false;
 		}
 		
 		if (this.attackTicks == 0) {
-			if (odds > 0 && dragon.getRNG().nextInt(odds) == 0) {
+			if (odds > 0 && dragon.getRandom().nextInt(odds) == 0) {
 				return true;
 			}
 		}
@@ -77,7 +77,7 @@ public abstract class DragonGambittedSpellAttackGoal<T extends DragonEntity & IT
 	}
 	
 	@Override
-	public boolean shouldContinueExecuting() {
+	public boolean canContinueToUse() {
 		return false;
 	}
 	
@@ -103,7 +103,7 @@ public abstract class DragonGambittedSpellAttackGoal<T extends DragonEntity & IT
 				continue;
 			}
 			
-			int nowTicks = dragon.world.getServer().getTickCounter();
+			int nowTicks = dragon.level.getServer().getTickCount();
 			
 			switch (gambit) {
 			case ALWAYS:
@@ -159,7 +159,7 @@ public abstract class DragonGambittedSpellAttackGoal<T extends DragonEntity & IT
 	}
 
 	@Override
-	public void startExecuting() {
+	public void start() {
 		Spell[] spells = getSpells();
 		DragonGambit[] gambits = getGambits();
 		
@@ -182,7 +182,7 @@ public abstract class DragonGambittedSpellAttackGoal<T extends DragonEntity & IT
 			return;
 		}
 		
-		dragon.faceEntity(currentTarget, 360f, 180f);
+		dragon.lookAt(currentTarget, 360f, 180f);
 		
 		spell.cast(dragon, 1);
 		attackTicks = this.delay;

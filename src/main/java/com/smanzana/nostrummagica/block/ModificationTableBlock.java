@@ -31,17 +31,17 @@ public class ModificationTableBlock extends Block {
 	public static final String ID = "modification_table";
 	
 	public ModificationTableBlock() {
-		super(Block.Properties.create(Material.WOOD)
-				.hardnessAndResistance(2.0f, 10.0f)
+		super(Block.Properties.of(Material.WOOD)
+				.strength(2.0f, 10.0f)
 				.sound(SoundType.WOOD)
 				.harvestTool(ToolType.AXE)
 				);
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (!worldIn.isRemote()) {
-			ModificationTableTileEntity te = (ModificationTableTileEntity) worldIn.getTileEntity(pos);
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		if (!worldIn.isClientSide()) {
+			ModificationTableTileEntity te = (ModificationTableTileEntity) worldIn.getBlockEntity(pos);
 			NostrumMagica.instance.proxy.openContainer(player, ModificationTableGui.ModificationTableContainer.Make(te));
 		}
 		
@@ -59,30 +59,30 @@ public class ModificationTableBlock extends Block {
 	}
 	
 	@Override
-	public BlockRenderType getRenderType(BlockState state) {
+	public BlockRenderType getRenderShape(BlockState state) {
 		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			destroy(world, pos, state);
-			world.removeTileEntity(pos);
+			world.removeBlockEntity(pos);
 		}
 	}
 	
 	private void destroy(World world, BlockPos pos, BlockState state) {
-		TileEntity ent = world.getTileEntity(pos);
+		TileEntity ent = world.getBlockEntity(pos);
 		if (ent == null || !(ent instanceof ModificationTableTileEntity))
 			return;
 		
 		ModificationTableTileEntity table = (ModificationTableTileEntity) ent;
-		for (int i = 0; i < table.getSizeInventory(); i++) {
-			if (!table.getStackInSlot(i).isEmpty()) {
+		for (int i = 0; i < table.getContainerSize(); i++) {
+			if (!table.getItem(i).isEmpty()) {
 				ItemEntity item = new ItemEntity(
 						world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
-						table.removeStackFromSlot(i));
-				world.addEntity(item);
+						table.removeItemNoUpdate(i));
+				world.addFreshEntity(item);
 			}
 		}
 		

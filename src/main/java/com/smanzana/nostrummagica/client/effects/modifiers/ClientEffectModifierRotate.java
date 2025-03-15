@@ -24,9 +24,9 @@ public class ClientEffectModifierRotate implements ClientEffectModifier {
 		float rotX = progress * rotationsX * 360f;
 		float rotY = progress * rotationsY * 360f;
 		float rotZ = progress * rotationsZ * 360f;
-		matrixStackIn.rotate(Vector3f.XP.rotationDegrees(rotX % 360f));
-		matrixStackIn.rotate(Vector3f.YP.rotationDegrees(rotY % 360f));
-		matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(rotZ % 360f));
+		matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(rotX % 360f));
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(rotY % 360f));
+		matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(rotZ % 360f));
 	}
 
 	@Override

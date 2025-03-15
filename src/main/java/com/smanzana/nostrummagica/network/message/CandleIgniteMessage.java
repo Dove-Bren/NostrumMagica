@@ -28,19 +28,19 @@ public class CandleIgniteMessage {
 
 	public static void handle(CandleIgniteMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
-		Minecraft.getInstance().runAsync(() -> {
+		Minecraft.getInstance().submit(() -> {
 			
 			PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
 			if (!DimensionUtils.InDimension(player, message.dimension)) {
 				return;
 			}
 			
-			BlockState state = player.world.getBlockState(message.pos);
+			BlockState state = player.level.getBlockState(message.pos);
 			if (state == null || !(state.getBlock() instanceof CandleBlock)) {
 				return;
 			}
 			
-			CandleBlock.setReagent(player.world, message.pos, state, message.type);
+			CandleBlock.setReagent(player.level, message.pos, state, message.type);
 		});
 	}
 	
@@ -55,14 +55,14 @@ public class CandleIgniteMessage {
 	}
 
 	public static CandleIgniteMessage decode(PacketBuffer buf) {
-		return new CandleIgniteMessage(NetUtils.unpackDimension(buf), buf.readBlockPos(), buf.readBoolean() ? buf.readEnumValue(ReagentType.class) : null);
+		return new CandleIgniteMessage(NetUtils.unpackDimension(buf), buf.readBlockPos(), buf.readBoolean() ? buf.readEnum(ReagentType.class) : null);
 	}
 
 	public static void encode(CandleIgniteMessage msg, PacketBuffer buf) {
 		NetUtils.packDimension(buf, msg.dimension);
 		buf.writeBlockPos(msg.pos);
 		buf.writeBoolean(msg.type != null);
-		if (msg.type != null) buf.writeEnumValue(msg.type);
+		if (msg.type != null) buf.writeEnum(msg.type);
 	}
 
 }

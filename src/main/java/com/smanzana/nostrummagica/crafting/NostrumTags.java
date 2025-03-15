@@ -203,7 +203,7 @@ public class NostrumTags {
 		public static final ITag.INamedTag<Item> TransmutableItem = tagOptional(TAG_TRANSMUTABLE_ITEM);
 		
 		private static ITag.INamedTag<Item> tag(String path) {
-			return ItemTags.makeWrapperTag(new ResourceLocation(NostrumMagica.MODID, path).toString());
+			return ItemTags.bind(new ResourceLocation(NostrumMagica.MODID, path).toString());
 		}
 		
 		private static ITag.INamedTag<Item> tagOptional(String path) {
@@ -212,7 +212,7 @@ public class NostrumTags {
 		
 		private static ITag.INamedTag<Item> forgeTag(String name) {
 			final ResourceLocation loc = new ResourceLocation("forge", name);
-			ITag<Item> found = ItemTags.getCollection().get(loc);
+			ITag<Item> found = ItemTags.getAllTags().getTag(loc);
 			if (found != null && found instanceof ITag.INamedTag) {
 				return (ITag.INamedTag<Item>) found;
 			}
@@ -228,7 +228,7 @@ public class NostrumTags {
 		public static final ITag.INamedTag<Block> TransmutableBlock = tag(TAG_TRANSMUTABLE_BLOCK);
 		
 		private static ITag.INamedTag<Block> tag(String path) {
-			return BlockTags.makeWrapperTag(new ResourceLocation(NostrumMagica.MODID, path).toString());
+			return BlockTags.bind(new ResourceLocation(NostrumMagica.MODID, path).toString());
 		}
 	}
 }

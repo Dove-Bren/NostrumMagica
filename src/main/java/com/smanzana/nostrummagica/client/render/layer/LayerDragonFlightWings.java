@@ -36,13 +36,13 @@ public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEn
 	@Override
 	public void render(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		if (shouldRender(player)) {
-			@Nonnull ItemStack chestpiece = player.getItemStackFromSlot(EquipmentSlotType.CHEST); 
+			@Nonnull ItemStack chestpiece = player.getItemBySlot(EquipmentSlotType.CHEST); 
 			render(stack, typeBuffer, packedLight, player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, (!chestpiece.isEmpty() && chestpiece.isEnchanted()));
 		}
 	}
 	
 	public boolean shouldRender(AbstractClientPlayerEntity player) {
-		for (ItemStack stack : player.getArmorInventoryList()) {
+		for (ItemStack stack : player.getArmorSlots()) {
 			if (!stack.isEmpty() && stack.getItem() instanceof IDragonWingRenderItem) {
 				if (((IDragonWingRenderItem) stack.getItem()).shouldRenderDragonWings(stack, player)) {
 					return true;
@@ -54,8 +54,8 @@ public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEn
 		IInventory baubles = NostrumMagica.instance.curios.getCurios(player);
 		
 		if (baubles != null) {
-			for (int i = 0; i < baubles.getSizeInventory(); i++) {
-				ItemStack stack = baubles.getStackInSlot(i);
+			for (int i = 0; i < baubles.getContainerSize(); i++) {
+				ItemStack stack = baubles.getItem(i);
 				if (!stack.isEmpty() && stack.getItem() instanceof IDragonWingRenderItem) {
 					if (((IDragonWingRenderItem) stack.getItem()).shouldRenderDragonWings(stack, player)) {
 						return true;
@@ -68,7 +68,7 @@ public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEn
 	}
 	
 	public int getColor(AbstractClientPlayerEntity player) {
-		for (ItemStack stack : player.getArmorInventoryList()) {
+		for (ItemStack stack : player.getArmorSlots()) {
 			if (!stack.isEmpty() && stack.getItem() instanceof IDragonWingRenderItem) {
 				if (((IDragonWingRenderItem) stack.getItem()).shouldRenderDragonWings(stack, player)) {
 					return ((IDragonWingRenderItem) stack.getItem()).getDragonWingColor(stack, player);
@@ -79,8 +79,8 @@ public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEn
 		// Try bauables
 		IInventory baubles = NostrumMagica.instance.curios.getCurios(player);
 		if (baubles != null) {
-			for (int i = 0; i < baubles.getSizeInventory(); i++) {
-				ItemStack stack = baubles.getStackInSlot(i);
+			for (int i = 0; i < baubles.getContainerSize(); i++) {
+				ItemStack stack = baubles.getItem(i);
 				if (!stack.isEmpty() && stack.getItem() instanceof IDragonWingRenderItem) {
 					if (((IDragonWingRenderItem) stack.getItem()).shouldRenderDragonWings(stack, player)) {
 						return ((IDragonWingRenderItem) stack.getItem()).getDragonWingColor(stack, player);
@@ -95,20 +95,20 @@ public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEn
 	public void render(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, boolean enchanted) {
 		
 		final float colors[] = ColorUtil.ARGBToColor(getColor(player));
-		final IVertexBuilder buffer = typeBuffer.getBuffer(RenderType.getEntitySolid(TEXTURE_WINGS));
+		final IVertexBuilder buffer = typeBuffer.getBuffer(RenderType.entitySolid(TEXTURE_WINGS));
 		
-		stack.push();
-		stack.rotate(Vector3f.XP.rotationDegrees(player.isSneaking() ? 25f : 0));
+		stack.pushPose();
+		stack.mulPose(Vector3f.XP.rotationDegrees(player.isShiftKeyDown() ? 25f : 0));
 		stack.translate(0, 0, .125f);
-		stack.translate(0, player.getHeight() * .3f, player.getWidth() * .3f);
-		stack.translate(0, player.isSneaking() ? .3 : 0, 0); // This is kind tear-y but things like elytra sore 'last' on the entity to smooth!
-		model.setRotationAngles(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-		model.render(stack, buffer, packedLight, OverlayTexture.NO_OVERLAY, colors[0], colors[1], colors[2], colors[3]);
+		stack.translate(0, player.getBbHeight() * .3f, player.getBbWidth() * .3f);
+		stack.translate(0, player.isShiftKeyDown() ? .3 : 0, 0); // This is kind tear-y but things like elytra sore 'last' on the entity to smooth!
+		model.setupAnim(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+		model.renderToBuffer(stack, buffer, packedLight, OverlayTexture.NO_OVERLAY, colors[0], colors[1], colors[2], colors[3]);
 		
 //		if (enchanted) {
 //		LayerArmorBase.renderEnchantedGlint(this.renderPlayer, player, model, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
 //	}
 		
-		stack.pop();
+		stack.popPose();
 	}
 }

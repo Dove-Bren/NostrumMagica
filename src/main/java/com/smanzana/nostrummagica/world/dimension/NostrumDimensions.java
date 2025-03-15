@@ -13,7 +13,7 @@ public class NostrumDimensions {
 	//public static RegistryKey<World> EmptyDimension = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, NostrumMagica.Loc(NostrumEmptyDimension.DIMENSION_ID));
 	
 	public static void init() {
-		Registry.register(Registry.CHUNK_GENERATOR_CODEC, NostrumMagica.Loc(EmptyChunkGen.ID), EmptyChunkGen.CODEC);
+		Registry.register(Registry.CHUNK_GENERATOR, NostrumMagica.Loc(EmptyChunkGen.ID), EmptyChunkGen.CODEC);
 
 		NostrumSorceryDimension.RegisterListener();
 	}
@@ -24,7 +24,7 @@ public class NostrumDimensions {
 		final String name = ModConfig.config.getSorceryDimension();
 		if (!name.equals(DimensionCacheInput)) {
 			DimensionCacheInput = name;
-			DimensionCache = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(name));
+			DimensionCache = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(name));
 		}
 		return DimensionCache;
 	}

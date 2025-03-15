@@ -45,9 +45,9 @@ public abstract class WorldTrial {
 		
 		final EElementalMastery mastery = attr.getElementalMastery(this.element);
 		if (mastery == EElementalMastery.NOVICE) {
-			if (!player.world.isRemote) {
+			if (!player.level.isClientSide) {
 				NostrumMagicaSounds.STATUS_DEBUFF3.play(player);
-				player.sendMessage(new TranslationTextComponent("info.element.starttrial", new Object[] {this.element.getName()}), Util.DUMMY_UUID);
+				player.sendMessage(new TranslationTextComponent("info.element.starttrial", new Object[] {this.element.getName()}), Util.NIL_UUID);
 			}
 		} else {
 			complete(player);
@@ -78,7 +78,7 @@ public abstract class WorldTrial {
 		attr.endTrial(element);
 		attr.setElementalMastery(this.element, newMastery);
 		
-		if (!player.world.isRemote) {
+		if (!player.level.isClientSide) {
 			NostrumMagicaSounds.LEVELUP.play(player);
 			// Message done in attr
 			//player.sendMessage(new TranslationTextComponent("info.element.mastery" + mastery.intValue(), new Object[] {this.element.getName()}));

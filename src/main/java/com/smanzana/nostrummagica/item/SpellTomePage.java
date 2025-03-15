@@ -69,7 +69,7 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
 		SpellTomeEnhancement enhance = getEnhancement(stack);
 		if (enhance == null)
 			return;
@@ -155,8 +155,8 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-		if (this.isInGroup(group)) {
+	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+		if (this.allowdedIn(group)) {
 			for (SpellTomeEnhancement enhancement : SpellTomeEnhancement.getEnhancements()) {
 				items.add(Create(enhancement, 1));
 				if (enhancement.getMaxLevel() != 1) {

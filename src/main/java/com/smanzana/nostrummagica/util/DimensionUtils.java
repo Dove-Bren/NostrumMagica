@@ -13,11 +13,11 @@ import net.minecraft.world.World;
 public class DimensionUtils {
 	
 	public static final RegistryKey<World> GetDimension(Entity ent) {
-		return ent.getEntityWorld().getDimensionKey();
+		return ent.getCommandSenderWorld().dimension();
 	}
 	
 	public static RegistryKey<World> GetDimension(World world) {
-		return world.getDimensionKey();
+		return world.dimension();
 	}
 
 	public static final boolean InDimension(Entity ent, RegistryKey<World> dimension) {
@@ -41,7 +41,7 @@ public class DimensionUtils {
 	}
 	
 	public static final boolean IsNether(RegistryKey<World> dim) {
-		return DimEquals(dim, World.THE_NETHER);
+		return DimEquals(dim, World.NETHER);
 	}
 	
 	public static final boolean IsNether(World world) {
@@ -49,7 +49,7 @@ public class DimensionUtils {
 	}
 	
 	public static final boolean IsEnd(RegistryKey<World> dim) {
-		return DimEquals(dim, World.THE_END);
+		return DimEquals(dim, World.END);
 	}
 	
 	public static final boolean IsEnd(World world) {
@@ -65,7 +65,7 @@ public class DimensionUtils {
 	}
 
 	public static final RegistryKey<World> GetDimKey(ResourceLocation loc) {
-		return RegistryKey.getOrCreateKey(Registry.WORLD_KEY, loc);
+		return RegistryKey.create(Registry.DIMENSION_REGISTRY, loc);
 	}
 	
 	public static final RegistryKey<World> GetDimKey(String locString) {
@@ -80,7 +80,7 @@ public class DimensionUtils {
 	}
 
 	public static boolean SameDimension(@Nonnull Entity a, @Nonnull Entity b) {
-		return SameDimension(a.getEntityWorld(), b.getEntityWorld());
+		return SameDimension(a.getCommandSenderWorld(), b.getCommandSenderWorld());
 	}
 	
 	public static boolean SameDimension(@Nonnull World a, @Nonnull World b) {

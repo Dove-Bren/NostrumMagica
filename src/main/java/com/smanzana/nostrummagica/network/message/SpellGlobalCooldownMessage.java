@@ -26,8 +26,8 @@ public class SpellGlobalCooldownMessage {
 			return;
 		}
 		
-		Minecraft.getInstance().runAsync(() -> {
-			NostrumMagica.instance.getSpellCooldownTracker(player.world).overrideGlobalCooldown(player, message.cooldownTicks);
+		Minecraft.getInstance().submit(() -> {
+			NostrumMagica.instance.getSpellCooldownTracker(player.level).overrideGlobalCooldown(player, message.cooldownTicks);
 		});
 	}
 		

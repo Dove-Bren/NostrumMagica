@@ -44,7 +44,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 		private BlockState wrappedState;
 		
 		public StaticBlockState(Block block) {
-			this(block.getDefaultState());
+			this(block.defaultBlockState());
 		}
 		
 		public StaticBlockState(BlockState state) {
@@ -56,29 +56,29 @@ public abstract class StaticRoom implements IDungeonRoom {
 			BlockState state = this.wrappedState;
 			
 			if (block instanceof HorizontalBlock) {
-				Direction cur = state.get(HorizontalBlock.HORIZONTAL_FACING);
+				Direction cur = state.getValue(HorizontalBlock.FACING);
 				cur = rotate(cur, rotation);
-				state = state.with(HorizontalBlock.HORIZONTAL_FACING, cur);
+				state = state.setValue(HorizontalBlock.FACING, cur);
 			} else if (block instanceof WallTorchBlock) {
-				Direction cur = state.get(WallTorchBlock.HORIZONTAL_FACING);
+				Direction cur = state.getValue(WallTorchBlock.FACING);
 				cur = rotate(cur, rotation);
-				state = state.with(WallTorchBlock.HORIZONTAL_FACING, cur);
+				state = state.setValue(WallTorchBlock.FACING, cur);
 			} else if (block instanceof RedstoneWallTorchBlock) {
-				Direction cur = state.get(RedstoneWallTorchBlock.FACING);
+				Direction cur = state.getValue(RedstoneWallTorchBlock.FACING);
 				cur = rotate(cur, rotation);
-				state = state.with(RedstoneWallTorchBlock.FACING, cur);
+				state = state.setValue(RedstoneWallTorchBlock.FACING, cur);
 			} else if (block instanceof LadderBlock) {
-				Direction cur = state.get(LadderBlock.FACING);
+				Direction cur = state.getValue(LadderBlock.FACING);
 				cur = rotate(cur, rotation);
-				state = state.with(LadderBlock.FACING, cur);
+				state = state.setValue(LadderBlock.FACING, cur);
 			} else if (block instanceof StairsBlock) {
-				Direction cur = state.get(StairsBlock.FACING);
+				Direction cur = state.getValue(StairsBlock.FACING);
 				cur = rotate(cur, rotation);
-				state = state.with(StairsBlock.FACING, cur);
+				state = state.setValue(StairsBlock.FACING, cur);
 			}
-			world.setBlockState(pos, state, 2);
+			world.setBlock(pos, state, 2);
 			if (world instanceof WorldGenRegion && WorldUtil.blockNeedsGenFixup(state)) {
-				world.getChunk(pos).markBlockForPostprocessing(pos);
+				world.getChunk(pos).markPosForPostprocessing(pos);
 			}
 		}
 		
@@ -101,7 +101,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 			}
 			
 			while (count-- > 0)
-				in = in.rotateY();
+				in = in.getClockWise();
 			
 			return in;
 		}
@@ -191,7 +191,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 		int relMaxZ = locMaxZ;
 		
 		// Apply rotation
-		for (int i = 0; i < start.getFacing().getOpposite().getHorizontalIndex(); i++) {
+		for (int i = 0; i < start.getFacing().getOpposite().get2DDataValue(); i++) {
 			// Actual coord change is (x,y)->(-y,x)
 			int tmp = relMinX;
 			relMinX = -relMinZ;
@@ -221,7 +221,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 			BlockState cur = world.getBlockState(pos);
 		
 			// Check if unbreakable...
-			if (cur != null && cur.getBlockHardness(world, pos) == -1)
+			if (cur != null && cur.getDestroySpeed(world, pos) == -1)
 				return false;
 		}
 		
@@ -271,7 +271,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 					z + start.getPos().getZ());
 			
 			// Bounds check!
-			if (bounds != null && !bounds.isVecInside(pos)) {
+			if (bounds != null && !bounds.isInside(pos)) {
 				continue;
 			}
 			
@@ -299,12 +299,12 @@ public abstract class StaticRoom implements IDungeonRoom {
 		for (BlueprintLocation lootSpot : this.getTreasureLocations(start)) {
 			// Actual dugneon generation will set up loot, but I was originally lazy and didn't put chests in spots.
 			// So if there isn't a chest there and it's air, replace with a chest.
-			if (bounds != null && !bounds.isVecInside(lootSpot.getPos())) {
+			if (bounds != null && !bounds.isInside(lootSpot.getPos())) {
 				continue;
 			}
 			
-			if (world.isAirBlock(lootSpot.getPos())) {
-				world.setBlockState(lootSpot.getPos(), Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, lootSpot.getFacing()), 2);
+			if (world.isEmptyBlock(lootSpot.getPos())) {
+				world.setBlock(lootSpot.getPos(), Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, lootSpot.getFacing()), 2);
 			}
 		}
 	}

@@ -43,8 +43,8 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		super.addInformation(stack, worldIn, tooltip, flagIn);
+	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		tooltip.add(new StringTextComponent("For Creative Singleplayer Use"));
 		if (Screen.hasShiftDown()) {
 			tooltip.add(new StringTextComponent("Select bounds to copy with right-click."));
@@ -53,16 +53,16 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 	}
 	
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		final World world = context.getWorld();
-		final BlockPos pos = context.getPos();
+	public ActionResultType useOn(ItemUseContext context) {
+		final World world = context.getLevel();
+		final BlockPos pos = context.getClickedPos();
 		final PlayerEntity player = context.getPlayer();
 		
-		if (world.isRemote)
+		if (world.isClientSide)
 			return ActionResultType.SUCCESS;
 		
 		if (FMLEnvironment.dist == Dist.DEDICATED_SERVER) {
-			player.sendMessage(new StringTextComponent("This item only works in single player"), Util.DUMMY_UUID);
+			player.sendMessage(new StringTextComponent("This item only works in single player"), Util.NIL_UUID);
 			return ActionResultType.FAIL;
 		}
 		
@@ -71,18 +71,18 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 		
 		if (player == null || !player.isCreative()) {
 			if (player != null) {
-				player.sendMessage(new StringTextComponent("You must be in creative to use this item"), Util.DUMMY_UUID);
+				player.sendMessage(new StringTextComponent("You must be in creative to use this item"), Util.NIL_UUID);
 			}
 			return ActionResultType.SUCCESS;
 		}
 		
 		// Handle selection and spawning based on shift
-		if (player.isSneaking()) {
+		if (player.isShiftKeyDown()) {
 			Direction face = null;
 			// Figure out facing by looking at clicked pos vs our pos
-			final BlockPos playerPos = player.getPosition();
-			face = Direction.getFacingFromVector((float) (pos.getX() - playerPos.getX()), 0f, (float) (pos.getZ() - playerPos.getZ()));
-			BlockPos placePos = pos.offset(context.getFace()); // offset by face clicked on
+			final BlockPos playerPos = player.blockPosition();
+			face = Direction.getNearest((float) (pos.getX() - playerPos.getX()), 0f, (float) (pos.getZ() - playerPos.getZ()));
+			BlockPos placePos = pos.relative(context.getClickedFace()); // offset by face clicked on
 			if (this.blueprint != null) {
 				// spawn
 				blueprint.spawn(world, placePos, face); // spawn rotated based on direction from us
@@ -123,7 +123,7 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 
 	@Override
 	public boolean shouldDisplayBlueprint(PlayerEntity player, ItemStack stack, BlockPos pos) {
-		return player.isSneaking() && player.isCreative();
+		return player.isShiftKeyDown() && player.isCreative();
 	}
 
 	@Override
@@ -133,7 +133,7 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 
 	@Override
 	public boolean shouldRenderSelection(PlayerEntity player, ItemStack stack) {
-		return player.isCreative() && select1 != null && DimensionUtils.SameDimension(selectWorld, player.world);
+		return player.isCreative() && select1 != null && DimensionUtils.SameDimension(selectWorld, player.level);
 	}
 
 	@Override

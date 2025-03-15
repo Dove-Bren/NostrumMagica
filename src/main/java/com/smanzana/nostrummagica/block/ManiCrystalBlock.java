@@ -34,28 +34,28 @@ public class ManiCrystalBlock extends Block {
 	public static final String ID_VANI = ID_PREFIX + "vani";
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", Direction.values());
 	
-	protected static final VoxelShape STANDING_AABB = Block.makeCuboidShape(16*(.5-(.16)), 16*0.1D, 16*(.5-.16), 16*(.5+.16), 16*0.8D, 16*(.5+.16));
-	protected static final VoxelShape HANGING_AABB = Block.makeCuboidShape(16*(.5-(.16)), 16*.55, 16*(.5-.16), 16*(.5+.16), 16*1.0, 16*(.5+.16));
-	protected static final VoxelShape WALL_NORTH_AABB = Block.makeCuboidShape(16*(.5-.16), 16*0.2D, 16*(1-.16), 16*(.5 + .16), 16*0.8D, 16*1);
-	protected static final VoxelShape WALL_EAST_AABB = Block.makeCuboidShape(16*0, 16*0.2D, 16*(.5-.16), 16*.16, 16*0.8D, 16*(.5+.16));
-	protected static final VoxelShape WALL_SOUTH_AABB = Block.makeCuboidShape(16*(.5-.16), 16*0.2D, 16*0, 16*(.5 + .16), 16*0.8D, 16*.16);
-	protected static final VoxelShape WALL_WEST_AABB = Block.makeCuboidShape(16*(1-.16), 16*0.2D, 16*(.5-.16), 16*1, 16*0.8D, 16*(.5+.16));
+	protected static final VoxelShape STANDING_AABB = Block.box(16*(.5-(.16)), 16*0.1D, 16*(.5-.16), 16*(.5+.16), 16*0.8D, 16*(.5+.16));
+	protected static final VoxelShape HANGING_AABB = Block.box(16*(.5-(.16)), 16*.55, 16*(.5-.16), 16*(.5+.16), 16*1.0, 16*(.5+.16));
+	protected static final VoxelShape WALL_NORTH_AABB = Block.box(16*(.5-.16), 16*0.2D, 16*(1-.16), 16*(.5 + .16), 16*0.8D, 16*1);
+	protected static final VoxelShape WALL_EAST_AABB = Block.box(16*0, 16*0.2D, 16*(.5-.16), 16*.16, 16*0.8D, 16*(.5+.16));
+	protected static final VoxelShape WALL_SOUTH_AABB = Block.box(16*(.5-.16), 16*0.2D, 16*0, 16*(.5 + .16), 16*0.8D, 16*.16);
+	protected static final VoxelShape WALL_WEST_AABB = Block.box(16*(1-.16), 16*0.2D, 16*(.5-.16), 16*1, 16*0.8D, 16*(.5+.16));
 	
 	private final int level;
 	
 	public ManiCrystalBlock(int level) {
-		super(Block.Properties.create(Material.ROCK)
-				.hardnessAndResistance(1.0f, 50.0f)
+		super(Block.Properties.of(Material.STONE)
+				.strength(1.0f, 50.0f)
 				.sound(SoundType.GLASS)
 				.harvestTool(ToolType.PICKAXE)
 				.harvestLevel(1)
-				.tickRandomly()
-				.setLightLevel(ManiCrystalBlock::getLightValue)
+				.randomTicks()
+				.lightLevel(ManiCrystalBlock::getLightValue)
 				);
 		this.level = level;
 		//this.setLightOpacity(0);
 		
-		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.UP));
+		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.UP));
 	}
 	
 	protected int getLevel() {
@@ -63,7 +63,7 @@ public class ManiCrystalBlock extends Block {
 	}
 	
 	@Override
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
 		builder.add(FACING);
 	}
 	
@@ -102,7 +102,7 @@ public class ManiCrystalBlock extends Block {
 	
 	@Override
 	public void randomTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
-		if (worldIn.isRemote) {
+		if (worldIn.isClientSide) {
 			return;
 		}
 		
@@ -113,7 +113,7 @@ public class ManiCrystalBlock extends Block {
 		if (getLevel() > 0 && (getLevel() >= 2 || random.nextInt(2) <= getLevel())) {
 			
 			// Check if there are too many already
-			if (worldIn.getEntitiesWithinAABB(WispEntity.class, VoxelShapes.fullCube().getBoundingBox().offset(pos).grow(20)).size() > 5) {
+			if (worldIn.getEntitiesOfClass(WispEntity.class, VoxelShapes.block().bounds().move(pos).inflate(20)).size() > 5) {
 				return;
 			}
 			
@@ -122,23 +122,23 @@ public class ManiCrystalBlock extends Block {
 			// Try to find a safe place to spawn the wisp
 			int attempts = 20;
 			do {
-				spawnPos = pos.add(
+				spawnPos = pos.offset(
 						NostrumMagica.rand.nextInt(10) - 5,
 						NostrumMagica.rand.nextInt(5),
 						NostrumMagica.rand.nextInt(10) - 5);
-			} while (!worldIn.isAirBlock(spawnPos) && attempts-- >= 0);
+			} while (!worldIn.isEmptyBlock(spawnPos) && attempts-- >= 0);
 			
-			if (worldIn.isAirBlock(spawnPos)) {
+			if (worldIn.isEmptyBlock(spawnPos)) {
 				WispEntity wisp = new WispEntity(NostrumEntityTypes.wisp, worldIn, pos);
-				wisp.setPosition(spawnPos.getX() + .5, spawnPos.getY(), spawnPos.getZ() + .5);
-				worldIn.addEntity(wisp);
+				wisp.setPos(spawnPos.getX() + .5, spawnPos.getY(), spawnPos.getZ() + .5);
+				worldIn.addFreshEntity(wisp);
 			}
 		}
 	}
 	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		switch (state.get(FACING)) {
+		switch (state.getValue(FACING)) {
 		case DOWN:
 			return HANGING_AABB;
 		case EAST:
@@ -157,20 +157,20 @@ public class ManiCrystalBlock extends Block {
 	
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(FACING, context.getFace());
+		return this.defaultBlockState().setValue(FACING, context.getClickedFace());
 	}
 	
 	@Override
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld world, BlockPos pos, BlockPos facingPos) {
-		if (!world.isRemote()) {
-			Direction myFacing = stateIn.get(FACING);
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld world, BlockPos pos, BlockPos facingPos) {
+		if (!world.isClientSide()) {
+			Direction myFacing = stateIn.getValue(FACING);
 			if (myFacing == Direction.UP || myFacing == Direction.DOWN) {
 				return stateIn;
 			}
 			
 			if (myFacing == facing.getOpposite()) {
-				if (world.isAirBlock(facingPos)) {
-					return Blocks.AIR.getDefaultState();
+				if (world.isEmptyBlock(facingPos)) {
+					return Blocks.AIR.defaultBlockState();
 				}
 			}
 			
@@ -183,7 +183,7 @@ public class ManiCrystalBlock extends Block {
 	 * @return
 	 */
 	public Vector3d getCrystalTipOffset(BlockState state) {
-		Direction facing = state.get(FACING);
+		Direction facing = state.getValue(FACING);
 		Vector3d offset = Vector3d.ZERO;
 		if (facing != null) {
 			switch (facing) {

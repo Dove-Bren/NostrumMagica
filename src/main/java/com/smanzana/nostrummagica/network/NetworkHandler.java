@@ -132,7 +132,7 @@ public class NetworkHandler {
 	//ctx.get().getSender());
 	
 	public static <T> void sendTo(T msg, ServerPlayerEntity player) {
-		NetworkHandler.syncChannel.sendTo(msg, player.connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+		NetworkHandler.syncChannel.sendTo(msg, player.connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
 	}
 	
 	public static <T> void sendToServer(T msg) {

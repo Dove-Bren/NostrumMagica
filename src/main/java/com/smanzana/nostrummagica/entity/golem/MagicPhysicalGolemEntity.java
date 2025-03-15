@@ -46,7 +46,7 @@ public class MagicPhysicalGolemEntity extends MagicGolemEntity {
 
 	@Override
 	public void doMeleeTask(LivingEntity target) {
-		this.attackEntityAsMob(target);
+		this.doHurtTarget(target);
 	}
 
 	@Override
@@ -54,13 +54,13 @@ public class MagicPhysicalGolemEntity extends MagicGolemEntity {
 		MagicPhysicalGolemEntity.init();
 		
 		// Either do debuff or damage
-		if (target.getActivePotionEffect(Effects.WEAKNESS) == null) {
-			LivingEntity targ = this.getAttackTarget();
+		if (target.getEffect(Effects.WEAKNESS) == null) {
+			LivingEntity targ = this.getTarget();
 			if (targ != target)
-				this.setAttackTarget(target);
+				this.setTarget(target);
 			spellDebuff.cast(this, 1.0f);
 			if (targ != target)
-				this.setAttackTarget(targ);
+				this.setTarget(targ);
 		} else {
 			spellRanged.cast(this, 1.0f);
 		}
@@ -78,12 +78,12 @@ public class MagicPhysicalGolemEntity extends MagicGolemEntity {
 
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
 		return MagicGolemEntity.BuildBaseAttributes()
-	        .createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.23D)
+	        .add(Attributes.MOVEMENT_SPEED, 0.23D)
 	
-	        .createMutableAttribute(Attributes.MAX_HEALTH, 16.0D)
+	        .add(Attributes.MAX_HEALTH, 16.0D)
 	
-	        .createMutableAttribute(Attributes.ATTACK_DAMAGE, 6.0D)
-	        .createMutableAttribute(Attributes.ARMOR, 8.0D);
+	        .add(Attributes.ATTACK_DAMAGE, 6.0D)
+	        .add(Attributes.ARMOR, 8.0D);
 	}
 
 	@Override

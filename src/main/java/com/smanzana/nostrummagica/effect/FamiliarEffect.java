@@ -32,18 +32,18 @@ public class FamiliarEffect extends Effect {
 	}
 	
 	@Override
-	public boolean isReady(int duration, int amp) {
+	public boolean isDurationEffectTick(int duration, int amp) {
 		return duration > 0 && duration % 5 == 0; // Check every 1/4 a second :shrug:
 		// Note: actual apply check is done in anon class when applying, and validates familiar status
 	}
 	
 	@Override
-	public void performEffect(LivingEntity entityLivingBaseIn, int p_76394_2_) {
+	public void applyEffectTick(LivingEntity entityLivingBaseIn, int p_76394_2_) {
 		;
 	}
 	
 	@Override
-	public void removeAttributesModifiersFromEntity(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
+	public void removeAttributeModifiers(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
 		// We were removed for whatever reason. Kill the familiars
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(entityLivingBaseIn);
 		if (attr != null)

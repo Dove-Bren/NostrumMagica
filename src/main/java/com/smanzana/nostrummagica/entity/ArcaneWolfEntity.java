@@ -109,6 +109,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import com.smanzana.nostrummagica.pet.IPetWithSoul.SoulBoundLore;
+
 public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEntityPet, IPetWithSoul, IStabbableEntity, IMagicEntity {
 	
 	public static enum ArcaneWolfElementalType {
@@ -285,7 +287,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 				(Spell.CreateAISpell("WolfSpeed")).addPart(new SpellShapePart(NostrumSpellShapes.Chain, NostrumSpellShapes.Chain.makeProps(8, true))).addPart(new SpellEffectPart(EMagicElement.WIND, 1, EAlteration.SUPPORT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.WIND, 1),
 				(wolf, target) -> {
-					return wolf.getAttackTarget() == null // Not in battle
+					return wolf.getTarget() == null // Not in battle
 							&& wolf.getMana() >= wolf.getMaxMana() * .30 // >= 30% mana
 							;
 				}),
@@ -297,26 +299,26 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 				(Spell.CreateAISpell("WolfRoots")).addPart(new SpellShapePart(NostrumSpellShapes.SeekingBullet)).addPart(new SpellEffectPart(EMagicElement.EARTH, 2, EAlteration.INFLICT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.EARTH, 1),
 				(wolf, target) -> {
-					return target.getActivePotionEffect(NostrumEffects.rooted) == null;
+					return target.getEffect(NostrumEffects.rooted) == null;
 				}),
 		REGEN("wolfregen", WolfSpellTargetGroup.ALLY, 50,
 				(Spell.CreateAISpell("WolfRegen")).addPart(new SpellShapePart(NostrumSpellShapes.AI)).addPart(new SpellEffectPart(EMagicElement.EARTH, 2, EAlteration.GROWTH)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.EARTH, 3),
 				(wolf, target) -> {
 					return target.getHealth() < target.getMaxHealth()
-							&& target.getActivePotionEffect(Effects.REGENERATION) == null;
+							&& target.getEffect(Effects.REGENERATION) == null;
 				}),
 		MAGIC_SHIELD("magicshield", WolfSpellTargetGroup.SELF, 30,
 				(Spell.CreateAISpell("WolfMagicShield")).addPart(new SpellShapePart(NostrumSpellShapes.Chain, NostrumSpellShapes.Chain.makeProps(8, true))).addPart(new SpellEffectPart(EMagicElement.ICE, 1, EAlteration.SUPPORT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.ICE, 1),
 				(wolf, target) -> {
-					return wolf.getAttackTarget() != null; // Don't want to cast out of battle
+					return wolf.getTarget() != null; // Don't want to cast out of battle
 				}),
 		WOLF_HEAL("heal", null, 20,
 				(Spell.CreateAISpell("WolfHeal")).addPart(new SpellShapePart(NostrumSpellShapes.AI)).addPart(new SpellEffectPart(EMagicElement.ICE, 2, EAlteration.GROWTH)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.ICE, 2),
 				(wolf, target) -> {
-					if (target.isEntityUndead()) {
+					if (target.isInvertedHealAndHarm()) {
 						// An attack against undead!
 						return !NostrumMagica.IsSameTeam(wolf, target);
 					} else {
@@ -327,20 +329,20 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 				(Spell.CreateAISpell("WolfIceFangs")).addPart(new SpellShapePart(NostrumSpellShapes.Chain, NostrumSpellShapes.Chain.makeProps(8, true))).addPart(new SpellEffectPart(EMagicElement.ICE, 2, EAlteration.ENCHANT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.ICE, 3),
 				(wolf, target) -> {
-					return wolf.getAttackTarget() != null; // Don't want to cast out of battle
+					return wolf.getTarget() != null; // Don't want to cast out of battle
 				}),
 		FIRE_TOUCH("firefang", WolfSpellTargetGroup.ENEMY, 10,
 				(Spell.CreateAISpell("WolfFireBite")).addPart(new SpellShapePart(NostrumSpellShapes.Touch)).addPart(new SpellEffectPart(EMagicElement.FIRE, 2, EAlteration.RUIN)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.FIRE, 1),
 				(wolf, target) -> {
-					return wolf.getDistance(target) <= TouchShape.AI_TOUCH_RANGE;
+					return wolf.distanceTo(target) <= TouchShape.AI_TOUCH_RANGE;
 				}),
 		MAGIC_BOOST("magicboost", WolfSpellTargetGroup.ALLY, 20,
 				(Spell.CreateAISpell("WolfMagicBoost")).addPart(new SpellShapePart(NostrumSpellShapes.AI)).addPart(new SpellEffectPart(EMagicElement.FIRE, 1, EAlteration.SUPPORT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.FIRE, 3),
 				(wolf, target) -> {
-					return target.getActivePotionEffect(NostrumEffects.magicBoost) == null
-							&& (wolf.getAttackTarget() != null || wolf.getMana() >= wolf.getMaxMana() * .75) // in battle or >= 75% mana
+					return target.getEffect(NostrumEffects.magicBoost) == null
+							&& (wolf.getTarget() != null || wolf.getMana() >= wolf.getMaxMana() * .75) // in battle or >= 75% mana
 							;
 				}),
 		ENDER_SHROUD("endershroud", WolfSpellTargetGroup.ENEMY, 20,
@@ -351,13 +353,13 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 				(Spell.CreateAISpell("WolfEnderFangs")).addPart(new SpellShapePart(NostrumSpellShapes.Chain, NostrumSpellShapes.Chain.makeProps(8, true))).addPart(new SpellEffectPart(EMagicElement.ENDER, 1, EAlteration.ENCHANT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.ENDER, 3),
 				(wolf, target) -> {
-					return wolf.getAttackTarget() != null; // Don't want to cast out of battle
+					return wolf.getTarget() != null; // Don't want to cast out of battle
 				}),
 		SLOW("slow", WolfSpellTargetGroup.ENEMY, 10,
 				(Spell.CreateAISpell("WolfSlow")).addPart(new SpellShapePart(NostrumSpellShapes.AI)).addPart(new SpellEffectPart(EMagicElement.LIGHTNING, 1, EAlteration.INFLICT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.LIGHTNING, 1),
 				(wolf, target) -> {
-					return target.getActivePotionEffect(Effects.SLOWNESS) == null;
+					return target.getEffect(Effects.MOVEMENT_SLOWDOWN) == null;
 				}),
 		CHAIN_LIGHTNING("chainlighting", WolfSpellTargetGroup.ENEMY, 40,
 				(Spell.CreateAISpell("WolfChainLightning")).addPart(new SpellShapePart(NostrumSpellShapes.SeekingBullet)).addPart(new SpellShapePart(NostrumSpellShapes.Chain, NostrumSpellShapes.Chain.makeProps(6, true))).addPart(new SpellEffectPart(EMagicElement.LIGHTNING, 2, EAlteration.RUIN)),
@@ -473,22 +475,22 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	
 	public static final String ID = "entity_arcane_wolf";
 	
-	protected static final DataParameter<Boolean> SOULBOUND = EntityDataManager.<Boolean>createKey(ArcaneWolfEntity.class, DataSerializers.BOOLEAN);
+	protected static final DataParameter<Boolean> SOULBOUND = EntityDataManager.<Boolean>defineId(ArcaneWolfEntity.class, DataSerializers.BOOLEAN);
 	
-	protected static final DataParameter<Integer> ATTRIBUTE_XP  = EntityDataManager.<Integer>createKey(ArcaneWolfEntity.class, DataSerializers.VARINT);
-    protected static final DataParameter<Integer> ATTRIBUTE_LEVEL  = EntityDataManager.<Integer>createKey(ArcaneWolfEntity.class, DataSerializers.VARINT);
-    protected static final DataParameter<Float> ATTRIBUTE_BOND  = EntityDataManager.<Float>createKey(ArcaneWolfEntity.class, DataSerializers.FLOAT);
-    protected static final DataParameter<Float> ATTRIBUTE_MANA_REGEN  = EntityDataManager.<Float>createKey(ArcaneWolfEntity.class, DataSerializers.FLOAT);
+	protected static final DataParameter<Integer> ATTRIBUTE_XP  = EntityDataManager.<Integer>defineId(ArcaneWolfEntity.class, DataSerializers.INT);
+    protected static final DataParameter<Integer> ATTRIBUTE_LEVEL  = EntityDataManager.<Integer>defineId(ArcaneWolfEntity.class, DataSerializers.INT);
+    protected static final DataParameter<Float> ATTRIBUTE_BOND  = EntityDataManager.<Float>defineId(ArcaneWolfEntity.class, DataSerializers.FLOAT);
+    protected static final DataParameter<Float> ATTRIBUTE_MANA_REGEN  = EntityDataManager.<Float>defineId(ArcaneWolfEntity.class, DataSerializers.FLOAT);
     
-    protected static final DataParameter<Integer> MANA  = EntityDataManager.<Integer>createKey(ArcaneWolfEntity.class, DataSerializers.VARINT);
-    protected static final DataParameter<Integer> MAX_MANA  = EntityDataManager.<Integer>createKey(ArcaneWolfEntity.class, DataSerializers.VARINT);
-    protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>createKey(ArcaneWolfEntity.class, PetJobSerializer.GetInstance());
-    protected static final DataParameter<Integer> RUNE_COLOR = EntityDataManager.<Integer>createKey(ArcaneWolfEntity.class, DataSerializers.VARINT);
+    protected static final DataParameter<Integer> MANA  = EntityDataManager.<Integer>defineId(ArcaneWolfEntity.class, DataSerializers.INT);
+    protected static final DataParameter<Integer> MAX_MANA  = EntityDataManager.<Integer>defineId(ArcaneWolfEntity.class, DataSerializers.INT);
+    protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>defineId(ArcaneWolfEntity.class, PetJobSerializer.GetInstance());
+    protected static final DataParameter<Integer> RUNE_COLOR = EntityDataManager.<Integer>defineId(ArcaneWolfEntity.class, DataSerializers.INT);
     
-    protected static final DataParameter<ArcaneWolfElementalType> ELEMENTAL_TYPE = EntityDataManager.<ArcaneWolfElementalType>createKey(ArcaneWolfEntity.class, ArcaneWolfElementalTypeSerializer.instance);
-    protected static final DataParameter<EMagicElement> TRAINING_ELEMENT = EntityDataManager.<EMagicElement>createKey(ArcaneWolfEntity.class, MagicElementDataSerializer.instance);
-    protected static final DataParameter<Integer> TRAINING_XP  = EntityDataManager.<Integer>createKey(ArcaneWolfEntity.class, DataSerializers.VARINT);
-    protected static final DataParameter<Integer> TRAINING_LEVEL  = EntityDataManager.<Integer>createKey(ArcaneWolfEntity.class, DataSerializers.VARINT);
+    protected static final DataParameter<ArcaneWolfElementalType> ELEMENTAL_TYPE = EntityDataManager.<ArcaneWolfElementalType>defineId(ArcaneWolfEntity.class, ArcaneWolfElementalTypeSerializer.instance);
+    protected static final DataParameter<EMagicElement> TRAINING_ELEMENT = EntityDataManager.<EMagicElement>defineId(ArcaneWolfEntity.class, MagicElementDataSerializer.instance);
+    protected static final DataParameter<Integer> TRAINING_XP  = EntityDataManager.<Integer>defineId(ArcaneWolfEntity.class, DataSerializers.INT);
+    protected static final DataParameter<Integer> TRAINING_LEVEL  = EntityDataManager.<Integer>defineId(ArcaneWolfEntity.class, DataSerializers.INT);
     
     private static final String NBT_SOUL_BOUND = "SoulBound";
     private static final String NBT_ATTR_XP = "AttrXP";
@@ -529,47 +531,47 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	protected void registerData() {
-		super.registerData();
-		dataManager.register(SOULBOUND, false);
-		dataManager.register(ATTRIBUTE_XP, 0);
-		dataManager.register(ATTRIBUTE_LEVEL, 0);
-		dataManager.register(ATTRIBUTE_BOND, 0f);
-		dataManager.register(ATTRIBUTE_MANA_REGEN, 1f);
-		dataManager.register(DATA_PET_ACTION, PetAction.WAITING);
-		dataManager.register(MANA, 0);
-		dataManager.register(MAX_MANA, 100);
-		dataManager.register(RUNE_COLOR, 0x00000000);
-		dataManager.register(ELEMENTAL_TYPE, ArcaneWolfElementalType.NONELEMENTAL);
-		dataManager.register(TRAINING_ELEMENT, EMagicElement.PHYSICAL);
-		dataManager.register(TRAINING_XP, 0);
-		dataManager.register(TRAINING_LEVEL, 0);
+	protected void defineSynchedData() {
+		super.defineSynchedData();
+		entityData.define(SOULBOUND, false);
+		entityData.define(ATTRIBUTE_XP, 0);
+		entityData.define(ATTRIBUTE_LEVEL, 0);
+		entityData.define(ATTRIBUTE_BOND, 0f);
+		entityData.define(ATTRIBUTE_MANA_REGEN, 1f);
+		entityData.define(DATA_PET_ACTION, PetAction.WAITING);
+		entityData.define(MANA, 0);
+		entityData.define(MAX_MANA, 100);
+		entityData.define(RUNE_COLOR, 0x00000000);
+		entityData.define(ELEMENTAL_TYPE, ArcaneWolfElementalType.NONELEMENTAL);
+		entityData.define(TRAINING_ELEMENT, EMagicElement.PHYSICAL);
+		entityData.define(TRAINING_XP, 0);
+		entityData.define(TRAINING_LEVEL, 0);
 	}
 		
 	
 	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		return WolfEntity.func_234233_eS_()
-			.createMutableAttribute(Attributes.MOVEMENT_SPEED, 0.35D)
-			.createMutableAttribute(Attributes.MAX_HEALTH, 50.0D)
-			.createMutableAttribute(Attributes.ARMOR, 10.0D)
-			.createMutableAttribute(Attributes.FOLLOW_RANGE, 60.0)
-			.createMutableAttribute(NostrumAttributes.magicResist, 20.0D)
-			.createMutableAttribute(Attributes.ATTACK_DAMAGE, 6.0D);
+		return WolfEntity.createAttributes()
+			.add(Attributes.MOVEMENT_SPEED, 0.35D)
+			.add(Attributes.MAX_HEALTH, 50.0D)
+			.add(Attributes.ARMOR, 10.0D)
+			.add(Attributes.FOLLOW_RANGE, 60.0)
+			.add(NostrumAttributes.magicResist, 20.0D)
+			.add(Attributes.ATTACK_DAMAGE, 6.0D);
 	}
 	
 	@Override
-	public void setTamed(boolean tamed) {
+	public void setTame(boolean tamed) {
 		// Parent resets max health. Reset health and max health after that
 		final float maxHealth = this.getMaxHealth();
 		final float health = this.getHealth();
-		super.setTamed(tamed);
+		super.setTame(tamed);
 		setMaxHealth(maxHealth);
 		setHealth(health);
 	}
 	
 	@Override
-	public void notifyDataManagerChange(DataParameter<?> key) {
-		super.notifyDataManagerChange(key);
+	public void onSyncedDataUpdated(DataParameter<?> key) {
+		super.onSyncedDataUpdated(key);
 	}
 	
 	@Override
@@ -590,22 +592,22 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 			@Override
 			protected void checkAndPerformAttack(LivingEntity target, double dist) {
 
-				if (this.func_234040_h_() /*attackTick <= 0*/ && dist > this.getAttackReachSqr(target)) {
+				if (this.isTimeToAttack() /*attackTick <= 0*/ && dist > this.getAttackReachSqr(target)) {
 					// Too far
 					if (ArcaneWolfEntity.this.hasWolfCapability(WolfTypeCapability.WOLF_BLINK)
-							&& ArcaneWolfEntity.this.rand.nextFloat() < .05) {
-						Vector3d currentPos = ArcaneWolfEntity.this.getPositionVec();
+							&& ArcaneWolfEntity.this.random.nextFloat() < .05) {
+						Vector3d currentPos = ArcaneWolfEntity.this.position();
 						if (ArcaneWolfEntity.this.teleportToEnemy(target)) {
-							ArcaneWolfEntity.this.world.playSound(null, currentPos.x, currentPos.y, currentPos.z,
-									SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.NEUTRAL, 1f, 1f);
-							ArcaneWolfEntity.this.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT, 1f, 1f);
+							ArcaneWolfEntity.this.level.playSound(null, currentPos.x, currentPos.y, currentPos.z,
+									SoundEvents.ENDERMAN_TELEPORT, SoundCategory.NEUTRAL, 1f, 1f);
+							ArcaneWolfEntity.this.playSound(SoundEvents.ENDERMAN_TELEPORT, 1f, 1f);
 							
 							// If currently training ender, get some xp!
 							if (ArcaneWolfEntity.this.getTrainingElement() == EMagicElement.ENDER) {
 								ArcaneWolfEntity.this.addTrainingXP(1);
 							}
 							
-							if (ArcaneWolfEntity.this.rand.nextBoolean()) {
+							if (ArcaneWolfEntity.this.random.nextBoolean()) {
 								ArcaneWolfEntity.this.addXP(1);
 							}
 						}
@@ -616,7 +618,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 			}
 		});
 		// Attack/Offensive spells
-		this.goalSelector.addGoal(priority++, new SpellAttackGoal<ArcaneWolfEntity>(this, 20 * 3, 4, true, (w) -> {return !w.isSitting();}) {
+		this.goalSelector.addGoal(priority++, new SpellAttackGoal<ArcaneWolfEntity>(this, 20 * 3, 4, true, (w) -> {return !w.isOrderedToSit();}) {
 			private List<Spell> spellList = new ArrayList<>();
 			@Override
 			protected Spell pickSpell(Spell[] spells, ArcaneWolfEntity entity) {
@@ -624,7 +626,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 				if (spellList.isEmpty()) {
 					return null;
 				}
-				return spellList.get(entity.rand.nextInt(spellList.size()));
+				return spellList.get(entity.random.nextInt(spellList.size()));
 			}
 			
 			@Override
@@ -632,15 +634,15 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 				final int cost = getWolfSpellCost(spell);
 				wolf.addMana(-cost);
 				wolf.onWolfCast(spell, cost);
-				wolf.playSound(SoundEvents.ENTITY_WOLF_GROWL, 1f, .8f);
+				wolf.playSound(SoundEvents.WOLF_GROWL, 1f, .8f);
 				
-				if (ArcaneWolfEntity.this.rand.nextBoolean()) {
+				if (ArcaneWolfEntity.this.random.nextBoolean()) {
 					ArcaneWolfEntity.this.addXP(1);
 				}
 			}
 		});
 		// Ally spells
-		this.goalSelector.addGoal(priority++, new SpellAttackGoal<ArcaneWolfEntity>(this, 20 * 3, 20, false, (w) -> {return !w.isSitting();}) {
+		this.goalSelector.addGoal(priority++, new SpellAttackGoal<ArcaneWolfEntity>(this, 20 * 3, 20, false, (w) -> {return !w.isOrderedToSit();}) {
 			private List<Spell> spellList = new ArrayList<>();
 			@Override
 			protected Spell pickSpell(Spell[] spells, ArcaneWolfEntity entity) {
@@ -648,7 +650,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 				if (spellList.isEmpty()) {
 					return null;
 				}
-				return spellList.get(entity.rand.nextInt(spellList.size()));
+				return spellList.get(entity.random.nextInt(spellList.size()));
 			}
 			
 			@Override
@@ -659,8 +661,8 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 				if (owner != null) {
 					List<LivingEntity> tames = PetFuncs.GetTamedEntities(owner);
 					tames.add(owner);
-					tames.removeIf((e) -> { return e.getDistance(entity) > 15;});
-					Collections.shuffle(tames, new Random(entity.ticksExisted));
+					tames.removeIf((e) -> { return e.distanceTo(entity) > 15;});
+					Collections.shuffle(tames, new Random(entity.tickCount));
 					return tames.get(0);
 				} else {
 					return null;
@@ -672,15 +674,15 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 				final int cost = getWolfSpellCost(spell);
 				wolf.addMana(-cost);
 				wolf.onWolfCast(spell, cost);
-				wolf.playSound(SoundEvents.ENTITY_WOLF_AMBIENT, 1f, .8f);
+				wolf.playSound(SoundEvents.WOLF_AMBIENT, 1f, .8f);
 				
-				if (ArcaneWolfEntity.this.rand.nextBoolean()) {
+				if (ArcaneWolfEntity.this.random.nextBoolean()) {
 					ArcaneWolfEntity.this.addXP(1);
 				}
 			}
 		});
 		// Self spells (longer recast)
-		this.goalSelector.addGoal(priority++, new SpellAttackGoal<ArcaneWolfEntity>(this, 20 * 5, 100, false, (w) -> {return !w.isSitting();}) {
+		this.goalSelector.addGoal(priority++, new SpellAttackGoal<ArcaneWolfEntity>(this, 20 * 5, 100, false, (w) -> {return !w.isOrderedToSit();}) {
 			private List<Spell> spellList = new ArrayList<>();
 			@Override
 			protected Spell pickSpell(Spell[] spells, ArcaneWolfEntity entity) {
@@ -688,7 +690,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 				if (spellList.isEmpty()) {
 					return null;
 				}
-				return spellList.get(entity.rand.nextInt(spellList.size()));
+				return spellList.get(entity.random.nextInt(spellList.size()));
 			}
 			
 			@Override
@@ -701,9 +703,9 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 				final int cost = getWolfSpellCost(spell);
 				wolf.addMana(-cost);
 				wolf.onWolfCast(spell, cost);
-				wolf.playSound(SoundEvents.ENTITY_WOLF_PANT, 1f, .8f);
+				wolf.playSound(SoundEvents.WOLF_PANT, 1f, .8f);
 				
-				if (ArcaneWolfEntity.this.rand.nextBoolean()) {
+				if (ArcaneWolfEntity.this.random.nextBoolean()) {
 					ArcaneWolfEntity.this.addXP(1);
 				}
 			}
@@ -720,7 +722,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		//this.targetSelector.addGoal(priority++, new PetTargetGoal<EntityArcaneWolf>(this));
 		this.targetSelector.addGoal(priority++, new OwnerHurtByTargetGoal(this));
 		this.targetSelector.addGoal(priority++, new OwnerHurtTargetGoal(this));
-		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setCallsForHelp(ArcaneWolfEntity.class, WolfEntity.class));
+		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setAlertOthers(ArcaneWolfEntity.class, WolfEntity.class));
 		this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<AbstractSkeletonEntity>(this, AbstractSkeletonEntity.class, false));
 	}
 	
@@ -737,9 +739,9 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	public void baseTick() {
 		super.baseTick();
 		
-		if (world != null && !world.isRemote) {
-			if (!this.isSitting()) {
-				if (this.getAttackTarget() == null) {
+		if (level != null && !level.isClientSide) {
+			if (!this.isOrderedToSit()) {
+				if (this.getTarget() == null) {
 					setPetAction(PetAction.WAITING);
 				} else {
 					setPetAction(PetAction.ATTACKING);
@@ -751,23 +753,23 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	@Override
 	public void tick() {
 		super.tick();
-		this.stepHeight = 1.1f;
+		this.maxUpStep = 1.1f;
 		checkAndHandleLava();
 	}
 	
 	@Override
-	public void livingTick() {
-		super.livingTick();
+	public void aiStep() {
+		super.aiStep();
 		
-		if (world.isRemote) {
+		if (level.isClientSide) {
 			return;
 		}
 		
-		if (this.getAttackTarget() != null && !this.getAttackTarget().isAlive()) {
-			this.setAttackTarget(null);
+		if (this.getTarget() != null && !this.getTarget().isAlive()) {
+			this.setTarget(null);
 		}
 		
-		if (this.ticksExisted % 20 == 0) {
+		if (this.tickCount % 20 == 0) {
 			if (this.getMaxMana() > 0 && this.getMana() < this.getMaxMana()) {
 				float amt = this.getManaRegen();
 				
@@ -788,28 +790,28 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	public void travel(Vector3d move) {
 		//super.travel(strafe, vertical, forward);
 		
-		if (this.onGround && this.getMotion().y <= 0) {
+		if (this.onGround && this.getDeltaMovement().y <= 0) {
 			this.jumpCount = 0;
 		}
 		
-		if (this.isBeingRidden() && this.canBeSteered()) {
+		if (this.isVehicle() && this.canBeControlledByRider()) {
 			LivingEntity entitylivingbase = (LivingEntity)this.getControllingPassenger();
-			this.rotationYaw = entitylivingbase.rotationYaw;
-			this.prevRotationYaw = this.rotationYaw;
-			this.rotationPitch = entitylivingbase.rotationPitch * 0.5F;
-			this.setRotation(this.rotationYaw, this.rotationPitch);
-			this.renderYawOffset = this.rotationYaw;
-			this.rotationYawHead = this.renderYawOffset;
-			double strafe = entitylivingbase.moveStrafing * 0.45F;
-			double forward = entitylivingbase.moveForward * .7f;
+			this.yRot = entitylivingbase.yRot;
+			this.yRotO = this.yRot;
+			this.xRot = entitylivingbase.xRot * 0.5F;
+			this.setRot(this.yRot, this.xRot);
+			this.yBodyRot = this.yRot;
+			this.yHeadRot = this.yBodyRot;
+			double strafe = entitylivingbase.xxa * 0.45F;
+			double forward = entitylivingbase.zza * .7f;
 
 			if (forward < 0.0F) {
 				forward *= 0.5F;
 			}
 			
-			this.jumpMovementFactor = this.getAIMoveSpeed() * 0.33F;
+			this.flyingSpeed = this.getSpeed() * 0.33F;
 
-			if (this.canPassengerSteer()) {
+			if (this.isControlledByLocalInstance()) {
 //				if (this.setJump) {
 //					this.setJump = false;
 //					this.getMotion().y = (double)this.getJumpUpwardsMotion();
@@ -822,28 +824,28 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 //					net.minecraftforge.common.ForgeHooks.onLivingJump(this);
 //				}
 				
-				this.setAIMoveSpeed((float)this.getAttribute(Attributes.MOVEMENT_SPEED).getValue());
+				this.setSpeed((float)this.getAttribute(Attributes.MOVEMENT_SPEED).getValue());
 				super.travel(new Vector3d(strafe, move.y, forward));
 			}
 			else if (entitylivingbase instanceof PlayerEntity) {
-				this.setMotion(Vector3d.ZERO);
+				this.setDeltaMovement(Vector3d.ZERO);
 			}
 
-			this.prevLimbSwingAmount = this.limbSwingAmount;
-			double d1 = this.getPosX() - this.prevPosX;
-			double d0 = this.getPosZ() - this.prevPosZ;
+			this.animationSpeedOld = this.animationSpeed;
+			double d1 = this.getX() - this.xo;
+			double d0 = this.getZ() - this.zo;
 			float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 			if (f2 > 1.0F) {
 				f2 = 1.0F;
 			}
 
-			this.limbSwingAmount += (f2 - this.limbSwingAmount) * 0.4F;
-			this.limbSwing += this.limbSwingAmount;
+			this.animationSpeed += (f2 - this.animationSpeed) * 0.4F;
+			this.animationPosition += this.animationSpeed;
 		}
 		else
 		{
-			this.jumpMovementFactor = 0.02F;
+			this.flyingSpeed = 0.02F;
 			super.travel(move);
 		}
 	}
@@ -857,42 +859,42 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public boolean isPushedByWater() {
+	public boolean isPushedByFluid() {
 		if (this.hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
 			return false;
 		}
-		return super.isPushedByWater();
+		return super.isPushedByFluid();
 	}
 	
 	protected void checkAndHandleLava() {
 		if (this.hasWolfCapability(WolfTypeCapability.LAVA_WALK) && super.isInLava()) {
 			// Copied from Strider
-			ISelectionContext iselectioncontext = ISelectionContext.forEntity(this);
-			if (iselectioncontext.func_216378_a(FlowingFluidBlock.LAVA_COLLISION_SHAPE, this.getPosition(), true) && !this.world.getFluidState(this.getPosition().up()).isTagged(FluidTags.LAVA)) {
+			ISelectionContext iselectioncontext = ISelectionContext.of(this);
+			if (iselectioncontext.isAbove(FlowingFluidBlock.STABLE_SHAPE, this.blockPosition(), true) && !this.level.getFluidState(this.blockPosition().above()).is(FluidTags.LAVA)) {
 				this.onGround = true;
 			} else {
-				this.setMotion(this.getMotion().scale(0.5D).add(0.0D, 0.05D, 0.0D));
+				this.setDeltaMovement(this.getDeltaMovement().scale(0.5D).add(0.0D, 0.05D, 0.0D));
 			}
 		}
 	}
 	
 	@Override
-	public boolean func_230285_a_(Fluid fluid) {
+	public boolean canStandOnFluid(Fluid fluid) {
 		// Copied from Strider
 		if (this.hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
-			return fluid.isIn(FluidTags.LAVA);
+			return fluid.is(FluidTags.LAVA);
 		}
 		
-		return super.func_230285_a_(fluid);
+		return super.canStandOnFluid(fluid);
 	}
 	
 	@Override
-	public boolean isBreedingItem(@Nonnull ItemStack stack) {
+	public boolean isFood(@Nonnull ItemStack stack) {
 		return false;
 	}
 	
 	@Override
-	public boolean canMateWith(AnimalEntity otherAnimal) {
+	public boolean canMate(AnimalEntity otherAnimal) {
 		return false;
 	}
 	
@@ -902,7 +904,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public float getTailRotation() {
+	public float getTailAngle() {
 		return (float) (Math.PI * (.35f + .2f * (this.getHealth() / this.getMaxHealth())));
 	}
 	
@@ -920,15 +922,15 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public ActionResultType /*processInteract*/ func_230254_b_(PlayerEntity player, Hand hand) {
+	public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand) {
 		// Shift-right click toggles sitting.
 		// When not sitting, right-click mounts the wolf
 		// When sitting, will eventually open a GUI
-		final @Nonnull ItemStack stack = player.getHeldItem(hand);
-		if (this.isTamed() && player == this.getOwner()) {
-			if (player.isSneaking()) {
-				if (!this.world.isRemote) {
-					this.setSitting(!this.isSitting());
+		final @Nonnull ItemStack stack = player.getItemInHand(hand);
+		if (this.isTame() && player == this.getOwner()) {
+			if (player.isShiftKeyDown()) {
+				if (!this.level.isClientSide) {
+					this.setSitting(!this.isOrderedToSit());
 					if (player.isCreative()) {
 						this.setBond(1f);
 						this.addTrainingXP(500);
@@ -936,31 +938,31 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 				}
 				return ActionResultType.SUCCESS;
 			} else if (this.getHealth() < this.getMaxHealth() && isHungerItem(stack)) {
-				if (!this.world.isRemote) {
+				if (!this.level.isClientSide) {
 					this.heal(5f);
 					this.addBond(.2f);
 					
 					if (!player.isCreative()) {
-						player.getHeldItem(hand).shrink(1);
+						player.getItemInHand(hand).shrink(1);
 					}
 				}
 				return ActionResultType.SUCCESS;
-			} else if (this.isSitting() && stack.isEmpty()) {
-				if (!this.world.isRemote) {
+			} else if (this.isOrderedToSit() && stack.isEmpty()) {
+				if (!this.level.isClientSide) {
 					//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.getPosX(), (int) this.getPosY(), (int) this.getPosZ());
 					PetCommandAPI.OpenPetGUI(player, this);
 				}
 				return ActionResultType.SUCCESS;
 			} else if (stack.isEmpty()) {
-				if (!this.world.isRemote) {
+				if (!this.level.isClientSide) {
 					if (this.hasWolfCapability(WolfBondCapability.RIDEABLE)) {
 						if (this.getHealth() < ARCANE_WOLF_WARN_HEALTH) {
-							player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.low_health", this.getName()), Util.DUMMY_UUID);
+							player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.low_health", this.getName()), Util.NIL_UUID);
 						} else {
 							player.startRiding(this);
 						}
 					} else {
-						player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.no_ride", this.getName()), Util.DUMMY_UUID);
+						player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.no_ride", this.getName()), Util.NIL_UUID);
 					}
 				}
 				return ActionResultType.SUCCESS;
@@ -968,15 +970,15 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 			else {
 				; // fall through; we didn't handle it
 			}
-		} else if (!this.isTamed() && player.isCreative() && hand == Hand.MAIN_HAND && player.isSneaking()) {
-			if (!world.isRemote) {
-				this.setTamedBy(player);
+		} else if (!this.isTame() && player.isCreative() && hand == Hand.MAIN_HAND && player.isShiftKeyDown()) {
+			if (!level.isClientSide) {
+				this.tame(player);
 			}
 			return ActionResultType.SUCCESS;
 		} else {
 			// Someone other than the owner clicked
-			if (!this.world.isRemote) {
-				player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.not_yours", this.getName()), Util.DUMMY_UUID);
+			if (!this.level.isClientSide) {
+				player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.not_yours", this.getName()), Util.NIL_UUID);
 			}
 			return ActionResultType.SUCCESS;
 		}
@@ -990,60 +992,60 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public boolean canBeSteered() {
+	public boolean canBeControlledByRider() {
 		Entity entity = this.getControllingPassenger();
 		return entity instanceof LivingEntity;
 	}
 	
 	@Override
-	public double getMountedYOffset() {
+	public double getPassengersRidingOffset() {
 		// Dragons go from 60% to 100% height.
 		// This is synced with the rendering code.
-		return (this.getHeight() * 0.6D) - ((0.4f * this.getHeight()) * (1f-getGrowingAge()));
+		return (this.getBbHeight() * 0.6D) - ((0.4f * this.getBbHeight()) * (1f-getAge()));
 	}
 	
 	@Override
-	protected float getJumpUpwardsMotion() {
-		return super.getJumpUpwardsMotion() + getBonusJumpHeight();
+	protected float getJumpPower() {
+		return super.getJumpPower() + getBonusJumpHeight();
 	}
 	
 	@Override
-	protected void jump() {
-		super.jump();
+	protected void jumpFromGround() {
+		super.jumpFromGround();
 	}
 	
 	@Override
-	 public boolean canBeLeashedTo(PlayerEntity player) {
-		return !isSitting() && player == getOwner();
+	 public boolean canBeLeashed(PlayerEntity player) {
+		return !isOrderedToSit() && player == getOwner();
 	}
 	
 	public boolean isSoulBound() {
-		return this.dataManager.get(SOULBOUND);
+		return this.entityData.get(SOULBOUND);
 	}
 	
 	public void setSoulBound(boolean soulBound) {
-		this.dataManager.set(SOULBOUND, soulBound);
+		this.entityData.set(SOULBOUND, soulBound);
 	}
 	
 	@Override
-	public void func_233687_w_(boolean sitting) { // SetSitting
-		super.func_233687_w_(sitting); // SetSitting
+	public void setOrderedToSit(boolean sitting) { // SetSitting
+		super.setOrderedToSit(sitting); // SetSitting
 	}
 	
 	public void setSitting(boolean sitting) {
-		func_233687_w_(sitting);
-		this.setSleeping(sitting);
+		setOrderedToSit(sitting);
+		this.setInSittingPose(sitting);
 		if (sitting) {
 			setPetAction(PetAction.SITTING);
 		}
 	}
 	
 	public int getLevel() {
-		return this.dataManager.get(ATTRIBUTE_LEVEL);
+		return this.entityData.get(ATTRIBUTE_LEVEL);
 	}
 	
 	protected void setLevel(int level) {
-		this.dataManager.set(ATTRIBUTE_LEVEL, Math.max(1, level));
+		this.entityData.set(ATTRIBUTE_LEVEL, Math.max(1, level));
 	}
 	
 	protected int getMaxXP(int level) {
@@ -1051,7 +1053,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 
 	public int getXP() {
-		return this.dataManager.get(ATTRIBUTE_XP);
+		return this.entityData.get(ATTRIBUTE_XP);
 	}
 
 	public int getMaxXP() {
@@ -1059,30 +1061,30 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 
 	public int getMana() {
-		return this.dataManager.get(MANA);
+		return this.entityData.get(MANA);
 	}
 	
 	protected void setMana(int mana) {
-		this.dataManager.set(MANA, Math.max(0, Math.min(mana, this.getMaxMana())));
+		this.entityData.set(MANA, Math.max(0, Math.min(mana, this.getMaxMana())));
 	}
 
 	public int getMaxMana() {
-		if (dataManager.get(MAX_MANA) <= 0) {
+		if (entityData.get(MAX_MANA) <= 0) {
 			this.setMaxMana(100);
 		}
-		return dataManager.get(MAX_MANA);
+		return entityData.get(MAX_MANA);
 	}
 	
 	protected void setMaxMana(int maxMana) {
-		this.dataManager.set(MAX_MANA, Math.max(0, maxMana));
+		this.entityData.set(MAX_MANA, Math.max(0, maxMana));
 	}
 	
 	public float getManaRegen() {
-		return dataManager.get(ATTRIBUTE_MANA_REGEN);
+		return entityData.get(ATTRIBUTE_MANA_REGEN);
 	}
 	
 	protected void setManaRegen(float regen) {
-		dataManager.set(ATTRIBUTE_MANA_REGEN, Math.max(1f, regen));
+		entityData.set(ATTRIBUTE_MANA_REGEN, Math.max(1f, regen));
 	}
 	
 	protected void addManaRegen(float diff) {
@@ -1093,11 +1095,11 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		if (this.isSoulBound()) {
 			return 1f;
 		}
-		return this.dataManager.get(ATTRIBUTE_BOND);
+		return this.entityData.get(ATTRIBUTE_BOND);
 	}
 	
 	protected void setBond(float bond) {
-		this.dataManager.set(ATTRIBUTE_BOND, bond);
+		this.entityData.set(ATTRIBUTE_BOND, bond);
 	}
 	
 	/**
@@ -1107,10 +1109,10 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	 * @param rate
 	 */
 	public void addBond(float rate) {
-		if (getRNG().nextBoolean() && getRNG().nextBoolean()) {
+		if (getRandom().nextBoolean() && getRandom().nextBoolean()) {
 			float amt = 0.025f;
 			float current = getBond();
-			float mod = rate * (1f + (getRNG().nextFloat() - 0.5f) * .5f); // 100% +- 25% of rate
+			float mod = rate * (1f + (getRandom().nextFloat() - 0.5f) * .5f); // 100% +- 25% of rate
 			
 			amt *= mod;
 			
@@ -1124,7 +1126,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	public void removeBond(float rate) {
 		float amt = -0.01f;
 		float current = getBond();
-		float mod = rate * (1f + (getRNG().nextFloat() - 0.5f) * .5f); // 100% +- 25% of rate
+		float mod = rate * (1f + (getRandom().nextFloat() - 0.5f) * .5f); // 100% +- 25% of rate
 		
 		amt *= mod;
 		
@@ -1158,7 +1160,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	 * @param xp
 	 */
 	protected void setXP(int xp) {
-		this.dataManager.set(ATTRIBUTE_XP, xp);
+		this.entityData.set(ATTRIBUTE_XP, xp);
 	}
 	
 	@Override
@@ -1186,27 +1188,27 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	public int getRuneColor() {
-		return dataManager.get(RUNE_COLOR);
+		return entityData.get(RUNE_COLOR);
 	}
 	
 	public void setRuneColor(int ARGB) {
-		dataManager.set(RUNE_COLOR, ARGB);
+		entityData.set(RUNE_COLOR, ARGB);
 	}
 	
 	public ArcaneWolfElementalType getElementalType() {
-		return dataManager.get(ELEMENTAL_TYPE);
+		return entityData.get(ELEMENTAL_TYPE);
 	}
 	
 	protected void setElementalType(ArcaneWolfElementalType type) {
-		this.dataManager.set(ELEMENTAL_TYPE, type);
+		this.entityData.set(ELEMENTAL_TYPE, type);
 	}
 	
 	public int getTrainingXP() {
-		return dataManager.get(TRAINING_XP);
+		return entityData.get(TRAINING_XP);
 	}
 	
 	protected void setTrainingXP(int xp) {
-		dataManager.set(TRAINING_XP, xp);
+		entityData.set(TRAINING_XP, xp);
 	}
 	
 	public void addTrainingXP(int xp) {
@@ -1251,7 +1253,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	public @Nullable EMagicElement getTrainingElement() {
-		final EMagicElement elem = dataManager.get(TRAINING_ELEMENT);
+		final EMagicElement elem = entityData.get(TRAINING_ELEMENT);
 		if (elem == EMagicElement.PHYSICAL) {
 			return null;
 		}
@@ -1262,7 +1264,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		if (element == null) {
 			element = EMagicElement.PHYSICAL;
 		}
-		dataManager.set(TRAINING_ELEMENT, element);
+		entityData.set(TRAINING_ELEMENT, element);
 	}
 	
 	public boolean startTraining(EMagicElement element) {
@@ -1277,19 +1279,19 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	public int getTrainingLevel() {
-		return dataManager.get(TRAINING_LEVEL);
+		return entityData.get(TRAINING_LEVEL);
 	}
 	
 	protected void setTrainingLevel(int level) {
-		dataManager.set(TRAINING_LEVEL, level);
+		entityData.set(TRAINING_LEVEL, level);
 	}
 	
 	public void setPetAction(PetAction action) {
-		dataManager.set(DATA_PET_ACTION, action);
+		entityData.set(DATA_PET_ACTION, action);
 	}
 
 	public PetAction getPetAction() {
-		return dataManager.get(DATA_PET_ACTION);
+		return entityData.get(DATA_PET_ACTION);
 	}
 	
 	@Override
@@ -1363,19 +1365,19 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	
 	protected IInventory ensureInventorySize() {
 		final int size = getInventorySize();
-		if (this.inventory == null || this.inventory.getSizeInventory() != size) {
+		if (this.inventory == null || this.inventory.getContainerSize() != size) {
 			IInventory old = this.inventory;
 			this.inventory = new Inventory(size);
 			
 			if (old != null) {
 				// Copy over what we can. Drop the rest
 				int i = 0;
-				for (; i < Math.min(old.getSizeInventory(), inventory.getSizeInventory()); i++) {
-					inventory.setInventorySlotContents(i, old.removeStackFromSlot(i));
+				for (; i < Math.min(old.getContainerSize(), inventory.getContainerSize()); i++) {
+					inventory.setItem(i, old.removeItemNoUpdate(i));
 				}
 				
-				for (; i < old.getSizeInventory(); i++) {
-					this.entityDropItem(old.getStackInSlot(i), .5f);
+				for (; i < old.getContainerSize(); i++) {
+					this.spawnAtLocation(old.getItem(i), .5f);
 				}
 			}
 		}
@@ -1383,7 +1385,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	public IInventory getInventory() {
-		if (world == null || world.isRemote) {
+		if (level == null || level.isClientSide) {
 			ensureInventorySize(); // Client doesn't read NBT normally and will have wrong size
 		}
 		return inventory;
@@ -1397,18 +1399,18 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		
 		if (this.jumpCount < 1 + this.getBonusJumps()) {
 			this.jumpCount++;
-			this.jump();
+			this.jumpFromGround();
 		}
 	}
 	
 	@Override
-	public boolean onLivingFall(float distance, float damageMulti) {
+	public boolean causeFallDamage(float distance, float damageMulti) {
 		this.jumpCount = 0;
-		return super.onLivingFall(Math.max(0, distance-this.getFallReduction()), damageMulti);
+		return super.causeFallDamage(Math.max(0, distance-this.getFallReduction()), damageMulti);
 	}
 	
-	public void writeAdditional(CompoundNBT compound) {
-		super.writeAdditional(compound);
+	public void addAdditionalSaveData(CompoundNBT compound) {
+		super.addAdditionalSaveData(compound);
 		
 		compound.putBoolean(NBT_SOUL_BOUND, this.isSoulBound());
 		compound.putInt(NBT_ATTR_XP, this.getXP());
@@ -1418,9 +1420,9 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		// Ignore max health; already saved
 		compound.putInt(NBT_MANA, this.getMana());
 		compound.putInt(NBT_MAX_MANA, this.getMaxMana());
-		compound.putUniqueId(NBT_SOUL_ID, soulID);
+		compound.putUUID(NBT_SOUL_ID, soulID);
 		if (worldID != null) {
-			compound.putUniqueId(NBT_SOUL_WORLDID, worldID);
+			compound.putUUID(NBT_SOUL_WORLDID, worldID);
 		}
 		compound.putInt(NBT_RUNE_COLOR, this.getRuneColor());
 		if (this.getTrainingElement() != null) {
@@ -1434,8 +1436,8 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public void readAdditional(CompoundNBT compound) {
-		super.readAdditional(compound);
+	public void readAdditionalSaveData(CompoundNBT compound) {
+		super.readAdditionalSaveData(compound);
 		
 		this.setSoulBound(compound.getBoolean(NBT_SOUL_BOUND));
 		this.setXP(compound.getInt(NBT_ATTR_XP));
@@ -1447,12 +1449,12 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		this.setMana(compound.getInt(NBT_MANA));
 		
 		// Summon command passes empty NBT to parse. Don't overwrite random UUID if not present.
-		if (compound.hasUniqueId(NBT_SOUL_ID)) {
-			this.soulID = compound.getUniqueId(NBT_SOUL_ID);
+		if (compound.hasUUID(NBT_SOUL_ID)) {
+			this.soulID = compound.getUUID(NBT_SOUL_ID);
 		}
 		
-		if (compound.hasUniqueId(NBT_SOUL_WORLDID)) {
-			this.worldID = compound.getUniqueId(NBT_SOUL_WORLDID);
+		if (compound.hasUUID(NBT_SOUL_WORLDID)) {
+			this.worldID = compound.getUUID(NBT_SOUL_WORLDID);
 		} else {
 			this.worldID = null;
 		}
@@ -1481,7 +1483,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	
 	@Override
 	public Team getTeam() {
-		if (this.isTamed()) {
+		if (this.isTame()) {
 			LivingEntity entitylivingbase = this.getOwner();
 
 			if (entitylivingbase != null) {
@@ -1496,8 +1498,8 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	 * Returns whether this Entity is on the same team as the given Entity.
 	 */
 	@Override
-	public boolean isOnSameTeam(Entity entityIn) {
-		if (this.isTamed()) {
+	public boolean isAlliedTo(Entity entityIn) {
+		if (this.isTame()) {
 			LivingEntity myOwner = this.getOwner();
 
 			if (entityIn == myOwner) {
@@ -1510,21 +1512,21 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 					return true;
 				}
 				
-				return myOwner.isOnSameTeam(entityIn);
+				return myOwner.isAlliedTo(entityIn);
 			}
 		}
 
-		return super.isOnSameTeam(entityIn);
+		return super.isAlliedTo(entityIn);
 	}
 	
-	protected void dropInventory() {
-		if (!this.world.isRemote) {
+	protected void dropEquipment() {
+		if (!this.level.isClientSide) {
 			if (this.inventory != null) {
-				for (int i = 0; i < inventory.getSizeInventory(); i++) {
-					ItemStack stack = inventory.getStackInSlot(i);
+				for (int i = 0; i < inventory.getContainerSize(); i++) {
+					ItemStack stack = inventory.getItem(i);
 					if (!stack.isEmpty()) {
-						ItemEntity item = new ItemEntity(this.world, this.getPosX(), this.getPosY(), this.getPosZ(), stack);
-						this.world.addEntity(item);
+						ItemEntity item = new ItemEntity(this.level, this.getX(), this.getY(), this.getZ(), stack);
+						this.level.addFreshEntity(item);
 					}
 				}
 			}
@@ -1537,53 +1539,53 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 //				}
 //			}
 //			equipment.clear();
-			inventory.clear();
+			inventory.clearContent();
 		}
 	}
 	
 	@Override
-	public void onDeath(DamageSource cause) {
+	public void die(DamageSource cause) {
 		// dropInventory(); called by vanilla now
 
-		super.onDeath(cause);
+		super.die(cause);
 	}
 	
 	@Override
-	public boolean canDespawn(double distanceToClosestPlayer) {
+	public boolean removeWhenFarAway(double distanceToClosestPlayer) {
 		return false;
 	}
 	
 	@Override
-	public boolean hitByEntity(Entity entityIn) {
-		if (this.isRidingSameEntity(entityIn)) {
+	public boolean skipAttackInteraction(Entity entityIn) {
+		if (this.isPassengerOfSameVehicle(entityIn)) {
 			return true;
 		}
 		
-		return super.hitByEntity(entityIn);
+		return super.skipAttackInteraction(entityIn);
 	}
 	
 	@Override
-	public boolean attackEntityFrom(DamageSource source, float amount) {
-		boolean hurt = super.attackEntityFrom(source, amount);
+	public boolean hurt(DamageSource source, float amount) {
+		boolean hurt = super.hurt(source, amount);
 		
-		if (hurt && source.getTrueSource() != null) {
-			if (this.isRidingSameEntity(source.getTrueSource())) {
+		if (hurt && source.getEntity() != null) {
+			if (this.isPassengerOfSameVehicle(source.getEntity())) {
 				hurt = false;
 			}
 		}
 		
-		if (hurt && this.isTamed()) {
+		if (hurt && this.isTame()) {
 			LivingEntity owner = this.getOwner();
 			float health = this.getHealth();
 			if (health > 0f && health < ARCANE_WOLF_WARN_HEALTH) {
 				if (owner != null && owner instanceof PlayerEntity) {
-					((PlayerEntity) this.getOwner()).sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.hurt", this.getName()), Util.DUMMY_UUID);
+					((PlayerEntity) this.getOwner()).sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.hurt", this.getName()), Util.NIL_UUID);
 				}
 				this.stopRiding();
 			} else if (health > 0f) {
-				if (source.getTrueSource() == owner) {
+				if (source.getEntity() == owner) {
 					// Hurt by the owner!
-					if (this.getRNG().nextBoolean()) {
+					if (this.getRandom().nextBoolean()) {
 						// Remove bond!
 						this.removeBond(0.75f);
 					}
@@ -1595,18 +1597,18 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public boolean attackEntityAsMob(Entity entityIn) {
-		boolean hit = super.attackEntityAsMob(entityIn);
+	public boolean doHurtTarget(Entity entityIn) {
+		boolean hit = super.doHurtTarget(entityIn);
 		
-		if (hit && !world.isRemote) {
+		if (hit && !level.isClientSide) {
 			LivingEntity owner = this.getOwner();
 			if (owner != null) {
-				final double dist = owner.getDistance(owner);
+				final double dist = owner.distanceTo(owner);
 				if (dist <= 10) {
 					this.addBond(dist < 4 ? .5f : .2f);
 				}
 			}
-			if (rand.nextBoolean() && rand.nextBoolean()) {
+			if (random.nextBoolean() && random.nextBoolean()) {
 				this.addXP(1);
 			}
 		}
@@ -1631,17 +1633,17 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	@Override
 	public boolean onSoulStab(LivingEntity stabber, ItemStack stabbingItem) {
 		
-		if (this.isOwner(stabber) && !isSoulBound() && this.getBond() >= 1f) {
+		if (this.isOwnedBy(stabber) && !isSoulBound() && this.getBond() >= 1f) {
 			// Die and scream and drop a soul ember
 			this.setSoulBound(true);
 			
 			// Drop inventory before snapshotting
-			dropInventory();
+			dropEquipment();
 			
 			final ItemStack stack = ArcaneWolfSoulItem.MakeSoulItem(this, true);
 			if (!stack.isEmpty()) {
-				this.entityDropItem(stack, 1f);
-				this.attackEntityFrom(DamageSource.GENERIC, 1000000f);
+				this.spawnAtLocation(stack, 1f);
+				this.hurt(DamageSource.GENERIC, 1000000f);
 			}
 			
 			// Award lore about soul bonding
@@ -1658,7 +1660,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	public void levelup() {
 		int level = this.getLevel();
 		
-		Random rand = getRNG();
+		Random rand = getRandom();
 		float roll;
 		
 //		// Jump height:
@@ -1739,8 +1741,8 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		
 		LivingEntity owner = this.getOwner();
 		if (owner != null) {
-			this.playSound(SoundEvents.ENTITY_WOLF_AMBIENT, 1f, 1f);
-			owner.sendMessage(new StringTextComponent(this.getName().getString() + " leveled up!"), Util.DUMMY_UUID);
+			this.playSound(SoundEvents.WOLF_AMBIENT, 1f, 1f);
+			owner.sendMessage(new StringTextComponent(this.getName().getString() + " leveled up!"), Util.NIL_UUID);
 		}
 	}
 	
@@ -1773,10 +1775,10 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	protected void playTrainingLevelUp(EMagicElement element) {
-		if (!this.world.isRemote) {
-			this.playSound(SoundEvents.ENTITY_WOLF_PANT, 1f, 1f);
-			NostrumParticles.GLOW_ORB.spawn(this.world, new SpawnParams(
-					50, this.getPosX(), this.getPosY(), this.getPosZ(), 3.0, 30, 10, this.getEntityId()
+		if (!this.level.isClientSide) {
+			this.playSound(SoundEvents.WOLF_PANT, 1f, 1f);
+			NostrumParticles.GLOW_ORB.spawn(this.level, new SpawnParams(
+					50, this.getX(), this.getY(), this.getZ(), 3.0, 30, 10, this.getId()
 					).color(element.getColor()).dieOnTarget(true));
 		}
 	}
@@ -1796,10 +1798,10 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	protected void playTrainingFinishEffects(EMagicElement element) {
-		if (!world.isRemote) {
-			this.playSound(SoundEvents.ENTITY_WOLF_HOWL, 1f, 1f);
-			NostrumParticles.FILLED_ORB.spawn(this.world, new SpawnParams(
-					100, this.getPosX(), this.getPosY(), this.getPosZ(), 3.0, 60, 20, this.getEntityId()
+		if (!level.isClientSide) {
+			this.playSound(SoundEvents.WOLF_HOWL, 1f, 1f);
+			NostrumParticles.FILLED_ORB.spawn(this.level, new SpawnParams(
+					100, this.getX(), this.getY(), this.getZ(), 3.0, 60, 20, this.getId()
 					).color(element.getColor()));
 		}
 	}
@@ -1813,7 +1815,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 			// Earth upgrades inventory size!
 			ensureInventorySize(); // Auto resizes
 			// And adds armor
-			this.getAttribute(Attributes.ARMOR).applyPersistentModifier(new AttributeModifier(
+			this.getAttribute(Attributes.ARMOR).addPermanentModifier(new AttributeModifier(
 					UUID.fromString(UUID_EXTRA_ARMOR_MOD),
 					"ArcaneWolfEarthArmor",
 					5.0D,
@@ -1822,7 +1824,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		}
 		if (element == EMagicElement.LIGHTNING) {
 			// Lightning gives bonus magic resistance!
-			this.getAttribute(NostrumAttributes.magicResist).applyPersistentModifier(new AttributeModifier(
+			this.getAttribute(NostrumAttributes.magicResist).addPermanentModifier(new AttributeModifier(
 					UUID.fromString(UUID_MAGIC_RESIST_MOD),
 					"ArcaneWolfLightningResist",
 					30.0D,
@@ -2054,12 +2056,12 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	public static ArcaneWolfEntity TransformWolf(WolfEntity wolf, PlayerEntity player) {
-		ArcaneWolfEntity newWolf = new ArcaneWolfEntity(NostrumEntityTypes.arcaneWolf, wolf.world);
-		newWolf.setPosition(wolf.getPosX(), wolf.getPosY(), wolf.getPosZ());
-		newWolf.setTamedBy(player);
+		ArcaneWolfEntity newWolf = new ArcaneWolfEntity(NostrumEntityTypes.arcaneWolf, wolf.level);
+		newWolf.setPos(wolf.getX(), wolf.getY(), wolf.getZ());
+		newWolf.tame(player);
 		newWolf.setHealth(5f);
 		wolf.remove();
-		wolf.world.addEntity(newWolf);
+		wolf.level.addFreshEntity(newWolf);
 		return newWolf;
 	}
 	
@@ -2108,12 +2110,12 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 
 	@Override
 	public boolean isEntityTamed() {
-		return this.isTamed();
+		return this.isTame();
 	}
 
 	@Override
 	public boolean isEntitySitting() {
-		return this.isSitting();
+		return this.isOrderedToSit();
 	}
 
 	@Override
@@ -2123,7 +2125,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 
 	@Override
 	public UUID getPetID() {
-		return this.getUniqueID();
+		return this.getUUID();
 	}
 
 	@Override

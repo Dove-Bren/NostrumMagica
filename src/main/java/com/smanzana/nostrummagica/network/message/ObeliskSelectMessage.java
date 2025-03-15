@@ -23,7 +23,7 @@ public class ObeliskSelectMessage {
 		ctx.get().setPacketHandled(true);
 		ServerPlayerEntity player = ctx.get().getSender();
 		ctx.get().enqueueWork(() -> {
-			TileEntity te = player.world.getTileEntity(message.pos);
+			TileEntity te = player.level.getBlockEntity(message.pos);
 			if (te != null && te instanceof ObeliskTileEntity) {
 				((ObeliskTileEntity) te).setTargetIndex(message.index);
 			}

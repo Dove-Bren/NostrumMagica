@@ -74,10 +74,10 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 			} else {
 				this.setHitCount(origHitCount+1);
 			}
-			final Vector3d pos = Vector3d.copy(this.getPos()).add(getEntityOffset());
-			final float yOffset = (this.getTriggerEntity() == null ? 0 : this.getTriggerEntity().getHeight()/2f);
-			this.getWorld().playSound(null, pos.getX(), pos.getY() + yOffset, pos.getZ(), SoundEvents.ENTITY_ENDER_DRAGON_HURT, SoundCategory.BLOCKS, 1f, 1f);
-			NostrumParticles.FILLED_ORB.spawn(this.getWorld(), new SpawnParams(30, pos.getX(), pos.getY() + yOffset, pos.getZ(), .3,
+			final Vector3d pos = Vector3d.atLowerCornerOf(this.getBlockPos()).add(getEntityOffset());
+			final float yOffset = (this.getTriggerEntity() == null ? 0 : this.getTriggerEntity().getBbHeight()/2f);
+			this.getLevel().playSound(null, pos.x(), pos.y() + yOffset, pos.z(), SoundEvents.ENDER_DRAGON_HURT, SoundCategory.BLOCKS, 1f, 1f);
+			NostrumParticles.FILLED_ORB.spawn(this.getLevel(), new SpawnParams(30, pos.x(), pos.y() + yOffset, pos.z(), .3,
 					40, 20, new Vector3d(0, .1, 0), new Vector3d(.1, .05, .1)).gravity(true).color(getParticleColor()));
 		}
 	}
@@ -90,8 +90,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.putInt(NBT_HITS, this.getHitCount());
 		
@@ -99,22 +99,22 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		this.hitCount = nbt.getInt(NBT_HITS);
 	}
 	
 	protected static void DoEffect(BlockPos shrinePos, LivingEntity entity, int color) {
-		if (entity.world.isRemote) {
+		if (entity.level.isClientSide) {
 			return;
 		}
 		
 		NostrumMagicaSounds.LEVELUP.play(entity);
-		NostrumParticles.FILLED_ORB.spawn(entity.world, new SpawnParams(
+		NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
 			50,
 			shrinePos.getX() + .5, shrinePos.getY() + 1.75, shrinePos.getZ() + .5, 1, 40, 10,
-			entity.getEntityId()
+			entity.getId()
 			).color(color));
 	}
 	
@@ -139,8 +139,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT nbt) {
-			nbt = super.write(nbt);
+		public CompoundNBT save(CompoundNBT nbt) {
+			nbt = super.save(nbt);
 			
 			nbt.put(NBT_ELEMENT, element.toNBT());
 			
@@ -148,8 +148,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public void read(BlockState state, CompoundNBT nbt) {
-			super.read(state, nbt);
+		public void load(BlockState state, CompoundNBT nbt) {
+			super.load(state, nbt);
 			
 			if (nbt.contains(NBT_ELEMENT)) {
 				this.element = EMagicElement.FromNBT(nbt.get(NBT_ELEMENT));
@@ -159,7 +159,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		@Override
 		protected ShrineTriggerEntity.Element makeTriggerEntity(World world, double x, double y, double z) {
 			ShrineTriggerEntity.Element ent = new ShrineTriggerEntity.Element(NostrumEntityTypes.elementShrine, world);
-			ent.setPosition(x, y, z);
+			ent.setPos(x, y, z);
 			return ent;
 		}
 
@@ -176,10 +176,10 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 					&& attr.setElementalMastery(element, EElementalMastery.NOVICE)) {
 				// Just learned!
 				final int color = 0x80000000 | (0x00FFFFFF & element.getColor());
-				DoEffect(pos, player, color);
+				DoEffect(worldPosition, player, color);
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
 			} else {
-				player.sendMessage(new TranslationTextComponent("info.shrine.seektrial"), Util.DUMMY_UUID);
+				player.sendMessage(new TranslationTextComponent("info.shrine.seektrial"), Util.NIL_UUID);
 			}
 		}
 
@@ -215,8 +215,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT nbt) {
-			nbt = super.write(nbt);
+		public CompoundNBT save(CompoundNBT nbt) {
+			nbt = super.save(nbt);
 			
 			nbt.put(NBT_ALTERATION, alteration.toNBT());
 			
@@ -224,8 +224,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public void read(BlockState state, CompoundNBT nbt) {
-			super.read(state, nbt);
+		public void load(BlockState state, CompoundNBT nbt) {
+			super.load(state, nbt);
 			
 			if (nbt.contains(NBT_ALTERATION)) {
 				this.alteration = EAlteration.FromNBT(nbt.get(NBT_ALTERATION));
@@ -235,7 +235,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		@Override
 		protected ShrineTriggerEntity.Alteration makeTriggerEntity(World world, double x, double y, double z) {
 			ShrineTriggerEntity.Alteration ent = new ShrineTriggerEntity.Alteration(NostrumEntityTypes.alterationShrine, world);
-			ent.setPosition(x, y, z);
+			ent.setPos(x, y, z);
 			return ent;
 		}
 
@@ -249,8 +249,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 			
 			if (!attr.getAlterations().getOrDefault(alteration, false)) {
 				attr.unlockAlteration(alteration);
-				DoEffect(pos, player, 0x80808ABF);
-				player.sendMessage(new TranslationTextComponent("info.shrine.alteration", alteration.getName()), Util.DUMMY_UUID);
+				DoEffect(worldPosition, player, 0x80808ABF);
+				player.sendMessage(new TranslationTextComponent("info.shrine.alteration", alteration.getName()), Util.NIL_UUID);
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
 			}
 		}
@@ -290,8 +290,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT nbt) {
-			nbt = super.write(nbt);
+		public CompoundNBT save(CompoundNBT nbt) {
+			nbt = super.save(nbt);
 			
 			if (getShape() != null) {
 				nbt.putString(NBT_SHAPE, getShape().getShapeKey());
@@ -301,8 +301,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public void read(BlockState state, CompoundNBT nbt) {
-			super.read(state, nbt);
+		public void load(BlockState state, CompoundNBT nbt) {
+			super.load(state, nbt);
 			
 			if (nbt.contains(NBT_SHAPE)) {
 				this.shape = SpellShape.get(nbt.getString(NBT_SHAPE));
@@ -312,7 +312,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		@Override
 		protected ShrineTriggerEntity.Shape makeTriggerEntity(World world, double x, double y, double z) {
 			ShrineTriggerEntity.Shape ent = new ShrineTriggerEntity.Shape(NostrumEntityTypes.shapeShrine, world);
-			ent.setPosition(x, y, z);
+			ent.setPos(x, y, z);
 			return ent;
 		}
 
@@ -326,8 +326,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 			
 			if (!attr.getShapes().contains(shape)) {
 				attr.addShape(shape);
-				DoEffect(pos, player, 0x8080C0A0);
-				player.sendMessage(new TranslationTextComponent("info.shrine.shape", new Object[] {shape.getDisplayName()}), Util.DUMMY_UUID);
+				DoEffect(worldPosition, player, 0x8080C0A0);
+				player.sendMessage(new TranslationTextComponent("info.shrine.shape", new Object[] {shape.getDisplayName()}), Util.NIL_UUID);
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
 			}
 		}
@@ -364,8 +364,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public CompoundNBT write(CompoundNBT nbt) {
-			nbt = super.write(nbt);
+		public CompoundNBT save(CompoundNBT nbt) {
+			nbt = super.save(nbt);
 			
 			nbt.put(NBT_TIER, getTier().toNBT());
 			
@@ -373,15 +373,15 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public void read(BlockState state, CompoundNBT nbt) {
-			super.read(state, nbt);
+		public void load(BlockState state, CompoundNBT nbt) {
+			super.load(state, nbt);
 			this.tier = EMagicTier.FromNBT(nbt.get(NBT_TIER));
 		}
 
 		@Override
 		protected ShrineTriggerEntity.Tier makeTriggerEntity(World world, double x, double y, double z) {
 			ShrineTriggerEntity.Tier ent = new ShrineTriggerEntity.Tier(NostrumEntityTypes.tierShrine, world);
-			ent.setPosition(x, y, z);
+			ent.setPos(x, y, z);
 			return ent;
 		}
 
@@ -395,8 +395,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 			
 			if (!attr.getTier().isGreaterOrEqual(tier)) {
 				attr.setTier(tier);
-				DoEffect(pos, player, 0x80666666);
-				player.sendMessage(new TranslationTextComponent("info.shrine.tier", tier.getName()), Util.DUMMY_UUID);
+				DoEffect(worldPosition, player, 0x80666666);
+				player.sendMessage(new TranslationTextComponent("info.shrine.tier", tier.getName()), Util.NIL_UUID);
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
 			}
 		}

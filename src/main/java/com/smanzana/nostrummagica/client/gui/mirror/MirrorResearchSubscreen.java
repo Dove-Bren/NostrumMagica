@@ -197,7 +197,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	public void drawBackground(IMirrorScreen parent, MatrixStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
 		float extra = .1f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
 		float inv = .1f - extra;
-		Minecraft.getInstance().getTextureManager().bindTexture(RES_BACK);
+		Minecraft.getInstance().getTextureManager().bind(RES_BACK);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 0, 0, TEX_BACK_WIDTH, TEX_BACK_HEIGHT, width, height, TEX_BACK_WIDTH, TEX_BACK_HEIGHT,
 				.9f + extra, 1f, .8f + inv, 1f);
 	}
@@ -205,9 +205,9 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	@Override
 	public void drawForeground(IMirrorScreen parent, MatrixStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
 		final Minecraft mc = Minecraft.getInstance();
-		final FontRenderer font = mc.fontRenderer;
+		final FontRenderer font = mc.font;
 		
-		matrixStackIn.push();
+		matrixStackIn.pushPose();
 		matrixStackIn.translate(width/2, 20, 0);
 		RenderFuncs.drawGradientRect(matrixStackIn, -40, 0, 40, 20,
 				0xFF000000, 0xFF000000,
@@ -215,13 +215,13 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		
 		matrixStackIn.translate(0, 4, 0);
 		String str = "Points: " + attr.getResearchPoints();
-		int strWidth = font.getStringWidth(str);
-		matrixStackIn.push();
+		int strWidth = font.width(str);
+		matrixStackIn.pushPose();
 		matrixStackIn.scale(.75f, .75f, 1f);
-		font.drawString(matrixStackIn, str, -strWidth/2, 0, 0xFFFFFFFF);
-		matrixStackIn.pop();
+		font.draw(matrixStackIn, str, -strWidth/2, 0, 0xFFFFFFFF);
+		matrixStackIn.popPose();
 		
-		matrixStackIn.translate(0, font.FONT_HEIGHT, 0);
+		matrixStackIn.translate(0, font.lineHeight, 0);
 		
 		{
 			final int actKnowledge = NostrumMagic.getKnowledge(attr); 
@@ -237,7 +237,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			RenderFuncs.drawRect(matrixStackIn, - (barWidth/2) + 1, 0 + 1, - (barWidth/2) + 1 + x, 1 + barHeight, 0xFFFFFF00);
 		}
 		
-		matrixStackIn.pop();
+		matrixStackIn.popPose();
 		
 //		width = 200;
 //		int knowledgeHeight = 4;
@@ -297,7 +297,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 				new ClientPurchaseResearchMessage(research)	
 				);
 		} else if (state == ResearchState.COMPLETED) {
-			String info = I18n.format(research.getInfoKey(), new Object[0]);
+			String info = I18n.get(research.getInfoKey(), new Object[0]);
 			List<IBookPage> pages = new LinkedList<>();
 			BookScreen.makePagesFrom(pages, info);
 			
@@ -310,7 +310,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 				// translate display names
 				String[] displaysFixed = new String[displays.length];
 				for (int i = 0; i < displays.length; i++) {
-					displaysFixed[i] = I18n.format(displays[i], new Object[0]);
+					displaysFixed[i] = I18n.get(displays[i], new Object[0]);
 				}
 				pages.add(new ReferencePage(displaysFixed, references, false));
 			}
@@ -390,8 +390,8 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			
 			float alpha = (float) (this.animStartMS == 0 ? 1 : ((double)(System.currentTimeMillis() - animStartMS) / 500.0));
 			
-			matrixStackIn.push();
-			BufferBuilder buf = Tessellator.getInstance().getBuffer();
+			matrixStackIn.pushPose();
+			BufferBuilder buf = Tessellator.getInstance().getBuilder();
 	        RenderSystem.enableBlend();
 	        RenderSystem.disableColorLogicOp();
 	        RenderSystem.disableTexture();
@@ -419,9 +419,9 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        	}
 	        	
 	        	buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-		        buf.pos(child.x, child.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-		        buf.pos(parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-		        Tessellator.getInstance().draw();
+		        buf.vertex(child.x, child.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+		        buf.vertex(parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+		        Tessellator.getInstance().end();
 	        } else {
 		        boolean vertical;// = (Math.abs(diff.y) > Math.abs(diff.x));
 		        
@@ -456,18 +456,18 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        	}
 		        
 		        {
-		        	final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		        	final Matrix4f transform = matrixStackIn.last().pose();
 			        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-			        buf.pos(transform, child.x, child.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-			        buf.pos(transform, childTo.x, childTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-			        buf.pos(transform, parentTo.x, parentTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-			        buf.pos(transform, parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-			        Tessellator.getInstance().draw();
+			        buf.vertex(transform, child.x, child.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+			        buf.vertex(transform, childTo.x, childTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+			        buf.vertex(transform, parentTo.x, parentTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+			        buf.vertex(transform, parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+			        Tessellator.getInstance().end();
 		        }
 		        
 		        // Draw inside curve
 		        int points = 30;
-		        matrixStackIn.push();
+		        matrixStackIn.pushPose();
 		        matrixStackIn.translate(parentTo.x, parentTo.y, 0);
 		        float rotate = 0f;
 		        boolean flip = false;
@@ -488,39 +488,39 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		        		flip = (diff.x >= 0);
 		        	}
 		        }
-		        matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(rotate));
+		        matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(rotate));
 		        {
-		        	final Matrix4f transform = matrixStackIn.getLast().getMatrix();
+		        	final Matrix4f transform = matrixStackIn.last().pose();
 			        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
 			        for (int i = 0; i <= points; i++) {
 			        	float progress = (float) i / (float) points;
 			        	Vector2f point = Curves.alignedArc2D(progress, Vector2f.ZERO, radius, flip);
-			        	buf.pos(transform, point.x, point.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+			        	buf.vertex(transform, point.x, point.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
 			        }
-			        Tessellator.getInstance().draw();
+			        Tessellator.getInstance().end();
 		        }
-		        matrixStackIn.pop();
+		        matrixStackIn.popPose();
 	        }
 	        
 	        matrixStackIn.translate(child.x, child.y, .2);
 	        if (child.x < myCenter.x) {
 	        	// from left
-	        	matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(-90f));
+	        	matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(-90f));
 	        } else if (child.x > myCenter.x) {
 	        	// from right
-	        	matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(90f));
+	        	matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(90f));
 	        } else if (child.y > myCenter.y) {
 	        	// from bottom
-	        	matrixStackIn.rotate(Vector3f.ZP.rotationDegrees(180f));
+	        	matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(180f));
 	        }
 	        RenderSystem.enableTexture();
 			RenderSystem.enableBlend();
-			Minecraft.getInstance().getTextureManager().bindTexture(RES_ICONS);
+			Minecraft.getInstance().getTextureManager().bind(RES_ICONS);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, -(TEX_ARROW_WIDTH/2) - 1, -(TEX_ARROW_HEIGHT/2), TEX_ARROW_HOFFSET,
 					TEX_ARROW_VOFFSET, TEX_ARROW_WIDTH, TEX_ARROW_HEIGHT, 14, 7, TEX_UTILS_WIDTH,  TEX_UTILS_HEIGHT,
 					1f, 1f, 1f, alpha);
 			RenderSystem.enableDepthTest();
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		@Override
@@ -534,12 +534,12 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 				}
 				
 				RenderSystem.enableDepthTest();
-				matrixStackIn.push();
+				matrixStackIn.pushPose();
 				matrixStackIn.translate(0, 0, .1);
 				super.render(matrixStackIn, mouseX, mouseY, partialTicks);
 				matrixStackIn.translate(0, 0, -.1);
 				drawTreeLines(matrixStackIn, Minecraft.getInstance());
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 		}
 		
@@ -594,7 +594,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 				break;
 			}
 			
-			matrixStackIn.push();
+			matrixStackIn.pushPose();
 			float[] color = {1f, 1f, 1f, 1f};
 			switch (state) {
 			case COMPLETED:
@@ -610,34 +610,34 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			
 			RenderSystem.enableTexture();
 			RenderSystem.enableBlend();
-			Minecraft.getInstance().getTextureManager().bindTexture(RES_ICONS);
+			Minecraft.getInstance().getTextureManager().bind(RES_ICONS);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
 					textureY, textureW, textureH, this.width, this.height, TEX_UTILS_WIDTH, TEX_UTILS_HEIGHT,
 					color[0], color[1], color[2], color[3]);
 			
 			// Now draw icon
-			RenderHelper.enableStandardItemLighting();
+			RenderHelper.turnBackOn();
 			// RenderGuiItem moves 100 forward. Blocks render several z deep.
 			// Squish to 8 deep, and shift back
 			matrixStackIn.scale(1f, 1f, .4f);
 			matrixStackIn.translate(0, 0, -90);
 			RenderFuncs.RenderGUIItem(research.getIconItem(), matrixStackIn, x + (width - 16) / 2, y + (height - 16) / 2);
 			RenderSystem.enableDepthTest();
-			RenderHelper.disableStandardItemLighting();
+			RenderHelper.turnOff();
 			
-			matrixStackIn.pop();
+			matrixStackIn.popPose();
 		}
 		
 		@Override
 		public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
 			if (shouldShow() && this.visible && isHovered()) {
 				final Minecraft mc = Minecraft.getInstance();
-				final FontRenderer font = mc.fontRenderer;
-		        matrixStackIn.push();
+				final FontRenderer font = mc.font;
+		        matrixStackIn.pushPose();
 		        matrixStackIn.scale(fontScale, fontScale, 1f);
 		        matrixStackIn.translate((int) (mouseX / fontScale) - mouseX, (int) (mouseY / fontScale) - mouseY, 0);
 		        GuiUtils.drawHoveringText(matrixStackIn, tooltip, mouseX, mouseY, subscreen.width, subscreen.height, 400, font); // drawTooltip with array of text components
-				matrixStackIn.pop();
+				matrixStackIn.popPose();
 			}
 		}
 		
@@ -668,8 +668,8 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		
 		private List<ITextComponent> genTooltip() {
 			List<ITextComponent> tooltip = new LinkedList<>();
-			tooltip.add(new TranslationTextComponent(research.getNameKey(), new Object[0]).mergeStyle(TextFormatting.BLUE));
-			tooltip.add(new TranslationTextComponent(research.getDescKey(), new Object[0]).mergeStyle(TextFormatting.GRAY));
+			tooltip.add(new TranslationTextComponent(research.getNameKey(), new Object[0]).withStyle(TextFormatting.BLUE));
+			tooltip.add(new TranslationTextComponent(research.getDescKey(), new Object[0]).withStyle(TextFormatting.GRAY));
 			
 			TextFormatting bad = TextFormatting.RED;
 			boolean first = true;
@@ -685,7 +685,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 						}
 	        			for (ITextComponent line : req.getDescription(subscreen.player)) {
 	        				if (line instanceof TextComponent) {
-	        					tooltip.add(((TextComponent) line).mergeStyle(bad));
+	        					tooltip.add(((TextComponent) line).withStyle(bad));
 	        				} else {
 	        					tooltip.add(line);
 	        				}
@@ -696,13 +696,13 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			
 			if (this.state == ResearchState.INACTIVE && subscreen.attr.getResearchPoints() > 0 && NostrumMagica.canPurchaseResearch(subscreen.player, research)) {
 				tooltip.add(new StringTextComponent(" "));
-				tooltip.add(new TranslationTextComponent("info.research.purchase").mergeStyle(TextFormatting.GREEN));
+				tooltip.add(new TranslationTextComponent("info.research.purchase").withStyle(TextFormatting.GREEN));
 			} else if (this.state == ResearchState.COMPLETED) {
 				tooltip.add(new StringTextComponent(" "));
-				tooltip.add(new TranslationTextComponent("info.research.view").mergeStyle(TextFormatting.GREEN));
+				tooltip.add(new TranslationTextComponent("info.research.view").withStyle(TextFormatting.GREEN));
 			} else if (research.isPurchaseDisallowed()) {
 				tooltip.add(new StringTextComponent(" "));
-				tooltip.add(new TranslationTextComponent("info.research.disallowed").mergeStyle(TextFormatting.DARK_AQUA));
+				tooltip.add(new TranslationTextComponent("info.research.disallowed").withStyle(TextFormatting.DARK_AQUA));
 			}
 			
 			return tooltip;

@@ -29,20 +29,20 @@ public class MysticSnowLayerBlock extends Block {
 
 	public static final String ID = "mystic_snow_layer";
 	
-	private static final VoxelShape SHAPE = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D);
+	private static final VoxelShape SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2.0D, 16.0D);
 	private static final int DECAY_TICKS = 20 * 5;
 	
 	public MysticSnowLayerBlock() {
-		super(Block.Properties.create(Material.SNOW).hardnessAndResistance(0.1F).setRequiresTool().sound(SoundType.SNOW));
+		super(Block.Properties.of(Material.TOP_SNOW).strength(0.1F).requiresCorrectToolForDrops().sound(SoundType.SNOW));
 	}
 	
 	@Override
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
         return true;
     }
 	
 	@Override
-	public boolean isTransparent(BlockState state) {
+	public boolean useShapeForLightOcclusion(BlockState state) {
 		return true;
 	}
 	
@@ -57,21 +57,21 @@ public class MysticSnowLayerBlock extends Block {
     }
 	
 	@Override
-	public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
-		worldIn.getPendingBlockTicks().scheduleTick(pos, state.getBlock(), DECAY_TICKS);
+	public void onPlace(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
+		worldIn.getBlockTicks().scheduleTick(pos, state.getBlock(), DECAY_TICKS);
 	}
 	
 	@Override
-	public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
 		//worldIn.getPendingBlockTicks().scheduleTick(currentPos, state.getBlock(), DECAY_TICKS);
 		return state;
 	}
 	
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		final int blizzardPieces = ElementalArmor.GetSetCount(player, EMagicElement.ICE, ElementalArmor.Type.MASTER);
 		if (blizzardPieces == 4) {
-			player.addItemStackToInventory(new ItemStack(Items.SNOWBALL));
+			player.addItem(new ItemStack(Items.SNOWBALL));
 			worldIn.removeBlock(pos, false);
 			return ActionResultType.SUCCESS;
 		}

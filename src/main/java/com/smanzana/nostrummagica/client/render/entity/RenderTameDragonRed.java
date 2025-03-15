@@ -13,8 +13,8 @@ public class RenderTameDragonRed extends RenderDragonRed<TameRedDragonEntity> {
 	}
 	
 	@Override
-	protected void preRenderCallback(TameRedDragonEntity entityIn, MatrixStack matrixStackIn, float partialTicks) {
-		super.preRenderCallback(entityIn, matrixStackIn, partialTicks);
+	protected void scale(TameRedDragonEntity entityIn, MatrixStack matrixStackIn, float partialTicks) {
+		super.scale(entityIn, matrixStackIn, partialTicks);
 		
 		final float age = entityIn.getGrowingAge();
 		final float growthMod = .6f + .4f * age;

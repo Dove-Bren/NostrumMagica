@@ -19,7 +19,7 @@ public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
 	
 	protected void setTriggered(boolean triggered) {
 		this.triggered = triggered;
-		this.markDirty();
+		this.setChanged();
 	}
 	
 	@Override
@@ -28,8 +28,8 @@ public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
 	}
 	
 	@Override
-	public CompoundNBT write(CompoundNBT nbt) {
-		nbt = super.write(nbt);
+	public CompoundNBT save(CompoundNBT nbt) {
+		nbt = super.save(nbt);
 		
 		nbt.putBoolean(NBT_TRIGGERED, isTriggered());
 		
@@ -37,8 +37,8 @@ public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
 	}
 	
 	@Override
-	public void read(BlockState state, CompoundNBT nbt) {
-		super.read(state, nbt);
+	public void load(BlockState state, CompoundNBT nbt) {
+		super.load(state, nbt);
 		
 		this.triggered = nbt.getBoolean(NBT_TRIGGERED);
 	}
