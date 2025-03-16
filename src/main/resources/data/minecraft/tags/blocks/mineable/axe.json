@@ -1,0 +1,14 @@
+{
+	"replace": false,
+	"values": [
+		"nostrummagica:spelltable_advanced",
+		"nostrummagica:spelltable_basic",
+		"nostrummagica:lore_table",
+		"nostrummagica:spelltable_master",
+		"nostrummagica:modification_table",
+		"nostrummagica:spelltable_mystic",
+		"nostrummagica:rune_library",
+		"nostrummagica:rune_shaper",
+		"nostrummagica:tome_workshop"
+	]
+}

@@ -2,18 +2,17 @@ package com.smanzana.nostrummagica.block;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.common.ToolType;
 
 public class TomeWorkshopBlock extends Block {
 	
@@ -23,7 +22,6 @@ public class TomeWorkshopBlock extends Block {
 		super(Block.Properties.of(Material.WOOD)
 				.strength(2.0f, 10.0f)
 				.sound(SoundType.WOOD)
-				.harvestTool(ToolType.AXE)
 				);
 	}
 	

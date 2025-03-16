@@ -2,13 +2,12 @@ package com.smanzana.nostrummagica.block;
 
 import java.util.Random;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.ToolType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 
 public class MagicDirtBlock extends Block {
 
@@ -18,8 +17,6 @@ public class MagicDirtBlock extends Block {
 		super(Block.Properties.of(Material.DIRT)
 				.strength(.7f, 1.0f)
 				.sound(SoundType.GRAVEL)
-				.harvestTool(ToolType.SHOVEL)
-				.harvestLevel(1)
 				.randomTicks()
 				);
 	}

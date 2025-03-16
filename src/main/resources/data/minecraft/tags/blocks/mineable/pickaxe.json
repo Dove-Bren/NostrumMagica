@@ -1,0 +1,22 @@
+{
+	"replace": false,
+	"values": [
+		"nostrummagica:active_hopper",
+		"nostrummagica:altar_block",
+		"nostrummagica:mystic_anchor",
+		"nostrummagica:cursed_ice",
+		"nostrummagica:essore",
+		"nostrummagica:item_duct",
+		"nostrummagica:mana_armorer",
+		"nostrummagica:mani_crystal_mani",
+		"nostrummagica:mani_crystal_kani",
+		"nostrummagica:mani_crystal_vani",
+		"nostrummagica:mani_ore",
+		"nostrummagica:mine_block",
+		"nostrummagica:mirror_block",
+		"nostrummagica:nostrum_obelisk",
+		"nostrummagica:paradox_mirror",
+		"nostrummagica:putter",
+		"nostrummagica:portal_spawner"
+	]
+}
