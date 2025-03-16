@@ -5,8 +5,8 @@ import java.util.UUID;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
 
 public class AttributeReward implements IReward {
 
@@ -25,7 +25,7 @@ public class AttributeReward implements IReward {
 	}
 	
 	@Override
-	public void award(PlayerEntity player) {
+	public void award(Player player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return;

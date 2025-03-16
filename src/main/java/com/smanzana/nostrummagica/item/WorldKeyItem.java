@@ -8,23 +8,23 @@ import com.smanzana.autodungeons.tile.IWorldKeyHolder;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.nostrummagica.tile.LockedChestTileEntity;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ChestTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -44,14 +44,14 @@ public class WorldKeyItem extends Item {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		String keyName = "No key set";
 		WorldKey key = getKey(stack);
 		if (key != null) {
 			keyName = key.toString();
 		}
 		
-		tooltip.add(new StringTextComponent(keyName).withStyle(TextFormatting.GREEN));
+		tooltip.add(new TextComponent(keyName).withStyle(ChatFormatting.GREEN));
 	}
 	
 	public WorldKey getKey(ItemStack stack) {
@@ -63,9 +63,9 @@ public class WorldKeyItem extends Item {
 	}
 	
 	public void setKey(ItemStack stack, WorldKey key) {
-		CompoundNBT compound = stack.getTag();
+		CompoundTag compound = stack.getTag();
 		if (compound == null) {
-			compound = new CompoundNBT();
+			compound = new CompoundTag();
 		}
 		
 		compound.put(NBT_KEY_ID, key.asNBT());
@@ -77,7 +77,7 @@ public class WorldKeyItem extends Item {
 		if (stack.isEmpty() || !(stack.getItem() instanceof WorldKeyItem))
 			return;
 		
-		CompoundNBT tag;
+		CompoundTag tag;
 		if (!stack.hasTag())
 			return;
 		
@@ -88,61 +88,61 @@ public class WorldKeyItem extends Item {
 	}
 	
 	@Override
-	public ActionResultType useOn(ItemUseContext context) {
-		final World worldIn = context.getLevel();
+	public InteractionResult useOn(UseOnContext context) {
+		final Level worldIn = context.getLevel();
 		final BlockPos pos = context.getClickedPos();
-		final PlayerEntity playerIn = context.getPlayer();
+		final Player playerIn = context.getPlayer();
 		final @Nonnull ItemStack stack = context.getItemInHand();
 		
 		if (worldIn.isClientSide)
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		
 		if (pos == null)
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		
-		TileEntity te = worldIn.getBlockEntity(pos);
+		BlockEntity te = worldIn.getBlockEntity(pos);
 		if (te instanceof IWorldKeyHolder) {
 			IWorldKeyHolder holder = (IWorldKeyHolder) te;
 			if (playerIn.isShiftKeyDown()) {
 				WorldKey key = getKey(stack);
 				holder.setWorldKey(key);
-				playerIn.sendMessage(new StringTextComponent("Set object's key to " + key.toString().substring(0, 8)), Util.NIL_UUID);
+				playerIn.sendMessage(new TextComponent("Set object's key to " + key.toString().substring(0, 8)), Util.NIL_UUID);
 			} else {
 				if (holder.hasWorldKey()) {
 					WorldKey key = holder.getWorldKey();
 					setKey(stack, key);
-					playerIn.sendMessage(new StringTextComponent("Remembered key " + key.toString().substring(0, 8)), Util.NIL_UUID);
+					playerIn.sendMessage(new TextComponent("Remembered key " + key.toString().substring(0, 8)), Util.NIL_UUID);
 				} else {
-					playerIn.sendMessage(new StringTextComponent("No key to take"), Util.NIL_UUID);
+					playerIn.sendMessage(new TextComponent("No key to take"), Util.NIL_UUID);
 				}
 			}
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
-		if (te instanceof ChestTileEntity) {
+		if (te instanceof ChestBlockEntity) {
 			// Convert chests to locked chests
 			final WorldKey key = this.getKey(stack);
 			if (!LockedChestTileEntity.LockChest(worldIn, pos, key)) {
-				playerIn.sendMessage(new StringTextComponent("Failed to lock chest"), Util.NIL_UUID);
+				playerIn.sendMessage(new TextComponent("Failed to lock chest"), Util.NIL_UUID);
 			} else {
-				playerIn.sendMessage(new StringTextComponent("Locked chest with key " + key.toString().substring(0, 8)), Util.NIL_UUID); 
+				playerIn.sendMessage(new TextComponent("Locked chest with key " + key.toString().substring(0, 8)), Util.NIL_UUID); 
 			}
 		}
 		
-		return ActionResultType.PASS;
+		return InteractionResult.PASS;
 	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getItemInHand(hand);
 		
 		if (!worldIn.isClientSide() && playerIn.isShiftKeyDown()) {
 			clearKey(itemStackIn);
 			final WorldKey key = this.getKey(itemStackIn);
-			playerIn.sendMessage(new StringTextComponent("Generated new key " + key.toString().substring(0, 8)), Util.NIL_UUID);
-			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
+			playerIn.sendMessage(new TextComponent("Generated new key " + key.toString().substring(0, 8)), Util.NIL_UUID);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
 		}
 		
-		return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
+		return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStackIn);
 	}
 }

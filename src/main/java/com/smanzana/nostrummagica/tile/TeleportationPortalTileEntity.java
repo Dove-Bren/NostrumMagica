@@ -7,14 +7,14 @@ import com.smanzana.nostrummagica.block.PortalBlock;
 import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -26,7 +26,7 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	
 	private Location target;
 	
-	protected TeleportationPortalTileEntity(TileEntityType<?> type) {
+	protected TeleportationPortalTileEntity(BlockEntityType<?> type) {
 		super(type);
 	}
 	
@@ -34,7 +34,7 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 		this(NostrumTileEntities.TeleportationPortalTileEntityType);
 	}
 	
-	protected TeleportationPortalTileEntity(TileEntityType<?> type, Location target) {
+	protected TeleportationPortalTileEntity(BlockEntityType<?> type, Location target) {
 		this(type);
 		this.setTarget(target);
 	}
@@ -60,7 +60,7 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public int getColor() {
-		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.instance.proxy.getPlayer();
 		if (PortalBlock.getRemainingCharge(player) > 0) {
 			return 0x00A00050;
 		}
@@ -76,7 +76,7 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public float getOpacity() {
-		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.instance.proxy.getPlayer();
 		if (PortalBlock.getRemainingCharge(player) > 0) {
 			return 0.5f;
 		}
@@ -84,15 +84,15 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT compound) {
+	public void load(BlockState state, CompoundTag compound) {
 		super.load(state, compound);
 		
 		if (compound.contains(NBT_TARGET_LEGACY, NBT.TAG_LONG)) {
 			// Legacy!
-			target = new Location(WorldUtil.blockPosFromLong1_12_2(compound.getLong(NBT_TARGET_LEGACY)), World.OVERWORLD);
+			target = new Location(WorldUtil.blockPosFromLong1_12_2(compound.getLong(NBT_TARGET_LEGACY)), Level.OVERWORLD);
 		} else if (compound.contains(NBT_TARGET_LEGACY)) {
 			// Legacy 2!
-			target = new Location(NBTUtil.readBlockPos(compound.getCompound(NBT_TARGET_LEGACY)), World.OVERWORLD);
+			target = new Location(NbtUtils.readBlockPos(compound.getCompound(NBT_TARGET_LEGACY)), Level.OVERWORLD);
 		} else if (compound.contains(NBT_TARGET)) {
 			target = Location.FromNBT(compound.getCompound(NBT_TARGET));
 		} else {
@@ -101,7 +101,7 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		if (target != null) {
@@ -112,17 +112,17 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}

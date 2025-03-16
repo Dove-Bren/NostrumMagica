@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -14,24 +14,24 @@ import net.minecraftforge.registries.ObjectHolder;
 @ObjectHolder(NostrumMagica.MODID)
 public class NostrumContainers {
 
-	@ObjectHolder(ActiveHopperGui.ActiveHopperContainer.ID) public static ContainerType<ActiveHopperGui.ActiveHopperContainer> ActiveHopper;
-	@ObjectHolder(LoreTableGui.LoreTableContainer.ID) public static ContainerType<LoreTableGui.LoreTableContainer> LoreTable;
-	@ObjectHolder(ModificationTableGui.ModificationTableContainer.ID) public static ContainerType<ModificationTableGui.ModificationTableContainer> ModificationTable;
-	@ObjectHolder(PutterBlockGui.PutterBlockContainer.ID) public static ContainerType<PutterBlockGui.PutterBlockContainer> Putter;
-	@ObjectHolder(ReagentBagGui.BagContainer.ID) public static ContainerType<ReagentBagGui.BagContainer> ReagentBag;
-	@ObjectHolder(RuneBagGui.BagContainer.ID) public static ContainerType<RuneBagGui.BagContainer> RuneBag;
-	@ObjectHolder(MasterSpellCreationGui.SpellCreationContainer.ID) public static ContainerType<MasterSpellCreationGui.SpellCreationContainer> SpellCreationMaster;
-	@ObjectHolder(BasicSpellCraftGui.BasicSpellCraftContainer.ID) public static ContainerType<BasicSpellCraftGui.BasicSpellCraftContainer> SpellCreationBasic;
-	@ObjectHolder(RuneShaperGui.RuneShaperContainer.ID) public static ContainerType<RuneShaperGui.RuneShaperContainer> RuneShaper;
-	@ObjectHolder(RedwoodSpellCraftGui.RedwoodContainer.ID) public static ContainerType<RedwoodSpellCraftGui.RedwoodContainer> SpellCreationRedwood;
-	@ObjectHolder(MysticSpellCraftGui.MysticContainer.ID) public static ContainerType<MysticSpellCraftGui.MysticContainer> SpellCreationMystic;
-	@ObjectHolder(RuneLibraryGui.RuneLibraryContainer.ID) public static ContainerType<RuneLibraryGui.RuneLibraryContainer> RuneLibrary;
-	@ObjectHolder(LauncherBlockGui.LauncherBlockContainer.ID) public static ContainerType<LauncherBlockGui.LauncherBlockContainer> Launcher;
-	@ObjectHolder(SilverMirrorGui.MirrorContainer.ID) public static ContainerType<SilverMirrorGui.MirrorContainer> SilverMirror;
+	@ObjectHolder(ActiveHopperGui.ActiveHopperContainer.ID) public static MenuType<ActiveHopperGui.ActiveHopperContainer> ActiveHopper;
+	@ObjectHolder(LoreTableGui.LoreTableContainer.ID) public static MenuType<LoreTableGui.LoreTableContainer> LoreTable;
+	@ObjectHolder(ModificationTableGui.ModificationTableContainer.ID) public static MenuType<ModificationTableGui.ModificationTableContainer> ModificationTable;
+	@ObjectHolder(PutterBlockGui.PutterBlockContainer.ID) public static MenuType<PutterBlockGui.PutterBlockContainer> Putter;
+	@ObjectHolder(ReagentBagGui.BagContainer.ID) public static MenuType<ReagentBagGui.BagContainer> ReagentBag;
+	@ObjectHolder(RuneBagGui.BagContainer.ID) public static MenuType<RuneBagGui.BagContainer> RuneBag;
+	@ObjectHolder(MasterSpellCreationGui.SpellCreationContainer.ID) public static MenuType<MasterSpellCreationGui.SpellCreationContainer> SpellCreationMaster;
+	@ObjectHolder(BasicSpellCraftGui.BasicSpellCraftContainer.ID) public static MenuType<BasicSpellCraftGui.BasicSpellCraftContainer> SpellCreationBasic;
+	@ObjectHolder(RuneShaperGui.RuneShaperContainer.ID) public static MenuType<RuneShaperGui.RuneShaperContainer> RuneShaper;
+	@ObjectHolder(RedwoodSpellCraftGui.RedwoodContainer.ID) public static MenuType<RedwoodSpellCraftGui.RedwoodContainer> SpellCreationRedwood;
+	@ObjectHolder(MysticSpellCraftGui.MysticContainer.ID) public static MenuType<MysticSpellCraftGui.MysticContainer> SpellCreationMystic;
+	@ObjectHolder(RuneLibraryGui.RuneLibraryContainer.ID) public static MenuType<RuneLibraryGui.RuneLibraryContainer> RuneLibrary;
+	@ObjectHolder(LauncherBlockGui.LauncherBlockContainer.ID) public static MenuType<LauncherBlockGui.LauncherBlockContainer> Launcher;
+	@ObjectHolder(SilverMirrorGui.MirrorContainer.ID) public static MenuType<SilverMirrorGui.MirrorContainer> SilverMirror;
 	
 	@SubscribeEvent
-	public static void registerContainers(final RegistryEvent.Register<ContainerType<?>> event) {
-		final IForgeRegistry<ContainerType<?>> registry = event.getRegistry();
+	public static void registerContainers(final RegistryEvent.Register<MenuType<?>> event) {
+		final IForgeRegistry<MenuType<?>> registry = event.getRegistry();
 		
 		registry.register(IForgeContainerType.create(ActiveHopperGui.ActiveHopperContainer::FromNetwork).setRegistryName(ActiveHopperGui.ActiveHopperContainer.ID));
 		registry.register(IForgeContainerType.create(LoreTableGui.LoreTableContainer::FromNetwork).setRegistryName(LoreTableGui.LoreTableContainer.ID));

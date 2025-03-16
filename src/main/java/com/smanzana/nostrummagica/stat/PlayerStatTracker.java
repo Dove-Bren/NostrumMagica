@@ -10,29 +10,30 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class PlayerStatTracker extends WorldSavedData {
+public class PlayerStatTracker extends SavedData {
 
 	public static final String DATA_NAME = NostrumMagica.MODID + "_PlayerStats";
 	
 	private final Map<UUID, PlayerStats> playerTable;
 	
 	public PlayerStatTracker() {
-		this(DATA_NAME);
-	}
-	
-	public PlayerStatTracker(String name) {
-		super(name);
+		super();
 		this.playerTable = new HashMap<>();
 	}
 	
-	@Override
-	public void load(CompoundNBT nbt) {
+	public static PlayerStatTracker Load(CompoundTag nbt) {
+		PlayerStatTracker tracker = new PlayerStatTracker();
+		tracker.load(nbt);
+		return tracker;
+	}
+	
+	public void load(CompoundTag nbt) {
 		synchronized(this) {
 			this.playerTable.clear();
 			
@@ -53,7 +54,7 @@ public class PlayerStatTracker extends WorldSavedData {
 	}
 
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		synchronized(this) {
 			for (Entry<UUID, PlayerStats> entry : playerTable.entrySet()) {
 					nbt.put(entry.getKey().toString(), entry.getValue().toNBT(null));
@@ -63,7 +64,7 @@ public class PlayerStatTracker extends WorldSavedData {
 		return nbt;
 	}
 	
-	public static final void Update(@Nonnull PlayerEntity player, Consumer<PlayerStats> updater) {
+	public static final void Update(@Nonnull Player player, Consumer<PlayerStats> updater) {
 		if (player.level.isClientSide()) {
 			return;
 		}
@@ -74,11 +75,11 @@ public class PlayerStatTracker extends WorldSavedData {
 		tracker.update(player, stats);
 	}
 	
-	public @Nonnull PlayerStats get(@Nonnull PlayerEntity player) {
+	public @Nonnull PlayerStats get(@Nonnull Player player) {
 		return playerTable.computeIfAbsent(player.getUUID(), (u) -> new PlayerStats());
 	}
 	
-	public void update(@Nonnull PlayerEntity player, PlayerStats stats) {
+	public void update(@Nonnull Player player, PlayerStats stats) {
 		if (player.level.isClientSide()) {
 			return;
 		}
@@ -91,7 +92,7 @@ public class PlayerStatTracker extends WorldSavedData {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public void override(@Nonnull PlayerEntity player, PlayerStats stats) {
+	public void override(@Nonnull Player player, PlayerStats stats) {
 		playerTable.put(player.getUUID(), stats);
 	}
 	

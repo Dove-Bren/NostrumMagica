@@ -5,17 +5,17 @@ import java.util.Random;
 import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class CandleTileEntity extends TileEntity implements ITickableTileEntity, IReagentProviderTile {
+public class CandleTileEntity extends BlockEntity implements TickableBlockEntity, IReagentProviderTile {
 	
 	private static final String NBT_TYPE = "type";
 	private static Random rand = new Random();
@@ -52,7 +52,7 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity,
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		nbt.putString(NBT_TYPE, serializeType(type));
@@ -61,7 +61,7 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity,
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_TYPE, NBT.TAG_STRING))
@@ -71,17 +71,17 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity,
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
@@ -117,12 +117,12 @@ public class CandleTileEntity extends TileEntity implements ITickableTileEntity,
 	}
 
 	@Override
-	public ReagentType getPresentReagentType(TileEntity provider, World world, BlockPos pos) {
+	public ReagentType getPresentReagentType(BlockEntity provider, Level world, BlockPos pos) {
 		return this.getReagentType();
 	}
 
 	@Override
-	public boolean consumeReagentType(TileEntity provider, World world, BlockPos pos, ReagentType type) {
+	public boolean consumeReagentType(BlockEntity provider, Level world, BlockPos pos, ReagentType type) {
 		if (this.getReagentType() == null || (type != null && type != this.getReagentType())) {
 			return false;
 		}

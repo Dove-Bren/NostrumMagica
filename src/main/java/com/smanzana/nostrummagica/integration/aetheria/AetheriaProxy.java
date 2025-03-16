@@ -5,9 +5,9 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrumaetheria.api.capability.IAetherBurnable;
 import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.event.RegistryEvent;
@@ -83,7 +83,7 @@ public class AetheriaProxy {
 	}
 	
 	@SubscribeEvent
-	public void registerTileEntities(RegistryEvent.Register<TileEntityType<?>> event) {
+	public void registerTileEntities(RegistryEvent.Register<BlockEntityType<?>> event) {
 	}
 	
 	private void registerAetheriaQuests() {

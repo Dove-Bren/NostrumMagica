@@ -1,19 +1,19 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 
 /**
  * A Logic door that doesn't destroy itself, and can be triggered multiple times
@@ -38,7 +38,7 @@ public class ToggleLogicDoor extends LogicDoorBlock {
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		super.createBlockStateDefinition(builder);
 		builder.add(TOGGLED);
 	}
@@ -59,7 +59,7 @@ public class ToggleLogicDoor extends LogicDoorBlock {
 		return getStateWith(direction, true);
 	}
 	
-	protected void toggle(World world, BlockPos pos, BlockState state) {
+	protected void toggle(Level world, BlockPos pos, BlockState state) {
 		final BlockState newState = (isToggled(state) ? getUntoggled(state.getValue(FACING)) : getToggled(state.getValue(FACING)));
 		this.walkDoor(world, pos, state, (walkPos, walkState) -> {
 			world.setBlock(walkPos, newState, 3);
@@ -68,7 +68,7 @@ public class ToggleLogicDoor extends LogicDoorBlock {
 	}
 	
 	@Override
-	public void trigger(World world, BlockPos pos, BlockState state, BlockPos triggerPos) {
+	public void trigger(Level world, BlockPos pos, BlockState state, BlockPos triggerPos) {
 		this.toggle(world, pos, state);
 	}
 	
@@ -78,12 +78,12 @@ public class ToggleLogicDoor extends LogicDoorBlock {
 //	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		if (isToggled(state)) {
 			// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
-			if (context != ISelectionContext.empty()) {
-				if (context.getEntity() == null || !(context.getEntity() instanceof PlayerEntity) || !((PlayerEntity) context.getEntity()).isCreative()) {
-					return VoxelShapes.empty();
+			if (context != CollisionContext.empty()) {
+				if (context.getEntity() == null || !(context.getEntity() instanceof Player) || !((Player) context.getEntity()).isCreative()) {
+					return Shapes.empty();
 				}
 			}
 		}
@@ -93,9 +93,9 @@ public class ToggleLogicDoor extends LogicDoorBlock {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getCollisionShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		if (isToggled(state)) {
-			return VoxelShapes.empty();
+			return Shapes.empty();
 		}
 		
 		return super.getCollisionShape(state, worldIn, pos, context);

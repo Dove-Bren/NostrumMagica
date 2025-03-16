@@ -10,12 +10,12 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.util.TextUtils;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 
 public class OutcomeRecall implements IRitualOutcome {
 
@@ -24,7 +24,7 @@ public class OutcomeRecall implements IRitualOutcome {
 	}
 	
 	@Override
-	public boolean canPerform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout) {
+	public boolean canPerform(Level world, Player player, BlockPos center, IRitualLayout layout) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return false;
@@ -32,13 +32,13 @@ public class OutcomeRecall implements IRitualOutcome {
 		BlockPos pos = attr.getMarkLocation();
 		if (pos == null) {
 			if (!world.isClientSide)
-				player.sendMessage(new TranslationTextComponent("info.recall.fail", new Object[0]), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.recall.fail", new Object[0]), Util.NIL_UUID);
 			return false;
 		}
 		
 		if (!DimensionUtils.InDimension(player, attr.getMarkDimension())) {
 			if (!world.isClientSide)
-				player.sendMessage(new TranslationTextComponent("info.recall.baddimension", new Object[0]), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.recall.baddimension", new Object[0]), Util.NIL_UUID);
 			return false;
 		}
 		
@@ -46,7 +46,7 @@ public class OutcomeRecall implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
+	public void perform(Level world, Player player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// Return the player to their marked location, if they have one
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
@@ -55,7 +55,7 @@ public class OutcomeRecall implements IRitualOutcome {
 		BlockPos pos = attr.getMarkLocation();
 		if (pos == null) {
 			if (world.isClientSide)
-				player.sendMessage(new TranslationTextComponent("info.recall.fail", new Object[0]), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.recall.fail", new Object[0]), Util.NIL_UUID);
 			return;
 		}
 		
@@ -86,7 +86,7 @@ public class OutcomeRecall implements IRitualOutcome {
 //				}
 			}
 		} else {
-			player.sendMessage(new TranslationTextComponent("info.recall.baddimension", new Object[0]), Util.NIL_UUID);
+			player.sendMessage(new TranslatableComponent("info.recall.baddimension", new Object[0]), Util.NIL_UUID);
 		}
 	}
 	
@@ -96,7 +96,7 @@ public class OutcomeRecall implements IRitualOutcome {
 	}
 
 	@Override
-	public List<ITextComponent> getDescription() {
+	public List<Component> getDescription() {
 		return TextUtils.GetTranslatedList("ritual.outcome.recall.desc");
 	}
 }

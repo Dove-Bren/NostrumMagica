@@ -5,12 +5,12 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 
 public class CommandReloadSkills {
 	
-	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+	public static final void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(
 				Commands.literal("sreload")
 					.requires(s -> s.hasPermission(2))
@@ -18,7 +18,7 @@ public class CommandReloadSkills {
 				);
 	}
 
-	private static final int execute(CommandContext<CommandSource> context) throws CommandSyntaxException {
+	private static final int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
 		NostrumMagica.instance.reloadDefaultSkills();
 		return 0;
 	}

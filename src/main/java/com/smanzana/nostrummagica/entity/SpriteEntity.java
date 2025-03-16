@@ -20,53 +20,53 @@ import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.component.shapes.TouchShape;
 import com.smanzana.nostrummagica.util.SpellUtils;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntitySize;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.Pose;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.HurtByTargetGoal;
-import net.minecraft.entity.ai.goal.LookAtGoal;
-import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
-import net.minecraft.entity.ai.goal.SwimGoal;
-import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Hand;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.BiomeDictionary;
 
-public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElementalEntity {
+public class SpriteEntity extends PathfinderMob implements ILoreSupplier, IElementalEntity {
 	
 	public static final String ID = "entity_sprite";
 
-	private static final DataParameter<Boolean> SPRITE_ANGRY = EntityDataManager.<Boolean>defineId(SpriteEntity.class, DataSerializers.BOOLEAN);
+	private static final EntityDataAccessor<Boolean> SPRITE_ANGRY = SynchedEntityData.<Boolean>defineId(SpriteEntity.class, EntityDataSerializers.BOOLEAN);
 	
 	private static Spell EARTH_ZAP = null;
 	
@@ -83,7 +83,7 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 	private int idleCooldown;
 	private int effectCooldown = 0;
 	
-	public SpriteEntity(EntityType<? extends SpriteEntity> type, World worldIn) {
+	public SpriteEntity(EntityType<? extends SpriteEntity> type, Level worldIn) {
         super(type, worldIn);
         
         idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
@@ -100,7 +100,7 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
     		return sprite.isAngry() && sprite.getTarget() != null
     				&& sprite.getTarget().distanceToSqr(sprite) <= TouchShape.AI_TOUCH_RANGE * TouchShape.AI_TOUCH_RANGE;
     	}, EARTH_ZAP));
-        this.goalSelector.addGoal(priority++, new SwimGoal(this));
+        this.goalSelector.addGoal(priority++, new FloatGoal(this));
         this.goalSelector.addGoal(priority++, new FollowEntityGenericGoal<SpriteEntity>(this, 1D, 2f, 4f, false, null) {
         	@Override
         	protected LivingEntity getTarget(SpriteEntity entity) {
@@ -118,14 +118,14 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
         		return entity.getTarget();
         	}
         });
-        this.goalSelector.addGoal(priority++, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
-        this.goalSelector.addGoal(priority++, new LookAtGoal(this, PlayerEntity.class, 24.0F));
+        this.goalSelector.addGoal(priority++, new WaterAvoidingRandomStrollGoal(this, 1.0D));
+        this.goalSelector.addGoal(priority++, new LookAtPlayerGoal(this, Player.class, 24.0F));
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, true));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<Player>(this, Player.class, true));
     }
 
-    public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-    	return CreatureEntity.createMobAttributes()
+    public static final AttributeSupplier.Builder BuildAttributes() {
+    	return PathfinderMob.createMobAttributes()
     		.add(Attributes.MOVEMENT_SPEED, 0.33D)
     		.add(Attributes.MAX_HEALTH, 40.0D)
     		.add(Attributes.ATTACK_DAMAGE, 2.0D)
@@ -160,7 +160,7 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
     }
 
     @Override
-    protected float getStandingEyeHeight(Pose pose, EntitySize size)
+    protected float getStandingEyeHeight(Pose pose, EntityDimensions size)
     {
         return this.getBbHeight() * 0.4F;
     }
@@ -178,8 +178,8 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
         return flag;
     }
 
-    public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
-        return ActionResultType.PASS;
+    public InteractionResult /*processInteract*/ mobInteract(Player player, InteractionHand hand, @Nonnull ItemStack stack) {
+        return InteractionResult.PASS;
     }
 
     /**
@@ -194,7 +194,7 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
     /**
      * Returns true if the mob is currently able to mate with the specified mob.
      */
-    public boolean canMateWith(AnimalEntity otherAnimal)
+    public boolean canMateWith(Animal otherAnimal)
     {
         return false;
     }
@@ -204,16 +204,16 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
         return target != this;
     }
 
-    public boolean canBeLeashed(PlayerEntity player)
+    public boolean canBeLeashed(Player player)
     {
         return false;
     }
     
     private void applyEffect(LivingEntity entity) {
-    	entity.removeEffect(Effects.LEVITATION);
+    	entity.removeEffect(MobEffects.LEVITATION);
     	entity.removeEffect(NostrumEffects.rooted);
     	if (this.isAngry()) {
-    		entity.addEffect(new EffectInstance(NostrumEffects.rooted, 20 * 10));
+    		entity.addEffect(new MobEffectInstance(NostrumEffects.rooted, 20 * 10));
 		} else {
 			final int finalDur = 20*10;
 			int dur = 20 * 1;
@@ -222,11 +222,11 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 			}
 			
 			entity.addEffect(
-				new EffectInstance(Effects.LEVITATION, dur)
+				new MobEffectInstance(MobEffects.LEVITATION, dur)
 				);
-			if (entity instanceof PlayerEntity) {
+			if (entity instanceof Player) {
 				this.addEffect(
-						new EffectInstance(Effects.GLOWING, finalDur)
+						new MobEffectInstance(MobEffects.GLOWING, finalDur)
 					);
 			}
 		}
@@ -252,14 +252,14 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 				// Lift up players in a large radius. Lift up other entities at a much smaller one
 				
 				// Non-players
-				AxisAlignedBB bb = new AxisAlignedBB(getX() - 6, getY() - 40, getZ() - 6,
+				AABB bb = new AABB(getX() - 6, getY() - 40, getZ() - 6,
 						getX() + 6, getY() + 40, getZ() + 6);
 				List<Entity> entities = level.getEntities(this, bb);
 				
 				for (Entity entity : entities) {
 					if (entity instanceof LivingEntity && !(entity instanceof SpriteEntity)) {
 						
-						if (entity instanceof PlayerEntity) {
+						if (entity instanceof Player) {
 							continue;
 						}
 						
@@ -268,7 +268,7 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 				}
 				
 				// Players
-				for (PlayerEntity player : level.players()) {
+				for (Player player : level.players()) {
 					if (player.isCreative() || player.isSpectator()) {
 						continue;
 					}
@@ -336,14 +336,14 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 	}
 	
 	@Override
-	public void readAdditionalSaveData(CompoundNBT compound) {
+	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 		
 		this.entityData.set(SPRITE_ANGRY, compound.getBoolean("angry"));
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundNBT compound) {
+	public void addAdditionalSaveData(CompoundTag compound) {
     	super.addAdditionalSaveData(compound);
     	
     	compound.putBoolean("angry", this.isAngry());
@@ -420,7 +420,7 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 		return hurt;
 	}
 	
-	private void playEffect(IParticleData particle) {
+	private void playEffect(ParticleOptions particle) {
 		
 		for (int i = 0; i < 15; ++i) {
 			double d0 = this.random.nextGaussian() * 0.02D;
@@ -447,9 +447,9 @@ public class SpriteEntity extends CreatureEntity implements ILoreSupplier, IElem
 	}
 	
 	@Override
-	public float getWalkTargetValue(BlockPos pos, IWorldReader worldIn) {
+	public float getWalkTargetValue(BlockPos pos, LevelReader worldIn) {
 		// Want to use dimension key but not available with IWorldReadyer
-		RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, worldIn.getBiome(pos).getRegistryName());
+		ResourceKey<Biome> biomeKey = ResourceKey.create(Registry.BIOME_REGISTRY, worldIn.getBiome(pos).getRegistryName());
 		
 //		if (DimensionUtils.IsNether(worldIn.)) {
 //			return 0; // Nether is very bright

@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.serializer;
 
 import com.smanzana.nostrummagica.entity.dragon.RedDragonEntity.DragonBodyPartType;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.IDataSerializer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializer;
 
-public final class RedDragonBodyPartTypeSerializer implements IDataSerializer<DragonBodyPartType> {
+public final class RedDragonBodyPartTypeSerializer implements EntityDataSerializer<DragonBodyPartType> {
 	
 	public static RedDragonBodyPartTypeSerializer instance = new RedDragonBodyPartTypeSerializer();
 	
@@ -15,18 +15,18 @@ public final class RedDragonBodyPartTypeSerializer implements IDataSerializer<Dr
 	}
 	
 	@Override
-	public void write(PacketBuffer buf, DragonBodyPartType value) {
+	public void write(FriendlyByteBuf buf, DragonBodyPartType value) {
 		buf.writeEnum(value);
 	}
 
 	@Override
-	public DragonBodyPartType read(PacketBuffer buf)  {
+	public DragonBodyPartType read(FriendlyByteBuf buf)  {
 		return buf.readEnum(DragonBodyPartType.class);
 	}
 
 	@Override
-	public DataParameter<DragonBodyPartType> createAccessor(int id) {
-		return new DataParameter<>(id, this);
+	public EntityDataAccessor<DragonBodyPartType> createAccessor(int id) {
+		return new EntityDataAccessor<>(id, this);
 	}
 
 	@Override

@@ -7,9 +7,9 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
 
-import net.minecraft.command.arguments.ParticleArgument;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.IParticleData;
+import net.minecraft.commands.arguments.ParticleArgument;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.particles.ParticleOptions;
 
 public final class ParticleHelper {
 	
@@ -18,8 +18,8 @@ public final class ParticleHelper {
 	private static final String NBT_WRAPPER_TYPE_VANILLA = "vanilla";
 	private static final String NBT_WRAPPER_DATA = "data";
 
-	public static final CompoundNBT WriteToNBT(IParticleData data) {
-		CompoundNBT nbt = new CompoundNBT();
+	public static final CompoundTag WriteToNBT(ParticleOptions data) {
+		CompoundTag nbt = new CompoundTag();
 		
 		if (data instanceof NostrumParticleData) {
 			// ease of use NBT helpers
@@ -34,8 +34,8 @@ public final class ParticleHelper {
 		return nbt;
 	}
 	
-	public static final @Nullable IParticleData ReadFromNBT(CompoundNBT nbt) {
-		IParticleData data = null;
+	public static final @Nullable ParticleOptions ReadFromNBT(CompoundTag nbt) {
+		ParticleOptions data = null;
 		final String type = nbt.getString(NBT_WRAPPER_TYPE);
 		
 		if (type.equalsIgnoreCase(NBT_WRAPPER_TYPE_NOSTRUM)) {

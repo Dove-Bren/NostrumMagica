@@ -2,18 +2,18 @@ package com.smanzana.nostrummagica.client.effects;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -22,7 +22,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ClientEffectFormFlat implements ClientEffectForm {
 	
 	private final ResourceLocation texture;
-	private Vector3d offset;
+	private Vec3 offset;
 	
 	public ClientEffectFormFlat(ResourceLocation texture) {
 		this(texture, 0d, 0d, 0d);
@@ -31,7 +31,7 @@ public class ClientEffectFormFlat implements ClientEffectForm {
 	public ClientEffectFormFlat(ResourceLocation texture, double x, double y, double z) {
 		this.texture = texture;
 		if (x != 0 || y != 0 || z != 0)
-			this.offset = new Vector3d(x, y, z);
+			this.offset = new Vec3(x, y, z);
 		else
 			this.offset = null;
 	}
@@ -41,7 +41,7 @@ public class ClientEffectFormFlat implements ClientEffectForm {
 	}
 
 	@Override
-	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
+	public void draw(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
 		final float blue = (float) (color & 0xFF) / 255f;
 		final float green = (float) ((color >>> 8) & 0xFF) / 255f;
 		final float red = (float) ((color >>> 16) & 0xFF) / 255f;
@@ -57,9 +57,9 @@ public class ClientEffectFormFlat implements ClientEffectForm {
 			matrixStackIn.translate(offset.x, offset.y, offset.z);
 		}
 		
-		Tessellator tessellator = Tessellator.getInstance();
+		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder buffer = tessellator.getBuilder();
-		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.NEW_ENTITY);
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.NEW_ENTITY);
 
 		RenderSystem.disableCull();
 		RenderSystem.alphaFunc(GL11.GL_GREATER, 0f);

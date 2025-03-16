@@ -17,12 +17,12 @@ import com.smanzana.nostrummagica.ritual.outcome.IItemRitualOutcome;
 import com.smanzana.nostrummagica.ritual.outcome.IRitualOutcome;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implements InfoScreenIndexed {
 	
@@ -237,7 +237,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 		//this.setRegistryName(registryName);
 	}
 	
-	public boolean matches(PlayerEntity player, World world, BlockPos center, IRitualIngredients ingredients) {
+	public boolean matches(Player player, Level world, BlockPos center, IRitualIngredients ingredients) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return false;
@@ -281,7 +281,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 	 * @param center
 	 * @return
 	 */
-	public RitualResult perform(World world, PlayerEntity player, BlockPos center, IRitualLayout ingredients) {
+	public RitualResult perform(Level world, Player player, BlockPos center, IRitualLayout ingredients) {
 		
 		if (world.isClientSide) {
 			return new RitualResult(true, this.element, ItemStack.EMPTY, ItemStack.EMPTY, null, null);

@@ -5,19 +5,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.util.ISlotHelper;
 
-public class CurioInventoryWrapper implements IInventory {
+public class CurioInventoryWrapper implements Container {
 	
-	public static CurioInventoryWrapper getCuriosInventory(PlayerEntity entity) {
+	public static CurioInventoryWrapper getCuriosInventory(Player entity) {
 		return new CurioInventoryWrapper(entity, false);
 //		Optional<ItemStackArrayWrapper> opt = CuriosApi.getCuriosHelper().getCuriosHandler(entity).map((handler) -> {
 //			ICurioStacksHandler[] stackHandlers = handler.getCurios().values().toArray(new ICurioStacksHandler[0]);
@@ -133,7 +133,7 @@ public class CurioInventoryWrapper implements IInventory {
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return true;
 	}
 }

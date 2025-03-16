@@ -8,26 +8,26 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PutterBlock;
 import com.smanzana.nostrummagica.util.Inventories;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class PutterBlockTileEntity extends TileEntity implements ITickableTileEntity {
+public class PutterBlockTileEntity extends BlockEntity implements TickableBlockEntity {
 
 	private static final String NBT_INVENTORY = "inventory";
 	
-	private final Inventory inventory;
+	private final SimpleContainer inventory;
 	
 	private ItemEntity itemEntCache = null;
 	private int ticksExisted;
@@ -35,7 +35,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	public PutterBlockTileEntity() {
 		super(NostrumTileEntities.PutterBlockTileEntityType);
 		final PutterBlockTileEntity putter = this;
-		this.inventory = new Inventory(9) {
+		this.inventory = new SimpleContainer(9) {
 			@Override
 			public void setChanged() {
 				putter.setChanged();
@@ -43,12 +43,12 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 		};
 	}
 	
-	public IInventory getInventory() {
+	public Container getInventory() {
 		return inventory;
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		nbt.put(NBT_INVENTORY, Inventories.serializeInventory(inventory));
@@ -57,7 +57,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt == null)
@@ -115,7 +115,7 @@ public class PutterBlockTileEntity extends TileEntity implements ITickableTileEn
 				dx = -1;
 				break;
 			}
-			List<ItemEntity> items = level.getEntitiesOfClass(ItemEntity.class, VoxelShapes.block().bounds().move(worldPosition).move(dx, dy, dz));
+			List<ItemEntity> items = level.getEntitiesOfClass(ItemEntity.class, Shapes.block().bounds().move(worldPosition).move(dx, dy, dz));
 			if (items != null && !items.isEmpty()) {
 				itemEntCache = items.get(0);
 			}

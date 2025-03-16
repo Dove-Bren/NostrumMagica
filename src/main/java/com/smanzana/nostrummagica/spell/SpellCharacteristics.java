@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.spell;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 /**
  * Wrapper for the different characteristics of a spell.
@@ -30,8 +30,8 @@ public class SpellCharacteristics {
 		return element;
 	}
 	
-	public CompoundNBT toNBT() {
-		CompoundNBT tag = new CompoundNBT();
+	public CompoundTag toNBT() {
+		CompoundTag tag = new CompoundTag();
 		
 		tag.putBoolean(NBT_HARMFUL, harmful);
 		tag.put(NBT_ELEMENT, element.toNBT());
@@ -39,7 +39,7 @@ public class SpellCharacteristics {
 		return tag;
 	}
 	
-	public static final SpellCharacteristics FromNBT(CompoundNBT tag) {
+	public static final SpellCharacteristics FromNBT(CompoundTag tag) {
 		return new SpellCharacteristics(
 				tag.getBoolean(NBT_HARMFUL),
 				EMagicElement.FromNBT(tag.get(NBT_ELEMENT))

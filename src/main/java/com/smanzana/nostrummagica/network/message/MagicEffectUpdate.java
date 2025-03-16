@@ -7,9 +7,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Server is updating client's local value for a special effect
@@ -39,7 +39,7 @@ public class MagicEffectUpdate {
 		this.data = data;
 	}
 
-	public static MagicEffectUpdate decode(PacketBuffer buf) {
+	public static MagicEffectUpdate decode(FriendlyByteBuf buf) {
 		return new MagicEffectUpdate(
 				buf.readUUID(),
 				buf.readEnum(SpecialEffect.class),
@@ -49,7 +49,7 @@ public class MagicEffectUpdate {
 				);
 	}
 
-	public static void encode(MagicEffectUpdate msg, PacketBuffer buf) {
+	public static void encode(MagicEffectUpdate msg, FriendlyByteBuf buf) {
 		buf.writeUUID(msg.entityID);
 		buf.writeEnum(msg.type);
 		buf.writeBoolean(msg.data != null);

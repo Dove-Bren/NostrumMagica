@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
@@ -11,26 +11,26 @@ import com.smanzana.nostrummagica.tile.LockedChestTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 
-public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChestTileEntity> {
+public class TileEntityLockedChestRenderer extends BlockEntityRenderer<LockedChestTileEntity> {
 	
 	public static final ResourceLocation TEXT_LOCK_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/models/block/lock_plate.png");
 	public static final ResourceLocation TEXT_CHAINLINK_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/models/block/chain_link.png");
 
-	public TileEntityLockedChestRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+	public TileEntityLockedChestRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
 		super(rendererDispatcherIn);
 	}
 	
-	protected void renderLock(LockedChestTileEntity te, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	protected void renderLock(LockedChestTileEntity te, double ticks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		final Direction direction = te.getBlockState().getValue(LockedChestBlock.FACING);
 		float rot = direction.toYRot() + 90f;
 		
@@ -58,7 +58,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		final double yWiggleProg = ((ticks % yWigglePeriod) / yWigglePeriod);
 		final double yWiggle = .5 * Math.sin(yWiggleProg * Math.PI * 2);
 
-		final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.LOCKEDCHEST_LOCK);
+		final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.LOCKEDCHEST_LOCK);
 		
 		matrixStackIn.pushPose();
 		matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(rot)); // Rotate arm that's centered in the block
@@ -73,7 +73,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		matrixStackIn.popPose();
 	}
 	
-	protected void renderChains(LockedChestTileEntity te, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	protected void renderChains(LockedChestTileEntity te, double ticks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		final Direction direction = te.getBlockState().getValue(LockedChestBlock.FACING);
 		float rot = direction.toYRot();
 		
@@ -89,7 +89,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		final double majorWiggleProg = 1 - ((ticks % majorWigglePeriod) / majorWigglePeriod);
 		final float majorWiggle = (float) (2 * Math.sin(2 * Math.PI * majorWiggleProg));
 		
-		final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.LOCKEDCHEST_CHAIN);
+		final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.LOCKEDCHEST_CHAIN);
 		
 		matrixStackIn.pushPose();
 		matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(rot)); // Rotate to match block's orientation
@@ -117,7 +117,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 		matrixStackIn.popPose();
 	}
 	
-	public static void renderChain(MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, double ticks, float armLen, int points, float linkWidth) {
+	public static void renderChain(PoseStack matrixStackIn, VertexConsumer buffer, int packedLightIn, double ticks, float armLen, int points, float linkWidth) {
 		// Two ribbons perpendicular to each other offset by half a v on texture
 			
 		final float colorPeriod = 140;
@@ -162,8 +162,8 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 	}
 	
 	@Override
-	public void render(LockedChestTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
-			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+	public void render(LockedChestTileEntity tileEntityIn, float partialTicks, PoseStack matrixStackIn,
+			MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		
 		final double ticks = tileEntityIn.getLevel().getGameTime() + partialTicks;
 		final Minecraft mc = Minecraft.getInstance();
@@ -197,7 +197,7 @@ public class TileEntityLockedChestRenderer extends TileEntityRenderer<LockedChes
 			}
 			
 			matrixStackIn.scale(8, 8, 8);
-			ActiveRenderInfo renderInfo = mc.gameRenderer.getMainCamera();
+			Camera renderInfo = mc.gameRenderer.getMainCamera();
 			float yOffset = 1.4f;
 			
 			if (matches) {

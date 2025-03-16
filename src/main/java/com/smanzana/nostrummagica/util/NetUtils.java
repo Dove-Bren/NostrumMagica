@@ -11,39 +11,39 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
 public class NetUtils {
 
-	public static RegistryKey<World> unpackDimension(PacketBuffer buffer) {
+	public static ResourceKey<Level> unpackDimension(FriendlyByteBuf buffer) {
 		ResourceLocation loc = buffer.readResourceLocation();
 		return DimensionUtils.GetDimKey(loc);
 	}
 	
-	public static PacketBuffer packDimension(PacketBuffer buffer, RegistryKey<World> dimension) {
+	public static FriendlyByteBuf packDimension(FriendlyByteBuf buffer, ResourceKey<Level> dimension) {
 		buffer.writeResourceLocation(dimension.location());
 		return buffer;
 	}
 	
-	public static Codec<Vector3d> CODEC_VECTOR3D = Codec.DOUBLE.listOf().comapFlatMap(NetUtils::Vector3dUnpack, NetUtils::Vector3dPack);
+	public static Codec<Vec3> CODEC_VECTOR3D = Codec.DOUBLE.listOf().comapFlatMap(NetUtils::Vector3dUnpack, NetUtils::Vector3dPack);
 	
-	protected static final DataResult<Vector3d> Vector3dUnpack(List<Double> values) {
+	protected static final DataResult<Vec3> Vector3dUnpack(List<Double> values) {
 		if (values == null || values.size() != 3) {
 			final int count = (values == null ? 0 : values.size());
 			return DataResult.error("Require 3 doubles for vector, but only saw " + count);
 		}
 		
-		return DataResult.success(new Vector3d(values.get(0), values.get(1), values.get(2)));
+		return DataResult.success(new Vec3(values.get(0), values.get(1), values.get(2)));
 	}
 	
-	protected static final List<Double> Vector3dPack(Vector3d vector) {
+	protected static final List<Double> Vector3dPack(Vec3 vector) {
 		return ImmutableList.of(
 				vector.x(),
 				vector.y(),
@@ -51,16 +51,16 @@ public class NetUtils {
 				);
 	}
 	
-	public static <E extends Enum<E>, T> CompoundNBT ToNBT(Map<E, T> map, Function<T, INBT> writer) {
+	public static <E extends Enum<E>, T> CompoundTag ToNBT(Map<E, T> map, Function<T, Tag> writer) {
 		return ToNBT(map, (E key) -> key.name().toLowerCase(), writer);
 	}
 	
-	public static <E extends Enum<E>, T> Map<E, T> FromNBT(Map<E, T> mapToFill, Class<E> enumClass, CompoundNBT tag, Function<INBT, T> reader) {
+	public static <E extends Enum<E>, T> Map<E, T> FromNBT(Map<E, T> mapToFill, Class<E> enumClass, CompoundTag tag, Function<Tag, T> reader) {
 		return FromNBT(mapToFill, tag, (key) -> Enum.valueOf(enumClass, key.toUpperCase()), reader);
 	}
 	
-	public static <K, V> CompoundNBT ToNBT(Map<K, V> map, Function<K, String> keyWriter, Function<V, INBT> valueWriter) {
-		CompoundNBT tag = new CompoundNBT();
+	public static <K, V> CompoundTag ToNBT(Map<K, V> map, Function<K, String> keyWriter, Function<V, Tag> valueWriter) {
+		CompoundTag tag = new CompoundTag();
 		for (Entry<K, V> entry : map.entrySet()) {
 			if (entry.getValue() != null) {
 				tag.put(keyWriter.apply(entry.getKey()), valueWriter.apply(entry.getValue()));
@@ -69,7 +69,7 @@ public class NetUtils {
 		return tag;
 	}
 	
-	public static <K, V> Map<K, V> FromNBT(Map<K, V> mapToFill, CompoundNBT tag, Function<String, K> keyReader, Function<INBT, V> valueReader) {
+	public static <K, V> Map<K, V> FromNBT(Map<K, V> mapToFill, CompoundTag tag, Function<String, K> keyReader, Function<Tag, V> valueReader) {
 		for (String key : tag.getAllKeys()) {
 			try {
 				K mapKey = keyReader.apply(key);
@@ -81,17 +81,17 @@ public class NetUtils {
 		return mapToFill;
 	}
 	
-	public static <T> ListNBT ToNBT(List<T> list, Function<T, INBT> writer) {
-		ListNBT tagList = new ListNBT();
+	public static <T> ListTag ToNBT(List<T> list, Function<T, Tag> writer) {
+		ListTag tagList = new ListTag();
 		for (T elem : list) {
 			tagList.add(writer.apply(elem));
 		}
 		return tagList;
 	}
 	
-	public static <T> List<T> FromNBT(List<T> listToFill, ListNBT tagList, Function<INBT, T> reader) {
+	public static <T> List<T> FromNBT(List<T> listToFill, ListTag tagList, Function<Tag, T> reader) {
 		for (int i = 0; i < tagList.size(); i++) {
-			INBT tag = tagList.get(i);
+			Tag tag = tagList.get(i);
 			listToFill.add(reader.apply(tag));
 		}
 		return listToFill;

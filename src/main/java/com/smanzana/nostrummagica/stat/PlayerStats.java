@@ -9,9 +9,9 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.NetUtils;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.FloatNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.FloatTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class PlayerStats {
@@ -55,8 +55,8 @@ public class PlayerStats {
 		return this;
 	}
 
-	public @Nonnull CompoundNBT toNBT(@Nullable CompoundNBT nbt) {
-		CompoundNBT tag = NetUtils.ToNBT(this.stats, (k) -> k.getID().toString(), FloatNBT::valueOf);
+	public @Nonnull CompoundTag toNBT(@Nullable CompoundTag nbt) {
+		CompoundTag tag = NetUtils.ToNBT(this.stats, (k) -> k.getID().toString(), FloatTag::valueOf);
 		if (nbt == null) {
 			return tag;
 		} else {
@@ -65,16 +65,16 @@ public class PlayerStats {
 		}
 	}
 	
-	public static final PlayerStats FromNBT(@Nonnull CompoundNBT nbt) {
+	public static final PlayerStats FromNBT(@Nonnull CompoundTag nbt) {
 		PlayerStats stats = new PlayerStats();
 		
-		CompoundNBT tag;
+		CompoundTag tag;
 		if (nbt.contains("nostrum_stats", NBT.TAG_COMPOUND)) {
 			tag = nbt.getCompound("nostrum_stats");
 		} else {
 			tag = nbt;
 		}
-		NetUtils.FromNBT(stats.stats, tag, (k) -> new PlayerStat(new ResourceLocation(k)), (n) -> ((FloatNBT) n).getAsFloat());
+		NetUtils.FromNBT(stats.stats, tag, (k) -> new PlayerStat(new ResourceLocation(k)), (n) -> ((FloatTag) n).getAsFloat());
 		
 		return stats;
 	}

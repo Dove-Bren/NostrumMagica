@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.util;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 
 public class AttributeUtil {
 

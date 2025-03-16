@@ -1,14 +1,14 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.controller.MovementController;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.MoveControl;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public abstract class FlyingDragonEntity extends DragonEntity {
@@ -20,8 +20,8 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 		LANDING,
 	}
 	
-	private static final DataParameter<Integer> DRAGON_FLYING =
-			EntityDataManager.<Integer>defineId(FlyingDragonEntity.class, DataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DRAGON_FLYING =
+			SynchedEntityData.<Integer>defineId(FlyingDragonEntity.class, EntityDataSerializers.INT);
 	
 	private static final String DRAGON_SERIAL_FLYING_TOK = "DragonFlying";
 
@@ -40,7 +40,7 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 	protected float wingFlapProgress;
 	protected float wingFlapSpeed = 1f; // Relative speed. 1f is normal speed
 	
-	public FlyingDragonEntity(EntityType<? extends FlyingDragonEntity> type, World worldIn) {
+	public FlyingDragonEntity(EntityType<? extends FlyingDragonEntity> type, Level worldIn) {
 		super(type, worldIn);
 		
 		this.setFlyState(FlyState.LANDED);
@@ -66,7 +66,7 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 	}
 	
 	@Override
-	public void onSyncedDataUpdated(DataParameter<?> key) {
+	public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
 		super.onSyncedDataUpdated(key);
 		if (key == DRAGON_FLYING) {
 			onFlightStateChange();
@@ -128,7 +128,7 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 		this.entityData.define(DRAGON_FLYING, FlyState.LANDED.ordinal());
 	}
 	
-	public void readAdditionalSaveData(CompoundNBT compound) {
+	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 
         if (compound.contains(DRAGON_SERIAL_FLYING_TOK, NBT.TAG_ANY_NUMERIC)) {
@@ -145,7 +145,7 @@ public abstract class FlyingDragonEntity extends DragonEntity {
         }
 	}
 	
-	public void addAdditionalSaveData(CompoundNBT compound) {
+	public void addAdditionalSaveData(CompoundTag compound) {
     	super.addAdditionalSaveData(compound);
         compound.putByte(DRAGON_SERIAL_FLYING_TOK, (byte)this.getFlyState().ordinal());
 	}
@@ -181,7 +181,7 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 	
 	protected void entityStopFlying() {
 		if (!this.level.isClientSide) {
-			this.moveControl = new MovementController(this);
+			this.moveControl = new MoveControl(this);
 			this.navigation = this.createNavigation(level);
 			this.setGroundedAI();
 		}
@@ -225,7 +225,7 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 		}
 	}
 	
-	protected static final AttributeModifierMap.MutableAttribute BuildBaseFlyingAttributes() {
+	protected static final AttributeSupplier.Builder BuildBaseFlyingAttributes() {
 		return DragonEntity.BuildBaseDragonAttributes()
 				.add(Attributes.FLYING_SPEED);
 	}

@@ -4,9 +4,9 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.ChatFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -38,22 +38,22 @@ public enum EMagicElement {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public TextFormatting getChatColor() {
+	public ChatFormatting getChatColor() {
 		switch(this) {
 		case EARTH:
-			return TextFormatting.GOLD;
+			return ChatFormatting.GOLD;
 		case ENDER:
-			return TextFormatting.DARK_PURPLE;
+			return ChatFormatting.DARK_PURPLE;
 		case FIRE:
-			return TextFormatting.DARK_RED;
+			return ChatFormatting.DARK_RED;
 		case ICE:
-			return TextFormatting.AQUA;
+			return ChatFormatting.AQUA;
 		case LIGHTNING:
-			return TextFormatting.YELLOW;
+			return ChatFormatting.YELLOW;
 		case PHYSICAL:
-			return TextFormatting.DARK_GRAY;
+			return ChatFormatting.DARK_GRAY;
 		case WIND:
-			return TextFormatting.DARK_GREEN;
+			return ChatFormatting.DARK_GREEN;
 		}
 		return null;
 	}
@@ -134,14 +134,14 @@ public enum EMagicElement {
 		return names;
 	}
 	
-	public INBT toNBT() {
-		return StringNBT.valueOf(this.name().toLowerCase());
+	public Tag toNBT() {
+		return StringTag.valueOf(this.name().toLowerCase());
 	}
 	
-	public static final EMagicElement FromNBT(INBT nbt) {
+	public static final EMagicElement FromNBT(Tag nbt) {
 		EMagicElement element = EMagicElement.PHYSICAL;
 		try {
-			element = EMagicElement.valueOf(((StringNBT) nbt).getAsString().toUpperCase());
+			element = EMagicElement.valueOf(((StringTag) nbt).getAsString().toUpperCase());
 		} catch (Exception e) {
 			;
 		}

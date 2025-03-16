@@ -23,14 +23,14 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.NonNullList;
+import net.minecraft.Util;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.util.Lazy;
 
 /**
@@ -83,9 +83,9 @@ public class OnDamageShape extends SpellShape {
 			} else if (type == Event.TIME) {
 				if (!expired) {
 					expired = true;
-					if (this.entity instanceof PlayerEntity) {
-						PlayerEntity player = (PlayerEntity) this.entity;
-						player.sendMessage(new TranslationTextComponent("modification.damaged_duration.expire"), Util.NIL_UUID);
+					if (this.entity instanceof Player) {
+						Player player = (Player) this.entity;
+						player.sendMessage(new TranslatableComponent("modification.damaged_duration.expire"), Util.NIL_UUID);
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_DAMAGE, this.entity);
 					}
 				}
@@ -175,7 +175,7 @@ public class OnDamageShape extends SpellShape {
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
+	public boolean shouldTrace(Player player, SpellShapeProperties params) {
 		return false;
 	}
 	

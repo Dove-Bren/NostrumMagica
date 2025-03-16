@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed.EDragonArmorPart;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed.EDragonOverlayMaterial;
@@ -10,22 +10,22 @@ import com.smanzana.nostrummagica.entity.dragon.RedDragonBaseEntity;
 import com.smanzana.nostrummagica.item.armor.DragonArmor;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 
 public class RenderDragonRed<T extends RedDragonBaseEntity> extends MobRenderer<T, ModelDragonRed<T>> {
 
 	protected final ModelDragonRed<T> dragonModel;
 	
-	public RenderDragonRed(EntityRendererManager renderManagerIn, float shadowSizeIn) {
+	public RenderDragonRed(EntityRenderDispatcher renderManagerIn, float shadowSizeIn) {
 		this(renderManagerIn, new ModelDragonRed<>(), shadowSizeIn);
 	}
 	
-	protected RenderDragonRed(EntityRendererManager renderManagerIn, ModelDragonRed<T> modelBase, float shadowSizeIn) {
+	protected RenderDragonRed(EntityRenderDispatcher renderManagerIn, ModelDragonRed<T> modelBase, float shadowSizeIn) {
 		super(renderManagerIn, modelBase, shadowSizeIn);
 		this.dragonModel = modelBase;
 	}
@@ -33,16 +33,16 @@ public class RenderDragonRed<T extends RedDragonBaseEntity> extends MobRenderer<
 	@SuppressWarnings("deprecation")
 	@Override
 	public ResourceLocation getTextureLocation(T entity) {
-		return AtlasTexture.LOCATION_BLOCKS;
+		return TextureAtlas.LOCATION_BLOCKS;
 	}
 	
 	@Override
-	protected void scale(T entitylivingbaseIn, MatrixStack matrixStackIn, float partialTickTime) {
+	protected void scale(T entitylivingbaseIn, PoseStack matrixStackIn, float partialTickTime) {
 		super.scale(entitylivingbaseIn, matrixStackIn, partialTickTime);
 	}
 	
 	@Override
-	public void render(T entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(T entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		// Set up armor visiblity
 		@Nonnull final ItemStack chestArmor = entityIn.getDragonEquipment(DragonEquipmentSlot.BODY);
 		@Nonnull final ItemStack headArmor = entityIn.getDragonEquipment(DragonEquipmentSlot.HELM);

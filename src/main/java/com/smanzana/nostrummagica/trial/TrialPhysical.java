@@ -4,9 +4,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.passive.IronGolemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.DamageSource;
+import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -20,13 +20,13 @@ public class TrialPhysical extends WorldTrial {
 
 	@SubscribeEvent
 	public void onDeath(LivingDeathEvent e) {
-		if (e.getEntityLiving() instanceof IronGolemEntity) {
+		if (e.getEntityLiving() instanceof IronGolem) {
 			DamageSource source = e.getSource();
 			if (source.getEntity() == null ||
-					!(source.getEntity() instanceof PlayerEntity))
+					!(source.getEntity() instanceof Player))
 				return;
 			
-			PlayerEntity player = (PlayerEntity) source.getEntity();
+			Player player = (Player) source.getEntity();
 			
 			if (!player.getMainHandItem().isEmpty())
 				return;

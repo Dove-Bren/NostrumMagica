@@ -1,27 +1,27 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.util.ModelUtils;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Vector3f;
 
-public class TileEntityObeliskRenderer extends TileEntityRenderer<ObeliskTileEntity> {
+public class TileEntityObeliskRenderer extends BlockEntityRenderer<ObeliskTileEntity> {
 
 	protected static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "block/orb_crystal");
-	protected IBakedModel model;
+	protected BakedModel model;
 	
-	public TileEntityObeliskRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+	public TileEntityObeliskRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
 		super(rendererDispatcherIn);
 	}
 	
@@ -32,8 +32,8 @@ public class TileEntityObeliskRenderer extends TileEntityRenderer<ObeliskTileEnt
 	}
 	
 	@Override
-	public void render(ObeliskTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
-			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+	public void render(ObeliskTileEntity tileEntityIn, float partialTicks, PoseStack matrixStackIn,
+			MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
 		if (tileEntityIn.isMaster())
 			return;

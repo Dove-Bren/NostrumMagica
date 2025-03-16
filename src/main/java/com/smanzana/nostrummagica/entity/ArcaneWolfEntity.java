@@ -55,63 +55,63 @@ import com.smanzana.petcommand.api.pet.PetInfo;
 import com.smanzana.petcommand.api.pet.PetInfo.PetAction;
 import com.smanzana.petcommand.api.pet.PetInfo.SecondaryFlavor;
 
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.BegGoal;
-import net.minecraft.entity.ai.goal.FollowOwnerGoal;
-import net.minecraft.entity.ai.goal.HurtByTargetGoal;
-import net.minecraft.entity.ai.goal.LeapAtTargetGoal;
-import net.minecraft.entity.ai.goal.LookAtGoal;
-import net.minecraft.entity.ai.goal.LookRandomlyGoal;
-import net.minecraft.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
-import net.minecraft.entity.ai.goal.OwnerHurtByTargetGoal;
-import net.minecraft.entity.ai.goal.OwnerHurtTargetGoal;
-import net.minecraft.entity.ai.goal.SitGoal;
-import net.minecraft.entity.ai.goal.SwimGoal;
-import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.monster.AbstractSkeletonEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.WolfEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.potion.Effects;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.BegGoal;
+import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.LeapAtTargetGoal;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
+import net.minecraft.world.entity.ai.goal.SitWhenOrderedToGoal;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.AbstractSkeleton;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.scores.Team;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.Util;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import com.smanzana.nostrummagica.pet.IPetWithSoul.SoulBoundLore;
 
-public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEntityPet, IPetWithSoul, IStabbableEntity, IMagicEntity {
+public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPet, IPetWithSoul, IStabbableEntity, IMagicEntity {
 	
 	public static enum ArcaneWolfElementalType {
 		NONELEMENTAL("nonelemental", 0x00000000, null),
@@ -270,8 +270,8 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	public static interface IWolfAbility {
-		public ITextComponent getName();
-		public ITextComponent getDescription();
+		public Component getName();
+		public Component getDescription();
 		public @Nullable WolfSpellTargetGroup getTargetGroup();
 		public int getCost();
 	}
@@ -306,7 +306,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 				(wolf) -> wolf.hasElementLevel(EMagicElement.EARTH, 3),
 				(wolf, target) -> {
 					return target.getHealth() < target.getMaxHealth()
-							&& target.getEffect(Effects.REGENERATION) == null;
+							&& target.getEffect(MobEffects.REGENERATION) == null;
 				}),
 		MAGIC_SHIELD("magicshield", WolfSpellTargetGroup.SELF, 30,
 				(Spell.CreateAISpell("WolfMagicShield")).addPart(new SpellShapePart(NostrumSpellShapes.Chain, NostrumSpellShapes.Chain.makeProps(8, true))).addPart(new SpellEffectPart(EMagicElement.ICE, 1, EAlteration.SUPPORT)),
@@ -359,7 +359,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 				(Spell.CreateAISpell("WolfSlow")).addPart(new SpellShapePart(NostrumSpellShapes.AI)).addPart(new SpellEffectPart(EMagicElement.LIGHTNING, 1, EAlteration.INFLICT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.LIGHTNING, 1),
 				(wolf, target) -> {
-					return target.getEffect(Effects.MOVEMENT_SLOWDOWN) == null;
+					return target.getEffect(MobEffects.MOVEMENT_SLOWDOWN) == null;
 				}),
 		CHAIN_LIGHTNING("chainlighting", WolfSpellTargetGroup.ENEMY, 40,
 				(Spell.CreateAISpell("WolfChainLightning")).addPart(new SpellShapePart(NostrumSpellShapes.SeekingBullet)).addPart(new SpellShapePart(NostrumSpellShapes.Chain, NostrumSpellShapes.Chain.makeProps(6, true))).addPart(new SpellEffectPart(EMagicElement.LIGHTNING, 2, EAlteration.RUIN)),
@@ -382,8 +382,8 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		private final IWolfPredicate wolfChecker;
 		private final int cost;
 		
-		private final ITextComponent name;
-		private final ITextComponent description;
+		private final Component name;
+		private final Component description;
 		
 		private WolfSpell(String key, @Nullable WolfSpellTargetGroup group, int cost, Spell spell, IWolfPredicate wolfChecker, ISpellPredicate predicate) {
 			this.key = key;
@@ -393,8 +393,8 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 			this.wolfChecker = wolfChecker;
 			this.cost = cost;
 			
-			this.name = new TranslationTextComponent("info.wolf_ability." + key + ".name");
-			this.description = new TranslationTextComponent("info.wolf_ability." + key + ".desc");
+			this.name = new TranslatableComponent("info.wolf_ability." + key + ".name");
+			this.description = new TranslatableComponent("info.wolf_ability." + key + ".desc");
 		}
 		
 		public Spell getSpell() {
@@ -420,19 +420,19 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		}
 		
 		@Override
-		public ITextComponent getName() {
+		public Component getName() {
 			return name;
 		}
 		
 		@Override
-		public ITextComponent getDescription() {
+		public Component getDescription() {
 			return description;
 		}
 	}
 	
 	private static final class StubbedWolfAbility implements IWolfAbility {
-		private final ITextComponent name;
-		private final ITextComponent desc;
+		private final Component name;
+		private final Component desc;
 		private final int manaCost;
 		private final WolfSpellTargetGroup group;
 		
@@ -440,17 +440,17 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 			super();
 			this.manaCost = manaCost;
 			this.group = group;
-			this.name = new TranslationTextComponent("info.wolf_ability." + key + ".name");
-			this.desc = new TranslationTextComponent("info.wolf_ability." + key + ".desc");
+			this.name = new TranslatableComponent("info.wolf_ability." + key + ".name");
+			this.desc = new TranslatableComponent("info.wolf_ability." + key + ".desc");
 		}
 		
 		@Override
-		public ITextComponent getName() {
+		public Component getName() {
 			return name;
 		}
 		
 		@Override
-		public ITextComponent getDescription() {
+		public Component getDescription() {
 			return desc;
 		}
 		
@@ -475,22 +475,22 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	
 	public static final String ID = "entity_arcane_wolf";
 	
-	protected static final DataParameter<Boolean> SOULBOUND = EntityDataManager.<Boolean>defineId(ArcaneWolfEntity.class, DataSerializers.BOOLEAN);
+	protected static final EntityDataAccessor<Boolean> SOULBOUND = SynchedEntityData.<Boolean>defineId(ArcaneWolfEntity.class, EntityDataSerializers.BOOLEAN);
 	
-	protected static final DataParameter<Integer> ATTRIBUTE_XP  = EntityDataManager.<Integer>defineId(ArcaneWolfEntity.class, DataSerializers.INT);
-    protected static final DataParameter<Integer> ATTRIBUTE_LEVEL  = EntityDataManager.<Integer>defineId(ArcaneWolfEntity.class, DataSerializers.INT);
-    protected static final DataParameter<Float> ATTRIBUTE_BOND  = EntityDataManager.<Float>defineId(ArcaneWolfEntity.class, DataSerializers.FLOAT);
-    protected static final DataParameter<Float> ATTRIBUTE_MANA_REGEN  = EntityDataManager.<Float>defineId(ArcaneWolfEntity.class, DataSerializers.FLOAT);
+	protected static final EntityDataAccessor<Integer> ATTRIBUTE_XP  = SynchedEntityData.<Integer>defineId(ArcaneWolfEntity.class, EntityDataSerializers.INT);
+    protected static final EntityDataAccessor<Integer> ATTRIBUTE_LEVEL  = SynchedEntityData.<Integer>defineId(ArcaneWolfEntity.class, EntityDataSerializers.INT);
+    protected static final EntityDataAccessor<Float> ATTRIBUTE_BOND  = SynchedEntityData.<Float>defineId(ArcaneWolfEntity.class, EntityDataSerializers.FLOAT);
+    protected static final EntityDataAccessor<Float> ATTRIBUTE_MANA_REGEN  = SynchedEntityData.<Float>defineId(ArcaneWolfEntity.class, EntityDataSerializers.FLOAT);
     
-    protected static final DataParameter<Integer> MANA  = EntityDataManager.<Integer>defineId(ArcaneWolfEntity.class, DataSerializers.INT);
-    protected static final DataParameter<Integer> MAX_MANA  = EntityDataManager.<Integer>defineId(ArcaneWolfEntity.class, DataSerializers.INT);
-    protected static final DataParameter<PetAction> DATA_PET_ACTION = EntityDataManager.<PetAction>defineId(ArcaneWolfEntity.class, PetJobSerializer.GetInstance());
-    protected static final DataParameter<Integer> RUNE_COLOR = EntityDataManager.<Integer>defineId(ArcaneWolfEntity.class, DataSerializers.INT);
+    protected static final EntityDataAccessor<Integer> MANA  = SynchedEntityData.<Integer>defineId(ArcaneWolfEntity.class, EntityDataSerializers.INT);
+    protected static final EntityDataAccessor<Integer> MAX_MANA  = SynchedEntityData.<Integer>defineId(ArcaneWolfEntity.class, EntityDataSerializers.INT);
+    protected static final EntityDataAccessor<PetAction> DATA_PET_ACTION = SynchedEntityData.<PetAction>defineId(ArcaneWolfEntity.class, PetJobSerializer.GetInstance());
+    protected static final EntityDataAccessor<Integer> RUNE_COLOR = SynchedEntityData.<Integer>defineId(ArcaneWolfEntity.class, EntityDataSerializers.INT);
     
-    protected static final DataParameter<ArcaneWolfElementalType> ELEMENTAL_TYPE = EntityDataManager.<ArcaneWolfElementalType>defineId(ArcaneWolfEntity.class, ArcaneWolfElementalTypeSerializer.instance);
-    protected static final DataParameter<EMagicElement> TRAINING_ELEMENT = EntityDataManager.<EMagicElement>defineId(ArcaneWolfEntity.class, MagicElementDataSerializer.instance);
-    protected static final DataParameter<Integer> TRAINING_XP  = EntityDataManager.<Integer>defineId(ArcaneWolfEntity.class, DataSerializers.INT);
-    protected static final DataParameter<Integer> TRAINING_LEVEL  = EntityDataManager.<Integer>defineId(ArcaneWolfEntity.class, DataSerializers.INT);
+    protected static final EntityDataAccessor<ArcaneWolfElementalType> ELEMENTAL_TYPE = SynchedEntityData.<ArcaneWolfElementalType>defineId(ArcaneWolfEntity.class, ArcaneWolfElementalTypeSerializer.instance);
+    protected static final EntityDataAccessor<EMagicElement> TRAINING_ELEMENT = SynchedEntityData.<EMagicElement>defineId(ArcaneWolfEntity.class, MagicElementDataSerializer.instance);
+    protected static final EntityDataAccessor<Integer> TRAINING_XP  = SynchedEntityData.<Integer>defineId(ArcaneWolfEntity.class, EntityDataSerializers.INT);
+    protected static final EntityDataAccessor<Integer> TRAINING_LEVEL  = SynchedEntityData.<Integer>defineId(ArcaneWolfEntity.class, EntityDataSerializers.INT);
     
     private static final String NBT_SOUL_BOUND = "SoulBound";
     private static final String NBT_ATTR_XP = "AttrXP";
@@ -515,19 +515,19 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
     private static final String UUID_MAGIC_RESIST_MOD = "e68d5719-914d-4a14-88bc-a09e2bf8cbd5";
     private static final String UUID_EXTRA_ARMOR_MOD = "516f982f-1d97-468e-8b07-54efe1b819f6";
     
-    private IInventory inventory;
+    private Container inventory;
     
     private UUID soulID;
     private UUID worldID;
     private int jumpCount;
     
-	public ArcaneWolfEntity(EntityType<? extends ArcaneWolfEntity> type, World worldIn) {
+	public ArcaneWolfEntity(EntityType<? extends ArcaneWolfEntity> type, Level worldIn) {
 		super(type, worldIn);
         
         soulID = UUID.randomUUID();
         worldID = null;
         jumpCount = 0;
-        inventory = new Inventory(ARCANE_WOLF_BASE_INV_SIZE);
+        inventory = new SimpleContainer(ARCANE_WOLF_BASE_INV_SIZE);
 	}
 	
 	@Override
@@ -549,8 +549,8 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 		
 	
-	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		return WolfEntity.createAttributes()
+	public static final AttributeSupplier.Builder BuildAttributes() {
+		return Wolf.createAttributes()
 			.add(Attributes.MOVEMENT_SPEED, 0.35D)
 			.add(Attributes.MAX_HEALTH, 50.0D)
 			.add(Attributes.ARMOR, 10.0D)
@@ -570,7 +570,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public void onSyncedDataUpdated(DataParameter<?> key) {
+	public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
 		super.onSyncedDataUpdated(key);
 	}
 	
@@ -579,8 +579,8 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		//super.initEntityAI();
 		
 		int priority = 1;
-		this.goalSelector.addGoal(priority++, new SwimGoal(this));
-		this.goalSelector.addGoal(priority++, new SitGoal(this));
+		this.goalSelector.addGoal(priority++, new FloatGoal(this));
+		this.goalSelector.addGoal(priority++, new SitWhenOrderedToGoal(this));
 		this.goalSelector.addGoal(priority++, new ArcaneWolfBarrierGoal(this, 5));
 		this.goalSelector.addGoal(priority++, new ArcaneWolfStormGoal(this, 35));
 		this.goalSelector.addGoal(priority++, new ArcaneWolfEldrichGoal(this, 40));
@@ -596,10 +596,10 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 					// Too far
 					if (ArcaneWolfEntity.this.hasWolfCapability(WolfTypeCapability.WOLF_BLINK)
 							&& ArcaneWolfEntity.this.random.nextFloat() < .05) {
-						Vector3d currentPos = ArcaneWolfEntity.this.position();
+						Vec3 currentPos = ArcaneWolfEntity.this.position();
 						if (ArcaneWolfEntity.this.teleportToEnemy(target)) {
 							ArcaneWolfEntity.this.level.playSound(null, currentPos.x, currentPos.y, currentPos.z,
-									SoundEvents.ENDERMAN_TELEPORT, SoundCategory.NEUTRAL, 1f, 1f);
+									SoundEvents.ENDERMAN_TELEPORT, SoundSource.NEUTRAL, 1f, 1f);
 							ArcaneWolfEntity.this.playSound(SoundEvents.ENDERMAN_TELEPORT, 1f, 1f);
 							
 							// If currently training ender, get some xp!
@@ -713,17 +713,17 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		//this.goalSelector.addGoal(priority++, new FollowOwnerAdvancedGoal<EntityArcaneWolf>(this, 1.5f, 0f, .5f));
 		this.goalSelector.addGoal(priority++, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F, true));
 		//this.goalSelector.addGoal(7, new EntityAIMate(this, 1.0D));
-		this.goalSelector.addGoal(priority++, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
+		this.goalSelector.addGoal(priority++, new WaterAvoidingRandomStrollGoal(this, 1.0D));
 		this.goalSelector.addGoal(priority++, new BegGoal(this, 8.0F));
-		this.goalSelector.addGoal(priority++, new LookAtGoal(this, PlayerEntity.class, 8.0F));
-		this.goalSelector.addGoal(priority++, new LookRandomlyGoal(this));
+		this.goalSelector.addGoal(priority++, new LookAtPlayerGoal(this, Player.class, 8.0F));
+		this.goalSelector.addGoal(priority++, new RandomLookAroundGoal(this));
 		
 		priority = 1;
 		//this.targetSelector.addGoal(priority++, new PetTargetGoal<EntityArcaneWolf>(this));
 		this.targetSelector.addGoal(priority++, new OwnerHurtByTargetGoal(this));
 		this.targetSelector.addGoal(priority++, new OwnerHurtTargetGoal(this));
-		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setAlertOthers(ArcaneWolfEntity.class, WolfEntity.class));
-		this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<AbstractSkeletonEntity>(this, AbstractSkeletonEntity.class, false));
+		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setAlertOthers(ArcaneWolfEntity.class, Wolf.class));
+		this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<AbstractSkeleton>(this, AbstractSkeleton.class, false));
 	}
 	
 	@Override
@@ -787,7 +787,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public void travel(Vector3d move) {
+	public void travel(Vec3 move) {
 		//super.travel(strafe, vertical, forward);
 		
 		if (this.onGround && this.getDeltaMovement().y <= 0) {
@@ -825,16 +825,16 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 //				}
 				
 				this.setSpeed((float)this.getAttribute(Attributes.MOVEMENT_SPEED).getValue());
-				super.travel(new Vector3d(strafe, move.y, forward));
+				super.travel(new Vec3(strafe, move.y, forward));
 			}
-			else if (entitylivingbase instanceof PlayerEntity) {
-				this.setDeltaMovement(Vector3d.ZERO);
+			else if (entitylivingbase instanceof Player) {
+				this.setDeltaMovement(Vec3.ZERO);
 			}
 
 			this.animationSpeedOld = this.animationSpeed;
 			double d1 = this.getX() - this.xo;
 			double d0 = this.getZ() - this.zo;
-			float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
+			float f2 = Mth.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 			if (f2 > 1.0F) {
 				f2 = 1.0F;
@@ -869,8 +869,8 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	protected void checkAndHandleLava() {
 		if (this.hasWolfCapability(WolfTypeCapability.LAVA_WALK) && super.isInLava()) {
 			// Copied from Strider
-			ISelectionContext iselectioncontext = ISelectionContext.of(this);
-			if (iselectioncontext.isAbove(FlowingFluidBlock.STABLE_SHAPE, this.blockPosition(), true) && !this.level.getFluidState(this.blockPosition().above()).is(FluidTags.LAVA)) {
+			CollisionContext iselectioncontext = CollisionContext.of(this);
+			if (iselectioncontext.isAbove(LiquidBlock.STABLE_SHAPE, this.blockPosition(), true) && !this.level.getFluidState(this.blockPosition().above()).is(FluidTags.LAVA)) {
 				this.onGround = true;
 			} else {
 				this.setDeltaMovement(this.getDeltaMovement().scale(0.5D).add(0.0D, 0.05D, 0.0D));
@@ -894,7 +894,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public boolean canMate(AnimalEntity otherAnimal) {
+	public boolean canMate(Animal otherAnimal) {
 		return false;
 	}
 	
@@ -922,7 +922,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand) {
+	public InteractionResult /*processInteract*/ mobInteract(Player player, InteractionHand hand) {
 		// Shift-right click toggles sitting.
 		// When not sitting, right-click mounts the wolf
 		// When sitting, will eventually open a GUI
@@ -936,7 +936,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 						this.addTrainingXP(500);
 					}
 				}
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			} else if (this.getHealth() < this.getMaxHealth() && isHungerItem(stack)) {
 				if (!this.level.isClientSide) {
 					this.heal(5f);
@@ -946,44 +946,44 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 						player.getItemInHand(hand).shrink(1);
 					}
 				}
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			} else if (this.isOrderedToSit() && stack.isEmpty()) {
 				if (!this.level.isClientSide) {
 					//player.openGui(NostrumMagica.instance, NostrumGui.dragonID, this.world, (int) this.getPosX(), (int) this.getPosY(), (int) this.getPosZ());
 					PetCommandAPI.OpenPetGUI(player, this);
 				}
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			} else if (stack.isEmpty()) {
 				if (!this.level.isClientSide) {
 					if (this.hasWolfCapability(WolfBondCapability.RIDEABLE)) {
 						if (this.getHealth() < ARCANE_WOLF_WARN_HEALTH) {
-							player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.low_health", this.getName()), Util.NIL_UUID);
+							player.sendMessage(new TranslatableComponent("info.tamed_arcane_wolf.low_health", this.getName()), Util.NIL_UUID);
 						} else {
 							player.startRiding(this);
 						}
 					} else {
-						player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.no_ride", this.getName()), Util.NIL_UUID);
+						player.sendMessage(new TranslatableComponent("info.tamed_arcane_wolf.no_ride", this.getName()), Util.NIL_UUID);
 					}
 				}
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 			else {
 				; // fall through; we didn't handle it
 			}
-		} else if (!this.isTame() && player.isCreative() && hand == Hand.MAIN_HAND && player.isShiftKeyDown()) {
+		} else if (!this.isTame() && player.isCreative() && hand == InteractionHand.MAIN_HAND && player.isShiftKeyDown()) {
 			if (!level.isClientSide) {
 				this.tame(player);
 			}
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		} else {
 			// Someone other than the owner clicked
 			if (!this.level.isClientSide) {
-				player.sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.not_yours", this.getName()), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.tamed_arcane_wolf.not_yours", this.getName()), Util.NIL_UUID);
 			}
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
-		return ActionResultType.PASS;
+		return InteractionResult.PASS;
 	}
 	
 	@Nullable
@@ -1015,7 +1015,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	 public boolean canBeLeashed(PlayerEntity player) {
+	 public boolean canBeLeashed(Player player) {
 		return !isOrderedToSit() && player == getOwner();
 	}
 	
@@ -1363,11 +1363,11 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		return size;
 	}
 	
-	protected IInventory ensureInventorySize() {
+	protected Container ensureInventorySize() {
 		final int size = getInventorySize();
 		if (this.inventory == null || this.inventory.getContainerSize() != size) {
-			IInventory old = this.inventory;
-			this.inventory = new Inventory(size);
+			Container old = this.inventory;
+			this.inventory = new SimpleContainer(size);
 			
 			if (old != null) {
 				// Copy over what we can. Drop the rest
@@ -1384,7 +1384,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		return this.inventory;
 	}
 	
-	public IInventory getInventory() {
+	public Container getInventory() {
 		if (level == null || level.isClientSide) {
 			ensureInventorySize(); // Client doesn't read NBT normally and will have wrong size
 		}
@@ -1409,7 +1409,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		return super.causeFallDamage(Math.max(0, distance-this.getFallReduction()), damageMulti);
 	}
 	
-	public void addAdditionalSaveData(CompoundNBT compound) {
+	public void addAdditionalSaveData(CompoundTag compound) {
 		super.addAdditionalSaveData(compound);
 		
 		compound.putBoolean(NBT_SOUL_BOUND, this.isSoulBound());
@@ -1436,7 +1436,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public void readAdditionalSaveData(CompoundNBT compound) {
+	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 		
 		this.setSoulBound(compound.getBoolean(NBT_SOUL_BOUND));
@@ -1578,8 +1578,8 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 			LivingEntity owner = this.getOwner();
 			float health = this.getHealth();
 			if (health > 0f && health < ARCANE_WOLF_WARN_HEALTH) {
-				if (owner != null && owner instanceof PlayerEntity) {
-					((PlayerEntity) this.getOwner()).sendMessage(new TranslationTextComponent("info.tamed_arcane_wolf.hurt", this.getName()), Util.NIL_UUID);
+				if (owner != null && owner instanceof Player) {
+					((Player) this.getOwner()).sendMessage(new TranslatableComponent("info.tamed_arcane_wolf.hurt", this.getName()), Util.NIL_UUID);
 				}
 				this.stopRiding();
 			} else if (health > 0f) {
@@ -1742,7 +1742,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		LivingEntity owner = this.getOwner();
 		if (owner != null) {
 			this.playSound(SoundEvents.WOLF_AMBIENT, 1f, 1f);
-			owner.sendMessage(new StringTextComponent(this.getName().getString() + " leveled up!"), Util.NIL_UUID);
+			owner.sendMessage(new TextComponent(this.getName().getString() + " leveled up!"), Util.NIL_UUID);
 		}
 	}
 	
@@ -1922,7 +1922,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 	
 	@Override
-	public IPetGUISheet<? extends IEntityPet>[] getContainerSheets(PlayerEntity player) {
+	public IPetGUISheet<? extends IEntityPet>[] getContainerSheets(Player player) {
 		return ArrayUtil.MakeArray(
 				new ArcaneWolfInfoSheet(this),
 				new ArcaneWolfBondInfoSheet(this),
@@ -2055,7 +2055,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 		}
 	}
 	
-	public static ArcaneWolfEntity TransformWolf(WolfEntity wolf, PlayerEntity player) {
+	public static ArcaneWolfEntity TransformWolf(Wolf wolf, Player player) {
 		ArcaneWolfEntity newWolf = new ArcaneWolfEntity(NostrumEntityTypes.arcaneWolf, wolf.level);
 		newWolf.setPos(wolf.getX(), wolf.getY(), wolf.getZ());
 		newWolf.tame(player);
@@ -2119,7 +2119,7 @@ public class ArcaneWolfEntity extends WolfEntity implements ITameableEntity, IEn
 	}
 
 	@Override
-	public CompoundNBT serializeNBT() {
+	public CompoundTag serializeNBT() {
 		return super.serializeNBT();
 	}
 

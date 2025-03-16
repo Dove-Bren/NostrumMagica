@@ -3,15 +3,15 @@ package com.smanzana.nostrummagica.util;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ModelManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.resources.ResourceLocation;
 
 public class ModelUtils {
 
-	public static final IBakedModel GetBakedModel(ResourceLocation loc) {
+	public static final BakedModel GetBakedModel(ResourceLocation loc) {
 		final ModelManager manager = Minecraft.getInstance().getModelManager();
-		IBakedModel model = manager.getModel(loc);
+		BakedModel model = manager.getModel(loc);
 		if (model == null || model == manager.getMissingModel()) {
 			NostrumMagica.logger.error("Could not find model to match " + loc);
 			model = manager.getMissingModel();

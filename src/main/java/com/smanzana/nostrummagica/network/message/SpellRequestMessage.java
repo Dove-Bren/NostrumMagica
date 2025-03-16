@@ -8,8 +8,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.spell.Spell;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client is asking server for details about a spell (or multiple)
@@ -47,11 +47,11 @@ public class SpellRequestMessage {
 		this.ids = ids;
 	}
 
-	public static SpellRequestMessage decode(PacketBuffer buf) {
+	public static SpellRequestMessage decode(FriendlyByteBuf buf) {
 		return new SpellRequestMessage(buf.readVarIntArray());
 	}
 
-	public static void encode(SpellRequestMessage msg, PacketBuffer buf) {
+	public static void encode(SpellRequestMessage msg, FriendlyByteBuf buf) {
 		buf.writeVarIntArray(msg.ids);
 	}
 

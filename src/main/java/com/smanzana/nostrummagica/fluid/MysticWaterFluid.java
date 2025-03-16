@@ -10,28 +10,28 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.MysticWaterBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidAttributes;
@@ -63,7 +63,7 @@ public class MysticWaterFluid extends Fluid {
 	}
 	
 	@Override
-	protected void createFluidStateDefinition(StateContainer.Builder<Fluid, FluidState> builder) {
+	protected void createFluidStateDefinition(StateDefinition.Builder<Fluid, FluidState> builder) {
 		super.createFluidStateDefinition(builder);
 		builder.add(LEVEL_1_8, POWER);
 	}
@@ -76,7 +76,7 @@ public class MysticWaterFluid extends Fluid {
 	@Nullable
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public IParticleData getDripParticle() {
+	public ParticleOptions getDripParticle() {
 		return ParticleTypes.DRIPPING_WATER;
 	}
 	
@@ -87,7 +87,7 @@ public class MysticWaterFluid extends Fluid {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void animateTick(World worldIn, BlockPos pos, FluidState state, Random rand) {
+	public void animateTick(Level worldIn, BlockPos pos, FluidState state, Random rand) {
 		super.animateTick(worldIn, pos, state, rand);
 	}
 	
@@ -119,11 +119,11 @@ public class MysticWaterFluid extends Fluid {
 	}
 	
 	@Override
-	public int getTickDelay(IWorldReader p_205569_1_) {
+	public int getTickDelay(LevelReader p_205569_1_) {
 		return (20 * 2);
 	}
 	
-	protected boolean shouldDry(World worldIn, BlockPos pos, FluidState state) {
+	protected boolean shouldDry(Level worldIn, BlockPos pos, FluidState state) {
 		// power 0 should dry up every tick
 		// power 1 should dry up every OTHER tick
 		// power 2 should never dry up
@@ -140,7 +140,7 @@ public class MysticWaterFluid extends Fluid {
 	}
 	
 	@Override
-	public void tick(World worldIn, BlockPos pos, FluidState state) {
+	public void tick(Level worldIn, BlockPos pos, FluidState state) {
 		// Slowly dry up
 		if (!blockAboveIsWater(state, worldIn, pos) && shouldDry(worldIn, pos, state)) {
 			final int newLevel = this.getAmount(state) - 1;
@@ -155,7 +155,7 @@ public class MysticWaterFluid extends Fluid {
 	}
 	
 	@Override // no clue what this is
-	public boolean canBeReplacedWith(FluidState p_215665_1_, IBlockReader p_215665_2_, BlockPos p_215665_3_, Fluid p_215665_4_, Direction p_215665_5_) {
+	public boolean canBeReplacedWith(FluidState p_215665_1_, BlockGetter p_215665_2_, BlockPos p_215665_3_, Fluid p_215665_4_, Direction p_215665_5_) {
 		return false; // ?return p_215665_5_ == Direction.DOWN && !p_215665_4_.isIn(FluidTags.WATER);
 	}
 	
@@ -170,15 +170,15 @@ public class MysticWaterFluid extends Fluid {
 	}
 
 	@Override
-	protected Vector3d getFlow(IBlockReader blockReader, BlockPos pos, FluidState fluidState) {
-		return Vector3d.ZERO;
+	protected Vec3 getFlow(BlockGetter blockReader, BlockPos pos, FluidState fluidState) {
+		return Vec3.ZERO;
 	}
 	
-	protected boolean blockAboveIsWater(FluidState state, IBlockReader blockReader, BlockPos pos) {
+	protected boolean blockAboveIsWater(FluidState state, BlockGetter blockReader, BlockPos pos) {
 		return blockReader.getFluidState(pos.above()).is(FluidTags.WATER);
 	}
 
-	public float getHeight(FluidState state, IBlockReader blockReader, BlockPos pos) {
+	public float getHeight(FluidState state, BlockGetter blockReader, BlockPos pos) {
 		return blockAboveIsWater(state, blockReader, pos) ? 1.0F : state.getOwnHeight();
 	}
 
@@ -202,9 +202,9 @@ public class MysticWaterFluid extends Fluid {
 		return true;
 	}
 
-	public VoxelShape getShape(FluidState state, IBlockReader blockReader, BlockPos pos) {
-		return state.getAmount() == 9 && blockAboveIsWater(state, blockReader, pos) ? VoxelShapes.block() : this.shapes.computeIfAbsent(state, (stateIn) -> {
-			return VoxelShapes.box(0.0D, 0.0D, 0.0D, 1.0D, (double)stateIn.getHeight(blockReader, pos), 1.0D);
+	public VoxelShape getShape(FluidState state, BlockGetter blockReader, BlockPos pos) {
+		return state.getAmount() == 9 && blockAboveIsWater(state, blockReader, pos) ? Shapes.block() : this.shapes.computeIfAbsent(state, (stateIn) -> {
+			return Shapes.box(0.0D, 0.0D, 0.0D, 1.0D, (double)stateIn.getHeight(blockReader, pos), 1.0D);
 		});
 	}
 }

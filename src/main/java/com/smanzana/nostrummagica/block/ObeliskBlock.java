@@ -8,30 +8,30 @@ import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity.Corner;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.pathfinding.PathType;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.ToolType;
 
 /**
@@ -73,12 +73,12 @@ public class ObeliskBlock extends Block {
 	}
 	
 	@Override
-	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, BlockGetter worldIn, BlockPos pos, PathComputationType type) {
         return false;
     }
 	
 	@Override
-	public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
+	public int getLightValue(BlockState state, BlockGetter world, BlockPos pos) {
 		if (state == null)
 			return 0;
 		if (!state.getValue(TILE))
@@ -91,7 +91,7 @@ public class ObeliskBlock extends Block {
 	}
 	
 	@Override
-	public int getLightBlock(BlockState state, IBlockReader world, BlockPos pos) {
+	public int getLightBlock(BlockState state, BlockGetter world, BlockPos pos) {
 		if (state == null)
 			return 15;
 		if (!state.getValue(TILE))
@@ -101,16 +101,16 @@ public class ObeliskBlock extends Block {
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader source, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter source, BlockPos pos, CollisionContext context) {
 		if (state.getValue(TILE) && !state.getValue(MASTER)) {
 			return TILE_SHAPE;
 		} else {
-			return VoxelShapes.block();
+			return Shapes.block();
 		}
 	}
 	
 	@Override
-	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
+	public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
 		;
 	}
 	
@@ -125,16 +125,16 @@ public class ObeliskBlock extends Block {
 //	}
 	
 	@Override
-	public boolean canBeReplaced(BlockState state, BlockItemUseContext context) {
+	public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
         return false;
     }
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(MASTER, TILE);
 	}
 	
-	private void destroy(World world, BlockPos pos, BlockState state) {
+	private void destroy(Level world, BlockPos pos, BlockState state) {
 		if (world.isClientSide)
 			return;
 		
@@ -148,7 +148,7 @@ public class ObeliskBlock extends Block {
 		// Else, search up and down to find a tile
 		// If none are found, exit; we'll be destroyed
 		if (state.getValue(TILE)) {
-			TileEntity ent = world.getBlockEntity(pos);
+			BlockEntity ent = world.getBlockEntity(pos);
 			if (ent == null || !(ent instanceof ObeliskTileEntity))
 				return;
 			
@@ -164,7 +164,7 @@ public class ObeliskBlock extends Block {
 			// just cause this is rarely called and it's not THAT many checks
 			for (int i = -(TILE_HEIGHT - 1); i < TILE_HEIGHT; i++) {
 				BlockPos bp = pos.offset(0, i, 0);
-				TileEntity ent = world.getBlockEntity(bp);
+				BlockEntity ent = world.getBlockEntity(bp);
 				if (ent == null || !(ent instanceof ObeliskTileEntity))
 					continue;
 				
@@ -178,8 +178,8 @@ public class ObeliskBlock extends Block {
 	}
 	
 	@Override
-	public BlockRenderType getRenderShape(BlockState state) {
-		return BlockRenderType.MODEL;
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.MODEL;
 	}
 	
 	public static boolean blockIsMaster(BlockState state) {
@@ -203,7 +203,7 @@ public class ObeliskBlock extends Block {
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		if (state.getValue(TILE))
 			return new ObeliskTileEntity(state.getValue(MASTER));
 		
@@ -211,7 +211,7 @@ public class ObeliskBlock extends Block {
 	}
 	
 	@Override
-	public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			destroy(world, pos, state);
 			world.removeBlockEntity(pos);
@@ -227,18 +227,18 @@ public class ObeliskBlock extends Block {
 //	}
 	
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		
 		if (state.getValue(MASTER) == false) {
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (!ModConfig.config.obeliskReqMagic() && (attr == null || !attr.isUnlocked())) {
 			if (worldIn.isClientSide) {
-				player.sendMessage(new TranslationTextComponent("info.obelisk.nomagic"), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.obelisk.nomagic"), Util.NIL_UUID);
 			}
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
 		if (!worldIn.isClientSide()) {
@@ -246,14 +246,14 @@ public class ObeliskBlock extends Block {
 		} else {
 			NostrumMagica.instance.proxy.openObeliskScreen(worldIn, pos);
 		}
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 	
 	protected static int xs[] = new int[] {-TILE_OFFSETH, -TILE_OFFSETH, TILE_OFFSETH, TILE_OFFSETH};
 	protected static int zs[] = new int[] {-TILE_OFFSETH, TILE_OFFSETH, -TILE_OFFSETH, TILE_OFFSETH};
 	protected static Corner corners[] = new Corner[] {Corner.SW, Corner.NW, Corner.SE, Corner.NE};
 	
-	public static boolean canSpawnObelisk(World world, BlockPos center) {
+	public static boolean canSpawnObelisk(Level world, BlockPos center) {
 		BlockState state = world.getBlockState(center);
 		if (state == null || state.getDestroySpeed(world, center) > 2.0f)
 			return false;
@@ -266,7 +266,7 @@ public class ObeliskBlock extends Block {
 		return true;
 	}
 	
-	public static boolean spawnObelisk(World world, BlockPos center) {
+	public static boolean spawnObelisk(Level world, BlockPos center) {
 		if (!canSpawnObelisk(world, center)) {
 			return false;
 		}
@@ -293,7 +293,7 @@ public class ObeliskBlock extends Block {
 		return true;
 	}
 	
-	private static boolean checkPillar(World world, BlockPos center) {
+	private static boolean checkPillar(Level world, BlockPos center) {
 		for (int i = 0; i < TILE_HEIGHT; i++) {
 			if (!world.isEmptyBlock(center.offset(0, i, 0)))
 				return false;
@@ -302,7 +302,7 @@ public class ObeliskBlock extends Block {
 		return true;
 	}
 
-	private static void spawnPillar(World world, BlockPos center, Corner corner) {
+	private static void spawnPillar(Level world, BlockPos center, Corner corner) {
 		for (int i = 0; i < TILE_HEIGHT; i++) {
 			BlockPos pos = center.offset(0, i, 0);
 			if (i == TILE_OFFSETY - 1) {

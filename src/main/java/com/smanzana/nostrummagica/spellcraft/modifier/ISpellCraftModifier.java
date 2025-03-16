@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellIngredient;
 import com.smanzana.nostrummagica.spellcraft.SpellIngredientBuilder;
 
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
 
 public interface ISpellCraftModifier {
 
@@ -14,6 +14,6 @@ public interface ISpellCraftModifier {
 	
 	public void modify(SpellCraftContext context, SpellIngredient originalPart, SpellIngredientBuilder builder);
 
-	public List<ITextComponent> getDetails(List<ITextComponent> lines);
+	public List<Component> getDetails(List<Component> lines);
 	
 }

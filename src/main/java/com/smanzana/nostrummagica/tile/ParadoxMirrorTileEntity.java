@@ -17,22 +17,22 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTileEntity, IAetherInfusableTileEntity {
+public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBlockEntity, IAetherInfusableTileEntity {
 	
 	private @Nullable BlockPos linkedPosition;
 	
@@ -74,11 +74,11 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	private static final String NBT_LINKED_POS = "linked_pos";
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		if (linkedPosition != null) {
-			nbt.put(NBT_LINKED_POS, NBTUtil.writeBlockPos(linkedPosition));
+			nbt.put(NBT_LINKED_POS, NbtUtils.writeBlockPos(linkedPosition));
 		}
 		
 		// Could save and load cooldown but client won't use it and I don't care if people save/load over and over to transfer fast
@@ -87,7 +87,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt == null)
@@ -97,24 +97,24 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 			// Legacy!
 			linkedPosition = WorldUtil.blockPosFromLong1_12_2(nbt.getLong(NBT_LINKED_POS));
 		} else if (nbt.contains(NBT_LINKED_POS)) {
-			linkedPosition = NBTUtil.readBlockPos(nbt.getCompound(NBT_LINKED_POS));
+			linkedPosition = NbtUtils.readBlockPos(nbt.getCompound(NBT_LINKED_POS));
 		} else {
 			linkedPosition = null;
 		}
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
@@ -173,7 +173,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 			return null;
 		}
 		
-		TileEntity te = getLevel().getBlockEntity(pos);
+		BlockEntity te = getLevel().getBlockEntity(pos);
 		if (te == null || !(te instanceof ParadoxMirrorTileEntity)) {
 			return null;
 		}
@@ -212,8 +212,8 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 	}
 	
 	public void receiveAndSpawnItem(@Nonnull ItemStack stack, BlockPos fromPos) {
-		Vector3d spawnLoc = getSpawnLocation();
-		Vector3d spawnVelocity = getSpawnVelocity();
+		Vec3 spawnLoc = getSpawnLocation();
+		Vec3 spawnVelocity = getSpawnVelocity();
 		ItemEntity entity = new ItemEntity(getLevel(), spawnLoc.x, spawnLoc.y, spawnLoc.z, stack);
 		entity.setDeltaMovement(spawnVelocity);
 		entity.hurtMarked = true;
@@ -224,7 +224,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		playReceiveEffect(entity, fromPos);
 	}
 	
-	protected Vector3d getSpawnLocation() {
+	protected Vec3 getSpawnLocation() {
 		BlockPos pos = this.getBlockPos();
 		double x = pos.getX() + .5;
 		double y = pos.getY() + .4;
@@ -251,15 +251,15 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 		
 		}
 		
-		return new Vector3d(x, y, z);
+		return new Vec3(x, y, z);
 	}
 	
-	protected Vector3d getSpawnVelocity() {
-		return Vector3d.atLowerCornerOf(getFacing().getNormal()).scale(.1);
+	protected Vec3 getSpawnVelocity() {
+		return Vec3.atLowerCornerOf(getFacing().getNormal()).scale(.1);
 	}
 	
 	protected @Nullable ItemEntity findNearbyItem() {
-		AxisAlignedBB bb = new AxisAlignedBB(0, 0, 0, 1, 1, 1).move(this.getBlockPos());
+		AABB bb = new AABB(0, 0, 0, 1, 1, 1).move(this.getBlockPos());
 		for (ItemEntity entity : level.getEntitiesOfClass(ItemEntity.class, bb)) {
 			// Make sure entity isn't in the list of entities we've created
 			if (receivedEntities.contains(entity)) {
@@ -300,7 +300,7 @@ public class ParadoxMirrorTileEntity extends TileEntity implements ITickableTile
 			return;
 		}
 		
-		Vector3d spawnPos = this.getSpawnLocation();
+		Vec3 spawnPos = this.getSpawnLocation();
 		
 		NostrumParticles.GLOW_ORB.spawn(getLevel(), new SpawnParams(
 				2, // spawn count

@@ -12,13 +12,13 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.SpellEffectEvent.SpellEffectEndEvent;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -32,7 +32,7 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	protected float lastDamage;
 	protected @Nullable LivingEntity lastAttacker;
 	
-	protected CursedGlassTileEntity(TileEntityType<? extends CursedGlassTileEntity> tileType) {
+	protected CursedGlassTileEntity(BlockEntityType<? extends CursedGlassTileEntity> tileType) {
 		super(tileType);
 		requiredDamage = 4f;
 		lastDamageTicks = -1;
@@ -51,7 +51,7 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	private static final String NBT_NO_SWITCH = "no_switch";
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		nbt.putFloat(NBT_REQUIRED_DAMAGE, this.requiredDamage);
@@ -64,7 +64,7 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		this.requiredDamage = nbt.getFloat(NBT_REQUIRED_DAMAGE);
@@ -143,12 +143,12 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	}
 	
 	@Override
-	protected Vector3d getEntityOffset() {
-		return new Vector3d(0.5, 0, 0.5);
+	protected Vec3 getEntityOffset() {
+		return new Vec3(0.5, 0, 0.5);
 	}
 	
 	@Override
-	protected SwitchTriggerEntity makeTriggerEntity(World world, double x, double y, double z) {
+	protected SwitchTriggerEntity makeTriggerEntity(Level world, double x, double y, double z) {
 		CursedGlassTriggerEntity ent = new CursedGlassTriggerEntity(NostrumEntityTypes.cursedGlassTrigger, world);
 		ent.setPos(x, y, z);
 		return ent;

@@ -13,12 +13,12 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.TextUtils;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 /**
  * Base class for Nostrum skills.
@@ -60,7 +60,7 @@ public class Skill {
 	protected final int offsetX;
 	protected final int offsetY;
 	
-	private final ITextComponent name;
+	private final Component name;
 
 	/**
 	 * Creates a new skill.
@@ -82,7 +82,7 @@ public class Skill {
 		this.offsetX = x;
 		this.offsetY = y;
 		
-		name = new TranslationTextComponent("skill." + key.getNamespace() + "." + key.getPath());
+		name = new TranslatableComponent("skill." + key.getNamespace() + "." + key.getPath());
 		
 		Skill.register(this);
 	}
@@ -95,11 +95,11 @@ public class Skill {
 		return category;
 	}
 	
-	public ITextComponent getName() {
+	public Component getName() {
 		return name;
 	}
 	
-	public List<ITextComponent> getDescription() {
+	public List<Component> getDescription() {
 		return TextUtils.GetTranslatedList("skill." + key.getNamespace() + "." + key.getPath() + ".desc");
 	}
 	
@@ -122,7 +122,7 @@ public class Skill {
 		return this.offsetY;
 	}
 	
-	public void addToPlayer(PlayerEntity player) {
+	public void addToPlayer(Player player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return;
@@ -132,7 +132,7 @@ public class Skill {
 		if (!player.level.isClientSide)
 			NostrumMagicaSounds.SUCCESS_QUEST.play(player.level, player.getX(), player.getY(), player.getZ());
 		else
-			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
+			NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
 	}
 	
 	/**
@@ -142,11 +142,11 @@ public class Skill {
 	 * @param player
 	 * @return
 	 */
-	public boolean isHidden(PlayerEntity player) {
+	public boolean isHidden(Player player) {
 		return false;
 	}
 	
-	public boolean meetsRequirements(PlayerEntity player) {
+	public boolean meetsRequirements(Player player) {
 		// Only thing to check here is that player has any parents already
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (this.parent != null) {

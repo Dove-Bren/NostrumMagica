@@ -12,15 +12,15 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -59,8 +59,8 @@ public class MagicEffectProxy {
 			return this;
 		}
 		
-		public CompoundNBT toNBT() {
-			CompoundNBT tag = new CompoundNBT();
+		public CompoundTag toNBT() {
+			CompoundTag tag = new CompoundTag();
 			
 			if (element != null) {
 				tag.putString(NBT_ELEMENT, element.name().toLowerCase());
@@ -77,7 +77,7 @@ public class MagicEffectProxy {
 			return tag;
 		}
 		
-		public static EffectData fromNBT(CompoundNBT nbt) {
+		public static EffectData fromNBT(CompoundTag nbt) {
 			EffectData data = new EffectData();
 			
 			if (nbt.contains(NBT_ELEMENT)) {
@@ -331,7 +331,7 @@ public class MagicEffectProxy {
 	}
 	
 	private void removeEffect(LivingEntity entity, SpecialEffect effect) {
-		Effect potion = null;
+		MobEffect potion = null;
 		switch (effect) {
 		case SHIELD_PHYSICAL:
 			potion = NostrumEffects.physicalShield;
@@ -347,7 +347,7 @@ public class MagicEffectProxy {
 		}
 		
 		if (potion != null) {
-			EffectInstance eff = entity.getEffect(potion);
+			MobEffectInstance eff = entity.getEffect(potion);
 			if (eff != null && eff.getDuration() > 1) {
 				entity.removeEffect(potion);
 			}
@@ -405,12 +405,12 @@ public class MagicEffectProxy {
 			return;
 		}
 		
-		for (ServerPlayerEntity player : ((ServerWorld) base.level).players()) {
-			if (!(player instanceof ServerPlayerEntity)) {
+		for (ServerPlayer player : ((ServerLevel) base.level).players()) {
+			if (!(player instanceof ServerPlayer)) {
 				continue;
 			}
 			
-			NostrumMagica.instance.proxy.updateEntityEffect((ServerPlayerEntity) player, base, type, value);
+			NostrumMagica.instance.proxy.updateEntityEffect((ServerPlayer) player, base, type, value);
 		}
 	}
 }

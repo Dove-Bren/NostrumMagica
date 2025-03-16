@@ -11,23 +11,23 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.DyeColor;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.TranslatableComponent;
 
-public class LockedDoorTileEntity extends TileEntity implements ITickableTileEntity, IWorldKeyHolder, IUniqueBlueprintTileEntity {
+public class LockedDoorTileEntity extends BlockEntity implements TickableBlockEntity, IWorldKeyHolder, IUniqueBlueprintTileEntity {
 
 	private static final String NBT_LOCK = "lockkey";
 	private static final String NBT_COLOR = "color";
@@ -36,7 +36,7 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 	private DyeColor color;
 	private int ticksExisted;
 	
-	protected LockedDoorTileEntity(TileEntityType<? extends LockedDoorTileEntity> type) {
+	protected LockedDoorTileEntity(BlockEntityType<? extends LockedDoorTileEntity> type) {
 		super(type);
 		lockKey = new WorldKey();
 		color = DyeColor.GRAY;
@@ -52,7 +52,7 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		nbt.put(NBT_LOCK, lockKey.asNBT());
@@ -62,7 +62,7 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt == null)
@@ -77,17 +77,17 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
@@ -111,13 +111,13 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 		}
 	}
 	
-	public void attemptUnlock(PlayerEntity player) {
+	public void attemptUnlock(Player player) {
 		if (player.isCreative()
 				|| AutoDungeons.GetWorldKeys().consumeKey(lockKey)
 				) {
 			unlock();
 		} else {
-			player.sendMessage(new TranslationTextComponent("info.locked_door.nokey"), Util.NIL_UUID);
+			player.sendMessage(new TranslatableComponent("info.locked_door.nokey"), Util.NIL_UUID);
 			NostrumMagicaSounds.HOOKSHOT_TICK.play(player.level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
 		}
 	}
@@ -130,7 +130,7 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 		NostrumParticles.WARD.spawn(level, new SpawnParams(
 				50, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5, .75,
 				40, 10,
-				new Vector3d(0, .1, 0), new Vector3d(flySpeed, flySpeed / 2, flySpeed)
+				new Vec3(0, .1, 0), new Vec3(flySpeed, flySpeed / 2, flySpeed)
 				).gravity(.075f));
 		NostrumMagicaSounds.LORE.play(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
 	}
@@ -189,8 +189,8 @@ public class LockedDoorTileEntity extends TileEntity implements ITickableTileEnt
 		return this.getBlockState().getValue(LockedDoorBlock.FACING);
 	}
 	
-	private MutableBoundingBox boundsStach = null;
-	public MutableBoundingBox getDoorBounds() {
+	private BoundingBox boundsStach = null;
+	public BoundingBox getDoorBounds() {
 		if (boundsStach == null) {
 			boundsStach = LockedDoorBlock.FindDisplayBounds(getLevel(), getBlockPos());
 		}

@@ -4,10 +4,10 @@ import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client requests teleportation in a portal in the world.
@@ -18,7 +18,7 @@ public class WorldPortalTeleportRequestMessage {
 
 	public static void handle(WorldPortalTeleportRequestMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
-		ServerPlayerEntity sp = ctx.get().getSender();
+		ServerPlayer sp = ctx.get().getSender();
 		
 		ctx.get().enqueueWork(() -> {
 			NostrumMagica.instance.proxy.attemptBlockTeleport(sp, message.portalPos);				
@@ -35,11 +35,11 @@ public class WorldPortalTeleportRequestMessage {
 		this.portalPos = portalPos;
 	}
 
-	public static WorldPortalTeleportRequestMessage decode(PacketBuffer buf) {
+	public static WorldPortalTeleportRequestMessage decode(FriendlyByteBuf buf) {
 		return new WorldPortalTeleportRequestMessage(buf.readBlockPos());
 	}
 
-	public static void encode(WorldPortalTeleportRequestMessage msg, PacketBuffer buf) {
+	public static void encode(WorldPortalTeleportRequestMessage msg, FriendlyByteBuf buf) {
 		buf.writeBlockPos(msg.portalPos);
 	}
 }

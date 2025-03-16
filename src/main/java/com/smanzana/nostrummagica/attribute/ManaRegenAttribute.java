@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.attribute;
 
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.RangedAttribute;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.RangedAttribute;
+import net.minecraft.network.chat.Component;
 
 public class ManaRegenAttribute extends RangedAttribute implements IPrintableAttribute {
 	
@@ -14,7 +14,7 @@ public class ManaRegenAttribute extends RangedAttribute implements IPrintableAtt
 	}
 
 	@Override
-	public ITextComponent formatModifier(AttributeModifier modifier) {
+	public Component formatModifier(AttributeModifier modifier) {
 		return IPrintableAttribute.formatAttributeValuePercentage(this, modifier);
 	}
 

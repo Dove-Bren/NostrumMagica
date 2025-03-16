@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 
 /**
  * Top level entry for a spell log.

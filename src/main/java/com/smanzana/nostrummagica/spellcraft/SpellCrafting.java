@@ -21,18 +21,18 @@ import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 
 public class SpellCrafting {
 	
-	public static boolean CanCraftSpells(PlayerEntity player) {
+	public static boolean CanCraftSpells(Player player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		return attr != null && attr.isUnlocked() && attr.getCompletedResearches().contains("spellcraft");
 	}
 	
-	public static boolean CheckForValidRunes(SpellCraftContext context, IInventory inventory, int startIdx, int slotCount, @Nonnull List<String> errorsOut) {
+	public static boolean CheckForValidRunes(SpellCraftContext context, Container inventory, int startIdx, int slotCount, @Nonnull List<String> errorsOut) {
 		@Nonnull ItemStack stack;
 		boolean valid = true;
 		
@@ -101,7 +101,7 @@ public class SpellCrafting {
 	}
 	
 	public static @Nullable Spell CreateSpellFromRunes(SpellCraftContext context, @Nullable SpellCraftPattern pattern,
-			String spellName, IInventory inventory, int startIdx, int slotCount,
+			String spellName, Container inventory, int startIdx, int slotCount,
 			@Nullable List<String> errorsOut, @Nullable List<SpellPartSummary> partSummaryOut) {
 		List<SpellCraftPart> parts = new ArrayList<>(slotCount);
 		boolean parseSuccess = ParseRunes(inventory, startIdx, slotCount, context, pattern, parts, errorsOut);
@@ -214,7 +214,7 @@ public class SpellCrafting {
 		return cost;
 	}
 	
-	public static int CalculateManaCostFromRunes(SpellCraftContext context, @Nullable SpellCraftPattern pattern, IInventory inventory, int startIdx, int slotCount) {
+	public static int CalculateManaCostFromRunes(SpellCraftContext context, @Nullable SpellCraftPattern pattern, Container inventory, int startIdx, int slotCount) {
 		List<SpellCraftPart> parts = new ArrayList<>(slotCount);
 		ParseRunes(inventory, startIdx, slotCount, context, pattern, parts, null);
 		// Not checking return to run on whatever we CAN parse
@@ -273,7 +273,7 @@ public class SpellCrafting {
 		return weight;
 	}
 	
-	public static int CalculateWeightFromRunes(SpellCraftContext context, @Nullable SpellCraftPattern pattern, IInventory inventory, int startIdx, int slotCount) {
+	public static int CalculateWeightFromRunes(SpellCraftContext context, @Nullable SpellCraftPattern pattern, Container inventory, int startIdx, int slotCount) {
 		List<SpellCraftPart> parts = new ArrayList<>(slotCount);
 		ParseRunes(inventory, startIdx, slotCount, context, pattern, parts, null);
 		// Not checking return to run on whatever we CAN parse
@@ -290,7 +290,7 @@ public class SpellCrafting {
 	 * @param ingredient
 	 * @return whether parsing was successful (didn't reach any invalid sequence)
 	 */
-	protected static final boolean ParseRunes(IInventory inventory, int startIdx, int slotCount,
+	protected static final boolean ParseRunes(Container inventory, int startIdx, int slotCount,
 			@Nullable SpellCraftContext context, @Nullable SpellCraftPattern pattern,
 			List<SpellCraftPart> partsOut, @Nullable List<String> errorsOut) {
 		

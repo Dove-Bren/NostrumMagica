@@ -1,15 +1,15 @@
 package com.smanzana.nostrummagica.client.render.effect;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 
 public class EffectGemRenderer extends EffectBubbleRenderer {
 	
@@ -19,11 +19,11 @@ public class EffectGemRenderer extends EffectBubbleRenderer {
 		super(yOffset, orbitSpeed, orbitOffset, color);
 	}
 	
-	public EffectGemRenderer(float yExtraOffset, Effect effect) {
+	public EffectGemRenderer(float yExtraOffset, MobEffect effect) {
 		this(yExtraOffset + GetDefaultOffset(effect.getCategory()), GetDefaultOrbit(effect.getCategory()), GetDefaultOrbitOffset(effect), effect.getColor());
 	}
 	
-	public EffectGemRenderer(Effect effect) {
+	public EffectGemRenderer(MobEffect effect) {
 		this(0f, effect);
 	}
 	
@@ -33,12 +33,12 @@ public class EffectGemRenderer extends EffectBubbleRenderer {
 	}
 	
 	@Override
-	public void renderEffectOnEntity(EffectInstance effect, MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void renderEffectOnEntity(MobEffectInstance effect, PoseStack stack, MultiBufferSource typeBuffer, int packedLight, LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		super.renderEffectOnEntity(effect, stack, typeBuffer, packedLight, entity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
 	}
 	
-	protected void renderOrb(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, float width, float red, float green, float blue, float alpha) {
-		final IVertexBuilder buffer = typeBuffer.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE);
+	protected void renderOrb(PoseStack stack, MultiBufferSource typeBuffer, int packedLight, float width, float red, float green, float blue, float alpha) {
+		final VertexConsumer buffer = typeBuffer.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE);
 		final int packedOverlay = OverlayTexture.NO_OVERLAY;
 		
 		RenderFuncs.renderDiamond(stack, buffer, width, width, packedLight, packedOverlay, red, green, blue, alpha);

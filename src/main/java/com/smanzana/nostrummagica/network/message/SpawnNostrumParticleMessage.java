@@ -7,8 +7,8 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Server is signalling that some particles should be spawned
@@ -32,14 +32,14 @@ public class SpawnNostrumParticleMessage {
 		this.params = params;
 	}
 
-	public static SpawnNostrumParticleMessage decode(PacketBuffer buf) {
+	public static SpawnNostrumParticleMessage decode(FriendlyByteBuf buf) {
 		return new SpawnNostrumParticleMessage(
 				buf.readEnum(NostrumParticles.class),
 				SpawnParams.FromNBT(buf.readNbt())
 				);
 	}
 
-	public static void encode(SpawnNostrumParticleMessage msg, PacketBuffer buf) {
+	public static void encode(SpawnNostrumParticleMessage msg, FriendlyByteBuf buf) {
 		buf.writeEnum(msg.type);
 		buf.writeNbt(msg.params.toNBT(null));
 	}

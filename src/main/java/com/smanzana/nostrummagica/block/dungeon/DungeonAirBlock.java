@@ -5,22 +5,22 @@ import java.util.Random;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BreakableBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.HalfTransparentBlock;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class DungeonAirBlock extends BreakableBlock {
+public class DungeonAirBlock extends HalfTransparentBlock {
 
 	public static final String ID = "dungeon_air";
 	
@@ -35,7 +35,7 @@ public class DungeonAirBlock extends BreakableBlock {
 	// GetHowMuchLightGoesThrough?? Not sure.
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public float getShadeBrightness(BlockState state, IBlockReader worldIn, BlockPos pos) {
+	public float getShadeBrightness(BlockState state, BlockGetter worldIn, BlockPos pos) {
 		return 1.0F;
 	}
 	
@@ -45,7 +45,7 @@ public class DungeonAirBlock extends BreakableBlock {
 //	}
 
 	@Override
-	public boolean propagatesSkylightDown(BlockState state, IBlockReader reader, BlockPos pos) {
+	public boolean propagatesSkylightDown(BlockState state, BlockGetter reader, BlockPos pos) {
 		return true;
 	}
 
@@ -66,7 +66,7 @@ public class DungeonAirBlock extends BreakableBlock {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
 		super.animateTick(stateIn, worldIn, pos, rand);
 		
 		if (rand.nextBoolean() && rand.nextBoolean()
@@ -82,7 +82,7 @@ public class DungeonAirBlock extends BreakableBlock {
 			NostrumParticles.GLOW_ORB.spawn(worldIn, new SpawnParams(
 					1,
 					pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, .5, 40, 20,
-					new Vector3d(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025), null
+					new Vec3(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025, rand.nextFloat() * .05 - .025), null
 					).color(color));
 		}
 	}
@@ -140,15 +140,15 @@ public class DungeonAirBlock extends BreakableBlock {
 //	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
-		if (context != ISelectionContext.empty()) {
-			if (context.getEntity() == null || !(context.getEntity() instanceof PlayerEntity) || !((PlayerEntity) context.getEntity()).isCreative()) {
-				return VoxelShapes.empty();
+		if (context != CollisionContext.empty()) {
+			if (context.getEntity() == null || !(context.getEntity() instanceof Player) || !((Player) context.getEntity()).isCreative()) {
+				return Shapes.empty();
 			}
 		}
 		
-		return VoxelShapes.block();
+		return Shapes.block();
 	}
 	
 //	@Override

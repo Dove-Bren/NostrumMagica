@@ -2,8 +2,8 @@ package com.smanzana.nostrummagica.tile;
 
 import com.smanzana.nostrummagica.ritual.IReagentProvider;
 
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
-public interface IReagentProviderTile extends IReagentProvider<TileEntity> {
+public interface IReagentProviderTile extends IReagentProvider<BlockEntity> {
 
 }

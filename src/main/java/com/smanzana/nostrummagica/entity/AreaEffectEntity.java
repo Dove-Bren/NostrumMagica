@@ -12,25 +12,25 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.serializer.OptionalParticleDataSerializer;
 import com.smanzana.nostrummagica.util.ParticleHelper;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.AreaEffectCloudEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntitySize;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.Pose;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.AreaEffectCloud;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 /**
@@ -38,26 +38,26 @@ import net.minecraftforge.fml.network.NetworkHooks;
  * @author Skyler
  *
  */
-public class AreaEffectEntity extends AreaEffectCloudEntity {
+public class AreaEffectEntity extends AreaEffectCloud {
 	
 	public static interface IAreaEntityEffect {
-		public void apply(World world, Entity ent);
+		public void apply(Level world, Entity ent);
 	}
 	
 	public static interface IAreaLocationEffect {
-		public void apply(World world, BlockPos pos);
+		public void apply(Level world, BlockPos pos);
 	}
 	
 	public static interface IAreaVFX {
-		public void apply(World world, int ticksExisted, AreaEffectEntity cloud);
+		public void apply(Level world, int ticksExisted, AreaEffectEntity cloud);
 	}
 	
 	public static final String ID = "entity_effect_cloud";
 	
-	private static final DataParameter<Float> HEIGHT = EntityDataManager.<Float>defineId(AreaEffectEntity.class, DataSerializers.FLOAT);
-	private static final DataParameter<Optional<IParticleData>> EXTRA_PARTICLE = EntityDataManager.<Optional<IParticleData>>defineId(AreaEffectEntity.class, OptionalParticleDataSerializer.instance);
-	private static final DataParameter<Float> EXTRA_PARTICLE_OFFSET_Y = EntityDataManager.<Float>defineId(AreaEffectEntity.class, DataSerializers.FLOAT);
-	private static final DataParameter<Float> EXTRA_PARTICLE_FREQUENCY = EntityDataManager.<Float>defineId(AreaEffectEntity.class, DataSerializers.FLOAT);
+	private static final EntityDataAccessor<Float> HEIGHT = SynchedEntityData.<Float>defineId(AreaEffectEntity.class, EntityDataSerializers.FLOAT);
+	private static final EntityDataAccessor<Optional<ParticleOptions>> EXTRA_PARTICLE = SynchedEntityData.<Optional<ParticleOptions>>defineId(AreaEffectEntity.class, OptionalParticleDataSerializer.instance);
+	private static final EntityDataAccessor<Float> EXTRA_PARTICLE_OFFSET_Y = SynchedEntityData.<Float>defineId(AreaEffectEntity.class, EntityDataSerializers.FLOAT);
+	private static final EntityDataAccessor<Float> EXTRA_PARTICLE_FREQUENCY = SynchedEntityData.<Float>defineId(AreaEffectEntity.class, EntityDataSerializers.FLOAT);
 	
 	protected final List<IAreaEntityEffect> entityEffects;
 	protected final List<IAreaLocationEffect> locationEffects;
@@ -75,12 +75,12 @@ public class AreaEffectEntity extends AreaEffectCloudEntity {
 	protected boolean ignoreOwner;
 	
 	//private float prevHeight;
-	private Vector3d waddleDir;
+	private Vec3 waddleDir;
 	private double waddleMagnitude;
 	
 	protected final List<IAreaVFX> manualVFX;
 
-	public AreaEffectEntity(EntityType<? extends AreaEffectEntity> type, World worldIn) {
+	public AreaEffectEntity(EntityType<? extends AreaEffectEntity> type, Level worldIn) {
 		super(type, worldIn);
 		entityEffects = new LinkedList<>();
 		locationEffects = new LinkedList<>();
@@ -92,7 +92,7 @@ public class AreaEffectEntity extends AreaEffectCloudEntity {
 		manualVFX = new LinkedList<>();
 	}
 	
-	public AreaEffectEntity(EntityType<? extends AreaEffectEntity> type, World worldIn, double x, double y, double z) {
+	public AreaEffectEntity(EntityType<? extends AreaEffectEntity> type, Level worldIn, double x, double y, double z) {
 		super(type, worldIn);
 		this.setPos(x, y, z);
 		entityEffects = new LinkedList<>();
@@ -149,7 +149,7 @@ public class AreaEffectEntity extends AreaEffectCloudEntity {
 		this.locationEffects.add(effect);
 	}
 	
-	public void setWaddle(Vector3d direction, double waddle) {
+	public void setWaddle(Vec3 direction, double waddle) {
 		this.waddleDir = direction;
 		this.waddleMagnitude = waddle;
 	}
@@ -174,11 +174,11 @@ public class AreaEffectEntity extends AreaEffectCloudEntity {
 		return this.ignoreOwner;
 	}
 	
-	public @Nullable IParticleData getCustomParticle() {
+	public @Nullable ParticleOptions getCustomParticle() {
 		return this.getEntityData().get(EXTRA_PARTICLE).orElse(null);
 	}
 
-	public void setCustomParticle(@Nullable IParticleData particleIn) {
+	public void setCustomParticle(@Nullable ParticleOptions particleIn) {
 		this.getEntityData().set(EXTRA_PARTICLE, Optional.ofNullable(particleIn));
 	}
 
@@ -300,11 +300,11 @@ public class AreaEffectEntity extends AreaEffectCloudEntity {
 		
 		// Motion
 		this.waddle();
-		final Vector3d motion = this.getDeltaMovement();
+		final Vec3 motion = this.getDeltaMovement();
 		this.setPos(getX() + motion.x, getY() + motion.y, getZ() + motion.z);
         
         boolean elevated = false;
-        BlockPos.Mutable pos = new BlockPos.Mutable();
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         final double startY = this.getY();
         
         // Move up out of solid blocks
@@ -374,8 +374,8 @@ public class AreaEffectEntity extends AreaEffectCloudEntity {
 	}
 	
 	@Override
-	public EntitySize getDimensions(Pose pose) {
-		return EntitySize.scalable(this.getRadius() * 2.0F, this.entityData.get(HEIGHT));
+	public EntityDimensions getDimensions(Pose pose) {
+		return EntityDimensions.scalable(this.getRadius() * 2.0F, this.entityData.get(HEIGHT));
 	}
 	
 	protected void applyEffects(Entity ent) {
@@ -396,13 +396,13 @@ public class AreaEffectEntity extends AreaEffectCloudEntity {
 		if (this.getBbHeight() > 2 && !this.isWaiting()) {
 			float radius = this.getRadius();
 			float area = (float)Math.PI * radius * radius;
-			IParticleData particle = this.getParticle();
+			ParticleOptions particle = this.getParticle();
 	
 			for (int i = 0; (float)i < area; ++i) {
 				float f6 = this.random.nextFloat() * ((float)Math.PI * 2F);
-				float f7 = MathHelper.sqrt(this.random.nextFloat()) * radius;
-				float f8 = MathHelper.cos(f6) * f7;
-				float f9 = MathHelper.sin(f6) * f7;
+				float f7 = Mth.sqrt(this.random.nextFloat()) * radius;
+				float f8 = Mth.cos(f6) * f7;
+				float f9 = Mth.sin(f6) * f7;
 				double y = random.nextDouble() * (this.getBbHeight() - .5) + .5;
 	
 				if (particle.getType() == ParticleTypes.ENTITY_EFFECT) {
@@ -418,7 +418,7 @@ public class AreaEffectEntity extends AreaEffectCloudEntity {
 		}
 		
 		// Do custom particle spawning
-		final IParticleData particle = this.getCustomParticle();
+		final ParticleOptions particle = this.getCustomParticle();
 		final float frequency = this.getCustomParticleFrequency();
 		if (particle != null && frequency > 0f) { // optional
 			final float radius = this.getRadius();
@@ -430,9 +430,9 @@ public class AreaEffectEntity extends AreaEffectCloudEntity {
 					continue;
 				}
 				float f6 = this.random.nextFloat() * ((float)Math.PI * 2F);
-				float f7 = MathHelper.sqrt(this.random.nextFloat()) * radius;
-				float f8 = MathHelper.cos(f6) * f7;
-				float f9 = MathHelper.sin(f6) * f7;
+				float f7 = Mth.sqrt(this.random.nextFloat()) * radius;
+				float f8 = Mth.cos(f6) * f7;
+				float f9 = Mth.sin(f6) * f7;
 				double y = random.nextDouble() * (this.getBbHeight() - .5) + .5;
 	
 				this.level.addParticle(particle, this.getX() + (double)f8, this.getY() + y + yOffset, this.getZ() + (double)f9, (0.5D - this.random.nextDouble()) * 0.15D, 0.009999999776482582D, (0.5D - this.random.nextDouble()) * 0.15D);
@@ -477,7 +477,7 @@ public class AreaEffectEntity extends AreaEffectCloudEntity {
 			
 			if (this.tickCount % 5 == 0) {
 				// Blocks
-				AxisAlignedBB box = this.getBoundingBox();
+				AABB box = this.getBoundingBox();
 				for (BlockPos pos : BlockPos.betweenClosed(new BlockPos(box.minX, box.minY - 1, box.minZ), new BlockPos(box.maxX, box.maxY, box.maxZ))) {
 					double dx = (pos.getX() + .5) - this.getX();
 					double dz = (pos.getZ() + .5) - this.getZ();
@@ -519,7 +519,7 @@ public class AreaEffectEntity extends AreaEffectCloudEntity {
 	}
 	
 	@Override
-	public void onSyncedDataUpdated(DataParameter<?> key) {
+	public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
 		if (key == HEIGHT) {
 			this.refreshDimensions();
 		}
@@ -528,7 +528,7 @@ public class AreaEffectEntity extends AreaEffectCloudEntity {
 	}
 	
 	@Override
-	protected void readAdditionalSaveData(CompoundNBT compound) {
+	protected void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 		
 		if (compound.contains("Particle", 10)) {
@@ -541,7 +541,7 @@ public class AreaEffectEntity extends AreaEffectCloudEntity {
 	}
 	
 	@Override
-	protected void addAdditionalSaveData(CompoundNBT compound) {
+	protected void addAdditionalSaveData(CompoundTag compound) {
 		super.addAdditionalSaveData(compound);
 		
 		if (this.getCustomParticle() != null) {
@@ -552,7 +552,7 @@ public class AreaEffectEntity extends AreaEffectCloudEntity {
 	}
 
 	@Override
-	public IPacket<?> getAddEntityPacket() {
+	public Packet<?> getAddEntityPacket() {
 		// Have to override and use forge to use with non-living Entity types even though parent defines
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}

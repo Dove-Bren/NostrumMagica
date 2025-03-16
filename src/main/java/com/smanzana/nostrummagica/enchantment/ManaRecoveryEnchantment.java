@@ -1,10 +1,10 @@
 package com.smanzana.nostrummagica.enchantment;
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentType;
-import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
+import net.minecraft.world.entity.EquipmentSlot;
 
-import net.minecraft.enchantment.Enchantment.Rarity;
+import net.minecraft.world.item.enchantment.Enchantment.Rarity;
 
 public class ManaRecoveryEnchantment extends Enchantment {
 
@@ -19,12 +19,12 @@ public class ManaRecoveryEnchantment extends Enchantment {
 	}
 	
 	protected ManaRecoveryEnchantment() {
-		super(Rarity.RARE, EnchantmentType.ARMOR, 
-				new EquipmentSlotType[] {
-						EquipmentSlotType.FEET,
-						EquipmentSlotType.LEGS,
-						EquipmentSlotType.CHEST,
-						EquipmentSlotType.HEAD});
+		super(Rarity.RARE, EnchantmentCategory.ARMOR, 
+				new EquipmentSlot[] {
+						EquipmentSlot.FEET,
+						EquipmentSlot.LEGS,
+						EquipmentSlot.CHEST,
+						EquipmentSlot.HEAD});
 		this.setRegistryName(ID);
 	}
 

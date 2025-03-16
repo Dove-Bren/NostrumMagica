@@ -4,11 +4,11 @@ import java.util.EnumSet;
 
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 
-import net.minecraft.entity.ai.controller.MovementController;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.ai.control.MoveControl;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.core.BlockPos;
 
-import net.minecraft.entity.ai.goal.Goal.Flag;
+import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 public class DragonLandGoal extends Goal {
 
@@ -37,7 +37,7 @@ public class DragonLandGoal extends Goal {
 			return false;
 		}
 		
-		MovementController MovementController = this.dragon.getMoveControl();
+		MoveControl MovementController = this.dragon.getMoveControl();
 		if (!MovementController.hasWanted()) {
 			return false;
 		} else {
@@ -54,7 +54,7 @@ public class DragonLandGoal extends Goal {
 	public void start() {
 		
 		// Don't trust heightmap; just loop. Not that bad.
-		BlockPos.Mutable pos = new BlockPos.Mutable().set(dragon.blockPosition());
+		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos().set(dragon.blockPosition());
 		while(pos.getY() > 0) {
 			if (dragon.level.isEmptyBlock(pos)) {
 				pos.setY(pos.getY() - 1);

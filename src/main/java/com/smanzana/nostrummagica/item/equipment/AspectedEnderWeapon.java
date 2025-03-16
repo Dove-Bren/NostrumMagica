@@ -29,30 +29,30 @@ import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTier;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -63,11 +63,11 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	private static final float MAX_BALL_DIST = 30;
 	
 	public AspectedEnderWeapon() {
-		super(ItemTier.GOLD, 5, -2.6F, NostrumItems.PropEquipment().durability(1240));
+		super(Tiers.GOLD, 5, -2.6F, NostrumItems.PropEquipment().durability(1240));
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot equipmentSlot) {
 		return super.getDefaultAttributeModifiers(equipmentSlot);
     }
 	
@@ -110,35 +110,35 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	public void apply(LivingEntity caster, Spell spell, SpellCastSummary summary, ItemStack stack) {
 		// We provide -10% mana cost reduct
 		summary.addCostRate(-.1f);
-		ItemStacks.damageItem(stack, caster, caster.getItemInHand(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+		ItemStacks.damageItem(stack, caster, caster.getItemInHand(InteractionHand.MAIN_HAND) == stack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND, 1);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
-		tooltip.add(new StringTextComponent("Mana Cost Discount: 10%"));
+		tooltip.add(new TextComponent("Mana Cost Discount: 10%"));
 	}
 	
-	protected void doCastEffect(LivingEntity target, Vector3d startPos, Vector3d endPos) {
+	protected void doCastEffect(LivingEntity target, Vec3 startPos, Vec3 endPos) {
 		if (target.level.isClientSide) {
 			return;
 		}
 		
-		target.level.playSound(null, endPos.x(), endPos.y(), endPos.z(), SoundEvents.ENDERMAN_TELEPORT, SoundCategory.NEUTRAL, 1f, 1f);
-		target.level.playSound(null, startPos.x(), startPos.y(), startPos.z(), SoundEvents.ENDERMAN_TELEPORT, SoundCategory.NEUTRAL, 1f, 1f);
+		target.level.playSound(null, endPos.x(), endPos.y(), endPos.z(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.NEUTRAL, 1f, 1f);
+		target.level.playSound(null, startPos.x(), startPos.y(), startPos.z(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.NEUTRAL, 1f, 1f);
 		
 		for(int i = 0; i < 32; ++i) {
 			target.level.addParticle(ParticleTypes.PORTAL, endPos.x(), endPos.y() + NostrumMagica.rand.nextDouble() * 2.0D, endPos.z(), NostrumMagica.rand.nextGaussian(), 0.0D, NostrumMagica.rand.nextGaussian());
 		}
 		
-		Vector3d diff = endPos.subtract(startPos);
+		Vec3 diff = endPos.subtract(startPos);
 		
 		// Could go discrete increments, but just divide and stretch
 		final int intervals = 10;
 		for (int i = 0; i < intervals; i++) {
-			Vector3d offset = diff.scale((float) i/ (float) intervals);
-			final Vector3d pos = startPos.add(offset);
+			Vec3 offset = diff.scale((float) i/ (float) intervals);
+			final Vec3 pos = startPos.add(offset);
 			NostrumParticles.GLOW_ORB.spawn(target.level, new SpawnParams(
 					1,
 					pos.x, pos.y, pos.z, 0, 30, 5,
@@ -147,28 +147,28 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		}
 	}
 	
-	protected Vector3d getCastPosition(LivingEntity caster) {
-		RayTraceResult result = RayTrace.raytrace(caster.level, caster, caster.position().add(0, caster.getEyeHeight(), 0),
+	protected Vec3 getCastPosition(LivingEntity caster) {
+		HitResult result = RayTrace.raytrace(caster.level, caster, caster.position().add(0, caster.getEyeHeight(), 0),
 				caster.xRot, caster.yRot, MAX_BALL_DIST, (ent) -> {
 					return false; // Don't want entities
 				});
 		
-		if (result.getType() == RayTraceResult.Type.MISS) {
+		if (result.getType() == HitResult.Type.MISS) {
 			return caster.position().add(0, caster.getEyeHeight(), 0).add(
 					caster.getLookAngle().scale(MAX_BALL_DIST)
 					);
 		} else {
-			BlockRayTraceResult blockRes = (BlockRayTraceResult) result;
+			BlockHitResult blockRes = (BlockHitResult) result;
 			BlockPos pos = RayTrace.blockPosFromResult(result);
 			if (!caster.level.isEmptyBlock(pos)) {
 				pos = pos.relative(blockRes.getDirection());
 			}
-			return new Vector3d(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
+			return new Vec3(pos.getX() + .5, pos.getY(), pos.getZ() + .5);
 		}
 	}
 	
 	protected @Nullable EnderRodBallEntity findNearestBall(LivingEntity caster) {
-		ServerWorld world = (ServerWorld) caster.level;
+		ServerLevel world = (ServerLevel) caster.level;
 		List<Entity> balls = world.getEntities(NostrumEntityTypes.enderRodBall, (e) -> {
 			return e != null
 					&& e instanceof EnderRodBallEntity
@@ -196,7 +196,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		final boolean hasShield = attr != null && attr.hasSkill(NostrumSkills.Ender_Weapon);
 		if (hasBonus) {
 			int hurtCount = 0;
-			for (LivingEntity ent : Entities.GetEntities((ServerWorld) caster.level, (e) -> {
+			for (LivingEntity ent : Entities.GetEntities((ServerLevel) caster.level, (e) -> {
 				return e != null
 						&& !NostrumMagica.IsSameTeam(e, caster)
 						&& e.distanceTo(ball) <= 5;
@@ -208,18 +208,18 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 			NostrumParticles.GLOW_ORB.spawn(ball.level, new SpawnParams(
 					50,
 					ball.getX(), ball.getY() + ball.getBbHeight() / 2, ball.getZ(), .25, 50, 20,
-					new Vector3d(0, .1, 0), new Vector3d(.25, .05, .25)
+					new Vec3(0, .1, 0), new Vec3(.25, .05, .25)
 					).color(EMagicElement.ENDER.getColor()).gravity(true));
 			
 			if (hasShield && hurtCount > 0) {
 				// Apply effects if not present
-				final EffectInstance activePhysical = caster.getEffect(NostrumEffects.physicalShield);
-				final EffectInstance activeMagic = caster.getEffect(NostrumEffects.magicShield);
+				final MobEffectInstance activePhysical = caster.getEffect(NostrumEffects.physicalShield);
+				final MobEffectInstance activeMagic = caster.getEffect(NostrumEffects.magicShield);
 				if (activePhysical == null || activePhysical.getDuration() < 15 * 20) {
-					caster.addEffect(new EffectInstance(NostrumEffects.physicalShield, 15 * 20, 0));
+					caster.addEffect(new MobEffectInstance(NostrumEffects.physicalShield, 15 * 20, 0));
 				}
 				if (activeMagic == null || activeMagic.getDuration() < 15 * 20) {
-					caster.addEffect(new EffectInstance(NostrumEffects.magicShield, 15 * 20, 0));
+					caster.addEffect(new MobEffectInstance(NostrumEffects.magicShield, 15 * 20, 0));
 				}
 				
 				// Actually set amount
@@ -232,8 +232,8 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		ball.remove();
 	}
 	
-	protected void teleportEntity(LivingEntity caster, LivingEntity entity, Vector3d pos) {
-		final Vector3d startPos = entity.position();
+	protected void teleportEntity(LivingEntity caster, LivingEntity entity, Vec3 pos) {
+		final Vec3 startPos = entity.position();
 		NostrumTeleportEvent event = NostrumMagica.fireTeleportAttemptEvent(entity, pos.x(), pos.y(), pos.z(), caster);
 		if (!event.isCanceled()) {
 			entity.teleportTo(event.getTargetX(), event.getTargetY(), event.getTargetZ());
@@ -251,7 +251,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 			consumeBall(caster, ball);
 			
 			if (hasBonus && !NostrumMagica.IsSameTeam(target, caster)) {
-				target.addEffect(new EffectInstance(Effects.MOVEMENT_SLOWDOWN, 20 * 3, 3));
+				target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20 * 3, 3));
 			}
 			return true;
 		} else {
@@ -270,7 +270,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		}
 	}
 	
-	protected boolean castRod(World worldIn, LivingEntity caster) {
+	protected boolean castRod(Level worldIn, LivingEntity caster) {
 		// Find existing ball and consume it
 		@Nullable EnderRodBallEntity ball = this.findNearestBall(caster);
 		if (ball != null) {
@@ -278,7 +278,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		}
 		
 		// Create a new ball where caster is looking
-		Vector3d pos = this.getCastPosition(caster);
+		Vec3 pos = this.getCastPosition(caster);
 		ball = new EnderRodBallEntity(NostrumEntityTypes.enderRodBall, worldIn, caster);
 		ball.setPos(pos.x, pos.y, pos.z);
 		worldIn.addFreshEntity(ball);
@@ -291,14 +291,14 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	}
 	
 	@Override
-	public ActionResultType interactLivingEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+	public InteractionResult interactLivingEntity(ItemStack stack, Player playerIn, LivingEntity target, InteractionHand hand) {
 		if (!playerIn.level.isClientSide()) {
 			if (castOnEntity(playerIn, target)) {
-				ItemStacks.damageItem(stack, playerIn, playerIn.getMainHandItem() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+				ItemStacks.damageItem(stack, playerIn, playerIn.getMainHandItem() == stack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND, 1);
 			}
 		}
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 	
 	@Override
@@ -328,7 +328,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	}
 
 	@Override
-	protected void fireChargedWeapon(World worldIn, LivingEntity playerIn, Hand hand, ItemStack stack) {
+	protected void fireChargedWeapon(Level worldIn, LivingEntity playerIn, InteractionHand hand, ItemStack stack) {
 		if (!worldIn.isClientSide() && castRod(worldIn, playerIn)) {
 			ItemStacks.damageItem(stack, playerIn	, hand, 1);
 		}

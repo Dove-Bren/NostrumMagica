@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -29,21 +29,21 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.Font;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import net.minecraft.client.renderer.Rect2i;
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Matrix4f;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
@@ -51,26 +51,26 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 	private static final ResourceLocation RES_ICONS = NostrumMagica.Loc("textures/gui/mirror_skills.png");
 	private static final ResourceLocation RES_BACK = NostrumMagica.Loc("textures/gui/mirror_back_skills.png");
 	
-	private final ITextComponent name;
+	private final Component name;
 	private final ItemStack icon;
 	private final Map<SkillCategory, SkillCategoryButton> skillTabs;
 	private final Map<Skill, SkillButton> buttons;
 	private SkillCategory activeCategory;
 	
-	private PlayerEntity player;
+	private Player player;
 	private INostrumMagic attr;
 	private int width;
 	private int height;
 	
 	public MirrorSkillSubscreen() {
-		name = new TranslationTextComponent("mirror.tab.skill.name");
+		name = new TranslatableComponent("mirror.tab.skill.name");
 		icon = new ItemStack(NostrumItems.spellTomeCombat, 1);
 		buttons = new HashMap<>();
 		this.skillTabs = new HashMap<>();
 	}
 	
 	@Override
-	public ITextComponent getName() {
+	public Component getName() {
 		return name;
 	}
 	
@@ -80,12 +80,12 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 	}
 	
 	@Override
-	public boolean isVisible(IMirrorScreen parent, PlayerEntity player) {
+	public boolean isVisible(IMirrorScreen parent, Player player) {
 		return true;
 	}
 	
 	@Override
-	public void show(IMirrorScreen parent, PlayerEntity player, int width, int height, int guiLeft, int guiTop) {
+	public void show(IMirrorScreen parent, Player player, int width, int height, int guiLeft, int guiTop) {
 		this.player = player;
 		attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
@@ -99,7 +99,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		skillTabs.clear();
 		Map<SkillCategory, List<Skill>> categories = new HashMap<>();
 		
-		final Rectangle2d bounds = new Rectangle2d(guiLeft, guiTop, width, height);
+		final Rect2i bounds = new Rect2i(guiLeft, guiTop, width, height);
 		for (Skill skill : Skill.allSkills()) {
 			final int buttonWidth = POS_BUTTON_WIDTH;
 			final int buttonHeight = POS_BUTTON_HEIGHT;
@@ -148,12 +148,12 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 	}
 
 	@Override
-	public void hide(IMirrorScreen parent, PlayerEntity player) {
+	public void hide(IMirrorScreen parent, Player player) {
 		; // Not sure there's much to do. Parent will clean things up for us
 	}
 
 	@Override
-	public void drawBackground(IMirrorScreen parent, MatrixStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
+	public void drawBackground(IMirrorScreen parent, PoseStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
 		float extra = .1f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
 		float inv = .1f - extra;
 		
@@ -165,9 +165,9 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 	}
 
 	@Override
-	public void drawForeground(IMirrorScreen parent, MatrixStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
+	public void drawForeground(IMirrorScreen parent, PoseStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
 		final Minecraft mc = Minecraft.getInstance();
-		final FontRenderer font = mc.font;
+		final Font font = mc.font;
 		matrixStackIn.pushPose();
 		
 		matrixStackIn.translate(width/2, 20, 0);
@@ -276,7 +276,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		private final MirrorSkillSubscreen subscreen;
 		private final Skill skill;
 		
-		private final List<ITextComponent> tooltip;
+		private final List<Component> tooltip;
 		private final float fontScale = 0.75f;
 		
 		private SkillState state;
@@ -285,7 +285,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		private @Nullable SkillButton parentButton;
 		
 		public SkillButton(MirrorSkillSubscreen subscreen, Skill skill, int x, int y, int width, int height) {
-			super(x, y, width, height, StringTextComponent.EMPTY);
+			super(x, y, width, height, TextComponent.EMPTY);
 			this.subscreen = subscreen;
 			this.skill = skill;
 			this.tooltip = genTooltip();
@@ -345,7 +345,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 			subscreen.onSkillButton(this);
 		}
 		
-		public void drawTreeLines(MatrixStack matrixStackIn, Minecraft mc) {
+		public void drawTreeLines(PoseStack matrixStackIn, Minecraft mc) {
 //			if (skill.getParentKey() != null) {
 //				Skill parent = Skill.lookup(this.skill.getParentKey());
 //				if (parent == null)
@@ -363,14 +363,14 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		}
 		
 		@SuppressWarnings("deprecation")
-		private void renderLine(MatrixStack matrixStackIn, SkillButton other, boolean faded) {
+		private void renderLine(PoseStack matrixStackIn, SkillButton other, boolean faded) {
 			matrixStackIn.pushPose();
 //			GlStateManager.pushLightingAttributes();
 			matrixStackIn.translate(width / 2, height / 2, 0);
 			
 			final Matrix4f transform = matrixStackIn.last().pose();
 			
-			BufferBuilder buf = Tessellator.getInstance().getBuilder();
+			BufferBuilder buf = Tesselator.getInstance().getBuilder();
 			RenderSystem.enableBlend();
 			RenderSystem.disableTexture();
 			RenderSystem.lineWidth(3f);
@@ -380,10 +380,10 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 			RenderSystem.shadeModel(GL11.GL_SMOOTH);
 	        //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 //	        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
-	        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+	        buf.begin(GL11.GL_LINES, DefaultVertexFormat.POSITION_COLOR);
 	        buf.vertex(transform, x, y, 0).color(1f, 1f, 1f, faded ? .2f : .6f).endVertex();
 	        buf.vertex(transform, other.x, other.y, 0).color(1f, 1f, 1f, faded ? 0f : .6f).endVertex();
-	        Tessellator.getInstance().end();
+	        Tesselator.getInstance().end();
 	        RenderSystem.enableTexture();
 //	        GlStateManager.enableTexture();
 	        RenderSystem.disableBlend();
@@ -394,7 +394,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		}
 		
 		@Override
-		public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			// Render tree lines even if we're out of bounds
 			if (!this.isHidden()) {
 				updateState();
@@ -408,7 +408,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			int u = TEX_ICON_BUTTON_HOFFSET;
 			int v = TEX_ICON_BUTTON_VOFFSET;
 			float[] color = ColorUtil.ARGBToColor(skill.getCategory().getColor());
@@ -436,7 +436,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 
 			// Icon
 			matrixStackIn.pushPose();
-			RenderHelper.turnBackOn();
+			Lighting.turnBackOn();
 			// RenderGuiItem moves 100 forward. Blocks render several z deep.
 			// Squish to 8 deep, and shift back
 			matrixStackIn.scale(1f, 1f, .4f);
@@ -444,16 +444,16 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 			matrixStackIn.scale(.75f, .75f, 1f);
 			RenderFuncs.RenderGUIItem(skill.getIcon(), matrixStackIn, (- 16) / 2, (- 16) / 2);
 			RenderSystem.enableDepthTest();
-			RenderHelper.turnOff();
+			Lighting.turnOff();
 			
 			matrixStackIn.popPose();
 		}
 		
 		@Override
-		public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			if (this.isHovered()) { 
 				final Minecraft mc = Minecraft.getInstance();
-				final FontRenderer font = mc.font;
+				final Font font = mc.font;
 				matrixStackIn.pushPose();
 				matrixStackIn.scale(fontScale, fontScale, 1f);
 				matrixStackIn.translate((int) (mouseX / fontScale) - mouseX, (int) (mouseY / fontScale) - mouseY, 0);
@@ -462,17 +462,17 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 			}
 		}
 		
-		private List<ITextComponent> genTooltip() {
-			List<ITextComponent> tooltip = new LinkedList<>();
-			tooltip.add(((TextComponent) skill.getName()).withStyle(TextFormatting.BLUE));
+		private List<Component> genTooltip() {
+			List<Component> tooltip = new LinkedList<>();
+			tooltip.add(((BaseComponent) skill.getName()).withStyle(ChatFormatting.BLUE));
 			tooltip.addAll(skill.getDescription());
 			
 			if (this.subscreen.attr.hasSkill(skill)) {
-				tooltip.add(new StringTextComponent(" "));
-				tooltip.add(new StringTextComponent("Owned").withStyle(TextFormatting.BOLD, TextFormatting.DARK_GREEN));
+				tooltip.add(new TextComponent(" "));
+				tooltip.add(new TextComponent("Owned").withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_GREEN));
 			} else {
-				tooltip.add(new StringTextComponent(" "));
-				tooltip.add(new TranslationTextComponent("info.research.purchase").withStyle(TextFormatting.GREEN));
+				tooltip.add(new TextComponent(" "));
+				tooltip.add(new TranslatableComponent("info.research.purchase").withStyle(ChatFormatting.GREEN));
 			}
 			
 			return tooltip;
@@ -488,7 +488,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 	private static final class SkillCategoryButton implements IMirrorMinorTab {
 		
 		protected final SkillCategory category;
-		private final ITextComponent name;
+		private final Component name;
 		private final List<Skill> children;
 		
 		public SkillCategoryButton(MirrorSkillSubscreen subscreen, SkillCategory category) {
@@ -504,12 +504,12 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		}
 
 		@Override
-		public ITextComponent getName() {
+		public Component getName() {
 			return name;
 		}
 
 		@Override
-		public void renderTab(IMirrorScreen parent, IMirrorSubscreen subscreen, MatrixStack matrixStackIn, int width, int height) {
+		public void renderTab(IMirrorScreen parent, IMirrorSubscreen subscreen, PoseStack matrixStackIn, int width, int height) {
 			RenderFuncs.RenderGUIItem(category.getIcon(), matrixStackIn, (width - 16) / 2, (height - 16) / 2);
 		}
 

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.ActiveHopperTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
@@ -11,15 +11,15 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -34,13 +34,13 @@ public class ActiveHopperGui {
 	private static final int PUTTER_INV_HOFFSET = 80;
 	private static final int PUTTER_INV_VOFFSET = 20;
 	
-	public static class ActiveHopperContainer extends Container {
+	public static class ActiveHopperContainer extends AbstractContainerMenu {
 		
 		public static final String ID = "active_hopper";
 		
 		protected final ActiveHopperTileEntity hopper;
 		
-		public ActiveHopperContainer(int windowId, IInventory playerInv, ActiveHopperTileEntity hopper) {
+		public ActiveHopperContainer(int windowId, Container playerInv, ActiveHopperTileEntity hopper) {
 			super(NostrumContainers.ActiveHopper, windowId);
 
 			// Construct player hotbar
@@ -60,7 +60,7 @@ public class ActiveHopperGui {
 			this.hopper = hopper;
 		}
 		
-		public static ActiveHopperContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buf) {
+		public static ActiveHopperContainer FromNetwork(int windowId, Inventory playerInv, FriendlyByteBuf buf) {
 			return new ActiveHopperContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buf));
 		}
 		
@@ -74,13 +74,13 @@ public class ActiveHopperGui {
 		
 		@Override
 		@Nonnull
-		public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+		public ItemStack quickMoveStack(Player playerIn, int index) {
 			Slot slot = (Slot)this.slots.get(index);
 			ItemStack prev = ItemStack.EMPTY;
 
 			if (slot != null && slot.hasItem()) {
 				//IInventory from = slot.inventory;
-				IInventory to;
+				Container to;
 				
 				if (slot.container == hopper) {
 					to = playerIn.inventory;
@@ -113,7 +113,7 @@ public class ActiveHopperGui {
 		}
 		
 		@Override
-		public boolean stillValid(PlayerEntity playerIn) {
+		public boolean stillValid(Player playerIn) {
 			return true;
 		}
 	}
@@ -121,7 +121,7 @@ public class ActiveHopperGui {
 	@OnlyIn(Dist.CLIENT)
 	public static class ActiveHopperGuiContainer extends AutoGuiContainer<ActiveHopperContainer> {
 
-		public ActiveHopperGuiContainer(ActiveHopperContainer container, PlayerInventory playerInv, ITextComponent name) {
+		public ActiveHopperGuiContainer(ActiveHopperContainer container, Inventory playerInv, Component name) {
 			super(container, playerInv, name);
 			
 			this.imageWidth = GUI_WIDTH;
@@ -134,7 +134,7 @@ public class ActiveHopperGui {
 		}
 		
 		@Override
-		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+		protected void renderBg(PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
@@ -143,7 +143,7 @@ public class ActiveHopperGui {
 		}
 		
 		@Override
-		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			super.renderLabels(matrixStackIn, mouseX, mouseY);
 		}
 		

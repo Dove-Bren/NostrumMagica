@@ -8,8 +8,8 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.stat.PlayerStats;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Server is providing an updated view of this client's stats
@@ -40,14 +40,14 @@ public class PlayerStatSyncMessage {
 		this.stats = stats;
 	}
 
-	public static PlayerStatSyncMessage decode(PacketBuffer buf) {
+	public static PlayerStatSyncMessage decode(FriendlyByteBuf buf) {
 		UUID id = buf.readUUID();
 		PlayerStats stats = PlayerStats.FromNBT(buf.readNbt());
 		
 		return new PlayerStatSyncMessage(id, stats);
 	}
 
-	public static void encode(PlayerStatSyncMessage msg, PacketBuffer buf) {
+	public static void encode(PlayerStatSyncMessage msg, FriendlyByteBuf buf) {
 		buf.writeUUID(msg.id);
 		buf.writeNbt(msg.stats.toNBT(null));
 	}

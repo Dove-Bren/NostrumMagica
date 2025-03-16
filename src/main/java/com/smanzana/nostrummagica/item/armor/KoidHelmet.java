@@ -11,15 +11,15 @@ import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -32,7 +32,7 @@ public class KoidHelmet extends ArmorItem implements ILoreTagged {
 	protected Multimap<Attribute, AttributeModifier> attributes;
 
 	public KoidHelmet(Item.Properties properties) {
-		super(ArmorMaterial.TURTLE, EquipmentSlotType.HEAD, properties.durability(100));
+		super(ArmorMaterials.TURTLE, EquipmentSlot.HEAD, properties.durability(100));
 	}
 	
 	protected Multimap<Attribute, AttributeModifier> makeAttributes() {
@@ -59,7 +59,7 @@ public class KoidHelmet extends ArmorItem implements ILoreTagged {
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot equipmentSlot) {
 		if (equipmentSlot == this.slot) {
 			if (attributes == null) {
 				attributes = this.makeAttributes();
@@ -98,7 +98,7 @@ public class KoidHelmet extends ArmorItem implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlotType slot, String type) {
+	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
 		// Make this render the helm invisible, since I can't figure out how to make helmet just not render
 
 		return NostrumMagica.MODID + ":textures/models/empty.png";

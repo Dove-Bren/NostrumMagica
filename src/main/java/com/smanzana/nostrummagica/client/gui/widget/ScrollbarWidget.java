@@ -1,16 +1,16 @@
 package com.smanzana.nostrummagica.client.gui.widget;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
-public class ScrollbarWidget extends Widget {
+public class ScrollbarWidget extends AbstractWidget {
 	
 	public static interface IScrollbarListener {
 		/**
@@ -28,10 +28,10 @@ public class ScrollbarWidget extends Widget {
 	protected float scroll;
 	
 	public ScrollbarWidget(IScrollbarListener listener, int x, int y, int width, int height) {
-		this(listener, x, y, width, height, StringTextComponent.EMPTY);
+		this(listener, x, y, width, height, TextComponent.EMPTY);
 	}
 	
-	public ScrollbarWidget(IScrollbarListener listener, int x, int y, int width, int height, ITextComponent title) {
+	public ScrollbarWidget(IScrollbarListener listener, int x, int y, int width, int height, Component title) {
 		super(x, y, width, height, title);
 		this.listener = listener;
 		this.pressed = false;
@@ -129,7 +129,7 @@ public class ScrollbarWidget extends Widget {
 	private static final int POS_SCROLLBAR_HEIGHT = 14;
 
 	@Override
-	public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		final int xMargin = 2;
 		final int yMargin = 2;
 		matrixStackIn.pushPose();
@@ -160,12 +160,12 @@ public class ScrollbarWidget extends Widget {
 		matrixStackIn.popPose();
 	}
 	
-	protected void drawScrollbar(MatrixStack matrixStackIn, int width, int height) {
+	protected void drawScrollbar(PoseStack matrixStackIn, int width, int height) {
 		Minecraft.getInstance().getTextureManager().bind(TEXT);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, TEX_SCROLLBAR_HOFFSET, TEX_SCROLLBAR_VOFFSET, TEX_SCROLLBAR_WIDTH, TEX_SCROLLBAR_HEIGHT, width, height, TEX_WIDTH, TEX_HEIGHT);
 	}
 	
-	protected void drawTrack(MatrixStack matrixStackIn, int width, int height) {
+	protected void drawTrack(PoseStack matrixStackIn, int width, int height) {
 		RenderFuncs.drawRect(matrixStackIn, 0, 0, width, height, 0xFF000000);
 	}
 

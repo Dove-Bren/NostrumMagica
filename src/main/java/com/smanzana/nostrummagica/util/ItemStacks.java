@@ -4,10 +4,10 @@ import java.util.Objects;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionHand;
 
 public class ItemStacks {
 
@@ -24,12 +24,12 @@ public class ItemStacks {
 		return false;
 	}
 	
-	public static final <T extends LivingEntity> ItemStack damageItem(@Nonnull ItemStack stack, T entity, Hand hand, int damage) {
+	public static final <T extends LivingEntity> ItemStack damageItem(@Nonnull ItemStack stack, T entity, InteractionHand hand, int damage) {
 		stack.hurtAndBreak(damage, entity, playerIn -> playerIn.broadcastBreakEvent(hand));
 		return stack.isEmpty() ? ItemStack.EMPTY : stack;
 	}
 	
-	public static final <T extends LivingEntity> ItemStack damageEquippedArmor(@Nonnull ItemStack stack, T entity, EquipmentSlotType slot, int damage) {
+	public static final <T extends LivingEntity> ItemStack damageEquippedArmor(@Nonnull ItemStack stack, T entity, EquipmentSlot slot, int damage) {
 		stack.hurtAndBreak(damage, entity, playerIn -> playerIn.broadcastBreakEvent(slot));
 		return stack.isEmpty() ? ItemStack.EMPTY : stack;
 	}

@@ -7,7 +7,7 @@ import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef.DungeonRoomR
 import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef.DungeonStaircaseRoomRef;
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 

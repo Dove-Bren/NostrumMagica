@@ -7,9 +7,9 @@ import java.util.function.Supplier;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.Spell;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Server is replying to client detail request
@@ -45,14 +45,14 @@ public class SpellRequestReplyMessage {
 		this.clean = clean;
 	}
 
-	public static SpellRequestReplyMessage decode(PacketBuffer buf) {
+	public static SpellRequestReplyMessage decode(FriendlyByteBuf buf) {
 		List<Spell> spells = new ArrayList<>();
 		boolean clean = buf.readBoolean();
 		int spellCount = buf.readVarInt();
 		
 		for (int i = 0; i < spellCount; i++) {
 			int spellID = buf.readVarInt();
-			CompoundNBT tag = buf.readNbt();
+			CompoundTag tag = buf.readNbt();
 			Spell spell = Spell.fromNBT(tag, spellID);
 			
 			if (spell != null) {
@@ -63,7 +63,7 @@ public class SpellRequestReplyMessage {
 		return new SpellRequestReplyMessage(spells, clean);
 	}
 
-	public static void encode(SpellRequestReplyMessage msg, PacketBuffer buf) {
+	public static void encode(SpellRequestReplyMessage msg, FriendlyByteBuf buf) {
 		buf.writeBoolean(msg.clean);
 		buf.writeVarInt(msg.spells.size());
 		

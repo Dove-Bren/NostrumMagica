@@ -11,42 +11,42 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.SeekingBulletShape.SeekingBulletShapeInstance;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
-import net.minecraft.entity.projectile.ShulkerBulletEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.entity.projectile.ShulkerBullet;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 // Like shulker bullets but have spells in them
-public class SpellBulletEntity extends ShulkerBulletEntity {
+public class SpellBulletEntity extends ShulkerBullet {
 	
 	public static final String ID = "spell_bullet";
 
-	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>defineId(SpellBulletEntity.class, MagicElementDataSerializer.instance);
+	protected static final EntityDataAccessor<EMagicElement> ELEMENT = SynchedEntityData.<EMagicElement>defineId(SpellBulletEntity.class, MagicElementDataSerializer.instance);
 	
 	private SeekingBulletShapeInstance trigger;
 	private @Nullable Predicate<Entity> filter;
 	private LivingEntity target;
 	private LivingEntity shooter;
 	private double speed; // Vanilla shulkers use .15
-	private IParticleData particle;
+	private ParticleOptions particle;
 	
 	private boolean blockyPath; // Shulker-style pathing? Else smooth curve style.
 	
@@ -57,7 +57,7 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 	private double targetDeltaY;
 	private double targetDeltaZ;
 
-	public SpellBulletEntity(EntityType<? extends SpellBulletEntity> type, World world) {
+	public SpellBulletEntity(EntityType<? extends SpellBulletEntity> type, Level world) {
 		super(type, world);
 		this.speed = .15;
 		this.particle = ParticleTypes.CRIT;
@@ -78,7 +78,7 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 			LivingEntity target,
 			Direction.Axis axis,
 			double speed,
-			IParticleData particle,
+			ParticleOptions particle,
 			boolean blockyPath) {
 		//super(shooter.world, shooter, target, axis);
 		this(type, shooter.level);
@@ -130,7 +130,7 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 	}
 	
 	@Override
-	protected void onHit(RayTraceResult result) {
+	protected void onHit(HitResult result) {
 		Entity entityHit = RayTrace.entFromRaytrace(result);
 		if (entityHit == null) {
 			//trigger.onProjectileHit(result.getBlockPos());
@@ -151,7 +151,7 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 	}
 	
 	@Override
-	public boolean saveAsPassenger(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundTag compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
     }
@@ -246,7 +246,7 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 		double deltaX = targetX - this.getX();
 		double deltaY = targetY - this.getY();
 		double deltaZ = targetZ - this.getZ();
-		double dist = (double)MathHelper.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+		double dist = (double)Mth.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
 
 		if (dist == 0.0D)
 		{
@@ -277,17 +277,17 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 
 			if (!this.level.isClientSide) {
 				double dist = Double.MAX_VALUE;
-				if (this.target == null || !this.target.isAlive() || this.target instanceof PlayerEntity && ((PlayerEntity)this.target).isSpectator()) {
+				if (this.target == null || !this.target.isAlive() || this.target instanceof Player && ((Player)this.target).isSpectator()) {
 					if (!this.isNoGravity()) {
 						this.setDeltaMovement(this.getDeltaMovement().add(0, -0.04, 0));
 					}
 				} else {
 					dist = target.position().add(0, target.getBbHeight() / 2, 0).distanceTo(this.position());
-					this.targetDeltaX = MathHelper.clamp(this.targetDeltaX * 1.025D, -1.0D, 1.0D);
-					this.targetDeltaY = MathHelper.clamp(this.targetDeltaY * 1.025D, -1.0D, 1.0D);
-					this.targetDeltaZ = MathHelper.clamp(this.targetDeltaZ * 1.025D, -1.0D, 1.0D);
+					this.targetDeltaX = Mth.clamp(this.targetDeltaX * 1.025D, -1.0D, 1.0D);
+					this.targetDeltaY = Mth.clamp(this.targetDeltaY * 1.025D, -1.0D, 1.0D);
+					this.targetDeltaZ = Mth.clamp(this.targetDeltaZ * 1.025D, -1.0D, 1.0D);
 					final double adj = (this.blockyPath ? .2 : (dist < 2 ? .3 : .05));
-					final Vector3d oldMot = this.getDeltaMovement();
+					final Vec3 oldMot = this.getDeltaMovement();
 					this.setDeltaMovement(oldMot.add(
 							(this.targetDeltaX - oldMot.x) * adj,
 							(this.targetDeltaY - oldMot.y) * adj,
@@ -296,9 +296,9 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 				}
 				
 				if (dist < .5) {
-					this.onHit(new EntityRayTraceResult(target));
+					this.onHit(new EntityHitResult(target));
 				} else {
-					RayTraceResult raytraceresult = ProjectileHelper.getHitResult(this, (ent) -> ent != this.shooter);
+					HitResult raytraceresult = ProjectileUtil.getHitResult(this, (ent) -> ent != this.shooter);
 	
 					if (raytraceresult != null) {
 						this.onHit(raytraceresult);
@@ -307,7 +307,7 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 			}
 
 			this.setPos(this.getX() + this.getDeltaMovement().x, this.getY() + this.getDeltaMovement().y, this.getZ() + this.getDeltaMovement().z);
-			ProjectileHelper.rotateTowardsMovement(this, 0.5F);
+			ProjectileUtil.rotateTowardsMovement(this, 0.5F);
 
 			if (this.level.isClientSide) {
 				this.level.addParticle(particle, this.getX() - this.getDeltaMovement().x, this.getY() - this.getDeltaMovement().y + 0.15D, this.getZ() - this.getDeltaMovement().z, 0.0D, 0.0D, 0.0D);
@@ -339,7 +339,7 @@ public class SpellBulletEntity extends ShulkerBulletEntity {
 	}
 
 	@Override
-	public IPacket<?> getAddEntityPacket() {
+	public Packet<?> getAddEntityPacket() {
 		// Have to override and use forge to use with non-living Entity types even though parent defines
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}

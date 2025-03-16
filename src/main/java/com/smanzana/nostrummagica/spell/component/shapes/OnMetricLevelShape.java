@@ -10,14 +10,14 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponent;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.BaseComponent;
 
 /**
  * Shape that waits until a specific metric on an entity to raise/lower beyond a limit
@@ -26,8 +26,8 @@ import net.minecraft.util.text.TextComponent;
  */
 public abstract class OnMetricLevelShape extends SpellShape {
 
-	private static final TextComponent LABEL_BELOW = new StringTextComponent("Below");
-	private static final TextComponent LABEL_ABOVE = new StringTextComponent("Above");
+	private static final BaseComponent LABEL_BELOW = new TextComponent("Below");
+	private static final BaseComponent LABEL_ABOVE = new TextComponent("Above");
 	public static final SpellShapeProperty<Boolean> WHEN_ABOVE = new LabeledBooleanSpellShapeProperty("when_above", LABEL_BELOW, LABEL_ABOVE);
 	public static final SpellShapeProperty<Float> LEVEL = new PercentSpellShapeProperty("level", .5f, .2f, .8f, 1f);
 	
@@ -64,7 +64,7 @@ public abstract class OnMetricLevelShape extends SpellShape {
 	}
 	
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
+	public boolean shouldTrace(Player player, SpellShapeProperties params) {
 		return false;
 	}
 

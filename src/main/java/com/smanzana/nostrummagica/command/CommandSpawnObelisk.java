@@ -5,14 +5,14 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.block.ObeliskBlock;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.TextComponent;
 
 public class CommandSpawnObelisk {
 	
-	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+	public static final void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(
 				Commands.literal("spawnobelisk")
 					.requires(s -> s.hasPermission(2))
@@ -20,12 +20,12 @@ public class CommandSpawnObelisk {
 				);
 	}
 
-	private static final int execute(CommandContext<CommandSource> context) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().getPlayerOrException();
+	private static final int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
 		
 		if (!ObeliskBlock.spawnObelisk(player.level,
 				player.blockPosition().offset(0, -1, 0))) {
-			context.getSource().sendSuccess(new StringTextComponent("Not enough space to spawn an obelisk"), true);
+			context.getSource().sendSuccess(new TextComponent("Not enough space to spawn an obelisk"), true);
 			return 1;
 		}
 		

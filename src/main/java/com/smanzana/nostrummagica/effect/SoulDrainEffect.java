@@ -6,21 +6,21 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.util.Entities;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.server.level.ServerLevel;
 
-public class SoulDrainEffect extends Effect {
+public class SoulDrainEffect extends MobEffect {
 
 	public static final String ID = "soul_drain";
 	
 	public SoulDrainEffect() {
-		super(EffectType.HARMFUL, 0xFFE5799B);
+		super(MobEffectCategory.HARMFUL, 0xFFE5799B);
 		
 		this.addAttributeModifier(Attributes.MOVEMENT_SPEED,
 				"13dfa3dc-1105-40a9-92e4-bbc506eb90ed", -0.1D, AttributeModifier.Operation.MULTIPLY_TOTAL);
@@ -46,7 +46,7 @@ public class SoulDrainEffect extends Effect {
 		NostrumParticles.GLOW_ORB.spawn(source.level, new SpawnParams(
 				5, source.getX(), source.getY() + .75, source.getZ(), 0,
 				40, 0,
-				new Vector3d(0, .1, 0), new Vector3d(.1, 0, .1)
+				new Vec3(0, .1, 0), new Vec3(.1, 0, .1)
 				).color(0xFFE2346B).gravity(true));
 	}
 	
@@ -60,7 +60,7 @@ public class SoulDrainEffect extends Effect {
 	}
 	
 	protected List<LivingEntity> findSoulDestinations(LivingEntity source) {
-		return Entities.GetEntities((ServerWorld) source.level, (living) -> {
+		return Entities.GetEntities((ServerLevel) source.level, (living) -> {
 			return living.distanceToSqr(source) <= 144
 					&& living.getEffect(NostrumEffects.soulVampire) != null;
 		});

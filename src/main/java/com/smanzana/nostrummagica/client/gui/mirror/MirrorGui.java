@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -20,14 +20,14 @@ import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.TextComponent;
 
 public class MirrorGui extends Screen implements IMirrorScreen {
 	
@@ -76,7 +76,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 	private static final int POS_MINORTAB_HEIGHT = 28;
 	
 	//private INostrumMagic attr;
-	private final PlayerEntity player;
+	private final Player player;
 	private final @Nullable INostrumMagic attr;
 	private final boolean unlocked;
 	private final String unlockPrompt;
@@ -90,8 +90,8 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 	
 	private BookScreen currentInfoScreen = null;
 	
-	public MirrorGui(PlayerEntity player) {
-		super(new StringTextComponent("Nostrum Mirror"));
+	public MirrorGui(Player player) {
+		super(new TextComponent("Nostrum Mirror"));
 		this.player = player;
 		this.attr = NostrumMagica.getMagicWrapper(player);
 		this.unlocked = attr == null ? false : attr.isUnlocked();
@@ -123,7 +123,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 	}
 	
 	@Override
-	public void addWidget(Widget widget) {
+	public void addWidget(AbstractWidget widget) {
 		this.addButton(widget);
 	}
 
@@ -218,7 +218,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		return (this.height - guiHeight) / 2;
 	}
 	
-	private void drawLockedScreenBackground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	private void drawLockedScreenBackground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		Minecraft.getInstance().getTextureManager().bind(RES_BACK_CLOUD);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 0, 0, TEX_WIDTH, TEX_HEIGHT, guiWidth, guiHeight, TEX_WIDTH, TEX_HEIGHT);
 		
@@ -233,7 +233,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		this.font.draw(matrixStackIn, unlockPrompt, (this.guiWidth - len) / 2, y + (guiHeight / 3), 0xFFDFD000);
 	}
 	
-	private void drawLockedScreenForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	private void drawLockedScreenForeground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		if (attr == null) {
 			return;
 		}
@@ -297,12 +297,12 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		this.font.draw(matrixStackIn, str, (x + width / 2) - strLen/2, y - (3 + this.font.lineHeight), 0xFFFFFF);
 	}
 	
-	private void drawResearchPages(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	private void drawResearchPages(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		RenderFuncs.drawRect(matrixStackIn, 0, 0, this.width, this.height, 0x60000000);
 		currentInfoScreen.render(matrixStackIn, mouseX, mouseY, partialTicks);
 	}
 	
-	private void drawScreenBorder(MatrixStack matrixStackIn, float partialTicks) {
+	private void drawScreenBorder(PoseStack matrixStackIn, float partialTicks) {
 		Minecraft.getInstance().getTextureManager().bind(RES_BASE);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 				TEX_FRAME_HOFFSET, TEX_FRAME_VOFFSET, TEX_FRAME_WIDTH, TEX_FRAME_HEIGHT,
@@ -310,7 +310,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		final int leftOffset = guiLeft();
 		final int topOffset = guiTop();
 		
@@ -383,7 +383,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		}
 		matrixStackIn.popPose();
 		
-		for (Widget widget : this.buttons) {
+		for (AbstractWidget widget : this.buttons) {
 			// Hacky
 			if (widget instanceof MajorTabButton || widget instanceof MinorTabButton
 					|| (mouseX > guiLeft() && mouseX < guiLeft() + guiWidth && mouseY > guiTop() && mouseY < guiTop() + guiHeight)) {
@@ -477,7 +477,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 	@Override
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		// Super gets the first widget at pos and only call it on it. Do the normal iteration that mouseClicked does instead instead.
-		for(IGuiEventListener iguieventlistener : this.children()) {
+		for(GuiEventListener iguieventlistener : this.children()) {
 			if (iguieventlistener.mouseReleased(mouseX, mouseY, button)) {
 				this.setDragging(false);
 				return true;
@@ -499,7 +499,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
 		// Super gets the first widget at pos and only call it on it. Do the normal iteration that mouseClicked does instead instead.
-		for(IGuiEventListener iguieventlistener : this.children()) {
+		for(GuiEventListener iguieventlistener : this.children()) {
 			if (iguieventlistener.mouseScrolled(mouseX, mouseY, delta)) {
 				this.setDragging(false);
 				return true;
@@ -525,7 +525,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		private final IMirrorSubscreen subscreen;
 		
 		public MajorTabButton(MirrorGui gui, IMirrorSubscreen subscreen, int x, int y, int width, int height) {
-			super(x, y, width, height, StringTextComponent.EMPTY, (b) -> {
+			super(x, y, width, height, TextComponent.EMPTY, (b) -> {
 				gui.onButtonMajorTab(b);
 			});
 			this.gui = gui;
@@ -537,7 +537,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final int textureX;
 				final int textureY;
 				if (this.isHovered()) {
@@ -562,7 +562,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		}
 		
 		@Override
-		public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			if (this.isHovered()) { 
 				matrixStackIn.pushPose();
 				matrixStackIn.translate(0, 0, 250);
@@ -583,7 +583,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		private final IMirrorMinorTab tab;
 		
 		public MinorTabButton(MirrorGui gui, IMirrorMinorTab tab, int x, int y, int width, int height) {
-			super(x, y, width, height, StringTextComponent.EMPTY, (b) -> {
+			super(x, y, width, height, TextComponent.EMPTY, (b) -> {
 				gui.onButtonMinorTab(b);
 			});
 			this.gui = gui;
@@ -595,7 +595,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			final int textureX;
 			final int textureY;
 			if (isSelected()) {
@@ -631,7 +631,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		}
 		
 		@Override
-		public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			if (this.isHovered()) {
 				gui.renderTooltip(matrixStackIn, this.tab.getName(), mouseX, mouseY);
 			}

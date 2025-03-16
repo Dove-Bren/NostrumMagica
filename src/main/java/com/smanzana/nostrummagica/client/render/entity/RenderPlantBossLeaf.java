@@ -1,16 +1,16 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelPlantBossLeaf;
 import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Vector3f;
 
 public class RenderPlantBossLeaf extends EntityRenderer<PlantBossEntity.PlantBossLeafLimb> {
 
@@ -18,14 +18,14 @@ public class RenderPlantBossLeaf extends EntityRenderer<PlantBossEntity.PlantBos
 	
 	protected ModelPlantBossLeaf mainModel;
 	
-	public RenderPlantBossLeaf(EntityRendererManager renderManagerIn) {
+	public RenderPlantBossLeaf(EntityRenderDispatcher renderManagerIn) {
 		super(renderManagerIn);
 		
 		mainModel = new ModelPlantBossLeaf();
 	}
 	
 	@Override
-	public void render(PlantBossEntity.PlantBossLeafLimb entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(PlantBossEntity.PlantBossLeafLimb entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 		
 		PlantBossEntity plant = entityIn.getParent();

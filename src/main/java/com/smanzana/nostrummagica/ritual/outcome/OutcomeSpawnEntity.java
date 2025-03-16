@@ -6,18 +6,18 @@ import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.util.TextUtils;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 
 public class OutcomeSpawnEntity implements IRitualOutcome {
 
 	public static interface IEntityFactory {
-		public void spawn(World world, Vector3d pos, PlayerEntity invoker, ItemStack centerItem);
+		public void spawn(Level world, Vec3 pos, Player invoker, ItemStack centerItem);
 		
 		public String getEntityName();
 	}
@@ -31,7 +31,7 @@ public class OutcomeSpawnEntity implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
+	public void perform(Level world, Player player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		if (world.isClientSide)
 			return;
 		
@@ -40,7 +40,7 @@ public class OutcomeSpawnEntity implements IRitualOutcome {
 		final float distance = 2f;
 		for (int i = 0; i < count; i++) {
 			angle = interval * i;
-			Vector3d pos = new Vector3d(center.getX() + .5 + Math.cos(angle) * distance,
+			Vec3 pos = new Vec3(center.getX() + .5 + Math.cos(angle) * distance,
 					center.getY(),
 					center.getZ() + .5 + Math.sin(angle) * distance);
 			this.factory.spawn(world, pos, player, layout.getCenterItem(world, center));
@@ -53,7 +53,7 @@ public class OutcomeSpawnEntity implements IRitualOutcome {
 	}
 
 	@Override
-	public List<ITextComponent> getDescription() {
+	public List<Component> getDescription() {
 		String name = I18n.get(factory.getEntityName(), (Object[]) null);
 		return TextUtils.GetTranslatedList("ritual.outcome.spawn_entity.desc",
 				new Object[] {count, name});

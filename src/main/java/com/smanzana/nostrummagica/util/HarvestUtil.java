@@ -8,30 +8,29 @@ import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.CropsBlock;
-import net.minecraft.block.NetherWartBlock;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.NetherWartBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.Tags;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class HarvestUtil {
 	
 	private static final Method seedDrops;
 
 	static {
-		seedDrops = ObfuscationReflectionHelper.findMethod(CropsBlock.class, "getBaseSeedId");
+		seedDrops = net.minecraftforge.fml.util.ObfuscationReflectionHelper.findMethod(CropBlock.class, "getBaseSeedId");
 	}
 
 	private static Item getCropSeed(Block block) {
@@ -46,19 +45,19 @@ public class HarvestUtil {
 		return null;
 	}
 
-	public static boolean HarvestCrop(World world, BlockPos pos) {
+	public static boolean HarvestCrop(Level world, BlockPos pos) {
 		List<ItemStack> drops;
-		if (world.getBlockState(pos).getBlock() instanceof CropsBlock) {
-			CropsBlock crop = (CropsBlock) world.getBlockState(pos).getBlock();
+		if (world.getBlockState(pos).getBlock() instanceof CropBlock) {
+			CropBlock crop = (CropBlock) world.getBlockState(pos).getBlock();
 			if (crop.isMaxAge(world.getBlockState(pos))) {
 				if (!world.isClientSide) {
 					drops = Block.getDrops(world.getBlockState(pos),
-							(ServerWorld) world, pos,
+							(ServerLevel) world, pos,
 							world.getBlockEntity(pos));
 					for (int i = 0; i < drops.size(); i++) {
 						if (drops.get(i).getItem() != getCropSeed(crop))
 							world
-									.addFreshEntity(new ItemEntity((World) world, pos.getX(),
+									.addFreshEntity(new ItemEntity((Level) world, pos.getX(),
 											pos.getY(), pos.getZ(),
 											(ItemStack) drops.get(i)));
 					}
@@ -67,14 +66,14 @@ public class HarvestUtil {
 								|| crop == Blocks.CARROTS) {
 							drops.remove(0);
 							world
-									.addFreshEntity(new ItemEntity((World) world, pos.getX(),
+									.addFreshEntity(new ItemEntity((Level) world, pos.getX(),
 											pos.getY(), pos.getZ(),
 											(ItemStack) drops.get(i)));
 						}
 
 					}
-					world.playSound((PlayerEntity) null, pos, SoundEvents.CROP_BREAK,
-							SoundCategory.BLOCKS, 1.0F, 0.8F + world.random.nextFloat() * 0.4F);
+					world.playSound((Player) null, pos, SoundEvents.CROP_BREAK,
+							SoundSource.BLOCKS, 1.0F, 0.8F + world.random.nextFloat() * 0.4F);
 					world.setBlock(pos, crop.defaultBlockState(), 2);
 
 				}
@@ -90,16 +89,16 @@ public class HarvestUtil {
 			if (world.getBlockState(pos).getValue(NetherWartBlock.AGE) == 3) {
 				if (!world.isClientSide) {
 					drops = Block.getDrops(world.getBlockState(pos),
-							(ServerWorld) world, pos,
+							(ServerLevel) world, pos,
 							world.getBlockEntity(pos));
 					for (int i = 0; i < drops.size(); i++) {
 						world
-								.addFreshEntity(new ItemEntity((World) world, pos.getX(),
+								.addFreshEntity(new ItemEntity((Level) world, pos.getX(),
 										pos.getY(), pos.getZ(),
 										(ItemStack) drops.get(i)));
 					}
-					world.playSound((PlayerEntity) null, pos,
-							SoundEvents.NETHER_WART_BREAK, SoundCategory.BLOCKS, 1.0F,
+					world.playSound((Player) null, pos,
+							SoundEvents.NETHER_WART_BREAK, SoundSource.BLOCKS, 1.0F,
 							0.8F + world.random.nextFloat() * 0.4F);
 					world.setBlock(pos, nether.defaultBlockState(), 2);
 				}
@@ -113,7 +112,7 @@ public class HarvestUtil {
 	}
 	
 	public static boolean canHarvestCrop(BlockState state) {
-		return state.getBlock() instanceof CropsBlock
+		return state.getBlock() instanceof CropBlock
 				|| state.getBlock() instanceof NetherWartBlock;
 	}
 	
@@ -137,12 +136,12 @@ public class HarvestUtil {
 		 * @param isLeaves
 		 * @return true to keep walking or false to stop
 		 */
-		public boolean visit(World world, BlockPos pos, int depth, boolean isLeaves);
+		public boolean visit(Level world, BlockPos pos, int depth, boolean isLeaves);
 	}
 	
 	private static final int MAX_TREE = 200;
 	
-	public static boolean WalkTree(World world, BlockPos pos, ITreeWalker walker) {
+	public static boolean WalkTree(Level world, BlockPos pos, ITreeWalker walker) {
 //		Set<BlockPos> visitted = new HashSet<>();
 //		return walkTreeDepthFirst(visitted, world, pos, walker, 1);
 		
@@ -151,7 +150,7 @@ public class HarvestUtil {
 	
 	// Returns if any block was leaves or log.
 	// Breadth-first version
-	private static boolean walkTreeBreadthFirst(World world, BlockPos startPos, ITreeWalker walker) {
+	private static boolean walkTreeBreadthFirst(Level world, BlockPos startPos, ITreeWalker walker) {
 		final class NextNode {
 			public final BlockPos pos;
 			public final int depth;
@@ -308,27 +307,27 @@ public class HarvestUtil {
 		 * @param state
 		 * @return true to keep walking or false to stop
 		 */
-		public boolean visit(World world, BlockPos pos, int depth, BlockState state);
+		public boolean visit(Level world, BlockPos pos, int depth, BlockState state);
 		
-		public default boolean canVeinMine(World world, BlockPos pos, BlockState state) {
+		public default boolean canVeinMine(Level world, BlockPos pos, BlockState state) {
 			return state != null && (
 					Tags.Blocks.ORES.contains(state.getBlock())
 						|| Tags.Blocks.STONE.contains(state.getBlock())
 					);
 		}
 		
-		public default boolean matchesVein(World world, BlockPos pos, BlockState state, BlockState original) {
+		public default boolean matchesVein(Level world, BlockPos pos, BlockState state, BlockState original) {
 			return state.getBlock() == original.getBlock();
 		}
 	}
 	
 	private static final int MAX_VEIN = 20;
 	
-	public static boolean WalkVein(World world, BlockPos startPos, IVeinWalker walker) {
+	public static boolean WalkVein(Level world, BlockPos startPos, IVeinWalker walker) {
 		return walkVeinBreadthFirst(world, startPos, walker);
 	}
 	
-	private static boolean walkVeinBreadthFirst(World world, BlockPos startPos, IVeinWalker walker) {
+	private static boolean walkVeinBreadthFirst(Level world, BlockPos startPos, IVeinWalker walker) {
 		final class NextNode {
 			public final BlockPos pos;
 			public final int depth;

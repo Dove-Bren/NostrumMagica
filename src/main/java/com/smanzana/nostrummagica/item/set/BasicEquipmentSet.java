@@ -15,16 +15,16 @@ import com.smanzana.nostrummagica.inventory.EquipmentSlotKey;
 import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 import com.smanzana.nostrummagica.inventory.PlayerInventorySlotKey;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.BowItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SwordItem;
-import net.minecraft.item.ToolItem;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.DiggerItem;
 
 public class BasicEquipmentSet extends EquipmentSet {
 
@@ -62,7 +62,7 @@ public class BasicEquipmentSet extends EquipmentSet {
 	
 	protected boolean itemIsWeaponOrTool(Item item) {
 		return item instanceof SwordItem
-				|| item instanceof ToolItem
+				|| item instanceof DiggerItem
 				|| item instanceof BowItem
 				;
 	}
@@ -93,7 +93,7 @@ public class BasicEquipmentSet extends EquipmentSet {
 		// If it's a tool or weapon, also accept hands.
 		if (slot instanceof EquipmentSlotKey) {
 			return itemIsWeaponOrTool(stack.getItem())
-					|| ((EquipmentSlotKey) slot).getSlotType().getType() == EquipmentSlotType.Group.ARMOR;
+					|| ((EquipmentSlotKey) slot).getSlotType().getType() == EquipmentSlot.Type.ARMOR;
 		}
 		
 		// Not just blindly guess if that if it's not a PlayerInventorySlotKey, it's probably something special like

@@ -41,14 +41,14 @@ import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.network.play.ClientPlayNetHandler;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.common.MinecraftForge;
@@ -96,9 +96,9 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 		
 		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
 			Ingredient.invalidateAll();
-			@Nullable PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-			if (player != null && player.level.isClientSide() && player instanceof AbstractClientPlayerEntity) {
-				ClientPlayNetHandler handler = Minecraft.getInstance().getConnection();
+			@Nullable Player player = NostrumMagica.instance.proxy.getPlayer();
+			if (player != null && player.level.isClientSide() && player instanceof AbstractClientPlayer) {
+				ClientPacketListener handler = Minecraft.getInstance().getConnection();
 				ForgeHooksClient.onRecipesUpdated(handler.getRecipeManager());
 			}
 		});
@@ -187,10 +187,10 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 				RuneShaperGui.RuneShaperGuiContainer.class
 		);
 		
-		for (Class<? extends ContainerScreen<?>> clazz : list.toArray(new Class[0])) {
-			registration.addGenericGuiContainerHandler(clazz, new IGuiContainerHandler<ContainerScreen<?>>() {
+		for (Class<? extends AbstractContainerScreen<?>> clazz : list.toArray(new Class[0])) {
+			registration.addGenericGuiContainerHandler(clazz, new IGuiContainerHandler<AbstractContainerScreen<?>>() {
 				@Override
-				public List<Rectangle2d> getGuiExtraAreas(ContainerScreen<?> containerScreen) {
+				public List<Rect2i> getGuiExtraAreas(AbstractContainerScreen<?> containerScreen) {
 					return ((IJEIAwareGuiContainer) containerScreen).getGuiExtraAreas();
 				}
 			});
@@ -213,7 +213,7 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 		}
 	}
 	
-	public void refreshTransmuteRecipes(@Nullable PlayerEntity player) {
+	public void refreshTransmuteRecipes(@Nullable Player player) {
 		// Hide and unhide transmutation recipes based on whether a player has seen a given
 		if (runtime != null) {
 			IRecipeManager manager = runtime.getRecipeManager();
@@ -235,7 +235,7 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 		}
 	}
 	
-	public static void RefreshTransmuteRecipes(@Nullable PlayerEntity player) {
+	public static void RefreshTransmuteRecipes(@Nullable Player player) {
 		if (lastCreated != null) {
 			lastCreated.refreshTransmuteRecipes(player);
 		}

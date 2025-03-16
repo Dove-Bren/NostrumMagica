@@ -6,8 +6,8 @@ import com.minecolonies.api.IMinecoloniesAPI;
 import com.minecolonies.api.colony.IColony;
 import com.minecolonies.api.entity.citizen.AbstractCivilianEntity;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class MinecoloniesUtils {
 
@@ -29,7 +29,7 @@ public class MinecoloniesUtils {
 			}
 		}
 		
-		if (ent instanceof PlayerEntity) {
+		if (ent instanceof Player) {
 			return IMinecoloniesAPI.getInstance().getColonyManager().getIColonyByOwner(ent.level, ent.getUUID());
 		}
 		

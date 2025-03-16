@@ -7,16 +7,16 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 
 /**
  * Portal that takes players to and from the Sorcery dimension
@@ -24,7 +24,7 @@ import net.minecraft.world.World;
  *
  */
 @SuppressWarnings("deprecation")
-public class SorceryPortalBlock extends PortalBlock implements ITileEntityProvider  {
+public class SorceryPortalBlock extends PortalBlock implements EntityBlock  {
 	
 	public static final String ID = "sorcery_portal";
 	
@@ -42,7 +42,7 @@ public class SorceryPortalBlock extends PortalBlock implements ITileEntityProvid
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		if (isMaster(state)) {
 			return new SorceryPortalTileEntity();
 		}
@@ -59,7 +59,7 @@ public class SorceryPortalBlock extends PortalBlock implements ITileEntityProvid
 //	}
 	
 	@Override
-	protected void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn) {
+	protected void teleportEntity(Level worldIn, BlockPos portalPos, Entity entityIn) {
 		entityIn.stopRiding();
 		entityIn.ejectPassengers();
 		
@@ -93,17 +93,17 @@ public class SorceryPortalBlock extends PortalBlock implements ITileEntityProvid
 			}
 			entityIn.changeDimension(entityIn.getServer().getLevel(NostrumDimensions.GetSorceryDimension()), NostrumSorceryDimension.DimensionEntryTeleporter.INSTANCE);
 		} else {
-			entityIn.changeDimension(entityIn.getServer().getLevel(World.OVERWORLD), NostrumSorceryDimension.DimensionReturnTeleporter.INSTANCE);
+			entityIn.changeDimension(entityIn.getServer().getLevel(Level.OVERWORLD), NostrumSorceryDimension.DimensionReturnTeleporter.INSTANCE);
 		}
 	}
 	
 	@Override
-	protected boolean canTeleport(World worldIn, BlockPos portalPos, Entity entityIn) {
-		return entityIn instanceof PlayerEntity;
+	protected boolean canTeleport(Level worldIn, BlockPos portalPos, Entity entityIn) {
+		return entityIn instanceof Player;
 	}
 
 	@Override
-	public TileEntity newBlockEntity(IBlockReader worldIn) {
+	public BlockEntity newBlockEntity(BlockGetter worldIn) {
 		// TODO Auto-generated method stub
 		return null;
 	}

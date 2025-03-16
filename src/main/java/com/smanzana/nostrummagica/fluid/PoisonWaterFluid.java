@@ -10,27 +10,27 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.item.NostrumItems;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.fluid.FlowingFluid;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.Item;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.state.StateContainer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.item.Item;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidAttributes;
@@ -74,7 +74,7 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void animateTick(World worldIn, BlockPos pos, FluidState state, Random rand) {
+	public void animateTick(Level worldIn, BlockPos pos, FluidState state, Random rand) {
 		super.animateTick(worldIn, pos, state, rand);
 		
 		if (worldIn.isEmptyBlock(pos.above())) {
@@ -93,7 +93,7 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 				NostrumParticles.GLOW_ORB.spawn(worldIn, new SpawnParams(
 						1,
 						pos.getX() + .5, pos.getY() + 1.25, pos.getZ() + .5, .5, 30, 10,
-						new Vector3d(rand.nextFloat() * hMag - (hMag/2), rand.nextFloat() * vMag, rand.nextFloat() * hMag - (hMag/2)), null
+						new Vec3(rand.nextFloat() * hMag - (hMag/2), rand.nextFloat() * vMag, rand.nextFloat() * hMag - (hMag/2)), null
 						).color(color));
 			}
 		}
@@ -101,7 +101,7 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 	
 	@Nullable
 	@OnlyIn(Dist.CLIENT)
-	public IParticleData getDripParticle() {
+	public ParticleOptions getDripParticle() {
 		return ParticleTypes.DRIPPING_WATER; // Would be cool to have custom one
 	}
 	
@@ -111,20 +111,20 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 	}
 	
 	@Override
-	protected void beforeDestroyingBlock(IWorld worldIn, BlockPos pos, BlockState state) {
-		TileEntity tileentity = state.hasTileEntity() ? worldIn.getBlockEntity(pos) : null;
+	protected void beforeDestroyingBlock(LevelAccessor worldIn, BlockPos pos, BlockState state) {
+		BlockEntity tileentity = state.hasTileEntity() ? worldIn.getBlockEntity(pos) : null;
 		Block.dropResources(state, worldIn, pos, tileentity);
 	}
 	
 	@Override
-	public int getSlopeFindDistance(IWorldReader worldIn) {
+	public int getSlopeFindDistance(LevelReader worldIn) {
 		return 4; // Same as water
 	}
 	
 	@Override
 	public BlockState createLegacyBlock(FluidState state) {
 		Block block = this.bUnbreakable ? NostrumBlocks.unbreakablePoisonWaterBlock : NostrumBlocks.poisonWaterBlock;
-		return block.defaultBlockState().setValue(FlowingFluidBlock.LEVEL, Integer.valueOf(getLegacyLevel(state)));
+		return block.defaultBlockState().setValue(LiquidBlock.LEVEL, Integer.valueOf(getLegacyLevel(state)));
 	}
 	
 	@Override
@@ -137,17 +137,17 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 	}
 	
 	@Override
-	public int getDropOff(IWorldReader worldIn) {
+	public int getDropOff(LevelReader worldIn) {
 		return 1;
 	}
 	
 	@Override
-	public int getTickDelay(IWorldReader p_205569_1_) {
+	public int getTickDelay(LevelReader p_205569_1_) {
 		return 5; // Same as water?
 	}
 	
 	@Override // no clue what this is
-	public boolean canBeReplacedWith(FluidState p_215665_1_, IBlockReader p_215665_2_, BlockPos p_215665_3_, Fluid p_215665_4_, Direction p_215665_5_) {
+	public boolean canBeReplacedWith(FluidState p_215665_1_, BlockGetter p_215665_2_, BlockPos p_215665_3_, Fluid p_215665_4_, Direction p_215665_5_) {
 		return p_215665_5_ == Direction.DOWN && !p_215665_4_.is(FluidTags.WATER);
 	}
 
@@ -200,7 +200,7 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 		}
 		
 		@Override
-		protected void createFluidStateDefinition(StateContainer.Builder<Fluid, FluidState> builder) {
+		protected void createFluidStateDefinition(StateDefinition.Builder<Fluid, FluidState> builder) {
 			super.createFluidStateDefinition(builder);
 			builder.add(FlowingFluid.LEVEL);
 		}

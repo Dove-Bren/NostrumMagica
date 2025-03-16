@@ -6,10 +6,10 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class SkillCategory {
 
@@ -18,7 +18,7 @@ public class SkillCategory {
 	protected final Supplier<ItemStack> iconSupplier;
 	protected final @Nullable EMagicElement skillpointType;
 	
-	private final ITextComponent name;
+	private final Component name;
 	private ItemStack iconCache;
 	
 	public SkillCategory(ResourceLocation id, int color, Supplier<ItemStack> icon, @Nullable EMagicElement skillpointType) {
@@ -27,14 +27,14 @@ public class SkillCategory {
 		this.iconSupplier = icon;
 		this.skillpointType = skillpointType;
 		
-		name = new TranslationTextComponent("skill.category." + id.getNamespace() + "." + id.getPath());
+		name = new TranslatableComponent("skill.category." + id.getNamespace() + "." + id.getPath());
 	}
 	
 	public ResourceLocation getID() {
 		return this.id;
 	}
 	
-	public ITextComponent getName() {
+	public Component getName() {
 		return name;
 	}
 	

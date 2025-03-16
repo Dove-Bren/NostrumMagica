@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.item;
 
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public interface IPositionHolderItem {
 
@@ -19,7 +19,7 @@ public interface IPositionHolderItem {
 		if (stack.isEmpty() || !(stack.getItem() instanceof IPositionHolderItem))
 			return null;
 		
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null)
 			return null;
 		
@@ -40,27 +40,27 @@ public interface IPositionHolderItem {
 	 * @param stack
 	 * @return
 	 */
-	public static RegistryKey<World> getDimension(ItemStack stack) {
+	public static ResourceKey<Level> getDimension(ItemStack stack) {
 		if (stack.isEmpty() || !(stack.getItem() instanceof IPositionHolderItem))
-			return World.OVERWORLD;
+			return Level.OVERWORLD;
 		
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null)
-			return World.OVERWORLD;
+			return Level.OVERWORLD;
 		
 		return DimensionUtils.GetDimKey(nbt.getString(NBT_DIMENSION));
 	}
 	
-	public static void setPosition(ItemStack stack, RegistryKey<World> dimension, BlockPos pos) {
+	public static void setPosition(ItemStack stack, ResourceKey<Level> dimension, BlockPos pos) {
 		if (stack.isEmpty() || !(stack.getItem() instanceof IPositionHolderItem))
 			return;
 		
 		if (pos == null)
 			return;
 		
-		CompoundNBT tag;
+		CompoundTag tag;
 		if (!stack.hasTag())
-			tag = new CompoundNBT();
+			tag = new CompoundTag();
 		else
 			tag = stack.getTag();
 		
@@ -76,7 +76,7 @@ public interface IPositionHolderItem {
 		if (stack.isEmpty() || !(stack.getItem() instanceof IPositionHolderItem))
 			return;
 		
-		CompoundNBT tag;
+		CompoundTag tag;
 		if (!stack.hasTag())
 			return;
 		

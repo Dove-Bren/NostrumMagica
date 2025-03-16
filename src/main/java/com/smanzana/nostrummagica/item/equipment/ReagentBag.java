@@ -28,23 +28,23 @@ import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.Inventories.ItemStackArrayWrapper;
 import com.smanzana.nostrummagica.util.Inventories.IterableInventoryWrapper;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class ReagentBag extends Item implements ILoreTagged {
@@ -85,14 +85,14 @@ public class ReagentBag extends Item implements ILoreTagged {
 		
 		if (!bag.isEmpty() && bag.getItem() instanceof ReagentBag) {
 			if (!bag.hasTag())
-				bag.setTag(new CompoundNBT());
+				bag.setTag(new CompoundTag());
 			
-			CompoundNBT nbt = bag.getTag();
-			CompoundNBT items = nbt.getCompound(NBT_ITEMS);
+			CompoundTag nbt = bag.getTag();
+			CompoundTag items = nbt.getCompound(NBT_ITEMS);
 			if (item.isEmpty())
 				items.remove(pos + "");
 			else {
-				CompoundNBT compound = new CompoundNBT();
+				CompoundTag compound = new CompoundTag();
 				item.save(compound);
 				items.put(pos + "", compound);
 			}
@@ -159,7 +159,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 			if (!bag.hasTag())
 				return ItemStack.EMPTY;
 			
-			CompoundNBT items = bag.getTag().getCompound(NBT_ITEMS);
+			CompoundTag items = bag.getTag().getCompound(NBT_ITEMS);
 			if (items.contains(pos + "", NBT.TAG_COMPOUND))
 				return ItemStack.of(items.getCompound(pos + ""));
 			else
@@ -190,7 +190,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	public static boolean isVacuumEnabled(ItemStack stack) {
 		if (!stack.isEmpty() && stack.getItem() instanceof ReagentBag) {
 			if (!stack.hasTag())
-				stack.setTag(new CompoundNBT());
+				stack.setTag(new CompoundTag());
 			
 			return stack.getTag().getBoolean(NBT_VACUUM);
 		}
@@ -219,28 +219,28 @@ public class ReagentBag extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		int pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, hand);
 		NostrumMagica.instance.proxy.openContainer(playerIn, ReagentBagGui.BagContainer.Make(pos));
 		
-		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getItemInHand(hand));
+		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, playerIn.getItemInHand(hand));
     }
 	
 	@Override
-	public ActionResultType useOn(ItemUseContext context) {
+	public InteractionResult useOn(UseOnContext context) {
 		if (context.getPlayer().isShiftKeyDown()) {
 			if (context.getLevel().isClientSide()) {
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 			
 			// If sneaking, try and do container fast add.
 			final BlockPos pos = context.getClickedPos();
-			final TileEntity te = context.getLevel().getBlockEntity(pos);
+			final BlockEntity te = context.getLevel().getBlockEntity(pos);
 			if (te != null) {
 				
 				// First, check if it's a ritual setup and see about auto-inserting reagents
 				if (autoFillRitual(context.getLevel(), pos, te, context.getPlayer(), context.getItemInHand())) {
-					return ActionResultType.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
 				
 				// If not that, try to insert into container
@@ -250,7 +250,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 					for (int i = 0; i < contents.length; i++) {
 						setItem(context.getItemInHand(), contents[i], i);
 					}
-					return ActionResultType.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
 			}
 			
@@ -260,7 +260,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 		return super.useOn(context);
 	}
 	
-	public static class ReagentInventory extends Inventory {
+	public static class ReagentInventory extends SimpleContainer {
 
 		private static final int MAX_COUNT = 127;
 		
@@ -381,7 +381,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 		return InfoScreenTabs.INFO_REAGENTS;
 	}
 	
-	protected static final boolean autoFillRitual(World world, BlockPos pos, TileEntity te, PlayerEntity player, ItemStack bag) {
+	protected static final boolean autoFillRitual(Level world, BlockPos pos, BlockEntity te, Player player, ItemStack bag) {
 		if (te instanceof AltarTileEntity && !((AltarTileEntity) te).getItem().isEmpty()) {
 			// Capture current actual layout
 			AltarRitualLayout layout = AltarRitualLayout.Capture(world, pos, EMagicElement.PHYSICAL);
@@ -430,7 +430,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 			} else if (matches.size() > 1) {
 				// if full reagents aren't already out, give a nice message explaning what's going on
 				if (layout.getReagentItems(world, pos).size() < 4) {
-					player.sendMessage(new StringTextComponent("Matched multiple rituals. Filling for first. Use again to cycle."), Util.NIL_UUID);
+					player.sendMessage(new TextComponent("Matched multiple rituals. Filling for first. Use again to cycle."), Util.NIL_UUID);
 					match = matches.get(0);
 				} else {
 					// pull all reagents back to put fresh ones next. Figure out which recipe we're set up for.
@@ -486,7 +486,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 						return;
 					}
 					// Candle TE can exist or not
-					TileEntity candleTE = world.getBlockEntity(candlePos);
+					BlockEntity candleTE = world.getBlockEntity(candlePos);
 					if (candleTE != null && candleTE instanceof CandleTileEntity && ((CandleTileEntity) candleTE).getReagentType() != null) {
 						ReagentType type = ((CandleTileEntity) candleTE).getReagentType();
 						addItem(bag, ReagentItem.CreateStack(type, 1));
@@ -529,7 +529,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 								return;
 							}
 							// Candle TE can exist or not
-							TileEntity candleTE = world.getBlockEntity(candlePos);
+							BlockEntity candleTE = world.getBlockEntity(candlePos);
 							if (candleTE != null && candleTE instanceof CandleTileEntity && ((CandleTileEntity) candleTE).getReagentType() != null) {
 								return;
 							}

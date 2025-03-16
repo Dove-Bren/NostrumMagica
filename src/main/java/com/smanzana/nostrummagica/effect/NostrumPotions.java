@@ -5,14 +5,14 @@ import java.util.function.Supplier;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionUtils;
-import net.minecraft.potion.Potions;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.crafting.NBTIngredient;
@@ -24,20 +24,20 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum NostrumPotions {
 
-	MANAREGEN("mana-regen", () -> NostrumEffects.manaRegen.getEffectName(), () -> new EffectInstance(NostrumEffects.manaRegen, 20 * 60)),
-	MANAREGEN_EXTENDED("extended_mana-regen", () -> NostrumEffects.manaRegen.getEffectName(), () -> new EffectInstance(NostrumEffects.manaRegen, 20 * 3 * 60)),
-	MANAREGEN_STRONG("strong_mana-regen", () -> NostrumEffects.manaRegen.getEffectName(), () -> new EffectInstance(NostrumEffects.manaRegen, 20 * 60, 1)),
-	MANAREGEN_REALLY_STRONG("reallystrong_mana-regen", () -> NostrumEffects.manaRegen.getEffectName(), () -> new EffectInstance(NostrumEffects.manaRegen, 20 * 60, 2)),
-	MANAREGEN_STRONG_AND_LONG("strongandlong_mana-regen", () -> NostrumEffects.manaRegen.getEffectName(), () -> new EffectInstance(NostrumEffects.manaRegen, 20 * 3 * 60, 1)),
+	MANAREGEN("mana-regen", () -> NostrumEffects.manaRegen.getEffectName(), () -> new MobEffectInstance(NostrumEffects.manaRegen, 20 * 60)),
+	MANAREGEN_EXTENDED("extended_mana-regen", () -> NostrumEffects.manaRegen.getEffectName(), () -> new MobEffectInstance(NostrumEffects.manaRegen, 20 * 3 * 60)),
+	MANAREGEN_STRONG("strong_mana-regen", () -> NostrumEffects.manaRegen.getEffectName(), () -> new MobEffectInstance(NostrumEffects.manaRegen, 20 * 60, 1)),
+	MANAREGEN_REALLY_STRONG("reallystrong_mana-regen", () -> NostrumEffects.manaRegen.getEffectName(), () -> new MobEffectInstance(NostrumEffects.manaRegen, 20 * 60, 2)),
+	MANAREGEN_STRONG_AND_LONG("strongandlong_mana-regen", () -> NostrumEffects.manaRegen.getEffectName(), () -> new MobEffectInstance(NostrumEffects.manaRegen, 20 * 3 * 60, 1)),
 	;
 	
 	private final String registryName;
 	private final Supplier<String> effectNameSupp;
-	private final Supplier<EffectInstance> effectsSupp;
+	private final Supplier<MobEffectInstance> effectsSupp;
 	
 	private Potion type;
 	
-	private NostrumPotions(String registryName, Supplier<String> effectName, Supplier<EffectInstance> effects) {
+	private NostrumPotions(String registryName, Supplier<String> effectName, Supplier<MobEffectInstance> effects) {
 		// Note: using suppliers because effects won't be set up when enum is done.
 		this.registryName = registryName;
 		this.effectNameSupp = effectName;

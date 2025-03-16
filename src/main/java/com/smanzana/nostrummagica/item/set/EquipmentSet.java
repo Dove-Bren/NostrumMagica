@@ -8,13 +8,13 @@ import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 import com.smanzana.nostrummagica.util.TextUtils;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public abstract class EquipmentSet extends ForgeRegistryEntry<EquipmentSet> {
@@ -27,19 +27,19 @@ public abstract class EquipmentSet extends ForgeRegistryEntry<EquipmentSet> {
 	
 	public abstract void setTick(LivingEntity entity, Map<IInventorySlotKey<? extends LivingEntity>, ItemStack> setItems);
 	
-	public ITextComponent getName() {
-		return new TranslationTextComponent("set." + this.getRegistryName().getNamespace() + "." + this.getRegistryName().getPath() + ".name");
+	public Component getName() {
+		return new TranslatableComponent("set." + this.getRegistryName().getNamespace() + "." + this.getRegistryName().getPath() + ".name");
 	}
 	
-	public ITextComponent getDescription() {
-		return new TranslationTextComponent("set." + this.getRegistryName().getNamespace() + "." + this.getRegistryName().getPath() + ".desc");
+	public Component getDescription() {
+		return new TranslatableComponent("set." + this.getRegistryName().getNamespace() + "." + this.getRegistryName().getPath() + ".desc");
 	}
 	
 	public abstract Multimap<Attribute, AttributeModifier> getFullSetBonuses();
 	
 	public abstract int getFullSetCount();
 
-	public List<ITextComponent> getExtraBonuses(int setCount) {
+	public List<Component> getExtraBonuses(int setCount) {
 		if (setCount == this.getFullSetCount()) {
 			final String extraKey = "set." + this.getRegistryName().getNamespace() + "."
 					+ this.getRegistryName().getPath() + ".extra";

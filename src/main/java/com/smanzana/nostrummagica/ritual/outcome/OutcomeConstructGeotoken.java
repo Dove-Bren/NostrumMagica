@@ -9,13 +9,13 @@ import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.util.TextUtils;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 
 public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 
@@ -27,12 +27,12 @@ public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 	}
 	
 	@Override
-	public boolean canPerform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout) {
+	public boolean canPerform(Level world, Player player, BlockPos center, IRitualLayout layout) {
 		// Requires either a geogem or geotoken. Regardless of which, must contain a location!
 		if (PositionCrystal.getBlockPosition(layout.getCenterItem(world, center)) == null
 				&& PositionToken.getBlockPosition(layout.getCenterItem(world, center)) == null) {
 			if (!world.isClientSide) {
-				player.sendMessage(new TranslationTextComponent("info.create_geotoken.nopos", new Object[0]), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.create_geotoken.nopos", new Object[0]), Util.NIL_UUID);
 			}
 			return false;
 		}
@@ -41,7 +41,7 @@ public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
+	public void perform(Level world, Player player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// set up stack and then call super to spawn it
 		this.stack = PositionToken.constructFrom(layout.getCenterItem(world, center), tokenCount);
 		
@@ -63,7 +63,7 @@ public class OutcomeConstructGeotoken extends OutcomeSpawnItem {
 	}
 
 	@Override
-	public List<ITextComponent> getDescription() {
+	public List<Component> getDescription() {
 		return TextUtils.GetTranslatedList("ritual.outcome.construct_geotoken.desc");
 	}
 	

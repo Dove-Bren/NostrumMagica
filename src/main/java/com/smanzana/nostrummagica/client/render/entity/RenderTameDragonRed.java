@@ -1,19 +1,19 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.client.model.ModelTameDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 
 public class RenderTameDragonRed extends RenderDragonRed<TameRedDragonEntity> {
 
-	public RenderTameDragonRed(EntityRendererManager renderManagerIn, float shadowSizeIn) {
+	public RenderTameDragonRed(EntityRenderDispatcher renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelTameDragonRed(), shadowSizeIn);
 	}
 	
 	@Override
-	protected void scale(TameRedDragonEntity entityIn, MatrixStack matrixStackIn, float partialTicks) {
+	protected void scale(TameRedDragonEntity entityIn, PoseStack matrixStackIn, float partialTicks) {
 		super.scale(entityIn, matrixStackIn, partialTicks);
 		
 		final float age = entityIn.getGrowingAge();

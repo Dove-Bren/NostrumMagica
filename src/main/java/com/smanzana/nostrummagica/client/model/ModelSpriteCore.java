@@ -1,12 +1,12 @@
 package com.smanzana.nostrummagica.client.model;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.SpriteEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class ModelSpriteCore extends ModelBaked<SpriteEntity> {
 	
@@ -43,7 +43,7 @@ public class ModelSpriteCore extends ModelBaked<SpriteEntity> {
 	}
 	
 	@Override
-	protected void renderChild(ModelRendererBaked child, int index, MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
+	protected void renderChild(ModelRendererBaked child, int index, PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn,
 			float red, float green, float blue, float alpha) {
 		super.renderChild(child, index, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, 
 				red * this.red, green * this.green, blue * this.blue, alpha * this.alpha);

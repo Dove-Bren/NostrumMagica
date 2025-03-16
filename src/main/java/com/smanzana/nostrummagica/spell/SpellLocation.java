@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.spell;
 
 import java.util.Objects;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -22,7 +22,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  *
  */
 public class SpellLocation {
-	public final World world;
+	public final Level world;
 	
 	/**
 	 * These represent the block selected by the shape. For example, the block collided with
@@ -36,15 +36,15 @@ public class SpellLocation {
 	 * collided with.
 	 * Some shapes don't have a meaningful difference between this and the selected position.
 	 */
-	public final Vector3d hitPosition;
+	public final Vec3 hitPosition;
 	public final BlockPos hitBlockPos;
 	
 	/**
 	 * A position adjusted for shooting from.
 	 */
-	public final Vector3d shooterPosition;
+	public final Vec3 shooterPosition;
 	
-	public SpellLocation(World world, Vector3d hitPosition, BlockPos hitBlockPos, BlockPos selectedBlockPos, Vector3d shooterPosition) {
+	public SpellLocation(Level world, Vec3 hitPosition, BlockPos hitBlockPos, BlockPos selectedBlockPos, Vec3 shooterPosition) {
 		this.world = world;
 		this.hitPosition = hitPosition;
 		this.hitBlockPos = hitBlockPos;
@@ -57,7 +57,7 @@ public class SpellLocation {
 	 * @param selectedPosition
 	 * @param selectedBlockPos
 	 */
-	public SpellLocation(World world, Vector3d hitPosition, BlockPos hitBlockPos, Vector3d shooterPosition) {
+	public SpellLocation(Level world, Vec3 hitPosition, BlockPos hitBlockPos, Vec3 shooterPosition) {
 		this(world, hitPosition, hitBlockPos, hitBlockPos, shooterPosition);
 	}
 	
@@ -66,15 +66,15 @@ public class SpellLocation {
 	 * @param selectedPosition
 	 * @param selectedBlockPos
 	 */
-	public SpellLocation(World world, Vector3d selectedPosition, BlockPos selectedBlockPos) {
+	public SpellLocation(Level world, Vec3 selectedPosition, BlockPos selectedBlockPos) {
 		this(world, selectedPosition, selectedBlockPos, selectedPosition);
 	}
 	
-	public SpellLocation(World world, BlockPos isolatedBlockPos) {
-		this(world, Vector3d.atCenterOf(isolatedBlockPos), isolatedBlockPos);
+	public SpellLocation(Level world, BlockPos isolatedBlockPos) {
+		this(world, Vec3.atCenterOf(isolatedBlockPos), isolatedBlockPos);
 	}
 	
-	public SpellLocation(World world, Vector3d isolatedPos) {
+	public SpellLocation(Level world, Vec3 isolatedPos) {
 		this(world, isolatedPos, new BlockPos(isolatedPos));
 	}
 	
@@ -95,24 +95,24 @@ public class SpellLocation {
 	 * @param selectedPos
 	 * @return
 	 */
-	protected static final BlockPos GetHitPos(Vector3d hitVec, BlockPos selectedPos) {
-		final Vector3d diff = hitVec.subtract(Vector3d.atCenterOf(selectedPos));
+	protected static final BlockPos GetHitPos(Vec3 hitVec, BlockPos selectedPos) {
+		final Vec3 diff = hitVec.subtract(Vec3.atCenterOf(selectedPos));
 		return new BlockPos(
 				hitVec.add(diff.normalize().scale(.05))
 				);
 	}
 	
-	public SpellLocation(World world, BlockRayTraceResult rayTrace) {
+	public SpellLocation(Level world, BlockHitResult rayTrace) {
 		this(world,
 			rayTrace.getLocation(),
 			GetHitPos(rayTrace.getLocation(), rayTrace.getBlockPos()),
 			rayTrace.getBlockPos(),
-			Vector3d.atCenterOf(rayTrace.getBlockPos())
+			Vec3.atCenterOf(rayTrace.getBlockPos())
 		);
 	}
 	
-	public SpellLocation(World world, RayTraceResult rayTrace) {
-		this(world, (BlockRayTraceResult) rayTrace); // Kinda lame
+	public SpellLocation(Level world, HitResult rayTrace) {
+		this(world, (BlockHitResult) rayTrace); // Kinda lame
 	}
 	
 	@Override

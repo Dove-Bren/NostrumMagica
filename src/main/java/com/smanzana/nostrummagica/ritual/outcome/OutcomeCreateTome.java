@@ -8,11 +8,11 @@ import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.util.TextUtils;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 
 public class OutcomeCreateTome implements IRitualOutcome {
 
@@ -21,7 +21,7 @@ public class OutcomeCreateTome implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
+	public void perform(Level world, Player player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// Take plates and pages from the altars.
 		ItemStack tome = SpellTome.Create(layout.getCenterItem(world, center), layout.getExtraItems(world, center));
 		if (tome.isEmpty())
@@ -33,7 +33,7 @@ public class OutcomeCreateTome implements IRitualOutcome {
 		if (recipe.getTier() == 0) {
 			// give to player
 			
-			player.inventory.add(tome);
+			player.getInventory().add(tome);
 		} else {
 			altar.setItem(tome);
 		}
@@ -45,7 +45,7 @@ public class OutcomeCreateTome implements IRitualOutcome {
 	}
 
 	@Override
-	public List<ITextComponent> getDescription() {
+	public List<Component> getDescription() {
 		return TextUtils.GetTranslatedList("ritual.outcome.create_tome.desc");
 	}
 }

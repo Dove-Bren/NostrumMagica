@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.init;
 
 import java.util.Map;
 
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
@@ -115,32 +115,32 @@ import com.smanzana.nostrummagica.util.Curves;
 import com.smanzana.nostrummagica.util.Curves.ICurve3d;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.particle.IParticleFactory;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.client.renderer.BlockModelShapes;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.client.renderer.color.IItemColor;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.renderer.entity.AreaEffectCloudRenderer;
 import net.minecraft.client.renderer.entity.LightningBoltRenderer;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemModelsProperties;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Effect;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockDisplayReader;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -183,20 +183,20 @@ public class ClientInit {
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.DungeonKeyChestTileEntityType, TileEntityDungeonKeyChestRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.DungeonDoorTileEntityType, TileEntityDungeonDoorRenderer::new);
 		
-		ScreenManager.register(NostrumContainers.ActiveHopper, ActiveHopperGui.ActiveHopperGuiContainer::new);
-		ScreenManager.register(NostrumContainers.LoreTable, LoreTableGui.LoreTableGuiContainer::new);
-		ScreenManager.register(NostrumContainers.ModificationTable, ModificationTableGui.ModificationGui::new);
-		ScreenManager.register(NostrumContainers.Putter, PutterBlockGui.PutterBlockGuiContainer::new);
-		ScreenManager.register(NostrumContainers.ReagentBag, ReagentBagGui.BagGui::new);
-		ScreenManager.register(NostrumContainers.RuneBag, RuneBagGui.BagGui::new);
-		ScreenManager.register(NostrumContainers.SpellCreationMaster, MasterSpellCreationGui.SpellGui::new);
-		ScreenManager.register(NostrumContainers.SpellCreationBasic, BasicSpellCraftGui.BasicSpellCraftGuiContainer::new);
-		ScreenManager.register(NostrumContainers.RuneShaper, RuneShaperGui.RuneShaperGuiContainer::new);
-		ScreenManager.register(NostrumContainers.SpellCreationRedwood, RedwoodSpellCraftGui.Gui::new);
-		ScreenManager.register(NostrumContainers.SpellCreationMystic, MysticSpellCraftGui.Gui::new);
-		ScreenManager.register(NostrumContainers.RuneLibrary, RuneLibraryGui.Gui::new);
-		ScreenManager.register(NostrumContainers.Launcher, LauncherBlockGui.LauncherBlockGuiContainer::new);
-		ScreenManager.register(NostrumContainers.SilverMirror, SilverMirrorGui.MirrorGui::new);
+		MenuScreens.register(NostrumContainers.ActiveHopper, ActiveHopperGui.ActiveHopperGuiContainer::new);
+		MenuScreens.register(NostrumContainers.LoreTable, LoreTableGui.LoreTableGuiContainer::new);
+		MenuScreens.register(NostrumContainers.ModificationTable, ModificationTableGui.ModificationGui::new);
+		MenuScreens.register(NostrumContainers.Putter, PutterBlockGui.PutterBlockGuiContainer::new);
+		MenuScreens.register(NostrumContainers.ReagentBag, ReagentBagGui.BagGui::new);
+		MenuScreens.register(NostrumContainers.RuneBag, RuneBagGui.BagGui::new);
+		MenuScreens.register(NostrumContainers.SpellCreationMaster, MasterSpellCreationGui.SpellGui::new);
+		MenuScreens.register(NostrumContainers.SpellCreationBasic, BasicSpellCraftGui.BasicSpellCraftGuiContainer::new);
+		MenuScreens.register(NostrumContainers.RuneShaper, RuneShaperGui.RuneShaperGuiContainer::new);
+		MenuScreens.register(NostrumContainers.SpellCreationRedwood, RedwoodSpellCraftGui.Gui::new);
+		MenuScreens.register(NostrumContainers.SpellCreationMystic, MysticSpellCraftGui.Gui::new);
+		MenuScreens.register(NostrumContainers.RuneLibrary, RuneLibraryGui.Gui::new);
+		MenuScreens.register(NostrumContainers.Launcher, LauncherBlockGui.LauncherBlockGuiContainer::new);
+		MenuScreens.register(NostrumContainers.SilverMirror, SilverMirrorGui.MirrorGui::new);
 		
 		// Could probably make this be the default!
 		ISpellCraftPatternRenderer.RegisterRenderer(NostrumSpellCraftPatterns.lightweight, SpellCraftPatternAutoRenderer.INSTANCE);
@@ -267,7 +267,7 @@ public class ClientInit {
 	
 	@SubscribeEvent
 	public static void registerColorHandlers(ColorHandlerEvent.Item ev) {
-		IItemColor tinter = new IItemColor() {
+		ItemColor tinter = new ItemColor() {
 			@Override
 			public int getColor(ItemStack stack, int tintIndex) {
 				EMagicElement element = EssenceItem.findType(stack);
@@ -285,9 +285,9 @@ public class ClientInit {
 	
 	@SubscribeEvent
 	public static void registerColorHandlers(ColorHandlerEvent.Block event) {
-		IBlockColor tinter = new IBlockColor() {
+		BlockColor tinter = new BlockColor() {
 			@Override
-			public int getColor(BlockState state, IBlockDisplayReader world, BlockPos pos, int tintIndex) {
+			public int getColor(BlockState state, BlockAndTintGetter world, BlockPos pos, int tintIndex) {
 				BlockState mimickedState = MimicBlock.getMirrorState(state, world, pos).orElse(null);
 				
 				if (mimickedState != null) {
@@ -351,12 +351,12 @@ public class ClientInit {
 	@SubscribeEvent
 	public static void registerClientParticleFactories(ParticleFactoryRegisterEvent event) {
 		final Minecraft mc = Minecraft.getInstance();
-		ParticleManager manager = mc.particleEngine;
+		ParticleEngine manager = mc.particleEngine;
 		
 		for (NostrumParticles particle : NostrumParticles.values()) {
-			manager.register(particle.getType(), new IParticleFactory<NostrumParticleData>() {
+			manager.register(particle.getType(), new ParticleProvider<NostrumParticleData>() {
 				@Override
-				public Particle createParticle(NostrumParticleData typeIn, ClientWorld worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+				public Particle createParticle(NostrumParticleData typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
 					return particle.getFactory().createParticle(worldIn, typeIn.getParams());
 				}
 			});
@@ -364,86 +364,86 @@ public class ClientInit {
 	}
 	
 	private static final void registerBlockRenderLayer() {
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.activeHopper, RenderType.cutoutMipped());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.candle, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.chalk, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.cursedIce, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.dungeonAir, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.itemDuct, RenderType.cutoutMipped());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.lockedChest, RenderType.solid());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.magicWall, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.maniCrystalBlock, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.kaniCrystalBlock, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.vaniCrystalBlock, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicDoor, (t) -> true);//RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicDoorUnbreakable, (t) -> true);//RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicFacade, (t) -> true);//RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.mimicFacadeUnbreakable, (t) -> true);//RenderType.getCutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.mineBlock, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.obelisk, RenderType.solid());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.singleSpawner, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.matchSpawner, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.triggeredMatchSpawner, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.paradoxMirror, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.spellTable, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.activeHopper, RenderType.cutoutMipped());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.candle, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.chalk, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.cursedIce, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.dungeonAir, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.itemDuct, RenderType.cutoutMipped());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.lockedChest, RenderType.solid());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.magicWall, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.maniCrystalBlock, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.kaniCrystalBlock, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.vaniCrystalBlock, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.mimicDoor, (t) -> true);//RenderType.getCutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.mimicDoorUnbreakable, (t) -> true);//RenderType.getCutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.mimicFacade, (t) -> true);//RenderType.getCutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.mimicFacadeUnbreakable, (t) -> true);//RenderType.getCutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.mineBlock, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.obelisk, RenderType.solid());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.singleSpawner, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.matchSpawner, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.triggeredMatchSpawner, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.paradoxMirror, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.spellTable, RenderType.cutout());
 		//RenderTypeLookup.setRenderLayer(NostrumBlocks.switchBlock, RenderType.getTranslucent());
 		//RenderTypeLookup.setRenderLayer(NostrumBlocks.keySwitch, RenderType.getTranslucent());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.teleportRune, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.triggerRepeater, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.midnightIris, RenderType.cutoutMipped());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.crystabloom, RenderType.cutoutMipped());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.mandrakeCrop, RenderType.cutoutMipped());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.ginsengCrop, RenderType.cutoutMipped());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.essenceCrop, RenderType.cutoutMipped());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.poisonWaterBlock, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.unbreakablePoisonWaterBlock, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumFluids.poisonWater, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumFluids.poisonWaterFlowing, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumFluids.unbreakablePoisonWater, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumFluids.unbreakablePoisonWaterFlowing, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.manaArmorerBlock, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.dungeonBars, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.basicSpellTable, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.advancedSpellTable, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.mysticSpellTable, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.runeLibrary, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.cursedFire, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumFluids.mysticWater, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.mysticWaterBlock, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.toggleDoor, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.togglePlatform, RenderType.translucent());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.cursedGlass, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.smallDungeonKeyChest, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.largeDungeonKeyChest, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.smallDungeonDoor, RenderType.cutout());
-		RenderTypeLookup.setRenderLayer(NostrumBlocks.largeDungeonDoor, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.teleportRune, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.triggerRepeater, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.midnightIris, RenderType.cutoutMipped());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.crystabloom, RenderType.cutoutMipped());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.mandrakeCrop, RenderType.cutoutMipped());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.ginsengCrop, RenderType.cutoutMipped());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.essenceCrop, RenderType.cutoutMipped());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.poisonWaterBlock, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.unbreakablePoisonWaterBlock, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumFluids.poisonWater, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumFluids.poisonWaterFlowing, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumFluids.unbreakablePoisonWater, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumFluids.unbreakablePoisonWaterFlowing, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.manaArmorerBlock, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.dungeonBars, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.basicSpellTable, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.advancedSpellTable, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.mysticSpellTable, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.runeLibrary, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.cursedFire, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumFluids.mysticWater, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.mysticWaterBlock, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.toggleDoor, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.togglePlatform, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.cursedGlass, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.smallDungeonKeyChest, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.largeDungeonKeyChest, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.smallDungeonDoor, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.largeDungeonDoor, RenderType.cutout());
 	}
 	
 	private static final void registerItemModelProperties() {
-		ItemModelsProperties.register(NostrumItems.enderRod, ChargingSwordItem.PROPERTY_CHARGE, AspectedEnderWeapon::ModelCharge);
-		ItemModelsProperties.register(NostrumItems.enderRod, ChargingSwordItem.PROPERTY_CHARGING, AspectedEnderWeapon::ModelCharging);
-		ItemModelsProperties.register(NostrumItems.flameRod, ChargingSwordItem.PROPERTY_CHARGE, AspectedFireWeapon::ModelCharge);
-		ItemModelsProperties.register(NostrumItems.flameRod, ChargingSwordItem.PROPERTY_CHARGING, AspectedFireWeapon::ModelCharging);
-		ItemModelsProperties.register(NostrumItems.deepMetalAxe, NostrumMagica.Loc("blocking"), AspectedPhysicalWeapon::ModelBlocking);
-		ItemModelsProperties.register(NostrumItems.hookshotWeak, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
-		ItemModelsProperties.register(NostrumItems.hookshotMedium, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
-		ItemModelsProperties.register(NostrumItems.hookshotStrong, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
-		ItemModelsProperties.register(NostrumItems.hookshotClaw, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
-		ItemModelsProperties.register(NostrumItems.mageBlade, NostrumMagica.Loc("element"), MageBlade::ModelElement);
-		ItemModelsProperties.register(NostrumItems.mirrorShield, new ResourceLocation("blocking"), MirrorShield::ModelBlocking);
-		ItemModelsProperties.register(NostrumItems.mirrorShieldImproved, new ResourceLocation("blocking"), MirrorShield::ModelBlocking);
-		ItemModelsProperties.register(NostrumItems.mirrorShieldImproved, NostrumMagica.Loc("charged"), MirrorShieldImproved::ModelCharged);
-		ItemModelsProperties.register(NostrumItems.soulDagger, ChargingSwordItem.PROPERTY_CHARGE, SoulDagger::ModelCharge);
-		ItemModelsProperties.register(NostrumItems.soulDagger, ChargingSwordItem.PROPERTY_CHARGING, SoulDagger::ModelCharging);
-		ItemModelsProperties.register(NostrumItems.thanosStaff, NostrumMagica.Loc("activated"), ThanosStaff::ModelActivated);
-		ItemModelsProperties.register(NostrumItems.casterWand, ChargingSwordItem.PROPERTY_CHARGE, CasterWandItem::ModelCharge);
-		ItemModelsProperties.register(NostrumItems.casterWand, ChargingSwordItem.PROPERTY_CHARGING, CasterWandItem::ModelCharging);
+		ItemProperties.register(NostrumItems.enderRod, ChargingSwordItem.PROPERTY_CHARGE, AspectedEnderWeapon::ModelCharge);
+		ItemProperties.register(NostrumItems.enderRod, ChargingSwordItem.PROPERTY_CHARGING, AspectedEnderWeapon::ModelCharging);
+		ItemProperties.register(NostrumItems.flameRod, ChargingSwordItem.PROPERTY_CHARGE, AspectedFireWeapon::ModelCharge);
+		ItemProperties.register(NostrumItems.flameRod, ChargingSwordItem.PROPERTY_CHARGING, AspectedFireWeapon::ModelCharging);
+		ItemProperties.register(NostrumItems.deepMetalAxe, NostrumMagica.Loc("blocking"), AspectedPhysicalWeapon::ModelBlocking);
+		ItemProperties.register(NostrumItems.hookshotWeak, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
+		ItemProperties.register(NostrumItems.hookshotMedium, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
+		ItemProperties.register(NostrumItems.hookshotStrong, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
+		ItemProperties.register(NostrumItems.hookshotClaw, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
+		ItemProperties.register(NostrumItems.mageBlade, NostrumMagica.Loc("element"), MageBlade::ModelElement);
+		ItemProperties.register(NostrumItems.mirrorShield, new ResourceLocation("blocking"), MirrorShield::ModelBlocking);
+		ItemProperties.register(NostrumItems.mirrorShieldImproved, new ResourceLocation("blocking"), MirrorShield::ModelBlocking);
+		ItemProperties.register(NostrumItems.mirrorShieldImproved, NostrumMagica.Loc("charged"), MirrorShieldImproved::ModelCharged);
+		ItemProperties.register(NostrumItems.soulDagger, ChargingSwordItem.PROPERTY_CHARGE, SoulDagger::ModelCharge);
+		ItemProperties.register(NostrumItems.soulDagger, ChargingSwordItem.PROPERTY_CHARGING, SoulDagger::ModelCharging);
+		ItemProperties.register(NostrumItems.thanosStaff, NostrumMagica.Loc("activated"), ThanosStaff::ModelActivated);
+		ItemProperties.register(NostrumItems.casterWand, ChargingSwordItem.PROPERTY_CHARGE, CasterWandItem::ModelCharge);
+		ItemProperties.register(NostrumItems.casterWand, ChargingSwordItem.PROPERTY_CHARGING, CasterWandItem::ModelCharging);
 	}
 	
 	@SuppressWarnings("deprecation")
 	@SubscribeEvent
 	public void stitchEventPre(TextureStitchEvent.Pre event) {
-		if(event.getMap().location() != AtlasTexture.LOCATION_BLOCKS) {
+		if(event.getMap().location() != TextureAtlas.LOCATION_BLOCKS) {
 			return;
 		}
 		
@@ -530,9 +530,9 @@ public class ClientInit {
     	putMimicBlockModel(event.getModelRegistry(), NostrumBlocks.mimicFacadeUnbreakable);
 	}
 	
-	private static void putMimicBlockModel(Map<ResourceLocation, IBakedModel> registry, Block block) {
+	private static void putMimicBlockModel(Map<ResourceLocation, BakedModel> registry, Block block) {
 		for (BlockState state : block.getStateDefinition().getPossibleStates()) {
-			ModelResourceLocation loc = BlockModelShapes.stateToModelLocation(state);
+			ModelResourceLocation loc = BlockModelShaper.stateToModelLocation(state);
 			registry.put(loc, new MimicBlockBakedModel(registry.get(loc))); // Put a new mimic model wrapped around the default one
 		}
 	}
@@ -550,7 +550,7 @@ public class ClientInit {
 			
 			if (!selected.equals(hit)) {
 				// Actual selected as outline
-				IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_LINES);
+				VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_LINES);
 				matrixStackIn.pushPose();
 				matrixStackIn.translate(selected.getX() + .5, selected.getY() + .5, selected.getZ() + .5);
 				matrixStackIn.scale(1.005f, 1.005f, 1.005f);
@@ -565,7 +565,7 @@ public class ClientInit {
 				RenderFuncs.drawUnitCube(matrixStackIn, buffer, combinedLight, combinedOverlay, red, green, blue, alpha);
 				matrixStackIn.popPose();
 			} else {
-				final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_QUADS);
+				final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_QUADS);
 				matrixStackIn.pushPose();
 				matrixStackIn.translate(selected.getX() + .5, selected.getY() + .5, selected.getZ() + .5);
 				RenderFuncs.drawUnitCube(matrixStackIn, buffer, combinedLight, combinedOverlay, red, green, blue, alpha);
@@ -576,28 +576,28 @@ public class ClientInit {
 		// ENT done in renderer itself
 
 		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.LINE, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
-			final Vector3d start = comp.getStart();
-			final Vector3d end = comp.getEnd();
+			final Vec3 start = comp.getStart();
+			final Vec3 end = comp.getEnd();
 			final int combinedLight = 15728880;
 			final int combinedOverlay = OverlayTexture.NO_OVERLAY;
 			
-			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_LINES);
+			final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_LINES);
 			RenderFuncs.renderLine(matrixStackIn, buffer, start, end, 10, combinedOverlay, combinedLight, red, green, blue, alpha);
 		});
 
 		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.AOE_LINE, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
-			final Vector3d start = comp.getStart();
-			final Vector3d end = comp.getEnd();
+			final Vec3 start = comp.getStart();
+			final Vec3 end = comp.getEnd();
 			final float width = comp.getWidth();
 			final int combinedLight = 15728880;
 			final int combinedOverlay = OverlayTexture.NO_OVERLAY;
 			
-			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_LINES_THICK);
+			final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_LINES_THICK);
 			RenderFuncs.renderLine(matrixStackIn, buffer, start, end, width, combinedOverlay, combinedLight, red, green, blue, alpha);
 		});
 
 		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.CURVE, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
-			final Vector3d start = comp.getStart();
+			final Vec3 start = comp.getStart();
 			final ICurve3d curve = comp.getCurve();
 			final int combinedLight = 15728880;
 			final int combinedOverlay = OverlayTexture.NO_OVERLAY;
@@ -608,12 +608,12 @@ public class ClientInit {
 			final float period =  500f;
 			final float prog = (float) (System.currentTimeMillis() % (double) period) / period;
 			
-			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_ORB_CHAIN);
+			final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_ORB_CHAIN);
 			RenderFuncs.renderHorizontalRibbon(matrixStackIn, buffer, start, curve, 50, .2f, prog, combinedOverlay, combinedLight, red, green, blue, alpha);
 		});
 
 		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.DISK, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
-			final Vector3d start = comp.getStart();
+			final Vec3 start = comp.getStart();
 			final float radius = comp.getRadius();
 			final int combinedLight = 15728880;
 			final int combinedOverlay = OverlayTexture.NO_OVERLAY;
@@ -621,20 +621,20 @@ public class ClientInit {
 			final float period =  500f;
 			final float prog = (float) (System.currentTimeMillis() % (double) period) / period;
 			
-			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_ORB_CHAIN);
+			final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_ORB_CHAIN);
 			final ICurve3d curve = new Curves.FlatEllipse(radius, radius);
 			RenderFuncs.renderVerticalRibbon(matrixStackIn, buffer, start, curve, 50, .2f, prog, combinedOverlay, combinedLight, red, green, blue, alpha);
 		});
 		
 		SpellShapeRenderer.RegisterRenderer(SpellShapePreviewComponent.BOX, (matrixStackIn, bufferIn, partialTicks, comp, red, green, blue, alpha) -> {
-			final Vector3d start = comp.getStart();
-			final Vector3d end = comp.getEnd();
-			final Vector3d halfdiff = end.subtract(start).add(1, 1, 1).scale(.5f);
+			final Vec3 start = comp.getStart();
+			final Vec3 end = comp.getEnd();
+			final Vec3 halfdiff = end.subtract(start).add(1, 1, 1).scale(.5f);
 			
 			final int combinedLight = RenderFuncs.BrightPackedLight;
 			final int combinedOverlay = OverlayTexture.NO_OVERLAY;
 			
-			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_QUADS);
+			final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_QUADS);
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(start.x() + halfdiff.x(), start.y() + halfdiff.y(), start.z() + halfdiff.z());
 			matrixStackIn.scale((float) halfdiff.x() * 2, (float) halfdiff.y() * 2, (float) halfdiff.z() * 2);
@@ -667,11 +667,11 @@ public class ClientInit {
 		
 	}
 	
-	private static final void registerEffectBubbleRenderer(Effect effect) {
+	private static final void registerEffectBubbleRenderer(MobEffect effect) {
 		IEffectRenderer.RegisterRenderer(effect, new EffectBubbleRenderer(effect));
 	}
 	
-	private static final void registerEffectGemRenderer(Effect effect) {
+	private static final void registerEffectGemRenderer(MobEffect effect) {
 		IEffectRenderer.RegisterRenderer(effect, new EffectGemRenderer(effect));
 	}
 	

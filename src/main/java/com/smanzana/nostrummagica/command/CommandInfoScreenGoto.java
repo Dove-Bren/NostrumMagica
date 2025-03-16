@@ -6,15 +6,15 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.world.entity.player.Player;
 
 public class CommandInfoScreenGoto {
 
 	public static final String Command = "nostrumgoto";
 	
-	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+	public static final void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(
 				Commands.literal(Command)
 					//.requires(s -> s.hasPermissionLevel(2))
@@ -27,14 +27,14 @@ public class CommandInfoScreenGoto {
 		ClientCommands.Register(Command, CommandInfoScreenGoto::handleClient);
 	}
 
-	private static final int execute(CommandContext<CommandSource> context, final String tag) throws CommandSyntaxException {
+	private static final int execute(CommandContext<CommandSourceStack> context, final String tag) throws CommandSyntaxException {
 	
 		; // Do nothing on server
 		
 		return 0;
 	}
 	
-	private static final boolean handleClient(PlayerEntity player, String msg) {
+	private static final boolean handleClient(Player player, String msg) {
 		// expect {/nostrumgoto "Lore::thing"}
 		final String tag = msg.substring(Command.length() + 3, msg.length() - 1);
 		NostrumMagica.instance.proxy.openLoreLink(tag);

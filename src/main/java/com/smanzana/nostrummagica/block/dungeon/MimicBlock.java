@@ -9,43 +9,43 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.MimicBlockTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.SoundType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.DiggingParticle;
-import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.particles.BlockParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.client.particle.TerrainParticle;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.ModelProperty;
 
 @SuppressWarnings("deprecation")
-public abstract class MimicBlock extends Block implements ITileEntityProvider {
+public abstract class MimicBlock extends Block implements EntityBlock {
 	
 	public static class MimicBlockData {
 		public BlockState mimicState;
@@ -57,14 +57,14 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 	
 	public static final ModelProperty<MimicBlockData> MIMIC_MODEL_PROPERTY = new ModelProperty<>();
 	
-	public abstract @Nonnull BlockState getMimickedState(BlockState mimicBlockState, World world, BlockPos myPos);
+	public abstract @Nonnull BlockState getMimickedState(BlockState mimicBlockState, Level world, BlockPos myPos);
 	
 	public MimicBlock(Block.Properties builder) {
 		super(builder.noOcclusion());
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		super.createBlockStateDefinition(builder);
 	}
 	
@@ -74,12 +74,12 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 	}
 	
 	@Override
-	public TileEntity newBlockEntity(IBlockReader world) {
+	public BlockEntity newBlockEntity(BlockGetter world) {
 		return new MimicBlockTileEntity();
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		return newBlockEntity(world);
 	}
 	
@@ -94,16 +94,16 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 //	}
 	
 	@Override
-	public boolean canBeReplaced(BlockState state, BlockItemUseContext context) {
+	public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
         return false;
     }
 	
-	protected boolean shouldRefreshFromNeighbor(BlockState state, World worldIn, BlockPos myPos, BlockPos fromPos) {
+	protected boolean shouldRefreshFromNeighbor(BlockState state, Level worldIn, BlockPos myPos, BlockPos fromPos) {
 		return myPos.equals(fromPos.above());
 	}
 	
 	@Override
-	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+	public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
 		super.neighborChanged(state, worldIn, pos, blockIn, fromPos, isMoving);
 		
 		if (shouldRefreshFromNeighbor(state, worldIn, pos, fromPos)) {
@@ -115,22 +115,22 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 	
 	// Mimiced block attributes
 	@Override
-	public int getLightBlock(BlockState state, IBlockReader world, BlockPos pos) {
+	public int getLightBlock(BlockState state, BlockGetter world, BlockPos pos) {
 		return getValue(state, world, pos, BlockState::getLightBlock, () -> super.getLightBlock(state, world, pos));
 	}
 	
 	@Override
-	public VoxelShape getCollisionShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
 		return getValue(state, world, pos, BlockState::getCollisionShape, () -> super.getCollisionShape(state, world, pos, context));
     }
 
 	@Override
-	public float getShadeBrightness(BlockState state, IBlockReader world, BlockPos pos) {
+	public float getShadeBrightness(BlockState state, BlockGetter world, BlockPos pos) {
 		return getValue(state, world, pos, BlockState::getShadeBrightness, () -> super.getShadeBrightness(state, world, pos));
 	}
 
 	@Override
-	public boolean propagatesSkylightDown(BlockState state, IBlockReader world, BlockPos pos) {
+	public boolean propagatesSkylightDown(BlockState state, BlockGetter world, BlockPos pos) {
 		return getValue(state, world, pos, BlockState::propagatesSkylightDown, () -> super.propagatesSkylightDown(state, world, pos));
 	}
 
@@ -140,7 +140,7 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 //	}
 	
 	@Override
-    public SoundType getSoundType(BlockState state, IWorldReader world, BlockPos pos, @Nullable Entity entity) {
+    public SoundType getSoundType(BlockState state, LevelReader world, BlockPos pos, @Nullable Entity entity) {
         return getValue(state, world, pos, (mirror, reader, pos1) -> mirror.getSoundType(reader, pos1, entity), () -> super.getSoundType(state, world, pos, entity));
     }
 
@@ -151,22 +151,22 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 
     @Nullable
     @Override
-    public PathNodeType getAiPathNodeType(BlockState state, IBlockReader world, BlockPos pos, @Nullable MobEntity entity) {
+    public BlockPathTypes getAiPathNodeType(BlockState state, BlockGetter world, BlockPos pos, @Nullable Mob entity) {
         return getValue(state, world, pos, (mirror, reader, pos1) -> mirror.getAiPathNodeType(reader, pos1, entity), () -> super.getAiPathNodeType(state, world, pos, entity));
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         return getValue(state, worldIn, pos, (mirror, reader, pos1) -> mirror.getShape(reader, pos1, context), () -> super.getShape(state, worldIn, pos, context));
     }
 
 	@Override
-    public VoxelShape getOcclusionShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public VoxelShape getOcclusionShape(BlockState state, BlockGetter worldIn, BlockPos pos) {
         return getValue(state, worldIn, pos, BlockState::getBlockSupportShape, () -> super.getOcclusionShape(state, worldIn, pos));
     }
 
     @Override
-    public VoxelShape getInteractionShape(BlockState state, IBlockReader world, BlockPos pos) {
+    public VoxelShape getInteractionShape(BlockState state, BlockGetter world, BlockPos pos) {
         return getValue(state, world, pos, BlockState::getInteractionShape, () -> super.getInteractionShape(state, world, pos));
     }
 
@@ -177,7 +177,7 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 //    }
 
     @Override
-    public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
+    public int getLightValue(BlockState state, BlockGetter world, BlockPos pos) {
         int result = getValue(state, world, pos, BlockState::getLightValue, () -> super.getLightValue(state, world, pos));
         // Copied from secret rooms mod, b ut it's SO SLOW because getting the stacktrace on a thread is not fast. Kills performance!
 //        //This is needed so we can control AO. Try to remove this asap
@@ -196,13 +196,13 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
     
   //Entity#createRunningParticles
     @Override
-    public boolean addRunningEffects(BlockState state, World world, BlockPos pos, Entity entity) {
+    public boolean addRunningEffects(BlockState state, Level world, BlockPos pos, Entity entity) {
         Optional<BlockState> mirrorState = getMirrorState(state, world, pos);
         if(mirrorState.isPresent()) {
             BlockState blockstate = mirrorState.get();
-            if (blockstate.getRenderShape() != BlockRenderType.INVISIBLE) {
-                Vector3d Vector3d = entity.getDeltaMovement();
-                world.addParticle(new BlockParticleData(ParticleTypes.BLOCK, blockstate),
+            if (blockstate.getRenderShape() != RenderShape.INVISIBLE) {
+                Vec3 Vector3d = entity.getDeltaMovement();
+                world.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, blockstate),
                         entity.getX() + (world.random.nextFloat() - 0.5D) * entity.getBbWidth(),
                         entity.getY() + 0.1D,
                         entity.getZ() + (world.random.nextFloat() - 0.5D) * entity.getBbWidth(),
@@ -216,18 +216,18 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public boolean addHitEffects(BlockState state, World world, RayTraceResult target, ParticleManager manager) {
-        if(target instanceof BlockRayTraceResult) {
-            BlockPos pos = ((BlockRayTraceResult) target).getBlockPos();
+    public boolean addHitEffects(BlockState state, Level world, HitResult target, ParticleEngine manager) {
+        if(target instanceof BlockHitResult) {
+            BlockPos pos = ((BlockHitResult) target).getBlockPos();
             Optional<BlockState> mirrorState = getMirrorState(state, world, pos);
             if(mirrorState.isPresent()) {
                 BlockState blockstate = mirrorState.get();
-                Direction side = ((BlockRayTraceResult) target).getDirection();
-                if (blockstate.getRenderShape() != BlockRenderType.INVISIBLE) {
+                Direction side = ((BlockHitResult) target).getDirection();
+                if (blockstate.getRenderShape() != RenderShape.INVISIBLE) {
                     int x = pos.getX();
                     int y = pos.getY();
                     int z = pos.getZ();
-                    AxisAlignedBB bb = blockstate.getShape(world, pos).bounds();
+                    AABB bb = blockstate.getShape(world, pos).bounds();
                     double xPos = x + world.random.nextDouble() * (bb.maxX - bb.minX - 0.2F) + 0.1F + bb.minX;
                     double yPos = y + world.random.nextDouble() * (bb.maxY - bb.minY - 0.2F) + 0.1F + bb.minY;
                     double zPos = z + world.random.nextDouble() * (bb.maxZ - bb.minZ - 0.2F) + 0.1F + bb.minZ;
@@ -243,7 +243,7 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 
                     final Minecraft mc = Minecraft.getInstance();
                     mc.particleEngine.add(
-                            new DiggingParticle((ClientWorld) world, xPos, yPos, zPos, 0.0D, 0.0D, 0.0D, blockstate)
+                            new TerrainParticle((ClientLevel) world, xPos, yPos, zPos, 0.0D, 0.0D, 0.0D, blockstate)
                                     .init(pos)
                                     .setPower(0.2F)
                                     .scale(0.6F)
@@ -256,7 +256,7 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public boolean addDestroyEffects(BlockState stateIn, World world, BlockPos pos, ParticleManager manager) {
+    public boolean addDestroyEffects(BlockState stateIn, Level world, BlockPos pos, ParticleEngine manager) {
         Optional<BlockState> mirrorState = getMirrorState(stateIn, world, pos);
         if (mirrorState.isPresent()) {
             if(mirrorState.get().isAir(world, pos)) {
@@ -268,9 +268,9 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
                 double xDelta = Math.min(1.0D, x2 - x1);
                 double yDelta = Math.min(1.0D, y2 - y1);
                 double zDelta = Math.min(1.0D, z2 - z1);
-                int xAmount = Math.max(2, MathHelper.ceil( xDelta / 0.25D));
-                int yAmount = Math.max(2, MathHelper.ceil( yDelta / 0.25D));
-                int zAmount = Math.max(2, MathHelper.ceil( zDelta / 0.25D));
+                int xAmount = Math.max(2, Mth.ceil( xDelta / 0.25D));
+                int yAmount = Math.max(2, Mth.ceil( yDelta / 0.25D));
+                int zAmount = Math.max(2, Mth.ceil( zDelta / 0.25D));
 
                 for(int x = 0; x < xAmount; ++x) {
                     for(int y = 0; y < yAmount; ++y) {
@@ -284,7 +284,7 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
                             
                             final Minecraft mc = Minecraft.getInstance();
                             mc.particleEngine.add(
-                                    new DiggingParticle((ClientWorld) world,
+                                    new TerrainParticle((ClientLevel) world,
                                             pos.getX() + xPos,pos.getY() + yPos, pos.getZ() + zPos,
                                             dx - 0.5D, dy - 0.5D,dz - 0.5D, state)
                                             .init(pos)
@@ -298,25 +298,25 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public boolean addLandingEffects(BlockState state1, ServerWorld ServerWorld, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
+    public boolean addLandingEffects(BlockState state1, ServerLevel ServerWorld, BlockPos pos, BlockState state2, LivingEntity entity, int numberOfParticles) {
         Optional<BlockState> mirrorState = getMirrorState(state2, ServerWorld, pos);
         if(mirrorState.isPresent()) {
-            ServerWorld.sendParticles(new BlockParticleData(ParticleTypes.BLOCK, mirrorState.get()), entity.getX(), entity.getY(), entity.getZ(), numberOfParticles, 0.0D, 0.0D, 0.0D, 0.15F);
+            ServerWorld.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, mirrorState.get()), entity.getX(), entity.getY(), entity.getZ(), numberOfParticles, 0.0D, 0.0D, 0.0D, 0.15F);
         }
         return true;
     }
 	
 	
 	
-	public static <T, W extends IBlockReader> T getValue(@Nullable BlockState state, W reader, BlockPos pos, StateFunction<T, W> function, Supplier<T> defaultValue) {
+	public static <T, W extends BlockGetter> T getValue(@Nullable BlockState state, W reader, BlockPos pos, StateFunction<T, W> function, Supplier<T> defaultValue) {
         return getMirrorState(state, reader, pos).map(mirror -> function.getValue(mirror, reader, pos)).orElseGet(defaultValue);
     }
 
-    public static Optional<BlockState> getMirrorState(@Nullable BlockState state, IBlockReader world, BlockPos pos) {
+    public static Optional<BlockState> getMirrorState(@Nullable BlockState state, BlockGetter world, BlockPos pos) {
         return getMirrorData(state, world, pos).map(MimicBlockData::getBlockState);
     }
 
-    public static Optional<MimicBlockData> getMirrorData(@Nullable BlockState state, IBlockReader world, BlockPos pos) {
+    public static Optional<MimicBlockData> getMirrorData(@Nullable BlockState state, BlockGetter world, BlockPos pos) {
         if(world == null || pos == null) {
             return Optional.empty();
         }
@@ -325,7 +325,7 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
         	state = world.getBlockState(pos);
         }
         
-        TileEntity te = world.getBlockEntity(pos);
+        BlockEntity te = world.getBlockEntity(pos);
         if (state.getBlock() instanceof MimicBlock && te instanceof MimicBlockTileEntity) {
         	
         	MimicBlockData data = ((MimicBlockTileEntity) te).getData();
@@ -342,7 +342,7 @@ public abstract class MimicBlock extends Block implements ITileEntityProvider {
         }
     }
 
-    private interface StateFunction<T, W extends IBlockReader> {
+    private interface StateFunction<T, W extends BlockGetter> {
         T getValue(BlockState mirror, W reader, BlockPos pos);
     }
 }

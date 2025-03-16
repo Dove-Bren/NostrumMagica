@@ -4,15 +4,15 @@ import java.util.EnumSet;
 
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.EntityPredicate;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.TargetGoal;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 
-public class OwnerHurtByTargetGoalGeneric<T extends CreatureEntity & ITameableEntity> extends TargetGoal {
+public class OwnerHurtByTargetGoalGeneric<T extends PathfinderMob & ITameableEntity> extends TargetGoal {
 	
-	protected static final EntityPredicate CanAttack = new EntityPredicate().allowUnseeable().ignoreInvisibilityTesting();
+	protected static final TargetingConditions CanAttack = new TargetingConditions().allowUnseeable().ignoreInvisibilityTesting();
 	protected T theDefendingTameable;
 	protected LivingEntity theOwnerAttacker;
 	private int timestamp;

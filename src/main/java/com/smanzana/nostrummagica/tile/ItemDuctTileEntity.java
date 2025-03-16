@@ -12,18 +12,18 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.tileentity.ChestTileEntity;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.Container;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.LazyOptional;
@@ -31,7 +31,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ ITickableTileEntity {
+public class ItemDuctTileEntity extends BlockEntity implements /* IInventory, */ TickableBlockEntity {
 	
 	private static final class ItemEntry {
 		
@@ -49,15 +49,15 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 			this.inputDirection = inputDirection;
 		}
 		
-		public CompoundNBT toNBT() {
-			CompoundNBT tag = new CompoundNBT();
+		public CompoundTag toNBT() {
+			CompoundTag tag = new CompoundTag();
 			tag.putLong(NBT_TICK, addTick);
 			tag.put(NBT_ITEM, stack.serializeNBT());
 			tag.putInt(NBT_DIRECTION, inputDirection.get3DDataValue());
 			return tag;
 		}
 		
-		public static final ItemDuctTileEntity.ItemEntry fromNBT(CompoundNBT tag) {
+		public static final ItemDuctTileEntity.ItemEntry fromNBT(CompoundTag tag) {
 			final long tick = tag.getLong(NBT_TICK);
 			final ItemStack stack = ItemStack.of(tag.getCompound(NBT_ITEM));
 			final Direction dir = Direction.values()[tag.getInt(NBT_DIRECTION)];
@@ -156,10 +156,10 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
-		ListNBT list = new ListNBT();
+		ListTag list = new ListTag();
 		for (ItemDuctTileEntity.ItemEntry entry : itemQueue) {
 			list.add(entry.toNBT());
 		}
@@ -171,13 +171,13 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		itemQueue.clear();
-		ListNBT list = nbt.getList(NBT_SORTED, NBT.TAG_COMPOUND);
+		ListTag list = nbt.getList(NBT_SORTED, NBT.TAG_COMPOUND);
 		for (int i = 0; i < list.size(); i++) {
-			CompoundNBT tag = list.getCompound(i);
+			CompoundTag tag = list.getCompound(i);
 			itemQueue.add(ItemEntry.fromNBT(tag));
 		}
 		
@@ -222,7 +222,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		if (isFull()) {
 			// Drop on floor
 			// TODO make it actually drop on the face that it's being added?
-			InventoryHelper.dropItemStack(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5, stack);
+			Containers.dropItemStack(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5, stack);
 			return false;
 		}
 		
@@ -335,7 +335,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		if (!stack.isEmpty()) {
 			// Throw on the floor!
 			// TODO make it actually drop on the face that we would be coming out of
-			InventoryHelper.dropItemStack(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5, stack);
+			Containers.dropItemStack(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5, stack);
 		}
 	}
 	
@@ -348,7 +348,7 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 	 * @return
 	 */
 	private @Nonnull ItemStack attemptPush(ItemStack stack, Direction direction) {
-		@Nullable TileEntity te = level.getBlockEntity(worldPosition.relative(direction));
+		@Nullable BlockEntity te = level.getBlockEntity(worldPosition.relative(direction));
 		
 		if (te != null) {
 			if (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent()) {
@@ -356,12 +356,12 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 				return pushInto(stack, handler, direction);
 			}
 			
-			if (te instanceof IInventory) {
+			if (te instanceof Container) {
 				
-				IInventory inv = (IInventory) te;
+				Container inv = (Container) te;
 				
 				// Special cast for stupid chests :P
-				if (te instanceof ChestTileEntity) {
+				if (te instanceof ChestBlockEntity) {
 					BlockState state = level.getBlockState(worldPosition.relative(direction));
 					if (state != null && state.getBlock() instanceof ChestBlock) {
 						inv = ChestBlock.getContainer((ChestBlock) state.getBlock(), state, level, worldPosition.relative(direction), true);
@@ -375,9 +375,9 @@ public class ItemDuctTileEntity extends TileEntity implements /* IInventory, */ 
 		return stack;
 	}
 	
-	private @Nonnull ItemStack pushInto(ItemStack stack, IInventory inventory, Direction direction) {
-		if (inventory instanceof ISidedInventory) {
-			ISidedInventory sided = (ISidedInventory) inventory;
+	private @Nonnull ItemStack pushInto(ItemStack stack, Container inventory, Direction direction) {
+		if (inventory instanceof WorldlyContainer) {
+			WorldlyContainer sided = (WorldlyContainer) inventory;
 			for (int insertIndex : sided.getSlotsForFace(direction.getOpposite())) {
 				if (!sided.canPlaceItemThroughFace(insertIndex, stack, direction.getOpposite())) {
 					continue;

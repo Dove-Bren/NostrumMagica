@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.util;
 
-import net.minecraft.item.DyeColor;
+import net.minecraft.world.item.DyeColor;
 
 public class ColorUtil {
 	public static final int colorToARGB(float red, float green, float blue, float alpha) {
@@ -24,7 +24,7 @@ public class ColorUtil {
 	}
 	
 	public static final int dyeToARGB(DyeColor color) {
-		return 0xFF000000 | color.getColorValue();
+		return 0xFF000000 | color.getTextColor();
 	}
 	
 	public static final float[] ARGBToColor(int ARGB) {

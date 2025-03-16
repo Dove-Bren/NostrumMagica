@@ -7,11 +7,11 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class SkillRequirement implements IRequirement{
 
@@ -22,7 +22,7 @@ public class SkillRequirement implements IRequirement{
 	}
 
 	@Override
-	public boolean matches(PlayerEntity player) {
+	public boolean matches(Player player) {
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		return attr.hasSkill(skill);
 	}
@@ -33,8 +33,8 @@ public class SkillRequirement implements IRequirement{
 	}
 
 	@Override
-	public List<ITextComponent> getDescription(PlayerEntity player) {
-		return Lists.newArrayList(new TranslationTextComponent("info.requirement.spellknowledge", 
-				((TextComponent) skill.getName()).withStyle(TextFormatting.DARK_PURPLE)));
+	public List<Component> getDescription(Player player) {
+		return Lists.newArrayList(new TranslatableComponent("info.requirement.spellknowledge", 
+				((BaseComponent) skill.getName()).withStyle(ChatFormatting.DARK_PURPLE)));
 	}
 }

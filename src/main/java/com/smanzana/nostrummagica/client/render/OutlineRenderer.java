@@ -6,16 +6,16 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.shader.ShaderGroup;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.PostChain;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.client.event.EntityViewRenderEvent.CameraSetup;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -76,11 +76,11 @@ public class OutlineRenderer {
 		}
 	}
 	
-	private void setupOutlineBuffers(IRenderTypeBuffer.Impl bufferIn) {
+	private void setupOutlineBuffers(MultiBufferSource.BufferSource bufferIn) {
 		outlineBuffer = new CustomOutlineTypeBuffer(bufferIn, 1f, 1f, 0f, 1f);
 	}
 	
-	protected void renderEntityOutline(MatrixStack matrixStackIn, Entity entity, Outline outline, float rotationYaw, float partialTicks) {
+	protected void renderEntityOutline(PoseStack matrixStackIn, Entity entity, Outline outline, float rotationYaw, float partialTicks) {
 		if (outlineBuffer == null) {
 			this.setupOutlineBuffers(Minecraft.getInstance().renderBuffers().bufferSource());
 		}
@@ -91,8 +91,8 @@ public class OutlineRenderer {
 	
 	private void forceRenderOutline(float partialTicks) {
 		Minecraft mc = Minecraft.getInstance();
-		final WorldRenderer worldRenderer = mc.levelRenderer;
-		final ShaderGroup outlineShader = ObfuscationReflectionHelper.getPrivateValue(WorldRenderer.class, worldRenderer, "entityEffect");
+		final LevelRenderer worldRenderer = mc.levelRenderer;
+		final PostChain outlineShader = ObfuscationReflectionHelper.getPrivateValue(LevelRenderer.class, worldRenderer, "entityEffect");
 		
 		outlineShader.process(partialTicks);
 		mc.getMainRenderTarget().bindWrite(false);
@@ -104,7 +104,7 @@ public class OutlineRenderer {
 	public final void onEntityRender(RenderLivingEvent.Post<LivingEntity, EntityModel<LivingEntity>> event) {
 		if (!renderRecurseMarker) {
 			final LivingEntity entity = event.getEntity();
-			final MatrixStack matrixStackIn = event.getMatrixStack();
+			final PoseStack matrixStackIn = event.getMatrixStack();
 			
 			if (Minecraft.getInstance().shouldEntityAppearGlowing(entity)) {
 				renderEntityDoingGlow = true; // Note that vanilla is doing glow rendering

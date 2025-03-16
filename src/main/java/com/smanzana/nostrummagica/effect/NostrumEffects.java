@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.effect;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.potion.Effect;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -61,8 +61,8 @@ public class NostrumEffects {
 	@ObjectHolder(BonusJumpEffect.ID) public static BonusJumpEffect bonusJump;
 	
 	@SubscribeEvent
-    public static void registerPotions(RegistryEvent.Register<Effect> event) {
-    	final IForgeRegistry<Effect> registry = event.getRegistry();
+    public static void registerPotions(RegistryEvent.Register<MobEffect> event) {
+    	final IForgeRegistry<MobEffect> registry = event.getRegistry();
 
     	registry.register(new FamiliarEffect().setRegistryName(FamiliarEffect.ID));
     	registry.register(new FrostbiteEffect().setRegistryName(FrostbiteEffect.ID));

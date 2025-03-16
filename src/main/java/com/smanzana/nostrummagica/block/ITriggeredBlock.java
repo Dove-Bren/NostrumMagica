@@ -1,11 +1,11 @@
 package com.smanzana.nostrummagica.block;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public interface ITriggeredBlock {
 
-	public void trigger(World world, BlockPos blockPos, BlockState state, BlockPos triggerPos);
+	public void trigger(Level world, BlockPos blockPos, BlockState state, BlockPos triggerPos);
 	
 }

@@ -7,10 +7,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class ShapeMasteryRequirement implements IRequirement{
 
@@ -21,7 +21,7 @@ public class ShapeMasteryRequirement implements IRequirement{
 	}
 
 	@Override
-	public boolean matches(PlayerEntity player) {
+	public boolean matches(Player player) {
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		return attr.getShapes().contains(shape);
 	}
@@ -32,8 +32,8 @@ public class ShapeMasteryRequirement implements IRequirement{
 	}
 
 	@Override
-	public List<ITextComponent> getDescription(PlayerEntity player) {
-		return Lists.newArrayList(new TranslationTextComponent("info.requirement.shape", 
-				shape.getDisplayName().plainCopy().withStyle(TextFormatting.DARK_GREEN)));
+	public List<Component> getDescription(Player player) {
+		return Lists.newArrayList(new TranslatableComponent("info.requirement.shape", 
+				shape.getDisplayName().plainCopy().withStyle(ChatFormatting.DARK_GREEN)));
 	}
 }

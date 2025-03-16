@@ -37,22 +37,22 @@ import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.stat.PlayerStats;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.network.NetworkHooks;
-import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
+import net.minecraftforge.fmllegacy.network.PacketDistributor.TargetPoint;
 
 public class CommonProxy {
 	
@@ -60,7 +60,7 @@ public class CommonProxy {
 		
 	}
 	
-    public void syncPlayer(ServerPlayerEntity player) {
+    public void syncPlayer(ServerPlayer player) {
     	INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
     	attr.refresh(player);
     	NetworkHandler.sendTo(
@@ -78,13 +78,13 @@ public class CommonProxy {
     	sendPlayerStatSync(player);
     }
     
-    public void updateEntityEffect(ServerPlayerEntity player, LivingEntity entity, SpecialEffect effectType, EffectData data) {
+    public void updateEntityEffect(ServerPlayer player, LivingEntity entity, SpecialEffect effectType, EffectData data) {
     	NetworkHandler.sendTo(
     			new MagicEffectUpdate(entity, effectType, data),
     			player);
     }
 
-	public PlayerEntity getPlayer() {
+	public Player getPlayer() {
 		return null; // Doesn't mean anything on the server
 	}
 	
@@ -100,13 +100,13 @@ public class CommonProxy {
 		return true;
 	}
 	
-	public void openBook(PlayerEntity player, GuiBook book, Object userdata) {
+	public void openBook(Player player, GuiBook book, Object userdata) {
 		; // Server does nothing
 	}
 	
-	public void openContainer(PlayerEntity player, IPackedContainerProvider provider) {
-		if (!player.level.isClientSide() && player instanceof ServerPlayerEntity) {
-			NetworkHooks.openGui((ServerPlayerEntity) player, provider, provider.getData());
+	public void openContainer(Player player, IPackedContainerProvider provider) {
+		if (!player.level.isClientSide() && player instanceof ServerPlayer) {
+			NetworkHooks.openGui((ServerPlayer) player, provider, provider.getData());
 		}
 	}
 	
@@ -118,7 +118,7 @@ public class CommonProxy {
 		; // Nothing on server side
 	}
 	
-	public void openObeliskScreen(World world, BlockPos pos) {
+	public void openObeliskScreen(Level world, BlockPos pos) {
 		; // Nothing on server side
 	}
 	
@@ -130,8 +130,8 @@ public class CommonProxy {
 		; // Nothing on server side
 	}
 
-	public void sendSpellDebug(PlayerEntity player, ITextComponent comp) {
-		NetworkHandler.sendTo(new SpellDebugMessage(comp), (ServerPlayerEntity) player);
+	public void sendSpellDebug(Player player, Component comp) {
+		NetworkHandler.sendTo(new SpellDebugMessage(comp), (ServerPlayer) player);
 	}
 	
 	public String getTranslation(String key) {
@@ -162,9 +162,9 @@ public class CommonProxy {
 	 * @param negative whether the effect should be considered 'negative'/harmful
 	 * @param param optional extra float param for display
 	 */
-	public void spawnSpellShapeVfx(World world, SpellShape shape, SpellShapeProperties properties,
-			LivingEntity caster, Vector3d casterPos,
-			LivingEntity target, Vector3d targetPos,
+	public void spawnSpellShapeVfx(Level world, SpellShape shape, SpellShapeProperties properties,
+			LivingEntity caster, Vec3 casterPos,
+			LivingEntity target, Vec3 targetPos,
 			SpellCharacteristics characteristics) {
 		if (world == null) {
 			if (caster == null)
@@ -186,9 +186,9 @@ public class CommonProxy {
 		}
 	}
 	
-	public void spawnSpellEffectVfx(World world, SpellEffectPart effect,
-			LivingEntity caster, Vector3d casterPos,
-			LivingEntity target, Vector3d targetPos) {
+	public void spawnSpellEffectVfx(Level world, SpellEffectPart effect,
+			LivingEntity caster, Vec3 casterPos,
+			LivingEntity target, Vec3 targetPos) {
 		if (world == null) {
 			if (caster == null)
 				world = target.level; // If you NPE here you suck. Supply a world!
@@ -209,7 +209,7 @@ public class CommonProxy {
 		}
 	}
 	
-	public void sendMana(PlayerEntity player) {
+	public void sendMana(Player player) {
 		INostrumMagic stats = NostrumMagica.getMagicWrapper(player);
 		final int mana;
 		if (stats == null) {
@@ -221,17 +221,17 @@ public class CommonProxy {
 		NetworkHandler.sendToAllTracking(new ManaMessage(player, mana), player);
 	}
 	
-	public void sendPlayerStatSync(PlayerEntity player) {
+	public void sendPlayerStatSync(Player player) {
 		PlayerStats stats = NostrumMagica.instance.getPlayerStats().get(player);
-		NetworkHandler.sendTo(new PlayerStatSyncMessage(player.getUUID(), stats), (ServerPlayerEntity) player);
+		NetworkHandler.sendTo(new PlayerStatSyncMessage(player.getUUID(), stats), (ServerPlayer) player);
 	}
 	
-	public void sendManaArmorCapability(PlayerEntity player) {
+	public void sendManaArmorCapability(Player player) {
 		IManaArmor stats = NostrumMagica.getManaArmor(player);
 		NetworkHandler.sendToAllTracking(new ManaArmorSyncMessage(player, stats), player);
 	}
 	
-	public void sendSpellCraftingCapability(PlayerEntity player) {
+	public void sendSpellCraftingCapability(Player player) {
 		ISpellCrafting stats = NostrumMagica.getSpellCrafting(player);
 		NetworkHandler.sendToAllTracking(new SpellCraftingCapabilitySyncMessage(player, stats), player);
 	}
@@ -244,12 +244,12 @@ public class CommonProxy {
 		; // Nothing to do on server
 	}
 	
-	public void playRitualEffect(World world, BlockPos pos, EMagicElement element,
+	public void playRitualEffect(Level world, BlockPos pos, EMagicElement element,
 			ItemStack center, List<ItemStack> extras, List<ItemStack> reagents, ItemStack output) {
-		Set<PlayerEntity> players = new HashSet<>();
+		Set<Player> players = new HashSet<>();
 		final double MAX_RANGE_SQR = 2500.0;
 		if (pos != null) {
-			for (PlayerEntity player : ((ServerWorld) world).players()) {
+			for (Player player : ((ServerLevel) world).players()) {
 				if (player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) <= MAX_RANGE_SQR)
 					players.add(player);
 			}
@@ -261,27 +261,27 @@ public class CommonProxy {
 					world.dimension(),
 					pos, element, reagents, center, extras, output
 					);
-			for (PlayerEntity player : players) {
-				NetworkHandler.sendTo(message, (ServerPlayerEntity) player);
+			for (Player player : players) {
+				NetworkHandler.sendTo(message, (ServerPlayer) player);
 			}
 		}
 	}
 	
-	public void playPredefinedEffect(PredefinedEffect type, int duration, World world, Vector3d position) {
+	public void playPredefinedEffect(PredefinedEffect type, int duration, Level world, Vec3 position) {
 		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.dimension(), position), world, position);
 	}
 	
-	public void playPredefinedEffect(PredefinedEffect type, int duration, World world, Entity entity) {
+	public void playPredefinedEffect(PredefinedEffect type, int duration, Level world, Entity entity) {
 		playPredefinedEffect(new SpawnPredefinedEffectMessage(type, duration, world.dimension(), entity.getId()), world, entity.position());
 	}
 	
-	private void playPredefinedEffect(SpawnPredefinedEffectMessage message, World world, Vector3d center) {
+	private void playPredefinedEffect(SpawnPredefinedEffectMessage message, Level world, Vec3 center) {
 		final double MAX_RANGE = 50.0;
 		NetworkHandler.sendToAllAround(message, new TargetPoint(center.x, center.y, center.z, MAX_RANGE, world.dimension()));
 	}
 	
 	public boolean attemptBlockTeleport(Entity entity, BlockPos portalPos) {
-		final World world = entity.getCommandSenderWorld();
+		final Level world = entity.getCommandSenderWorld();
 		BlockState worldBlock = world.getBlockState(portalPos);
 		if (!(worldBlock.getBlock() instanceof IPortalBlock)) {
 			NostrumMagica.logger.warn("Entity requested teleport from non-portal block: " + entity + " at " + portalPos);
@@ -297,9 +297,9 @@ public class CommonProxy {
 		return false;
 	}
 	
-	public boolean attemptPlayerInteract(PlayerEntity player, World world, BlockPos pos, Hand hand, BlockRayTraceResult hit) {
-		ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+	public boolean attemptPlayerInteract(Player player, Level world, BlockPos pos, InteractionHand hand, BlockHitResult hit) {
+		ServerPlayer serverPlayer = (ServerPlayer) player;
 		return serverPlayer.gameMode.useItemOn(serverPlayer, world, ItemStack.EMPTY, hand, hit)
-				!= ActionResultType.PASS;
+				!= InteractionResult.PASS;
 	}
 }

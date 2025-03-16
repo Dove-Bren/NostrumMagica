@@ -13,18 +13,18 @@ import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.Inventories.ItemStackArrayWrapper;
 import com.smanzana.nostrummagica.util.Inventories.IterableInventoryWrapper;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class RuneBag extends Item implements ILoreTagged {
@@ -46,14 +46,14 @@ public class RuneBag extends Item implements ILoreTagged {
 		
 		if (!bag.isEmpty() && bag.getItem() instanceof RuneBag) {
 			if (!bag.hasTag())
-				bag.setTag(new CompoundNBT());
+				bag.setTag(new CompoundTag());
 			
-			CompoundNBT nbt = bag.getTag();
-			CompoundNBT items = nbt.getCompound(NBT_ITEMS);
+			CompoundTag nbt = bag.getTag();
+			CompoundTag items = nbt.getCompound(NBT_ITEMS);
 			if (item.isEmpty())
 				items.remove(pos + "");
 			else {
-				CompoundNBT compound = new CompoundNBT();
+				CompoundTag compound = new CompoundTag();
 				item.save(compound);
 				items.put(pos + "", compound);
 			}
@@ -80,7 +80,7 @@ public class RuneBag extends Item implements ILoreTagged {
 			if (!bag.hasTag())
 				return ItemStack.EMPTY;
 			
-			CompoundNBT items = bag.getTag().getCompound(NBT_ITEMS);
+			CompoundTag items = bag.getTag().getCompound(NBT_ITEMS);
 			if (items.contains(pos + "", NBT.TAG_COMPOUND))
 				return ItemStack.of(items.getCompound(pos + ""));
 			else
@@ -111,7 +111,7 @@ public class RuneBag extends Item implements ILoreTagged {
 	public static boolean isVacuumEnabled(ItemStack stack) {
 		if (!stack.isEmpty() && stack.getItem() instanceof RuneBag) {
 			if (!stack.hasTag())
-				stack.setTag(new CompoundNBT());
+				stack.setTag(new CompoundTag());
 			
 			return stack.getTag().getBoolean(NBT_VACUUM);
 		}
@@ -140,24 +140,24 @@ public class RuneBag extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
-		int pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, Hand.MAIN_HAND);
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
+		int pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, InteractionHand.MAIN_HAND);
 		ItemStack inHand = playerIn.getMainHandItem();
 		if (inHand.isEmpty()) {
 			inHand = playerIn.getOffhandItem();
-			pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, Hand.OFF_HAND);
+			pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, InteractionHand.OFF_HAND);
 		}
 		NostrumMagica.instance.proxy.openContainer(playerIn, RuneBagGui.BagContainer.Make(pos));
 		
-		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getItemInHand(hand));
+		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, playerIn.getItemInHand(hand));
     }
 	
 	@Override
-	public ActionResultType useOn(ItemUseContext context) {
+	public InteractionResult useOn(UseOnContext context) {
 		if (context.getPlayer().isShiftKeyDown()) {
 			// If sneaking, try and do container fast add.
 			final BlockPos pos = context.getClickedPos();
-			final TileEntity te = context.getLevel().getBlockEntity(pos);
+			final BlockEntity te = context.getLevel().getBlockEntity(pos);
 			if (te != null) {
 				ItemStack[] contents = getItems(context.getItemInHand());
 				if (Inventories.attemptAddToTile(new IterableInventoryWrapper(new ItemStackArrayWrapper(contents)), context.getLevel().getBlockState(pos), te, context.getClickedFace())) {
@@ -165,7 +165,7 @@ public class RuneBag extends Item implements ILoreTagged {
 					for (int i = 0; i < contents.length; i++) {
 						setItem(context.getItemInHand(), contents[i], i);
 					}
-					return ActionResultType.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
 			}
 			
@@ -175,7 +175,7 @@ public class RuneBag extends Item implements ILoreTagged {
 		return super.useOn(context);
 	}
 	
-	public static class RuneInventory extends Inventory {
+	public static class RuneInventory extends SimpleContainer {
 
 		private static final int MAX_COUNT = 64;
 		

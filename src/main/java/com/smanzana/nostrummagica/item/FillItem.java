@@ -8,20 +8,20 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -51,39 +51,39 @@ public class FillItem extends Item {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
-		tooltip.add(new StringTextComponent("For Creative Use"));
+		tooltip.add(new TextComponent("For Creative Use"));
 	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		return super.use(worldIn, playerIn, hand);
 	}
 	
 	@Override
-	public ActionResultType useOn(ItemUseContext context) {
-		final World world = context.getLevel();
+	public InteractionResult useOn(UseOnContext context) {
+		final Level world = context.getLevel();
 		final BlockPos pos = context.getClickedPos();
-		final PlayerEntity player = context.getPlayer();
+		final Player player = context.getPlayer();
 		
 		if (world.isClientSide)
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		
 		if (pos == null)
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		
 		if (player == null || !player.isCreative()) {
 			if (player != null) {
-				player.sendMessage(new StringTextComponent("You must be in creative to use this item"), Util.NIL_UUID);
+				player.sendMessage(new TextComponent("You must be in creative to use this item"), Util.NIL_UUID);
 			}
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
 		final BlockPos startPos = pos.relative(context.getClickedFace());
 		fill(player, world, startPos);
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 	
 	protected BlockState getFillState() {
@@ -94,11 +94,11 @@ public class FillItem extends Item {
 		return this.fillStateCache;
 	}
 	
-	protected void setState(PlayerEntity player, World world, BlockPos pos) {
+	protected void setState(Player player, Level world, BlockPos pos) {
 		world.setBlock(pos, this.getFillState(), 3); // ? Different flags for speed?
 	}
 	
-	protected boolean shouldFill(World world, BlockPos pos) {
+	protected boolean shouldFill(Level world, BlockPos pos) {
 		return world.isEmptyBlock(pos);
 	}
 	
@@ -106,7 +106,7 @@ public class FillItem extends Item {
 		return !this.onlyDown || (checkPos.getY() <= startPos.getY());
 	}
 	
-	protected void fill(PlayerEntity player, World world, BlockPos start) {
+	protected void fill(Player player, Level world, BlockPos start) {
 		final FillContext context = new FillContext(this, start);
 		
 		while (context.hasNext()) {
@@ -114,7 +114,7 @@ public class FillItem extends Item {
 			fillAndAdd(player, world, pos, context);
 		}
 		
-		player.sendMessage(new StringTextComponent("Filled " + context.count + " blocks"), Util.NIL_UUID);
+		player.sendMessage(new TextComponent("Filled " + context.count + " blocks"), Util.NIL_UUID);
 	}
 	
 	private static final class FillContext {
@@ -147,7 +147,7 @@ public class FillItem extends Item {
 		}
 	}
 	
-	private void fillAndAdd(PlayerEntity player, World world, BlockPos pos, FillContext context) {
+	private void fillAndAdd(Player player, Level world, BlockPos pos, FillContext context) {
 		// Check and fill the current block, and then add neighbors to the list
 		if (shouldFill(world, pos)) {
 			setState(player, world, pos);

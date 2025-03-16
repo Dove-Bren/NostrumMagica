@@ -4,18 +4,18 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.IItemTier;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SwordItem;
-import net.minecraft.item.UseAction;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -29,11 +29,11 @@ public abstract class ChargingSwordItem extends SwordItem {
 	public static final ResourceLocation PROPERTY_CHARGING = NostrumMagica.Loc("charging");
 	public static final ResourceLocation PROPERTY_CHARGE = NostrumMagica.Loc("charge");
 	
-	public ChargingSwordItem(IItemTier tier, int attackDamageIn, float attackSpeedIn, Item.Properties builder) {
+	public ChargingSwordItem(Tier tier, int attackDamageIn, float attackSpeedIn, Item.Properties builder) {
 		super(tier, attackDamageIn, attackSpeedIn, builder);
 	}
 	
-	protected boolean canCharge(World worldIn, PlayerEntity playerIn, Hand hand, ItemStack stack) {
+	protected boolean canCharge(Level worldIn, Player playerIn, InteractionHand hand, ItemStack stack) {
 		return true;
 	}
 	
@@ -54,26 +54,26 @@ public abstract class ChargingSwordItem extends SwordItem {
 	 */
 	protected abstract int getTotalChargeTime(ItemStack stack);
 	
-	protected abstract void fireChargedWeapon(World worldIn, LivingEntity playerIn, Hand hand, ItemStack stack);
+	protected abstract void fireChargedWeapon(Level worldIn, LivingEntity playerIn, InteractionHand hand, ItemStack stack);
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		final ItemStack held = playerIn.getItemInHand(hand);
 		
 		if (canCharge(worldIn, playerIn, hand, held)) {
 			// Don't do when sneaking so players can still use a shield
 			if (!playerIn.isShiftKeyDown()) {
 				playerIn.startUsingItem(hand);
-				return new ActionResult<ItemStack>(ActionResultType.SUCCESS, held);
+				return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, held);
 			}
 		}
 		
-		return new ActionResult<ItemStack>(ActionResultType.PASS, held);
+		return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, held);
 	}
 	
 	@Override
-	public UseAction getUseAnimation(ItemStack stack) {
-		return UseAction.BOW;
+	public UseAnim getUseAnimation(ItemStack stack) {
+		return UseAnim.BOW;
 	}
 	
 	@Override
@@ -90,7 +90,7 @@ public abstract class ChargingSwordItem extends SwordItem {
 	}
 	
 	@Override
-	public void releaseUsing(ItemStack stack, World worldIn, LivingEntity entityLiving, int timeLeft) {
+	public void releaseUsing(ItemStack stack, Level worldIn, LivingEntity entityLiving, int timeLeft) {
 		
 		// Only do something if enough time has passed
 		final int duration = stack.getUseDuration() - timeLeft;
@@ -98,19 +98,19 @@ public abstract class ChargingSwordItem extends SwordItem {
 			return;
 		}
 		
-		final Hand hand = entityLiving.getMainHandItem() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND;
+		final InteractionHand hand = entityLiving.getMainHandItem() == stack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
 		fireChargedWeapon(worldIn, entityLiving, hand, stack);
 	}
 	
 	@Override
-	public ItemStack finishUsingItem(ItemStack stack, World worldIn, LivingEntity entityLiving) {
-		final Hand hand = entityLiving.getMainHandItem() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND;
+	public ItemStack finishUsingItem(ItemStack stack, Level worldIn, LivingEntity entityLiving) {
+		final InteractionHand hand = entityLiving.getMainHandItem() == stack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
 		fireChargedWeapon(worldIn, entityLiving, hand, stack);
 		return stack;
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static final float ModelCharge(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+	public static final float ModelCharge(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn) {
 		if (entityIn == null) {
 			return 0.0F;
 		} else {
@@ -119,7 +119,7 @@ public abstract class ChargingSwordItem extends SwordItem {
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public static final float ModelCharging(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+	public static final float ModelCharging(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn) {
 		return entityIn != null && entityIn.isUsingItem() && entityIn.getUseItem() == stack ? 1.0F : 0.0F;
 	}
 	

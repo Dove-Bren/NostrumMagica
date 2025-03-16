@@ -2,15 +2,15 @@ package com.smanzana.nostrummagica.client.model;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.util.ModelUtils;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.Model;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.model.Model;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * A BakedModel but as a ModelRenderer.
@@ -23,10 +23,10 @@ import net.minecraft.util.ResourceLocation;
  *
  * @param <T>
  */
-public class ModelRendererBaked extends ModelRenderer {
+public class ModelRendererBaked extends ModelPart {
 
 	private final ResourceLocation modelLocation;
-	private @Nullable IBakedModel bakedModel;
+	private @Nullable BakedModel bakedModel;
 	private boolean loaded;
 	
 	public ModelRendererBaked(Model base, ResourceLocation modelLocation) {
@@ -43,7 +43,7 @@ public class ModelRendererBaked extends ModelRenderer {
 		this.modelLocation = modelLocation;
 	}
 	
-	protected IBakedModel loadModel(ResourceLocation location) {
+	protected BakedModel loadModel(ResourceLocation location) {
 		return ModelUtils.GetBakedModel(location);
 	}
 	
@@ -56,7 +56,7 @@ public class ModelRendererBaked extends ModelRenderer {
 	
 	// Made public with AT :)
 	@Override
-	public void compile(MatrixStack.Entry matrixEntryIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void compile(PoseStack.Pose matrixEntryIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		checkAndLoadModel();
 		
 		// Render obj model

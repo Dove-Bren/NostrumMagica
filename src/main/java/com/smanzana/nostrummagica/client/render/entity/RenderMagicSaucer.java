@@ -1,20 +1,20 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBaked;
 import com.smanzana.nostrummagica.entity.CyclerSpellSaucerEntity;
 import com.smanzana.nostrummagica.entity.SpellSaucerEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Vector3f;
 
 public class RenderMagicSaucer<T extends SpellSaucerEntity> extends EntityRenderer<T> {
 	
@@ -22,7 +22,7 @@ public class RenderMagicSaucer<T extends SpellSaucerEntity> extends EntityRender
 	
 	private ModelBaked<T> mainModel;
 
-	public RenderMagicSaucer(EntityRendererManager renderManagerIn) {
+	public RenderMagicSaucer(EntityRenderDispatcher renderManagerIn) {
 		super(renderManagerIn);
 		mainModel = new ModelBaked<>(RenderType::entityTranslucent, MODEL);
 	}
@@ -30,11 +30,11 @@ public class RenderMagicSaucer<T extends SpellSaucerEntity> extends EntityRender
 	@SuppressWarnings("deprecation")
 	@Override
 	public ResourceLocation getTextureLocation(SpellSaucerEntity entity) {
-		return AtlasTexture.LOCATION_BLOCKS;
+		return TextureAtlas.LOCATION_BLOCKS;
 	}
 	
 	@Override
-	public void render(T entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(T entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		
 		// Cyclers used to render where they 'should' be instead of where they were, but I'm not super sure how to do that with this rendering stack.
 //		if (entityIn instanceof EntityCyclerSpellSaucer) {

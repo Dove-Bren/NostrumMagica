@@ -11,33 +11,33 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.pathfinding.PathType;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 
-public abstract class MagicDoorBlock extends HorizontalBlock {
+public abstract class MagicDoorBlock extends HorizontalDirectionalBlock {
 	
 	protected static final BooleanProperty MASTER = BooleanProperty.create("master");
 	protected static final VoxelShape MIRROR_AABB_EW = Block.box(6.4D, 0.0D, 0D,09.6D, 16D, 16D);
@@ -58,11 +58,11 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(MASTER, FACING);
 	}
 	
-	private void destroy(World world, BlockPos pos, BlockState state) {
+	private void destroy(Level world, BlockPos pos, BlockState state) {
 		if (world.isClientSide)
 			return;
 		
@@ -87,13 +87,13 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 			}
 		}
 		
-		((ServerWorld)world).addParticle(ParticleTypes.LAVA, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, .01, 0, .01);
+		((ServerLevel)world).addParticle(ParticleTypes.LAVA, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, .01, 0, .01);
 		// tODO this used to spawn 100 of them
 //		((ServerWorld)world).addParticle(ParticleTypes., pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
 //				.3, .3, .3);
 	}
 	
-	protected BlockPos getMasterPos(World world, BlockState state, BlockPos pos) {
+	protected BlockPos getMasterPos(Level world, BlockState state, BlockPos pos) {
 		return walkDoor(world, pos, state, (checkPos, checkState) -> {
 			return isMaster(checkState);
 		});
@@ -104,12 +104,12 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 		public boolean walk(BlockPos pos, BlockState state);
 	}
 	
-	protected BlockPos walkDoor(World world, BlockPos start, BlockState startState, IDoorWalker walkFunc) {
+	protected BlockPos walkDoor(Level world, BlockPos start, BlockState startState, IDoorWalker walkFunc) {
 		final BlockState origState = startState;
 		return WorldUtil.WalkConnectedBlocks(world, start, new IBlockWalker() {
 
 			@Override
-			public boolean canVisit(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos,
+			public boolean canVisit(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
 					BlockState state, int distance) {
 				if (state == null || !(state.getBlock() instanceof MagicDoorBlock))
 					return false;
@@ -122,7 +122,7 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 			}
 
 			@Override
-			public boolean walk(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos,
+			public boolean walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
 					BlockState state, int distance, int walkCount) {
 				if (startPos.equals(pos)) {
 					// Block was already destroyed, so use saved blockstate
@@ -191,7 +191,7 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 	}
 	
 	@Override
-	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			this.destroy(worldIn, pos, state);
 			worldIn.removeBlockEntity(pos);
@@ -199,29 +199,29 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 	}
 	
 	@Override
-	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, BlockGetter worldIn, BlockPos pos, PathComputationType type) {
         return false;
     }
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		if (state.getValue(FACING).get2DDataValue() % 2 != 0)
 			return MIRROR_AABB_EW;
 		return MIRROR_AABB_NS;
 	}
 	
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		Direction enumfacing = context.getHorizontalDirection().getOpposite();
 		return getMaster(enumfacing);
 	}
 	
 	@Override
-	public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+	public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		this.spawnDoor(worldIn, pos, state, null);
 	}
 	
-	protected void spawnDoor(IWorld world, BlockPos masterBlock, BlockState masterState, @Nullable MutableBoundingBox bounds) {
+	protected void spawnDoor(LevelAccessor world, BlockPos masterBlock, BlockState masterState, @Nullable BoundingBox bounds) {
 		// Fill all air blocks around the master in all directions that are ortho to facing
 		Set<BlockPos> visited = new HashSet<>();
 		List<BlockPos> next = new LinkedList<>();
@@ -270,23 +270,23 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 		}
 	}
 	
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		return ActionResultType.PASS;
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+		return InteractionResult.PASS;
 	}
 	
-	public void clearDoor(World world, BlockPos onePos, BlockState state) {
+	public void clearDoor(Level world, BlockPos onePos, BlockState state) {
 		destroy(world, onePos, state);
 		NostrumMagicaSounds.AMBIENT_WOOSH2.play(world, onePos.getX(), onePos.getY(), onePos.getZ());
 	}
 	
-	public static final BlockPos FindBottomCenterPos(World world, BlockPos samplePos) {
+	public static final BlockPos FindBottomCenterPos(Level world, BlockPos samplePos) {
 		// Master is at TE's pos... but is it the bottom block? And is it in center?
 		final BlockState startState = world.getBlockState(samplePos);
 		final Direction face = startState.getValue(MagicDoorBlock.FACING);
 		final Block matchBlock = startState.getBlock();
 		
 		// Find bottom
-		BlockPos.Mutable cursor = new BlockPos.Mutable().set(samplePos);
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos().set(samplePos);
 		cursor.move(Direction.DOWN, 1);
 		
 		while (cursor.getY() >= 0) {
@@ -333,14 +333,14 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 				.5 * (rightPos.getZ() + leftPos.getZ()));
 	}
 	
-	public static final MutableBoundingBox FindDisplayBounds(World world, BlockPos samplePos) {
+	public static final BoundingBox FindDisplayBounds(Level world, BlockPos samplePos) {
 		// Master is at TE's pos... but is it the bottom block? And is it in center?
 		final BlockState startState = world.getBlockState(samplePos);
 		final Direction face = startState.getValue(MagicDoorBlock.FACING);
 		final Block matchBlock = startState.getBlock();
 		
 		// Find bottom
-		BlockPos.Mutable cursor = new BlockPos.Mutable().set(samplePos);
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos().set(samplePos);
 		cursor.move(Direction.DOWN, 1);
 		
 		while (cursor.getY() >= 0) {
@@ -409,6 +409,6 @@ public abstract class MagicDoorBlock extends HorizontalBlock {
 		BlockPos bottomLeft = new BlockPos(leftTopPos.getX(), bottomPos.getY(), leftTopPos.getZ());
 		BlockPos topRight = new BlockPos(rightTopPos.getX(), maxY, rightTopPos.getZ());
 		
-		return new MutableBoundingBox(bottomLeft, topRight); // constructor takes care of min/maxing x and z
+		return new BoundingBox(bottomLeft, topRight); // constructor takes care of min/maxing x and z
 	}
 }

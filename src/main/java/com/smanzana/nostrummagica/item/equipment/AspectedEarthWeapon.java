@@ -23,34 +23,34 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTier;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.ToolItem;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.DiggerItem;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 
-public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpellEquipment {
+public class AspectedEarthWeapon extends DiggerItem implements ILoreTagged, ISpellEquipment {
 
 	public static final String ID = "sword_earth";
 	
@@ -59,19 +59,19 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 	private static final int HarvestLevel = 3;
 	
 	public AspectedEarthWeapon() {
-		super(AttackDamage, AttackSpeed, ItemTier.DIAMOND, new HashSet<>(), NostrumItems.PropEquipment().durability(1440).addToolType(ToolType.PICKAXE, HarvestLevel).addToolType(ToolType.SHOVEL, HarvestLevel));
+		super(AttackDamage, AttackSpeed, Tiers.DIAMOND, new HashSet<>(), NostrumItems.PropEquipment().durability(1440).addToolType(ToolType.PICKAXE, HarvestLevel).addToolType(ToolType.SHOVEL, HarvestLevel));
 	}
 	
 	@Override
 	public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 		stack.hurtAndBreak(1, attacker, (p) -> {
-			p.broadcastBreakEvent(EquipmentSlotType.MAINHAND);
+			p.broadcastBreakEvent(EquipmentSlot.MAINHAND);
 		});
 		return true;
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot equipmentSlot) {
 		Multimap<Attribute, AttributeModifier> multimap = super.getDefaultAttributeModifiers(equipmentSlot);
 //		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
 //			multimap.put(Attributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", (double)attackDamage, AttributeModifier.Operation.ADDITION));
@@ -83,7 +83,7 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 	
 	@Override
 	public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-		if (enchantment.category == EnchantmentType.WEAPON) {
+		if (enchantment.category == EnchantmentCategory.WEAPON) {
 			return true;
 		}
 		
@@ -152,18 +152,18 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 	public void apply(LivingEntity caster, Spell spell, SpellCastSummary summary, ItemStack stack) {
 		// We provide -10% mana cost reduct
 		summary.addCostRate(-.1f);
-		ItemStacks.damageItem(stack, caster, caster.getItemInHand(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+		ItemStacks.damageItem(stack, caster, caster.getItemInHand(InteractionHand.MAIN_HAND) == stack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND, 1);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
-		tooltip.add(new StringTextComponent("Mana Cost Discount: 10%"));
+		tooltip.add(new TextComponent("Mana Cost Discount: 10%"));
 	}
 	
 	@Override
-	public ActionResultType useOn(ItemUseContext context) {
+	public InteractionResult useOn(UseOnContext context) {
 		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(context.getPlayer());
 		final ItemStack held = context.getItemInHand();
 		final boolean hasBonus = ElementalArmor.GetSetCount(context.getPlayer(), EMagicElement.EARTH, ElementalArmor.Type.MASTER) == 4;
@@ -190,12 +190,12 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 					}
 				}
 			}
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
-		return ActionResultType.PASS;
+		return InteractionResult.PASS;
 	}
 	
-	protected static void doMineEffect(PlayerEntity caster, World world, BlockPos pos) {
+	protected static void doMineEffect(Player caster, Level world, BlockPos pos) {
 		if (caster.level.isClientSide) {
 			return;
 		}
@@ -217,7 +217,7 @@ public class AspectedEarthWeapon extends ToolItem implements ILoreTagged, ISpell
 //		}
 	}
 	
-	protected static boolean makeMine(World world, PlayerEntity playerIn, BlockPos pos, Direction face) {
+	protected static boolean makeMine(Level world, Player playerIn, BlockPos pos, Direction face) {
 		BlockState stateToPlace = NostrumBlocks.mineBlock.defaultBlockState().setValue(MineBlock.FACING, face);
 		if (NostrumBlocks.mineBlock.canSurvive(stateToPlace, world, pos)) {
 			world.setBlock(pos, stateToPlace, 3);

@@ -16,33 +16,33 @@ import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
 import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.tile.SingleSpawnerTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.ToolType;
 
 public class SingleSpawnerBlock extends Block {
 	
-	public static enum Type implements IStringSerializable {
+	public static enum Type implements StringRepresentable {
 		// Do not change order. Ordinals are used
 		GOLEM_EARTH,
 		GOLEM_ENDER,
@@ -85,7 +85,7 @@ public class SingleSpawnerBlock extends Block {
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(MOB);
 	}
 	
@@ -94,15 +94,15 @@ public class SingleSpawnerBlock extends Block {
 	}
 	
 	@Override
-	public BlockRenderType getRenderShape(BlockState state) {
-		return BlockRenderType.MODEL;
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.MODEL;
 	}
 	
 	@Override
-	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
+	public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
 		if (!worldIn.isClientSide())
 		{
-			for (PlayerEntity player : worldIn.players()) {
+			for (Player player : worldIn.players()) {
 				if (!player.isSpectator() && !player.isCreative() && player.distanceToSqr(pos.getX() + .5, pos.getY(), pos.getZ() + .5) < SPAWN_DIST_SQ) {
 					this.spawn(worldIn, pos, state, rand);
 					worldIn.removeBlock(pos, false);
@@ -112,9 +112,9 @@ public class SingleSpawnerBlock extends Block {
 		}
 	}
 	
-	public MobEntity spawn(World world, BlockPos pos, BlockState state, Random rand) {
+	public Mob spawn(Level world, BlockPos pos, BlockState state, Random rand) {
 		Type type = state.getValue(MOB);
-		MobEntity entity = getEntity(type, world, pos);
+		Mob entity = getEntity(type, world, pos);
 		
 		entity.setPersistenceRequired();
 		entity.setPos(pos.getX() + 0.5, pos.getY(), pos.getZ() + .5);
@@ -123,11 +123,11 @@ public class SingleSpawnerBlock extends Block {
 		return entity;
 	}
 	
-	protected static MobEntity getEntity(Type type, World world, BlockPos pos) {
+	protected static Mob getEntity(Type type, Level world, BlockPos pos) {
 		if (type == null)
 			return null;
 		
-		MobEntity entity = null;
+		Mob entity = null;
 		
 		switch (type) {
 		case GOLEM_EARTH:
@@ -169,7 +169,7 @@ public class SingleSpawnerBlock extends Block {
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		return new SingleSpawnerTileEntity();
 	}
 	
@@ -189,24 +189,24 @@ public class SingleSpawnerBlock extends Block {
 //	}
 
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (worldIn.isClientSide) {
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
-		if (hand != Hand.MAIN_HAND) {
-			return ActionResultType.SUCCESS;
+		if (hand != InteractionHand.MAIN_HAND) {
+			return InteractionResult.SUCCESS;
 		}
 		
-		TileEntity te = worldIn.getBlockEntity(pos);
+		BlockEntity te = worldIn.getBlockEntity(pos);
 		if (te == null || !(te instanceof SingleSpawnerTileEntity)) {
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
 		if (playerIn.isCreative()) {
 			ItemStack heldItem = playerIn.getItemInHand(hand);
 			if (heldItem.isEmpty()) {
-				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.getValue(MOB).getSerializedName()), Util.NIL_UUID);
+				playerIn.sendMessage(new TextComponent("Currently set to " + state.getValue(MOB).getSerializedName()), Util.NIL_UUID);
 			} else if (heldItem.getItem() instanceof EssenceItem) {
 				Type type = null;
 				switch (EssenceItem.findType(heldItem)) {
@@ -239,9 +239,9 @@ public class SingleSpawnerBlock extends Block {
 			} else if (heldItem.getItem() == Items.SUGAR_CANE) {
 				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, Type.PLANT_BOSS));
 			}
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
-		return ActionResultType.PASS;
+		return InteractionResult.PASS;
 	}
 }

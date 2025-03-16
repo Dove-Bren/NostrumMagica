@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.serializer;
 
 import com.smanzana.petcommand.api.pet.PetInfo;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.IDataSerializer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializer;
 
-public final class PetJobSerializer implements IDataSerializer<PetInfo.PetAction> {
+public final class PetJobSerializer implements EntityDataSerializer<PetInfo.PetAction> {
 	
 	private static PetJobSerializer instance = new PetJobSerializer();
 	public static PetJobSerializer GetInstance() {
@@ -18,18 +18,18 @@ public final class PetJobSerializer implements IDataSerializer<PetInfo.PetAction
 	}
 	
 	@Override
-	public void write(PacketBuffer buf, PetInfo.PetAction value) {
+	public void write(FriendlyByteBuf buf, PetInfo.PetAction value) {
 		buf.writeEnum(value);
 	}
 
 	@Override
-	public PetInfo.PetAction read(PacketBuffer buf)  {
+	public PetInfo.PetAction read(FriendlyByteBuf buf)  {
 		return buf.readEnum(PetInfo.PetAction.class);
 	}
 
 	@Override
-	public DataParameter<PetInfo.PetAction> createAccessor(int id) {
-		return new DataParameter<>(id, this);
+	public EntityDataAccessor<PetInfo.PetAction> createAccessor(int id) {
+		return new EntityDataAccessor<>(id, this);
 	}
 
 	@Override

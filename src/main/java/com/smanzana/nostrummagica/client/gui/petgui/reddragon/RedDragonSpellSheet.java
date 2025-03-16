@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
@@ -19,15 +19,15 @@ import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
 import com.smanzana.petcommand.api.client.petgui.PetGUIRenderHelper;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -57,7 +57,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	
 	private TameRedDragonEntity dragon;
 	private RedDragonSpellInventory dragonInv;
-	private IInventory playerInv;
+	private Container playerInv;
 	private IPetContainer<TameRedDragonEntity> container;
 	private int width;
 	private int height;
@@ -125,7 +125,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	}
 	
 	@Override
-	public void showSheet(TameRedDragonEntity dragon, PlayerEntity player, IPetContainer<TameRedDragonEntity> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(TameRedDragonEntity dragon, Player player, IPetContainer<TameRedDragonEntity> container, int width, int height, int offsetX, int offsetY) {
 		this.container = container;
 		this.dragonInv = this.dragon.getSpellInventory();
 		this.playerInv = player.inventory;
@@ -143,11 +143,11 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	}
 
 	@Override
-	public void hideSheet(TameRedDragonEntity dragon, PlayerEntity player, IPetContainer<TameRedDragonEntity> container) {
+	public void hideSheet(TameRedDragonEntity dragon, Player player, IPetContainer<TameRedDragonEntity> container) {
 		container.clearSlots();
 	}
 	
-	private void drawCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
+	private void drawCell(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(x, y, 0);
@@ -157,7 +157,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	
 	private static @Nonnull ItemStack scrollShadow = ItemStack.EMPTY;
 	
-	private void drawNextCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
+	private void drawNextCell(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
 		
 		if (scrollShadow.isEmpty()) {
@@ -182,7 +182,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		matrixStackIn.popPose();
 	}
 	
-	private void drawShadowCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
+	private void drawShadowCell(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(x, y, 0);
@@ -195,7 +195,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		matrixStackIn.popPose();
 	}
 	
-	private void drawFadedCell(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
+	private void drawFadedCell(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y) {
 		final int cellWidth = 18;
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(x, y, 0);
@@ -208,7 +208,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		matrixStackIn.popPose();
 	}
 	
-	private void drawGambit(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, DragonGambit gambit) {
+	private void drawGambit(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, DragonGambit gambit) {
 		int texOffsetX = 0;
 		int texOffsetY = 0;
 		if (gambit != null) {
@@ -223,7 +223,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 				toggleSize,	toggleSize, GUI_TEX_WIDTH, GUI_TEX_HEIGHT);
 	}
 	
-	private void drawRow(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, String title, NonNullList<ItemStack> slots, DragonGambit gambits[]) {
+	private void drawRow(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int x, int y, String title, NonNullList<ItemStack> slots, DragonGambit gambits[]) {
 		
 		final int usedCount = dragonInv.getUsedSlots();
 		final int extraCount = Math.max(0, this.dragon.getMagicMemorySize() - usedCount);
@@ -258,7 +258,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	}
 
 	@Override
-	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void draw(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		// Draw sheet
 		matrixStackIn.pushPose();
 		{
@@ -300,7 +300,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void overlay(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void overlay(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
 		// Draw spell icon overlays
 		{
@@ -517,7 +517,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 //	}
 	
 	private void sendGambitCycle(int index, boolean forward) {
-		CompoundNBT nbt = new CompoundNBT();
+		CompoundTag nbt = new CompoundTag();
 		nbt.putString("type", SheetMessageType.GAMBIT_CYCLE.name());
 		nbt.putInt("index", index);
 		nbt.putBoolean("forward", forward);
@@ -525,7 +525,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	}
 	
 	private void sendGambit(int index, DragonGambit gambit) {
-		CompoundNBT nbt = new CompoundNBT();
+		CompoundTag nbt = new CompoundTag();
 		nbt.putString("type", SheetMessageType.REV_GAMBIT.name());
 		nbt.putInt("index", index);
 		nbt.putString("gambit", gambit.name());
@@ -533,12 +533,12 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	}
 	
 	private void sendAllGambits(DragonGambit gambits[]) {
-		CompoundNBT nbt = new CompoundNBT();
+		CompoundTag nbt = new CompoundTag();
 		nbt.putString("type", SheetMessageType.REV_ALL_GAMBITS.name());
 		
-		ListNBT list = new ListNBT();
+		ListTag list = new ListTag();
 		for (int i = 0; i < gambits.length; i++) {
-			StringNBT tag = StringNBT.valueOf(gambits[i].name());
+			StringTag tag = StringTag.valueOf(gambits[i].name());
 			list.add(tag);
 		}
 		
@@ -547,7 +547,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	}
 	
 	// Client has requested information about 1 or all gambits
-	private void receiveGambitReq(CompoundNBT nbt) {
+	private void receiveGambitReq(CompoundTag nbt) {
 		boolean all = nbt.getBoolean("all");
 		
 		if (all) {
@@ -559,7 +559,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	}
 	
 	// Client has requested we cycle a gambit
-	private void receiveGambitCycle(CompoundNBT nbt) {
+	private void receiveGambitCycle(CompoundTag nbt) {
 		int index = nbt.getInt("index");
 		boolean forward = nbt.getBoolean("forward");
 		
@@ -590,7 +590,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	}
 	
 	// Server has sent info about a gambit
-	private void receiveGambit(CompoundNBT nbt) {
+	private void receiveGambit(CompoundTag nbt) {
 		int index = nbt.getInt("index");
 		String name = nbt.getString("gambit");
 		DragonGambit gambit;
@@ -604,8 +604,8 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	}
 	
 	// Server has sent information about all gambits
-	private void receiveAllGambits(CompoundNBT nbt) {
-		ListNBT list = nbt.getList("gambits", NBT.TAG_STRING);
+	private void receiveAllGambits(CompoundTag nbt) {
+		ListTag list = nbt.getList("gambits", NBT.TAG_STRING);
 		if (list != null) {
 			for (int i = 0; i < dragonInv.getContainerSize() && i < list.size(); i++) {
 				String name = list.getString(i);
@@ -622,7 +622,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	}
 
 	@Override
-	public void handleMessage(CompoundNBT data) {
+	public void handleMessage(CompoundTag data) {
 		String typeKey = data.getString("type");
 		SheetMessageType type;
 		try {

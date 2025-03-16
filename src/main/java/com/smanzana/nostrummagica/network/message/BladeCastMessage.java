@@ -4,9 +4,9 @@ import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.item.equipment.WarlockSword;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client has cast a spell
@@ -23,18 +23,18 @@ public class BladeCastMessage {
 		// Attempt blade cast
 		// TODO make this more generic with an interface or something and move trying to find the hand
 		// into a helper on the interface instead of in warlock blade
-		final ServerPlayerEntity sp = ctx.get().getSender();
+		final ServerPlayer sp = ctx.get().getSender();
 		ctx.get().setPacketHandled(true);
 		ctx.get().enqueueWork(() -> {
 			WarlockSword.DoCast(sp);
 		});
 	}
 	
-	public static BladeCastMessage decode(PacketBuffer buf) {
+	public static BladeCastMessage decode(FriendlyByteBuf buf) {
 		return new BladeCastMessage();
 	}
 
-	public static void encode(BladeCastMessage msg, PacketBuffer buf) {
+	public static void encode(BladeCastMessage msg, FriendlyByteBuf buf) {
 		;
 	}
 

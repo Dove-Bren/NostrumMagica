@@ -3,16 +3,16 @@ package com.smanzana.nostrummagica.criteria;
 import com.google.gson.JsonObject;
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.advancements.criterion.AbstractCriterionTrigger;
-import net.minecraft.advancements.criterion.CriterionInstance;
-import net.minecraft.advancements.criterion.EntityPredicate;
-import net.minecraft.advancements.criterion.EntityPredicate.AndPredicate;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.loot.ConditionArrayParser;
-import net.minecraft.loot.ConditionArraySerializer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
+import net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance;
+import net.minecraft.advancements.critereon.EntityPredicate;
+import net.minecraft.advancements.critereon.EntityPredicate.Composite;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.advancements.critereon.DeserializationContext;
+import net.minecraft.advancements.critereon.SerializationContext;
+import net.minecraft.resources.ResourceLocation;
 
-public class CraftSpellCriteriaTrigger extends AbstractCriterionTrigger<CraftSpellCriteriaTrigger.Instance> {
+public class CraftSpellCriteriaTrigger extends SimpleCriterionTrigger<CraftSpellCriteriaTrigger.Instance> {
 
 	private static final ResourceLocation ID = NostrumMagica.Loc("craft_spell");
 	public static final CraftSpellCriteriaTrigger Instance = new CraftSpellCriteriaTrigger();
@@ -23,24 +23,24 @@ public class CraftSpellCriteriaTrigger extends AbstractCriterionTrigger<CraftSpe
 	}
 	
 	@Override
-	public CraftSpellCriteriaTrigger.Instance createInstance(JsonObject json, EntityPredicate.AndPredicate entityPredicate, ConditionArrayParser conditionsParser) {
+	public CraftSpellCriteriaTrigger.Instance createInstance(JsonObject json, EntityPredicate.Composite entityPredicate, DeserializationContext conditionsParser) {
 		return new Instance(entityPredicate);
 	}
 	
-	public void trigger(ServerPlayerEntity player) {
+	public void trigger(ServerPlayer player) {
 		this.trigger(player, (instance) -> {
 			return true;
 		});
 	}
 	
-	public static class Instance extends CriterionInstance {
+	public static class Instance extends AbstractCriterionTriggerInstance {
 		
-		public Instance(AndPredicate playerCondition) {
+		public Instance(Composite playerCondition) {
 			super(CraftSpellCriteriaTrigger.ID, playerCondition);
 		}
 		
 		@Override
-		public JsonObject serializeToJson(ConditionArraySerializer conditions) {
+		public JsonObject serializeToJson(SerializationContext conditions) {
 			JsonObject obj = super.serializeToJson(conditions);
 			return obj;
 		}

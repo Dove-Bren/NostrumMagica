@@ -7,11 +7,11 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Default implementation of the IManaArmor interface
@@ -117,7 +117,7 @@ public class ManaArmor implements IManaArmor {
 	protected void spawnEffects(Entity hurtEntity, DamageSource source, float originalAmount, float finalAmount) {
 		NostrumParticles.WARD.spawn(hurtEntity.level, new NostrumParticles.SpawnParams(
 				4, hurtEntity.getX(), hurtEntity.getY() + (hurtEntity.getBbHeight()/2), hurtEntity.getZ(), .75, 30, 0,
-				Vector3d.ZERO, new Vector3d(.0, -.01, .0)
+				Vec3.ZERO, new Vec3(.0, -.01, .0)
 				//hurtEntity.getEntityId()
 				)
 					.color(0x602244FF)
@@ -138,7 +138,7 @@ public class ManaArmor implements IManaArmor {
 		NostrumMagicaSounds.SHIELD_BREAK.play(hurtEntity);
 		NostrumParticles.WARD.spawn(hurtEntity.level, new NostrumParticles.SpawnParams(
 				20, hurtEntity.getX(), hurtEntity.getY() + (hurtEntity.getBbHeight()/2), hurtEntity.getZ(), .75, 30, 0,
-				new Vector3d(.0, -.01, .0), new Vector3d(.01, 0, .01) 
+				new Vec3(.0, -.01, .0), new Vec3(.01, 0, .01) 
 				//hurtEntity.getEntityId()
 				)
 					.gravity(true)
@@ -148,8 +148,8 @@ public class ManaArmor implements IManaArmor {
 	protected void removeArmor(Entity exhaustedEntity) {
 		this.setHasArmor(false, 0);
 		spawnBreakEffects(exhaustedEntity);
-		if (exhaustedEntity instanceof ServerPlayerEntity) {
-			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) exhaustedEntity);
+		if (exhaustedEntity instanceof ServerPlayer) {
+			NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) exhaustedEntity);
 		}
 	}
 	

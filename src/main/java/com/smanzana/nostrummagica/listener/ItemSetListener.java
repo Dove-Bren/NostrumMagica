@@ -17,23 +17,24 @@ import com.smanzana.nostrummagica.inventory.EquipmentSlotKey;
 import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 import com.smanzana.nostrummagica.item.set.EquipmentSet;
 
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.LogicalSidedProvider;
+import net.minecraftforge.fmllegacy.LogicalSidedProvider;
 
 public class ItemSetListener {
 	
@@ -91,15 +92,15 @@ public class ItemSetListener {
 	}
 	
 	protected static final boolean ScanEntityEquipment(LivingEntity entity, BiFunction<IInventorySlotKey<? extends LivingEntity>, ItemStack, Boolean> action) {
-		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
+		for (EquipmentSlot slot : EquipmentSlot.values()) {
 			EquipmentSlotKey key = new EquipmentSlotKey(slot);
 			if (!action.apply(key, entity.getItemBySlot(slot))) {
 				return false;
 			}
 		}
 		
-		if (NostrumMagica.instance.curios.isEnabled() && entity instanceof PlayerEntity) {
-			CurioInventoryWrapper curios = NostrumMagica.instance.curios.getCurios((PlayerEntity) entity);
+		if (NostrumMagica.instance.curios.isEnabled() && entity instanceof Player) {
+			CurioInventoryWrapper curios = NostrumMagica.instance.curios.getCurios((Player) entity);
 			if (curios != null) {
 				for (CurioSlotReference slot : curios.getKeySet()) {
 					ItemStack stack = slot.getHeldStack(entity);
@@ -154,7 +155,7 @@ public class ItemSetListener {
 	
 	protected boolean canHaveSets(LivingEntity entity) {
 		// For now, just restrict to players to avoid scanning/saving other entities
-		return entity != null && entity instanceof PlayerEntity;
+		return entity != null && entity instanceof Player;
 	}
 	
 	protected void updateEntity(LivingEntity entity) {
@@ -183,14 +184,14 @@ public class ItemSetListener {
 	@SubscribeEvent
 	public void ServerWorldTick(ServerTickEvent event) {
 		if (event.phase == TickEvent.Phase.END) {
-			for (ServerWorld world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getAllLevels()) {
-				world.getEntities().forEach((ent) -> {
+			for (ServerLevel world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getAllLevels()) {
+				world.getEntities().get(EntityTypeTest.forClass(LivingEntity.class), (ent) -> {
 					if (ent instanceof LivingEntity) {
 						LivingEntity living = (LivingEntity) ent;
 						updateEntity(living);
 		
-						if (living.isFallFlying() && living.isShiftKeyDown() && living instanceof ServerPlayerEntity) {
-							((ServerPlayerEntity) living).stopFallFlying();
+						if (living.isFallFlying() && living.isShiftKeyDown() && living instanceof ServerPlayer) {
+							((ServerPlayer) living).stopFallFlying();
 						}
 					}
 				});
@@ -204,13 +205,13 @@ public class ItemSetListener {
 				&& !NostrumMagica.instance.proxy.hasIntegratedServer()
 				&& NostrumMagica.instance.proxy.getPlayer() != null
 				&& NostrumMagica.instance.proxy.getPlayer().level != null) {
-			((ClientWorld) NostrumMagica.instance.proxy.getPlayer().level).entitiesForRendering().forEach((ent) -> {
+			((ClientLevel) NostrumMagica.instance.proxy.getPlayer().level).entitiesForRendering().forEach((ent) -> {
 				if (ent instanceof LivingEntity) {
 					LivingEntity living = (LivingEntity) ent;
 					updateEntity(living);
 	
-					if (living.isFallFlying() && living.isShiftKeyDown() && living instanceof ServerPlayerEntity) {
-						((ServerPlayerEntity) living).stopFallFlying();
+					if (living.isFallFlying() && living.isShiftKeyDown() && living instanceof ServerPlayer) {
+						((ServerPlayer) living).stopFallFlying();
 					}
 				}
 			});

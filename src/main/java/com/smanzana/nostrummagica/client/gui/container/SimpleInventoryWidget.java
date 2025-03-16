@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.widget.IMoveableWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ObscurableWidget;
@@ -14,18 +14,18 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.TextComponent;
 
 public class SimpleInventoryWidget extends ParentWidget implements IScrollbarListener {
 	
 	public static interface IHiddenSlotFactory {
-		public HideableSlot apply(IInventory inventory, int slotIdx, int x, int y);
+		public HideableSlot apply(Container inventory, int slotIdx, int x, int y);
 	}
 	
 	protected static class SlotWidget extends ObscurableWidget implements IMoveableWidget {
@@ -35,20 +35,20 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 		protected final int startY;
 		
 		public SlotWidget(HideableSlot slot, int guiLeft, int guiTop) {
-			super(guiLeft + slot.x - 1, guiTop + slot.y - 1, 18, 18, StringTextComponent.EMPTY);
+			super(guiLeft + slot.x - 1, guiTop + slot.y - 1, 18, 18, TextComponent.EMPTY);
 			this.startX = this.x;
 			this.startY = this.y;
 			this.slot = slot;
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			Minecraft.getInstance().getTextureManager().bind(TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y, TEX_SLOT_HOFFSET, TEX_SLOT_VOFFSET, TEX_SLOT_WIDTH, TEX_SLOT_HEIGHT, this.width, this.height, TEX_WIDTH, TEX_HEIGHT);
 		}
 		
 		@Override
-		public void setBounds(Rectangle2d bounds) {
+		public void setBounds(Rect2i bounds) {
 			super.setBounds(bounds);
 			this.slot.setHidden(!this.inBounds());
 		}
@@ -148,10 +148,10 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 	
 	protected final SimpleInventoryContainerlet containerlet;
 	protected List<SlotWidget> slotWidgets;
-	protected Rectangle2d guiBounds;
+	protected Rect2i guiBounds;
 	protected float[] color = {1f, 1f, 1f, 1f};
 	
-	public SimpleInventoryWidget(ContainerScreen<? extends Container> gui, SimpleInventoryContainerlet containerlet) {
+	public SimpleInventoryWidget(AbstractContainerScreen<? extends AbstractContainerMenu> gui, SimpleInventoryContainerlet containerlet) {
 		super(containerlet.x + gui.getGuiLeft(), containerlet.y + gui.getGuiTop(), containerlet.width, containerlet.height, containerlet.title);
 		this.containerlet = containerlet;
 		this.slotWidgets = new ArrayList<>(containerlet.slots.size());
@@ -161,7 +161,7 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 	
 	protected void init(SimpleInventoryContainerlet containerlet, int guiLeft, int guiTop) {
 		this.slotWidgets.clear();
-		guiBounds = new Rectangle2d(containerlet.invBounds.getX() + guiLeft, containerlet.invBounds.getY() + guiTop, containerlet.invBounds.getWidth(), containerlet.invBounds.getHeight());
+		guiBounds = new Rect2i(containerlet.invBounds.getX() + guiLeft, containerlet.invBounds.getY() + guiTop, containerlet.invBounds.getWidth(), containerlet.invBounds.getHeight());
 		for (HideableSlot slot : containerlet.slots) {
 			SlotWidget widget = new SlotWidget(slot, guiLeft, guiTop);
 			widget.setBounds(guiBounds);
@@ -201,7 +201,7 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 	}
 	
 	@Override
-	public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(this.x, this.y, 0);
 		renderInventoryBackground(matrixStackIn, this.width, this.height, color[0], color[1], color[2], color[3]);
@@ -209,9 +209,9 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 	}
 	
 	@Override
-	protected void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	protected void renderForeground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		final Minecraft mc = Minecraft.getInstance();
-		final FontRenderer fontRenderer = mc.font;
+		final Font fontRenderer = mc.font;
 		
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(this.x, this.y, 0);
@@ -220,7 +220,7 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 		matrixStackIn.popPose();
 	}
 	
-	protected void renderInventoryBackground(MatrixStack matrixStackIn, int width, int height, float red, float green, float blue, float alpha) {
+	protected void renderInventoryBackground(PoseStack matrixStackIn, int width, int height, float red, float green, float blue, float alpha) {
 		Minecraft.getInstance().getTextureManager().bind(TEXT);
 		
 		// Note: hardcoding border size to be 4
@@ -237,7 +237,7 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 4, 4, TEX_CENTER_HOFFSET, TEX_CENTER_VOFFSET, TEX_CENTER_WIDTH, TEX_CENTER_HEIGHT, width-8, height-8, TEX_WIDTH, TEX_HEIGHT, red, green, blue, alpha);
 	}
 	
-	protected void renderInventoryOverlay(MatrixStack matrixStackIn, int width, int height, Rectangle2d hollow, float red, float green, float blue, float alpha) {
+	protected void renderInventoryOverlay(PoseStack matrixStackIn, int width, int height, Rect2i hollow, float red, float green, float blue, float alpha) {
 		Minecraft.getInstance().getTextureManager().bind(TEXT);
 		
 //		final int innerOffset = 4;

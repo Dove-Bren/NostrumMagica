@@ -10,14 +10,14 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.NetUtils;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Sent to client to let them know a candle has been ignited, and a tile entity should be created.
@@ -30,7 +30,7 @@ public class CandleIgniteMessage {
 		ctx.get().setPacketHandled(true);
 		Minecraft.getInstance().submit(() -> {
 			
-			PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+			Player player = NostrumMagica.instance.proxy.getPlayer();
 			if (!DimensionUtils.InDimension(player, message.dimension)) {
 				return;
 			}
@@ -44,21 +44,21 @@ public class CandleIgniteMessage {
 		});
 	}
 	
-	private final RegistryKey<World> dimension;
+	private final ResourceKey<Level> dimension;
 	private final BlockPos pos;
 	private final @Nullable ReagentType type;
 	
-	public CandleIgniteMessage(RegistryKey<World> dimension, BlockPos pos, @Nullable ReagentType type) {
+	public CandleIgniteMessage(ResourceKey<Level> dimension, BlockPos pos, @Nullable ReagentType type) {
 		this.dimension = dimension;
 		this.pos = pos;
 		this.type = type;
 	}
 
-	public static CandleIgniteMessage decode(PacketBuffer buf) {
+	public static CandleIgniteMessage decode(FriendlyByteBuf buf) {
 		return new CandleIgniteMessage(NetUtils.unpackDimension(buf), buf.readBlockPos(), buf.readBoolean() ? buf.readEnum(ReagentType.class) : null);
 	}
 
-	public static void encode(CandleIgniteMessage msg, PacketBuffer buf) {
+	public static void encode(CandleIgniteMessage msg, FriendlyByteBuf buf) {
 		NetUtils.packDimension(buf, msg.dimension);
 		buf.writeBlockPos(msg.pos);
 		buf.writeBoolean(msg.type != null);

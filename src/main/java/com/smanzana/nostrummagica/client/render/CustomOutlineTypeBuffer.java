@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.client.render;
 
 import java.util.Optional;
 
-import com.mojang.blaze3d.vertex.DefaultColorVertexBuilder;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.DefaultedVertexConsumer;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 
 /**
@@ -16,18 +16,18 @@ import net.minecraft.client.renderer.RenderType;
  * @author Skyler
  *
  */
-public class CustomOutlineTypeBuffer implements IRenderTypeBuffer {
+public class CustomOutlineTypeBuffer implements MultiBufferSource {
 	
-	private final IRenderTypeBuffer.Impl bufferIn;
-	private final IRenderTypeBuffer.Impl outlineBuffer;
+	private final MultiBufferSource.BufferSource bufferIn;
+	private final MultiBufferSource.BufferSource outlineBuffer;
 	private int red;
 	private int green;
 	private int blue;
 	private int alpha;
 	
-	public CustomOutlineTypeBuffer(IRenderTypeBuffer.Impl bufferIn, float red, float green, float blue, float alpha) {
+	public CustomOutlineTypeBuffer(MultiBufferSource.BufferSource bufferIn, float red, float green, float blue, float alpha) {
 		this.bufferIn = bufferIn;
-		this.outlineBuffer = IRenderTypeBuffer.immediate(new BufferBuilder(256));
+		this.outlineBuffer = MultiBufferSource.immediate(new BufferBuilder(256));
 		
 		this.color(red, green, blue, alpha);
 	}
@@ -40,18 +40,18 @@ public class CustomOutlineTypeBuffer implements IRenderTypeBuffer {
 	}
 
 	@Override
-	public IVertexBuilder getBuffer(RenderType type) {
+	public VertexConsumer getBuffer(RenderType type) {
 		// Very nearly a duplicate of OutlineLayerBuffer except we don't delegate to the original non-outline buffer.
 		// That means we ONLY render the outline, which is good in that we don't render the entity again.
 		
 		if (type.isOutline()) {
-	         IVertexBuilder ivertexbuilder2 = this.outlineBuffer.getBuffer(type);
+	         VertexConsumer ivertexbuilder2 = this.outlineBuffer.getBuffer(type);
 	         return new ColoredOutline(ivertexbuilder2, this.red, this.green, this.blue, this.alpha);
 	      } else {
-	         IVertexBuilder ivertexbuilder = this.bufferIn.getBuffer(type);
+	         VertexConsumer ivertexbuilder = this.bufferIn.getBuffer(type);
 	         Optional<RenderType> optional = type.outline();
 	         if (optional.isPresent()) {
-	            IVertexBuilder ivertexbuilder1 = this.outlineBuffer.getBuffer(optional.get());
+	            VertexConsumer ivertexbuilder1 = this.outlineBuffer.getBuffer(optional.get());
 	            ColoredOutline outlinelayerbuffer$coloredoutline = new ColoredOutline(ivertexbuilder1, this.red, this.green, this.blue, this.alpha);
 	            return outlinelayerbuffer$coloredoutline;
 	         } else {
@@ -64,20 +64,20 @@ public class CustomOutlineTypeBuffer implements IRenderTypeBuffer {
 		this.outlineBuffer.endBatch();
 	}
 	
-	protected static final class ColoredOutline extends DefaultColorVertexBuilder {
+	protected static final class ColoredOutline extends DefaultedVertexConsumer {
 		private double x;
 		private double y;
 		private double z;
 		private float u;
 		private float v;
-		final IVertexBuilder builder;
-		public ColoredOutline(IVertexBuilder builder, int red, int green, int blue, int alpha) {
+		final VertexConsumer builder;
+		public ColoredOutline(VertexConsumer builder, int red, int green, int blue, int alpha) {
 			this.builder = builder;
 			this.defaultColor(red, green, blue, alpha);
 		}
 
 		@Override
-		public IVertexBuilder vertex(double x, double y, double z) {
+		public VertexConsumer vertex(double x, double y, double z) {
 			this.x = x;
 			this.y = y;
 			this.z = z;
@@ -85,29 +85,29 @@ public class CustomOutlineTypeBuffer implements IRenderTypeBuffer {
 		}
 
 		@Override
-		public IVertexBuilder color(int red, int green, int blue, int alpha) {
+		public VertexConsumer color(int red, int green, int blue, int alpha) {
 			return this;
 		}
 
 		@Override
-		public IVertexBuilder uv(float u, float v) {
+		public VertexConsumer uv(float u, float v) {
 			this.u = u;
 			this.v = v;
 			return this;
 		}
 
 		@Override
-		public IVertexBuilder overlayCoords(int u, int v) {
+		public VertexConsumer overlayCoords(int u, int v) {
 			return this;
 		}
 
 		@Override
-		public IVertexBuilder uv2(int u, int v) {
+		public VertexConsumer uv2(int u, int v) {
 			return this;
 		}
 
 		@Override
-		public IVertexBuilder normal(float x, float y, float z) {
+		public VertexConsumer normal(float x, float y, float z) {
 			return this;
 		}
 

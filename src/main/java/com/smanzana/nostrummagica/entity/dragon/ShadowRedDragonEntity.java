@@ -10,40 +10,40 @@ import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.HurtByTargetGoal;
-import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.DamageSource;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreSupplier {
 	
 	public static final String ID = "entity_shadow_dragon_red";
 
-	private static final DataParameter<Boolean> HASTARGET =
-			EntityDataManager.<Boolean>defineId(RedDragonEntity.class, DataSerializers.BOOLEAN);
+	private static final EntityDataAccessor<Boolean> HASTARGET =
+			SynchedEntityData.<Boolean>defineId(RedDragonEntity.class, EntityDataSerializers.BOOLEAN);
 	private static final String DRAGON_SERIAL_HASTARGET_TOK = "DragonShadowTarget";
 	
 	private LivingEntity target;
 	private boolean targetInitted;
 	
-	public ShadowRedDragonEntity(EntityType<? extends ShadowRedDragonEntity> type, World worldIn) {
+	public ShadowRedDragonEntity(EntityType<? extends ShadowRedDragonEntity> type, Level worldIn) {
 		super(type, worldIn);
 		
         this.maxUpStep = 2;
         this.targetInitted = false;
 	}
 	
-	public ShadowRedDragonEntity(EntityType<? extends ShadowRedDragonEntity> type, World worldIn, LivingEntity target) {
+	public ShadowRedDragonEntity(EntityType<? extends ShadowRedDragonEntity> type, Level worldIn, LivingEntity target) {
 		this(type, worldIn);
 		this.target = target;
 		this.entityData.set(HASTARGET, true);
@@ -60,7 +60,7 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreS
 				this.targetSelector.addGoal(1, new DragonFocusedTargetGoal<LivingEntity>(this, this.target, true));
 			} else {
 				this.targetSelector.addGoal(1, new HurtByTargetGoal(this).setAlertOthers(ShadowRedDragonEntity.class));
-				this.targetSelector.addGoal(2, new DragonNearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, true));
+				this.targetSelector.addGoal(2, new DragonNearestAttackableTargetGoal<Player>(this, Player.class, true));
 			}
 			targetInitted = true;
 		}
@@ -71,7 +71,7 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreS
 		super.registerGoals();
 		
 		this.goalSelector.addGoal(1, new DragonMeleeAttackGoal(this, 1.0D, true, 4F * .6F * 4F * .6F * 1.2));
-		this.goalSelector.addGoal(2, new WaterAvoidingRandomWalkingGoal(this, 1.0D, 30));
+		this.goalSelector.addGoal(2, new WaterAvoidingRandomStrollGoal(this, 1.0D, 30));
 	}
 	
 	@Override
@@ -135,7 +135,7 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreS
 		//
 	}
 
-	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
+	public static final AttributeSupplier.Builder BuildAttributes() {
 		return RedDragonBaseEntity.BuildBaseRedDragonAttributes()
 	        .add(Attributes.MOVEMENT_SPEED, 0.33D)
 	        .add(Attributes.MAX_HEALTH, 50.0D)
@@ -167,7 +167,7 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreS
 		}
 	}
 	
-	public void readAdditionalSaveData(CompoundNBT compound) {
+	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 
 		if (compound.contains(DRAGON_SERIAL_HASTARGET_TOK, NBT.TAG_ANY_NUMERIC)) {
@@ -175,7 +175,7 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreS
         }
 	}
 	
-	public void addAdditionalSaveData(CompoundNBT compound) {
+	public void addAdditionalSaveData(CompoundTag compound) {
     	super.addAdditionalSaveData(compound);
     	compound.putBoolean(DRAGON_SERIAL_HASTARGET_TOK, this.entityData.get(HASTARGET));
 	}

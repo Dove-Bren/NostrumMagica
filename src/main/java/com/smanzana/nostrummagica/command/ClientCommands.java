@@ -7,7 +7,7 @@ import java.util.function.BiFunction;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -16,9 +16,9 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value=Dist.CLIENT)
 public class ClientCommands {
 
-	public static Map<String, BiFunction<PlayerEntity, String, Boolean>> COMMANDS = new HashMap<>();
+	public static Map<String, BiFunction<Player, String, Boolean>> COMMANDS = new HashMap<>();
 
-	public static void Register(String command, BiFunction<PlayerEntity, String, Boolean> handler) {
+	public static void Register(String command, BiFunction<Player, String, Boolean> handler) {
 		COMMANDS.put(command.toLowerCase(), handler);
 	}
 	
@@ -37,7 +37,7 @@ public class ClientCommands {
 			
 			if (COMMANDS.containsKey(cmd)) {
 				final Minecraft mc = Minecraft.getInstance();
-				final PlayerEntity player = mc.player;
+				final Player player = mc.player;
 				if (COMMANDS.get(cmd).apply(player, message)) {
 					event.setCanceled(true);
 				}

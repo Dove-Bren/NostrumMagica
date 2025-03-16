@@ -1,15 +1,15 @@
 package com.smanzana.nostrummagica.integration.curios;
 
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurio;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 
 public class NostrumCurioCapability implements ICurio {
@@ -71,8 +71,8 @@ public class NostrumCurioCapability implements ICurio {
 	}
 
 	@Override
-	public void render(String identifier, int index, MatrixStack matrixStackIn,
-			IRenderTypeBuffer bufferIn, int light,
+	public void render(String identifier, int index, PoseStack matrixStackIn,
+			MultiBufferSource bufferIn, int light,
 			LivingEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		getItem().doRender(stack, matrixStackIn, index, bufferIn, light, entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
 	}

@@ -28,30 +28,30 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.passive.WolfEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTier;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -62,14 +62,14 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 	private static final float STAB_RANGE = 3f;
 	
 	public SoulDagger() {
-		super(ItemTier.IRON, 3, -2.4F, NostrumItems.PropEquipment().durability(500));
+		super(Tiers.IRON, 3, -2.4F, NostrumItems.PropEquipment().durability(500));
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot equipmentSlot) {
         Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 
-        if (equipmentSlot == EquipmentSlotType.MAINHAND)
+        if (equipmentSlot == EquipmentSlot.MAINHAND)
         {
         	ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 			builder.putAll(multimap);
@@ -121,15 +121,15 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 //		tooltip.add("Magic Potency Bonus: 20%");
-		tooltip.add(new StringTextComponent("Mana Cost Reduction: 5%"));
-		tooltip.add(new TranslationTextComponent("item.nostrummagica.soul_dagger.desc"));
+		tooltip.add(new TextComponent("Mana Cost Reduction: 5%"));
+		tooltip.add(new TranslatableComponent("item.nostrummagica.soul_dagger.desc"));
 	}
 	
 	@Override
-	protected void fireChargedWeapon(World worldIn, LivingEntity entityLiving, Hand hand, ItemStack stack) {
+	protected void fireChargedWeapon(Level worldIn, LivingEntity entityLiving, InteractionHand hand, ItemStack stack) {
 		if (worldIn.isClientSide()) {
 			return;
 		}
@@ -153,12 +153,12 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 		}
 	}
 	
-	protected List<LivingEntity> findStabTargets(World worldIn, LivingEntity wielder, ItemStack dagger) {
-		RayTraceResult mop = RayTrace.raytrace(wielder.level, wielder, wielder.getEyePosition(.5f), wielder.getViewVector(.5f), STAB_RANGE, new RayTrace.OtherLiving(wielder));
-		if (mop == null || mop.getType() != RayTraceResult.Type.ENTITY) {
+	protected List<LivingEntity> findStabTargets(Level worldIn, LivingEntity wielder, ItemStack dagger) {
+		HitResult mop = RayTrace.raytrace(wielder.level, wielder, wielder.getEyePosition(.5f), wielder.getViewVector(.5f), STAB_RANGE, new RayTrace.OtherLiving(wielder));
+		if (mop == null || mop.getType() != HitResult.Type.ENTITY) {
 			return new ArrayList<>();
 		} else {
-			EntityRayTraceResult entResult = (EntityRayTraceResult) mop;
+			EntityHitResult entResult = (EntityHitResult) mop;
 			LivingEntity living = NostrumMagica.resolveLivingEntity(entResult.getEntity());
 			if (living == null) {
 				return new ArrayList<>();
@@ -168,13 +168,13 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 		}
 	}
 	
-	protected boolean doSpecialWolfStab(LivingEntity stabber, WolfEntity wolf, ItemStack dagger) {
+	protected boolean doSpecialWolfStab(LivingEntity stabber, Wolf wolf, ItemStack dagger) {
 		if (wolf.getEffect(NostrumEffects.nostrumTransformation) != null
-				&& stabber instanceof PlayerEntity
+				&& stabber instanceof Player
 				&& wolf.isOwnedBy(stabber)) {
 			// Wolves get transformed into arcane wolves!
 			wolf.playSound(SoundEvents.WOLF_HOWL, 1f, 1f);
-			ArcaneWolfEntity.TransformWolf(wolf, (PlayerEntity) stabber);
+			ArcaneWolfEntity.TransformWolf(wolf, (Player) stabber);
 			return true;
 		}
 		
@@ -190,13 +190,13 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 			}
 		}
 		
-		if (target instanceof WolfEntity) {
-			if (doSpecialWolfStab(attacker, (WolfEntity) target, dagger)) {
+		if (target instanceof Wolf) {
+			if (doSpecialWolfStab(attacker, (Wolf) target, dagger)) {
 				return true;
 			}
 		}
 		
-		int durationTicks = (target instanceof PlayerEntity ? 20 : 60);
+		int durationTicks = (target instanceof Player ? 20 : 60);
 		
 //		//TODO testing code; remove!
 //		{
@@ -233,8 +233,8 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 		float damage = 6.0f + EnchantmentHelper.getDamageBonus(dagger, target.getMobType());
 		
 		final boolean hit;
-		if (attacker instanceof PlayerEntity) {
-			hit = target.hurt(DamageSource.playerAttack((PlayerEntity)attacker), damage);
+		if (attacker instanceof Player) {
+			hit = target.hurt(DamageSource.playerAttack((Player)attacker), damage);
 		} else {
 			hit = target.hurt(DamageSource.mobAttack(attacker), damage);
 		}
@@ -243,12 +243,12 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 			target.invulnerableTime = 0;
 			target.setInvulnerable(false);
 			
-			target.addEffect(new EffectInstance(Effects.MOVEMENT_SLOWDOWN, durationTicks, 6));
+			target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, durationTicks, 6));
 			// Effects:
 			{
 				NostrumParticles.GLOW_ORB.spawn(attacker.level, new SpawnParams(
 						30, target.getX(), target.getY() + target.getBbHeight(), target.getZ(), .5, 60, 20,
-						new Vector3d(0, .05, 0), new Vector3d(.1, 0, .1)
+						new Vec3(0, .05, 0), new Vec3(.1, 0, .1)
 						).color(.6f, .6f, 0f, 0f).dieOnTarget(true).gravity(.1f));
 			}
 			
@@ -257,9 +257,9 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 				final int manaDrawn;
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(target);
 				INostrumMagic attrSelf = NostrumMagica.getMagicWrapper(attacker);
-				if (attrSelf == null || (attr == null && target instanceof PlayerEntity)) {
+				if (attrSelf == null || (attr == null && target instanceof Player)) {
 					manaDrawn = 0;
-				} else if (attrSelf != null && attr == null && target instanceof MobEntity) {
+				} else if (attrSelf != null && attr == null && target instanceof Mob) {
 					// Just fudge some mana to steal
 					manaDrawn = NostrumMagica.rand.nextInt(50) + 50;
 				} else {
@@ -281,7 +281,7 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 				}
 			}
 			
-			EffectInstance effect = attacker.getEffect(NostrumEffects.soulVampire);
+			MobEffectInstance effect = attacker.getEffect(NostrumEffects.soulVampire);
 			if (effect != null && effect.getDuration() > 0) {
 				attacker.heal(damage);
 			}
@@ -301,12 +301,12 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 	}
 	
 	@Override
-	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
+	public boolean shouldTrace(Level world, Player player, ItemStack stack) {
 		return true;
 	}
 
 	@Override
-	public double getTraceRange(World world, PlayerEntity player, ItemStack stack) {
+	public double getTraceRange(Level world, Player player, ItemStack stack) {
 		return STAB_RANGE;
 	}
 }

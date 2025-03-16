@@ -4,16 +4,16 @@ import com.google.gson.JsonObject;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
 
-import net.minecraft.advancements.criterion.AbstractCriterionTrigger;
-import net.minecraft.advancements.criterion.CriterionInstance;
-import net.minecraft.advancements.criterion.EntityPredicate;
-import net.minecraft.advancements.criterion.EntityPredicate.AndPredicate;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.loot.ConditionArrayParser;
-import net.minecraft.loot.ConditionArraySerializer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
+import net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance;
+import net.minecraft.advancements.critereon.EntityPredicate;
+import net.minecraft.advancements.critereon.EntityPredicate.Composite;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.advancements.critereon.DeserializationContext;
+import net.minecraft.advancements.critereon.SerializationContext;
+import net.minecraft.resources.ResourceLocation;
 
-public class TierCriteriaTrigger extends AbstractCriterionTrigger<TierCriteriaTrigger.Instance> {
+public class TierCriteriaTrigger extends SimpleCriterionTrigger<TierCriteriaTrigger.Instance> {
 
 	private static final ResourceLocation ID = NostrumMagica.Loc("tier");
 	public static final TierCriteriaTrigger Instance = new TierCriteriaTrigger();
@@ -24,23 +24,23 @@ public class TierCriteriaTrigger extends AbstractCriterionTrigger<TierCriteriaTr
 	}
 	
 	@Override
-	public TierCriteriaTrigger.Instance createInstance(JsonObject json, EntityPredicate.AndPredicate entityPredicate, ConditionArrayParser conditionsParser) {
+	public TierCriteriaTrigger.Instance createInstance(JsonObject json, EntityPredicate.Composite entityPredicate, DeserializationContext conditionsParser) {
 		final String tierKey = json.get("tier").getAsString();
 		final EMagicTier tier = EMagicTier.valueOf(tierKey.toUpperCase());
 		return new Instance(entityPredicate, tier);
 	}
 	
-	public void trigger(ServerPlayerEntity player, EMagicTier tier) {
+	public void trigger(ServerPlayer player, EMagicTier tier) {
 		this.trigger(player, (instance) -> {
 			return instance.test(tier);
 		});
 	}
 	
-	public static class Instance extends CriterionInstance {
+	public static class Instance extends AbstractCriterionTriggerInstance {
 		
 		private final EMagicTier tier;
 
-		public Instance(AndPredicate playerCondition, EMagicTier tier) {
+		public Instance(Composite playerCondition, EMagicTier tier) {
 			super(TierCriteriaTrigger.ID, playerCondition);
 			this.tier = tier;
 		}
@@ -50,7 +50,7 @@ public class TierCriteriaTrigger extends AbstractCriterionTrigger<TierCriteriaTr
 		}
 		
 		@Override
-		public JsonObject serializeToJson(ConditionArraySerializer conditions) {
+		public JsonObject serializeToJson(SerializationContext conditions) {
 			JsonObject obj = super.serializeToJson(conditions);
 			obj.addProperty("tier", this.tier.name().toLowerCase());
 			return obj;

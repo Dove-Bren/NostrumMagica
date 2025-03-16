@@ -10,11 +10,11 @@ import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.ArcaneWolfElementalTyp
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.petcommand.api.PetFuncs;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.EffectType;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.phys.Vec3;
 
 public class ArcaneWolfMysticGoal extends Goal {
 
@@ -49,20 +49,20 @@ public class ArcaneWolfMysticGoal extends Goal {
 		return tames;
 	}
 	
-	protected boolean isBadEffect(EffectInstance effect) {
-		return effect.getEffect().getCategory() == EffectType.HARMFUL;
+	protected boolean isBadEffect(MobEffectInstance effect) {
+		return effect.getEffect().getCategory() == MobEffectCategory.HARMFUL;
 	}
 	
 	protected boolean applyTo(ArcaneWolfEntity wolf, LivingEntity target) {
 		// Mystic removes negative status effects from allies
-		List<EffectInstance> removeList = new ArrayList<>();
-		for (EffectInstance effect : target.getActiveEffects()) {
+		List<MobEffectInstance> removeList = new ArrayList<>();
+		for (MobEffectInstance effect : target.getActiveEffects()) {
 			if (isBadEffect(effect)) {
 				removeList.add(effect);
 			}
 		}
 		
-		for (EffectInstance effect : removeList) {
+		for (MobEffectInstance effect : removeList) {
 			target.removeEffect(effect.getEffect());
 		}
 		
@@ -81,7 +81,7 @@ public class ArcaneWolfMysticGoal extends Goal {
 					final double angleRad = 2 * Math.PI * ((double) i / 10.0);
 					NostrumParticles.FILLED_ORB.spawn(wolf.level, new SpawnParams(
 							1, target.getX(), target.getY() + target.getEyeHeight(), target.getZ(), 0, 30, 0,
-							new Vector3d(Math.cos(angleRad) * .1, .05, Math.sin(angleRad) * .1), null
+							new Vec3(Math.cos(angleRad) * .1, .05, Math.sin(angleRad) * .1), null
 							).color(ArcaneWolfElementalType.MYSTIC.getColor()));
 				}
 			}

@@ -6,18 +6,18 @@ import com.smanzana.nostrumaetheria.api.blocks.IAetherInfusableTileEntity;
 import com.smanzana.nostrumaetheria.api.blocks.IAetherInfuserTileEntity;
 import com.smanzana.nostrumaetheria.api.item.IAetherInfuserLens;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class AltarTileEntity extends TileEntity implements ISidedInventory, IAetherInfusableTileEntity {
+public class AltarTileEntity extends BlockEntity implements WorldlyContainer, IAetherInfusableTileEntity {
 	
 	private @Nonnull ItemStack stack = ItemStack.EMPTY;
 	
@@ -54,11 +54,11 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	private static final String NBT_ITEM = "item";
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		if (stack != ItemStack.EMPTY) {
-			CompoundNBT tag = new CompoundNBT();
+			CompoundTag tag = new CompoundTag();
 			tag = stack.save(tag);
 			nbt.put(NBT_ITEM, tag);
 		}
@@ -67,7 +67,7 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt == null)
@@ -76,23 +76,23 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 		if (!nbt.contains(NBT_ITEM, NBT.TAG_COMPOUND)) {
 			stack = ItemStack.EMPTY;
 		} else {
-			CompoundNBT tag = nbt.getCompound(NBT_ITEM);
+			CompoundTag tag = nbt.getCompound(NBT_ITEM);
 			stack = ItemStack.of(tag);
 		}
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
@@ -149,17 +149,17 @@ public class AltarTileEntity extends TileEntity implements ISidedInventory, IAet
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return true;
 	}
 
 	@Override
-	public void startOpen(PlayerEntity player) {
+	public void startOpen(Player player) {
 		;
 	}
 
 	@Override
-	public void stopOpen(PlayerEntity player) {
+	public void stopOpen(Player player) {
 		;
 	}
 

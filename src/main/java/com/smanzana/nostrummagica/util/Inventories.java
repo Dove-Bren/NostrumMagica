@@ -6,25 +6,25 @@ import java.util.NoSuchElementException;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.tileentity.ChestTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class Inventories {
 
-	private static final @Nonnull ItemStack attemptAddToInventory(IInventory inventory, @Nonnull ItemStack stack, boolean commit) {
+	private static final @Nonnull ItemStack attemptAddToInventory(Container inventory, @Nonnull ItemStack stack, boolean commit) {
     	if (stack.isEmpty()) {
     		return ItemStack.EMPTY;
     	}
@@ -98,7 +98,7 @@ public class Inventories {
         return stack;
     }
 	 
-	public static final @Nonnull ItemStack addItem(IInventory inventory, @Nonnull ItemStack stack) {
+	public static final @Nonnull ItemStack addItem(Container inventory, @Nonnull ItemStack stack) {
 		return attemptAddToInventory(inventory, stack, true);
 	}
 	
@@ -110,7 +110,7 @@ public class Inventories {
 		return attemptAddToInventory(handler, stack, true);
 	}
 	
-	public static final boolean canFit(IInventory inventory, @Nonnull ItemStack stack) {
+	public static final boolean canFit(Container inventory, @Nonnull ItemStack stack) {
 		return attemptAddToInventory(inventory, stack, false).isEmpty();
 	}
 	
@@ -122,7 +122,7 @@ public class Inventories {
 		return attemptAddToInventory(handler, stack, false).isEmpty();
 	}
 	
-	public static final @Nonnull ItemStack simulateAddItem(IInventory inventory, @Nonnull ItemStack stack) {
+	public static final @Nonnull ItemStack simulateAddItem(Container inventory, @Nonnull ItemStack stack) {
 		return attemptAddToInventory(inventory, stack, false);
 	}
 	
@@ -130,7 +130,7 @@ public class Inventories {
 		return attemptAddToInventory(handler, stack, false);
 	}
 	
-	private static final @Nonnull ItemStack attemptRemoveFromInventory(IInventory inventory, @Nonnull ItemStack stack, boolean commit) {
+	private static final @Nonnull ItemStack attemptRemoveFromInventory(Container inventory, @Nonnull ItemStack stack, boolean commit) {
 		if (stack.isEmpty()) {
     		return ItemStack.EMPTY;
     	}
@@ -169,7 +169,7 @@ public class Inventories {
         return itemstack;
 	}
 	
-	public static final boolean contains(IInventory inventory, @Nonnull ItemStack items) {
+	public static final boolean contains(Container inventory, @Nonnull ItemStack items) {
 		return attemptRemoveFromInventory(inventory, items, false).isEmpty();
 	}
 	
@@ -177,7 +177,7 @@ public class Inventories {
 		return contains(new ItemStackArrayWrapper(inventory), items);
 	}
 	
-	public static final @Nonnull ItemStack remove(IInventory inventory, @Nonnull ItemStack items) {
+	public static final @Nonnull ItemStack remove(Container inventory, @Nonnull ItemStack items) {
 		return attemptRemoveFromInventory(inventory, items, true);
 	}
 	
@@ -185,31 +185,31 @@ public class Inventories {
 		return remove(new ItemStackArrayWrapper(inventory), items);
 	}
 	
-	public static final INBT serializeInventory(IInventory inv) {
-		ListNBT list = new ListNBT();
+	public static final Tag serializeInventory(Container inv) {
+		ListTag list = new ListTag();
 		for (int i = 0; i < inv.getContainerSize(); i++) {
 			@Nonnull ItemStack stack = inv.getItem(i);
 			if (!stack.isEmpty()) {
 				list.add(stack.serializeNBT());
 			} else {
-				list.add(new CompoundNBT());
+				list.add(new CompoundTag());
 			}
 		}
 		
 		return list;
 	}
 	
-	public static final boolean deserializeInventory(IInventory base, INBT nbt) {
+	public static final boolean deserializeInventory(Container base, Tag nbt) {
 		if (base == null) {
 			return false;
 		}
 		
 		base.clearContent();
 		
-		if (nbt != null && nbt instanceof ListNBT) {
-			ListNBT list = (ListNBT) nbt;
+		if (nbt != null && nbt instanceof ListTag) {
+			ListTag list = (ListTag) nbt;
 			for (int i = 0; i < list.size(); i++) {
-				CompoundNBT tag = list.getCompound(i);
+				CompoundTag tag = list.getCompound(i);
 				@Nonnull ItemStack stack = ItemStack.of(tag);
 				base.setItem(i, stack);
 			}
@@ -218,16 +218,16 @@ public class Inventories {
 		return true;
 	}
 	
-	public static final int getPlayerHandSlotIndex(PlayerInventory inv, Hand hand) {
+	public static final int getPlayerHandSlotIndex(Inventory inv, InteractionHand hand) {
 		// Hardcoded stuff
-		if (hand == Hand.MAIN_HAND) {
+		if (hand == InteractionHand.MAIN_HAND) {
 			return inv.selected;
 		} else {
 			return 40;
 		}
 	}
 	
-	public static final boolean attemptAddToTile(Iterable<ItemStack> itemsToAdd, BlockState state, TileEntity te, Direction direction) {
+	public static final boolean attemptAddToTile(Iterable<ItemStack> itemsToAdd, BlockState state, BlockEntity te, Direction direction) {
 		boolean attemptedAny = false;
 		if (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).isPresent()) {
 			@Nullable IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).orElse(null);
@@ -247,12 +247,12 @@ public class Inventories {
 					}
 				}
 			}
-		} else if (te instanceof IInventory) {
+		} else if (te instanceof Container) {
 			
-			IInventory inv = (IInventory) te;
+			Container inv = (Container) te;
 			
 			// Special cast for stupid chests :P
-			if (te instanceof ChestTileEntity) {
+			if (te instanceof ChestBlockEntity) {
 				if (state != null && state.getBlock() instanceof ChestBlock) {
 					inv = ChestBlock.getContainer((ChestBlock) state.getBlock(), state, te.getLevel(), te.getBlockPos(), true);
 				}
@@ -277,7 +277,7 @@ public class Inventories {
 	}
 	
 	// TODO make a pool of these and implement a 'set' interface to avoid allocating and deallocing these
-	public static class ItemStackArrayWrapper implements IInventory {
+	public static class ItemStackArrayWrapper implements Container {
 
 		private final @Nonnull ItemStack[] array;
 		
@@ -330,12 +330,12 @@ public class Inventories {
 		}
 
 		@Override
-		public void startOpen(PlayerEntity player) {
+		public void startOpen(Player player) {
 			;
 		}
 
 		@Override
-		public void stopOpen(PlayerEntity player) {
+		public void stopOpen(Player player) {
 			;
 		}
 
@@ -364,7 +364,7 @@ public class Inventories {
 		}
 
 		@Override
-		public boolean stillValid(PlayerEntity player) {
+		public boolean stillValid(Player player) {
 			return true;
 		}
 		
@@ -372,9 +372,9 @@ public class Inventories {
 	
 	public static class IterableInventoryWrapper implements Iterable<ItemStack> {
 		
-		private final IInventory inventory;
+		private final Container inventory;
 		
-		public IterableInventoryWrapper(IInventory inventory) {
+		public IterableInventoryWrapper(Container inventory) {
 			this.inventory = inventory;
 		}
 

@@ -6,15 +6,15 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class ChalkItem extends Item implements ILoreTagged {
 
@@ -50,19 +50,19 @@ public class ChalkItem extends Item implements ILoreTagged {
 	}
 
 	@Override
-	public ActionResultType useOn(ItemUseContext context) {
+	public InteractionResult useOn(UseOnContext context) {
 		final BlockPos pos = context.getClickedPos();
-		final PlayerEntity player = context.getPlayer();
-		final World world = context.getLevel();
+		final Player player = context.getPlayer();
+		final Level world = context.getLevel();
 		final Direction facing = context.getClickedFace();
 		
 		ItemStack stack = context.getItemInHand();
         if (facing == Direction.UP && player.mayUseItemAt(pos.relative(facing), facing, stack) && Block.canSupportRigidBlock(world, pos) && world.isEmptyBlock(pos.above())) {
         	world.setBlockAndUpdate(pos.above(), NostrumBlocks.chalk.defaultBlockState());
         	ItemStacks.damageItem(stack, player, context.getHand(), 1);
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         } else {
-        	return ActionResultType.FAIL;
+        	return InteractionResult.FAIL;
         }
 	}
 

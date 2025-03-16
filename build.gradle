@@ -12,15 +12,15 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = "1.16.5-1.11.10"
+version = "1.17.1-1.12.0"
 group= "com.smanzana.nostrummagica" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "nostrummagica"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-	mappings channel: 'official', version: "1.16.5"
+	mappings channel: 'official', version: "1.17.1"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 	
 	 // Structures in 1.16.x require you to place them in some vanilla maps which are private variables
@@ -38,8 +38,9 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 			
-			// Caelus mixins don't work without this
-			property 'mixin.env.disableRefMap', 'true'
+			// Curios requires mixins
+			property 'mixin.env.remapRefMap', 'true'
+			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             mods {
                 nostrummagica {
@@ -57,9 +58,10 @@ minecraft {
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
-
-	    // Caelus mixins don't work without this
-		property 'mixin.env.disableRefMap', 'true'
+			
+			// Curios requires mixins
+			property 'mixin.env.remapRefMap', 'true'
+			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             mods {
                 nostrummagica {
@@ -154,7 +156,7 @@ repositories {
 }
 
 dependencies {
-	minecraft 'net.minecraftforge:forge:1.16.5-36.2.34'
+	minecraft 'net.minecraftforge:forge:1.17.1-37.1.1'
 	
     compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
@@ -165,11 +167,11 @@ dependencies {
 	//compile 'top.theillusivec4.caelus:caelus-forge:${caelus_version}'
 	compileOnly fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}")
 	
-	compileOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}:api")
-	//runtimeOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}")
+	//compileOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}:api")
+	////runtimeOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}")
 	
-	compileOnly fg.deobf("com.smanzana:musica:${musica_version}")
-	runtimeOnly fg.deobf("com.smanzana:musica:${musica_version}")
+	//compileOnly fg.deobf("com.smanzana:musica:${musica_version}")
+	//runtimeOnly fg.deobf("com.smanzana:musica:${musica_version}")
 	
 	runtimeOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}")
 	compileOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}:api")
@@ -177,9 +179,9 @@ dependencies {
 	runtimeOnly fg.deobf("com.smanzana:autodungeons:${autodungeons_version}")
 	compileOnly fg.deobf("com.smanzana:autodungeons:${autodungeons_version}")
 	
-	compileOnly fg.deobf("local:minecolonies:${minecolonies_version}:api")
-	//runtimeOnly fg.deobf("local:minecolonies:${minecolonies_version}")
-	implementation fg.deobf("curse.maven:structurize-298744:${structurize_version}")
+	//compileOnly fg.deobf("local:minecolonies:${minecolonies_version}:api")
+	////runtimeOnly fg.deobf("local:minecolonies:${minecolonies_version}")
+	//implementation fg.deobf("curse.maven:structurize-298744:${structurize_version}")
 }
 
 task sourcesJar(type: Jar) {

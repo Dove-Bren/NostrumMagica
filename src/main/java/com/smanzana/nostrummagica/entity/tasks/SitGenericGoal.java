@@ -4,13 +4,13 @@ import java.util.EnumSet;
 
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
 
-import net.minecraft.entity.ai.goal.Goal.Flag;
+import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
-public class SitGenericGoal<T extends CreatureEntity & ITameableEntity> extends Goal {
+public class SitGenericGoal<T extends PathfinderMob & ITameableEntity> extends Goal {
 	
 	private final T entity;
 

@@ -15,24 +15,24 @@ import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileEntity, ITickableTileEntity {
+public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTileEntity, TickableBlockEntity {
 	
 	private static final String NBT_OFFSET = "offset";
 	
@@ -80,32 +80,32 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
-	public CompoundNBT save(CompoundNBT compound) {
+	public CompoundTag save(CompoundTag compound) {
 		super.save(compound);
 		
 		if (teleOffset != null) {
-			compound.put(NBT_OFFSET, NBTUtil.writeBlockPos(teleOffset));
+			compound.put(NBT_OFFSET, NbtUtils.writeBlockPos(teleOffset));
 		}
 		
 		return compound;
 	}
 	
-	public void load(BlockState state, CompoundNBT compound) {
+	public void load(BlockState state, CompoundTag compound) {
 		super.load(state, compound);
 		
 		teleOffset = null;
@@ -113,7 +113,7 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 			// Legacy format! Probably dungeon spawning
 			teleOffset = WorldUtil.blockPosFromLong1_12_2(compound.getLong(NBT_OFFSET));
 		} else {
-			teleOffset = NBTUtil.readBlockPos(compound.getCompound(NBT_OFFSET));
+			teleOffset = NbtUtils.readBlockPos(compound.getCompound(NBT_OFFSET));
 		}
 	}
 	
@@ -145,13 +145,13 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 	}
 	
 	protected Collection<Entity> scanForEntities() {
-		return level.getEntities((Entity) null, VoxelShapes.block().bounds().move(worldPosition), (e) -> { return true; });
+		return level.getEntities((Entity) null, Shapes.block().bounds().move(worldPosition), (e) -> { return true; });
 	}
 	
 	protected void entityOnTileTick(Entity entity) {
 		// If no charge yet, play startup effects
 		if (!hasEntityCharge(entity)) {
-			level.playSound(null, worldPosition, SoundEvents.PORTAL_TRIGGER, SoundCategory.BLOCKS, 1f, (4f / (float) TELEPORT_CHARGE_TIME));
+			level.playSound(null, worldPosition, SoundEvents.PORTAL_TRIGGER, SoundSource.BLOCKS, 1f, (4f / (float) TELEPORT_CHARGE_TIME));
 		}
 		
 		incrEntityCharge(entity);
@@ -163,7 +163,7 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 			final double rx = NostrumMagica.rand.nextFloat() - .5f;
 			final double rz = NostrumMagica.rand.nextFloat() - .5f;
 			
-			((ServerWorld) level).sendParticles(ParticleTypes.DRAGON_BREATH, worldPosition.getX() + .5 + rx, worldPosition.getY(), worldPosition.getZ() + .5 + rz, count,
+			((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH, worldPosition.getX() + .5 + rx, worldPosition.getY(), worldPosition.getZ() + .5 + rz, count,
 					0, .25, 0, NostrumMagica.rand.nextFloat());
 		}
 	}
@@ -198,7 +198,7 @@ public class TeleportRuneTileEntity extends TileEntity implements IOrientedTileE
 					double dz = target.getZ() + .5;
 					for (int i = 0; i < 10; i++) {
 						
-						((ServerWorld) level).sendParticles(ParticleTypes.DRAGON_BREATH,
+						((ServerLevel) level).sendParticles(ParticleTypes.DRAGON_BREATH,
 								dx,
 								dy,
 								dz,

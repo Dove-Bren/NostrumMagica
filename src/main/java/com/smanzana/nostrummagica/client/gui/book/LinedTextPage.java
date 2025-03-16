@@ -3,9 +3,9 @@ package com.smanzana.nostrummagica.client.gui.book;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Font;
 
 public class LinedTextPage implements IBookPage {
 	
@@ -22,7 +22,7 @@ public class LinedTextPage implements IBookPage {
 	}
 
 	@Override
-	public void draw(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
+	public void draw(BookScreen parent, PoseStack matrixStackIn, Font fonter, int xoffset, int yoffset, int width, int height) {
 		for (String line : text) {
 			fonter.draw(matrixStackIn, line, xoffset, yoffset, 0x000000);
 			yoffset += fonter.lineHeight + LINE_HEIGHT_EXTRA;
@@ -30,7 +30,7 @@ public class LinedTextPage implements IBookPage {
 	}
 
 	@Override
-	public void overlay(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
+	public void overlay(BookScreen parent, PoseStack matrixStackIn, Font fonter, int mouseX, int mouseY, int trueX, int trueY) {
 		; //nothing to do
 	}
 	

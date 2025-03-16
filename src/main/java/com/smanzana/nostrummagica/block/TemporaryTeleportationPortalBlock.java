@@ -8,13 +8,13 @@ import java.util.Set;
 import com.smanzana.nostrummagica.tile.TemporaryPortalTileEntity;
 import com.smanzana.nostrummagica.util.Location;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 
 /**
  * Teleportation Portal with a finite lifetime
@@ -39,7 +39,7 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		if (isMaster(state)) {
 			return new TemporaryPortalTileEntity();
 		}
@@ -47,12 +47,12 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 		return null;
 	}
 	
-	protected static void spawnPortal(World worldIn, BlockPos portalMaster, Location target, int duration) {
+	protected static void spawnPortal(Level worldIn, BlockPos portalMaster, Location target, int duration) {
 		TemporaryPortalTileEntity te = new TemporaryPortalTileEntity(target, worldIn.getGameTime() + duration);
 		worldIn.setBlockEntity(portalMaster, te);
 	}
 	
-	public static void spawn(World world, BlockPos at, Location target, int duration) {
+	public static void spawn(Level world, BlockPos at, Location target, int duration) {
 		BlockState state = NostrumBlocks.temporaryTeleportationPortal.getMaster();
 		world.setBlockAndUpdate(at, state);
 		NostrumBlocks.temporaryTeleportationPortal.createPaired(world, at);
@@ -60,7 +60,7 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 		spawnPortal(world, at, target, duration);
 	}
 	
-	public static BlockPos spawnNearby(World world, BlockPos center, double radius, boolean centerValid, Location target, int duration) {
+	public static BlockPos spawnNearby(Level world, BlockPos center, double radius, boolean centerValid, Location target, int duration) {
 		// Find a spot to place it!
 		List<BlockPos> next = new LinkedList<>();
 		Set<BlockPos> seen = new HashSet<>();

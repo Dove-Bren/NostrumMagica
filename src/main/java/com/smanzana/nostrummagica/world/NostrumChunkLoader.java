@@ -1,17 +1,17 @@
 package com.smanzana.nostrummagica.world;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.server.TicketType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.TicketType;
 
 public class NostrumChunkLoader {
 	
-	public static void forceChunk(ServerWorld world, TicketType<BlockPos> ticket, BlockPos pos) {
+	public static void forceChunk(ServerLevel world, TicketType<BlockPos> ticket, BlockPos pos) {
 		world.getChunkSource().registerTickingTicket(ticket, new ChunkPos(pos), 1, pos); // 1 chunk radius?
 	}
 	
-	public static void unforceChunk(ServerWorld world, TicketType<BlockPos> ticket, BlockPos pos) {
+	public static void unforceChunk(ServerLevel world, TicketType<BlockPos> ticket, BlockPos pos) {
 		world.getChunkSource().releaseTickingTicket(ticket, new ChunkPos(pos), 1, pos);
 	}
 

@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 /**
  * A shape part of a spell, including any properties this instance may have.
@@ -36,9 +36,9 @@ public class SpellShapePart {
 	private static final String NBT_SHAPE = "shape";
 	private static final String NBT_PROPS = "properties";
 	
-	public CompoundNBT toNBT(@Nullable CompoundNBT tag) {
+	public CompoundTag toNBT(@Nullable CompoundTag tag) {
 		if (tag == null) {
-			tag = new CompoundNBT();
+			tag = new CompoundTag();
 		}
 		
 		tag.putString(NBT_SHAPE, this.getShape().getShapeKey());
@@ -47,7 +47,7 @@ public class SpellShapePart {
 		return tag;
 	}
 	
-	public static SpellShapePart FromNBT(CompoundNBT tag) {
+	public static SpellShapePart FromNBT(CompoundTag tag) {
 		SpellShape shape = SpellShape.get(tag.getString(NBT_SHAPE));
 		if (shape == null) {
 			shape = SpellShape.getAllShapes().iterator().next();

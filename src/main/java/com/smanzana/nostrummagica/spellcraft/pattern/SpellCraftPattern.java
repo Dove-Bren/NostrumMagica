@@ -10,10 +10,10 @@ import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.util.TextUtils;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -46,15 +46,15 @@ public abstract class SpellCraftPattern extends ForgeRegistryEntry<SpellCraftPat
 		return "pattern." + this.getRegistryName().getNamespace() + "." + this.getRegistryName().getPath();
 	}
 	
-	public ITextComponent getName() {
-		return new TranslationTextComponent(getUnlocalizedName()).withStyle(TextFormatting.DARK_GREEN);
+	public Component getName() {
+		return new TranslatableComponent(getUnlocalizedName()).withStyle(ChatFormatting.DARK_GREEN);
 	}
 	
 	public String getUnlocalizedDescription() {
 		return getUnlocalizedName() + ".description";
 	}
 	
-	public List<ITextComponent> addDescription(List<ITextComponent> description) {
+	public List<Component> addDescription(List<Component> description) {
 		description.addAll(TextUtils.GetTranslatedList(getUnlocalizedDescription()));
 		return description;
 	}

@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.MagicTierIcon;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
@@ -9,14 +9,14 @@ import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.entity.ShrineTriggerEntity;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix3f;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 
 public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> extends EntityRenderer<E> {
 
@@ -25,7 +25,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 	private static final ResourceLocation TEX_BUBBLE_DAM2 = NostrumMagica.Loc("textures/block/shrine_bubble_2.png");
 	private static final ResourceLocation TEX_BUBBLE_DAM3 = NostrumMagica.Loc("textures/block/shrine_bubble_3.png");
 	
-	public RenderShrineTrigger(EntityRendererManager renderManagerIn) {
+	public RenderShrineTrigger(EntityRenderDispatcher renderManagerIn) {
 		super(renderManagerIn);
 	}
 
@@ -34,10 +34,10 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 		return TEX_BUBBLE;
 	}
 	
-	protected abstract void renderSymbol(E entityIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, float scale, float glow, float[] color, int packedLightIn);
+	protected abstract void renderSymbol(E entityIn, PoseStack matrixStackIn, MultiBufferSource bufferIn, float scale, float glow, float[] color, int packedLightIn);
 	
 	@Override
-	public void render(E entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(E entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		final Minecraft mc = Minecraft.getInstance();
 		if (entityIn.isInvisibleTo(mc.player)) {
 			return;
@@ -87,7 +87,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 		{
 			Matrix4f transform = matrixStackIn.last().pose();
 			Matrix3f normal = matrixStackIn.last().normal();
-			IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.GetBlendedEntity(bubbleTex, true));
+			VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.GetBlendedEntity(bubbleTex, true));
 			buffer.vertex(transform, -0.5f, -.5f, 0.0f).color(color[0], color[1], color[2], color[3]).uv(0, 1f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
 			buffer.vertex(transform, 0.5f, -.5f, 0.0f).color(color[0], color[1], color[2], color[3]).uv(1f, 1f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
 			buffer.vertex(transform, 0.5f, .5f, 0.0f).color(color[0], color[1], color[2], color[3]).uv(1f, 0f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
@@ -100,13 +100,13 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 	}
 	
 	protected static abstract class SpellComponentRender<E extends ShrineTriggerEntity<?>> extends RenderShrineTrigger<E> {
-		public SpellComponentRender(EntityRendererManager renderManagerIn) {
+		public SpellComponentRender(EntityRenderDispatcher renderManagerIn) {
 			super(renderManagerIn);
 		}
 		
 		protected abstract SpellComponentIcon getIcon(E entity);
 		
-		protected void renderSymbol(E entityIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, float scale, float glow, float[] color, int packedLightIn) {
+		protected void renderSymbol(E entityIn, PoseStack matrixStackIn, MultiBufferSource bufferIn, float scale, float glow, float[] color, int packedLightIn) {
 			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
 			matrixStackIn.scale(.75f, .75f, 1f);
 			matrixStackIn.scale(scale, scale, 1f);
@@ -118,7 +118,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 	
 	public static class Element extends SpellComponentRender<ShrineTriggerEntity.Element> {
 		
-		public Element(EntityRendererManager renderManagerIn) {
+		public Element(EntityRenderDispatcher renderManagerIn) {
 			super(renderManagerIn);
 		}
 		
@@ -131,7 +131,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 	
 	public static class Shape extends SpellComponentRender<ShrineTriggerEntity.Shape> {
 		
-		public Shape(EntityRendererManager renderManagerIn) {
+		public Shape(EntityRenderDispatcher renderManagerIn) {
 			super(renderManagerIn);
 		}
 		
@@ -144,7 +144,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 	
 	public static class Alteration extends SpellComponentRender<ShrineTriggerEntity.Alteration> {
 		
-		public Alteration(EntityRendererManager renderManagerIn) {
+		public Alteration(EntityRenderDispatcher renderManagerIn) {
 			super(renderManagerIn);
 		}
 		
@@ -157,12 +157,12 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 	
 	public static class Tier extends RenderShrineTrigger<ShrineTriggerEntity.Tier> {
 		
-		public Tier(EntityRendererManager renderManagerIn) {
+		public Tier(EntityRenderDispatcher renderManagerIn) {
 			super(renderManagerIn);
 		}
 		
 		@Override
-		protected void renderSymbol(ShrineTriggerEntity.Tier entityIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, float scale, float glow, float[] color, int packedLightIn) {
+		protected void renderSymbol(ShrineTriggerEntity.Tier entityIn, PoseStack matrixStackIn, MultiBufferSource bufferIn, float scale, float glow, float[] color, int packedLightIn) {
 			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
 			matrixStackIn.scale(.75f, .75f, 1f);
 			matrixStackIn.scale(scale, scale, 1f);

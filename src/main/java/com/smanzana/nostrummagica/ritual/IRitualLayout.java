@@ -2,20 +2,20 @@ package com.smanzana.nostrummagica.ritual;
 
 import java.util.List;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public interface IRitualLayout extends IRitualIngredients {
 	
-	public ItemStack getCenterItem(World world, BlockPos center);
+	public ItemStack getCenterItem(Level world, BlockPos center);
 	
-	public List<ItemStack> getExtraItems(World world, BlockPos center);
+	public List<ItemStack> getExtraItems(Level world, BlockPos center);
 	
-	public List<ItemStack> getReagentItems(World world, BlockPos center);
+	public List<ItemStack> getReagentItems(Level world, BlockPos center);
 	
-	public void clearIngredients(World world, BlockPos center, RitualRecipe recipePerformed);
+	public void clearIngredients(Level world, BlockPos center, RitualRecipe recipePerformed);
 	
-	public void setOutputItems(World world, BlockPos center, Iterable<ItemStack> output);
+	public void setOutputItems(Level world, BlockPos center, Iterable<ItemStack> output);
 
 }

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.attribute;
 
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.ai.attributes.RangedAttribute;
+import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 
 public class MagicReductionAttribute extends RangedAttribute {
 	

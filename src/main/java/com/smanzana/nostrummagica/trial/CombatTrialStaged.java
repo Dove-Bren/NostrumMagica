@@ -9,14 +9,14 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * A combat trial with stages of mob spawns that wait for the prevous spawns to die
@@ -27,14 +27,14 @@ public abstract class CombatTrialStaged extends CombatTrial {
 	protected int stage;
 	protected boolean success;
 	
-	protected CombatTrialStaged(ServerWorld world, BlockPos center, @Nullable PlayerEntity player, CombatTrialStage ... stages) {
+	protected CombatTrialStaged(ServerLevel world, BlockPos center, @Nullable Player player, CombatTrialStage ... stages) {
 		super(world, center, player);
 		this.stages = stages;
 		stage = 0;
 		success = false;
 	}
 	
-	protected CombatTrialStaged(ServerWorld world, BlockPos center, @Nullable PlayerEntity player) {
+	protected CombatTrialStaged(ServerLevel world, BlockPos center, @Nullable Player player) {
 		this(world, center, player, (CombatTrialStage[])null);
 	}
 	
@@ -109,10 +109,10 @@ public abstract class CombatTrialStaged extends CombatTrial {
 		}
 	}
 	
-	protected static final List<BlockPos> findCacheableSpawnSuggestions(World world, BlockPos center, Predicate<BlockState> filter) {
+	protected static final List<BlockPos> findCacheableSpawnSuggestions(Level world, BlockPos center, Predicate<BlockState> filter) {
 		List<BlockPos> list = new ArrayList<>();
 		
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		for (int x = -10; x <= 10; x++)
 		for (int z = -10; z <= 10; z++)
 		for (int y = -2; y <= 2; y++) {
@@ -132,7 +132,7 @@ public abstract class CombatTrialStaged extends CombatTrial {
 	 * @param entity
 	 * @return
 	 */
-	protected static final BlockPos findRandomSpawnPos(World world, BlockPos center, LivingEntity entity) {
+	protected static final BlockPos findRandomSpawnPos(Level world, BlockPos center, LivingEntity entity) {
 		int attempts = 50; // Vanilla just doesn't spawn if it can't find one
 		while (attempts-- > 0) {
 			BlockPos attemptSpot = center.offset(
@@ -151,11 +151,11 @@ public abstract class CombatTrialStaged extends CombatTrial {
 	}
 	
 	protected static interface TrialMobProvider {
-		public MobEntity provideEntity(World world);
+		public Mob provideEntity(Level world);
 	}
 	
 	protected static interface TrialSpawnProvider {
-		public BlockPos provideSpawn(World world, BlockPos center, MobEntity entity);
+		public BlockPos provideSpawn(Level world, BlockPos center, Mob entity);
 	}
 	
 	protected static class CombatTrialStage {
@@ -163,10 +163,10 @@ public abstract class CombatTrialStaged extends CombatTrial {
 		protected final TrialMobProvider provider;
 		protected final TrialSpawnProvider spawnFinder;
 		protected final int numEntities;
-		protected final List<MobEntity> stageEntities;
-		protected final @Nullable PlayerEntity focusPlayer;
+		protected final List<Mob> stageEntities;
+		protected final @Nullable Player focusPlayer;
 		
-		public CombatTrialStage(@Nullable PlayerEntity focusPlayer, TrialMobProvider provider, TrialSpawnProvider spawnFinder, int numEntities) {
+		public CombatTrialStage(@Nullable Player focusPlayer, TrialMobProvider provider, TrialSpawnProvider spawnFinder, int numEntities) {
 			stageEntities = new ArrayList<>();
 			this.provider = provider;
 			this.spawnFinder = spawnFinder;
@@ -174,14 +174,14 @@ public abstract class CombatTrialStaged extends CombatTrial {
 			this.focusPlayer = focusPlayer;
 		}
 		
-		public void spawnStage(World world, BlockPos center, @Nullable PlayerEntity focusPlayer) {
+		public void spawnStage(Level world, BlockPos center, @Nullable Player focusPlayer) {
 			for (int i = 0; i < numEntities; i++) {
 				stageEntities.add(spawnOneEntity(world, center, focusPlayer));
 			}
 		}
 		
-		protected MobEntity spawnOneEntity(World world, BlockPos center, @Nullable PlayerEntity focusPlayer) {
-			final MobEntity ent = genEntity(world);
+		protected Mob spawnOneEntity(Level world, BlockPos center, @Nullable Player focusPlayer) {
+			final Mob ent = genEntity(world);
 			final BlockPos spawn = findSpawnPos(world, center, ent);
 			ent.setPos(spawn.getX() + .5, spawn.getY(), spawn.getZ() + .5);
 			world.addFreshEntity(ent);
@@ -192,19 +192,19 @@ public abstract class CombatTrialStaged extends CombatTrial {
 			return ent;
 		}
 		
-		protected BlockPos findSpawnPos(World world, BlockPos center, MobEntity ent) {
+		protected BlockPos findSpawnPos(Level world, BlockPos center, Mob ent) {
 			return this.spawnFinder.provideSpawn(world, center, ent);
 		}
 		
-		protected MobEntity genEntity(World world) {
+		protected Mob genEntity(Level world) {
 			return this.provider.provideEntity(world);
 		}
 		
 		protected boolean isComplete() {
 			// Clean up dead entities, and then return if list is empty
-			Iterator<MobEntity> it = this.stageEntities.iterator();
+			Iterator<Mob> it = this.stageEntities.iterator();
 			while (it.hasNext()) {
-				MobEntity ent = it.next();
+				Mob ent = it.next();
 				if (ent == null || !ent.isAlive()) {
 					it.remove();
 				}
@@ -214,26 +214,26 @@ public abstract class CombatTrialStaged extends CombatTrial {
 		}
 		
 		public void stopStage() {
-			for (MobEntity ent : this.stageEntities) {
-				ent.remove();
+			for (Mob ent : this.stageEntities) {
+				ent.discard();
 			}
 		}
 	}
 	
 	protected static class RandomPoolMobProvider implements TrialMobProvider {
 
-		protected final List<EntityType<? extends MobEntity>> types;
+		protected final List<EntityType<? extends Mob>> types;
 		
 		@SafeVarargs
-		public RandomPoolMobProvider(EntityType<? extends MobEntity> ... types) {
+		public RandomPoolMobProvider(EntityType<? extends Mob> ... types) {
 			this.types = new ArrayList<>(types.length);
-			for (EntityType<? extends MobEntity> type : types) {
+			for (EntityType<? extends Mob> type : types) {
 				this.types.add(type);
 			}
 		}
 		
 		@Override
-		public MobEntity provideEntity(World world) {
+		public Mob provideEntity(Level world) {
 			return types.get(NostrumMagica.rand.nextInt(types.size())).create(world);
 		}
 	}
@@ -241,12 +241,12 @@ public abstract class CombatTrialStaged extends CombatTrial {
 	protected static class CachedSpawnProvider implements TrialSpawnProvider {
 		private final List<BlockPos> spawnCandidates;
 		
-		public CachedSpawnProvider(World world, BlockPos center, Predicate<BlockState> filter) {
+		public CachedSpawnProvider(Level world, BlockPos center, Predicate<BlockState> filter) {
 			spawnCandidates = findCacheableSpawnSuggestions(world, center, filter);
 		}
 		
 		@Override
-		public BlockPos provideSpawn(World world, BlockPos center, MobEntity entity) {
+		public BlockPos provideSpawn(Level world, BlockPos center, Mob entity) {
 			if (this.spawnCandidates.isEmpty()) {
 				return CombatTrialStaged.findRandomSpawnPos(world, center, entity);
 			} else {

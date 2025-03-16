@@ -5,14 +5,14 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 
 public class CommandTestConfig {
 
 	public static int level = 0;
 	
-	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+	public static final void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(
 				Commands.literal("testconfig")
 					.requires(s -> s.hasPermission(2))
@@ -22,7 +22,7 @@ public class CommandTestConfig {
 				);
 	}
 
-	private static final int execute(CommandContext<CommandSource> context, int level) throws CommandSyntaxException {
+	private static final int execute(CommandContext<CommandSourceStack> context, int level) throws CommandSyntaxException {
 		CommandTestConfig.level = level;
 		return 0;
 	}

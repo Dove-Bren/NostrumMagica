@@ -2,17 +2,17 @@ package com.smanzana.nostrummagica.trial;
 
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 
 public class CombatTrialEnder extends CombatTrialStaged {
 	
-	protected CombatTrialEnder(ServerWorld world, BlockPos center, PlayerEntity player) {
+	protected CombatTrialEnder(ServerLevel world, BlockPos center, Player player) {
 		super(world, center, player);
 		
 		// Note: Ender willos and koids blink you and randomly teleport you, which would be bad in the sorc dim

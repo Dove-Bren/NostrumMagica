@@ -1,16 +1,16 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelPlantBossBramble;
 import com.smanzana.nostrummagica.entity.plantboss.PlantBossBrambleEntity;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Vector3f;
 
 public class RenderPlantBossBramble extends EntityRenderer<PlantBossBrambleEntity> {
 
@@ -18,7 +18,7 @@ public class RenderPlantBossBramble extends EntityRenderer<PlantBossBrambleEntit
 	
 	protected ModelPlantBossBramble mainModel;
 	
-	public RenderPlantBossBramble(EntityRendererManager renderManagerIn) {
+	public RenderPlantBossBramble(EntityRenderDispatcher renderManagerIn) {
 		super(renderManagerIn);
 		
 		mainModel = new ModelPlantBossBramble();
@@ -27,7 +27,7 @@ public class RenderPlantBossBramble extends EntityRenderer<PlantBossBrambleEntit
 	}
 	
 	@Override
-	public void render(PlantBossBrambleEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(PlantBossBrambleEntity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 //		if (entity.isWolfWet()) {
 //			float f = entity.getBrightness() * entity.getShadingWhileWet(partialTicks);
 //			GlStateManager.color4f(f, f, f);

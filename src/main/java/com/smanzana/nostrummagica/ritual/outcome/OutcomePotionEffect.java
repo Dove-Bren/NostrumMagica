@@ -7,26 +7,26 @@ import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.util.TextUtils;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 
 public class OutcomePotionEffect implements IRitualOutcome {
 
-	private EffectInstance effect;
+	private MobEffectInstance effect;
 	
-	public OutcomePotionEffect(Effect effect, int amplitude, int duration) {
-		this.effect = new EffectInstance(effect, duration, amplitude);
+	public OutcomePotionEffect(MobEffect effect, int amplitude, int duration) {
+		this.effect = new MobEffectInstance(effect, duration, amplitude);
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
+	public void perform(Level world, Player player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// Apply effect to the player
-		player.addEffect(new EffectInstance(effect)); // copy
+		player.addEffect(new MobEffectInstance(effect)); // copy
 	}
 	
 	@Override
@@ -35,7 +35,7 @@ public class OutcomePotionEffect implements IRitualOutcome {
 	}
 
 	@Override
-	public List<ITextComponent> getDescription() {
+	public List<Component> getDescription() {
 		String name = I18n.get(effect.getDescriptionId(), (Object[]) null);
 		String display = SpellPlate.toRoman(effect.getAmplifier() + 1);
 		String secs = "" + (effect.getDuration() / 20);

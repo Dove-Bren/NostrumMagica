@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
@@ -14,11 +14,11 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 
 public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutcomeWrapper> {
 	
@@ -38,7 +38,7 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, int xPosition, int yPosition, RitualOutcomeWrapper ingredient) {
+	public void render(PoseStack matrixStackIn, int xPosition, int yPosition, RitualOutcomeWrapper ingredient) {
 		if (ingredient == null)
 			return;
 		Minecraft.getInstance().getTextureManager().bind(RITUAL_TEXTURE);
@@ -66,7 +66,7 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 	}
 
 	@Override
-	public List<ITextComponent> getTooltip(RitualOutcomeWrapper ingredient, ITooltipFlag flag) {
+	public List<Component> getTooltip(RitualOutcomeWrapper ingredient, TooltipFlag flag) {
 		if (ingredient == null)
 			return new LinkedList<>();
 		
@@ -78,11 +78,11 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 	}
 
 	@Override
-	public FontRenderer getFontRenderer(Minecraft minecraft, RitualOutcomeWrapper ingredient) {
+	public Font getFontRenderer(Minecraft minecraft, RitualOutcomeWrapper ingredient) {
 		if (ingredient == null)
 			return minecraft.font;
 		
-		FontRenderer render = null;
+		Font render = null;
 		ItemStack stack = fetchItem(ingredient.getOutcome());
 		if (stack != null)
 			render = stack.getItem().getFontRenderer(stack);

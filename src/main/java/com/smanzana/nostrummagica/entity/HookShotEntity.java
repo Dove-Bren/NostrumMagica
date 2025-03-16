@@ -14,24 +14,24 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.RayTraceResult.Type;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.HitResult.Type;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkHooks;
@@ -48,7 +48,7 @@ public class HookShotEntity extends Entity {
 	
 	// Sound and other mechanical cache stuff
 	private int tickHooked;
-	private Vector3d posLastPlayed;
+	private Vec3 posLastPlayed;
 	
 	private static final String NBT_CASTER_ID = "caster_uuid";
 	private static final String NBT_ATTACHED_ID = "attached_uuid";
@@ -58,20 +58,20 @@ public class HookShotEntity extends Entity {
 	private static final String NBT_VELOCITYY = "velocity_y";
 	private static final String NBT_VELOCITYZ = "velocity_z";
 	
-	protected static final DataParameter<HookshotType> DATA_TYPE = EntityDataManager.<HookshotType>defineId(HookShotEntity.class, HookshotTypeDataSerializer.instance);
-	protected static final DataParameter<Boolean> DATA_HOOKED = EntityDataManager.<Boolean>defineId(HookShotEntity.class, DataSerializers.BOOLEAN);
-	protected static final DataParameter<Boolean> DATA_FETCHING = EntityDataManager.<Boolean>defineId(HookShotEntity.class, DataSerializers.BOOLEAN);
-	protected static final DataParameter<Optional<UUID>> DATA_CASTING_ENTITY = EntityDataManager.<Optional<UUID>>defineId(HookShotEntity.class, DataSerializers.OPTIONAL_UUID);
-	protected static final DataParameter<Optional<UUID>> DATA_HOOKED_ENTITY = EntityDataManager.<Optional<UUID>>defineId(HookShotEntity.class, DataSerializers.OPTIONAL_UUID);
+	protected static final EntityDataAccessor<HookshotType> DATA_TYPE = SynchedEntityData.<HookshotType>defineId(HookShotEntity.class, HookshotTypeDataSerializer.instance);
+	protected static final EntityDataAccessor<Boolean> DATA_HOOKED = SynchedEntityData.<Boolean>defineId(HookShotEntity.class, EntityDataSerializers.BOOLEAN);
+	protected static final EntityDataAccessor<Boolean> DATA_FETCHING = SynchedEntityData.<Boolean>defineId(HookShotEntity.class, EntityDataSerializers.BOOLEAN);
+	protected static final EntityDataAccessor<Optional<UUID>> DATA_CASTING_ENTITY = SynchedEntityData.<Optional<UUID>>defineId(HookShotEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+	protected static final EntityDataAccessor<Optional<UUID>> DATA_HOOKED_ENTITY = SynchedEntityData.<Optional<UUID>>defineId(HookShotEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 	
-	public HookShotEntity(EntityType<? extends HookShotEntity> type, World worldIn) {
+	public HookShotEntity(EntityType<? extends HookShotEntity> type, Level worldIn) {
 		super(type, worldIn);
 		
 		this.setNoGravity(true);
 		this.setInvulnerable(true);
 	}
 	
-	public HookShotEntity(EntityType<? extends HookShotEntity> entType, World worldIn, LivingEntity caster, double maxLength, Vector3d direction, HookshotType type) {
+	public HookShotEntity(EntityType<? extends HookShotEntity> entType, Level worldIn, LivingEntity caster, double maxLength, Vec3 direction, HookshotType type) {
 		this(entType, worldIn);
 		setCaster(caster);
 		setMaxLength(maxLength);
@@ -199,15 +199,15 @@ public class HookShotEntity extends Entity {
 		{
 			super.tick();
 
-			RayTraceResult raytraceresult = RayTrace.forwardsRaycast(this, true, true, this.tickCount >= 5, caster);
+			HitResult raytraceresult = RayTrace.forwardsRaycast(this, true, true, this.tickCount >= 5, caster);
 
 			if (raytraceresult != null) {
 				this.onImpact(raytraceresult);
 			}
 
-			final Vector3d motion = this.getDeltaMovement();
+			final Vec3 motion = this.getDeltaMovement();
 			this.setPos(getX() + motion.x, getY() + motion.y, getZ() + motion.z);
-			ProjectileHelper.rotateTowardsMovement(this, 0.2F);
+			ProjectileUtil.rotateTowardsMovement(this, 0.2F);
 			float f = getMovementFactor();
 
 			if (this.isInWater())
@@ -278,8 +278,8 @@ public class HookShotEntity extends Entity {
 			caster.hurtMarked = true;
 			attachedEntity.hurtMarked = true;
 			
-			Vector3d diff = caster.position().add(0, caster.getEyeHeight(), 0).subtract(this.position());
-			Vector3d velocity = diff.normalize().scale(0.75);
+			Vec3 diff = caster.position().add(0, caster.getEyeHeight(), 0).subtract(this.position());
+			Vec3 velocity = diff.normalize().scale(0.75);
 			
 			if (attachedEntity instanceof ItemEntity) {
 				attachedEntity.setDeltaMovement(velocity.x, velocity.y, velocity.z);
@@ -305,8 +305,8 @@ public class HookShotEntity extends Entity {
 					return;
 				}
 				
-				Vector3d diff = this.position().subtract(caster.position());
-				Vector3d velocity = diff.normalize().scale(0.75);
+				Vec3 diff = this.position().subtract(caster.position());
+				Vec3 velocity = diff.normalize().scale(0.75);
 				caster.setDeltaMovement(velocity.x, velocity.y, velocity.z);
 				caster.fallDistance = 0;
 				//caster.onGround = true;
@@ -355,7 +355,7 @@ public class HookShotEntity extends Entity {
 		}
 	}
 
-	protected void onImpact(RayTraceResult result) {
+	protected void onImpact(HitResult result) {
 		if (isHooked()) {
 			return;
 		}
@@ -368,20 +368,20 @@ public class HookShotEntity extends Entity {
 			wantsFetch = caster.isShiftKeyDown();
 		}
 		
-		if (result.getType() == Type.ENTITY && ((EntityRayTraceResult) result).getEntity() != null && HookshotItem.CanBeHooked(getHookshotType(), ((EntityRayTraceResult) result).getEntity()) && (caster == null || caster != ((EntityRayTraceResult) result).getEntity())) {
+		if (result.getType() == Type.ENTITY && ((EntityHitResult) result).getEntity() != null && HookshotItem.CanBeHooked(getHookshotType(), ((EntityHitResult) result).getEntity()) && (caster == null || caster != ((EntityHitResult) result).getEntity())) {
 			tickHooked = this.tickCount;
 			
 			// Large entities cannot be fetched, and instead we'll override and force the play er to go to them.
 			// So if you try to pull a large enemy, you get pulled to them instead hilariously.
 			// Non-living entities are ignored... except for ItemEntity which are always fetched.
-			if (((EntityRayTraceResult) result).getEntity() instanceof ItemEntity) {
+			if (((EntityHitResult) result).getEntity() instanceof ItemEntity) {
 				this.setIsFetch(true);
-			} else if (!((EntityRayTraceResult) result).getEntity().isPickable()) {
+			} else if (!((EntityHitResult) result).getEntity().isPickable()) {
 				// ignore the entity for like arrows and stuff
 				return;
-			} else if (((EntityRayTraceResult) result).getEntity() instanceof MultiPartEntityPart) {
+			} else if (((EntityHitResult) result).getEntity() instanceof MultiPartEntityPart) {
 				return;
-			} else if (((EntityRayTraceResult) result).getEntity().getBbWidth() > 1.5 || ((EntityRayTraceResult) result).getEntity().getBbHeight() > 2.5) {
+			} else if (((EntityHitResult) result).getEntity().getBbWidth() > 1.5 || ((EntityHitResult) result).getEntity().getBbHeight() > 2.5) {
 				this.setIsFetch(false);
 			} else {
 				this.setIsFetch(wantsFetch);
@@ -393,7 +393,7 @@ public class HookShotEntity extends Entity {
 				caster.teleportTo(caster.getX(), caster.getY() + caster.getEyeHeight(), caster.getZ());
 			}
 			
-			setHookedEntity(((EntityRayTraceResult) result).getEntity());
+			setHookedEntity(((EntityHitResult) result).getEntity());
 		} else if (result.getType() == Type.BLOCK) {
 			// If shooter wants fetch, don't hook to blocks
 			
@@ -421,7 +421,7 @@ public class HookShotEntity extends Entity {
 	}
 	
 	@Override
-	public boolean saveAsPassenger(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundTag compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
 	}
@@ -436,7 +436,7 @@ public class HookShotEntity extends Entity {
 	}
 
 	@Override
-	protected void readAdditionalSaveData(CompoundNBT compound) {
+	protected void readAdditionalSaveData(CompoundTag compound) {
 		maxLength = compound.getDouble(NBT_MAX_LENGTH);
 		velocityX = compound.getDouble(NBT_VELOCITYX);
 		velocityY = compound.getDouble(NBT_VELOCITYY);
@@ -466,7 +466,7 @@ public class HookShotEntity extends Entity {
 	}
 
 	@Override
-	protected void addAdditionalSaveData(CompoundNBT compound) {
+	protected void addAdditionalSaveData(CompoundTag compound) {
 		LivingEntity caster = getCaster();
 		if (caster != null) {
 			compound.putUUID(NBT_CASTER_ID, caster.getUUID());
@@ -493,7 +493,7 @@ public class HookShotEntity extends Entity {
 	}
 
 	@Override
-	public IPacket<?> getAddEntityPacket() {
+	public Packet<?> getAddEntityPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 }

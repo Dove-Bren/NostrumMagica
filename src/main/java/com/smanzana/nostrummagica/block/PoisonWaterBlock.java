@@ -12,24 +12,24 @@ import com.smanzana.nostrummagica.fluid.PoisonWaterFluid;
 import com.smanzana.nostrummagica.loretag.IBlockLoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.fluid.FlowingFluid;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.pathfinding.PathType;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
 
-public class PoisonWaterBlock extends FlowingFluidBlock {
+public class PoisonWaterBlock extends LiquidBlock {
 
 	public static final String ID_BREAKABLE = "poison_water_block";
 	public static final String ID_UNBREAKABLE = "poison_water_unbreakable_block";
@@ -45,12 +45,12 @@ public class PoisonWaterBlock extends FlowingFluidBlock {
 	}
 	
 	@Override
-	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, BlockGetter worldIn, BlockPos pos, PathComputationType type) {
 		return false;
 	}
 	
 	@Override
-	public Fluid takeLiquid(IWorld worldIn, BlockPos pos, BlockState state) {
+	public Fluid takeLiquid(LevelAccessor worldIn, BlockPos pos, BlockState state) {
 		// want to do this but we don't know the player
 //		final boolean allowed;
 //		if (this.unbreakable) {
@@ -70,13 +70,13 @@ public class PoisonWaterBlock extends FlowingFluidBlock {
 	}
 	
 	@Override
-	public boolean canBeReplaced(BlockState state, BlockItemUseContext useContext) {
+	public boolean canBeReplaced(BlockState state, BlockPlaceContext useContext) {
 		return !unbreakable;
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void entityInside(BlockState state, World world, BlockPos pos, Entity entity) {
+	public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
 		if (!world.isClientSide
 				&& entity instanceof LivingEntity) {
 			if (entity.tickCount % 10 == 0) {
@@ -94,7 +94,7 @@ public class PoisonWaterBlock extends FlowingFluidBlock {
 				}
 				
 				// Mystic air effect prevents poison water damage
-				final EffectInstance instance = living.getEffect(NostrumEffects.mysticAir);
+				final MobEffectInstance instance = living.getEffect(NostrumEffects.mysticAir);
 				if (instance != null && instance.getDuration() > 0) {
 					return;
 				}

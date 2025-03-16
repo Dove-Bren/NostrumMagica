@@ -13,14 +13,14 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.tile.ISpellCraftingTileEntity;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client has clicked to create a spell in the Spell Table
@@ -34,13 +34,13 @@ public class SpellCraftMessage {
 		// Call 'craft' method on it
 		// boom
 		ctx.get().setPacketHandled(true);
-		final ServerPlayerEntity sp = ctx.get().getSender();
+		final ServerPlayer sp = ctx.get().getSender();
 		
 		ctx.get().enqueueWork(() -> {
-			World world = sp.level;
+			Level world = sp.level;
 			
 			// Get the TE
-			TileEntity TE = world.getBlockEntity(message.pos);
+			BlockEntity TE = world.getBlockEntity(message.pos);
 			if (TE == null) {
 				NostrumMagica.logger.warn("Got craft message that didn't line up with a crafting table. This is a bug!");
 				return;
@@ -83,13 +83,13 @@ public class SpellCraftMessage {
 		this.craftPattern = craftPattern;
 	}
 
-	public static SpellCraftMessage decode(PacketBuffer buf) {
+	public static SpellCraftMessage decode(FriendlyByteBuf buf) {
 		return new SpellCraftMessage(buf.readUtf(32767), buf.readBlockPos(), buf.readVarInt(),
 				(buf.readBoolean() ? SpellCraftPattern.Get(buf.readResourceLocation()) : null)
 			);
 	}
 
-	public static void encode(SpellCraftMessage msg, PacketBuffer buf) {
+	public static void encode(SpellCraftMessage msg, FriendlyByteBuf buf) {
 		buf.writeUtf(msg.name);
 		buf.writeBlockPos(msg.pos);
 		buf.writeVarInt(msg.iconIndex);

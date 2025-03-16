@@ -3,9 +3,9 @@ package com.smanzana.nostrummagica.entity.tasks.dragon;
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.FlyingDragonEntity;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class DragonMeleeAttackGoal extends MeleeAttackGoal {

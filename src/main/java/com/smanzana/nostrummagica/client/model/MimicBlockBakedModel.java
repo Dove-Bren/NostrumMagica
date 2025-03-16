@@ -10,25 +10,25 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.model.ItemOverrideList;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.model.data.IModelData;
 
 @SuppressWarnings("deprecation")
-public class MimicBlockBakedModel implements IBakedModel {
+public class MimicBlockBakedModel implements BakedModel {
 
 	//private final TextureAtlasSprite particle;
-	private final IBakedModel undisguisedModel;
+	private final BakedModel undisguisedModel;
 	
-	public MimicBlockBakedModel(IBakedModel undisguisedModel) {
+	public MimicBlockBakedModel(BakedModel undisguisedModel) {
 		//particle = Minecraft.getInstance().getTextureMap().getAtlasSprite(new ResourceLocation(NostrumMagica.MODID, "block/mimic_facade").toString());
 		this.undisguisedModel = undisguisedModel;
 	}
@@ -58,9 +58,9 @@ public class MimicBlockBakedModel implements IBakedModel {
 		return state;
 	}
 	
-	protected @Nonnull IBakedModel getModelToRender(@Nullable BlockState nestedState) {
-		final IBakedModel missing = this.undisguisedModel;//Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getMissingModel();
-		IBakedModel nestedModel = null;
+	protected @Nonnull BakedModel getModelToRender(@Nullable BlockState nestedState) {
+		final BakedModel missing = this.undisguisedModel;//Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModelManager().getMissingModel();
+		BakedModel nestedModel = null;
 		
 		if (nestedState != null) {
 			
@@ -78,7 +78,7 @@ public class MimicBlockBakedModel implements IBakedModel {
 		return nestedModel == null ? missing : nestedModel;
 	}
 	
-	protected @Nonnull IBakedModel getModelToRender(@Nullable IModelData extraData) {
+	protected @Nonnull BakedModel getModelToRender(@Nullable IModelData extraData) {
 		return getModelToRender(getNestedState(extraData));
 	}
 	
@@ -98,7 +98,7 @@ public class MimicBlockBakedModel implements IBakedModel {
 		BlockState nested = getNestedState(extraData);
 		if (nested == null || nested.isAir()) {
 			return this.undisguisedModel.getQuads(state, side, rand, extraData);
-		}else if (RenderTypeLookup.canRenderInLayer(state, MinecraftForgeClient.getRenderLayer())) {
+		}else if (ItemBlockRenderTypes.canRenderInLayer(state, MinecraftForgeClient.getRenderLayer())) {
 			return getModelToRender(nested).getQuads(nested, side, rand, extraData);
 		} else {
 			return EmptyQuads;
@@ -123,12 +123,12 @@ public class MimicBlockBakedModel implements IBakedModel {
 	}
 	
 	@Override
-	public ItemCameraTransforms getTransforms() {
+	public ItemTransforms getTransforms() {
 		return this.undisguisedModel.getTransforms();
 	}
 
 	@Override
-	public ItemOverrideList getOverrides() {
+	public ItemOverrides getOverrides() {
 		return this.undisguisedModel.getOverrides();
 	}
 	

@@ -11,11 +11,11 @@ import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
 import com.smanzana.nostrummagica.item.IElytraRenderer;
 import com.smanzana.nostrummagica.item.armor.ICapeProvider;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -47,7 +47,7 @@ public class NostrumElytraWrapper {
 	}
 	
 	public static final void AddElytraModifier(LivingEntity entity, AttributeModifier modifier) {
-		final ModifiableAttributeInstance inst = entity.getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
+		final AttributeInstance inst = entity.getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
 		if (inst == null) {
 			throw new RuntimeException("Caelus is required for NostrumMagica, but no Caelus attribute found.");
 		}
@@ -66,7 +66,7 @@ public class NostrumElytraWrapper {
 	}
 	
 	public static final void RemoveElytraModifier(LivingEntity entity, AttributeModifier modifier) {
-		final ModifiableAttributeInstance inst = entity.getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
+		final AttributeInstance inst = entity.getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
 		if (inst == null) {
 			throw new RuntimeException("Caelus is required for NostrumMagica, but no Caelus attribute found.");
 		}

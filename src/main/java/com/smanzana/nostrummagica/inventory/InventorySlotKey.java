@@ -2,10 +2,10 @@ package com.smanzana.nostrummagica.inventory;
 
 import java.util.Objects;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 
-public class InventorySlotKey implements IInventorySlotKey<IInventory> {
+public class InventorySlotKey implements IInventorySlotKey<Container> {
 	
 	private final int slotIdx;
 	
@@ -14,12 +14,12 @@ public class InventorySlotKey implements IInventorySlotKey<IInventory> {
 	}
 
 	@Override
-	public ItemStack getHeldStack(IInventory inventory) {
+	public ItemStack getHeldStack(Container inventory) {
 		return inventory.getItem(slotIdx);
 	}
 
 	@Override
-	public ItemStack setStack(IInventory inventory, ItemStack newStack) {
+	public ItemStack setStack(Container inventory, ItemStack newStack) {
 		ItemStack existing = getHeldStack(inventory);
 		inventory.setItem(slotIdx, newStack);
 		return existing;

@@ -9,8 +9,8 @@ import com.smanzana.nostrummagica.spell.SpellEffectEvent.SpellEffectEndEvent;
 import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -32,16 +32,16 @@ public class PlayerStatListener {
 		if (event.getSource() instanceof MagicDamageSource) {
 			MagicDamageSource source = (MagicDamageSource) event.getSource();
 			if (event.getAmount() > 0f) {
-				if (source.getEntity() != null && source.getEntity() instanceof PlayerEntity) {
-					PlayerStatTracker.Update((PlayerEntity) source.getEntity(), (stats) -> {
+				if (source.getEntity() != null && source.getEntity() instanceof Player) {
+					PlayerStatTracker.Update((Player) source.getEntity(), (stats) -> {
 						stats.addMagicDamageDealt(event.getAmount(), source.getElement());
 					});
 				}
 			}
 		}
 		
-		if (event.getEntityLiving() instanceof PlayerEntity) {
-			PlayerEntity player = (PlayerEntity) event.getEntityLiving();
+		if (event.getEntityLiving() instanceof Player) {
+			Player player = (Player) event.getEntityLiving();
 			@Nullable EMagicElement element;
 			if (event.getSource() instanceof MagicDamageSource) {
 				element = ((MagicDamageSource) event.getSource()).getElement();
@@ -58,8 +58,8 @@ public class PlayerStatListener {
 		if (event.isCanceled())
 			return;
 		
-		if (event.getSource() != null && event.getSource().getEntity() != null && event.getSource().getEntity() instanceof PlayerEntity) {
-			final PlayerEntity player = (PlayerEntity) event.getSource().getEntity();
+		if (event.getSource() != null && event.getSource().getEntity() != null && event.getSource().getEntity() instanceof Player) {
+			final Player player = (Player) event.getSource().getEntity();
 			final LivingEntity killed = event.getEntityLiving();
 			PlayerStatTracker.Update(player, (stats) -> stats.incrStat(PlayerStat.EntityKills(killed.getType())));
 			
@@ -80,9 +80,9 @@ public class PlayerStatListener {
 	
 	@SubscribeEvent
 	public void onSpellEnd(SpellEffectEndEvent event) {
-		if (!event.getCaster().level.isClientSide() && event.getCaster() instanceof PlayerEntity) {
+		if (!event.getCaster().level.isClientSide() && event.getCaster() instanceof Player) {
 			final float damageTotalFinal = event.getSpellFinalResults().damageTotal;
-			PlayerStatTracker.Update((PlayerEntity) event.getCaster(), (stats) -> {
+			PlayerStatTracker.Update((Player) event.getCaster(), (stats) -> {
 				if (damageTotalFinal > 0) {
 					stats.takeMax(PlayerStat.MaxSpellDamageDealt, damageTotalFinal);
 				}

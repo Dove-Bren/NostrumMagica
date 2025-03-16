@@ -12,9 +12,9 @@ import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.petcommand.api.PetFuncs;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.potion.EffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.effect.MobEffectInstance;
 
 public class ArcaneWolfBarrierGoal extends Goal {
 
@@ -67,7 +67,7 @@ public class ArcaneWolfBarrierGoal extends Goal {
 		}
 		
 		if (doPhysical) {
-			EffectInstance effect = new EffectInstance(NostrumEffects.physicalShield, 20 * 15, 0);
+			MobEffectInstance effect = new MobEffectInstance(NostrumEffects.physicalShield, 20 * 15, 0);
 			if (!hasPhysical) {
 				// Re-apply potion effect
 				target.addEffect(effect);
@@ -85,7 +85,7 @@ public class ArcaneWolfBarrierGoal extends Goal {
 				}
 			}
 		} else {
-			EffectInstance effect = new EffectInstance(NostrumEffects.magicShield, 20 * 15, 0);
+			MobEffectInstance effect = new MobEffectInstance(NostrumEffects.magicShield, 20 * 15, 0);
 			if (!hasMagical) {
 				// Re-apply potion effect
 				target.addEffect(effect);

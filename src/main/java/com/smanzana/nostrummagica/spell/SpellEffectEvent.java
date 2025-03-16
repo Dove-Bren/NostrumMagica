@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.spell.Spell.SpellResult;
 import com.smanzana.nostrummagica.spell.component.SpellAction.SpellActionResult;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 
 public abstract class SpellEffectEvent extends SpellEvent {
 	

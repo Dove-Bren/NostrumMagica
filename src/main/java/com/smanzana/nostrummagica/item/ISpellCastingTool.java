@@ -2,8 +2,8 @@ package com.smanzana.nostrummagica.item;
 
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Like ISpellEquipment except {@link #onCastFromTool(LivingEntity, SpellCastSummary, ItemStack)} is only called when

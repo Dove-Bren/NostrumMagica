@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.DungeonLauncherTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
@@ -10,15 +10,15 @@ import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -33,13 +33,13 @@ public class LauncherBlockGui {
 	private static final int LAUNCHER_INV_HOFFSET = 62;
 	private static final int LAUNCHER_INV_VOFFSET = 17;
 	
-	public static class LauncherBlockContainer extends Container {
+	public static class LauncherBlockContainer extends AbstractContainerMenu {
 		
 		public static final String ID = "launcher";
 		
 		protected final DungeonLauncherTileEntity launcher;
 		
-		public LauncherBlockContainer(int windowId, PlayerInventory playerInv, DungeonLauncherTileEntity launcher) {
+		public LauncherBlockContainer(int windowId, Inventory playerInv, DungeonLauncherTileEntity launcher) {
 			super(NostrumContainers.Launcher, windowId);
 			
 			// Construct player inventory
@@ -54,7 +54,7 @@ public class LauncherBlockGui {
 			}
 			
 			// Construct launcher inventory
-			IInventory launcherInv = launcher.getInventory();
+			Container launcherInv = launcher.getInventory();
 			for (int y = 0; y < 3; y++) {
 				for (int x = 0; x < 3; x++) {
 					this.addSlot(new Slot(launcherInv, x + y * 3, LAUNCHER_INV_HOFFSET + (x * 18), LAUNCHER_INV_VOFFSET + (y * 18)));
@@ -64,7 +64,7 @@ public class LauncherBlockGui {
 			this.launcher = launcher;
 		}
 		
-		public static final LauncherBlockContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+		public static final LauncherBlockContainer FromNetwork(int windowId, Inventory playerInv, FriendlyByteBuf buffer) {
 			return new LauncherBlockContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}
 		
@@ -78,13 +78,13 @@ public class LauncherBlockGui {
 		
 		@Override
 		@Nonnull
-		public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+		public ItemStack quickMoveStack(Player playerIn, int index) {
 			Slot slot = (Slot)this.slots.get(index);
 			ItemStack prev = ItemStack.EMPTY;
 
 			if (slot != null && slot.hasItem()) {
 				//IInventory from = slot.inventory;
-				IInventory to;
+				Container to;
 				
 				if (slot.container == launcher.getInventory()) {
 					to = playerIn.inventory;
@@ -117,7 +117,7 @@ public class LauncherBlockGui {
 		}
 		
 		@Override
-		public boolean stillValid(PlayerEntity playerIn) {
+		public boolean stillValid(Player playerIn) {
 			return true;
 		}
 	}
@@ -127,7 +127,7 @@ public class LauncherBlockGui {
 
 		//private LauncherBlockContainer container;
 		
-		public LauncherBlockGuiContainer(LauncherBlockContainer container, PlayerInventory playerInv, ITextComponent name) {
+		public LauncherBlockGuiContainer(LauncherBlockContainer container, Inventory playerInv, Component name) {
 			super(container, playerInv, name);
 			//this.container = container;
 			
@@ -141,7 +141,7 @@ public class LauncherBlockGui {
 		}
 		
 		@Override
-		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+		protected void renderBg(PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
@@ -150,7 +150,7 @@ public class LauncherBlockGui {
 		}
 		
 		@Override
-		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			super.renderLabels(matrixStackIn, mouseX, mouseY);
 		}
 		

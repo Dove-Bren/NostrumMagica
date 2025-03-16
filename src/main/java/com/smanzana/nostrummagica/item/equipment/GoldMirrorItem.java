@@ -9,16 +9,16 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.RemoteInteractMessage;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 
-import net.minecraft.item.Item.Properties;
+import net.minecraft.world.item.Item.Properties;
 
 public class GoldMirrorItem extends HandheldMirrorItem implements ILoreTagged {
 
@@ -56,12 +56,12 @@ public class GoldMirrorItem extends HandheldMirrorItem implements ILoreTagged {
 	}
 
 	@Override
-	protected void handleOpen(PlayerEntity player, Hand hand, ItemStack stack) {
+	protected void handleOpen(Player player, InteractionHand hand, ItemStack stack) {
 		if (!player.level.isClientSide()) {
 			return; // Only run client side to kick off handshake
 		}
 		
-		final RegistryKey<World> dimension = IPositionHolderItem.getDimension(stack);
+		final ResourceKey<Level> dimension = IPositionHolderItem.getDimension(stack);
 		final BlockPos pos = IPositionHolderItem.getBlockPosition(stack);
 		
 		if (pos != null && dimension != null && DimensionUtils.InDimension(player, dimension)) {
@@ -69,7 +69,7 @@ public class GoldMirrorItem extends HandheldMirrorItem implements ILoreTagged {
 			if (NostrumMagica.isBlockLoaded(player.level, pos)) {
 				NetworkHandler.sendToServer(new RemoteInteractMessage(dimension, pos, hand));
 			} else {
-				player.sendMessage(new TranslationTextComponent("info.gold_mirror.not_loaded"), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.gold_mirror.not_loaded"), Util.NIL_UUID);
 			}
 		}
 	}

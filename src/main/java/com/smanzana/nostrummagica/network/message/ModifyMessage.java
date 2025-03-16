@@ -6,14 +6,14 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.tile.ModificationTableTileEntity;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client has clicked to submit a modification on the modification table
@@ -28,11 +28,11 @@ public class ModifyMessage {
 		// boom
 		ctx.get().setPacketHandled(true);
 		ctx.get().enqueueWork(() -> {
-			PlayerEntity sp = ctx.get().getSender();
-			World world = sp.level;
+			Player sp = ctx.get().getSender();
+			Level world = sp.level;
 			
 			// Get the TE
-			TileEntity TE = world.getBlockEntity(message.pos);
+			BlockEntity TE = world.getBlockEntity(message.pos);
 			if (TE == null) {
 				NostrumMagica.logger.warn("Got modify message that didn't line up with a modification table. This is a bug!");
 				return;
@@ -57,11 +57,11 @@ public class ModifyMessage {
 		this.flt = flt;
 	}
 
-	public static ModifyMessage decode(PacketBuffer buf) {
+	public static ModifyMessage decode(FriendlyByteBuf buf) {
 		return new ModifyMessage(buf.readBlockPos(), buf.readBoolean(), buf.readFloat());
 	}
 
-	public static void encode(ModifyMessage msg, PacketBuffer buf) {
+	public static void encode(ModifyMessage msg, FriendlyByteBuf buf) {
 		buf.writeBlockPos(msg.pos);
 		buf.writeBoolean(msg.bool);
 		buf.writeFloat(msg.flt);

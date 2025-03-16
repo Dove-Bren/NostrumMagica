@@ -4,15 +4,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
 public final class ShapedWithRemainingRecipe extends ShapedRecipe {
@@ -34,7 +34,7 @@ public final class ShapedWithRemainingRecipe extends ShapedRecipe {
 	}
 	
 	@Override
-	public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
+	public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
 		NonNullList<ItemStack> list = inner.getRemainingItems(inv);
 		if (list == null) {
 			list = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
@@ -59,20 +59,20 @@ public final class ShapedWithRemainingRecipe extends ShapedRecipe {
 	}
 	
 	@Override
-	public IRecipeSerializer<ShapedWithRemainingRecipe> getSerializer() {
+	public RecipeSerializer<ShapedWithRemainingRecipe> getSerializer() {
 		return NostrumCrafting.shapedWithRemainingSerializer;
 	}
 	
-	public static class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>>  implements IRecipeSerializer<ShapedWithRemainingRecipe> {
+	public static class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>>  implements RecipeSerializer<ShapedWithRemainingRecipe> {
 
 		public static final String ID = "shaped_with_remaining";
 		
 		@Override
 		public ShapedWithRemainingRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
-			ShapedRecipe original = IRecipeSerializer.SHAPED_RECIPE.fromJson(recipeId, json);
+			ShapedRecipe original = RecipeSerializer.SHAPED_RECIPE.fromJson(recipeId, json);
 			
 			NonNullList<Ingredient> remaining = NonNullList.create();
-			for (JsonElement ele : JSONUtils.getAsJsonArray(json, "remaining")) {
+			for (JsonElement ele : GsonHelper.getAsJsonArray(json, "remaining")) {
 				remaining.add(Ingredient.fromJson(ele));
 			}
 			
@@ -80,8 +80,8 @@ public final class ShapedWithRemainingRecipe extends ShapedRecipe {
 		}
 
 		@Override
-		public ShapedWithRemainingRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
-			ShapedRecipe original = IRecipeSerializer.SHAPED_RECIPE.fromNetwork(recipeId, buffer);
+		public ShapedWithRemainingRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
+			ShapedRecipe original = RecipeSerializer.SHAPED_RECIPE.fromNetwork(recipeId, buffer);
 			
 			int remainingSize = buffer.readInt();
 			NonNullList<Ingredient> remaining = NonNullList.withSize(remainingSize, Ingredient.EMPTY);
@@ -93,8 +93,8 @@ public final class ShapedWithRemainingRecipe extends ShapedRecipe {
 		}
 
 		@Override
-		public void toNetwork(PacketBuffer buffer, ShapedWithRemainingRecipe recipe) {
-			IRecipeSerializer.SHAPED_RECIPE.toNetwork(buffer, recipe);
+		public void toNetwork(FriendlyByteBuf buffer, ShapedWithRemainingRecipe recipe) {
+			RecipeSerializer.SHAPED_RECIPE.toNetwork(buffer, recipe);
 			
 			// Write size and then list of remaining items
 			buffer.writeInt(recipe.remaining.size());

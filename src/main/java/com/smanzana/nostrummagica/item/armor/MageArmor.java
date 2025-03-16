@@ -13,17 +13,17 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -39,8 +39,8 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 	
 	protected Multimap<Attribute, AttributeModifier> attributes;
 
-	public MageArmor(EquipmentSlotType slot, Item.Properties properties) {
-		super(ArmorMaterial.LEATHER, slot, properties.durability(250));
+	public MageArmor(EquipmentSlot slot, Item.Properties properties) {
+		super(ArmorMaterials.LEATHER, slot, properties.durability(250));
 	}
 	
 	protected Multimap<Attribute, AttributeModifier> makeAttributes() {
@@ -90,7 +90,7 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot equipmentSlot) {
 		if (equipmentSlot == this.slot) {
 			if (attributes == null) {
 				attributes = this.makeAttributes();
@@ -127,7 +127,7 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 		return InfoScreenTabs.INFO_ITEMS;
 	}
 	
-	public static MageArmor get(EquipmentSlotType slot) {
+	public static MageArmor get(EquipmentSlot slot) {
 		switch (slot) {
 		case CHEST:
 			return NostrumItems.mageArmorChest;
@@ -146,9 +146,9 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlotType slot, String type) {
+	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
 		// Make this render the helm invisible, since I can't figure out how to make helmet just not render
-		final boolean isLegSlot = slot == EquipmentSlotType.LEGS;
+		final boolean isLegSlot = slot == EquipmentSlot.LEGS;
 		return String.format("%s:textures/models/armor/mage_layer_%d%s.png", NostrumMagica.MODID, (isLegSlot ? 2 : 1), type == null ? "" : String.format("_%s", type));
 	}
 
@@ -157,8 +157,8 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 	@SuppressWarnings("unchecked")
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public <A extends BipedModel<?>> A getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlotType armorSlot, A _default) {
-		if (armorSlot == EquipmentSlotType.HEAD && this.slot == armorSlot) {
+	public <A extends HumanoidModel<?>> A getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlot armorSlot, A _default) {
+		if (armorSlot == EquipmentSlot.HEAD && this.slot == armorSlot) {
 			if (model == null) {
 				model = new ModelWitchHat<>(0f);
 			}

@@ -10,15 +10,15 @@ import com.smanzana.nostrummagica.integration.curios.items.IColorableCurio;
 import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapelessRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -64,7 +64,7 @@ public final class BaubleColorRecipe extends ShapelessRecipe {
 	 * @param inv
 	 * @return
 	 */
-	protected @Nonnull ItemStack findBauble(CraftingInventory inv) {
+	protected @Nonnull ItemStack findBauble(CraftingContainer inv) {
 		@Nonnull ItemStack found = ItemStack.EMPTY;
 		for (int i = 0; i < inv.getContainerSize(); i++) {
 			@Nonnull ItemStack stack = inv.getItem(i);
@@ -82,7 +82,7 @@ public final class BaubleColorRecipe extends ShapelessRecipe {
 	}
 	
 	@Override
-	public ItemStack assemble(CraftingInventory inv) {
+	public ItemStack assemble(CraftingContainer inv) {
 		@Nonnull ItemStack result = ItemStack.EMPTY;
 		@Nonnull ItemStack bauble = findBauble(inv);
 		
@@ -166,24 +166,24 @@ public final class BaubleColorRecipe extends ShapelessRecipe {
 	}
 	
 	@Override
-	public IRecipeSerializer<BaubleColorRecipe> getSerializer() {
+	public RecipeSerializer<BaubleColorRecipe> getSerializer() {
 		return NostrumCrafting.baubleColorSerializer;
 	}
 	
-	public static final class Serializer extends ForgeRegistryEntry<IRecipeSerializer<?>>  implements IRecipeSerializer<BaubleColorRecipe> {
+	public static final class Serializer extends ForgeRegistryEntry<RecipeSerializer<?>>  implements RecipeSerializer<BaubleColorRecipe> {
 
 		public static final String ID = "bauble_color";
 		
 		@Override
 		public BaubleColorRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
-			if (JSONUtils.isValidNode(json, "result")) {
+			if (GsonHelper.isValidNode(json, "result")) {
 				throw new JsonParseException("BaubleColor recipe cannot specify a result");
 			}
 			
-			String group = JSONUtils.getAsString(json, "group", "");
+			String group = GsonHelper.getAsString(json, "group", "");
 
 			NonNullList<Ingredient> ingredients = NonNullList.create();
-			for (JsonElement ele : JSONUtils.getAsJsonArray(json, "ingredients")) {
+			for (JsonElement ele : GsonHelper.getAsJsonArray(json, "ingredients")) {
 				ingredients.add(Ingredient.fromJson(ele));
 			}
 
@@ -191,7 +191,7 @@ public final class BaubleColorRecipe extends ShapelessRecipe {
 				throw new JsonParseException("No ingredients for BaubleColor recipe");
 			}
 			
-			ItemStack displayStack = CraftingHelper.getItemStack(JSONUtils.getAsJsonObject(json, "display"), true);
+			ItemStack displayStack = CraftingHelper.getItemStack(GsonHelper.getAsJsonObject(json, "display"), true);
 			if (displayStack == null || displayStack.isEmpty()) {
 				throw new JsonParseException("\"display\" section is required and must be a valid itemstack (not ingredient)");
 			}
@@ -200,17 +200,17 @@ public final class BaubleColorRecipe extends ShapelessRecipe {
 		}
 
 		@Override
-		public BaubleColorRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+		public BaubleColorRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
 			// I think I can just piggy back off of shapeless recipe serializer
 			ResourceLocation fakeRecipeId = new ResourceLocation(recipeId.getNamespace(), recipeId.getPath() + ".fake");
-			ShapelessRecipe base = IRecipeSerializer.SHAPELESS_RECIPE.fromNetwork(fakeRecipeId, buffer);
+			ShapelessRecipe base = RecipeSerializer.SHAPELESS_RECIPE.fromNetwork(fakeRecipeId, buffer);
 			
 			return new BaubleColorRecipe(recipeId, base.getGroup(), base.getResultItem(), base.getIngredients());
 		}
 
 		@Override
-		public void toNetwork(PacketBuffer buffer, BaubleColorRecipe recipe) {
-			IRecipeSerializer.SHAPELESS_RECIPE.toNetwork(buffer, recipe);
+		public void toNetwork(FriendlyByteBuf buffer, BaubleColorRecipe recipe) {
+			RecipeSerializer.SHAPELESS_RECIPE.toNetwork(buffer, recipe);
 		}
 		
 	}

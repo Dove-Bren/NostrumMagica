@@ -3,19 +3,19 @@ package com.smanzana.nostrummagica.client.gui;
 import java.util.EnumMap;
 import java.util.Map;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -49,11 +49,11 @@ public class MagicTierIcon {
 				"textures/gui/tier_" + tier.name().toLowerCase() + ".png");
 	}
 	
-	public void draw(AbstractGui parent, MatrixStack matrixStackIn, FontRenderer fonter, int xOffset, int yOffset, int width, int height) {
+	public void draw(GuiComponent parent, PoseStack matrixStackIn, Font fonter, int xOffset, int yOffset, int width, int height) {
 		draw(parent, matrixStackIn, fonter, xOffset, yOffset, width, height, 1f, 1f, 1f, 1f);
 	}
 	
-	public void draw(AbstractGui parent, MatrixStack matrixStackIn, FontRenderer fonter, int xOffset, int yOffset, int width, int height,
+	public void draw(GuiComponent parent, PoseStack matrixStackIn, Font fonter, int xOffset, int yOffset, int width, int height,
 			float red, float green, float blue, float alpha) {
 		matrixStackIn.pushPose();
 
@@ -68,21 +68,21 @@ public class MagicTierIcon {
 		matrixStackIn.popPose();
 	}
 	
-	public void draw(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, int width, int height, boolean outline) {
-		IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.GetBlendedEntity(getModelLocation(), outline));
+	public void draw(PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, int width, int height, boolean outline) {
+		VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.GetBlendedEntity(getModelLocation(), outline));
 		draw(matrixStackIn, buffer, packedLightIn, width, height);
 	}
 	
-	public void draw(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, int width, int height, boolean outline, float red, float green, float blue, float alpha) {
-		IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.GetBlendedEntity(getModelLocation(), outline));
+	public void draw(PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, int width, int height, boolean outline, float red, float green, float blue, float alpha) {
+		VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.GetBlendedEntity(getModelLocation(), outline));
 		draw(matrixStackIn, buffer, packedLightIn, width, height, red, green, blue, alpha);
 	}
 	
-	public void draw(MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, int width, int height) {
+	public void draw(PoseStack matrixStackIn, VertexConsumer buffer, int packedLightIn, int width, int height) {
 		draw(matrixStackIn, buffer, packedLightIn, width, height, 1f, 1f, 1f, 1f);
 	}
 	
-	public void draw(MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, int width, int height, float red, float green, float blue, float alpha) {
+	public void draw(PoseStack matrixStackIn, VertexConsumer buffer, int packedLightIn, int width, int height, float red, float green, float blue, float alpha) {
 		RenderFuncs.drawScaledCustomSizeModalRect(matrixStackIn, buffer, 0, 0, 0, 0, this.width, this.height, width, height, this.width, this.height,
 				red, green, blue, alpha);
 		

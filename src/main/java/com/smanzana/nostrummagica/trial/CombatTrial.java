@@ -6,13 +6,13 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerLevel;
 
 /**
  * Series of combat waves that must be overcome to complete a trial.
@@ -22,11 +22,11 @@ import net.minecraft.world.server.ServerWorld;
  */
 public abstract class CombatTrial {
 
-	protected final ServerWorld world;
+	protected final ServerLevel world;
 	protected final BlockPos center;
-	protected final @Nullable PlayerEntity focusedPlayer;
+	protected final @Nullable Player focusedPlayer;
 	
-	protected CombatTrial(ServerWorld world, BlockPos center, @Nullable PlayerEntity focusedPlayer) {
+	protected CombatTrial(ServerLevel world, BlockPos center, @Nullable Player focusedPlayer) {
 		this.world = world;
 		this.center = center;
 		this.focusedPlayer = focusedPlayer;
@@ -45,7 +45,7 @@ public abstract class CombatTrial {
 	public void trialTick() {
 		if (!playerIsNear()) {
 			if (this.focusedPlayer != null) {
-				focusedPlayer.sendMessage(new TranslationTextComponent("info.trial.fail"), Util.NIL_UUID);
+				focusedPlayer.sendMessage(new TranslatableComponent("info.trial.fail"), Util.NIL_UUID);
 			}
 			endTrial();
 		}
@@ -69,7 +69,7 @@ public abstract class CombatTrial {
 	}
 	
 	protected static final void playSpawnEffects(BlockPos center, LivingEntity entity) {
-		((MobEntity)entity).spawnAnim();
+		((Mob)entity).spawnAnim();
 		
 		NostrumParticles.GLOW_ORB.spawn(entity.level, new SpawnParams(
 				10, center.getX() + .5, center.getY() + 1.25, center.getZ() + .5, .25,
@@ -78,7 +78,7 @@ public abstract class CombatTrial {
 				).dieOnTarget(true));
 	}
 	
-	public static final CombatTrial CreateForElement(EMagicElement element, ServerWorld world, BlockPos center, @Nullable PlayerEntity focusedPlayer) {
+	public static final CombatTrial CreateForElement(EMagicElement element, ServerLevel world, BlockPos center, @Nullable Player focusedPlayer) {
 		switch (element) {
 		case EARTH:
 			return new CombatTrialEarth(world, center, focusedPlayer);

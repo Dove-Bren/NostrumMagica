@@ -17,14 +17,14 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class SpellTableTileEntity extends TileEntity implements ISpellCraftingInventory, ISpellCraftingTileEntity {
+public class SpellTableTileEntity extends BlockEntity implements ISpellCraftingInventory, ISpellCraftingTileEntity {
 
 	private static final String NBT_INV = "inventory";
 	
@@ -119,16 +119,16 @@ public class SpellTableTileEntity extends TileEntity implements ISpellCraftingIn
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return true;
 	}
 
 	@Override
-	public void startOpen(PlayerEntity player) {
+	public void startOpen(Player player) {
 	}
 
 	@Override
-	public void stopOpen(PlayerEntity player) {
+	public void stopOpen(Player player) {
 	}
 
 	@Override
@@ -169,33 +169,33 @@ public class SpellTableTileEntity extends TileEntity implements ISpellCraftingIn
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
-		CompoundNBT compound = new CompoundNBT();
+		CompoundTag compound = new CompoundTag();
 		
 		for (int i = 0; i < getContainerSize(); i++) {
 			if (getItem(i).isEmpty())
 				continue;
 			
-			CompoundNBT tag = new CompoundNBT();
+			CompoundTag tag = new CompoundTag();
 			compound.put(i + "", getItem(i).save(tag));
 		}
 		
 		if (nbt == null)
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		
 		nbt.put(NBT_INV, compound);
 		return nbt;
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_INV, NBT.TAG_COMPOUND))
 			return;
 		
-		CompoundNBT items = nbt.getCompound(NBT_INV);
+		CompoundTag items = nbt.getCompound(NBT_INV);
 		for (String key : items.getAllKeys()) {
 			int id;
 			try {
@@ -211,7 +211,7 @@ public class SpellTableTileEntity extends TileEntity implements ISpellCraftingIn
 	}
 	
 	@Override
-	public Spell craft(PlayerEntity crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
+	public Spell craft(Player crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
 		ItemStack stack = this.getItem(0);
 		if (stack.isEmpty() || !(stack.getItem() instanceof BlankScroll)) {
 			return null;
@@ -254,7 +254,7 @@ public class SpellTableTileEntity extends TileEntity implements ISpellCraftingIn
 	}
 
 	@Override
-	public int getMaxWeight(PlayerEntity crafter) {
+	public int getMaxWeight(Player crafter) {
 		return 5;
 	}
 }

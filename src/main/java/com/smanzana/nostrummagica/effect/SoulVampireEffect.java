@@ -1,15 +1,15 @@
 package com.smanzana.nostrummagica.effect;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 
-public class SoulVampireEffect extends Effect {
+public class SoulVampireEffect extends MobEffect {
 
 	public static final String ID = "soul_vampire";
 	
 	public SoulVampireEffect() {
-		super(EffectType.BENEFICIAL, 0xFFE2346B);
+		super(MobEffectCategory.BENEFICIAL, 0xFFE2346B);
 	}
 	
 	public boolean isDurationEffectTick(int duration, int amp) {

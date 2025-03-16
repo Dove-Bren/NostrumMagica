@@ -1,21 +1,21 @@
 package com.smanzana.nostrummagica.entity.tasks;
 
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.ai.goal.TemptGoal;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.TemptGoal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 // Slightly extending to make it a little easier to just customize some things
 public class GenericTemptGoal extends TemptGoal {
 	
 	protected double speed; // :( private in parent
 	
-	public GenericTemptGoal(CreatureEntity creatureIn, double speedIn, Ingredient temptItemIn, boolean scaredByPlayerMovementIn) {
+	public GenericTemptGoal(PathfinderMob creatureIn, double speedIn, Ingredient temptItemIn, boolean scaredByPlayerMovementIn) {
 		this(creatureIn, speedIn, scaredByPlayerMovementIn, temptItemIn);
 	}
 
-	public GenericTemptGoal(CreatureEntity creatureIn, double speedIn, boolean scaredByPlayerMovementIn, Ingredient temptItemIn) {
+	public GenericTemptGoal(PathfinderMob creatureIn, double speedIn, boolean scaredByPlayerMovementIn, Ingredient temptItemIn) {
 		super(creatureIn, speedIn, scaredByPlayerMovementIn, temptItemIn);
 		this.speed = speedIn;
 	}
@@ -24,7 +24,7 @@ public class GenericTemptGoal extends TemptGoal {
 		return super.shouldFollowItem(stack);
 	}
 
-	protected void moveToclosestPlayer(CreatureEntity tempted, PlayerEntity player) {
+	protected void moveToclosestPlayer(PathfinderMob tempted, Player player) {
 		if (this.mob.distanceToSqr(this.player) < 6.25D) {
 			this.mob.getNavigation().stop();
 		} else {

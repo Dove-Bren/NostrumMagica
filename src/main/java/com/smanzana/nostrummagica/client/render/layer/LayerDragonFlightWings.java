@@ -2,30 +2,30 @@ package com.smanzana.nostrummagica.client.render.layer;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelDragonFlightWings;
 import com.smanzana.nostrummagica.item.IDragonWingRenderItem;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.PlayerRenderer;
-import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.entity.model.PlayerModel;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Vector3f;
 
-public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
+public class LayerDragonFlightWings extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
 
 	protected static final ResourceLocation TEXTURE_WINGS = new ResourceLocation(NostrumMagica.MODID, "textures/entity/dragonflightwing.png");
-	protected final ModelDragonFlightWings<AbstractClientPlayerEntity> model = new ModelDragonFlightWings<>();
+	protected final ModelDragonFlightWings<AbstractClientPlayer> model = new ModelDragonFlightWings<>();
 	protected final PlayerRenderer renderPlayer;
 	
 	public LayerDragonFlightWings(PlayerRenderer renderPlayerIn) {
@@ -34,14 +34,14 @@ public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEn
 	}
 	
 	@Override
-	public void render(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void render(PoseStack stack, MultiBufferSource typeBuffer, int packedLight, AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		if (shouldRender(player)) {
-			@Nonnull ItemStack chestpiece = player.getItemBySlot(EquipmentSlotType.CHEST); 
+			@Nonnull ItemStack chestpiece = player.getItemBySlot(EquipmentSlot.CHEST); 
 			render(stack, typeBuffer, packedLight, player, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, (!chestpiece.isEmpty() && chestpiece.isEnchanted()));
 		}
 	}
 	
-	public boolean shouldRender(AbstractClientPlayerEntity player) {
+	public boolean shouldRender(AbstractClientPlayer player) {
 		for (ItemStack stack : player.getArmorSlots()) {
 			if (!stack.isEmpty() && stack.getItem() instanceof IDragonWingRenderItem) {
 				if (((IDragonWingRenderItem) stack.getItem()).shouldRenderDragonWings(stack, player)) {
@@ -51,7 +51,7 @@ public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEn
 		}
 		
 		// Try bauables
-		IInventory baubles = NostrumMagica.instance.curios.getCurios(player);
+		Container baubles = NostrumMagica.instance.curios.getCurios(player);
 		
 		if (baubles != null) {
 			for (int i = 0; i < baubles.getContainerSize(); i++) {
@@ -67,7 +67,7 @@ public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEn
 		return false;
 	}
 	
-	public int getColor(AbstractClientPlayerEntity player) {
+	public int getColor(AbstractClientPlayer player) {
 		for (ItemStack stack : player.getArmorSlots()) {
 			if (!stack.isEmpty() && stack.getItem() instanceof IDragonWingRenderItem) {
 				if (((IDragonWingRenderItem) stack.getItem()).shouldRenderDragonWings(stack, player)) {
@@ -77,7 +77,7 @@ public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEn
 		}
 		
 		// Try bauables
-		IInventory baubles = NostrumMagica.instance.curios.getCurios(player);
+		Container baubles = NostrumMagica.instance.curios.getCurios(player);
 		if (baubles != null) {
 			for (int i = 0; i < baubles.getContainerSize(); i++) {
 				ItemStack stack = baubles.getItem(i);
@@ -92,10 +92,10 @@ public class LayerDragonFlightWings extends LayerRenderer<AbstractClientPlayerEn
 		return 0xFF000000;
 	}
 	
-	public void render(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, boolean enchanted) {
+	public void render(PoseStack stack, MultiBufferSource typeBuffer, int packedLight, AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, boolean enchanted) {
 		
 		final float colors[] = ColorUtil.ARGBToColor(getColor(player));
-		final IVertexBuilder buffer = typeBuffer.getBuffer(RenderType.entitySolid(TEXTURE_WINGS));
+		final VertexConsumer buffer = typeBuffer.getBuffer(RenderType.entitySolid(TEXTURE_WINGS));
 		
 		stack.pushPose();
 		stack.mulPose(Vector3f.XP.rotationDegrees(player.isShiftKeyDown() ? 25f : 0));

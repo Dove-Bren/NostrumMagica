@@ -5,9 +5,9 @@ import java.util.Collection;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.set.EquipmentSet;
 
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Registry;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -20,7 +20,7 @@ import net.minecraftforge.registries.RegistryBuilder;
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class EquipmentSetRegistry {
 
-	public static final RegistryKey<Registry<EquipmentSet>> KEY_REG_ITEMSETS = RegistryKey.createRegistryKey(new ResourceLocation(NostrumMagica.MODID, "item_sets"));
+	public static final ResourceKey<Registry<EquipmentSet>> KEY_REG_ITEMSETS = ResourceKey.createRegistryKey(new ResourceLocation(NostrumMagica.MODID, "item_sets"));
 	
 	private static IForgeRegistry<EquipmentSet> REGISTRY;
 	

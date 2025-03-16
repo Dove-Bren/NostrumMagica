@@ -2,10 +2,10 @@ package com.smanzana.nostrummagica.spell.component;
 
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.nbt.FloatNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponent;
+import net.minecraft.nbt.FloatTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.BaseComponent;
 
 public class FloatSpellShapeProperty extends SpellShapeProperty<Float> {
 
@@ -28,13 +28,13 @@ public class FloatSpellShapeProperty extends SpellShapeProperty<Float> {
 	}
 
 	@Override
-	public Float readValue(INBT tag) {
-		return tag instanceof FloatNBT ? ((FloatNBT) tag).getAsFloat() : getDefault();
+	public Float readValue(Tag tag) {
+		return tag instanceof FloatTag ? ((FloatTag) tag).getAsFloat() : getDefault();
 	}
 
 	@Override
-	public INBT writeValue(Float value) {
-		return FloatNBT.valueOf(value);
+	public Tag writeValue(Float value) {
+		return FloatTag.valueOf(value);
 	}
 
 	@Override
@@ -52,8 +52,8 @@ public class FloatSpellShapeProperty extends SpellShapeProperty<Float> {
 	}
 
 	@Override
-	public TextComponent getDisplayValue(SpellShape shape, Float value) {
-		return new StringTextComponent(String.format("%.1f", value)); 
+	public BaseComponent getDisplayValue(SpellShape shape, Float value) {
+		return new TextComponent(String.format("%.1f", value)); 
 	}
 
 	@Override

@@ -3,15 +3,15 @@ package com.smanzana.nostrummagica.client.gui;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -36,11 +36,11 @@ public class SpellIcon {
 		v = TEX_ICON_WIDTH * (index / TEX_HCOUNT);
 	}
 	
-	public void render(Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height) {
+	public void render(Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height) {
 		render(mc, matrixStackIn, x, y, width, height, 1f, 1f, 1f, 1f);
 	}
 	
-	public void render(Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, float red, float green, float blue, float alpha) {
+	public void render(Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, float red, float green, float blue, float alpha) {
 		matrixStackIn.pushPose();
 
 		Minecraft.getInstance().getTextureManager().bind(TEX);
@@ -52,7 +52,7 @@ public class SpellIcon {
 		matrixStackIn.popPose();
 	}
 	
-	public void render(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, float red, float green, float blue, float alpha, int width, int height) {
+	public void render(PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, float red, float green, float blue, float alpha, int width, int height) {
 		RenderFuncs.drawScaledCustomSizeModalRect(matrixStackIn, bufferIn.getBuffer(NostrumRenderTypes.GetIconType(TEX)), 0, 0, u, v, TEX_ICON_WIDTH, TEX_ICON_WIDTH, width, height, TEX_WIDTH, TEX_WIDTH,
 				red, green, blue, alpha);
 	}

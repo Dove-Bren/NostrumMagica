@@ -4,10 +4,10 @@ import java.util.EnumSet;
 
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
 
-import net.minecraft.entity.ai.goal.Goal.Flag;
+import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 public class DragonFlyStrafeGoal<T extends DragonEntity> extends Goal {
 

@@ -1,11 +1,11 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.PaneBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.IronBarsBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
 
-public class DungeonBarsBlock extends PaneBlock {
+public class DungeonBarsBlock extends IronBarsBlock {
 
 	public static final String ID = "dungeon_bars";
 	

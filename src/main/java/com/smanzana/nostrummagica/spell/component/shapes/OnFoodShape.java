@@ -18,13 +18,13 @@ import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.NonNullList;
+import net.minecraft.Util;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.util.Lazy;
 
 /**
@@ -61,10 +61,10 @@ public class OnFoodShape extends OnMetricLevelShape {
 		
 		@Override
 		public void spawn(LivingEntity caster) {
-			if (entity instanceof PlayerEntity) {
+			if (entity instanceof Player) {
 				// max food level is hardcoded as 20
 				final int amt = (int) (this.amount * /*((PlayerEntity) entity).getFoodStats.getMaxFood()*/ 20);
-				NostrumMagica.playerListener.registerFood(this, (PlayerEntity) entity, amt, onHigh);
+				NostrumMagica.playerListener.registerFood(this, (Player) entity, amt, onHigh);
 				NostrumMagica.playerListener.registerTimer(this, 0, 20 * duration);
 			} else {
 				NostrumMagica.playerListener.registerTimer(this, 20, 0);
@@ -78,7 +78,7 @@ public class OnFoodShape extends OnMetricLevelShape {
 		
 		@Override
 		public boolean onEvent(Event type, LivingEntity entity, Object unused) {
-			if (type == Event.FOOD || (type == Event.TIME && !(this.entity instanceof PlayerEntity))) {
+			if (type == Event.FOOD || (type == Event.TIME && !(this.entity instanceof Player))) {
 				if (!expired) {
 					TriggerData data = new TriggerData(
 							Lists.newArrayList(this.getState().getSelf()),
@@ -96,9 +96,9 @@ public class OnFoodShape extends OnMetricLevelShape {
 			} else if (type == Event.TIME) {
 				if (!expired) {
 					expired = true;
-					if (this.entity instanceof PlayerEntity) {
-						PlayerEntity player = (PlayerEntity) this.entity;
-						player.sendMessage(new TranslationTextComponent("modification.damaged_duration.health"), Util.NIL_UUID);
+					if (this.entity instanceof Player) {
+						Player player = (Player) this.entity;
+						player.sendMessage(new TranslatableComponent("modification.damaged_duration.health"), Util.NIL_UUID);
 						NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_FOOD, this.entity);
 					}
 				}

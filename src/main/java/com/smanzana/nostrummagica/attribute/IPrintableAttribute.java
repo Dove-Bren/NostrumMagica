@@ -2,20 +2,20 @@ package com.smanzana.nostrummagica.attribute;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public interface IPrintableAttribute {
 
 	@Nullable
-	public ITextComponent formatModifier(AttributeModifier modifier);
+	public Component formatModifier(AttributeModifier modifier);
 	
 	@Nullable
-	public static ITextComponent formatAttributeValueVanilla(Attribute attribute, AttributeModifier modifier) {
+	public static Component formatAttributeValueVanilla(Attribute attribute, AttributeModifier modifier) {
 		double val = modifier.getAmount();
 		if (val == 0) {
 			return null;
@@ -23,21 +23,21 @@ public interface IPrintableAttribute {
 
 		// Formatting here copied from Vanilla
 		if (val > 0) {
-			return (new TranslationTextComponent("attribute.modifier.plus." + modifier.getOperation().toValue(),
+			return (new TranslatableComponent("attribute.modifier.plus." + modifier.getOperation().toValue(),
 					ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(val),
-					new TranslationTextComponent(attribute.getDescriptionId())))
-							.withStyle(TextFormatting.BLUE);
+					new TranslatableComponent(attribute.getDescriptionId())))
+							.withStyle(ChatFormatting.BLUE);
 		} else {
 			val = -val;
-			return (new TranslationTextComponent("attribute.modifier.take." + modifier.getOperation().toValue(),
+			return (new TranslatableComponent("attribute.modifier.take." + modifier.getOperation().toValue(),
 					ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(val),
-					new TranslationTextComponent(attribute.getDescriptionId())))
-							.withStyle(TextFormatting.RED);
+					new TranslatableComponent(attribute.getDescriptionId())))
+							.withStyle(ChatFormatting.RED);
 		}
 	}
 
 	@Nullable
-	public static ITextComponent formatAttributeValuePercentage(Attribute attribute, AttributeModifier modifier) {
+	public static Component formatAttributeValuePercentage(Attribute attribute, AttributeModifier modifier) {
 		double val = modifier.getAmount();
 		if (val == 0) {
 			return null;
@@ -45,13 +45,13 @@ public interface IPrintableAttribute {
 		
 
 		final String op;
-		final TextFormatting color;
+		final ChatFormatting color;
 		if (val > 0) {
 			 op = "plus";
-			 color = TextFormatting.BLUE;
+			 color = ChatFormatting.BLUE;
 		} else {
 			 op = "take";
-			 color = TextFormatting.RED;
+			 color = ChatFormatting.RED;
 		}
 		
 		final String transKey;
@@ -70,15 +70,15 @@ public interface IPrintableAttribute {
 			break;
 		}
 		
-		return new TranslationTextComponent(transKey,
+		return new TranslatableComponent(transKey,
 					ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(val > 0 ? val : -val),
-					new TranslationTextComponent(attribute.getDescriptionId())
+					new TranslatableComponent(attribute.getDescriptionId())
 				).withStyle(color);
 	}
 	
 	public static interface IPercentageAttribute extends IPrintableAttribute {
 		@Nullable
-		public default ITextComponent formatModifier(AttributeModifier modifier) {
+		public default Component formatModifier(AttributeModifier modifier) {
 			return IPrintableAttribute.formatAttributeValuePercentage((Attribute) this, modifier);
 		}
 	}

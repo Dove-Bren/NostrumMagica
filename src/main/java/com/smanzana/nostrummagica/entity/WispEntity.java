@@ -37,55 +37,55 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.SpellUtils;
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntitySize;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MoverType;
-import net.minecraft.entity.Pose;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.controller.MovementController;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.HurtByTargetGoal;
-import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
-import net.minecraft.entity.monster.MonsterEntity;
-import net.minecraft.entity.passive.GolemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.MoveControl;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.animal.AbstractGolem;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantableEntity, IElementalEntity {
+public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchantableEntity, IElementalEntity {
 	
 	public static final String ID = "entity_wisp";
 	
 	protected static final double MAX_WISP_DISTANCE_SQ = 144;
-	protected static final DataParameter<Optional<BlockPos>> HOME  = EntityDataManager.<Optional<BlockPos>>defineId(WispEntity.class, DataSerializers.OPTIONAL_BLOCK_POS);
-	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>defineId(WispEntity.class, MagicElementDataSerializer.instance);
+	protected static final EntityDataAccessor<Optional<BlockPos>> HOME  = SynchedEntityData.<Optional<BlockPos>>defineId(WispEntity.class, EntityDataSerializers.OPTIONAL_BLOCK_POS);
+	protected static final EntityDataAccessor<EMagicElement> ELEMENT = SynchedEntityData.<EMagicElement>defineId(WispEntity.class, MagicElementDataSerializer.instance);
 	
 	public static final String LoreKey = "nostrum__wisp";
 	
@@ -95,7 +95,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 
 	private Spell defaultSpell;
 	
-	public WispEntity(EntityType<? extends WispEntity> type, World worldIn) {
+	public WispEntity(EntityType<? extends WispEntity> type, Level worldIn) {
 		super(type, worldIn);
 		this.setNoGravity(true);
 		this.moveControl = new WispMoveHelper(this);
@@ -106,7 +106,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		this.pickElement();
 	}
 	
-	public WispEntity(EntityType<? extends WispEntity> type, World worldIn, BlockPos homePos) {
+	public WispEntity(EntityType<? extends WispEntity> type, Level worldIn, BlockPos homePos) {
 		this(type, worldIn);
 		this.restrictTo(homePos, (int) MAX_WISP_DISTANCE_SQ);
 		this.setHome(homePos);
@@ -132,9 +132,9 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		priority = 1;
 		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setAlertOthers(WispEntity.class));
 		if (level != null && this.random.nextBoolean() && DimensionUtils.IsNether(level)) {
-			this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, null));
+			this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<Player>(this, Player.class, 10, true, false, null));
 		} else {
-			this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<MonsterEntity>(this, MonsterEntity.class, 10, true, false, (mob) -> {
+			this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<Monster>(this, Monster.class, 10, true, false, (mob) -> {
 				// Wisps spawned with no home will be neutral
 				if (this.getHome() == null) {
 					return false;
@@ -146,8 +146,8 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		}
 	}
 	
-	public static final AttributeModifierMap.MutableAttribute BuildAttributes(){
-		return GolemEntity.createMobAttributes()
+	public static final AttributeSupplier.Builder BuildAttributes(){
+		return AbstractGolem.createMobAttributes()
 			.add(Attributes.MOVEMENT_SPEED, 0.1D)
 			.add(Attributes.MAX_HEALTH, 5.0D)
 			.add(Attributes.ARMOR, 0.0D)
@@ -174,7 +174,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		return 1F;
 	}
 
-	protected float getStandingEyeHeight(Pose pose, EntitySize size) {
+	protected float getStandingEyeHeight(Pose pose, EntityDimensions size) {
 		return this.getBbHeight() * 0.5F;
 	}
 
@@ -189,11 +189,11 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		return flag;
 	}
 
-	public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
-		return ActionResultType.PASS;
+	public InteractionResult /*processInteract*/ mobInteract(Player player, InteractionHand hand, @Nonnull ItemStack stack) {
+		return InteractionResult.PASS;
 	}
 
-	public boolean canBeLeashed(PlayerEntity player) {
+	public boolean canBeLeashed(Player player) {
 		return false;
 	}
 	
@@ -213,7 +213,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		
 		if (!level.isClientSide && this.getHome() == null && this.isAlive() && this.getHealth() > 0) {
 			if (perilLoc == null || !perilLoc.equals(blockPosition())) {
-				BlockPos.Mutable cursor = new BlockPos.Mutable();
+				BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 				cursor.set(blockPosition());
 				while (cursor.getY() > 0 && level.isEmptyBlock(cursor)) {
 					cursor.move(Direction.DOWN);
@@ -251,7 +251,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 			int color = element.getColor();
 			NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
 					1, getX(), getY() + getBbHeight()/2f, getZ(), 0, 40, 0,
-					new Vector3d(random.nextFloat() * .05 - .025, random.nextFloat() * .05 - .025, random.nextFloat() * .05 - .025), null
+					new Vec3(random.nextFloat() * .05 - .025, random.nextFloat() * .05 - .025, random.nextFloat() * .05 - .025), null
 					).color(color));
 		}
 	}
@@ -319,7 +319,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	}
 	
 	@Override
-	public void readAdditionalSaveData(CompoundNBT compound) {
+	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 		if (compound.contains("home", NBT.TAG_LONG)) {
 			setHome(BlockPos.of(compound.getLong("home"))); // Warning: can break if save used across game versions
@@ -327,7 +327,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	}
 	
 	@Override
-	public void addAdditionalSaveData(CompoundNBT compound) {
+	public void addAdditionalSaveData(CompoundTag compound) {
 		super.addAdditionalSaveData(compound);
 		
 		BlockPos homePos = this.getHome();
@@ -337,7 +337,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	}
 	
 	@Override
-	public boolean saveAsPassenger(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundTag compound) {
 		return false; // don't persist
 	}
 	
@@ -401,7 +401,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		return super.hurt(source, amount);
 	}
 	
-	private void playEffect(IParticleData particle) {
+	private void playEffect(ParticleOptions particle) {
 		
 		for (int i = 0; i < 15; ++i) {
 			double d0 = this.random.nextGaussian() * 0.02D;
@@ -447,7 +447,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	}
 	
 	// Adapted from the wisp move helper
-	static protected class WispMoveHelper extends MovementController {
+	static protected class WispMoveHelper extends MoveControl {
 		private final WispEntity parentEntity;
 		private int courseChangeCooldown;
 
@@ -458,20 +458,20 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 
 		@Override
 		public void tick() {
-			if (this.operation == MovementController.Action.MOVE_TO) {
+			if (this.operation == MoveControl.Operation.MOVE_TO) {
 				double d0 = this.getWantedX() - this.parentEntity.getX();
 				double d1 = this.getWantedY() - this.parentEntity.getY();
 				double d2 = this.getWantedZ() - this.parentEntity.getZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 				
 				if (d3 < 6) {
-					this.operation = MovementController.Action.WAIT;
+					this.operation = MoveControl.Operation.WAIT;
 					return;
 				}
 
 				if (this.courseChangeCooldown-- <= 0) {
 					this.courseChangeCooldown += this.parentEntity.getRandom().nextInt(5) + 2;
-					d3 = (double)MathHelper.sqrt(d3);
+					d3 = (double)Mth.sqrt(d3);
 
 					if (this.isNotColliding(this.getWantedX(), this.getWantedY(), this.getWantedZ(), d3)) {
 						this.parentEntity.setDeltaMovement(this.parentEntity.getDeltaMovement().add(
@@ -480,7 +480,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 								d2 / d3 * 0.005D
 								));
 					} else {
-						this.operation = MovementController.Action.WAIT;
+						this.operation = MoveControl.Operation.WAIT;
 					}
 				}
 			}
@@ -493,7 +493,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 			double d0 = (x - this.parentEntity.getX()) / p_179926_7_;
 			double d1 = (y - this.parentEntity.getY()) / p_179926_7_;
 			double d2 = (z - this.parentEntity.getZ()) / p_179926_7_;
-			AxisAlignedBB axisalignedbb = this.parentEntity.getBoundingBox();
+			AABB axisalignedbb = this.parentEntity.getBoundingBox();
 
 			for (int i = 1; (double)i < p_179926_7_; ++i) {
 				axisalignedbb = axisalignedbb.move(d0, d1, d2);
@@ -509,7 +509,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	
 	// Copied from EntityFlying class
 	@Override
-	public void travel(Vector3d how) {
+	public void travel(Vec3 how) {
 		if (this.isInWater()) {
 			this.moveRelative(0.02F, how);
 			this.move(MoverType.SELF, this.getDeltaMovement());
@@ -523,7 +523,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 
 			if (this.onGround) {
 				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
-				BlockPos underPos = new BlockPos(MathHelper.floor(this.getX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getZ()));
+				BlockPos underPos = new BlockPos(Mth.floor(this.getX()), Mth.floor(this.getBoundingBox().minY) - 1, Mth.floor(this.getZ()));
 				BlockState underState = this.level.getBlockState(underPos);
 				f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
 			}
@@ -534,7 +534,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 
 			if (this.onGround) {
 				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
-				BlockPos underPos = new BlockPos(MathHelper.floor(this.getX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getZ()));
+				BlockPos underPos = new BlockPos(Mth.floor(this.getX()), Mth.floor(this.getBoundingBox().minY) - 1, Mth.floor(this.getZ()));
 				BlockState underState = this.level.getBlockState(underPos);
 				f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
 			}
@@ -546,7 +546,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		this.animationSpeedOld = this.animationSpeed;
 		double d1 = this.getX() - this.xo;
 		double d0 = this.getZ() - this.zo;
-		float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
+		float f2 = Mth.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 		if (f2 > 1.0F) {
 			f2 = 1.0F;
@@ -565,7 +565,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 	}
 	
 	@Override
-	public boolean checkSpawnRules(IWorld world, SpawnReason spawnReason) {
+	public boolean checkSpawnRules(LevelAccessor world, MobSpawnType spawnReason) {
 		if (!super.checkSpawnRules(world, spawnReason)) {
 			return false;
 		}
@@ -573,8 +573,8 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		return true;
 	}
 	
-	public static boolean canSpawnExtraCheck(EntityType<WispEntity> type, IServerWorld world, SpawnReason reason, BlockPos pos, Random rand) {
-		AxisAlignedBB bb = new AxisAlignedBB(pos).inflate(40);
+	public static boolean canSpawnExtraCheck(EntityType<WispEntity> type, ServerLevelAccessor world, MobSpawnType reason, BlockPos pos, Random rand) {
+		AABB bb = new AABB(pos).inflate(40);
 		if (DimensionUtils.IsOverworld(world.getLevel())) {
 			if (world.getMaxLocalRawBrightness(pos) > .75f) {
 				return false;
@@ -609,7 +609,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		 * Returns whether the Goal should begin execution.
 		 */
 		public boolean canUse() {
-			MovementController MovementController = this.parentEntity.getMoveControl();
+			MoveControl MovementController = this.parentEntity.getMoveControl();
 
 			if (!MovementController.hasWanted()) {
 				return true;
@@ -930,7 +930,7 @@ public class WispEntity extends GolemEntity implements ILoreSupplier, IEnchantab
 		
 		if (element == this.getElement()) {
 			// Get a buff
-			this.addEffect(new EffectInstance(NostrumEffects.magicBoost, 20 * 30, Math.max(0, power - 1)));
+			this.addEffect(new MobEffectInstance(NostrumEffects.magicBoost, 20 * 30, Math.max(0, power - 1)));
 		} else {
 			this.setElement(element);
 		}

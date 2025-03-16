@@ -1,25 +1,25 @@
 package com.smanzana.nostrummagica.effect;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.DisplayEffectsScreen;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.EffectType;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class NaturesBlessingEffect extends Effect {
+public class NaturesBlessingEffect extends MobEffect {
 
 	public static final String ID = "naturesblessing";
 	
 	public NaturesBlessingEffect() {
-		super(EffectType.BENEFICIAL, 0xFF38810D);
+		super(MobEffectCategory.BENEFICIAL, 0xFF38810D);
 	}
 	
 	public boolean isDurationEffectTick(int duration, int amp) {
@@ -41,11 +41,11 @@ public class NaturesBlessingEffect extends Effect {
 				entity.heal(amt);
 			} else {
 				// Food
-				if (entity instanceof PlayerEntity) {
-					PlayerEntity player = (PlayerEntity) entity;
+				if (entity instanceof Player) {
+					Player player = (Player) entity;
 					player.getFoodData().eat((int) amt, 0);
-				} else if (entity instanceof AnimalEntity) {
-					((AnimalEntity) entity).setInLove(null);
+				} else if (entity instanceof Animal) {
+					((Animal) entity).setInLove(null);
 				}
 			}
 		}
@@ -53,13 +53,13 @@ public class NaturesBlessingEffect extends Effect {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderInventoryEffect(EffectInstance effect, DisplayEffectsScreen<?> gui, MatrixStack matrixStackIn, int x, int y, float z) {
+    public void renderInventoryEffect(MobEffectInstance effect, EffectRenderingInventoryScreen<?> gui, PoseStack matrixStackIn, int x, int y, float z) {
 		PotionIcon.NATURESBLESSING.draw(matrixStackIn, gui.getMinecraft(), x + 6, y + 7);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-    public void renderHUDEffect(EffectInstance effect, AbstractGui gui, MatrixStack matrixStackIn, int x, int y, float z, float alpha) {
+    public void renderHUDEffect(MobEffectInstance effect, GuiComponent gui, PoseStack matrixStackIn, int x, int y, float z, float alpha) {
 		PotionIcon.NATURESBLESSING.draw(matrixStackIn, Minecraft.getInstance(), x + 3, y + 3);
 	}
 	

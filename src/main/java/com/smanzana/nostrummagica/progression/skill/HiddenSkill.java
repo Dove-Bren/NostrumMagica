@@ -8,9 +8,9 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.progression.requirement.IRequirement;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 
 public class HiddenSkill extends Skill {
 
@@ -32,12 +32,12 @@ public class HiddenSkill extends Skill {
 	}
 	
 	@Override
-	public boolean isHidden(PlayerEntity player) {
+	public boolean isHidden(Player player) {
 		return !meetsRequirements(player);
 	}
 	
 	@Override
-	public boolean meetsRequirements(PlayerEntity player) {
+	public boolean meetsRequirements(Player player) {
 		if (!super.meetsRequirements(player)) {
 			return false;
 		}

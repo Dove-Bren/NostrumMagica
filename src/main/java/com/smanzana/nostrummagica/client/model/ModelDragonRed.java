@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.dragon.RedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.RedDragonBaseEntity;
@@ -16,9 +16,9 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.MemoryPool;
 
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 
 public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T> {
 	
@@ -284,7 +284,7 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 	
 	
 	@Override
-	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		// Update overlay visibility
 		for (DragonArmorKey key : overlays.keySet()) {
 			final ModelRendererBakedWithOffset renderer = overlays.get(key);
@@ -527,12 +527,12 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 			backleg_left.setOffsetY(-.5f);
 			backleg_right.setOffsetY(-.5f);
 		} else if (!flying && dragon.isOnGround()) {
-			frontleg_left.xRot = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
-			frontleg_right.xRot = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+			frontleg_left.xRot = Mth.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
+			frontleg_right.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
 			
 			limbSwingAmount *= .5;
-			backleg_left.xRot = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
-			backleg_right.xRot = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+			backleg_left.xRot = Mth.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
+			backleg_right.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
 		} else {
 			float ang = (float) (Math.PI * 2 * 0.12);
 			frontleg_left.xRot = frontleg_right.xRot = ang;

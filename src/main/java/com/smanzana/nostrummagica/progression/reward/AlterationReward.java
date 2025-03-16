@@ -4,8 +4,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.EAlteration;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
 
 public class AlterationReward implements IReward {
 
@@ -16,7 +16,7 @@ public class AlterationReward implements IReward {
 	}
 	
 	@Override
-	public void award(PlayerEntity player) {
+	public void award(Player player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr != null)
 			attr.unlockAlteration(alteration);

@@ -9,9 +9,9 @@ import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.ArcaneWolfElementalType;
 import com.smanzana.petcommand.api.PetFuncs;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.potion.EffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.effect.MobEffectInstance;
 
 public class ArcaneWolfNatureGoal extends Goal {
 
@@ -48,9 +48,9 @@ public class ArcaneWolfNatureGoal extends Goal {
 	
 	protected boolean applyTo(ArcaneWolfEntity wolf, LivingEntity target) {
 		// Nature keeps the "Nature's blessing" status effect constant
-		EffectInstance effect = target.getEffect(NostrumEffects.naturesBlessing);
+		MobEffectInstance effect = target.getEffect(NostrumEffects.naturesBlessing);
 		if (effect == null || effect.getDuration() < 11 * 20) {
-			target.addEffect(new EffectInstance(NostrumEffects.naturesBlessing, 20 * 30, 0));
+			target.addEffect(new MobEffectInstance(NostrumEffects.naturesBlessing, 20 * 30, 0));
 		}
 		
 		return effect == null; // Only charge for applying the first time

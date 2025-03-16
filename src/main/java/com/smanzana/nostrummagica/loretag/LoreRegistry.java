@@ -19,10 +19,10 @@ import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity.TameRedDrago
 import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
 import com.smanzana.nostrummagica.pet.IPetWithSoul.SoulBoundLore;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.monster.SkeletonEntity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.monster.Skeleton;
 
 /**
  * Provides lookup from key to ILoreTagged to support offlining and onlining
@@ -80,7 +80,7 @@ public class LoreRegistry {
 		register(PoisonWaterTag.instance());
 	}
 	
-	public static final class UndeadLore implements IEntityLoreTagged<SkeletonEntity> {
+	public static final class UndeadLore implements IEntityLoreTagged<Skeleton> {
 		
 		private static UndeadLore instance = null;
 		public static UndeadLore instance() {
@@ -116,7 +116,7 @@ public class LoreRegistry {
 		}
 
 		@Override
-		public EntityType<SkeletonEntity> getEntityType() {
+		public EntityType<Skeleton> getEntityType() {
 			return EntityType.SKELETON;
 		}
 	}

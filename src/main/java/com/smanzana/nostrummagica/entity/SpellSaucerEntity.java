@@ -5,14 +5,14 @@ import java.util.Map;
 
 import com.smanzana.nostrummagica.spell.SpellLocation;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
 /**
  * Spell projectile that by default doesn't die on impact and instead keeps track of who it's
@@ -27,13 +27,13 @@ public abstract class SpellSaucerEntity extends SpellProjectileEntity {
 	private final Map<Entity, Integer> hitEntities;
 	private final Map<BlockPos, Integer> hitBlocks;
 	
-	protected SpellSaucerEntity(EntityType<? extends SpellSaucerEntity> type, World world) {
+	protected SpellSaucerEntity(EntityType<? extends SpellSaucerEntity> type, Level world) {
 		super(type, world);
 		this.hitEntities = new HashMap<>();
 		this.hitBlocks = new HashMap<>();
 	}
 	
-	protected SpellSaucerEntity(EntityType<? extends SpellSaucerEntity> type, ISpellProjectileShape trigger, World world, LivingEntity shooter, float speed, double maxDistance, int hitCooldown) {
+	protected SpellSaucerEntity(EntityType<? extends SpellSaucerEntity> type, ISpellProjectileShape trigger, Level world, LivingEntity shooter, float speed, double maxDistance, int hitCooldown) {
 		super(type, trigger, shooter, speed, maxDistance);
 		this.hitEntities = new HashMap<>();
 		this.hitBlocks = new HashMap<>();
@@ -41,8 +41,8 @@ public abstract class SpellSaucerEntity extends SpellProjectileEntity {
 	}
 	
 	protected SpellSaucerEntity(EntityType<? extends SpellSaucerEntity> type, ISpellProjectileShape trigger,
-			World world, LivingEntity shooter,
-			Vector3d origin, Vector3d direction,
+			Level world, LivingEntity shooter,
+			Vec3 origin, Vec3 direction,
 			float speedFactor, double maxDistance, int hitCooldown) {
 		super(type, trigger, world, shooter, origin, direction, speedFactor, maxDistance);
 		this.hitEntities = new HashMap<>();
@@ -50,7 +50,7 @@ public abstract class SpellSaucerEntity extends SpellProjectileEntity {
 		this.hitCooldown = hitCooldown;
 	}
 	
-	protected SpellSaucerEntity(EntityType<? extends SpellSaucerEntity> type, ISpellProjectileShape trigger, World world, LivingEntity shooter, float speed, double maxDistance) {
+	protected SpellSaucerEntity(EntityType<? extends SpellSaucerEntity> type, ISpellProjectileShape trigger, Level world, LivingEntity shooter, float speed, double maxDistance) {
 		this(type, trigger, world, shooter, speed, maxDistance, -1);
 	}
 	
@@ -87,7 +87,7 @@ public abstract class SpellSaucerEntity extends SpellProjectileEntity {
 	}
 
 	@Override
-	protected void onHit(RayTraceResult result) {
+	protected void onHit(HitResult result) {
 		super.onHit(result);
 	}
 	
@@ -140,7 +140,7 @@ public abstract class SpellSaucerEntity extends SpellProjectileEntity {
 	}
 	
 	@Override
-	public boolean saveAsPassenger(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundTag compound) {
 		return false; // This makes us not save and persist!!
 	}
 

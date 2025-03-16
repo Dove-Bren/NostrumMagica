@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.gui.widget;
 
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.ReagentAndRuneTransfer;
 import com.smanzana.nostrummagica.item.ReagentItem;
@@ -13,15 +13,15 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.AbstractButton;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 
 public class QuickMoveBagButton extends AbstractButton {
@@ -30,17 +30,17 @@ public class QuickMoveBagButton extends AbstractButton {
 	protected static final int TEX_WIDTH = 32;
 	protected static final int TEX_HEIGHT = 32;
 	
-	protected final PlayerEntity player;
-	protected final ContainerScreen<?> screen;
+	protected final Player player;
+	protected final AbstractContainerScreen<?> screen;
 
-	public QuickMoveBagButton(int x, int y, int width, int height, PlayerEntity player, ContainerScreen<?> screen) {
-		super(x, y, width, height, StringTextComponent.EMPTY);
+	public QuickMoveBagButton(int x, int y, int width, int height, Player player, AbstractContainerScreen<?> screen) {
+		super(x, y, width, height, TextComponent.EMPTY);
 		this.player = player;
 		this.screen = screen;
 	}
 	
 	@Override
-	public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		final float color[] = ColorUtil.ARGBToColor(shouldBeClickable() ? 0xFFFFFFFF : 0xFF808080);
 		if (this.isHovered()) {
 			color[0] *= .8f;
@@ -61,7 +61,7 @@ public class QuickMoveBagButton extends AbstractButton {
 	/**
 	 * Attempt to move to a good spot in the container
 	 */
-	public void handleLayout(ContainerScreen<?> screen) {
+	public void handleLayout(AbstractContainerScreen<?> screen) {
 		// Guess based on top left player inventory slot seen?
 		int minX = Integer.MAX_VALUE;
 		int maxX = -1;
@@ -71,7 +71,7 @@ public class QuickMoveBagButton extends AbstractButton {
 		for (Slot slot : screen.getMenu().slots) {
 			if (slot.container == this.player.inventory) {
 				final int slotIdx = slot.getSlotIndex();
-				if (PlayerInventory.isHotbarSlot(slotIdx) || slotIdx >= 36) {
+				if (Inventory.isHotbarSlot(slotIdx) || slotIdx >= 36) {
 					continue; // hotbar or armor slot
 				}
 				
@@ -99,7 +99,7 @@ public class QuickMoveBagButton extends AbstractButton {
 		return ShouldBeClickable(player, screen);
 	}
 	
-	protected static final boolean ShouldBeClickable(PlayerEntity player, ContainerScreen<?> screen) {
+	protected static final boolean ShouldBeClickable(Player player, AbstractContainerScreen<?> screen) {
 		boolean foundReagent = false;
 		boolean foundRune = false;
 		for (Slot slot : screen.getMenu().slots) {
@@ -137,14 +137,14 @@ public class QuickMoveBagButton extends AbstractButton {
 	}
 	
 	public static final void OnContainerScreenShow(InitGuiEvent.Post event) {
-		if (event.getGui() instanceof ContainerScreen) {
+		if (event.getGui() instanceof AbstractContainerScreen) {
 			final Minecraft mc = Minecraft.getInstance();
-			PlayerEntity player = mc.player;
-			final ContainerScreen<?> screen = (ContainerScreen<?>) event.getGui();
+			Player player = mc.player;
+			final AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) event.getGui();
 			if (ReagentAndRuneTransfer.ShouldAddTo(player, screen.getMenu())) {
 				// May have already added button.
 				QuickMoveBagButton button = null;
-				for (Widget w : event.getWidgetList()) {
+				for (AbstractWidget w : event.getWidgetList()) {
 					if (w instanceof QuickMoveBagButton) {
 						button = (QuickMoveBagButton) w;
 						break;

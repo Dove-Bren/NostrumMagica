@@ -2,15 +2,15 @@ package com.smanzana.nostrummagica.client.gui;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.TextComponent;
 
 public class StackableScreen extends Screen {
 
 	private @Nullable Screen prevScreen;
 	
 	public StackableScreen() {
-		super(new StringTextComponent("StableSceenParent"));
+		super(new TextComponent("StableSceenParent"));
 	}
 	
 	public StackableScreen(Screen prevScreen) {

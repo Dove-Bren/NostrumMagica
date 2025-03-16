@@ -15,19 +15,19 @@ import com.smanzana.nostrummagica.spell.log.ESpellLogModifierType;
 import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.util.AttributeUtil;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.monster.EndermanEntity;
-import net.minecraft.entity.monster.EndermiteEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Endermite;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class SpellDamage {
 	
@@ -146,7 +146,7 @@ public class SpellDamage {
 		// Reduce any from main-hand weapon, since that's given assuming it's used to attack
 		ItemStack held = caster.getMainHandItem();
 		if (!held.isEmpty()) {
-			final Multimap<Attribute, AttributeModifier> heldAttribs = held.getAttributeModifiers(EquipmentSlotType.MAINHAND);
+			final Multimap<Attribute, AttributeModifier> heldAttribs = held.getAttributeModifiers(EquipmentSlot.MAINHAND);
 			if (heldAttribs != null && heldAttribs.containsKey(Attributes.ATTACK_DAMAGE)) {
 				double extra = 0;
 				for (AttributeModifier mod : heldAttribs.get(Attributes.ATTACK_DAMAGE)) {
@@ -171,7 +171,7 @@ public class SpellDamage {
 		// Reduce any from main-hand weapon, since that's given assuming it's used to attack
 		ItemStack held = caster.getMainHandItem();
 		if (!held.isEmpty()) {
-			final Multimap<Attribute, AttributeModifier> heldAttribs = held.getAttributeModifiers(EquipmentSlotType.MAINHAND);
+			final Multimap<Attribute, AttributeModifier> heldAttribs = held.getAttributeModifiers(EquipmentSlot.MAINHAND);
 			if (heldAttribs != null && heldAttribs.containsKey(Attributes.ATTACK_DAMAGE)) {
 				for (AttributeModifier mod : heldAttribs.get(Attributes.ATTACK_DAMAGE)) {
 					amt += mod.getAmount();
@@ -194,8 +194,8 @@ public class SpellDamage {
 		}
 	}
 	
-	private static final ITextComponent MakeLabel(String cause) {
-		return new TranslationTextComponent("spelllogmod.nostrummagica." + cause.toLowerCase());
+	private static final Component MakeLabel(String cause) {
+		return new TranslatableComponent("spelllogmod.nostrummagica." + cause.toLowerCase());
 	}
 	
 	public static final float CalculateDamage(@Nullable LivingEntity caster, LivingEntity target, float baseDamage, float efficiency, EMagicElement element, ISpellLogBuilder log) {
@@ -229,10 +229,10 @@ public class SpellDamage {
 			final boolean light;
 			final boolean flamy;
 			
-			if (target instanceof EndermanEntity || target instanceof EndermiteEntity
+			if (target instanceof EnderMan || target instanceof Endermite
 					|| target instanceof DragonEntity) {
 				// Ender status and immunity can be turned off with the disrupt status effect
-				EffectInstance effect = target.getEffect(NostrumEffects.disruption);
+				MobEffectInstance effect = target.getEffect(NostrumEffects.disruption);
 				if (effect != null && effect.getDuration() > 0) {
 					ender = false;
 				} else {
@@ -242,9 +242,9 @@ public class SpellDamage {
 				ender = false;
 			}
 			
-			if (target.getBbHeight() < 1.5f || target instanceof EndermanEntity || target instanceof ShadowRedDragonEntity) {
+			if (target.getBbHeight() < 1.5f || target instanceof EnderMan || target instanceof ShadowRedDragonEntity) {
 				light = true;
-			} else if (magic != null && magic.hasSkill(NostrumSkills.Wind_Inflict) && target.getEffect(Effects.POISON) != null) {
+			} else if (magic != null && magic.hasSkill(NostrumSkills.Wind_Inflict) && target.getEffect(MobEffects.POISON) != null) {
 				// Poisoned enemies count as light with wind inflict skill
 				light = true;
 			} else {
@@ -266,7 +266,7 @@ public class SpellDamage {
 			}
 			
 			if (element == EMagicElement.EARTH && magic != null && magic.hasSkill(NostrumSkills.Earth_Adept)) {
-				EffectInstance strength = caster == null ? null : caster.getEffect(Effects.DAMAGE_BOOST);
+				MobEffectInstance strength = caster == null ? null : caster.getEffect(MobEffects.DAMAGE_BOOST);
 				if (strength != null) {
 					// Matches strength attribute boost
 					damage.baseFlat(NostrumSkills.Earth_Adept, 3 * (strength.getAmplifier() + 1));
@@ -322,13 +322,13 @@ public class SpellDamage {
 		}
 		
 		// Apply boosts and resist
-		ModifiableAttributeInstance attr = caster == null ? null : caster.getAttribute(NostrumAttributes.magicDamage);
+		AttributeInstance attr = caster == null ? null : caster.getAttribute(NostrumAttributes.magicDamage);
 		if (attr != null && attr.getValue() != 0.0D) {
 			damage.bonusScale("MagicDamageAttribute", (Math.max(0, Math.min(100, 1f + (float)(attr.getValue() / 100.0)))) - 1f);
 		}
 		
 		// TODO: make into attribute?
-		final @Nullable EffectInstance magicWeakness = caster == null ? null : caster.getEffect(NostrumEffects.magicWeakness);
+		final @Nullable MobEffectInstance magicWeakness = caster == null ? null : caster.getEffect(NostrumEffects.magicWeakness);
 		if (magicWeakness != null && magicWeakness.getDuration() > 0) {
 			damage.finalFlat(NostrumSkills.Physical_Inflict, -2 * (magicWeakness.getAmplifier() + 1));
 		}

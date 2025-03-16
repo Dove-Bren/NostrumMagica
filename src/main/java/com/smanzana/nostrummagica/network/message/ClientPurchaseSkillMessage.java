@@ -9,10 +9,10 @@ import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import io.netty.handler.codec.DecoderException;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client has requested a skill be purchased
@@ -23,7 +23,7 @@ public class ClientPurchaseSkillMessage {
 	
 	public static void handle(ClientPurchaseSkillMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
-		final ServerPlayerEntity sp = ctx.get().getSender();
+		final ServerPlayer sp = ctx.get().getSender();
 		
 		ctx.get().enqueueWork(() -> {
 			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
@@ -63,7 +63,7 @@ public class ClientPurchaseSkillMessage {
 		this.skill = skill;
 	}
 
-	public static ClientPurchaseSkillMessage decode(PacketBuffer buf) {
+	public static ClientPurchaseSkillMessage decode(FriendlyByteBuf buf) {
 		final String skillKeyRaw = buf.readUtf(32767);
 		Skill skill = Skill.lookup(new ResourceLocation(skillKeyRaw));
 		if (skill == null) {
@@ -73,7 +73,7 @@ public class ClientPurchaseSkillMessage {
 		return new ClientPurchaseSkillMessage(skill);
 	}
 
-	public static void encode(ClientPurchaseSkillMessage msg, PacketBuffer buf) {
+	public static void encode(ClientPurchaseSkillMessage msg, FriendlyByteBuf buf) {
 		buf.writeUtf(msg.skill.getKey().toString());
 	}
 

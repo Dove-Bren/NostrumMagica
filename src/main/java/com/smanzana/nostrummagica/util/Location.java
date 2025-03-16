@@ -2,25 +2,25 @@ package com.smanzana.nostrummagica.util;
 
 import java.util.Objects;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.Level;
 
 public class Location {
 
 	private BlockPos pos;
-	private RegistryKey<World> dimension;
+	private ResourceKey<Level> dimension;
 	
-	public Location(BlockPos pos, RegistryKey<World> dimension) {
+	public Location(BlockPos pos, ResourceKey<Level> dimension) {
 		this.pos = pos;
 		this.dimension = dimension;
 	}
 	
-	public Location(World world, BlockPos pos) {
+	public Location(Level world, BlockPos pos) {
 		this(pos, world.dimension());
 	}
 	
@@ -28,7 +28,7 @@ public class Location {
 		return pos;
 	}
 	
-	public RegistryKey<World> getDimension() {
+	public ResourceKey<Level> getDimension() {
 		return dimension;
 	}
 	
@@ -45,20 +45,20 @@ public class Location {
 	private static final String NBT_DIM = "dim";
 	private static final String NBT_POS = "pos";
 	
-	public CompoundNBT toNBT() {
-		return toNBT(new CompoundNBT());
+	public CompoundTag toNBT() {
+		return toNBT(new CompoundTag());
 	}
 	
-	public CompoundNBT toNBT(CompoundNBT tag) {
+	public CompoundTag toNBT(CompoundTag tag) {
 		tag.putString(NBT_DIM, dimension.location().toString());
-		tag.put(NBT_POS, NBTUtil.writeBlockPos(pos));
+		tag.put(NBT_POS, NbtUtils.writeBlockPos(pos));
 		return tag;
 	}
 	
-	public static Location FromNBT(CompoundNBT tag) {
+	public static Location FromNBT(CompoundTag tag) {
 		return new Location(
-				NBTUtil.readBlockPos(tag.getCompound(NBT_POS)),
-				RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(tag.getString(NBT_DIM)))
+				NbtUtils.readBlockPos(tag.getCompound(NBT_POS)),
+				ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(tag.getString(NBT_DIM)))
 				);
 	}
 	

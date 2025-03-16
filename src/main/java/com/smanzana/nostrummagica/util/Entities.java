@@ -1,37 +1,38 @@
 package com.smanzana.nostrummagica.util;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import com.google.common.collect.Lists;
+
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.entity.EntityTypeTest;
 
 public class Entities {
 
-	public static @Nullable Entity FindEntity(World world, UUID id) {
-		if (world.isClientSide() && world instanceof ClientWorld) {
-			Iterable<Entity> entities = ((ClientWorld)world).entitiesForRendering();
+	public static @Nullable Entity FindEntity(Level world, UUID id) {
+		if (world.isClientSide() && world instanceof ClientLevel) {
+			Iterable<Entity> entities = ((ClientLevel)world).entitiesForRendering();
 			for (Entity ent : entities) {
 				if (ent.getUUID().equals(id)) {
 					return ent;
 				}
 			}
-		} else if (world instanceof ServerWorld) {
-			return ((ServerWorld) world).getEntity(id);
+		} else if (world instanceof ServerLevel) {
+			return ((ServerLevel) world).getEntity(id);
 		}
 		
 		return null;
 	}
 	
-	public static @Nullable LivingEntity FindLiving(World world, UUID id) {
+	public static @Nullable LivingEntity FindLiving(Level world, UUID id) {
 		Entity ent = FindEntity(world, id);
 		if (ent != null && ent instanceof LivingEntity) {
 			return (LivingEntity) ent;
@@ -40,15 +41,8 @@ public class Entities {
 		return null;
 	}
 	
-	public static List<LivingEntity> GetEntities(ServerWorld world, Predicate<LivingEntity> predicate) {
-		List<Entity> entities = world.getEntities()
-				.filter((e) -> {return e instanceof LivingEntity;})
-				.filter((e) -> {return predicate.test((LivingEntity) e);})
-				.collect(Collectors.toList());
-		List<LivingEntity> livingList = new ArrayList<LivingEntity>();
-		for (Entity e : entities) {
-			livingList.add((LivingEntity) e);
-		}
+	public static List<LivingEntity> GetEntities(ServerLevel world, Predicate<LivingEntity> predicate) {
+		List<LivingEntity> livingList = Lists.newArrayList(world.getEntities(EntityTypeTest.forClass(LivingEntity.class), predicate));
 		return livingList;
 	}
 	

@@ -6,16 +6,16 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 
 public class SpellBubbleEntity extends SpellProjectileEntity {
 	
@@ -24,15 +24,15 @@ public class SpellBubbleEntity extends SpellProjectileEntity {
 	protected float drag;
 	protected int lifetime;
 	
-	public SpellBubbleEntity(EntityType<? extends SpellBubbleEntity> type, World world) {
+	public SpellBubbleEntity(EntityType<? extends SpellBubbleEntity> type, Level world) {
 		super(type, world);
 		drag = 1f;
 		this.lifetime = 20;
 	}
 	
 	protected SpellBubbleEntity(EntityType<? extends SpellBubbleEntity> type,
-			ISpellProjectileShape trigger, World world, LivingEntity shooter,
-			Vector3d origin, Vector3d direction,
+			ISpellProjectileShape trigger, Level world, LivingEntity shooter,
+			Vec3 origin, Vec3 direction,
 			float speedFactor, float dragFactor, int lifetime) {
 		super(type, trigger, world, shooter, origin, direction, speedFactor, 50);
 		this.drag = dragFactor;
@@ -55,7 +55,7 @@ public class SpellBubbleEntity extends SpellProjectileEntity {
 		this(NostrumEntityTypes.spellBubble, trigger, shooter, speedFactor, dragFactor, lifetime);
 	}
 
-	public SpellBubbleEntity(ISpellProjectileShape trigger,	LivingEntity shooter, Vector3d origin, Vector3d direction, float speedFactor, float dragFactor, int lifetime) {
+	public SpellBubbleEntity(ISpellProjectileShape trigger,	LivingEntity shooter, Vec3 origin, Vec3 direction, float speedFactor, float dragFactor, int lifetime) {
 		this(NostrumEntityTypes.spellBubble, trigger, shooter.level, shooter, origin, direction, speedFactor, dragFactor, lifetime);
 	}
 	
@@ -129,7 +129,7 @@ public class SpellBubbleEntity extends SpellProjectileEntity {
 			// DamagingProjectileEntity's collision detection is based on motion and doesn't work at these low speeds,
 			// so do our own checking
 			for (Entity e : this.level.getEntities(this, this.getBoundingBox(), this::canImpact)) {
-				this.onHit(new EntityRayTraceResult(e, this.position()));
+				this.onHit(new EntityHitResult(e, this.position()));
 			}
 		}
 		
@@ -145,8 +145,8 @@ public class SpellBubbleEntity extends SpellProjectileEntity {
 	}
 	
 	@Override
-	protected IParticleData getTrailParticle() {
-		return new NostrumParticleData(NostrumParticles.WARD.getType(), new SpawnParams(1, 0, 0, 0, 0, 1, 0, Vector3d.ZERO));
+	protected ParticleOptions getTrailParticle() {
+		return new NostrumParticleData(NostrumParticles.WARD.getType(), new SpawnParams(1, 0, 0, 0, 0, 1, 0, Vec3.ZERO));
 	}
 	
 	@Override
@@ -158,7 +158,7 @@ public class SpellBubbleEntity extends SpellProjectileEntity {
 	
 	@Override
 	protected void onProjectileDeath() {
-		((ServerWorld) level).sendParticles(ParticleTypes.BUBBLE_POP, this.getX(), this.getY(), this.getZ(), 3, 0, 0, 0, 0);
+		((ServerLevel) level).sendParticles(ParticleTypes.BUBBLE_POP, this.getX(), this.getY(), this.getZ(), 3, 0, 0, 0, 0);
 		NostrumMagicaSounds.BUBBLE_POP.play(this);
 	}
 }

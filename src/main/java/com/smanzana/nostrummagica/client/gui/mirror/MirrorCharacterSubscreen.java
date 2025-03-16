@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -15,34 +15,34 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 	
 	//private static final ResourceLocation RES_ICONS = NostrumMagica.Loc("textures/gui/mirror_character.png");
 	
-	private final ITextComponent name;
+	private final Component name;
 	private final ItemStack icon;
 	
 	private @Nullable INostrumMagic attr;
 	
 	public MirrorCharacterSubscreen() {
-		name = new TranslationTextComponent("mirror.tab.character.name");
+		name = new TranslatableComponent("mirror.tab.character.name");
 		icon = new ItemStack(Items.PLAYER_HEAD, 1);
 	}
 	
 	@Override
-	public ITextComponent getName() {
+	public Component getName() {
 		return name;
 	}
 	
@@ -52,12 +52,12 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 	}
 	
 	@Override
-	public boolean isVisible(IMirrorScreen parent, PlayerEntity player) {
+	public boolean isVisible(IMirrorScreen parent, Player player) {
 		return true;
 	}
 	
 	@Override
-	public void show(IMirrorScreen parent, PlayerEntity player, int width, int height, int guiLeft, int guiTop) {
+	public void show(IMirrorScreen parent, Player player, int width, int height, int guiLeft, int guiTop) {
 		this.attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
 			return; // Just do nothing. Shouldn't exist and I don't want to program a message for if it happens.
@@ -66,7 +66,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 		// Set up sections
 		// Basic stats section
 		final Minecraft mc = Minecraft.getInstance();
-		final FontRenderer font = mc.font;
+		final Font font = mc.font;
 		final Screen helper = parent.getGuiHelper();
 		final int leftMargin = guiLeft + 16;
 
@@ -174,21 +174,21 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 	}
 
 	@Override
-	public void hide(IMirrorScreen parent, PlayerEntity player) {
+	public void hide(IMirrorScreen parent, Player player) {
 		; // Not sure there's much to do. Parent will clean things up for us
 	}
 
 	@Override
-	public void drawBackground(IMirrorScreen parent, MatrixStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
+	public void drawBackground(IMirrorScreen parent, PoseStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
 		RenderFuncs.drawGradientRect(matrixStackIn, 0, 0, width, height,
 				0xFF332266, 0xFF221155, 0xFF443388, 0xFF443377
 				);
 	}
 
 	@Override
-	public void drawForeground(IMirrorScreen parent, MatrixStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
+	public void drawForeground(IMirrorScreen parent, PoseStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
 		final Minecraft mc = Minecraft.getInstance();
-		final FontRenderer font = mc.font;
+		final Font font = mc.font;
 		
 		// DRAW STATS
 		int y = 22;
@@ -217,11 +217,11 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 		matrixStackIn.popPose();
 	}
 	
-	protected List<ITextComponent> getAttribDesc(Attribute attrib) {
+	protected List<Component> getAttribDesc(Attribute attrib) {
 		return TextUtils.GetTranslatedList(attrib.getDescriptionId() + ".desc");
 	}
 	
-	protected List<ITextComponent> getMiscDesc(String key) {
+	protected List<Component> getMiscDesc(String key) {
 		return TextUtils.GetTranslatedList(key);
 	}
 	
@@ -229,19 +229,19 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 		// Add buttons that show up on the character screen
 	}
 	
-	private static class SectionLabel extends Widget {
+	private static class SectionLabel extends AbstractWidget {
 		
 		private final String label;
-		private final FontRenderer font;
+		private final Font font;
 		
-		public SectionLabel(String label, FontRenderer font, int x, int y, int width, int height) {
-			super(x, y, width, height, new StringTextComponent(label));
+		public SectionLabel(String label, Font font, int x, int y, int width, int height) {
+			super(x, y, width, height, new TextComponent(label));
 			this.label = label;
 			this.font = font;
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			final float scale = .75f;
 			
 			matrixStackIn.pushPose();

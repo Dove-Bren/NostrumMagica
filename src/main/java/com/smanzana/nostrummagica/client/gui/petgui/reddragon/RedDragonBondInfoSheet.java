@@ -1,16 +1,16 @@
 package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
 
 public class RedDragonBondInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 
@@ -21,19 +21,19 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<TameRedDragonEntity>
 	}
 	
 	@Override
-	public void showSheet(TameRedDragonEntity dragon, PlayerEntity player, IPetContainer<TameRedDragonEntity> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(TameRedDragonEntity dragon, Player player, IPetContainer<TameRedDragonEntity> container, int width, int height, int offsetX, int offsetY) {
 		
 	}
 
 	@Override
-	public void hideSheet(TameRedDragonEntity dragon, PlayerEntity player, IPetContainer<TameRedDragonEntity> container) {
+	public void hideSheet(TameRedDragonEntity dragon, Player player, IPetContainer<TameRedDragonEntity> container) {
 		
 	}
 
 	@Override
-	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void draw(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
-		FontRenderer fonter = mc.font;
+		Font fonter = mc.font;
 		int x = 0;
 		int y = 5;
 		final int infoColor = 0xFFFFFFFF;
@@ -115,7 +115,7 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<TameRedDragonEntity>
 	}
 
 	@Override
-	public void handleMessage(CompoundNBT data) {
+	public void handleMessage(CompoundTag data) {
 		
 	}
 
@@ -130,7 +130,7 @@ public class RedDragonBondInfoSheet implements IPetGUISheet<TameRedDragonEntity>
 	}
 
 	@Override
-	public void overlay(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void overlay(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
 	}
 

@@ -50,51 +50,51 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Projectiles;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.block.BambooSaplingBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.CropsBlock;
-import net.minecraft.block.IGrowable;
-import net.minecraft.block.SaplingBlock;
+import net.minecraft.world.level.block.BambooSaplingBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.EquipmentSlotType.Group;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.IDyeableArmorItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.BlockParticleData;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.Direction;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlot.Type;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.DyeableLeatherItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
@@ -108,7 +108,7 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
 public class ElementalArmor extends ArmorItem
-		implements IReactiveEquipment, IDragonWingRenderItem, IDyeableArmorItem, IElytraRenderer {
+		implements IReactiveEquipment, IDragonWingRenderItem, DyeableLeatherItem, IElytraRenderer {
 
 	public static enum Type {
 		NOVICE(.8f), ADEPT(.9f), MASTER(1f);
@@ -192,7 +192,7 @@ public class ElementalArmor extends ArmorItem
 	// UUID.fromString("3F7D236D-1118-6524-3375-34814505B28E"),
 	// UUID.fromString("4A632266-F4E1-2E67-7836-64FD783B7A50")};
 
-	private static int calcArmor(EquipmentSlotType slot, EMagicElement element, Type type) {
+	private static int calcArmor(EquipmentSlot slot, EMagicElement element, Type type) {
 
 		// Ratio of full armor for a MASTER set
 		final float fullProt;
@@ -263,7 +263,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	// Calcs magic resist on a scale from 0 to 1 (with 1 being 100%)
-	private static float calcMagicResistBase(EquipmentSlotType slot, EMagicElement element, Type type) {
+	private static float calcMagicResistBase(EquipmentSlot slot, EMagicElement element, Type type) {
 
 		// Ratio of full armor for a MASTER set
 		final float fullProt;
@@ -320,7 +320,7 @@ public class ElementalArmor extends ArmorItem
 		return fullProt * typeScale * slotScale;
 	}
 
-	private static final double calcMagicReduct(EquipmentSlotType slot, EMagicElement element, Type type) {
+	private static final double calcMagicReduct(EquipmentSlot slot, EMagicElement element, Type type) {
 		// each piece will give (.1, .15, .25) of their type depending on level.
 		return (type == Type.NOVICE ? .1 : (type == Type.ADEPT ? .15 : .25));
 	}
@@ -399,7 +399,7 @@ public class ElementalArmor extends ArmorItem
 		return reduc;
 	}
 
-	private static int calcArmorDurability(EquipmentSlotType slot, EMagicElement element, Type type) {
+	private static int calcArmorDurability(EquipmentSlot slot, EMagicElement element, Type type) {
 		float mod = 1f;
 		switch (element) {
 		case EARTH:
@@ -418,13 +418,13 @@ public class ElementalArmor extends ArmorItem
 			break;
 		}
 
-		int diamond = ArmorMaterial.DIAMOND.getDurabilityForSlot(slot);
+		int diamond = ArmorMaterials.DIAMOND.getDurabilityForSlot(slot);
 		double amt = diamond * 1.25 * type.scale; // 80, 90, 100% of (125% of diamond)
 
 		return (int) Math.floor(amt * mod);
 	}
 
-	private static double calcArmorSpeedBoost(EquipmentSlotType slot, EMagicElement element, Type type) {
+	private static double calcArmorSpeedBoost(EquipmentSlot slot, EMagicElement element, Type type) {
 		if (type != Type.MASTER) {
 			return 0;
 		}
@@ -444,7 +444,7 @@ public class ElementalArmor extends ArmorItem
 		return 0;
 	}
 
-	private static double calcArmorJumpBoost(EquipmentSlotType slot, EMagicElement element, Type type) {
+	private static double calcArmorJumpBoost(EquipmentSlot slot, EMagicElement element, Type type) {
 		if (type != Type.MASTER) {
 			return 0;
 		}
@@ -491,7 +491,7 @@ public class ElementalArmor extends ArmorItem
 		return mult * (total / 4);
 	}
 
-	private static int calcArmorToughness(EquipmentSlotType slot, EMagicElement element, Type type) {
+	private static int calcArmorToughness(EquipmentSlot slot, EMagicElement element, Type type) {
 		return type.ordinal() + 2;
 	}
 
@@ -508,8 +508,8 @@ public class ElementalArmor extends ArmorItem
 	@OnlyIn(Dist.CLIENT)
 	private static List<ModelEnchantedArmorBase<LivingEntity>> armorModels;
 
-	public ElementalArmor(EMagicElement element, EquipmentSlotType slot, Type type, Item.Properties builder) {
-		super(ArmorMaterial.IRON, slot, builder.durability(calcArmorDurability(slot, element, type)));
+	public ElementalArmor(EMagicElement element, EquipmentSlot slot, Type type, Item.Properties builder) {
+		super(ArmorMaterials.IRON, slot, builder.durability(calcArmorDurability(slot, element, type)));
 
 		this.type = type;
 		this.element = element;
@@ -532,7 +532,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	@Override
-	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot equipmentSlot) {
 		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 
 		if (equipmentSlot == this.slot) {
@@ -606,7 +606,7 @@ public class ElementalArmor extends ArmorItem
 		return !offense && NostrumMagica.rand.nextFloat() <= chancePer * (float) (Math.min(2, type.scale) + 1);
 	}
 
-	public static ElementalArmor get(EMagicElement element, EquipmentSlotType slot, Type type) {
+	public static ElementalArmor get(EMagicElement element, EquipmentSlot slot, Type type) {
 		ElementalArmor armor = null;
 
 		switch (element) {
@@ -1038,7 +1038,7 @@ public class ElementalArmor extends ArmorItem
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlotType slot, String type) {
+	public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
 		if (!(stack.getItem() instanceof ElementalArmor)) {
 			return null;
 		}
@@ -1057,8 +1057,8 @@ public class ElementalArmor extends ArmorItem
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public BipedModel getArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlotType slot,
-			BipedModel defaultModel) {
+	public HumanoidModel getArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot,
+			HumanoidModel defaultModel) {
 		final int setCount = getSetPieces(entity);
 		final int index = (setCount - 1) + (type == Type.MASTER ? 1 : 0); // Boost 1 if ultimate armor
 		ModelEnchantedArmorBase<LivingEntity> model = armorModels.get(index % armorModels.size());
@@ -1071,8 +1071,8 @@ public class ElementalArmor extends ArmorItem
 		int count = 0;
 
 		if (entity != null) {
-			for (EquipmentSlotType slot : new EquipmentSlotType[] { EquipmentSlotType.HEAD, EquipmentSlotType.CHEST,
-					EquipmentSlotType.LEGS, EquipmentSlotType.FEET }) {
+			for (EquipmentSlot slot : new EquipmentSlot[] { EquipmentSlot.HEAD, EquipmentSlot.CHEST,
+					EquipmentSlot.LEGS, EquipmentSlot.FEET }) {
 				ItemStack inSlot = entity.getItemBySlot(slot);
 				if (inSlot.isEmpty() || !(inSlot.getItem() instanceof ElementalArmor)) {
 					continue;
@@ -1117,8 +1117,8 @@ public class ElementalArmor extends ArmorItem
 		List<ElementalArmor> list = new LinkedList<>();
 
 		for (EMagicElement element : EMagicElement.values()) {
-			for (EquipmentSlotType slot : EquipmentSlotType.values())
-				if (slot.getType() == EquipmentSlotType.Group.ARMOR) {
+			for (EquipmentSlot slot : EquipmentSlot.values())
+				if (slot.getType() == EquipmentSlot.Type.ARMOR) {
 					for (Type type : Type.values()) {
 						list.add(get(element, slot, type));
 					}
@@ -1128,7 +1128,7 @@ public class ElementalArmor extends ArmorItem
 		return list;
 	}
 
-	protected void onArmorDisplayTick(World world, PlayerEntity player, ItemStack itemStack, int setCount) {
+	protected void onArmorDisplayTick(Level world, Player player, ItemStack itemStack, int setCount) {
 		final int displayLevel = (Math.min(2, type.ordinal()) + 1) * (setCount * setCount);
 
 		if (NostrumMagica.rand.nextInt(400) > displayLevel) {
@@ -1138,7 +1138,7 @@ public class ElementalArmor extends ArmorItem
 		final double dx;
 		final double dy;
 		final double dz;
-		final IParticleData effect;
+		final ParticleOptions effect;
 		final int mult;
 		final float rangeMod;
 		switch (element) {
@@ -1162,7 +1162,7 @@ public class ElementalArmor extends ArmorItem
 			rangeMod = 1.5f;
 			break;
 		case ICE:
-			effect = new BlockParticleData(ParticleTypes.FALLING_DUST, Blocks.SNOW_BLOCK.defaultBlockState());
+			effect = new BlockParticleOption(ParticleTypes.FALLING_DUST, Blocks.SNOW_BLOCK.defaultBlockState());
 			dx = dz = 0;
 			dy = .025;
 			mult = 1;
@@ -1174,7 +1174,7 @@ public class ElementalArmor extends ArmorItem
 			rangeMod = 0;
 			NostrumParticles.LIGHTNING_STATIC.spawn(world,
 					new SpawnParams(1, player.getX(), player.getY() + 1, player.getZ(), 1, 20 * 1, 0,
-							new Vector3d(0, 0.01 * (NostrumMagica.rand.nextBoolean() ? 1 : -1), 0), null).color(.8f, 1f,
+							new Vec3(0, 0.01 * (NostrumMagica.rand.nextBoolean() ? 1 : -1), 0), null).color(.8f, 1f,
 									1f, 0f));
 			break;
 		case PHYSICAL:
@@ -1201,8 +1201,8 @@ public class ElementalArmor extends ArmorItem
 		}
 	}
 
-	protected void onServerTick(World world, PlayerEntity player, ItemStack stack, int setCount) {
-		if (setCount == 4 && this.type == Type.MASTER && this.slot == EquipmentSlotType.CHEST) {
+	protected void onServerTick(Level world, Player player, ItemStack stack, int setCount) {
+		if (setCount == 4 && this.type == Type.MASTER && this.slot == EquipmentSlot.CHEST) {
 			if (element == EMagicElement.ICE) {
 				if (player.isOnGround() && !ArmorCheckFlying(player) && GetArmorEffectsEnabled(player)) {
 					final BlockPos pos = player.blockPosition();
@@ -1216,17 +1216,17 @@ public class ElementalArmor extends ArmorItem
 			} else if (element == EMagicElement.WIND) {
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 				if (attr != null && attr.getMana() > 0 && player.isSprinting() && !ArmorCheckFlying(player) && GetArmorEffectsEnabled(player)) {
-					if (!player.hasEffect(Effects.MOVEMENT_SPEED) || player.tickCount % 10 == 0) {
-						player.addEffect(new EffectInstance(Effects.MOVEMENT_SPEED, 20, 0));
+					if (!player.hasEffect(MobEffects.MOVEMENT_SPEED) || player.tickCount % 10 == 0) {
+						player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 20, 0));
 					}
-					if (!player.hasEffect(Effects.JUMP) || player.tickCount % 10 == 0) {
-						player.addEffect(new EffectInstance(Effects.JUMP, 20, 1));
+					if (!player.hasEffect(MobEffects.JUMP) || player.tickCount % 10 == 0) {
+						player.addEffect(new MobEffectInstance(MobEffects.JUMP, 20, 1));
 					}
 
 					// Refresh nearby tornados
 					if (player.isOnGround())
 						for (AreaEffectEntity cloud : world.getEntitiesOfClass(AreaEffectEntity.class,
-								(new AxisAlignedBB(0, 0, 0, 1, 1, 1))
+								(new AABB(0, 0, 0, 1, 1, 1))
 										.move(player.getX(), player.getY(), player.getZ()).inflate(5),
 								(effect) -> {
 									// lol
@@ -1257,7 +1257,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	@Override
-	public void onArmorTick(ItemStack itemStack, World world, PlayerEntity player) {
+	public void onArmorTick(ItemStack itemStack, Level world, Player player) {
 		super.onArmorTick(itemStack, world, player);
 
 		final int setCount = getSetPieces(player);
@@ -1269,8 +1269,8 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	public static final boolean EntityHasEnchantedArmor(LivingEntity entity) {
-		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-			if (slot.getType() != Group.ARMOR) {
+		for (EquipmentSlot slot : EquipmentSlot.values()) {
+			if (slot.getType() != Type.ARMOR) {
 				continue;
 			}
 
@@ -1285,12 +1285,12 @@ public class ElementalArmor extends ArmorItem
 
 	// Updates all entities' current set bonuses (or lack there-of) from enchanted
 	// armor
-	public static void ServerWorldTick(ServerWorld world) {
+	public static void ServerWorldTick(ServerLevel world) {
 		world.getEntities().forEach((ent) -> {
 			if (ent instanceof LivingEntity) {
 				LivingEntity living = (LivingEntity) ent;
-				if (living.isFallFlying() && living.isShiftKeyDown() && living instanceof ServerPlayerEntity) {
-					((ServerPlayerEntity) living).stopFallFlying();
+				if (living.isFallFlying() && living.isShiftKeyDown() && living instanceof ServerPlayer) {
+					((ServerPlayer) living).stopFallFlying();
 				}
 			}
 		});
@@ -1298,11 +1298,11 @@ public class ElementalArmor extends ArmorItem
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
 		if (ElementalArmor.GetHasWingUpgrade(stack)) {
-			tooltip.add(new TranslationTextComponent("info.armor.wing_upgrade").withStyle(TextFormatting.GOLD));
+			tooltip.add(new TranslatableComponent("info.armor.wing_upgrade").withStyle(ChatFormatting.GOLD));
 		}
 	}
 
@@ -1311,11 +1311,11 @@ public class ElementalArmor extends ArmorItem
 	public boolean shouldRenderElyta(LivingEntity entity, ItemStack stack) {
 		return stack != entity.getMainHandItem() && stack != entity.getOffhandItem() && hasElytra(entity)
 				&& (element == EMagicElement.ICE || element == EMagicElement.LIGHTNING || element == EMagicElement.WIND)
-				&& (!(entity instanceof PlayerEntity) || !(shouldRenderDragonWings(stack, (PlayerEntity) entity)));
+				&& (!(entity instanceof Player) || !(shouldRenderDragonWings(stack, (Player) entity)));
 	}
 
 	protected boolean hasElytra(LivingEntity entity) {
-		if (this.type == Type.MASTER && this.slot == EquipmentSlotType.CHEST) {
+		if (this.type == Type.MASTER && this.slot == EquipmentSlot.CHEST) {
 			// Check if full set is available
 			return (4 == getSetPieces(entity));
 		}
@@ -1332,7 +1332,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	protected static @Nullable ElementalArmor getChestPiece(LivingEntity entity) {
-		ItemStack chestpiece = entity.getItemBySlot(EquipmentSlotType.CHEST);
+		ItemStack chestpiece = entity.getItemBySlot(EquipmentSlot.CHEST);
 		if (chestpiece.isEmpty() || !(chestpiece.getItem() instanceof ElementalArmor)) {
 			return null;
 		}
@@ -1363,7 +1363,7 @@ public class ElementalArmor extends ArmorItem
 	protected static final int EARTH_GROW_COST = 5;
 
 	protected boolean hasManaJump(LivingEntity entity) {
-		if (this.type == Type.MASTER && this.slot == EquipmentSlotType.CHEST) {
+		if (this.type == Type.MASTER && this.slot == EquipmentSlot.CHEST) {
 			// Check if full set is available and if we have enough mana
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 			if (attr == null || attr.getMana() < MANA_JUMP_COST) {
@@ -1380,7 +1380,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	protected boolean hasWindTornado(LivingEntity entity) {
-		if (this.type == Type.MASTER && this.slot == EquipmentSlotType.CHEST && this.element == EMagicElement.WIND) {
+		if (this.type == Type.MASTER && this.slot == EquipmentSlot.CHEST && this.element == EMagicElement.WIND) {
 			// Check if full set is available and if we have enough mana
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 			if (attr == null || attr.getMana() < WIND_TORNADO_COST) {
@@ -1397,7 +1397,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	protected boolean hasEnderDash(LivingEntity entity) {
-		if (this.type == Type.MASTER && this.slot == EquipmentSlotType.CHEST && this.element == EMagicElement.ENDER) {
+		if (this.type == Type.MASTER && this.slot == EquipmentSlot.CHEST && this.element == EMagicElement.ENDER) {
 			// Check if full set is available and if we have enough mana
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 			if (attr == null || attr.getMana() < ENDER_DASH_COST) {
@@ -1414,11 +1414,11 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	protected boolean hasDragonFlight(LivingEntity entity) {
-		if (this.type == Type.MASTER && this.slot == EquipmentSlotType.CHEST) {
+		if (this.type == Type.MASTER && this.slot == EquipmentSlot.CHEST) {
 			boolean hasRightElement = element == EMagicElement.ENDER || element == EMagicElement.EARTH
 					|| element == EMagicElement.FIRE || element == EMagicElement.PHYSICAL;
 			if (!hasRightElement) {
-				ItemStack chest = entity.getItemBySlot(EquipmentSlotType.CHEST);
+				ItemStack chest = entity.getItemBySlot(EquipmentSlot.CHEST);
 				hasRightElement = ElementalArmor.GetHasWingUpgrade(chest);
 			}
 			if (hasRightElement) {
@@ -1440,7 +1440,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	protected static void consumeManaJump(LivingEntity entity) {
-		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
+		if (entity instanceof Player && ((Player) entity).isCreative()) {
 			return;
 		}
 
@@ -1451,7 +1451,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	protected static void consumeWindTornado(LivingEntity entity) {
-		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
+		if (entity instanceof Player && ((Player) entity).isCreative()) {
 			return;
 		}
 
@@ -1462,7 +1462,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	protected static void consumeWindJumpWhirlwind(LivingEntity entity) {
-		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
+		if (entity instanceof Player && ((Player) entity).isCreative()) {
 			return;
 		}
 
@@ -1473,7 +1473,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	protected static void consumeEnderDash(LivingEntity entity) {
-		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
+		if (entity instanceof Player && ((Player) entity).isCreative()) {
 			return;
 		}
 
@@ -1484,7 +1484,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	protected static void consumeDragonFlight(LivingEntity entity) {
-		if (entity instanceof PlayerEntity && ((PlayerEntity) entity).isCreative()) {
+		if (entity instanceof Player && ((Player) entity).isCreative()) {
 			return;
 		}
 
@@ -1502,27 +1502,27 @@ public class ElementalArmor extends ArmorItem
 	private static boolean rightPressedEarly = false;
 	private static long lastRightMSecs = -1;
 
-	private static KeyBinding bindingEnderLeft;
-	private static KeyBinding bindingEnderRight;
-	private static KeyBinding bindingEnderBack;
+	private static KeyMapping bindingEnderLeft;
+	private static KeyMapping bindingEnderRight;
+	private static KeyMapping bindingEnderBack;
 	// private static KeyBinding bindingSummonTornado;
-	private static KeyBinding bindingSummonJumpWhirlwind;
-	private static KeyBinding bindingToggleArmorEffect;
+	private static KeyMapping bindingSummonJumpWhirlwind;
+	private static KeyMapping bindingToggleArmorEffect;
 
 	public static final void ClientInit() {
-		bindingEnderLeft = new KeyBinding("key.dash.left.desc", GLFW.GLFW_KEY_KP_7, "key.nostrummagica.desc");
+		bindingEnderLeft = new KeyMapping("key.dash.left.desc", GLFW.GLFW_KEY_KP_7, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingEnderLeft);
 
-		bindingEnderRight = new KeyBinding("key.dash.right.desc", GLFW.GLFW_KEY_KP_9, "key.nostrummagica.desc");
+		bindingEnderRight = new KeyMapping("key.dash.right.desc", GLFW.GLFW_KEY_KP_9, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingEnderRight);
 
-		bindingEnderBack = new KeyBinding("key.dash.back.desc", GLFW.GLFW_KEY_KP_2, "key.nostrummagica.desc");
+		bindingEnderBack = new KeyMapping("key.dash.back.desc", GLFW.GLFW_KEY_KP_2, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingEnderBack);
 
-		bindingSummonJumpWhirlwind = new KeyBinding("key.wind.jump.desc", GLFW.GLFW_KEY_M, "key.nostrummagica.desc");
+		bindingSummonJumpWhirlwind = new KeyMapping("key.wind.jump.desc", GLFW.GLFW_KEY_M, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingSummonJumpWhirlwind);
 
-		bindingToggleArmorEffect = new KeyBinding("key.armor.toggle.desc", GLFW.GLFW_KEY_KP_5,
+		bindingToggleArmorEffect = new KeyMapping("key.armor.toggle.desc", GLFW.GLFW_KEY_KP_5,
 				"key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingToggleArmorEffect);
 
@@ -1540,7 +1540,7 @@ public class ElementalArmor extends ArmorItem
 
 	@SubscribeEvent
 	public static void onKey(KeyInputEvent event) {
-		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.instance.proxy.getPlayer();
 		if (bindingEnderLeft.consumeClick()) {
 			clientDashSide(player, false);
 		} else if (bindingEnderRight.consumeClick()) {
@@ -1560,7 +1560,7 @@ public class ElementalArmor extends ArmorItem
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void onClientJump(PlayerJumpEvent.Post event) {
-		final ClientPlayerEntity player = (ClientPlayerEntity) event.getPlayer();
+		final LocalPlayer player = (LocalPlayer) event.getPlayer();
 		final boolean flying = ArmorCheckFlying(player);
 		
 		boolean hasJump = true;
@@ -1593,7 +1593,7 @@ public class ElementalArmor extends ArmorItem
 	@SubscribeEvent
 	public static void onClientTick(TickEvent.ClientTickEvent event) {
 		Minecraft mc = Minecraft.getInstance();
-		final ClientPlayerEntity player = mc.player;
+		final LocalPlayer player = mc.player;
 		if (player == null) {
 			return;
 		}
@@ -1733,17 +1733,17 @@ public class ElementalArmor extends ArmorItem
 		}
 	}
 
-	protected static final void SendUpdates(LivingEntity entity, @Nullable PlayerEntity toPlayer) {
+	protected static final void SendUpdates(LivingEntity entity, @Nullable Player toPlayer) {
 		// Note: We only do players for now
-		if (entity instanceof PlayerEntity) {
-			final PlayerEntity player = (PlayerEntity) entity;
+		if (entity instanceof Player) {
+			final Player player = (Player) entity;
 			final EnchantedArmorStateUpdate message = new EnchantedArmorStateUpdate(ArmorState.FLYING,
 					ArmorCheckFlying(player), player.getId());
 			if (player.level.isClientSide) {
 				assert (player == NostrumMagica.instance.proxy.getPlayer());
 				NetworkHandler.sendToServer(message);
 			} else if (toPlayer != null) {
-				NetworkHandler.sendTo(message, (ServerPlayerEntity) toPlayer);
+				NetworkHandler.sendTo(message, (ServerPlayer) toPlayer);
 			} else {
 				NetworkHandler.sendToDimension(message, DimensionUtils.GetDimension(player));
 			}
@@ -1855,9 +1855,9 @@ public class ElementalArmor extends ArmorItem
 	private static final String NBT_WING_UPGRADE = "dragonwing_upgrade";
 
 	public static final void SetHasWingUpgrade(ItemStack stack, boolean upgraded) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 
 		nbt.putBoolean(NBT_WING_UPGRADE, upgraded);
@@ -1867,30 +1867,30 @@ public class ElementalArmor extends ArmorItem
 
 	public static final boolean GetHasWingUpgrade(ItemStack stack) {
 		return !stack.isEmpty() && stack.getItem() instanceof ElementalArmor
-				&& ((ElementalArmor) stack.getItem()).getSlot() == EquipmentSlotType.CHEST && stack.hasTag()
+				&& ((ElementalArmor) stack.getItem()).getSlot() == EquipmentSlot.CHEST && stack.hasTag()
 				&& stack.getTag().getBoolean(NBT_WING_UPGRADE);
 	}
 
-	private static final boolean DoEnderDash(LivingEntity entity, Vector3d dir) {
+	private static final boolean DoEnderDash(LivingEntity entity, Vec3 dir) {
 		if (DimensionUtils.IsSorceryDim(entity.level)) {
 			return false;
 		}
 
 		final float dashDist = 4.0f;
-		final Vector3d idealVec = entity.position().add(dashDist * dir.x, dashDist * dir.y, dashDist * dir.z);
+		final Vec3 idealVec = entity.position().add(dashDist * dir.x, dashDist * dir.y, dashDist * dir.z);
 
 		// Do three traces from y=0, y=1, and y=2. Take best one
-		Vector3d bestResult = null;
+		Vec3 bestResult = null;
 		double bestDist = -1;
-		final Vector3d startPos = entity.position();
+		final Vec3 startPos = entity.position();
 		for (int y = -1; y <= 4; y++) {
-			final Vector3d end = idealVec.add(0, y, 0);
-			RayTraceResult mop = RayTrace.raytrace(entity.level, entity, startPos.add(0, y, 0), end, (ent) -> {
+			final Vec3 end = idealVec.add(0, y, 0);
+			HitResult mop = RayTrace.raytrace(entity.level, entity, startPos.add(0, y, 0), end, (ent) -> {
 				return false;
 			});
 
-			final Vector3d spot;
-			if (mop != null && mop.getType() == RayTraceResult.Type.BLOCK) {
+			final Vec3 spot;
+			if (mop != null && mop.getType() == HitResult.Type.BLOCK) {
 				spot = mop.getLocation();
 			} else {
 				// Didn't hit anything. Count as ideal
@@ -1910,7 +1910,7 @@ public class ElementalArmor extends ArmorItem
 			if (!event.isCanceled()) {
 				if (entity.randomTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), false)) {
 					entity.level.playSound(null, startPos.x, startPos.y, startPos.z,
-							SoundEvents.ENDERMAN_TELEPORT, SoundCategory.PLAYERS, 1f, 1f);
+							SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1f, 1f);
 					NostrumMagica.fireTeleprotedOtherEvent(event.getEntity(), entity, event.getPrev(),
 							event.getTarget());
 					return true;
@@ -1920,21 +1920,21 @@ public class ElementalArmor extends ArmorItem
 		return false;
 	}
 
-	protected static final boolean CanGrow(BlockState state, IGrowable growable) {
+	protected static final boolean CanGrow(BlockState state, BonemealableBlock growable) {
 		// Don't grow mushrooms and stuff... althoug why not?
-		return growable instanceof CropsBlock || growable instanceof SaplingBlock
+		return growable instanceof CropBlock || growable instanceof SaplingBlock
 				|| growable instanceof BambooSaplingBlock;
 	}
 
-	public static synchronized final @Nullable BlockPos DoEarthGrow(World world, BlockPos center) {
+	public static synchronized final @Nullable BlockPos DoEarthGrow(Level world, BlockPos center) {
 		Collections.shuffle(EARTH_SCAN_POS);
 
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		for (BlockPos offset : EARTH_SCAN_POS) {
 			cursor.set(center.getX() + offset.getX(), center.getY() + offset.getY(), center.getZ() + offset.getZ());
 			BlockState state = world.getBlockState(cursor);
-			if (state != null && state.getBlock() instanceof IGrowable) {
-				IGrowable growable = (IGrowable) state.getBlock();
+			if (state != null && state.getBlock() instanceof BonemealableBlock) {
+				BonemealableBlock growable = (BonemealableBlock) state.getBlock();
 				if (!CanGrow(state, growable)) {
 					continue;
 				}
@@ -1942,10 +1942,10 @@ public class ElementalArmor extends ArmorItem
 						&& growable.isBonemealSuccess(world, random, cursor, state)) {
 					// Only grow 1/4th the time
 					if (random.nextBoolean() && random.nextBoolean()) {
-						growable.performBonemeal((ServerWorld) world, random, cursor, state);
+						growable.performBonemeal((ServerLevel) world, random, cursor, state);
 					}
 
-					((ServerWorld) world).sendParticles(ParticleTypes.HAPPY_VILLAGER,
+					((ServerLevel) world).sendParticles(ParticleTypes.HAPPY_VILLAGER,
 							cursor.getX() + .5 + (-.5 + random.nextDouble()), cursor.getY() + .5,
 							cursor.getZ() + .5 + (-.5 + random.nextDouble()), 2, .2, .2, .2, 0);
 					return cursor.immutable();
@@ -1956,7 +1956,7 @@ public class ElementalArmor extends ArmorItem
 		return null;
 	}
 
-	public static final boolean DoEarthDig(World world, PlayerEntity player, BlockPos pos, Direction face) {
+	public static final boolean DoEarthDig(Level world, Player player, BlockPos pos, Direction face) {
 		if (!player.getMainHandItem().isEmpty()) {
 			return false;
 		}
@@ -2007,7 +2007,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	public static final void HandleStateUpdate(ArmorState state, LivingEntity ent, boolean data) {
-		ItemStack chest = ent.getItemBySlot(EquipmentSlotType.CHEST);
+		ItemStack chest = ent.getItemBySlot(EquipmentSlot.CHEST);
 		if (chest.isEmpty() || !(chest.getItem() instanceof ElementalArmor)) {
 			return;
 		}
@@ -2041,14 +2041,14 @@ public class ElementalArmor extends ArmorItem
 						AspectedEnderWeapon.AttemptCasterTeleport(ent, held);
 					}
 				} else {
-					final Vector3d realLook = ent.getLookAngle();
-					final Vector3d fakeLook = new Vector3d(realLook.x, 0, realLook.z);
-					Vector3d dir = fakeLook.scale(-1);
+					final Vec3 realLook = ent.getLookAngle();
+					final Vec3 fakeLook = new Vec3(realLook.x, 0, realLook.z);
+					Vec3 dir = fakeLook.scale(-1);
 					if (DoEnderDash(ent, dir)) {
 						ElementalArmor.consumeEnderDash(ent);
 					} else {
-						if (ent instanceof PlayerEntity) {
-							NostrumMagica.instance.proxy.sendMana((PlayerEntity) ent);
+						if (ent instanceof Player) {
+							NostrumMagica.instance.proxy.sendMana((Player) ent);
 						}
 					}
 				}
@@ -2056,9 +2056,9 @@ public class ElementalArmor extends ArmorItem
 			break;
 		case ENDER_DASH_SIDE:
 			if (!ent.level.isClientSide && armor.hasEnderDash(ent) && !DimensionUtils.IsSorceryDim(ent.level)) {
-				final Vector3d realLook = ent.getLookAngle();
-				final Vector3d fakeLook = new Vector3d(realLook.x, 0, realLook.z);
-				final Vector3d dir = fakeLook.yRot((float) ((Math.PI / 2) * (data ? -1 : 1)));
+				final Vec3 realLook = ent.getLookAngle();
+				final Vec3 fakeLook = new Vec3(realLook.x, 0, realLook.z);
+				final Vec3 dir = fakeLook.yRot((float) ((Math.PI / 2) * (data ? -1 : 1)));
 				if (DoEnderDash(ent, dir)) {
 					consumeEnderDash(ent);
 				}
@@ -2087,7 +2087,7 @@ public class ElementalArmor extends ArmorItem
 					}
 
 					// Projectiles get turned downward
-					if (entity instanceof ProjectileEntity) {
+					if (entity instanceof Projectile) {
 						LivingEntity shooter = Projectiles.getShooter(entity);
 						if (shooter == ent) {
 							// Let summoner's projectiles go unharmed
@@ -2164,8 +2164,8 @@ public class ElementalArmor extends ArmorItem
 					ElementalArmor.consumeDragonFlight(ent);
 				} else {
 					if (SetArmorWingFlap(ent)) {
-						if (ent instanceof PlayerEntity) {
-							NostrumMagicaSounds.WING_FLAP.playClient((PlayerEntity) ent);
+						if (ent instanceof Player) {
+							NostrumMagicaSounds.WING_FLAP.playClient((Player) ent);
 						}
 					}
 				}
@@ -2176,16 +2176,16 @@ public class ElementalArmor extends ArmorItem
 			break;
 		case WIND_JUMP_WHIRLWIND:
 			if (!ent.level.isClientSide && armor.hasWindTornado(ent)) {
-				PlayerEntity playerIn = (PlayerEntity) ent;
+				Player playerIn = (Player) ent;
 				ElementalArmor.consumeWindJumpWhirlwind(ent);
 				final float maxDist = 20;
-				RayTraceResult mop = RayTrace.raytrace(playerIn.level, playerIn,
+				HitResult mop = RayTrace.raytrace(playerIn.level, playerIn,
 						playerIn.position().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookAngle(), maxDist,
 						(e) -> {
 							return e != playerIn;
 						});
-				if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
-					final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY
+				if (mop != null && mop.getType() != HitResult.Type.MISS) {
+					final Vec3 at = (mop.getType() == HitResult.Type.ENTITY
 							? RayTrace.entFromRaytrace(mop).position()
 							: mop.getLocation());
 					AspectedWeapon.spawnJumpVortex(playerIn.level, playerIn, at, AspectedWeapon.Type.MASTER);
@@ -2206,7 +2206,7 @@ public class ElementalArmor extends ArmorItem
 		ElementalArmor armor = getChestPiece(ent);
 		if (armor != null && armor.getType() == Type.MASTER && armor.getSetPieces(ent) == 4) {
 			// Jump-boost gives an extra .1 per level. We want 2-block height so we do .2
-			Vector3d motion = ent.getDeltaMovement();
+			Vec3 motion = ent.getDeltaMovement();
 			ent.setDeltaMovement(motion.x, motion.y + armor.jumpBoost, motion.z);
 		}
 	}
@@ -2229,7 +2229,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	@Override
-	public boolean shouldRenderDragonWings(ItemStack stack, PlayerEntity player) {
+	public boolean shouldRenderDragonWings(ItemStack stack, Player player) {
 		final boolean flying = player.isFallFlying();
 		// Maybe should have an interface?
 		if (ElementalArmor.GetSetCount(player, EMagicElement.PHYSICAL, Type.MASTER) == 4
@@ -2253,7 +2253,7 @@ public class ElementalArmor extends ArmorItem
 	}
 
 	@Override
-	public int getDragonWingColor(ItemStack stack, PlayerEntity player) {
+	public int getDragonWingColor(ItemStack stack, Player player) {
 		return this.element.getColor();
 	}
 }

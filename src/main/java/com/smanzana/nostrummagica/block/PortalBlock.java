@@ -10,30 +10,30 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.WeakHashSet;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.pathfinding.PathType;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -47,31 +47,31 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 	}
 	
 	@Override
-	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, BlockGetter worldIn, BlockPos pos, PathComputationType type) {
         return true;
     }
 	
 	@Override
-	public boolean canBeReplaced(BlockState state, BlockItemUseContext context) {
+	public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
         return false;
     }
 	
 	@Override
-	public int getLightBlock(BlockState state, IBlockReader world, BlockPos pos) {
+	public int getLightBlock(BlockState state, BlockGetter world, BlockPos pos) {
 		return 0;
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState blockState, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		return VoxelShapes.block();
+	public VoxelShape getShape(BlockState blockState, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		return Shapes.block();
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(MASTER);
 	}
 	
-	private void destroy(World world, BlockPos pos, BlockState state) {
+	private void destroy(Level world, BlockPos pos, BlockState state) {
 		if (state == null)
 			state = world.getBlockState(pos);
 		
@@ -95,8 +95,8 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public BlockRenderType getRenderShape(BlockState state) {
-		return BlockRenderType.ENTITYBLOCK_ANIMATED;
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.ENTITYBLOCK_ANIMATED;
 	}
 	
 	public BlockState getSlaveState() {
@@ -113,7 +113,7 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 	}
 	
 	@Override
-	public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
 			this.destroy(world, pos, state);
 			world.removeBlockEntity(pos);
@@ -121,7 +121,7 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 	}
 	
 	@Override
-	public boolean canSurvive(BlockState state, IWorldReader worldIn, BlockPos pos) {
+	public boolean canSurvive(BlockState state, LevelReader worldIn, BlockPos pos) {
 		if (!worldIn.isEmptyBlock(pos.above()))
 			return false;
 		
@@ -135,16 +135,16 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 	}
 	
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return getMaster();
 	}
 	
-	public void createPaired(World worldIn, BlockPos pos) {
+	public void createPaired(Level worldIn, BlockPos pos) {
 		worldIn.setBlockAndUpdate(pos.above(), getSlaveState());
 	}
 	
 	@Override
-	public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+	public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		// This method hopefully is ONLY called when placed manually in the world.
 		// Auto-create slave state
 		createPaired(worldIn, pos);
@@ -152,13 +152,13 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
 		if (!isMaster(stateIn)) {
 			return;
 		}
 		
 		if (rand.nextFloat() < .01f) {
-			worldIn.playLocalSound((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D, NostrumMagicaSounds.PORTAL.getEvent(), SoundCategory.BLOCKS, 0.5F, rand.nextFloat() * 0.4F + 0.8F, false);
+			worldIn.playLocalSound((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D, NostrumMagicaSounds.PORTAL.getEvent(), SoundSource.BLOCKS, 0.5F, rand.nextFloat() * 0.4F + 0.8F, false);
 		}
 		
 		// Create particles
@@ -196,14 +196,14 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
     	}
 	}
 	
-	protected abstract boolean canTeleport(World worldIn, BlockPos portalPos, Entity entityIn);
+	protected abstract boolean canTeleport(Level worldIn, BlockPos portalPos, Entity entityIn);
 	
-	protected abstract void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn);
+	protected abstract void teleportEntity(Level worldIn, BlockPos portalPos, Entity entityIn);
 	
 	@Override
-	public boolean attemptTeleport(World world, BlockPos pos, BlockState state, Entity entity) {
+	public boolean attemptTeleport(Level world, BlockPos pos, BlockState state, Entity entity) {
 		teleportEntity(world, pos, entity);
-		if (entity instanceof PlayerEntity) {
+		if (entity instanceof Player) {
 			ServerEntityTeleportCharge.put(entity, -(TELEPORT_CHARGE_TIME * 5 * 20));
 		}
 		return true;
@@ -226,7 +226,7 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 	public static final int TELEPORT_CHARGE_TIME = 3;
 	
 	@Override
-	public void entityInside(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
+	public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn) {
 		// This func is called many (4) times each frame (per logical side) for portals.
 		// First is during entity updates on the player, which happens for both blocks since both are collided.
 		// Second is when handling player movement.
@@ -273,7 +273,7 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 			}
 		} else {
 			// Servers don't manage player counting
-			if (!(entityIn instanceof PlayerEntity)) {
+			if (!(entityIn instanceof Player)) {
 				int charge = ServerEntityTeleportCharge.getOrDefault(entityIn, 0) + 2; // + 2 because we decrement each tick, too
 				if (charge >= maxChargeTicks) {
 					doTeleport = true;
@@ -341,9 +341,9 @@ public abstract class PortalBlock extends Block implements IPortalBlock  {
 		return (charge == null || charge >= 0 ? 0 : -charge);
 	}
 	
-	public static abstract class NostrumPortalTileEntityBase extends TileEntity {
+	public static abstract class NostrumPortalTileEntityBase extends BlockEntity {
 		
-		public NostrumPortalTileEntityBase(TileEntityType<?> tileEntityTypeIn) {
+		public NostrumPortalTileEntityBase(BlockEntityType<?> tileEntityTypeIn) {
 			super(tileEntityTypeIn);
 		}
 

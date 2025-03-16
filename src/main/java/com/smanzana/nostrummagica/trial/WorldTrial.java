@@ -9,10 +9,10 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.Util;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public abstract class WorldTrial {
 
@@ -32,7 +32,7 @@ public abstract class WorldTrial {
 		this.element = element;
 	}
 	
-	public boolean canTake(PlayerEntity entityPlayer, INostrumMagic attr) {
+	public boolean canTake(Player entityPlayer, INostrumMagic attr) {
 		final EElementalMastery mastery = attr.getElementalMastery(this.element);
 		
 		return !attr.hasTrial(this.element) // Can't already have this trial
@@ -40,21 +40,21 @@ public abstract class WorldTrial {
 				&& !mastery.isGreaterOrEqual(EElementalMastery.MASTER); // Can't be master or better
 	}
 	
-	public void start(PlayerEntity player, INostrumMagic attr) {
+	public void start(Player player, INostrumMagic attr) {
 		attr.startTrial(this.element);
 		
 		final EElementalMastery mastery = attr.getElementalMastery(this.element);
 		if (mastery == EElementalMastery.NOVICE) {
 			if (!player.level.isClientSide) {
 				NostrumMagicaSounds.STATUS_DEBUFF3.play(player);
-				player.sendMessage(new TranslationTextComponent("info.element.starttrial", new Object[] {this.element.getName()}), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.element.starttrial", new Object[] {this.element.getName()}), Util.NIL_UUID);
 			}
 		} else {
 			complete(player);
 		}
 	}
 	
-	protected void complete(PlayerEntity player) {
+	protected void complete(Player player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return;
@@ -82,7 +82,7 @@ public abstract class WorldTrial {
 			NostrumMagicaSounds.LEVELUP.play(player);
 			// Message done in attr
 			//player.sendMessage(new TranslationTextComponent("info.element.mastery" + mastery.intValue(), new Object[] {this.element.getName()}));
-			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
+			NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
 		}
 			
 	}

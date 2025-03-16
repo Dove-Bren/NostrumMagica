@@ -9,13 +9,13 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.pet.IPetWithSoul;
 import com.smanzana.nostrummagica.util.Entities;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
 /**
  * Item that stores a pet's soul, allowing for resurrection once dead.
@@ -34,7 +34,7 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 	}
 	
 	public @Nullable UUID getPetSoulID(ItemStack stack) {
-		CompoundNBT tag = stack.getTag();
+		CompoundTag tag = stack.getTag();
 		if (tag != null && tag.hasUUID(NBT_PETID)) {
 			return tag.getUUID(NBT_PETID);
 		} else {
@@ -43,16 +43,16 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 	}
 	
 	public void setPetSoulID(ItemStack stack, UUID rawSoulID) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		nbt.putUUID(NBT_PETID, rawSoulID);
 		stack.setTag(nbt);
 	}
 	
 	public @Nullable String getPetName(ItemStack stack) {
-		CompoundNBT tag = stack.getTag();
+		CompoundTag tag = stack.getTag();
 		if (tag != null) {
 			return tag.getString(NBT_PETNAME);
 		} else {
@@ -61,9 +61,9 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 	}
 	
 	public void setPetName(ItemStack stack, String name) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		nbt.putString(NBT_PETNAME, name);
 		stack.setTag(nbt);
@@ -86,19 +86,19 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 	 * @param stack
 	 * @return
 	 */
-	public abstract boolean canSpawnEntity(World world, @Nullable LivingEntity spawner, Vector3d pos, ItemStack stack);
+	public abstract boolean canSpawnEntity(Level world, @Nullable LivingEntity spawner, Vec3 pos, ItemStack stack);
 	
 	protected abstract void setWorldID(LivingEntity pet, UUID worldID);
 	
-	protected abstract void beforePetRespawn(LivingEntity pet, World world, Vector3d pos, ItemStack stack);
+	protected abstract void beforePetRespawn(LivingEntity pet, Level world, Vec3 pos, ItemStack stack);
 	
 	@Override
-	public int getEntityLifespan(ItemStack itemStack, World world) {
+	public int getEntityLifespan(ItemStack itemStack, Level world) {
 		// Default is 6000 == 5 mins.
 		return 18000;
 	}
 	
-	public static @Nullable LivingEntity SpawnPet(ItemStack stack, World world, Vector3d pos) {
+	public static @Nullable LivingEntity SpawnPet(ItemStack stack, Level world, Vec3 pos) {
 		if (stack == null || stack.isEmpty() || !(stack.getItem() instanceof PetSoulItem)) {
 			return null;
 		}
@@ -109,7 +109,7 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 			return null;
 		}
 		
-		CompoundNBT snapshot = NostrumMagica.instance.getPetSoulRegistry().getPetSnapshot(soulID);
+		CompoundTag snapshot = NostrumMagica.instance.getPetSoulRegistry().getPetSnapshot(soulID);
 		if (snapshot == null) {
 			return null;
 		}

@@ -10,19 +10,19 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.DamagingProjectileEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 /**
@@ -31,14 +31,14 @@ import net.minecraftforge.fml.network.NetworkHooks;
  * @author Skyler
  *
  */
-public class MagicDamageProjectileEntity extends DamagingProjectileEntity {
+public class MagicDamageProjectileEntity extends AbstractHurtingProjectile {
 	
 	public static final String ID = "magic_projectile";
 	
-	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>defineId(MagicDamageProjectileEntity.class, MagicElementDataSerializer.instance);
+	protected static final EntityDataAccessor<EMagicElement> ELEMENT = SynchedEntityData.<EMagicElement>defineId(MagicDamageProjectileEntity.class, MagicElementDataSerializer.instance);
 	protected float damage;
 
-	public MagicDamageProjectileEntity(EntityType<? extends DamagingProjectileEntity> type, World world) {
+	public MagicDamageProjectileEntity(EntityType<? extends AbstractHurtingProjectile> type, Level world) {
 		super(type, world);
 		damage = 2f;
 	}
@@ -66,7 +66,7 @@ public class MagicDamageProjectileEntity extends DamagingProjectileEntity {
 	}
 	
 	@Override
-	public boolean saveAsPassenger(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundTag compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
     }
@@ -77,12 +77,12 @@ public class MagicDamageProjectileEntity extends DamagingProjectileEntity {
 	}
 	
 	@Override
-	protected IParticleData getTrailParticle() {
-		return new NostrumParticleData(NostrumParticles.WARD.getType(), new SpawnParams(1, 0, 0, 0, 0, 1, 0, Vector3d.ZERO));
+	protected ParticleOptions getTrailParticle() {
+		return new NostrumParticleData(NostrumParticles.WARD.getType(), new SpawnParams(1, 0, 0, 0, 0, 1, 0, Vec3.ZERO));
 	}
 	
 	@Override
-	public IPacket<?> getAddEntityPacket() {
+	public Packet<?> getAddEntityPacket() {
 		// Have to override and use forge to use with non-living Entity types even though parent defines
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
@@ -97,7 +97,7 @@ public class MagicDamageProjectileEntity extends DamagingProjectileEntity {
 		NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
 				2,
 				getX(), getY() + getBbHeight()/2f, getZ(), 0, 40, 0,
-				new Vector3d(random.nextFloat() * .05 - .025, random.nextFloat() * .05, random.nextFloat() * .05 - .025), null
+				new Vec3(random.nextFloat() * .05 - .025, random.nextFloat() * .05, random.nextFloat() * .05 - .025), null
 			).color(color));
 	}
 	
@@ -120,7 +120,7 @@ public class MagicDamageProjectileEntity extends DamagingProjectileEntity {
 	}
 	
 	@Override
-	protected void onHitEntity(EntityRayTraceResult result) {
+	protected void onHitEntity(EntityHitResult result) {
 		if (!level.isClientSide()) {
 			Entity entityHit = result.getEntity();
 			boolean canImpact = this.canImpact(entityHit);
@@ -132,7 +132,7 @@ public class MagicDamageProjectileEntity extends DamagingProjectileEntity {
 	}
 	
 	@Override
-	protected void onHitBlock(BlockRayTraceResult result) {
+	protected void onHitBlock(BlockHitResult result) {
 		if (!level.isClientSide()) {
 			NostrumMagicaSounds.CAST_FAIL.play(this);
 			this.remove();

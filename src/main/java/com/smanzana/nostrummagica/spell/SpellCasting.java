@@ -22,12 +22,12 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.MinecraftForge;
 
 public class SpellCasting {
@@ -59,15 +59,15 @@ public class SpellCasting {
 	}
 	
 	public static final SpellCastResult AttemptToolCast(Spell spell, LivingEntity entity, ItemStack tool) {
-		final boolean freeCast = entity instanceof PlayerEntity
-				? ((PlayerEntity) entity).isCreative()
+		final boolean freeCast = entity instanceof Player
+				? ((Player) entity).isCreative()
 				: false;
 		return AttemptCast(spell, entity, tool, freeCast, false);
 	}
 	
 	public static final SpellCastResult CheckToolCast(Spell spell, LivingEntity entity, ItemStack tool) {
-		final boolean freeCast = entity instanceof PlayerEntity
-				? ((PlayerEntity) entity).isCreative()
+		final boolean freeCast = entity instanceof Player
+				? ((Player) entity).isCreative()
 				: false;
 		return AttemptCast(spell, entity, tool, freeCast, true);
 	}
@@ -79,7 +79,7 @@ public class SpellCasting {
 
 	protected static final SpellCastResult AttemptCast(Spell spell, LivingEntity entity, ItemStack tool, boolean freeCast, boolean checking) {
 		INostrumMagic att = NostrumMagica.getMagicWrapper(entity);
-		@Nullable PlayerEntity playerCast = (entity instanceof PlayerEntity) ? (PlayerEntity) entity : null;
+		@Nullable Player playerCast = (entity instanceof Player) ? (Player) entity : null;
 		
 		final SpellCastEvent.Pre event = new SpellCastEvent.Pre(spell, entity);
 		if (MinecraftForge.EVENT_BUS.post(event)) {
@@ -95,10 +95,10 @@ public class SpellCasting {
 		
 		// Check that the player can cast this (if it's not creative)
 		if (!playerCast.isCreative()) {
-			List<ITextComponent> problems = new ArrayList<>(4);
+			List<Component> problems = new ArrayList<>(4);
 			if (!NostrumMagica.canCast(spell, att, problems)) {
 				NostrumMagica.logger.warn("Got cast message from client with too low of stats. They should relog... " + entity);
-				for (ITextComponent problem : problems) {
+				for (Component problem : problems) {
 					entity.sendMessage(problem, Util.NIL_UUID);
 				}
 				return EmitCastPostEvent(SpellCastResult.fail(spell, entity));
@@ -197,7 +197,7 @@ public class SpellCasting {
 				for (Entry<ReagentType, Integer> row : reagents.entrySet()) {
 					int count = NostrumMagica.getReagentCount(playerCast, row.getKey());
 					if (count < row.getValue()) {
-						playerCast.sendMessage(new TranslationTextComponent("info.spell.bad_reagent", row.getKey().prettyName()), Util.NIL_UUID);
+						playerCast.sendMessage(new TranslatableComponent("info.spell.bad_reagent", row.getKey().prettyName()), Util.NIL_UUID);
 						return EmitCastPostEvent(SpellCastResult.fail(spell, entity, summary));
 					}
 				}
@@ -300,8 +300,8 @@ public class SpellCasting {
 				((ISpellCastingTool) tool.getItem()).onFinishCastFromTool(entity, summary, tool);
 			}
 			
-			if (!seen && entity instanceof PlayerEntity) {
-				PlayerStatTracker.Update((PlayerEntity) entity, (stats) -> stats.incrStat(PlayerStat.UniqueSpellsCast));
+			if (!seen && entity instanceof Player) {
+				PlayerStatTracker.Update((Player) entity, (stats) -> stats.incrStat(PlayerStat.UniqueSpellsCast));
 			}
 		}
 		

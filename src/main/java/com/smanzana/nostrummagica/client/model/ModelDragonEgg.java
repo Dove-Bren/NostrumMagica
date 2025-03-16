@@ -1,15 +1,15 @@
 package com.smanzana.nostrummagica.client.model;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.entity.dragon.DragonEggEntity;
 
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.ModelPart;
 
 public class ModelDragonEgg extends EntityModel<DragonEggEntity> {
 
-	private ModelRenderer main;
+	private ModelPart main;
 	private float coldScale;
 	
 	private static final int textureHeight = 32;
@@ -20,7 +20,7 @@ public class ModelDragonEgg extends EntityModel<DragonEggEntity> {
 	}
 	
 	public ModelDragonEgg() {
-		main = new ModelRenderer(this, 0, 0);
+		main = new ModelPart(this, 0, 0);
 		int y = 28;
 		
 		main.setTexSize(textureWidth, textureHeight);
@@ -42,7 +42,7 @@ public class ModelDragonEgg extends EntityModel<DragonEggEntity> {
 	}
 	
 	@Override
-	public void renderToBuffer(MatrixStack matrixStack, IVertexBuilder buffer,
+	public void renderToBuffer(PoseStack matrixStack, VertexConsumer buffer,
             int light, int overlay, float red, float green, float blue, float alpha) {
 		
 		// Tint based on how cold it is

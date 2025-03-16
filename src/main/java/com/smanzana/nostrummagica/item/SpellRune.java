@@ -22,18 +22,18 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -163,7 +163,7 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResultType useOn(ItemUseContext context) {
+	public InteractionResult useOn(UseOnContext context) {
 		// Probably wnat this later
 		return super.useOn(context);
 	}
@@ -244,8 +244,8 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		
 		@Override
 		@OnlyIn(Dist.CLIENT)
-		public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-			tooltip.add(new StringTextComponent("Element").withStyle(TextFormatting.DARK_GRAY));
+		public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+			tooltip.add(new TextComponent("Element").withStyle(ChatFormatting.DARK_GRAY));
 			
 		}
 		
@@ -280,12 +280,12 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		
 		@Override
 		@OnlyIn(Dist.CLIENT)
-		public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 			final boolean extra = Screen.hasShiftDown();
-			tooltip.add(new StringTextComponent("Alteration").withStyle(TextFormatting.AQUA));
+			tooltip.add(new TextComponent("Alteration").withStyle(ChatFormatting.AQUA));
 			if (extra) {
-				tooltip.add(new StringTextComponent("Weight " + alteration.getWeight()).withStyle(TextFormatting.DARK_PURPLE));
-				tooltip.add(new StringTextComponent(alteration.getCost() + " Mana").withStyle(TextFormatting.GREEN));
+				tooltip.add(new TextComponent("Weight " + alteration.getWeight()).withStyle(ChatFormatting.DARK_PURPLE));
+				tooltip.add(new TextComponent(alteration.getCost() + " Mana").withStyle(ChatFormatting.GREEN));
 			}
 		}
 
@@ -322,34 +322,34 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		}
 		
 		@SuppressWarnings("unchecked")
-		protected <T> void addTooltipProperty(List<ITextComponent> tooltip, SpellShapeProperty<T> property, SpellShape shape, Object value) {
+		protected <T> void addTooltipProperty(List<Component> tooltip, SpellShapeProperty<T> property, SpellShape shape, Object value) {
 			tooltip.add(property.getDisplayName(shape)
-					.append(new StringTextComponent(": "))
+					.append(new TextComponent(": "))
 					.append(property.getDisplayValue(shape, (T) value))
 					);
 		}
 		
 		@Override
 		@OnlyIn(Dist.CLIENT)
-		public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+		public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 			final boolean extra = Screen.hasShiftDown();
-			final @Nullable Container openContainer = (NostrumMagica.instance.proxy.getPlayer() != null)
+			final @Nullable AbstractContainerMenu openContainer = (NostrumMagica.instance.proxy.getPlayer() != null)
 					? NostrumMagica.instance.proxy.getPlayer().containerMenu : null;
 			SpellShapeProperties params = getPieceShapeParam(stack);
-			tooltip.add(new StringTextComponent("Shape").withStyle(TextFormatting.DARK_RED));
+			tooltip.add(new TextComponent("Shape").withStyle(ChatFormatting.DARK_RED));
 			if (shape.getAttributes(params).terminal) {
-				tooltip.add(new StringTextComponent("Terminal Shape").withStyle(TextFormatting.GRAY));
+				tooltip.add(new TextComponent("Terminal Shape").withStyle(ChatFormatting.GRAY));
 			}
 			if (extra
 					|| (openContainer != null && openContainer instanceof SpellCreationGui.SpellCreationContainer)) {
-				tooltip.add(new StringTextComponent("Weight " + this.getShape().getWeight(params)).withStyle(TextFormatting.DARK_PURPLE));
-				tooltip.add(new StringTextComponent(this.getShape().getManaCost(params) + " Mana").withStyle(TextFormatting.GREEN));
+				tooltip.add(new TextComponent("Weight " + this.getShape().getWeight(params)).withStyle(ChatFormatting.DARK_PURPLE));
+				tooltip.add(new TextComponent(this.getShape().getManaCost(params) + " Mana").withStyle(ChatFormatting.GREEN));
 			}
 			
 			if (extra
 					|| (openContainer != null && openContainer instanceof RuneShaperGui.RuneShaperContainer)) {
 				if (!shape.getDefaultProperties().getProperties().isEmpty()) {
-					tooltip.add(new StringTextComponent("Rune Shaper Compatible").withStyle(TextFormatting.GOLD));
+					tooltip.add(new TextComponent("Rune Shaper Compatible").withStyle(ChatFormatting.GOLD));
 				}
 			}
 
@@ -372,9 +372,9 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		}
 		
 		public void setPieceShapeParam(ItemStack stack, SpellShapeProperties params) {
-			CompoundNBT nbt = stack.getTag();
+			CompoundTag nbt = stack.getTag();
 			if (nbt == null) {
-				nbt = new CompoundNBT();
+				nbt = new CompoundTag();
 			}
 			
 			nbt.put(NBT_SHAPE_PROPS, params.toNBT());

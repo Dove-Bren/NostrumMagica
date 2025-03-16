@@ -21,14 +21,14 @@ import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.AIShape;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 
 public class CommandRandomSpell {
 	
-	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+	public static final void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(
 				Commands.literal("randomspell")
 					.requires(s -> s.hasPermission(2))
@@ -42,12 +42,12 @@ public class CommandRandomSpell {
 				);
 	}
 
-	private static final int execute(CommandContext<CommandSource> context, String name) throws CommandSyntaxException {
+	private static final int execute(CommandContext<CommandSourceStack> context, String name) throws CommandSyntaxException {
 		return execute(context, name, 50, 1);
 	}
 	
-	private static final int execute(CommandContext<CommandSource> context, String name, int cost, int weight) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().getPlayerOrException();
+	private static final int execute(CommandContext<CommandSourceStack> context, String name, int cost, int weight) throws CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
 		
 		if (name == null || name.isEmpty()) {
 			name = "Random Spell";

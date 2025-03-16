@@ -11,28 +11,28 @@ import com.smanzana.nostrummagica.serializer.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.DamagingProjectileEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkHooks;
 
-public class SpellProjectileEntity extends DamagingProjectileEntity {
+public class SpellProjectileEntity extends AbstractHurtingProjectile {
 	
 	public static interface ISpellProjectileShape {
 
@@ -40,24 +40,24 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 		
 		public void onProjectileHit(Entity entity);
 		
-		public void onProjectileEnd(Vector3d pos);
+		public void onProjectileEnd(Vec3 pos);
 		
 		public EMagicElement getElement();
 	}
 	
 	public static final String ID = "spell_projectile";
-	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>defineId(SpellProjectileEntity.class, MagicElementDataSerializer.instance);
+	protected static final EntityDataAccessor<EMagicElement> ELEMENT = SynchedEntityData.<EMagicElement>defineId(SpellProjectileEntity.class, MagicElementDataSerializer.instance);
 	
 	// Generic projectile members
 	protected final ISpellProjectileShape trigger;
-	protected final Vector3d origin;
+	protected final Vec3 origin;
 	protected LivingEntity shootingEntity;
 	protected Predicate<Entity> filter;
 	
 	// Base class implementation variables
 	private double maxDistance; // Squared distance so no sqrt
 	
-	public SpellProjectileEntity(EntityType<? extends SpellProjectileEntity> type, World world) {
+	public SpellProjectileEntity(EntityType<? extends SpellProjectileEntity> type, Level world) {
 		super(type, world);
 		this.trigger = null;
 		this.origin = null;
@@ -65,11 +65,11 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 	}
 	
 	protected SpellProjectileEntity(EntityType<? extends SpellProjectileEntity> type,
-			ISpellProjectileShape trigger, World world, LivingEntity shooter,
-			Vector3d origin, Vector3d direction,
+			ISpellProjectileShape trigger, Level world, LivingEntity shooter,
+			Vec3 origin, Vec3 direction,
 			float speedFactor, double maxDistance) {
 		super(type, origin.x(), origin.y(), origin.z(), 0, 0, 0, world);
-		Vector3d accel = getAccel(direction, speedFactor);
+		Vec3 accel = getAccel(direction, speedFactor);
 		this.xPower = accel.x;
 		this.yPower = accel.y;
 		this.zPower = accel.z;
@@ -99,7 +99,7 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 		this(NostrumEntityTypes.spellProjectile, trigger, shooter, speedFactor, maxDistance);
 	}
 
-	public SpellProjectileEntity(ISpellProjectileShape trigger,	LivingEntity shooter, Vector3d origin, Vector3d direction, float speedFactor, double maxDistance) {
+	public SpellProjectileEntity(ISpellProjectileShape trigger,	LivingEntity shooter, Vec3 origin, Vec3 direction, float speedFactor, double maxDistance) {
 		this(NostrumEntityTypes.spellProjectile, trigger, shooter.level, shooter, origin, direction, speedFactor, maxDistance);
 	}
 	
@@ -120,11 +120,11 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 		return distance <= 64 * 64 * 64;
 	}
 	
-	private Vector3d getAccel(Vector3d direction, double scale) {
-		Vector3d base = direction.normalize();
+	private Vec3 getAccel(Vec3 direction, double scale) {
+		Vec3 base = direction.normalize();
 		final double tickScale = .05;
 		
-		return new Vector3d(base.x * scale * tickScale, base.y * scale * tickScale, base.z * scale * tickScale);
+		return new Vec3(base.x * scale * tickScale, base.y * scale * tickScale, base.z * scale * tickScale);
 	}
 	
 	protected boolean dieOnImpact(BlockPos pos) {
@@ -167,7 +167,7 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 		NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
 				2,
 				getX(), getY() + getBbHeight()/2f, getZ(), 0, 40, 0,
-				new Vector3d(random.nextFloat() * .05 - .025, random.nextFloat() * .05, random.nextFloat() * .05 - .025), null
+				new Vec3(random.nextFloat() * .05 - .025, random.nextFloat() * .05, random.nextFloat() * .05 - .025), null
 			).color(color));
 	}
 	
@@ -197,14 +197,14 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 	}
 
 	@Override
-	protected void onHit(RayTraceResult result) {
+	protected void onHit(HitResult result) {
 		if (level.isClientSide() || this.trigger == null)
 			return;
 		
-		if (result.getType() == RayTraceResult.Type.MISS) {
+		if (result.getType() == HitResult.Type.MISS) {
 			; // Do nothing
-		} else if (result.getType() == RayTraceResult.Type.BLOCK) {
-			BlockPos pos = ((BlockRayTraceResult) result).getBlockPos();
+		} else if (result.getType() == HitResult.Type.BLOCK) {
+			BlockPos pos = ((BlockHitResult) result).getBlockPos();
 			boolean canImpact = this.canImpact(pos);
 			if (canImpact) {
 				this.doImpact(new SpellLocation(level, result));
@@ -214,8 +214,8 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 					return;
 				}
 			}
-		} else if (result.getType() == RayTraceResult.Type.ENTITY) {
-			Entity entityHit = ((EntityRayTraceResult) result).getEntity();
+		} else if (result.getType() == HitResult.Type.ENTITY) {
+			Entity entityHit = ((EntityHitResult) result).getEntity();
 			if (entityHit instanceof SpellProjectileEntity) {
 				; // Just don't hit other projectiles
 			} else {
@@ -232,7 +232,7 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 	}
 	
 	@Override
-	public boolean saveAsPassenger(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundTag compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
     }
@@ -243,7 +243,7 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 	}
 	
 	@Override
-	protected IParticleData getTrailParticle() {
+	protected ParticleOptions getTrailParticle() {
 		return ParticleTypes.ENCHANT;
 	}
 	
@@ -256,7 +256,7 @@ public class SpellProjectileEntity extends DamagingProjectileEntity {
 	}
 
 	@Override
-	public IPacket<?> getAddEntityPacket() {
+	public Packet<?> getAddEntityPacket() {
 		// Have to override and use forge to use with non-living Entity types even though parent defines
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}

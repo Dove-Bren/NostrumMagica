@@ -3,13 +3,13 @@ package com.smanzana.nostrummagica.serializer;
 
 import java.util.Optional;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.IDataSerializer;
-import net.minecraft.particles.IParticleData;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.core.particles.ParticleOptions;
 
-public class OptionalParticleDataSerializer implements IDataSerializer<Optional<IParticleData>> {
+public class OptionalParticleDataSerializer implements EntityDataSerializer<Optional<ParticleOptions>> {
 
 	public static final OptionalParticleDataSerializer instance = new OptionalParticleDataSerializer();
 	
@@ -18,29 +18,29 @@ public class OptionalParticleDataSerializer implements IDataSerializer<Optional<
 	}
 	
 	@Override
-	public void write(PacketBuffer buf, Optional<IParticleData> value) {
+	public void write(FriendlyByteBuf buf, Optional<ParticleOptions> value) {
 		buf.writeBoolean(value.isPresent());
 		if (value.isPresent()) {
-			DataSerializers.PARTICLE.write(buf, value.get());
+			EntityDataSerializers.PARTICLE.write(buf, value.get());
 		}
 	}
 
 	@Override
-	public Optional<IParticleData> read(PacketBuffer buf)  {
+	public Optional<ParticleOptions> read(FriendlyByteBuf buf)  {
 		if (buf.readBoolean()) {
-			return Optional.of(DataSerializers.PARTICLE.read(buf));
+			return Optional.of(EntityDataSerializers.PARTICLE.read(buf));
 		} else {
 			return Optional.empty();
 		}
 	}
 
 	@Override
-	public DataParameter<Optional<IParticleData>> createAccessor(int id) {
-		return new DataParameter<>(id, this);
+	public EntityDataAccessor<Optional<ParticleOptions>> createAccessor(int id) {
+		return new EntityDataAccessor<>(id, this);
 	}
 
 	@Override
-	public Optional<IParticleData> copy(Optional<IParticleData> value) {
+	public Optional<ParticleOptions> copy(Optional<ParticleOptions> value) {
 		return Optional.ofNullable(value.orElse(null));
 	}
 }

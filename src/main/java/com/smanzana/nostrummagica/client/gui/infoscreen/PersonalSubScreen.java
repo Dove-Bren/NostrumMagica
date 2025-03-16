@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
@@ -22,11 +22,11 @@ import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.AbstractWidget;
+import com.mojang.blaze3d.platform.Lighting;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public abstract class PersonalSubScreen implements IInfoSubScreen {
@@ -45,7 +45,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		}
 		
 		@Override
-		public void draw(INostrumMagic attr, Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
+		public void draw(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
 			
 			String desc;
 			if (attr.isUnlocked()) {
@@ -124,7 +124,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		}
 
 		@Override
-		public Collection<Widget> getWidgets(int x, int y, int width, int height) {
+		public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
 			return null;
 		}
 		
@@ -137,7 +137,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		private class StatLabel {
 			
 			private String label;
-			private List<ITextComponent> tooltip;
+			private List<Component> tooltip;
 			private int x;
 			private int y;
 			private int width;
@@ -160,23 +160,23 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				int index = raw.indexOf('|');
 				while (index != -1) {
 					String sub = raw.substring(0, index).trim();
-					tooltip.add(new StringTextComponent(sub));
+					tooltip.add(new TextComponent(sub));
 					raw = raw.substring(index + 1).trim();
 					index = raw.indexOf('|');
 				}
 				
-				tooltip.add(new StringTextComponent(raw));
+				tooltip.add(new TextComponent(raw));
 			}
 			
-			public void draw(MatrixStack matrixStackIn, Minecraft mc, int offsetx, int offsety, int width, int height) {
+			public void draw(PoseStack matrixStackIn, Minecraft mc, int offsetx, int offsety, int width, int height) {
 				mc.font.draw(matrixStackIn, label, offsetx + x, offsety + y, 0xFFFFFFFF);
 			}
 			
-			public void drawOverlay(MatrixStack matrixStackIn, Minecraft mc, int offsetx, int offsety, int width, int height, int mouseX, int mouseY) {
+			public void drawOverlay(PoseStack matrixStackIn, Minecraft mc, int offsetx, int offsety, int width, int height, int mouseX, int mouseY) {
 				if (mouseX >= offsetx + x && mouseX <= x + offsetx + this.width
 						&& mouseY >= offsety + y && mouseY <= y + offsety + this.height) {
 					GuiUtils.drawHoveringText(matrixStackIn, tooltip, mouseX, mouseY, width, height, 150, mc.font);
-					RenderHelper.turnOff();
+					Lighting.turnOff();
 				}
 			}
 			
@@ -192,7 +192,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		}
 		
 		@Override
-		public void draw(INostrumMagic attr, Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
+		public void draw(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
 			
 			if (labels == null) {
 				int drawX = 0;
@@ -288,7 +288,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		}
 
 		@Override
-		public Collection<Widget> getWidgets(int x, int y, int width, int height) {
+		public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
 			return null;
 		}
 		
@@ -302,13 +302,13 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		}
 		
 		@Override
-		public void draw(INostrumMagic attr, Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
+		public void draw(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
 			
 			final float known = 1f;
 			final float unknown = .15f;
 			final int iconWidth = 16;
 			int drawX, drawY;
-			ITextComponent tooltipText = null;
+			Component tooltipText = null;
 			
 			drawX = x + 20;
 			drawY = y + 20;
@@ -333,7 +333,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				
 				if (mouseX >= drawX && mouseY >= drawY
 						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
-					tooltipText = new StringTextComponent(elem.getName() + ": ")
+					tooltipText = new TextComponent(elem.getName() + ": ")
 							.append(mastery.getName());
 				}
 				
@@ -391,7 +391,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 					if (knownShapes.contains(shape)) {
 						tooltipText = shape.getDisplayName();
 					} else {
-						tooltipText = new StringTextComponent("Unknown Shape");
+						tooltipText = new TextComponent("Unknown Shape");
 					}
 				}
 				
@@ -419,9 +419,9 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				if (mouseX >= drawX && mouseY >= drawY
 						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
 					if (has != null && has) {
-						tooltipText = new StringTextComponent(alteration.getName());
+						tooltipText = new TextComponent(alteration.getName());
 					} else {
-						tooltipText = new StringTextComponent("Unknown Alteration");
+						tooltipText = new TextComponent("Unknown Alteration");
 					}
 				}
 				
@@ -436,12 +436,12 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			if (tooltipText != null) {
 				GuiUtils.drawHoveringText(matrixStackIn, Lists.newArrayList(tooltipText), mouseX, mouseY, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), 200, mc.font);
-				RenderHelper.turnOff();
+				Lighting.turnOff();
 			}
 		}
 
 		@Override
-		public Collection<Widget> getWidgets(int x, int y, int width, int height) {
+		public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
 			return null;
 		}
 		
@@ -459,7 +459,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		}
 		
 		@Override
-		public void draw(INostrumMagic attr, Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
+		public void draw(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
 			
 			if (rows == null) {
 				rows = new LinkedList<>();
@@ -518,7 +518,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		}
 
 		@Override
-		public Collection<Widget> getWidgets(int x, int y, int width, int height) {
+		public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
 			return null;
 		}
 		
@@ -533,7 +533,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				this.name = name;
 			}
 			
-			public void draw(MatrixStack matrixStackIn, Minecraft mc) {
+			public void draw(PoseStack matrixStackIn, Minecraft mc) {
 				final float ratio = .8f;
 				int len = mc.font.width(name);
 				len = (int) (len * ratio);
@@ -574,7 +574,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				}
 			}
 			
-			public void draw(MatrixStack matrixStackIn, Minecraft mc) {
+			public void draw(PoseStack matrixStackIn, Minecraft mc) {
 				final float ratio = .5f;
 				int len = mc.font.width(alterationName + ": ");
 				this.width = (int) ((len + mc.font.width(name)) * ratio);
@@ -591,15 +591,15 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				
 			}
 			
-			public void drawOverlay(MatrixStack matrixStackIn, Minecraft mc, int mouseX, int mouseY) {
+			public void drawOverlay(PoseStack matrixStackIn, Minecraft mc, int mouseX, int mouseY) {
 				if (desc == null)
 					return;
 				
 				final float ratio = .5f;
 				if (mouseX >= x && mouseY >= y
 						&& mouseX <= x + width && mouseY <= y + (int) (mc.font.lineHeight * ratio)) {
-					GuiUtils.drawHoveringText(matrixStackIn, Lists.newArrayList(new StringTextComponent(desc)), mouseX, mouseY, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), 200, mc.font);
-					RenderHelper.turnOff();
+					GuiUtils.drawHoveringText(matrixStackIn, Lists.newArrayList(new TextComponent(desc)), mouseX, mouseY, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), 200, mc.font);
+					Lighting.turnOff();
 				}
 			}
 			

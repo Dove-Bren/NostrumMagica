@@ -3,11 +3,11 @@ package com.smanzana.nostrummagica.serializer;
 import com.smanzana.nostrummagica.item.armor.DragonArmor;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonArmorMaterial;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.IDataSerializer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializer;
 
-public final class DragonArmorMaterialSerializer implements IDataSerializer<DragonArmor.DragonArmorMaterial> {
+public final class DragonArmorMaterialSerializer implements EntityDataSerializer<DragonArmor.DragonArmorMaterial> {
 	
 	public static final DragonArmorMaterialSerializer instance = new DragonArmorMaterialSerializer();
 	
@@ -16,18 +16,18 @@ public final class DragonArmorMaterialSerializer implements IDataSerializer<Drag
 	}
 	
 	@Override
-	public void write(PacketBuffer buf, DragonArmor.DragonArmorMaterial value) {
+	public void write(FriendlyByteBuf buf, DragonArmor.DragonArmorMaterial value) {
 		buf.writeEnum(value);
 	}
 
 	@Override
-	public DragonArmor.DragonArmorMaterial read(PacketBuffer buf)  {
+	public DragonArmor.DragonArmorMaterial read(FriendlyByteBuf buf)  {
 		return buf.readEnum(DragonArmor.DragonArmorMaterial.class);
 	}
 
 	@Override
-	public DataParameter<DragonArmor.DragonArmorMaterial> createAccessor(int id) {
-		return new DataParameter<>(id, this);
+	public EntityDataAccessor<DragonArmor.DragonArmorMaterial> createAccessor(int id) {
+		return new EntityDataAccessor<>(id, this);
 	}
 
 	@Override

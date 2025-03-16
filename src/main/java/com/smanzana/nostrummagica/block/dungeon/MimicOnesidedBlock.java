@@ -9,26 +9,26 @@ import com.smanzana.autodungeons.block.IDirectionalBlock;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.DelayLoadedMimicBlockTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.DrawHighlightEvent;
@@ -64,16 +64,16 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(FACING);
 	}
 	
-	protected Vector3d getEntEffectiveMotion(Entity entityIn) {
+	protected Vec3 getEntEffectiveMotion(Entity entityIn) {
 		// XZ motion isn't stored on the server and is handled client-side
 		// Server also resets lastPos in an inconvenient way.
 		final double dx;
 		final double dz;
-		if (entityIn instanceof PlayerEntity) {
+		if (entityIn instanceof Player) {
 			dx = entityIn.level.isClientSide()
 					? (entityIn.getDeltaMovement().x)
 					: (entityIn.getX() - NostrumMagica.playerListener.getLastTickPos(entityIn).x);
@@ -92,16 +92,16 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 //						? (entityIn.getMotion().z)
 //						: (entityIn.getPosZ() - NostrumMagica.playerListener.getLastTickPos(entityIn).z);
 		
-		return new Vector3d(dx, entityIn.getDeltaMovement().y, dz);
+		return new Vec3(dx, entityIn.getDeltaMovement().y, dz);
 	}
 	
-	protected Vector3d getEntEffectivePos(Entity entityIn, @Nullable Vector3d motion) {
+	protected Vec3 getEntEffectivePos(Entity entityIn, @Nullable Vec3 motion) {
 		//final AxisAlignedBB entityBox = entityIn.getCollisionBoundingBox();
 		
 		// cant use getCenter cause it's client-side only
 		//Vector3d center = entityBox.getCenter();
 		//Vector3d center = new Vector3d(entityBox.minX + (entityBox.maxX - entityBox.minX) * 0.5D, entityBox.minY + (entityBox.maxY - entityBox.minY) * 0.5D, entityBox.minZ + (entityBox.maxZ - entityBox.minZ) * 0.5D);
-		Vector3d center = entityIn.position();
+		Vec3 center = entityIn.position();
 		
 		if (motion == null) {
 			motion = getEntEffectiveMotion(entityIn);
@@ -116,12 +116,12 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	// 120286 130 673212
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
-		if (context != ISelectionContext.empty()) {
-			if (context.getEntity() == null || !(context.getEntity() instanceof PlayerEntity) || !((PlayerEntity) context.getEntity()).isCreative()) {
+		if (context != CollisionContext.empty()) {
+			if (context.getEntity() == null || !(context.getEntity() instanceof Player) || !((Player) context.getEntity()).isCreative()) {
 				// Hide if looking at from the right way
-				final Vector3d center = getEntEffectivePos(context.getEntity(), null);
+				final Vec3 center = getEntEffectivePos(context.getEntity(), null);
 				final Direction side = state.getValue(FACING);
 				final boolean blocks;
 				
@@ -148,7 +148,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 				}
 				
 				if (!blocks) {
-					return VoxelShapes.empty();
+					return Shapes.empty();
 				}
 			}
 		}
@@ -157,15 +157,15 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	}
 	
 	@Override
-	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getCollisionShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		boolean solid = false;
 		
 		if (!isDoor) {
 			solid = false;
 		} else if (context.getEntity() != null) {
 			final Entity entityIn = context.getEntity();
-			final Vector3d motion = this.getEntEffectiveMotion(entityIn);
-			final Vector3d center = this.getEntEffectivePos(entityIn, motion);
+			final Vec3 motion = this.getEntEffectiveMotion(entityIn);
+			final Vec3 center = this.getEntEffectivePos(entityIn, motion);
 			Direction side = state.getValue(FACING);
 			
 			switch (side) {
@@ -192,14 +192,14 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 		}
 		
 		if (solid) {
-			return VoxelShapes.block();
+			return Shapes.block();
 		} else {
-			return VoxelShapes.empty();
+			return Shapes.empty();
 		}
     }
 	
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		//Direction enumfacing = Direction.getHorizontal(MathHelper.floor_double((double)(placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3).getOpposite();
 		return this.defaultBlockState()
 				.setValue(FACING,context.getNearestLookingDirection().getOpposite())
@@ -215,7 +215,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
 	public void onBlockHighlight(DrawHighlightEvent.HighlightBlock event) {
-		if (event.getTarget().getType() == RayTraceResult.Type.BLOCK) {
+		if (event.getTarget().getType() == HitResult.Type.BLOCK) {
 			BlockPos pos = new BlockPos(event.getTarget().getLocation());
 			BlockState hit = event.getInfo().getEntity().level.getBlockState(pos);
 			if (hit != null && hit.getBlock() == this) {
@@ -253,7 +253,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	}
 	
 	@Override
-	protected boolean shouldRefreshFromNeighbor(BlockState state, World worldIn, BlockPos myPos, BlockPos fromPos) {
+	protected boolean shouldRefreshFromNeighbor(BlockState state, Level worldIn, BlockPos myPos, BlockPos fromPos) {
 		// Mimic blocks mimic what's below them, unless placed up/down in which case they go north
 		Direction mimicFacing = state.getValue(FACING);
 		final BlockPos samplePos = (mimicFacing.getAxis() == Axis.Y
@@ -264,7 +264,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public @Nonnull BlockState getMimickedState(BlockState mimicBlockState, World world, BlockPos myPos) {
+	public @Nonnull BlockState getMimickedState(BlockState mimicBlockState, Level world, BlockPos myPos) {
 		// Mimic blocks mimic what's below them, unless placed up/down in which case they go north
 		Direction mimicFacing = mimicBlockState.getValue(FACING);
 		final Function<BlockPos, BlockPos> moveCursor;
@@ -295,7 +295,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		if (state.getValue(FACING).getAxis() == Axis.Y) {
 			return new DelayLoadedMimicBlockTileEntity();
 		}

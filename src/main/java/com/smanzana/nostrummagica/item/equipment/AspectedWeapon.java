@@ -31,31 +31,31 @@ import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTier;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.SwordItem;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 
 public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	
@@ -236,8 +236,8 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	private EMagicElement element;
 	
 	public AspectedWeapon(EMagicElement element, Type type) {
-		super(ItemTier.DIAMOND,
-				(int) (calcDamage(element, type) - ItemTier.DIAMOND.getAttackDamageBonus()), // Calc desired damage, and subtrace the amt diamond tier is gonna give
+		super(Tiers.DIAMOND,
+				(int) (calcDamage(element, type) - Tiers.DIAMOND.getAttackDamageBonus()), // Calc desired damage, and subtrace the amt diamond tier is gonna give
 				calcSwingSpeed(element, type),
 				NostrumItems.PropEquipment().durability(calcDurability(element, type)));
 		
@@ -246,10 +246,10 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType slot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
 		Multimap<Attribute, AttributeModifier> multimap = super.getDefaultAttributeModifiers(slot);
 
-		if (slot == EquipmentSlotType.OFFHAND && element == EMagicElement.WIND) {
+		if (slot == EquipmentSlot.OFFHAND && element == EMagicElement.WIND) {
 			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 			builder.putAll(multimap);
 			double amt = typeScale(this.type)* .1;
@@ -388,9 +388,9 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 //	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
-		Vector3d dir = playerIn.getLookAngle();
+		Vec3 dir = playerIn.getLookAngle();
 		dir = dir.add(0, -dir.y, 0).normalize();
 		
 		ItemStack itemStackIn = playerIn.getItemInHand(hand);
@@ -416,7 +416,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 //					cloud.getMotion().y = dir.y;
 //					cloud.getMotion().z = dir.z;
 					
-					spawnIceCloud(worldIn, playerIn, new Vector3d(playerIn.getX() + dir.x, playerIn.getY() + .75, playerIn.getZ() + dir.z), dir, this.type);
+					spawnIceCloud(worldIn, playerIn, new Vec3(playerIn.getX() + dir.x, playerIn.getY() + .75, playerIn.getZ() + dir.z), dir, this.type);
 					
 					ItemStacks.damageItem(itemStackIn, playerIn, hand, 2);
 				}
@@ -424,18 +424,18 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				playerIn.resetAttackStrengthTicker();
 			}
 			
-			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
 		} else if (element == EMagicElement.WIND) {
 			if (playerIn.getAttackStrengthScale(0.5F) > .95 && playerIn.isShiftKeyDown()) {
 				if (!worldIn.isClientSide) {
-					spawnWalkingVortex(worldIn, playerIn, new Vector3d(playerIn.getX() + dir.x, playerIn.getY() + .75, playerIn.getZ() + dir.z), dir, this.type);
+					spawnWalkingVortex(worldIn, playerIn, new Vec3(playerIn.getX() + dir.x, playerIn.getY() + .75, playerIn.getZ() + dir.z), dir, this.type);
 					ItemStacks.damageItem(itemStackIn, playerIn, hand, 1);
 				}
 				playerIn.resetAttackStrengthTicker();
-				return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
+				return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
 			} else if (isWindPropel(itemStackIn, playerIn)) {
 				doPropel(itemStackIn,  playerIn);
-				return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
+				return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
 			}
 			
 		} else if (element == EMagicElement.LIGHTNING && ElementalArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, ElementalArmor.Type.MASTER) == 4) {
@@ -454,9 +454,9 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 					if (attr != null && attr.getMana() >= 30) {
 						if (!worldIn.isClientSide) {
 							final float maxDist = 50;
-							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.position().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookAngle(), maxDist, (ent) -> { return ent != playerIn;});
-							if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
-								final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).position() : mop.getLocation());
+							HitResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.position().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookAngle(), maxDist, (ent) -> { return ent != playerIn;});
+							if (mop != null && mop.getType() != HitResult.Type.MISS) {
+								final Vec3 at = (mop.getType() == HitResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).position() : mop.getLocation());
 								summonBoltAtTarget(playerIn, worldIn, at);
 							}
 						}
@@ -468,42 +468,42 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 						ItemStacks.damageItem(itemStackIn, playerIn, hand, 1);
 					}
 					playerIn.resetAttackStrengthTicker();
-					return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
+					return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
 				}
 			}
 		}
 			
-        return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
+        return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStackIn);
 	}
 	
 	@Override
-	public ActionResultType useOn(ItemUseContext context) {
-		final World worldIn = context.getLevel();
-		final PlayerEntity playerIn = context.getPlayer();
+	public InteractionResult useOn(UseOnContext context) {
+		final Level worldIn = context.getLevel();
+		final Player playerIn = context.getPlayer();
 		final BlockPos pos = context.getClickedPos();
-		Vector3d hitVec = context.getClickLocation();
+		Vec3 hitVec = context.getClickLocation();
 		ItemStack stack = context.getItemInHand();
-		final Hand hand = context.getHand();
+		final InteractionHand hand = context.getHand();
 		if (playerIn.getAttackStrengthScale(0.5F) > .95) {
-			Vector3d dir = hitVec.subtract(playerIn.position());
+			Vec3 dir = hitVec.subtract(playerIn.position());
 			dir = dir.add(0, -dir.y, 0);
 			dir = dir.normalize();
 			if (element == EMagicElement.WIND) {
 				if (playerIn.isShiftKeyDown()) {
 					if (!worldIn.isClientSide) {
-						spawnWalkingVortex(worldIn, playerIn, new Vector3d(playerIn.getX() + dir.x, playerIn.getY() + .75, playerIn.getZ() + dir.z), dir, this.type);
+						spawnWalkingVortex(worldIn, playerIn, new Vec3(playerIn.getX() + dir.x, playerIn.getY() + .75, playerIn.getZ() + dir.z), dir, this.type);
 						ItemStacks.damageItem(stack, playerIn, hand, 1);
 					}
 					playerIn.resetAttackStrengthTicker();
-					return ActionResultType.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
 			} else if (element == EMagicElement.ICE) {
 				if (!worldIn.isClientSide) { 
-					spawnIceCloud(worldIn, playerIn, new Vector3d(pos.getX() + hitVec.x, pos.getY() + 1, pos.getZ() + hitVec.z), dir, this.type);
+					spawnIceCloud(worldIn, playerIn, new Vec3(pos.getX() + hitVec.x, pos.getY() + 1, pos.getZ() + hitVec.z), dir, this.type);
 					ItemStacks.damageItem(stack, playerIn, hand, 2);
 				}
 				playerIn.resetAttackStrengthTicker();
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			} else if (element == EMagicElement.LIGHTNING && ElementalArmor.GetSetCount(playerIn, EMagicElement.LIGHTNING, ElementalArmor.Type.MASTER) == 4) {
 				
 				boolean used = false;
@@ -520,9 +520,9 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 					if (attr != null && attr.getMana() >= 30) {
 						if (!worldIn.isClientSide) {
 							final float maxDist = 50;
-							RayTraceResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.position().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookAngle(), maxDist, (ent) -> { return ent != playerIn;});
-							if (mop != null && mop.getType() != RayTraceResult.Type.MISS) {
-								final Vector3d at = (mop.getType() == RayTraceResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).position() : mop.getLocation());
+							HitResult mop = RayTrace.raytrace(worldIn, playerIn, playerIn.position().add(0, playerIn.getEyeHeight(), 0), playerIn.getLookAngle(), maxDist, (ent) -> { return ent != playerIn;});
+							if (mop != null && mop.getType() != HitResult.Type.MISS) {
+								final Vec3 at = (mop.getType() == HitResult.Type.ENTITY ? RayTrace.entFromRaytrace(mop).position() : mop.getLocation());
 								summonBoltAtTarget(playerIn, worldIn, at);
 							}
 						}
@@ -534,15 +534,15 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 						ItemStacks.damageItem(stack, playerIn, hand, 1);
 					}
 					playerIn.resetAttackStrengthTicker();
-					return ActionResultType.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
 			}
 		}
-		return ActionResultType.PASS;
+		return InteractionResult.PASS;
 		
 	}
 	
-	protected static void spawnIceCloud(World world, PlayerEntity caster, Vector3d at, Vector3d direction, Type weaponType) {
+	protected static void spawnIceCloud(Level world, Player caster, Vec3 at, Vec3 direction, Type weaponType) {
 		final int blizzardCount = ElementalArmor.GetSetCount(caster, EMagicElement.ICE, ElementalArmor.Type.MASTER);
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 3 seconds
@@ -563,13 +563,13 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		final boolean hasHeal = attr != null && attr.hasSkill(NostrumSkills.Ice_Weapon);
 		final boolean hasHealBoost = attr != null && attr.hasSkill(NostrumSkills.Ice_Master);
 		final boolean hasHealShield = attr != null && attr.hasSkill(NostrumSkills.Ice_Adept);
-		cloud.addEffect((World w, Entity ent) -> {
+		cloud.addEffect((Level w, Entity ent) -> {
 			if (hasHeal && ent != caster && ent instanceof LivingEntity && NostrumMagica.IsSameTeam(caster, (LivingEntity) ent)) {
 				((LivingEntity) ent).heal(hasHealBoost ? 2f : 1f);
 				((LivingEntity) ent).removeEffectNoUpdate(NostrumEffects.frostbite);
 				
 				if (hasHealShield && NostrumMagica.rand.nextInt(8) == 0) {
-					((LivingEntity) ent).addEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1f), 0));
+					((LivingEntity) ent).addEffect(new MobEffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1f), 0));
 				}
 				NostrumParticles.FILLED_ORB.spawn(ent.level, new SpawnParams(
 						10, ent.getX(), ent.getY() + ent.getBbHeight()/2, ent.getZ(), 4,
@@ -577,7 +577,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 						ent.getId()
 						).color(NostrumEffects.frostbite.getColor()).dieOnTarget(true));
 			} else if (ent instanceof LivingEntity) {
-				((LivingEntity) ent).addEffect(new EffectInstance(NostrumEffects.frostbite, 20 * 10));
+				((LivingEntity) ent).addEffect(new MobEffectInstance(NostrumEffects.frostbite, 20 * 10));
 			}
 		});
 		cloud.setVerticleStepping(true);
@@ -587,7 +587,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		cloud.setDeltaMovement(direction);
 	}
 	
-	protected static void spawnWalkingVortex(World world, PlayerEntity caster, Vector3d at, Vector3d direction, Type weaponType) {
+	protected static void spawnWalkingVortex(Level world, Player caster, Vec3 at, Vec3 direction, Type weaponType) {
 		final int hurricaneCount = ElementalArmor.GetSetCount(caster, EMagicElement.WIND, ElementalArmor.Type.MASTER);
 		direction = direction.scale(5f/(3f * 20f)); // 5 blocks over 10 seconds
 		AreaEffectEntity cloud = new AreaEffectEntity(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
@@ -605,7 +605,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				cloud.addTime(1, false);
 				
 				// Move in direction of player look
-				Vector3d lookDir = Vector3d.directionFromRotation(0, entity.yRot).scale(5f/(3f * 20f)); // 5 blocks over 10 seconds;
+				Vec3 lookDir = Vec3.directionFromRotation(0, entity.getYRot()).scale(5f/(3f * 20f)); // 5 blocks over 10 seconds;
 				cloud.setWaddle(lookDir, 2);
 				entity.getLookAngle();
 				
@@ -623,8 +623,8 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			final int period = 20;
 			final float prog = ((float) (entity.tickCount % period) / (float) period);
 			final double dy = (Math.sin(prog * 2 * Math.PI) + 1) / 2;
-			final Vector3d target = new Vector3d(cloud.getX(), cloud.getY() + 2 + dy, cloud.getZ());
-			final Vector3d diff = target.subtract(entity.position());
+			final Vec3 target = new Vec3(cloud.getX(), cloud.getY() + 2 + dy, cloud.getZ());
+			final Vec3 diff = target.subtract(entity.position());
 			entity.setDeltaMovement(diff.x / 2,
 					diff.y / 2,
 					diff.z / 2
@@ -673,7 +673,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		cloud.setDeltaMovement(direction);
 	}
 	
-	public static void spawnJumpVortex(World world, PlayerEntity caster, Vector3d at, Type weaponType) {
+	public static void spawnJumpVortex(Level world, Player caster, Vec3 at, Type weaponType) {
 		AreaEffectEntity cloud = new AreaEffectEntity(NostrumEntityTypes.areaEffect, world, at.x, at.y, at.z);
 		cloud.setOwner(caster);
 		cloud.setWaitTime(0);
@@ -716,23 +716,23 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			return false;
 		}
 		
-		if (!(entity.level instanceof ServerWorld)) {
+		if (!(entity.level instanceof ServerLevel)) {
 			return false;
 		}
 		
-		((ServerWorld)entity.level).addFreshEntity(
+		((ServerLevel)entity.level).addFreshEntity(
 				new TameLightning(NostrumEntityTypes.tameLightning, entity.level, entity.getX(), entity.getY(), entity.getZ())
 				);
 		attr.addMana(-30);
-		if (entity instanceof PlayerEntity) {
-			NostrumMagica.instance.proxy.sendMana((PlayerEntity) entity);
+		if (entity instanceof Player) {
+			NostrumMagica.instance.proxy.sendMana((Player) entity);
 		}
 		
 		if (attr.hasSkill(NostrumSkills.Lightning_Weapon)) {
 			// Explode magic rend
 			// Spread
 			for (Entity ent : entity.getCommandSenderWorld().getEntities(entity, entity.getBoundingBox().inflate(5), (ent) -> ent instanceof LivingEntity && !NostrumMagica.IsSameTeam((LivingEntity) ent, entity))) {
-				((LivingEntity) ent).addEffect(new EffectInstance(NostrumEffects.magicRend, 20 * 15, 0));
+				((LivingEntity) ent).addEffect(new MobEffectInstance(NostrumEffects.magicRend, 20 * 15, 0));
 				
 				NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
 						10, entity.getX(), entity.getY() + entity.getBbHeight()/2, entity.getZ(), 0,
@@ -744,27 +744,27 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
 					50, entity.getX(), entity.getY() + entity.getBbHeight()/2, entity.getZ(), 0,
 					30, 10,
-					new Vector3d(0, .1, 0), new Vector3d(.2, .05, .2)
+					new Vec3(0, .1, 0), new Vec3(.2, .05, .2)
 					).color(NostrumEffects.magicRend.getColor()).gravity(true));
 			//NostrumMagicaSounds.MELT_METAL.play(event.getEntityLiving());
 		}
 		return true;
 	}
 	
-	protected static boolean summonBoltAtTarget(LivingEntity caster, World world, Vector3d pos) {
+	protected static boolean summonBoltAtTarget(LivingEntity caster, Level world, Vec3 pos) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 		if (attr == null || attr.getMana() < 30) {
 			return false;
 		}
 		
-		if (!(world instanceof ServerWorld)) {
+		if (!(world instanceof ServerLevel)) {
 			return false;
 		}
 		
 		int count = 1;
-		if (caster != null && caster instanceof PlayerEntity) {
+		if (caster != null && caster instanceof Player) {
 			// Look for lightning belt
-			IInventory baubles = NostrumMagica.instance.curios.getCurios((PlayerEntity) caster);
+			Container baubles = NostrumMagica.instance.curios.getCurios((Player) caster);
 			if (baubles != null) {
 				for (int i = 0; i < baubles.getContainerSize(); i++) {
 					ItemStack stack = baubles.getItem(i);
@@ -778,12 +778,12 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			}
 		}
 		
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		Random rand = (caster == null ? new Random() : caster.getRandom());
 		for (int i = 0; i < count; i++) {
 			
 			if (i == 0) {
-				((ServerWorld) world).addFreshEntity(
+				((ServerLevel) world).addFreshEntity(
 						new TameLightning(NostrumEntityTypes.tameLightning, world, pos.x, pos.y, pos.z)
 						);
 			} else {
@@ -800,7 +800,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				}
 				
 				if (world.isEmptyBlock(cursor)) {
-					((ServerWorld) world).addFreshEntity(
+					((ServerLevel) world).addFreshEntity(
 						new TameLightning(NostrumEntityTypes.tameLightning, world, cursor.getX() + 0.5, cursor.getY(), cursor.getZ() + 0.5)
 						);
 				}
@@ -808,26 +808,26 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		}
 		
 		attr.addMana(-30);
-		if (caster instanceof PlayerEntity) {
-			NostrumMagica.instance.proxy.sendMana((PlayerEntity) caster);
+		if (caster instanceof Player) {
+			NostrumMagica.instance.proxy.sendMana((Player) caster);
 		}
 		return true;
 	}
 	
 	@Override
-	public ActionResultType interactLivingEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+	public InteractionResult interactLivingEntity(ItemStack stack, Player playerIn, LivingEntity target, InteractionHand hand) {
 		if (element == EMagicElement.WIND) {
 			SpellAction fly = new SpellAction();
 			fly.push(5.0f, typeScale(this.type));
 			fly.apply(playerIn, target, 1.0f, ISpellLogBuilder.Dummy);
 			ItemStacks.damageItem(stack, playerIn, hand, 2);
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
 	}
 	
-	public static void spawnWhirlwindParticle(World world, int count, Vector3d pos, AreaEffectEntity cloud, int color, float gravity) {
+	public static void spawnWhirlwindParticle(Level world, int count, Vec3 pos, AreaEffectEntity cloud, int color, float gravity) {
 		NostrumParticles.GLOW_ORB.spawn(world, new NostrumParticles.SpawnParams(count, pos.x, pos.y, pos.z,
 				cloud.getRadius(),
 				cloud.getRemainingTicks() / 4, 20,
@@ -841,7 +841,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			);
 	}
 	
-	protected static boolean isWindPropel(ItemStack stack, PlayerEntity player) {
+	protected static boolean isWindPropel(ItemStack stack, Player player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		return hasWindPropel(stack) && attr != null && attr.hasSkill(NostrumSkills.Wind_Weapon) && attr.getMana() >= WIND_COST;
 	}
@@ -853,12 +853,12 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	
 	private static SpellAction propelAction = new SpellAction().propel(1);
 	
-	protected static void doPropel(ItemStack stack, PlayerEntity player) {
+	protected static void doPropel(ItemStack stack, Player player) {
 		if (isWindPropel(stack, player)) {
 			// Adjust velocity, ignoring downward velocity so players can use it to move even when falling down fast
-			Vector3d motion = player.getDeltaMovement();
+			Vec3 motion = player.getDeltaMovement();
 			if (motion.y < 0) {
-				motion = new Vector3d(motion.x, 0, motion.z);
+				motion = new Vec3(motion.x, 0, motion.z);
 			}
 			if (motion.length() < 1.0 || player.isFallFlying()) {
 				propelAction.apply(player, player, 1f, ISpellLogBuilder.Dummy);

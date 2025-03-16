@@ -5,9 +5,9 @@ import java.util.Random;
 
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 
-import net.minecraft.entity.ai.controller.MovementController;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.ai.control.MoveControl;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.core.BlockPos;
 
 public class DragonFlyRandomGoal extends Goal {
 
@@ -24,7 +24,7 @@ public class DragonFlyRandomGoal extends Goal {
      */
     public boolean canUse()
     {
-        MovementController MovementController = this.parentEntity.getMoveControl();
+        MoveControl MovementController = this.parentEntity.getMoveControl();
 
         if (MovementController.hasWanted())
         {
@@ -64,7 +64,7 @@ public class DragonFlyRandomGoal extends Goal {
         // Find y
         double y;
         {
-        	BlockPos.Mutable pos = new BlockPos.Mutable().set(this.parentEntity.blockPosition());
+        	BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos().set(this.parentEntity.blockPosition());
     		while(pos.getY() > 0) {
     			if (this.parentEntity.level.isEmptyBlock(pos)) {
     				pos.setY(pos.getY() - 1);

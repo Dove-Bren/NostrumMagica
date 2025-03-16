@@ -5,10 +5,10 @@ import java.lang.reflect.Field;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.Item;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class ElementalFireArmor extends ElementalArmor {
@@ -30,7 +30,7 @@ public class ElementalFireArmor extends ElementalArmor {
 	public static final String ID_FEET_ADEPT = ID_PREFIX + "feet_adept";
 	public static final String ID_FEET_MASTER = ID_PREFIX + "feet_master";
 		
-	public ElementalFireArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
+	public ElementalFireArmor(EquipmentSlot slot, Type type, Item.Properties properties) {
 		super(EMagicElement.FIRE, slot, type, properties);
 	}
 	

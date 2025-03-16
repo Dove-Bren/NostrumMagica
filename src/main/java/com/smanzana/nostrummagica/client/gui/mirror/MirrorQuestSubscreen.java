@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -25,22 +25,22 @@ import com.smanzana.nostrummagica.progression.reward.AttributeReward.AwardType;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.Font;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import net.minecraft.client.renderer.Rect2i;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Matrix4f;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
@@ -48,23 +48,23 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 	private static final ResourceLocation RES_ICONS = NostrumMagica.Loc("textures/gui/mirror_quest.png");
 	private static final ResourceLocation RES_BACK = NostrumMagica.Loc("textures/gui/mirror_quest_back.png");
 	
-	private final ITextComponent name;
+	private final Component name;
 	private final ItemStack icon;
 	private final Map<NostrumQuest, QuestButton> buttons;
 	
-	private PlayerEntity player;
+	private Player player;
 	private INostrumMagic attr;
 	private int width;
 	private int height;
 	
 	public MirrorQuestSubscreen() {
-		name = new TranslationTextComponent("mirror.tab.quest.name");
+		name = new TranslatableComponent("mirror.tab.quest.name");
 		icon = new ItemStack(Items.FILLED_MAP, 1);
 		buttons = new HashMap<>();
 	}
 	
 	@Override
-	public ITextComponent getName() {
+	public Component getName() {
 		return name;
 	}
 	
@@ -74,12 +74,12 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 	}
 	
 	@Override
-	public boolean isVisible(IMirrorScreen parent, PlayerEntity player) {
+	public boolean isVisible(IMirrorScreen parent, Player player) {
 		return true;
 	}
 	
 	@Override
-	public void show(IMirrorScreen parent, PlayerEntity player, int width, int height, int guiLeft, int guiTop) {
+	public void show(IMirrorScreen parent, Player player, int width, int height, int guiLeft, int guiTop) {
 		this.player = player;
 		attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
@@ -90,7 +90,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 		this.height = height;
 		
 		buttons.clear();
-		final Rectangle2d bounds = new Rectangle2d(guiLeft, guiTop, width, height);
+		final Rect2i bounds = new Rect2i(guiLeft, guiTop, width, height);
 		for (NostrumQuest quest : NostrumQuest.allQuests()) {
 			final int buttonX = guiLeft + (width/2) + (quest.getPlotX() * GRID_SCALE);
 			final int buttonY = guiTop + (height/2) + (-quest.getPlotY() * GRID_SCALE);
@@ -110,12 +110,12 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 	}
 
 	@Override
-	public void hide(IMirrorScreen parent, PlayerEntity player) {
+	public void hide(IMirrorScreen parent, Player player) {
 		; // Not sure there's much to do. Parent will clean things up for us
 	}
 
 	@Override
-	public void drawBackground(IMirrorScreen parent, MatrixStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
+	public void drawBackground(IMirrorScreen parent, PoseStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
 		float extra = .1f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
 		float inv = .1f - extra;
 		
@@ -127,7 +127,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 	}
 
 	@Override
-	public void drawForeground(IMirrorScreen parent, MatrixStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
+	public void drawForeground(IMirrorScreen parent, PoseStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
 		
 	}
 	
@@ -177,7 +177,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 		private final MirrorQuestSubscreen subscreen;
 		private final NostrumQuest quest;
 		
-		private final List<ITextComponent> tooltip;
+		private final List<Component> tooltip;
 		private final float fontScale = 0.75f;
 		
 		private QuestState state;
@@ -186,7 +186,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 		private int iconV;
 		
 		public QuestButton(MirrorQuestSubscreen subscreen, NostrumQuest quest, int x, int y, int width, int height) {
-			super(x, y, width, height, StringTextComponent.EMPTY);
+			super(x, y, width, height, TextComponent.EMPTY);
 			this.subscreen = subscreen;
 			this.quest = quest;
 			this.tooltip = genTooltip();
@@ -230,7 +230,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 			updateQuestState();
 		}
 		
-		public void drawTreeLines(MatrixStack matrixStackIn, Minecraft mc) {
+		public void drawTreeLines(PoseStack matrixStackIn, Minecraft mc) {
 			if (quest.getParentKeys() != null && quest.getParentKeys().length != 0) {
 				for (String key : quest.getParentKeys()) {
 					NostrumQuest quest = NostrumQuest.lookup(key);
@@ -244,23 +244,23 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 			}
 		}
 		
-		private void renderLine(MatrixStack matrixStackIn, QuestButton other) {
+		private void renderLine(PoseStack matrixStackIn, QuestButton other) {
 			matrixStackIn.pushPose();
 //			GlStateManager.pushLightingAttributes();
 			matrixStackIn.translate(width / 2, height / 2, 0);
 			
 			final Matrix4f transform = matrixStackIn.last().pose();
 			
-			BufferBuilder buf = Tessellator.getInstance().getBuilder();
+			BufferBuilder buf = Tesselator.getInstance().getBuilder();
 			RenderSystem.enableBlend();
 			RenderSystem.disableTexture();
 			RenderSystem.lineWidth(3f);
 	        //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 //	        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
-	        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+	        buf.begin(GL11.GL_LINES, DefaultVertexFormat.POSITION_COLOR);
 	        buf.vertex(transform, x, y, 0).color(1f, 1f, 1f, .6f).endVertex();
 	        buf.vertex(transform, other.x, other.y, 0).color(1f, 1f, 1f, .6f).endVertex();
-	        Tessellator.getInstance().end();
+	        Tesselator.getInstance().end();
 	        RenderSystem.enableTexture();
 //	        GlStateManager.enableTexture();
 	        RenderSystem.disableBlend();
@@ -271,7 +271,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 		}
 		
 		@Override
-		public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			updateQuestState();
 			
 			// Render tree lines even if we're out of bounds
@@ -286,7 +286,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			final int u;
 			final int v;
 			final int uw;
@@ -342,10 +342,10 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 		}
 		
 		@Override
-		public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			if (this.isHovered()) { 
 				final Minecraft mc = Minecraft.getInstance();
-				final FontRenderer font = mc.font;
+				final Font font = mc.font;
 				matrixStackIn.pushPose();
 				matrixStackIn.scale(fontScale, fontScale, 1f);
 				matrixStackIn.translate((int) (mouseX / fontScale) - mouseX, (int) (mouseY / fontScale) - mouseY, 0);
@@ -384,47 +384,47 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 			}
 		}
 		
-		private List<ITextComponent> genTooltip() {
+		private List<Component> genTooltip() {
 			int maxWidth = 200; 
-			List<ITextComponent> tooltip = new LinkedList<>();
-			tooltip.add(new TranslationTextComponent("quest." + quest.getKey() + ".name", new Object[0])
-					.withStyle(TextFormatting.BLUE));
+			List<Component> tooltip = new LinkedList<>();
+			tooltip.add(new TranslatableComponent("quest." + quest.getKey() + ".name", new Object[0])
+					.withStyle(ChatFormatting.BLUE));
 			
-			TextFormatting bad = TextFormatting.RED;
+			ChatFormatting bad = ChatFormatting.RED;
 			
 			// Requirements
 	        if (quest.getRequirements() != null && quest.getRequirements().length > 0) {
-	        	tooltip.add(new TranslationTextComponent("info.requirement.missing"));
+	        	tooltip.add(new TranslatableComponent("info.requirement.missing"));
 	        	for (IRequirement req : quest.getRequirements()) {
-	        		TextFormatting style = TextFormatting.GRAY;
+	        		ChatFormatting style = ChatFormatting.GRAY;
 	        		if (!req.matches(subscreen.player)) {
 	        			style = bad;
 	        		}
-        			for (ITextComponent line : req.getDescription(subscreen.player)) {
-        				if (line instanceof TextComponent) {
-        					tooltip.add(((TextComponent) line).withStyle(style));
+        			for (Component line : req.getDescription(subscreen.player)) {
+        				if (line instanceof BaseComponent) {
+        					tooltip.add(((BaseComponent) line).withStyle(style));
         				} else {
         					tooltip.add(line);
         				}
         			}
 	        	}
-	        	tooltip.add(new StringTextComponent(""));
+	        	tooltip.add(new TextComponent(""));
 	        }
 			
 			if (quest.getReward() != null) {
 				String desc = quest.getReward().getDescription();
 				if (desc != null && !desc.isEmpty())
-					tooltip.add(new StringTextComponent(desc).withStyle(TextFormatting.GOLD));
+					tooltip.add(new TextComponent(desc).withStyle(ChatFormatting.GOLD));
 			}
 			
 			if (this.state == QuestState.INACTIVE && NostrumMagica.canTakeQuest(subscreen.player, quest)) {
-				tooltip.add(new TranslationTextComponent("info.quest.accept").withStyle(TextFormatting.GREEN));
+				tooltip.add(new TranslatableComponent("info.quest.accept").withStyle(ChatFormatting.GREEN));
 			}
 			
 			if (this.state == QuestState.COMPLETED) {
 				final Minecraft mc = Minecraft.getInstance();
-				final FontRenderer font = mc.font;
-	            for (ITextComponent line : tooltip) {
+				final Font font = mc.font;
+	            for (Component line : tooltip) {
 	            	int width = font.width(line);
 	            	if (width > maxWidth)
 	            		maxWidth = width;
@@ -432,12 +432,12 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 	            
 	            String desc = I18n.get("quest." + quest.getKey() + ".desc", new Object[0]);
 	            if (desc != null && !desc.isEmpty()) {
-	            	tooltip.add(new StringTextComponent(""));
+	            	tooltip.add(new TextComponent(""));
 	            	StringBuffer buf = new StringBuffer();
 	            	int index = 0;
 	            	while (index < desc.length()) {
 	            		if (desc.charAt(index) == '|') {
-	            			tooltip.add(new StringTextComponent(buf.toString()));
+	            			tooltip.add(new TextComponent(buf.toString()));
 	            			buf = new StringBuffer();
 	            		} else {
 		            		int oldlen = font.width(buf.toString());
@@ -451,16 +451,16 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 		            				
 		            				if (last == 0) {
 		            					// oh well
-		            					tooltip.add(new StringTextComponent(buf.toString()));
+		            					tooltip.add(new TextComponent(buf.toString()));
 		            					buf = new StringBuffer();
 		            				} else {
-		            					tooltip.add(new StringTextComponent(buf.substring(0, last)));
+		            					tooltip.add(new TextComponent(buf.substring(0, last)));
 		            					StringBuffer oldbuf = buf;
 		            					buf = new StringBuffer();
 		            					buf.append(oldbuf.substring(last + 1));
 		            				}
 		            			} else {
-		            				tooltip.add(new StringTextComponent(buf.toString()));
+		            				tooltip.add(new TextComponent(buf.toString()));
 			            			buf = new StringBuffer();
 		            				index++;
 			            			continue; // Don't add it
@@ -472,7 +472,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 	            		index++;
 	            	}
 	            	if (buf.length() > 0)
-	            		tooltip.add(new StringTextComponent(buf.toString()));
+	            		tooltip.add(new TextComponent(buf.toString()));
 	            }
 			}
 			

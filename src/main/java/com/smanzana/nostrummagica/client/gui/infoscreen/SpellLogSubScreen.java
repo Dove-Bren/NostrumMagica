@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
@@ -28,13 +28,13 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.AbstractButton;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 public class SpellLogSubScreen implements IInfoSubScreen {
 
@@ -51,7 +51,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 	}
 	
 	@Override
-	public void draw(INostrumMagic attr, Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
+	public void draw(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
 		
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(x, y, 0);
@@ -64,7 +64,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 	}
 	
 	@Override
-	public void drawForeground(INostrumMagic attr, Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
+	public void drawForeground(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
 		
 		// A bit hacky, but sometimes we scroll off vertically and it looks ugly...
 		RenderFuncs.drawRect(matrixStackIn, x, y + height - 5, x + width, y + height, 0xFF000000);
@@ -72,7 +72,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(0, 0, 100);
 		for (List<ObscurableWidget> widgets : stageSubWidgets) {
-			for (Widget widget : widgets) {
+			for (AbstractWidget widget : widgets) {
 				widget.renderToolTip(matrixStackIn, mouseX, mouseY);
 			}
 		}
@@ -83,15 +83,15 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		final List<ObscurableWidget> widgets = new ArrayList<>();
 		
 		final Minecraft mc = Minecraft.getInstance();
-		final ITextComponent title = (summary.getShape() == null ? new StringTextComponent("Start") : summary.getShape().getDisplayName());
+		final Component title = (summary.getShape() == null ? new TextComponent("Start") : summary.getShape().getDisplayName());
 		widgets.add(new TextWidget(mc.screen, title,
 				x + (width / 2), y + GUI.STAGE_SECTION_VOFFSET, 1, 1)
 				.center());
 		
 		
 		final String entCount = " " + summary.getAffectedEntCounts().size();
-		List<ITextComponent> tooltip = new ArrayList<>();
-		tooltip.add(new StringTextComponent("Entities:"));
+		List<Component> tooltip = new ArrayList<>();
+		tooltip.add(new TextComponent("Entities:"));
 		summary.getAffectedEntCounts().entrySet().stream().map(e -> e.getKey().getName().plainCopy().append(" x" + e.getValue())).forEachOrdered(tooltip::add);
 		final LabeledWidget entIcon = new LabeledWidget(mc.screen, new AffectedEntsLabel(GUI.AFFECTED_LEN, GUI.AFFECTED_LEN), new LabeledWidget.TextValue(() -> entCount),
 				x + (width / 2) - (GUI.AFFECTED_LEN + 14), y + GUI.STAGE_SECTION_VOFFSET + 12,
@@ -100,8 +100,8 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		
 		final String locCount = " " + summary.getAffectedLocCounts().size();
 		tooltip = new ArrayList<>();
-		tooltip.add(new StringTextComponent("Locations:"));
-		summary.getAffectedLocCounts().entrySet().stream().map(e -> new StringTextComponent(String.format("(%d, %d, %d) x%d", e.getKey().hitBlockPos.getX(), e.getKey().hitBlockPos.getY(), e.getKey().hitBlockPos.getZ(), e.getValue()))).forEachOrdered(tooltip::add);
+		tooltip.add(new TextComponent("Locations:"));
+		summary.getAffectedLocCounts().entrySet().stream().map(e -> new TextComponent(String.format("(%d, %d, %d) x%d", e.getKey().hitBlockPos.getX(), e.getKey().hitBlockPos.getY(), e.getKey().hitBlockPos.getZ(), e.getValue()))).forEachOrdered(tooltip::add);
 		final LabeledWidget locIcon = new LabeledWidget(mc.screen, new AffectedLocsLabel(GUI.AFFECTED_LEN, GUI.AFFECTED_LEN), new LabeledWidget.TextValue(() -> locCount),
 				x + (width / 2) + 10, y + GUI.STAGE_SECTION_VOFFSET + 12,
 				10, 10)
@@ -123,13 +123,13 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 			if (summary.getTotalDamage() > 0 || summary.getTotalHeal() == 0f) {
 				final String damageText = String.format(" %.1f", summary.getTotalDamage());
 				widgets.add(new LabeledWidget(mc.screen, new TotalDamageLabel(16, 16), new LabeledWidget.TextValue(() -> damageText), x + 10, y + GUI.STAGE_SECTION_VOFFSET + 20, 10, 10)
-						.tooltip(new StringTextComponent("Total Damage")));
+						.tooltip(new TextComponent("Total Damage")));
 				shift = true;
 			}
 			if (summary.getTotalHeal() > 0f) {
 				final String healText = String.format(" +%.1f", summary.getTotalHeal());
 				widgets.add(new LabeledWidget(mc.screen, new TotalHealLabel(16, 16), new LabeledWidget.TextValue(() -> healText), x + 10 + (shift ? 50 : 0), y + GUI.STAGE_SECTION_VOFFSET + 20, 10, 10)
-						.tooltip(new StringTextComponent("Total Healing")));
+						.tooltip(new TextComponent("Total Healing")));
 			}
 			
 			// For now, just find first entity stage effect and display it?
@@ -153,8 +153,8 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 	}
 
 	@Override
-	public Collection<Widget> getWidgets(int x, int y, int width, int height) {
-		List<Widget> widgets = new ArrayList<>();
+	public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
+		List<AbstractWidget> widgets = new ArrayList<>();
 		
 		this.stageButtons.clear();
 		
@@ -254,14 +254,14 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		private boolean active;
 
 		public StageButton(SpellLogSubScreen screen, int idx, SpellLogStageSummary stageSummary, int x, int y, int width, int height) {
-			super(x, y, width, height, StringTextComponent.EMPTY);
+			super(x, y, width, height, TextComponent.EMPTY);
 			this.screen = screen;
 			this.idx = idx;
 			this.stageSummary = stageSummary;
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			final float tint = (this.isHovered() ? .8f : 1f) * (active ? .8f : 1f);
 			
 			Minecraft.getInstance().getTextureManager().bind(Texture.TEXT);
@@ -280,7 +280,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 			}
 			
 			if (this.isHovered()) {
-				final ITextComponent title = (stageSummary.getShape() == null ? new StringTextComponent("Start") : stageSummary.getShape().getDisplayName());
+				final Component title = (stageSummary.getShape() == null ? new TextComponent("Start") : stageSummary.getShape().getDisplayName());
 				final Minecraft mc = Minecraft.getInstance();
 				mc.screen.renderTooltip(matrixStackIn, title, mouseX, mouseY);
 			}
@@ -303,7 +303,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 		
 		@Override
-		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color) {
+		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
 			Minecraft.getInstance().getTextureManager().bind(Texture.TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 					Texture.AFFECT_ICON_HOFFSET, Texture.AFFECT_ICON_VOFFSET, Texture.AFFECT_ICON_WIDTH, Texture.AFFECT_ICON_HEIGHT,
@@ -320,7 +320,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 		
 		@Override
-		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color) {
+		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
 			Minecraft.getInstance().getTextureManager().bind(Texture.TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 					Texture.AFFECT_ICON_HOFFSET, Texture.AFFECT_ICON_VOFFSET, Texture.AFFECT_ICON_WIDTH, Texture.AFFECT_ICON_HEIGHT,
@@ -341,13 +341,13 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 		
 		@Override
-		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color) {
+		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
 			Minecraft.getInstance().getTextureManager().bind(Texture.TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 					Texture.DAMAGE_TOT_ICON_HOFFSET, Texture.DAMAGE_TOT_ICON_VOFFSET, Texture.DAMAGE_TOT_ICON_WIDTH, Texture.DAMAGE_TOT_ICON_HEIGHT,
 					this.width, height, Texture.WIDTH, Texture.HEIGHT);
 			
-			return new Rectangle2d(x, y, width, height);
+			return new Rect2i(x, y, width, height);
 		}
 	}
 	
@@ -364,7 +364,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 		
 		@Override
-		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color) {
+		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
 			final float colors[] = ColorUtil.ARGBToColor(element.getColor()); // ignore color argument
 			Minecraft.getInstance().getTextureManager().bind(Texture.TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
@@ -372,7 +372,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 					this.width, height, Texture.WIDTH, Texture.HEIGHT,
 					colors[0], colors[1], colors[2], colors[3]);
 			
-			return new Rectangle2d(x, y, width, height);
+			return new Rect2i(x, y, width, height);
 		}
 	}
 	
@@ -387,13 +387,13 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 		
 		@Override
-		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color) {
+		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
 			Minecraft.getInstance().getTextureManager().bind(Texture.TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 					Texture.HEAL_TOT_ICON_HOFFSET, Texture.HEAL_TOT_ICON_VOFFSET, Texture.HEAL_TOT_ICON_WIDTH, Texture.HEAL_TOT_ICON_HEIGHT,
 					this.width, height, Texture.WIDTH, Texture.HEIGHT);
 			
-			return new Rectangle2d(x, y, width, height);
+			return new Rect2i(x, y, width, height);
 		}
 	}
 	
@@ -410,7 +410,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 		
 		@Override
-		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color) {
+		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
 			final float colors[] = ColorUtil.ARGBToColor(element.getColor()); // ignore color argument
 			
 			Minecraft.getInstance().getTextureManager().bind(Texture.TEXT);
@@ -419,7 +419,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 					this.width, height, Texture.WIDTH, Texture.HEIGHT,
 					colors[0], colors[1], colors[2], colors[3]);
 			
-			return new Rectangle2d(x, y, width, height);
+			return new Rect2i(x, y, width, height);
 		}
 	}
 	
@@ -429,7 +429,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		private final List<EffectLineWidget> lineWidgets;
 		
 		public EffectSummaryWidget(LivingEntity entity, SpellLogEffectSummary summary, int x, int y, int width, int heightIn) {
-			super(x, y, width, heightIn, StringTextComponent.EMPTY);
+			super(x, y, width, heightIn, TextComponent.EMPTY);
 			
 			// Reset height and built it as we go
 			this.height = 0;
@@ -440,18 +440,18 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 			if (summary.getTotalDamage() > 0 || summary.getTotalHeal() == 0f) {
 				final String damageText = String.format(" %.1f", summary.getTotalDamage());
 				this.addChild(new LabeledWidget(mc.screen, new TotalDamageLabel(16, 16), new LabeledWidget.TextValue(() -> damageText), x + 10, y + height, 10, 10)
-						.tooltip(new StringTextComponent("Damaged"))
+						.tooltip(new TextComponent("Damaged"))
 						.scale(.75f));
 				shift = true;
 			}
 			if (summary.getTotalHeal() > 0f) {
 				final String healText = String.format(" %.1f", summary.getTotalHeal());
 				this.addChild(new LabeledWidget(mc.screen, new TotalHealLabel(16, 16), new LabeledWidget.TextValue(() -> healText), x + 10 + (shift ? 40 : 0), y + height, 10, 10)
-						.tooltip(new StringTextComponent("Healed"))
+						.tooltip(new TextComponent("Healed"))
 						.scale(.75f));
 			}
 			
-			final ITextComponent title = entity.getName();
+			final Component title = entity.getName();
 			addChild(new TextWidget(mc.screen, title,
 					x + (width / 2), y + height, 1, 1)
 					.center());
@@ -499,17 +499,17 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			RenderFuncs.drawRect(matrixStackIn, x, y, x + width, y + height, 0xFF404040);
 		}
 		
 		@Override
-		protected void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		protected void renderForeground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			super.renderForeground(matrixStackIn, mouseX, mouseY, partialTicks);
 			
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 100);
-			for (Widget widget : this.children) {
+			for (AbstractWidget widget : this.children) {
 				widget.renderToolTip(matrixStackIn, mouseX, mouseY);
 			}
 			matrixStackIn.popPose();
@@ -521,7 +521,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		private SpellLogEffectLine line;
 		
 		public EffectLineWidget(SpellLogEffectLine line, int x, int y, int width, int heightIn) {
-			super(x, y, width, heightIn, StringTextComponent.EMPTY);
+			super(x, y, width, heightIn, TextComponent.EMPTY);
 			this.line = line;
 			
 			// Reset height and built it as we go
@@ -536,20 +536,20 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 				final String damageText = String.format(" %.1f", line.getTotalDamage());
 				final @Nullable EMagicElement element = ((SpellLogEffectLine.Damage)line).getElement();
 				this.addChild(new LabeledWidget(mc.screen, new DamageLabel(element, 16, 16), new LabeledWidget.TextValue(() -> damageText), x + width - (12 + 40), y + height, 10, 10)
-						.tooltip(new StringTextComponent((element == null ? "Raw" : element.getName()) + " Damage"))
+						.tooltip(new TextComponent((element == null ? "Raw" : element.getName()) + " Damage"))
 						.scale(.75f));
 			} else if (line instanceof SpellLogEffectLine.Heal) {
 				final String healText = String.format(" %.1f", line.getTotalHeal());
 				final @Nullable EMagicElement element = ((SpellLogEffectLine.Heal)line).getElement();
 				this.addChild(new LabeledWidget(mc.screen, new HealLabel(element, 16, 16), new LabeledWidget.TextValue(() -> healText), x + width - (12 + 40), y + height, 10, 10)
-						.tooltip(new StringTextComponent((element == null ? "Raw" : element.getName()) + " Healing"))
+						.tooltip(new TextComponent((element == null ? "Raw" : element.getName()) + " Healing"))
 						.scale(.75f));
 			}
 			
 			height += 12;
 			
 			if (line.getModifiers().isEmpty()) {
-				this.addChild(new TextWidget(mc.screen, new StringTextComponent("No modifiers"), x + 8, y + height, 100, 10).scale(.75f));
+				this.addChild(new TextWidget(mc.screen, new TextComponent("No modifiers"), x + 8, y + height, 100, 10).scale(.75f));
 				height += (int) (mc.font.lineHeight * .75f);
 			} else {
 				for (SpellLogModifier mod : line.getModifiers()) {
@@ -563,17 +563,17 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			RenderFuncs.drawRect(matrixStackIn, x, y, x + width, y + height, line.isHarmful() ? 0xFF804040 : 0xFF404080);
 		}
 		
 		@Override
-		protected void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		protected void renderForeground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			super.renderForeground(matrixStackIn, mouseX, mouseY, partialTicks);
 			
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 100);
-			for (Widget widget : this.children) {
+			for (AbstractWidget widget : this.children) {
 				widget.renderToolTip(matrixStackIn, mouseX, mouseY);
 			}
 			matrixStackIn.popPose();
@@ -583,7 +583,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 	private static class ModifierWidget extends ParentWidget {
 		
 		public ModifierWidget(SpellLogModifier modifier, int x, int y, int width, int heightIn) {
-			super(x, y, width, heightIn, StringTextComponent.EMPTY);
+			super(x, y, width, heightIn, TextComponent.EMPTY);
 			
 			final Minecraft mc = Minecraft.getInstance();
 			
@@ -599,17 +599,17 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			;
 		}
 		
 		@Override
-		protected void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		protected void renderForeground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			super.renderForeground(matrixStackIn, mouseX, mouseY, partialTicks);
 			
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 100);
-			for (Widget widget : this.children) {
+			for (AbstractWidget widget : this.children) {
 				widget.renderToolTip(matrixStackIn, mouseX, mouseY);
 			}
 			matrixStackIn.popPose();

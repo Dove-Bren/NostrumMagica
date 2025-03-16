@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.spell.component;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.IPrettyEnum;
 
-import net.minecraft.util.text.TextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public enum SpellShapeSelector implements IPrettyEnum {
 
@@ -14,16 +14,16 @@ public enum SpellShapeSelector implements IPrettyEnum {
 	
 	private final boolean affectsBlocks;
 	private final boolean affectsEntities;
-	private final TextComponent displayName;
+	private final BaseComponent displayName;
 	
 	private SpellShapeSelector(boolean blocks, boolean entities) {
-		this.displayName = new TranslationTextComponent("shape_selector." + this.name().toLowerCase() + ".name");
+		this.displayName = new TranslatableComponent("shape_selector." + this.name().toLowerCase() + ".name");
 		this.affectsBlocks = blocks;
 		this.affectsEntities = entities;
 	}
 
 	@Override
-	public TextComponent getDisplayName() {
+	public BaseComponent getDisplayName() {
 		return displayName;
 	}
 
@@ -37,16 +37,16 @@ public enum SpellShapeSelector implements IPrettyEnum {
 	
 	public static final EnumSpellShapeProperty<SpellShapeSelector> PROPERTY = new EnumSpellShapeProperty<SpellShapeSelector>("selector", SpellShapeSelector.class) {
 		
-		private final TextComponent name = new TranslationTextComponent("shapeprop." + this.getName() + ".name");
-		private final TextComponent desc = new TranslationTextComponent("shapeprop." + this.getName() + ".desc");
+		private final BaseComponent name = new TranslatableComponent("shapeprop." + this.getName() + ".name");
+		private final BaseComponent desc = new TranslatableComponent("shapeprop." + this.getName() + ".desc");
 		
 		@Override
-		public TextComponent getDisplayName(SpellShape shape) {
+		public BaseComponent getDisplayName(SpellShape shape) {
 			return name.plainCopy();
 		}
 		
 		@Override
-		public TextComponent getDisplayDescription(SpellShape shape) {
+		public BaseComponent getDisplayDescription(SpellShape shape) {
 			return desc.plainCopy();
 		}
 		

@@ -12,22 +12,22 @@ import com.smanzana.nostrummagica.tile.DungeonDoorTileEntity;
 import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
 
 public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILargeDoorMarker {
 
@@ -40,7 +40,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		if (!this.isMaster(state))
 			return null;
 		
@@ -48,7 +48,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 	}
 	
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (!worldIn.isClientSide()) {
 			BlockPos master = this.getMasterPos(worldIn, state, pos);
 			if (master != null) {
@@ -61,23 +61,23 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 					if (record != null) {
 						WorldKey key = door.isLarge() ? record.instance.getLargeKey() : record.instance.getSmallKey();
 						door.setWorldKey(key);
-						playerIn.sendMessage(new StringTextComponent("Set to dungeon key"), Util.NIL_UUID);
+						playerIn.sendMessage(new TextComponent("Set to dungeon key"), Util.NIL_UUID);
 					} else {
-						playerIn.sendMessage(new StringTextComponent("Not in a dungeon, so no key to set"), Util.NIL_UUID);
+						playerIn.sendMessage(new TextComponent("Not in a dungeon, so no key to set"), Util.NIL_UUID);
 					}
-					return ActionResultType.SUCCESS;
+					return InteractionResult.SUCCESS;
 				} else {
 					door.attemptUnlock(playerIn);
 				}
 			}
 		}
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 	
 	protected abstract WorldKey pickDungeonKey(DungeonInstance dungeon);
 	
-	public void spawnDungeonDoor(IWorld worldIn, BlockPos start, Direction facing, @Nullable MutableBoundingBox bounds, DungeonInstance dungeon) {
+	public void spawnDungeonDoor(LevelAccessor worldIn, BlockPos start, Direction facing, @Nullable BoundingBox bounds, DungeonInstance dungeon) {
 		final boolean isWorldGen = WorldUtil.IsWorldGen(worldIn);
 		// This is pretty dumb, but terrain gen will 'defer' tile entities under normal circumstances. By default,
 		// our setBlockState below will during world gen, too.
@@ -99,7 +99,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 		door.setWorldKey(pickDungeonKey(dungeon), WorldUtil.IsWorldGen(worldIn));
 	}
 	
-	public void overrideDungeonKey(IWorld worldIn, BlockPos masterPos, DungeonInstance dungeon) {
+	public void overrideDungeonKey(LevelAccessor worldIn, BlockPos masterPos, DungeonInstance dungeon) {
 		DungeonDoorTileEntity door = (DungeonDoorTileEntity) worldIn.getBlockEntity(masterPos);
 		if (door == null) {
 			System.out.println("No door where it said there would be! " + masterPos);
@@ -114,7 +114,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 	}
 	
 	@Override
-	public void setKey(IWorld worldIn, BlockState state, BlockPos masterPos, WorldKey key, DungeonRoomInstance dungeon, @Nullable MutableBoundingBox bounds) {
+	public void setKey(LevelAccessor worldIn, BlockState state, BlockPos masterPos, WorldKey key, DungeonRoomInstance dungeon, @Nullable BoundingBox bounds) {
 		DungeonDoorTileEntity door = (DungeonDoorTileEntity) worldIn.getBlockEntity(masterPos);
 		door.setWorldKey(key, WorldUtil.IsWorldGen(worldIn));
 	}

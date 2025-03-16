@@ -13,33 +13,33 @@ import com.smanzana.nostrummagica.network.message.CandleIgniteMessage;
 import com.smanzana.nostrummagica.tile.CandleTileEntity;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.FlintAndSteelItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.FlintAndSteelItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
@@ -70,7 +70,7 @@ public class CandleBlock extends Block {
 		this.registerDefaultState(this.stateDefinition.any().setValue(LIT, false));
 	}
 	
-	protected boolean isValidPosition(IWorldReader worldIn, BlockPos pos, Direction facing) {
+	protected boolean isValidPosition(LevelReader worldIn, BlockPos pos, Direction facing) {
 		// copied from WallTorchBlock
 		BlockPos blockpos = pos.relative(facing.getOpposite());
 		BlockState blockstate = worldIn.getBlockState(blockpos);
@@ -78,15 +78,15 @@ public class CandleBlock extends Block {
 	}
 	
 	@Override
-	public boolean canSurvive(BlockState state, IWorldReader world, BlockPos pos) {
+	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
 		return isValidPosition(world, pos, state.getValue(FACING));
 	}
 	
 	@Override
 	@Nullable
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		BlockState blockstate = this.defaultBlockState();
-		IWorldReader iworldreader = context.getLevel();
+		LevelReader iworldreader = context.getLevel();
 		BlockPos blockpos = context.getClickedPos();
 		Direction[] adirection = context.getNearestLookingDirections();
 		
@@ -109,7 +109,7 @@ public class CandleBlock extends Block {
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		Direction facing = state.getValue(FACING);
 		switch (facing) {
 		case EAST:
@@ -129,16 +129,16 @@ public class CandleBlock extends Block {
 	}
 	
 	@Override
-	public BlockRenderType getRenderShape(BlockState state) {
-		return BlockRenderType.MODEL;
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.MODEL;
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(LIT, FACING);
 	}
 	
-    public static void light(World world, BlockPos pos, BlockState state) {
+    public static void light(Level world, BlockPos pos, BlockState state) {
     	if (!state.getValue(LIT)) {
 	    	world.setBlockAndUpdate(pos, state.setValue(LIT, true));
 			
@@ -148,11 +148,11 @@ public class CandleBlock extends Block {
     	}
     }
     
-    public static void extinguish(World world, BlockPos pos, BlockState state) {
+    public static void extinguish(Level world, BlockPos pos, BlockState state) {
     	extinguish(world, pos, state, false);
     }
     
-    public static void extinguish(World world, BlockPos pos, BlockState state, boolean force) {
+    public static void extinguish(Level world, BlockPos pos, BlockState state, boolean force) {
     	
     	if (world.getBlockEntity(pos) != null) {
     		world.removeBlockEntity(pos);
@@ -180,7 +180,7 @@ public class CandleBlock extends Block {
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		return null;
 		
 		// We don't create when the block is placed.
@@ -193,11 +193,11 @@ public class CandleBlock extends Block {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (newState.getBlock() != state.getBlock()) {
 			super.onRemove(state, world, pos, newState, isMoving);
 			
-			TileEntity ent = world.getBlockEntity(pos);
+			BlockEntity ent = world.getBlockEntity(pos);
 			if (ent == null)
 				return;
 			
@@ -207,15 +207,15 @@ public class CandleBlock extends Block {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean triggerEvent(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+	public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
 		super.triggerEvent(state, worldIn, pos, id, param);
-        TileEntity tileentity = worldIn.getBlockEntity(pos);
+        BlockEntity tileentity = worldIn.getBlockEntity(pos);
         return tileentity == null ? false : tileentity.triggerEvent(id, param);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
 		
 		if (null == stateIn || !stateIn.getValue(LIT))
 			return;
@@ -255,10 +255,10 @@ public class CandleBlock extends Block {
 	}
 	
 	@Override
-	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
+	public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
 		// Check for a reagent item over the candle
 		if (state.getValue(LIT) && worldIn.getBlockEntity(pos) == null) {
-			List<ItemEntity> items = worldIn.getEntitiesOfClass(ItemEntity.class, VoxelShapes.block().bounds().move(pos).expandTowards(0, 1, 0));
+			List<ItemEntity> items = worldIn.getEntitiesOfClass(ItemEntity.class, Shapes.block().bounds().move(pos).expandTowards(0, 1, 0));
 			if (items != null && !items.isEmpty()) {
 				for (ItemEntity item : items) {
 					ItemStack stack = item.getItem();
@@ -285,24 +285,24 @@ public class CandleBlock extends Block {
 	}
 	
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 
 		if (worldIn.isClientSide())
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		
 		ItemStack heldItem = playerIn.getItemInHand(hand);
 		
 		if (!state.getValue(LIT)) {
 			if (heldItem.isEmpty())
-				return ActionResultType.FAIL;
+				return InteractionResult.FAIL;
 			
 			if (heldItem.getItem() instanceof FlintAndSteelItem) {
 				light(worldIn, pos, state);
 				ItemStacks.damageItem(heldItem, playerIn, hand, 1);
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 			
-			return ActionResultType.FAIL;
+			return InteractionResult.FAIL;
 		}
 		
 		// it's lit
@@ -310,34 +310,34 @@ public class CandleBlock extends Block {
 			// only if mainhand or mainhand is null. Otherwise if offhand is
 			// empty, will still put out. Dumb!
 			
-			if (hand == Hand.MAIN_HAND && (playerIn.getMainHandItem().isEmpty())) {
+			if (hand == InteractionHand.MAIN_HAND && (playerIn.getMainHandItem().isEmpty())) {
 				// putting it out
 				extinguish(worldIn, pos, state, true);
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 			
-			return ActionResultType.FAIL;
+			return InteractionResult.FAIL;
 		}
 
 		if (!(heldItem.getItem() instanceof ReagentItem))
-			return ActionResultType.FAIL;
+			return InteractionResult.FAIL;
 		
-		TileEntity te = worldIn.getBlockEntity(pos);
+		BlockEntity te = worldIn.getBlockEntity(pos);
 		if (te != null)
-			return ActionResultType.FAIL;
+			return InteractionResult.FAIL;
 		
 		ReagentType type = ReagentItem.FindType(heldItem);
 		heldItem.split(1);
 		
 		if (type == null)
-			return ActionResultType.FAIL;
+			return InteractionResult.FAIL;
 		
 		setReagent(worldIn, pos, state, type);
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 	
-	public static void setReagent(World world, BlockPos pos, BlockState state, ReagentType type) {
+	public static void setReagent(Level world, BlockPos pos, BlockState state, ReagentType type) {
 		if (world.isClientSide && type == null) {
 			extinguish(world, pos, state, false);
 			return;
@@ -347,7 +347,7 @@ public class CandleBlock extends Block {
 		
 		CandleTileEntity candle = null;
 		if (world.getBlockEntity(pos) != null) {
-			TileEntity te = world.getBlockEntity(pos);
+			BlockEntity te = world.getBlockEntity(pos);
 			if (te instanceof CandleTileEntity) {
 				candle = (CandleTileEntity) te;
 			} else {
@@ -369,17 +369,17 @@ public class CandleBlock extends Block {
 	}
 	
 	@Override
-	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+	public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
 		if (!isValidPosition(worldIn, pos, state.getValue(FACING))) {
 			worldIn.destroyBlock(pos, true);
 		}
 	}
 	
-	public static boolean IsCandleEnhancingBlock(World world, BlockPos pos, BlockState state) {
+	public static boolean IsCandleEnhancingBlock(Level world, BlockPos pos, BlockState state) {
 		return state.getBlock().isFireSource(state, world, pos, Direction.UP);
 	}
 	
-	public static boolean IsCandleEnhanced(World world, BlockPos candlePos) {
+	public static boolean IsCandleEnhanced(Level world, BlockPos candlePos) {
 		BlockPos[] positions = {
 				candlePos.below(),
 				candlePos.below().below(),

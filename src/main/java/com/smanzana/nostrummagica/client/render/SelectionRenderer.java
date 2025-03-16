@@ -1,19 +1,19 @@
 package com.smanzana.nostrummagica.client.render;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.item.ISelectionItem;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -27,8 +27,8 @@ public class SelectionRenderer {
 	@SubscribeEvent
 	public void onRender(RenderWorldLastEvent event) {
 		Minecraft mc = Minecraft.getInstance();
-		ClientPlayerEntity player = mc.player;
-		final MatrixStack matrixStackIn = event.getMatrixStack();
+		LocalPlayer player = mc.player;
+		final PoseStack matrixStackIn = event.getMatrixStack();
 		
 		final ItemStack selectionStack = this.findStackToRender(player);
 		if (!selectionStack.isEmpty()) {
@@ -44,10 +44,10 @@ public class SelectionRenderer {
 				}
 				
 				if (minDist < 5096) {
-					final IRenderTypeBuffer.Impl bufferIn = IRenderTypeBuffer.immediate(Tessellator.getInstance().getBuilder());
+					final MultiBufferSource.BufferSource bufferIn = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
 					bufferIn.getBuffer(NostrumRenderTypes.SPELLSHAPE_QUADS);
 					if (freePos != null) {
-						final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.WORLD_SELECT_HIGHLIGHT);
+						final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.WORLD_SELECT_HIGHLIGHT);
 						renderSelectionBox(
 								matrixStackIn, buffer,
 								new BlockPos(Math.min(anchor.getX(), freePos.getX()),
@@ -63,7 +63,7 @@ public class SelectionRenderer {
 					}
 					
 					// Render anchor anchor block special
-					final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.WORLD_SELECT_HIGHLIGHT);
+					final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.WORLD_SELECT_HIGHLIGHT);
 					renderAnchorBlock(matrixStackIn, buffer, anchor, event.getPartialTicks());
 					bufferIn.endBatch();
 				}
@@ -71,7 +71,7 @@ public class SelectionRenderer {
 		}
 	}
 	
-	protected ItemStack findStackToRender(PlayerEntity player) {
+	protected ItemStack findStackToRender(Player player) {
 		ItemStack ret = ItemStack.EMPTY;
 		for (ItemStack held : player.getHandSlots()) {
 			if (!held.isEmpty() && held.getItem() instanceof ISelectionItem) {
@@ -85,10 +85,10 @@ public class SelectionRenderer {
 		return ret;
 	}
 	
-	private void renderAnchorBlock(MatrixStack matrixStackIn, IVertexBuilder buffer, BlockPos pos, float partialTicks) {
+	private void renderAnchorBlock(PoseStack matrixStackIn, VertexConsumer buffer, BlockPos pos, float partialTicks) {
 		Minecraft mc = Minecraft.getInstance();
-		Vector3d playerPos = mc.gameRenderer.getMainCamera().getPosition();//player.getEyePosition(partialTicks).subtract(0, player.getEyeHeight(), 0);
-		Vector3d offset = new Vector3d(pos.getX() - playerPos.x,
+		Vec3 playerPos = mc.gameRenderer.getMainCamera().getPosition();//player.getEyePosition(partialTicks).subtract(0, player.getEyeHeight(), 0);
+		Vec3 offset = new Vec3(pos.getX() - playerPos.x,
 				pos.getY() - playerPos.y,
 				pos.getZ() - playerPos.z);
 		
@@ -99,10 +99,10 @@ public class SelectionRenderer {
 		matrixStackIn.popPose();
 	}
 	
-	private void renderSelectionBox(MatrixStack matrixStackIn, IVertexBuilder buffer, BlockPos min, BlockPos max, float partialTicks, boolean valid) {
+	private void renderSelectionBox(PoseStack matrixStackIn, VertexConsumer buffer, BlockPos min, BlockPos max, float partialTicks, boolean valid) {
 		Minecraft mc = Minecraft.getInstance();
-		Vector3d playerPos = mc.gameRenderer.getMainCamera().getPosition();//player.getEyePosition(partialTicks).subtract(0, player.getEyeHeight(), 0);
-		Vector3d offset = new Vector3d(min.getX() - playerPos.x,
+		Vec3 playerPos = mc.gameRenderer.getMainCamera().getPosition();//player.getEyePosition(partialTicks).subtract(0, player.getEyeHeight(), 0);
+		Vec3 offset = new Vec3(min.getX() - playerPos.x,
 				min.getY() - playerPos.y,
 				min.getZ() - playerPos.z);
 		

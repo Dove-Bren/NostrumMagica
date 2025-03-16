@@ -18,12 +18,12 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public interface INostrumMagic {
 	
@@ -36,14 +36,14 @@ public interface INostrumMagic {
 			this.level = level;
 		}
 		
-		public CompoundNBT toNBT() {
-			CompoundNBT tag = new CompoundNBT();
+		public CompoundTag toNBT() {
+			CompoundTag tag = new CompoundTag();
 			tag.putString("key", key);
 			tag.putInt("level", level);
 			return tag;
 		}
 		
-		public static TransmuteKnowledge fromNBT(CompoundNBT tag) {
+		public static TransmuteKnowledge fromNBT(CompoundTag tag) {
 			return new TransmuteKnowledge(tag.getString("key"), tag.getInt("level"));
 		}
 		
@@ -150,9 +150,9 @@ public interface INostrumMagic {
 	public boolean hasTrial(EMagicElement element);
 	
 	// Mark/recall
-	public void setMarkLocation(RegistryKey<World> dimension, BlockPos location);
+	public void setMarkLocation(ResourceKey<Level> dimension, BlockPos location);
 	public BlockPos getMarkLocation();
-	public RegistryKey<World> getMarkDimension();
+	public ResourceKey<Level> getMarkDimension();
 	public void unlockEnhancedTeleport();
 	public boolean hasEnhancedTeleport();
 	
@@ -218,18 +218,18 @@ public interface INostrumMagic {
 	public Map<EMagicElement, Map<EAlteration, Boolean>> getSpellKnowledge();
 	
 	// Sorcery Portal
-	public RegistryKey<World> getSorceryPortalDimension();
+	public ResourceKey<Level> getSorceryPortalDimension();
 	public BlockPos getSorceryPortalPos();
 	public void clearSorceryPortal();
-	public void setSorceryPortalLocation(RegistryKey<World> dimension, BlockPos pos);
+	public void setSorceryPortalLocation(ResourceKey<Level> dimension, BlockPos pos);
 	
 	// Sorcery dimension respawn support
 	public static final class VanillaRespawnInfo {
-		public final @Nonnull RegistryKey<World> dimension;
+		public final @Nonnull ResourceKey<Level> dimension;
 		public final @Nonnull BlockPos pos;
 		public final float yaw;
 		public final boolean forced;
-		public VanillaRespawnInfo(RegistryKey<World> dimension, BlockPos pos, float yaw, boolean forced) {
+		public VanillaRespawnInfo(ResourceKey<Level> dimension, BlockPos pos, float yaw, boolean forced) {
 			this.dimension = dimension;
 			this.pos = pos;
 			this.yaw = yaw;
@@ -240,5 +240,5 @@ public interface INostrumMagic {
 	public void setSavedRespawnInfo(@Nullable VanillaRespawnInfo info);
 	
 	// Refresh attributes and rescan for them
-	public void refresh(ServerPlayerEntity player);
+	public void refresh(ServerPlayer player);
 }

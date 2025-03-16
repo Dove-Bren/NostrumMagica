@@ -10,11 +10,11 @@ import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.Entities;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Server has processed spell cast request and sent back
@@ -27,7 +27,7 @@ public class ClientShapeVfxRenderMessage {
 	public static void handle(ClientShapeVfxRenderMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
 		Minecraft.getInstance().submit(() -> {
-			final World world = NostrumMagica.instance.proxy.getPlayer().level;
+			final Level world = NostrumMagica.instance.proxy.getPlayer().level;
 			LivingEntity caster, target;
 			caster = target = null;
 			
@@ -52,16 +52,16 @@ public class ClientShapeVfxRenderMessage {
 	}
 
 	private final UUID caster;
-	private final Vector3d casterPos;
+	private final Vec3 casterPos;
 	private final UUID target;
-	private final Vector3d targetPos;
+	private final Vec3 targetPos;
 	private final SpellShape shape;
 	private final SpellShapeProperties properties;
 	private final SpellCharacteristics characteristics;
 	
 	public ClientShapeVfxRenderMessage(
-			LivingEntity caster, Vector3d casterPos,
-			LivingEntity target, Vector3d targetPos,
+			LivingEntity caster, Vec3 casterPos,
+			LivingEntity target, Vec3 targetPos,
 			SpellShape shape,
 			SpellShapeProperties properties,
 			SpellCharacteristics characteristics) {
@@ -71,8 +71,8 @@ public class ClientShapeVfxRenderMessage {
 	}
 	
 	public ClientShapeVfxRenderMessage(
-			UUID caster, Vector3d casterPos,
-			UUID target, Vector3d targetPos,
+			UUID caster, Vec3 casterPos,
+			UUID target, Vec3 targetPos,
 			SpellShape shape,
 			SpellShapeProperties properties,
 			SpellCharacteristics characteristics) {
@@ -85,11 +85,11 @@ public class ClientShapeVfxRenderMessage {
 		this.characteristics = characteristics;
 	}
 
-	public static ClientShapeVfxRenderMessage decode(PacketBuffer buf) {
+	public static ClientShapeVfxRenderMessage decode(FriendlyByteBuf buf) {
 		final UUID caster;
-		final Vector3d casterPos;
+		final Vec3 casterPos;
 		final UUID target;
-		final Vector3d targetPos;
+		final Vec3 targetPos;
 		final SpellShape shape;
 		final SpellShapeProperties properties;
 		final SpellCharacteristics characteristics;
@@ -101,7 +101,7 @@ public class ClientShapeVfxRenderMessage {
 		}
 		
 		if (buf.readBoolean()) {
-			casterPos = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
+			casterPos = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
 		} else {
 			casterPos = null;
 		}
@@ -113,7 +113,7 @@ public class ClientShapeVfxRenderMessage {
 		}
 		
 		if (buf.readBoolean()) {
-			targetPos = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
+			targetPos = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
 		} else {
 			targetPos = null;
 		}
@@ -133,7 +133,7 @@ public class ClientShapeVfxRenderMessage {
 				);
 	}
 
-	public static void encode(ClientShapeVfxRenderMessage msg, PacketBuffer buf) {
+	public static void encode(ClientShapeVfxRenderMessage msg, FriendlyByteBuf buf) {
 		buf.writeBoolean(msg.caster != null);
 		if (msg.caster != null) {
 			buf.writeUUID(msg.caster);

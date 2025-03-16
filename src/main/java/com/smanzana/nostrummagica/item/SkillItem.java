@@ -11,21 +11,21 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -37,7 +37,7 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 	public static final String ID_SKILL_SCROLL_LARGE = "research_scroll_large";
 	
 	private static interface SkillFunc {
-		public boolean award(PlayerEntity player, INostrumMagic attr, ItemStack stack);
+		public boolean award(Player player, INostrumMagic attr, ItemStack stack);
 	}
 	
 	private final SkillFunc func;
@@ -85,10 +85,10 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		final @Nonnull ItemStack stack = playerIn.getItemInHand(hand);
 		if (playerIn.isShiftKeyDown()) {
-			return new ActionResult<ItemStack>(ActionResultType.PASS, stack);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, stack);
 		}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
@@ -96,19 +96,19 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 			if (this.func.award(playerIn, attr, stack)) {
 				NostrumMagicaSounds.LORE.play(null, playerIn.level, playerIn.getX(), playerIn.getY(), playerIn.getZ());
 				stack.shrink(1);
-				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) playerIn);
+				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) playerIn);
 			}
-			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, stack);
 		}
 		
-		return new ActionResult<ItemStack>(ActionResultType.PASS, stack);
+		return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, stack);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		if (I18n.exists(getDescKey())) {
-			tooltip.add(new TranslationTextComponent(getDescKey()).withStyle(TextFormatting.BLUE));
+			tooltip.add(new TranslatableComponent(getDescKey()).withStyle(ChatFormatting.BLUE));
 		}
 	}
 	
@@ -116,7 +116,7 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 		public Mirror() {
 			super(NostrumItems.PropUnstackable().rarity(Rarity.EPIC), (player, attr, stack) -> {
 				attr.addSkillPoint();
-				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_MIRROR), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.skillitem." + ID_SKILL_MIRROR), Util.NIL_UUID);
 				return true;
 			});
 		}
@@ -126,11 +126,11 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 		public EnderPin() {
 			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
 				if (attr.hasEnhancedTeleport()) {
-					player.sendMessage(new TranslationTextComponent("info.skillitem.advtele.unlocked", new Object[0]), Util.NIL_UUID);
+					player.sendMessage(new TranslatableComponent("info.skillitem.advtele.unlocked", new Object[0]), Util.NIL_UUID);
 					return false;
 				} else {
 					attr.unlockEnhancedTeleport();
-					player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_ENDER_PIN), Util.NIL_UUID);
+					player.sendMessage(new TranslatableComponent("info.skillitem." + ID_SKILL_ENDER_PIN), Util.NIL_UUID);
 					return true;
 				}
 			});
@@ -141,7 +141,7 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 		public SmallScroll() {
 			super(NostrumItems.PropUnstackable().rarity(Rarity.RARE), (player, attr, stack) -> {
 				attr.addResearchPoint();
-				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_SCROLL_SMALL), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.skillitem." + ID_SKILL_SCROLL_SMALL), Util.NIL_UUID);
 				return true;
 			});
 		}
@@ -153,7 +153,7 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 				attr.addResearchPoint();
 				attr.addResearchPoint();
 				attr.addResearchPoint();
-				player.sendMessage(new TranslationTextComponent("info.skillitem." + ID_SKILL_SCROLL_LARGE), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.skillitem." + ID_SKILL_SCROLL_LARGE), Util.NIL_UUID);
 				return true;
 			});
 		}

@@ -1,10 +1,10 @@
 package com.smanzana.nostrummagica.client.gui.mirror;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.client.gui.widget.FixedWidget;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.TextComponent;
 
 public abstract class PanningMirrorSubscreen implements IMirrorSubscreen {
 	
@@ -93,7 +93,7 @@ public abstract class PanningMirrorSubscreen implements IMirrorSubscreen {
 	protected abstract void onZoom(int panX, int panY, float zoomScale);
 	
 	@Override
-	public void show(IMirrorScreen parent, PlayerEntity player, int width, int height, int guiLeft, int guiTop) {
+	public void show(IMirrorScreen parent, Player player, int width, int height, int guiLeft, int guiTop) {
 		// Add a widget to capture mouse events as the last thing so buttons on top get clicked first.
 		// AKA call super last!
 		parent.addWidget(new PanWidget(this, guiLeft, guiTop, width, height));
@@ -104,7 +104,7 @@ public abstract class PanningMirrorSubscreen implements IMirrorSubscreen {
 		private final PanningMirrorSubscreen subscreen;
 		
 		public PanWidget(PanningMirrorSubscreen subscreen, int x, int y, int width, int height) {
-			super(x, y, width, height, StringTextComponent.EMPTY);
+			super(x, y, width, height, TextComponent.EMPTY);
 			this.subscreen = subscreen;
 		}
 		
@@ -133,7 +133,7 @@ public abstract class PanningMirrorSubscreen implements IMirrorSubscreen {
 		}
 		
 		@Override
-		public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			; // don't render anything
 		}
 	}

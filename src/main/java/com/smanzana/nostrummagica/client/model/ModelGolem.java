@@ -1,18 +1,18 @@
 package com.smanzana.nostrummagica.client.model;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
 
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.ModelPart;
 
 public class ModelGolem<T extends MagicGolemEntity> extends EntityModel<T> {
 
-	private ModelRenderer head;
-	private ModelRenderer body1;
-	private ModelRenderer body2;
-	private ModelRenderer body3;
+	private ModelPart head;
+	private ModelPart body1;
+	private ModelPart body2;
+	private ModelPart body3;
 	
 	private static final int textureHeight = 64;
 	private static final int textureWidth = 64;
@@ -27,22 +27,22 @@ public class ModelGolem<T extends MagicGolemEntity> extends EntityModel<T> {
 		int centerX, centerZ;
 		centerX = centerZ = 0;
 		
-		head = new ModelRenderer(this, 0, 0);
+		head = new ModelPart(this, 0, 0);
 		head.addBox(-4, -5, -4, 8, 10, 8);
 		head.setTexSize(textureWidth, textureHeight);
 		head.setPos(centerX, 5.0f, centerZ); // 34
 		
-		body1 = new ModelRenderer(this, 0, 0);
+		body1 = new ModelPart(this, 0, 0);
 		body1.addBox(-6, -3, -2, 16, 6, 10);
 		body1.setTexSize(textureWidth, textureHeight);
 		body1.setPos(centerX, 26.0f, centerZ); // 24
 		
-		body2 = new ModelRenderer(this, 0, 0);
+		body2 = new ModelPart(this, 0, 0);
 		body2.addBox(-4, -4, -6, 10, 8, 8);
 		body2.setTexSize(textureWidth, textureHeight);
 		body2.setPos(centerX, 17.0f, centerZ); // 14
 		
-		body3 = new ModelRenderer(this, 0, 0);
+		body3 = new ModelPart(this, 0, 0);
 		body3.addBox(-6, -2, -4, 8, 4, 8);
 		body3.setTexSize(textureWidth, textureHeight);
 		body3.setPos(centerX, 34.0f, centerZ); // 10
@@ -50,7 +50,7 @@ public class ModelGolem<T extends MagicGolemEntity> extends EntityModel<T> {
 	}
 	
 	@Override
-	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		matrixStackIn.pushPose();
 		
 		float modelScale = 1.0f;// / 20.0f; // 16 pixels wide model to .8 blocks

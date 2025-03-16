@@ -7,26 +7,26 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.EffectType;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
-public class MysticAirEffect extends Effect {
+public class MysticAirEffect extends MobEffect {
 
 	public static final String ID = "mystic_air";
 	
 	public MysticAirEffect() {
-		super(EffectType.BENEFICIAL, 0xFFD5CFDF);
+		super(MobEffectCategory.BENEFICIAL, 0xFFD5CFDF);
 	}
 	
 	public boolean isDurationEffectTick(int duration, int amp) {
@@ -34,11 +34,11 @@ public class MysticAirEffect extends Effect {
 	}
 	
 	protected void reduceAmp(LivingEntity entity, int newAmplifier) {
-		EffectInstance instance = entity.getEffect(this);
+		MobEffectInstance instance = entity.getEffect(this);
 		entity.removeEffect(this);
 		
 		if (newAmplifier >= 0) {
-			entity.addEffect(new EffectInstance(this, instance.getDuration(), newAmplifier));
+			entity.addEffect(new MobEffectInstance(this, instance.getDuration(), newAmplifier));
 		}
 	}
 	
@@ -57,7 +57,7 @@ public class MysticAirEffect extends Effect {
 					40, 0,
 					entity.getId()
 					).color(EMagicElement.WIND.getColor()).setTargetBehavior(TargetBehavior.ORBIT));
-			entity.level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.PLAYER_BREATH, SoundCategory.PLAYERS, 1f, 1f);
+			entity.level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.PLAYER_BREATH, SoundSource.PLAYERS, 1f, 1f);
 		}
 	}
 	
@@ -72,7 +72,7 @@ public class MysticAirEffect extends Effect {
 		}
 		
 		if (event.getDistance() > 3) { // 3 is magic number pulled from LivingEntity which lives in a protected method
-			EffectInstance effect = event.getEntityLiving().getEffect(NostrumEffects.mysticAir);
+			MobEffectInstance effect = event.getEntityLiving().getEffect(NostrumEffects.mysticAir);
 			if (effect != null && effect.getDuration() > 0) {
 				final LivingEntity living = event.getEntityLiving();
 				// Instantly extinguish and cancel in exchange for some effect
@@ -80,7 +80,7 @@ public class MysticAirEffect extends Effect {
 				((MysticAirEffect) effect.getEffect()).reduceAmp(living, effect.getAmplifier() - 1);
 				//event.getEntityLiving().world.playSound(null, living.getPosX(), living.getPosY(), living.getPosZ(), SoundEvents.ENTITY_PLAYER_BREATH, SoundCategory.PLAYERS, 1f, 1f);
 				NostrumMagicaSounds.WING_FLAP.play(living);
-				((ServerWorld) living.level).sendParticles(ParticleTypes.POOF, living.getX(), living.getY(), living.getZ(), 10, 0, 0, 0, .05);
+				((ServerLevel) living.level).sendParticles(ParticleTypes.POOF, living.getX(), living.getY(), living.getZ(), 10, 0, 0, 0, .05);
 				
 			}
 		}

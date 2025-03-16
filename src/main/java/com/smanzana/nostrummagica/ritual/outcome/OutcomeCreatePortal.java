@@ -8,12 +8,12 @@ import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.util.TextUtils;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 
 public class OutcomeCreatePortal implements IRitualOutcome {
 
@@ -21,10 +21,10 @@ public class OutcomeCreatePortal implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
+	public void perform(Level world, Player player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		
 		world.setBlockAndUpdate(center.below(), NostrumBlocks.sorceryPortalSpawner.defaultBlockState());
-		TileEntity te = world.getBlockEntity(center.offset(0, 0, 0));
+		BlockEntity te = world.getBlockEntity(center.offset(0, 0, 0));
 		if (te == null || !(te instanceof AltarTileEntity))
 			return;
 		((AltarTileEntity) te).setItem(ItemStack.EMPTY);
@@ -37,7 +37,7 @@ public class OutcomeCreatePortal implements IRitualOutcome {
 	}
 
 	@Override
-	public List<ITextComponent> getDescription() {
+	public List<Component> getDescription() {
 		return TextUtils.GetTranslatedList("ritual.outcome.create_portal.desc");
 	}
 	

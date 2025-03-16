@@ -3,14 +3,14 @@ package com.smanzana.nostrummagica.client.gui.infoscreen;
 import java.util.Collection;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.gui.components.AbstractWidget;
 
 public class LoreInfoSubScreen implements IInfoSubScreen {
 
@@ -21,7 +21,7 @@ public class LoreInfoSubScreen implements IInfoSubScreen {
 	}
 	
 	@Override
-	public void draw(INostrumMagic attr, Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
+	public void draw(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
 		String title = this.tag.getLoreDisplayName();
 		int len = mc.font.width(title);
 		mc.font.drawShadow(matrixStackIn, title, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
@@ -42,7 +42,7 @@ public class LoreInfoSubScreen implements IInfoSubScreen {
 	}
 
 	@Override
-	public Collection<Widget> getWidgets(int x, int y, int width, int height) {
+	public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
 		return null;
 	}
 

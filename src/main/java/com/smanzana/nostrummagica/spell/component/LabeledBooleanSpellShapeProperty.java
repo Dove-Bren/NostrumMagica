@@ -2,20 +2,20 @@ package com.smanzana.nostrummagica.spell.component;
 
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.util.text.TextComponent;
+import net.minecraft.network.chat.BaseComponent;
 
 public class LabeledBooleanSpellShapeProperty extends BooleanSpellShapeProperty {
 	
-	private final TextComponent falseLabel;
-	private final TextComponent trueLabel;
+	private final BaseComponent falseLabel;
+	private final BaseComponent trueLabel;
 
-	public LabeledBooleanSpellShapeProperty(String name, TextComponent falseLabel, TextComponent trueLabel) {
+	public LabeledBooleanSpellShapeProperty(String name, BaseComponent falseLabel, BaseComponent trueLabel) {
 		super(name);
 		this.falseLabel = falseLabel;
 		this.trueLabel = trueLabel;
 	}
 	@Override
-	public TextComponent getDisplayValue(SpellShape shape, Boolean value) {
+	public BaseComponent getDisplayValue(SpellShape shape, Boolean value) {
 		return value ? trueLabel : falseLabel; 
 	}
 }

@@ -15,54 +15,54 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntitySize;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.Pose;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.HurtByTargetGoal;
-import net.minecraft.entity.ai.goal.LookAtGoal;
-import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
-import net.minecraft.entity.ai.goal.SwimGoal;
-import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
-import net.minecraft.entity.monster.MonsterEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElementalEntity {
+public class KoidEntity extends Monster implements ILoreSupplier, IElementalEntity {
 	
 	public static final String ID = "entity_koid";
 
-	private static final DataParameter<Integer> KOID_VARIANT =
-			EntityDataManager.<Integer>defineId(KoidEntity.class, DataSerializers.INT);
+	private static final EntityDataAccessor<Integer> KOID_VARIANT =
+			SynchedEntityData.<Integer>defineId(KoidEntity.class, EntityDataSerializers.INT);
 	
 	private KoidTask kTask;
 	private int idleCooldown;
 	
-	public KoidEntity(EntityType<? extends KoidEntity> type, World worldIn) {
+	public KoidEntity(EntityType<? extends KoidEntity> type, Level worldIn) {
 		this(type, worldIn, EMagicElement.values()[NostrumMagica.rand.nextInt(
 				EMagicElement.values().length)]);
 	}
 	
-    protected KoidEntity(EntityType<? extends KoidEntity> type, World worldIn, EMagicElement element) {
+    protected KoidEntity(EntityType<? extends KoidEntity> type, Level worldIn, EMagicElement element) {
         super(type, worldIn);
         
         this.setElement(element);
@@ -70,15 +70,15 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
     }
     
     protected void registerGoals() {
-        this.goalSelector.addGoal(1, new SwimGoal(this));
-        this.goalSelector.addGoal(4, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
-        this.goalSelector.addGoal(5, new LookAtGoal(this, PlayerEntity.class, 8.0F));
+        this.goalSelector.addGoal(1, new FloatGoal(this));
+        this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 1.0D));
+        this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, true));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<Player>(this, Player.class, true));
     }
     
-    public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-        return MonsterEntity.createMonsterAttributes()
+    public static final AttributeSupplier.Builder BuildAttributes() {
+        return Monster.createMonsterAttributes()
 	        .add(Attributes.MOVEMENT_SPEED, 0.33D)
 	        .add(Attributes.MAX_HEALTH, 10.0D)
 	        .add(Attributes.ATTACK_DAMAGE, 2.0D)
@@ -108,7 +108,7 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
         return 0.7F;
     }
 
-    protected float getStandingEyeHeight(Pose pose, EntitySize size)
+    protected float getStandingEyeHeight(Pose pose, EntityDimensions size)
     {
         return this.getBbHeight() * 0.8F;
     }
@@ -125,8 +125,8 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
         return flag;
     }
 
-    public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
-        return ActionResultType.PASS;
+    public InteractionResult /*processInteract*/ mobInteract(Player player, InteractionHand hand, @Nonnull ItemStack stack) {
+        return InteractionResult.PASS;
     }
 
     /**
@@ -141,7 +141,7 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
     /**
      * Returns true if the mob is currently able to mate with the specified mob.
      */
-    public boolean canMateWith(AnimalEntity otherAnimal)
+    public boolean canMateWith(Animal otherAnimal)
     {
         return false;
     }
@@ -152,7 +152,7 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
         		&& NostrumMagica.itemSetListener.getActiveSetCount(target, NostrumEquipmentSets.koidSet) < 3;
     }
 
-    public boolean canBeLeashed(PlayerEntity player)
+    public boolean canBeLeashed(Player player)
     {
         return false;
     }
@@ -244,7 +244,7 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
 		}
 	}
 	
-	public void readAdditionalSaveData(CompoundNBT compound) {
+	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 
         if (compound.contains("KoidType", NBT.TAG_ANY_NUMERIC)) {
@@ -255,7 +255,7 @@ public class KoidEntity extends MonsterEntity implements ILoreSupplier, IElement
         this.setCombatTask();
 	}
 	
-	public void addAdditionalSaveData(CompoundNBT compound) {
+	public void addAdditionalSaveData(CompoundTag compound) {
     	super.addAdditionalSaveData(compound);
         compound.putByte("KoidType", (byte)this.getElement().ordinal());
 	}

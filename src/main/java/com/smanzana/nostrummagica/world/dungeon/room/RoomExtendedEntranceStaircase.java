@@ -11,18 +11,18 @@ import com.smanzana.autodungeons.world.dungeon.room.IStaircaseRoom;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.RedstoneWallTorchBlock;
-import net.minecraft.block.StairsBlock;
-import net.minecraft.state.properties.Half;
-import net.minecraft.state.properties.StairsShape;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RedstoneWallTorchBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.StairsShape;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.levelgen.Heightmap;
 
 /**
  * Entrance staircase. Extends up to nearly surface level and then spawns a shrine.
@@ -63,14 +63,14 @@ public class RoomExtendedEntranceStaircase extends StaticRoom implements IStairc
 				'B', (dark ? NostrumBlocks.dungeonBlock : NostrumBlocks.lightDungeonBlock),
 				'N', new StaticBlockState(Blocks.REDSTONE_WALL_TORCH.defaultBlockState().setValue(RedstoneWallTorchBlock.FACING, Direction.NORTH)),
 				' ', null,
-				'U', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH).setValue(StairsBlock.HALF, Half.BOTTOM).setValue(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
-				'R', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST).setValue(StairsBlock.HALF, Half.BOTTOM).setValue(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
-				'D', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.SOUTH).setValue(StairsBlock.HALF, Half.BOTTOM).setValue(StairsBlock.SHAPE, StairsShape.STRAIGHT)),
-				'L', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.WEST).setValue(StairsBlock.HALF, Half.BOTTOM).setValue(StairsBlock.SHAPE, StairsShape.STRAIGHT)));
+				'U', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.NORTH).setValue(StairBlock.HALF, Half.BOTTOM).setValue(StairBlock.SHAPE, StairsShape.STRAIGHT)),
+				'R', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST).setValue(StairBlock.HALF, Half.BOTTOM).setValue(StairBlock.SHAPE, StairsShape.STRAIGHT)),
+				'D', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.SOUTH).setValue(StairBlock.HALF, Half.BOTTOM).setValue(StairBlock.SHAPE, StairsShape.STRAIGHT)),
+				'L', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.WEST).setValue(StairBlock.HALF, Half.BOTTOM).setValue(StairBlock.SHAPE, StairsShape.STRAIGHT)));
 	}
 	
 	@Override
-	public boolean canSpawnAt(IWorld world, BlueprintLocation start) {
+	public boolean canSpawnAt(LevelAccessor world, BlueprintLocation start) {
 		int minX = start.getPos().getX() - 5;
 		int minY = start.getPos().getY();
 		int minZ = start.getPos().getZ() - 5;
@@ -92,7 +92,7 @@ public class RoomExtendedEntranceStaircase extends StaticRoom implements IStairc
 	}
 	
 	@Override
-	public void spawn(IWorld world, BlueprintLocation start, MutableBoundingBox bounds, UUID dungeonID) {
+	public void spawn(LevelAccessor world, BlueprintLocation start, BoundingBox bounds, UUID dungeonID) {
 		getEntryStart((type, x, z) -> world.getHeight(type, x, z), start, true, world, bounds, dungeonID);
 	}
 	
@@ -101,11 +101,11 @@ public class RoomExtendedEntranceStaircase extends StaticRoom implements IStairc
 		return getEntryStart(world, start, false, null, null, null);
 	}
 	
-	private BlueprintLocation getEntryStart(IWorldHeightReader heightReader, BlueprintLocation start, boolean spawn, IWorld world, MutableBoundingBox bounds, UUID dungeonID) {
+	private BlueprintLocation getEntryStart(IWorldHeightReader heightReader, BlueprintLocation start, boolean spawn, LevelAccessor world, BoundingBox bounds, UUID dungeonID) {
 		int stairHeight = 4;
 		BlockPos pos = start.getPos();
 		
-		BlockPos blockpos = new BlockPos(pos.getX(), heightReader.getHeight(Heightmap.Type.WORLD_SURFACE, pos.getX(), pos.getZ()), pos.getZ());
+		BlockPos blockpos = new BlockPos(pos.getX(), heightReader.getHeight(Heightmap.Types.WORLD_SURFACE, pos.getX(), pos.getZ()), pos.getZ());
 		
 		int maxY = blockpos.getY();
 		BlockPos cur = start.getPos();
@@ -174,17 +174,17 @@ public class RoomExtendedEntranceStaircase extends StaticRoom implements IStairc
 	}
 
 	@Override
-	public MutableBoundingBox getBounds(BlueprintLocation start) {
+	public BoundingBox getBounds(BlueprintLocation start) {
 		// This should repeat what spawn does and find the actual bounds, but that requires querying the world which
 		// this method would like to not do.
 		// So instead, guess based on start to an approximate height of 128.
 		
 		final BlockPos topPos = new BlockPos(start.getPos().getX(), 128, start.getPos().getZ());
-		MutableBoundingBox bounds = null;
+		BoundingBox bounds = null;
 		
 		// Add staircase down to actual start
 		final int stairHeight = 4;
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		cursor.set(start.getPos());
 		for (int i = start.getPos().getY(); i < topPos.getY(); i+= stairHeight) {
 			cursor.setY(i);

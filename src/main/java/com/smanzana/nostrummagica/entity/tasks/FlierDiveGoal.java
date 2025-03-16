@@ -4,9 +4,9 @@ import java.util.EnumSet;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
 
 /**
  * Attempts to dive into the enemy to make a melee attack.
@@ -14,7 +14,7 @@ import net.minecraft.entity.ai.goal.Goal;
  *
  * @param <T>
  */
-public class FlierDiveGoal<T extends MobEntity> extends Goal
+public class FlierDiveGoal<T extends Mob> extends Goal
 {
 	protected final T entity;
 	private final double moveSpeedAmp;

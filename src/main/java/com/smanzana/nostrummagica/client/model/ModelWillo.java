@@ -3,21 +3,21 @@ package com.smanzana.nostrummagica.client.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.entity.WilloEntity;
 
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.ModelPart;
 
 public class ModelWillo extends EntityModel<WilloEntity> {
 	
 	private static final int SEGMENTS = 8;
 	private static final float PERIOD = 20f * 2;
 	
-	private List<ModelRenderer> armLeft;
-	private List<ModelRenderer> armRight;
+	private List<ModelPart> armLeft;
+	private List<ModelPart> armRight;
 	
 	protected float waveProg;
 	
@@ -32,7 +32,7 @@ public class ModelWillo extends EntityModel<WilloEntity> {
 		final float offset = 16f * .75f;
 		final float spacing = 16f * .75f;
 		for (int i = 0; i < SEGMENTS; i++) {
-			ModelRenderer render = new ModelRenderer(this, 0, 0);
+			ModelPart render = new ModelPart(this, 0, 0);
 			render.texOffs(0, 18);
 			render.addBox(-4.5f + (offset + (i+1) * spacing), -4.5f, -4.5f, 9, 9, 9);
 			//render.offsetX = offset + (i+1) * spacing;
@@ -41,7 +41,7 @@ public class ModelWillo extends EntityModel<WilloEntity> {
 		}
 		
 		for (int i = 0; i < SEGMENTS; i++) {
-			ModelRenderer render = new ModelRenderer(this, 0, 0);
+			ModelPart render = new ModelPart(this, 0, 0);
 			render.texOffs(0, 18);
 			render.addBox(-4.5f + (-offset + (i+1) * -spacing), -4.5f, -4.5f, 9, 9, 9);
 //			render.offsetX = -offset + (i+1) * -spacing;
@@ -59,7 +59,7 @@ public class ModelWillo extends EntityModel<WilloEntity> {
 	}
 	
 	@Override
-	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn,
+	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn,
 			float red, float green, float blue, float alpha) {
 		// Used to have all parented to a main modelrender, and adjusted the yoffset to make it do the wave with its arms.
 		// There is no adjustable offset on model renderers OR on their boxes. So isntead we iterate the lists ourselves

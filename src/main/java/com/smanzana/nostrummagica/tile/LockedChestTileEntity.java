@@ -13,42 +13,42 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.Inventories;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.DyeColor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ChestTileEntity;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 
-public class LockedChestTileEntity extends TileEntity implements ITickableTileEntity, IInventory, IWorldKeyHolder, IUniqueBlueprintTileEntity {
+public class LockedChestTileEntity extends BlockEntity implements TickableBlockEntity, Container, IWorldKeyHolder, IUniqueBlueprintTileEntity {
 
 	private static final String NBT_INV = "inventory";
 	private static final String NBT_LOCK = "lockkey";
 	private static final String NBT_COLOR = "color";
 	
-	private final Inventory inventory;
+	private final SimpleContainer inventory;
 	private WorldKey lockKey;
 	private DyeColor color;
 	private int ticksExisted;
 	
 	public LockedChestTileEntity() {
 		super(NostrumTileEntities.LockedChestEntityType);
-		inventory = new Inventory(27);
+		inventory = new SimpleContainer(27);
 		lockKey = new WorldKey();
 		color = DyeColor.RED;
 	}
@@ -59,7 +59,7 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		nbt.put(NBT_INV, Inventories.serializeInventory(inventory));
@@ -70,7 +70,7 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt == null)
@@ -86,17 +86,17 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
@@ -116,13 +116,13 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 		}
 	}
 	
-	public void attemptUnlock(PlayerEntity player) {
+	public void attemptUnlock(Player player) {
 		if (player.isCreative()
 				|| AutoDungeons.GetWorldKeys().consumeKey(lockKey)
 				) {
 			unlock();
 		} else {
-			player.sendMessage(new TranslationTextComponent("info.locked_chest.nokey"), Util.NIL_UUID);
+			player.sendMessage(new TranslatableComponent("info.locked_chest.nokey"), Util.NIL_UUID);
 			NostrumMagicaSounds.HOOKSHOT_TICK.play(player.level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
 		}
 	}
@@ -136,7 +136,7 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 		NostrumParticles.WARD.spawn(level, new SpawnParams(
 				50, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5, .75,
 				40, 10,
-				new Vector3d(0, .1, 0), new Vector3d(flySpeed, flySpeed / 2, flySpeed)
+				new Vec3(0, .1, 0), new Vec3(flySpeed, flySpeed / 2, flySpeed)
 				).gravity(.075f));
 		NostrumMagicaSounds.LORE.play(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
 		
@@ -144,9 +144,9 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 		//Vector3d velocity, Vector3d velocityJitter
 	}
 	
-	protected void fillChestEntity(TileEntity entity) {
-		if (entity != null && entity instanceof ChestTileEntity) {
-			ChestTileEntity chest = (ChestTileEntity) entity;
+	protected void fillChestEntity(BlockEntity entity) {
+		if (entity != null && entity instanceof ChestBlockEntity) {
+			ChestBlockEntity chest = (ChestBlockEntity) entity;
 			
 			chest.clearContent();
 			
@@ -164,7 +164,7 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 		}
 	}
 	
-	public void setContents(IInventory chest) {
+	public void setContents(Container chest) {
 		this.clearContent();
 		final int sharedSlotCount = Math.min(this.getContainerSize(), chest.getContainerSize());
 		
@@ -215,7 +215,7 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return this.inventory.stillValid(player);
 	}
 
@@ -259,12 +259,12 @@ public class LockedChestTileEntity extends TileEntity implements ITickableTileEn
 		}
 	}
 	
-	public static final boolean LockChest(World world, BlockPos pos, WorldKey key) {
-		TileEntity te = world.getBlockEntity(pos);
-		if (te instanceof ChestTileEntity) {
-			ChestTileEntity chest = (ChestTileEntity) te;
+	public static final boolean LockChest(Level world, BlockPos pos, WorldKey key) {
+		BlockEntity te = world.getBlockEntity(pos);
+		if (te instanceof ChestBlockEntity) {
+			ChestBlockEntity chest = (ChestBlockEntity) te;
 			final Direction facing = world.getBlockState(pos).getValue(ChestBlock.FACING);
-			Inventory invCopy = new Inventory(chest.getContainerSize());
+			SimpleContainer invCopy = new SimpleContainer(chest.getContainerSize());
 			
 			for (int i = 0; i < invCopy.getContainerSize(); i++) {
 				invCopy.setItem(i, chest.removeItemNoUpdate(i));

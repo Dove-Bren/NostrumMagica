@@ -2,10 +2,10 @@ package com.smanzana.nostrummagica.entity.tasks;
 
 import com.google.common.base.Predicate;
 
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.ai.goal.PanicGoal;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.PanicGoal;
 
-public class PanicGenericGoal<T extends CreatureEntity> extends PanicGoal {
+public class PanicGenericGoal<T extends PathfinderMob> extends PanicGoal {
 
 	private Predicate<T> filter;
 	private T creature;

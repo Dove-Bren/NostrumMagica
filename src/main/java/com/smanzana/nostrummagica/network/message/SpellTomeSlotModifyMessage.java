@@ -8,10 +8,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.spell.Spell;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client has made a change to their tome's spell page loadouts
@@ -22,7 +22,7 @@ public class SpellTomeSlotModifyMessage {
 
 	public static void handle(SpellTomeSlotModifyMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
-		final ServerPlayerEntity sp = ctx.get().getSender();
+		final ServerPlayer sp = ctx.get().getSender();
 		
 		ctx.get().enqueueWork(() -> {
 			// Find tome
@@ -73,7 +73,7 @@ public class SpellTomeSlotModifyMessage {
 		this.spellID = spellID;
 	}
 
-	public static SpellTomeSlotModifyMessage decode(PacketBuffer buf) {
+	public static SpellTomeSlotModifyMessage decode(FriendlyByteBuf buf) {
 		return new SpellTomeSlotModifyMessage(
 				buf.readVarInt(),
 				buf.readVarInt(),
@@ -82,7 +82,7 @@ public class SpellTomeSlotModifyMessage {
 				);
 	}
 
-	public static void encode(SpellTomeSlotModifyMessage msg, PacketBuffer buf) {
+	public static void encode(SpellTomeSlotModifyMessage msg, FriendlyByteBuf buf) {
 		buf.writeVarInt(msg.tomeID);
 		buf.writeVarInt(msg.pageIdx);
 		buf.writeVarInt(msg.slotIdx);

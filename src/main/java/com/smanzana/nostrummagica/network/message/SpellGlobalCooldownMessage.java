@@ -5,9 +5,9 @@ import java.util.function.Supplier;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Server is informing the client of a cooldown
@@ -19,7 +19,7 @@ public class SpellGlobalCooldownMessage {
 	public static void handle(SpellGlobalCooldownMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
 		
-		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.instance.proxy.getPlayer();
 		
 		if (player == null) {
 			// Haven't finished loading. Just drop it
@@ -38,11 +38,11 @@ public class SpellGlobalCooldownMessage {
 		this.cooldownTicks = cooldownTicks;
 	}
 	
-	public static SpellGlobalCooldownMessage decode(PacketBuffer buf) {
+	public static SpellGlobalCooldownMessage decode(FriendlyByteBuf buf) {
 		return new SpellGlobalCooldownMessage(buf.readVarInt());
 	}
 
-	public static void encode(SpellGlobalCooldownMessage msg, PacketBuffer buf) {
+	public static void encode(SpellGlobalCooldownMessage msg, FriendlyByteBuf buf) {
 		buf.writeVarInt(msg.cooldownTicks);
 	}
 

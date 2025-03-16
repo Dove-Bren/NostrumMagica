@@ -1,15 +1,15 @@
 package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.client.gui.Font;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.ChatFormatting;
 
 public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 
@@ -20,18 +20,18 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 	}
 	
 	@Override
-	public void showSheet(TameRedDragonEntity dragon, PlayerEntity player, IPetContainer<TameRedDragonEntity> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(TameRedDragonEntity dragon, Player player, IPetContainer<TameRedDragonEntity> container, int width, int height, int offsetX, int offsetY) {
 		
 	}
 
 	@Override
-	public void hideSheet(TameRedDragonEntity dragon, PlayerEntity player, IPetContainer<TameRedDragonEntity> container) {
+	public void hideSheet(TameRedDragonEntity dragon, Player player, IPetContainer<TameRedDragonEntity> container) {
 		
 	}
 
 	@Override
-	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
-		FontRenderer fonter = mc.font;
+	public void draw(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+		Font fonter = mc.font;
 		int x = 0;
 		int y = 5;
 		int w;
@@ -48,7 +48,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 		//final int 
 		String str;
 		
-		str = TextFormatting.BOLD + "Attributes" + TextFormatting.RESET;
+		str = ChatFormatting.BOLD + "Attributes" + ChatFormatting.RESET;
 		x = 5;
 		fonter.draw(matrixStackIn, str, x, y, categoryColor);
 		
@@ -81,7 +81,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 		
 		y += largeMargin;
 		
-		str = TextFormatting.BOLD + "Movement" + TextFormatting.RESET;
+		str = ChatFormatting.BOLD + "Movement" + ChatFormatting.RESET;
 		x = 5;
 		fonter.draw(matrixStackIn, str, x, y, categoryColor);
 		y += h + mediumMargin;
@@ -126,7 +126,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 		
 		y += largeMargin;
 		
-		str = TextFormatting.BOLD + "Capabilities" + TextFormatting.RESET;
+		str = ChatFormatting.BOLD + "Capabilities" + ChatFormatting.RESET;
 		x = 5;
 		fonter.draw(matrixStackIn, str, x, y, categoryColor);
 		y += h + mediumMargin;
@@ -159,7 +159,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 		
 			y += largeMargin;
 		
-			str = TextFormatting.BOLD + "Magic" + TextFormatting.RESET;
+			str = ChatFormatting.BOLD + "Magic" + ChatFormatting.RESET;
 			x = 5;
 			fonter.draw(matrixStackIn, str, x, y, categoryColor);
 			y += h + mediumMargin;
@@ -198,7 +198,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 	}
 
 	@Override
-	public void handleMessage(CompoundNBT data) {
+	public void handleMessage(CompoundTag data) {
 		
 	}
 
@@ -212,7 +212,7 @@ public class RedDragonInfoSheet implements IPetGUISheet<TameRedDragonEntity> {
 	}
 
 	@Override
-	public void overlay(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void overlay(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
 	}
 

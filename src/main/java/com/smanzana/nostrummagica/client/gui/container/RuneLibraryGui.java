@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.RuneLibraryTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
@@ -10,15 +10,15 @@ import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -33,13 +33,13 @@ public class RuneLibraryGui {
 	private static final int RUNELIBRARY_INV_HOFFSET = 8;
 	private static final int RUNELIBRARY_INV_VOFFSET = 17;
 	
-	public static class RuneLibraryContainer extends Container {
+	public static class RuneLibraryContainer extends AbstractContainerMenu {
 		
 		public static final String ID = "rune_library";
 		
 		protected final RuneLibraryTileEntity library;
 		
-		public RuneLibraryContainer(int windowId, PlayerInventory playerInv, RuneLibraryTileEntity library) {
+		public RuneLibraryContainer(int windowId, Inventory playerInv, RuneLibraryTileEntity library) {
 			super(NostrumContainers.RuneLibrary, windowId);
 			
 			// Construct player inventory
@@ -54,7 +54,7 @@ public class RuneLibraryGui {
 			}
 			
 			// Construct library inventory
-			IInventory libraryInv = library.getInventory();
+			Container libraryInv = library.getInventory();
 			for (int y = 0; y < 3; y++) {
 				for (int x = 0; x < 9; x++) {
 					this.addSlot(new Slot(libraryInv, x + y * 9, RUNELIBRARY_INV_HOFFSET + (x * 18), RUNELIBRARY_INV_VOFFSET + (y * 18)) {
@@ -69,7 +69,7 @@ public class RuneLibraryGui {
 			this.library = library;
 		}
 		
-		public static final RuneLibraryContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+		public static final RuneLibraryContainer FromNetwork(int windowId, Inventory playerInv, FriendlyByteBuf buffer) {
 			return new RuneLibraryContainer(windowId, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}
 		
@@ -83,13 +83,13 @@ public class RuneLibraryGui {
 		
 		@Override
 		@Nonnull
-		public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+		public ItemStack quickMoveStack(Player playerIn, int index) {
 			Slot slot = (Slot)this.slots.get(index);
 			ItemStack prev = ItemStack.EMPTY;
 
 			if (slot != null && slot.hasItem()) {
 				//IInventory from = slot.inventory;
-				IInventory to;
+				Container to;
 				
 				if (slot.container == library.getInventory()) {
 					to = playerIn.inventory;
@@ -122,7 +122,7 @@ public class RuneLibraryGui {
 		}
 		
 		@Override
-		public boolean stillValid(PlayerEntity playerIn) {
+		public boolean stillValid(Player playerIn) {
 			return true;
 		}
 	}
@@ -130,7 +130,7 @@ public class RuneLibraryGui {
 	@OnlyIn(Dist.CLIENT)
 	public static class Gui extends AutoGuiContainer<RuneLibraryContainer> {
 
-		public Gui(RuneLibraryContainer container, PlayerInventory playerInv, ITextComponent name) {
+		public Gui(RuneLibraryContainer container, Inventory playerInv, Component name) {
 			super(container, playerInv, name);
 			//this.container = container;
 			
@@ -144,7 +144,7 @@ public class RuneLibraryGui {
 		}
 		
 		@Override
-		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+		protected void renderBg(PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
@@ -153,7 +153,7 @@ public class RuneLibraryGui {
 		}
 		
 		@Override
-		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			super.renderLabels(matrixStackIn, mouseX, mouseY);
 		}
 		

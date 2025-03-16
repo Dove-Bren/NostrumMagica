@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.ScrollScreen;
@@ -19,20 +19,20 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.util.InputMappings;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.client.gui.Font;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public class SpellPreviewPage implements IClickableBookPage {
 
 	private Spell spell;
 	private String description;
-	private List<ITextComponent> tooltip;
+	private List<Component> tooltip;
 	private final ItemStack tome;
 	
 	public SpellPreviewPage(ItemStack tome, Spell spell) {
@@ -46,17 +46,17 @@ public class SpellPreviewPage implements IClickableBookPage {
 			if (count == null || count == 0)
 				continue;
 			
-			tooltip.add(new StringTextComponent(count + " " + type.prettyName()));
+			tooltip.add(new TextComponent(count + " " + type.prettyName()));
 		}
-		tooltip.add(new StringTextComponent("Click for details").withStyle(TextFormatting.GRAY));
-		tooltip.add(new StringTextComponent("Shift+Right Click to remove and destroy").withStyle(TextFormatting.DARK_RED));
+		tooltip.add(new TextComponent("Click for details").withStyle(ChatFormatting.GRAY));
+		tooltip.add(new TextComponent("Shift+Right Click to remove and destroy").withStyle(ChatFormatting.DARK_RED));
 		
 		description = "";
 		this.tome = tome;
 	}
 	
 	@Override
-	public void draw(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
+	public void draw(BookScreen parent, PoseStack matrixStackIn, Font fonter, int xoffset, int yoffset, int width, int height) {
 
 		yoffset += 5;
 		height -= 5;
@@ -100,18 +100,18 @@ public class SpellPreviewPage implements IClickableBookPage {
 	}
 
 	@Override
-	public void overlay(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
+	public void overlay(BookScreen parent, PoseStack matrixStackIn, Font fonter, int mouseX, int mouseY, int trueX, int trueY) {
 		Minecraft mc = Minecraft.getInstance();
 		GuiUtils.drawHoveringText(matrixStackIn, tooltip, trueX, trueY, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), 200, fonter);
 	}
 
 	@Override
 	public boolean onClick(BookScreen parent, double mouseX, double mouseY, int button) {
-		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.instance.proxy.getPlayer();
 		
 		if (button == 0) {
 			Minecraft.getInstance().setScreen(new ScrollScreen(spell));
-		} else if (button == 1 && InputMappings.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)) {
+		} else if (button == 1 && InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)) {
 			// Fake on client
 			SpellTome.removeSpell(tome, spell.getRegistryID());
 			NostrumMagica.instance.proxy.openBook(player, (SpellTome) tome.getItem(), tome);

@@ -67,29 +67,29 @@ import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.util.InputMappings;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import com.mojang.math.Vector3f;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
 import net.minecraftforge.client.event.InputEvent.MouseScrollEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
@@ -102,16 +102,16 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class ClientProxy extends CommonProxy {
 	
-	private KeyBinding bindingCast1;
-	private KeyBinding bindingCast2;
-	private KeyBinding bindingCast3;
-	private KeyBinding bindingCast4;
-	private KeyBinding bindingCast5;
-	private KeyBinding bindingScroll;
-	private KeyBinding bindingInfo;
-	private KeyBinding bindingBladeCast;
-	private KeyBinding bindingHUD;
-	private KeyBinding bindingShapeHelp;
+	private KeyMapping bindingCast1;
+	private KeyMapping bindingCast2;
+	private KeyMapping bindingCast3;
+	private KeyMapping bindingCast4;
+	private KeyMapping bindingCast5;
+	private KeyMapping bindingScroll;
+	private KeyMapping bindingInfo;
+	private KeyMapping bindingBladeCast;
+	private KeyMapping bindingHUD;
+	private KeyMapping bindingShapeHelp;
 	private OverlayRenderer overlayRenderer;
 	private ClientEffectRenderer effectRenderer;
 	private OutlineRenderer outlineRenderer;
@@ -131,49 +131,49 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	public void initKeybinds() {
-		bindingCast1 = new KeyBinding("key.cast1.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_Z, "key.nostrummagica.desc");
+		bindingCast1 = new KeyMapping("key.cast1.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingCast1);
-		bindingCast2 = new KeyBinding("key.cast2.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_X, "key.nostrummagica.desc");
+		bindingCast2 = new KeyMapping("key.cast2.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingCast2);
-		bindingCast3 = new KeyBinding("key.cast3.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_C, "key.nostrummagica.desc");
+		bindingCast3 = new KeyMapping("key.cast3.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_C, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingCast3);
-		bindingCast4 = new KeyBinding("key.cast4.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.nostrummagica.desc");
+		bindingCast4 = new KeyMapping("key.cast4.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingCast4);
-		bindingCast5 = new KeyBinding("key.cast5.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.nostrummagica.desc");
+		bindingCast5 = new KeyMapping("key.cast5.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingCast5);
-		bindingScroll = new KeyBinding("key.spellscroll.desc", GLFW.GLFW_KEY_LEFT_SHIFT, "key.nostrummagica.desc");
+		bindingScroll = new KeyMapping("key.spellscroll.desc", GLFW.GLFW_KEY_LEFT_SHIFT, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingScroll);
-		bindingInfo = new KeyBinding("key.infoscreen.desc", GLFW.GLFW_KEY_HOME, "key.nostrummagica.desc");
+		bindingInfo = new KeyMapping("key.infoscreen.desc", GLFW.GLFW_KEY_HOME, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingInfo);
-		bindingBladeCast = new KeyBinding("key.bladecast.desc", GLFW.GLFW_KEY_R, "key.nostrummagica.desc");
+		bindingBladeCast = new KeyMapping("key.bladecast.desc", GLFW.GLFW_KEY_R, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingBladeCast);
-		bindingHUD = new KeyBinding("key.hud.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_TAB, "key.nostrummagica.desc");
+		bindingHUD = new KeyMapping("key.hud.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_TAB, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingHUD);
-		bindingShapeHelp = new KeyBinding("key.shapehelp.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputMappings.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.nostrummagica.desc");
+		bindingShapeHelp = new KeyMapping("key.shapehelp.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingShapeHelp);
 	}
 	
-	public KeyBinding getBindingCast1() {
+	public KeyMapping getBindingCast1() {
 		return bindingCast1;
 	}
 
-	public KeyBinding getBindingCast2() {
+	public KeyMapping getBindingCast2() {
 		return bindingCast2;
 	}
 
-	public KeyBinding getBindingCast3() {
+	public KeyMapping getBindingCast3() {
 		return bindingCast3;
 	}
 
-	public KeyBinding getBindingCast4() {
+	public KeyMapping getBindingCast4() {
 		return bindingCast4;
 	}
 
-	public KeyBinding getBindingCast5() {
+	public KeyMapping getBindingCast5() {
 		return bindingCast5;
 	}
 	
-	public KeyBinding getHUDKey() {
+	public KeyMapping getHUDKey() {
 		return bindingHUD;
 	}
 
@@ -214,7 +214,7 @@ public class ClientProxy extends CommonProxy {
 		} else if (bindingCast5.consumeClick()) {
 			doCast(4);
 		} else if (bindingInfo.consumeClick()) {
-			PlayerEntity player = mc.player;
+			Player player = mc.player;
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null)
 				return;
@@ -222,14 +222,14 @@ public class ClientProxy extends CommonProxy {
 //			player.openGui(NostrumMagica.instance,
 //					NostrumGui.infoscreenID, player.world, 0, 0, 0);
 		} else if (mc.options.keyJump.consumeClick()) {
-			PlayerEntity player = mc.player;
+			Player player = mc.player;
 			if (player.isPassenger() && player.getVehicle() instanceof TameRedDragonEntity) {
 				((DragonEntity) player.getVehicle()).dragonJump();
 			} else if (player.isPassenger() && player.getVehicle() instanceof ArcaneWolfEntity) {
 				((ArcaneWolfEntity) player.getVehicle()).wolfJump();
 			}
 		} else if (bindingBladeCast.consumeClick()) {
-			PlayerEntity player = mc.player;
+			Player player = mc.player;
 			if (player.getAttackStrengthScale(0.5F) > .95) {
 				player.resetAttackStrengthTicker();
 				//player.swingArm(Hand.MAIN_HAND);
@@ -248,7 +248,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	private void doCast(int castSlot) {
-		final PlayerEntity player = getPlayer();
+		final Player player = getPlayer();
 		Spell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
 		if (castSlot < 0 || spells == null || spells.length == 0 || spells.length <= castSlot) {
 			return;
@@ -285,7 +285,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void syncPlayer(ServerPlayerEntity player) {
+	public void syncPlayer(ServerPlayer player) {
 		if (player.level.isClientSide)
 			return;
 		
@@ -293,7 +293,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public PlayerEntity getPlayer() {
+	public Player getPlayer() {
 		final Minecraft mc = Minecraft.getInstance();
 		return mc.player;
 	}
@@ -304,7 +304,7 @@ public class ClientProxy extends CommonProxy {
 		// If we can look up stats, apply them.
 		// Otherwise, stash them for loading when we apply attributes
 		final Minecraft mc = Minecraft.getInstance();
-		PlayerEntity player = mc.player;
+		Player player = mc.player;
 		INostrumMagic existing = NostrumMagica.getMagicWrapper(player);
 		if (existing != null && player.isAlive()) {
 			// apply them
@@ -350,12 +350,12 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void openBook(PlayerEntity player, GuiBook book, Object userdata) {
+	public void openBook(Player player, GuiBook book, Object userdata) {
 		Minecraft.getInstance().setScreen(book.getScreen(userdata));
 	}
 	
 	@Override
-	public void openContainer(PlayerEntity player, IPackedContainerProvider provider) {
+	public void openContainer(Player player, IPackedContainerProvider provider) {
 		if (!player.level.isClientSide) {
 			super.openContainer(player, provider);
 		}
@@ -369,14 +369,14 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void openMirrorScreen() {
-		final PlayerEntity player = getPlayer();
+		final Player player = getPlayer();
 		if (player.level.isClientSide()) {
 			Minecraft.getInstance().setScreen((Screen) new MirrorGui(player));
 		}
 	}
 	
 	@Override
-	public void openObeliskScreen(World world, BlockPos pos) {
+	public void openObeliskScreen(Level world, BlockPos pos) {
 		if (world.isClientSide()) {
 			ObeliskTileEntity te = (ObeliskTileEntity) world.getBlockEntity(pos);
 			Minecraft.getInstance().setScreen(new ObeliskScreen(te));
@@ -385,7 +385,7 @@ public class ClientProxy extends CommonProxy {
 	
 	@Override
 	public void openTomeWorkshopScreen() {
-		final PlayerEntity player = getPlayer();
+		final Player player = getPlayer();
 		if (player.level.isClientSide()) {
 			Minecraft.getInstance().setScreen(new TomeWorkshopScreen(player));
 		}
@@ -393,17 +393,17 @@ public class ClientProxy extends CommonProxy {
 	
 	public void openLoreLink(String tag) {
 		final Minecraft mc = Minecraft.getInstance();
-		final PlayerEntity player = mc.player;
+		final Player player = mc.player;
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
-			player.sendMessage(new StringTextComponent("Could not find magic wrapper for player"), Util.NIL_UUID);
+			player.sendMessage(new TextComponent("Could not find magic wrapper for player"), Util.NIL_UUID);
 		} else {
 			mc.setScreen(new InfoScreen(attr, tag));
 		}
 	}
 	
 	@Override
-	public void sendSpellDebug(PlayerEntity player, ITextComponent comp) {
+	public void sendSpellDebug(Player player, Component comp) {
 		if (!player.level.isClientSide) {
 			super.sendSpellDebug(player, comp);
 		}
@@ -437,9 +437,9 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	private static final ClientEffect doCorruptEffect(LivingEntity source,
-			Vector3d sourcePos,
+			Vec3 sourcePos,
 			LivingEntity target,
-			Vector3d targetPos,
+			Vec3 targetPos,
 			SpellEffectPart part) {
 		ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.position() : targetPos,
 				new ClientEffectFormFlat(ClientEffectIcon.ARROWD, 0, 0, 0),
@@ -454,7 +454,7 @@ public class ClientProxy extends CommonProxy {
 		effect
 		.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
 		.modify(new ClientEffectModifierTranslate(0, 1.5f, -1.5f))
-		.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, -2, 0), .3f, 1f))
+		.modify(new ClientEffectModifierMove(new Vec3(0, 0, 0), new Vec3(0, -2, 0), .3f, 1f))
 		.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
 		.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
 		;
@@ -468,7 +468,7 @@ public class ClientProxy extends CommonProxy {
 				(source, sourcePos, target, targetPos, properties, characteristics) -> {
 					// TODO get the shape params in here to modify scale
 					// TODO get whether it's a good thing or not
-					ClientEffect effect = new ClientEffectMajorSphere(target == null ? targetPos : new Vector3d(0, 0, 0),
+					ClientEffect effect = new ClientEffectMajorSphere(target == null ? targetPos : new Vec3(0, 0, 0),
 							NostrumSpellShapes.Burst.getRadius(properties) + .5f,
 							characteristics.isHarmful(),
 							1000L);
@@ -669,7 +669,7 @@ public class ClientProxy extends CommonProxy {
 		
 		renderer.registerEffect((EAlteration) null,
 				(source, sourcePos, target, targetPos, part) -> {
-					ClientEffect effect = new ClientEffectMirrored(target == null ? targetPos : new Vector3d(0, 0, 0),
+					ClientEffect effect = new ClientEffectMirrored(target == null ? targetPos : new Vec3(0, 0, 0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING1, 0, 0, 0),
 							500L, 5);
 					
@@ -680,7 +680,7 @@ public class ClientProxy extends CommonProxy {
 					.modify(new ClientEffectModifierColor(part.getElement().getColor(), part.getElement().getColor()))
 					.modify(new ClientEffectModifierRotate(0f, .4f, 0f))
 					.modify(new ClientEffectModifierTranslate(0, 0, -1))
-					.modify(new ClientEffectModifierMove(new Vector3d(0, 1.5, 0), new Vector3d(0, .5, .7), .5f, 1f))
+					.modify(new ClientEffectModifierMove(new Vec3(0, 1.5, 0), new Vec3(0, .5, .7), .5f, 1f))
 					.modify(new ClientEffectModifierGrow(.1f, .3f, .2f, .8f, .5f))
 					;
 					return effect;
@@ -701,7 +701,7 @@ public class ClientProxy extends CommonProxy {
 					effect
 					.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
 					.modify(new ClientEffectModifierTranslate(0, 1.5f, -1.5f))
-					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, -2, 0), .3f, 1f))
+					.modify(new ClientEffectModifierMove(new Vec3(0, 0, 0), new Vec3(0, -2, 0), .3f, 1f))
 					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
 					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
 					;
@@ -723,7 +723,7 @@ public class ClientProxy extends CommonProxy {
 					effect
 					.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
 					.modify(new ClientEffectModifierTranslate(0, 0f, -1.5f))
-					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, 1.5, 0), 0f, .7f))
+					.modify(new ClientEffectModifierMove(new Vec3(0, 0, 0), new Vec3(0, 1.5, 0), 0f, .7f))
 					.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
 					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
 					;
@@ -733,7 +733,7 @@ public class ClientProxy extends CommonProxy {
 		renderer.registerEffect(EAlteration.GROWTH,
 				(source, sourcePos, target, targetPos, part) -> {
 					ClientEffect effect = new ClientEffectEchoed(targetPos == null ? target.position() : targetPos, 
-							new ClientEffectMirrored(new Vector3d(0,0,0),
+							new ClientEffectMirrored(new Vec3(0,0,0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING3, 0, 0, 0),
 							2L * 1000L, 4), 2L * 1000L, 5, .2f);
 					
@@ -828,9 +828,9 @@ public class ClientProxy extends CommonProxy {
 										
 					effect
 					.modify(new ClientEffectModifierTranslate(0f, 1f, 0f))
-					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, 1.5, 0), 0f, .3f))
-					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1.5)))
-					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, -2, 0), 0f, 1f))
+					.modify(new ClientEffectModifierMove(new Vec3(0, 0, 0), new Vec3(0, 1.5, 0), 0f, .3f))
+					.modify(new ClientEffectModifierMove(new Vec3(0, 0, 0), new Vec3(0, 0, 1.5)))
+					.modify(new ClientEffectModifierMove(new Vec3(0, 0, 0), new Vec3(0, -2, 0), 0f, 1f))
 					.modify(new ClientEffectModifierGrow(.6f, .2f, .7f, .6f, .5f))
 					.modify(new ClientEffectModifierShrink(1f, 1f, .5f, 0f, .6f))
 					;
@@ -852,9 +852,9 @@ public class ClientProxy extends CommonProxy {
 					effect
 					.modify(new ClientEffectModifierRotate(0f, -.5f, 0f))
 					.modify(new ClientEffectModifierTranslate(0f, 1f, 0f))
-					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, 1.5, 0), 0f, .3f))
-					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, 0, 1.5)))
-					.modify(new ClientEffectModifierMove(new Vector3d(0, 0, 0), new Vector3d(0, -2, 0), 0f, 1f))
+					.modify(new ClientEffectModifierMove(new Vec3(0, 0, 0), new Vec3(0, 1.5, 0), 0f, .3f))
+					.modify(new ClientEffectModifierMove(new Vec3(0, 0, 0), new Vec3(0, 0, 1.5)))
+					.modify(new ClientEffectModifierMove(new Vec3(0, 0, 0), new Vec3(0, -2, 0), 0f, 1f))
 					.modify(new ClientEffectModifierRotate(1f, 0f, 0f))
 					.modify(new ClientEffectModifierGrow(.6f, .2f, .7f, .6f, .5f))
 					.modify(new ClientEffectModifierShrink(1f, 1f, .5f, 0f, .6f))
@@ -888,9 +888,9 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void spawnSpellShapeVfx(World world, SpellShape shape, SpellShapeProperties properties,
-			LivingEntity caster, Vector3d casterPos,
-			LivingEntity target, Vector3d targetPos,
+	public void spawnSpellShapeVfx(Level world, SpellShape shape, SpellShapeProperties properties,
+			LivingEntity caster, Vec3 casterPos,
+			LivingEntity target, Vec3 targetPos,
 			SpellCharacteristics characteristics) {
 		if (world == null && target != null) {
 			world = target.level;
@@ -906,15 +906,15 @@ public class ClientProxy extends CommonProxy {
 //			if (target != null)
 //				targetPos = target.getPositionVec();
 //			else
-				targetPos = new Vector3d(0, 0, 0);
+				targetPos = new Vec3(0, 0, 0);
 		
 		this.effectRenderer.spawnEffect(shape, caster, casterPos, target, targetPos, properties, characteristics);
 	}
 	
 	@Override
-	public void spawnSpellEffectVfx(World world, SpellEffectPart effect,
-			LivingEntity caster, Vector3d casterPos,
-			LivingEntity target, Vector3d targetPos) {
+	public void spawnSpellEffectVfx(Level world, SpellEffectPart effect,
+			LivingEntity caster, Vec3 casterPos,
+			LivingEntity target, Vec3 targetPos) {
 		if (world == null && target != null) {
 			world = target.level;
 		}
@@ -929,13 +929,13 @@ public class ClientProxy extends CommonProxy {
 //			if (target != null)
 //				targetPos = target.getPositionVec();
 //			else
-				targetPos = new Vector3d(0, 0, 0);
+				targetPos = new Vec3(0, 0, 0);
 		
 		this.effectRenderer.spawnEffect(effect, caster, casterPos, target, targetPos);
 	}
 	
 	@Override
-	public void updateEntityEffect(ServerPlayerEntity player, LivingEntity entity, SpecialEffect effectType, EffectData data) {
+	public void updateEntityEffect(ServerPlayer player, LivingEntity entity, SpecialEffect effectType, EffectData data) {
 		return;
 	}
 	
@@ -947,19 +947,19 @@ public class ClientProxy extends CommonProxy {
 			final Minecraft mc = Minecraft.getInstance();
 			final String translated = I18n.get(this.bindingInfo.saveString());
 			mc.player.sendMessage(
-					new TranslationTextComponent("info.nostrumwelcome.text", new Object[]{
+					new TranslatableComponent("info.nostrumwelcome.text", new Object[]{
 							translated
 					}), Util.NIL_UUID);
 			ClientProxy.shownText = true;
 		}
 		
-		if (event.getWorld() != null && event.getWorld().isClientSide() && event.getEntity() instanceof PlayerEntity) {
-			NostrumMagica.instance.proxy.requestStats((PlayerEntity) event.getEntity());
+		if (event.getWorld() != null && event.getWorld().isClientSide() && event.getEntity() instanceof Player) {
+			NostrumMagica.instance.proxy.requestStats((Player) event.getEntity());
 		}
 	}
 	
 	@Override
-	public void sendMana(PlayerEntity player) {
+	public void sendMana(Player player) {
 		if (player.level.isClientSide) {
 			return;
 		}
@@ -968,7 +968,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void sendPlayerStatSync(PlayerEntity player) {
+	public void sendPlayerStatSync(Player player) {
 		if (player.level.isClientSide()) {
 			return;
 		}
@@ -977,7 +977,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void sendManaArmorCapability(PlayerEntity player) {
+	public void sendManaArmorCapability(Player player) {
 		if (player.level.isClientSide) {
 			return;
 		}
@@ -986,7 +986,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void sendSpellCraftingCapability(PlayerEntity player) {
+	public void sendSpellCraftingCapability(Player player) {
 		if (player.level.isClientSide()) {
 			return;
 		}
@@ -1011,7 +1011,7 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public void playRitualEffect(World world, BlockPos pos, EMagicElement element,
+	public void playRitualEffect(Level world, BlockPos pos, EMagicElement element,
 			ItemStack center, @Nullable List<ItemStack> extras, List<ItemStack> reagents, ItemStack output) {
 		if (world.isClientSide) {
 			return;
@@ -1050,13 +1050,13 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	@Override
-	public boolean attemptPlayerInteract(PlayerEntity player, World world, BlockPos pos, Hand hand, BlockRayTraceResult hit) {
+	public boolean attemptPlayerInteract(Player player, Level world, BlockPos pos, InteractionHand hand, BlockHitResult hit) {
 		if (!player.level.isClientSide()) {
 			return super.attemptPlayerInteract(player, world, pos, hand, hit);
 		}
 		
 		final Minecraft mc = Minecraft.getInstance();
-		return mc.gameMode.useItemOn((ClientPlayerEntity) player, (ClientWorld) world, hand, hit)
-				!= ActionResultType.PASS;
+		return mc.gameMode.useItemOn((LocalPlayer) player, (ClientLevel) world, hand, hit)
+				!= InteractionResult.PASS;
 	}
 }

@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.integration.minecolonies;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 public class MinecoloniesProxy {

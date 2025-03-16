@@ -1,39 +1,39 @@
 package com.smanzana.nostrummagica.client.render.effect;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.IEffectRenderer;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.Atlases;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.model.RenderMaterial;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Matrix3f;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.util.Mth;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 
 public class CursedFireEffectRenderer implements IEffectRenderer {
 	
 	@SuppressWarnings("deprecation")
-	public static final RenderMaterial TEX_FIRE_0 = new RenderMaterial(AtlasTexture.LOCATION_BLOCKS, NostrumMagica.Loc("block/cursed_fire_0"));
+	public static final Material TEX_FIRE_0 = new Material(TextureAtlas.LOCATION_BLOCKS, NostrumMagica.Loc("block/cursed_fire_0"));
 	@SuppressWarnings("deprecation")
-	public static final RenderMaterial TEX_FIRE_1 = new RenderMaterial(AtlasTexture.LOCATION_BLOCKS, NostrumMagica.Loc("block/cursed_fire_1"));
+	public static final Material TEX_FIRE_1 = new Material(TextureAtlas.LOCATION_BLOCKS, NostrumMagica.Loc("block/cursed_fire_1"));
 
 	
 	@Override
-	public void renderEffectOnEntity(EffectInstance effect, MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void renderEffectOnEntity(MobEffectInstance effect, PoseStack stack, MultiBufferSource typeBuffer, int packedLight, LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		final Minecraft mc = Minecraft.getInstance();
-		final ActiveRenderInfo activeInfo = mc.gameRenderer.getMainCamera();
+		final Camera activeInfo = mc.gameRenderer.getMainCamera();
 		
-		final float entYaw = MathHelper.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
+		final float entYaw = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
 		
 		stack.pushPose();
 		
@@ -72,7 +72,7 @@ public class CursedFireEffectRenderer implements IEffectRenderer {
 		stack.popPose();
 	}
 	
-	public static final void renderFire(MatrixStack stack, IRenderTypeBuffer typeBuffer, TextureAtlasSprite sprite, int packedLight, float width, float red, float green, float blue, float alpha) {
+	public static final void renderFire(PoseStack stack, MultiBufferSource typeBuffer, TextureAtlasSprite sprite, int packedLight, float width, float red, float green, float blue, float alpha) {
 		final Matrix4f transform = stack.last().pose();
 		final Matrix3f normal = stack.last().normal();
 		final int packedOverlay = OverlayTexture.NO_OVERLAY;
@@ -84,7 +84,7 @@ public class CursedFireEffectRenderer implements IEffectRenderer {
 		final float uMax = sprite.getU1();
 		final float vMin = sprite.getV0();
 		final float vMax = sprite.getV1();
-		final IVertexBuilder buffer = typeBuffer.getBuffer(Atlases.cutoutBlockSheet());
+		final VertexConsumer buffer = typeBuffer.getBuffer(Sheets.cutoutBlockSheet());
 		buffer.vertex(transform, xMax, yMin, 0).color(red, green, blue, alpha).uv(uMax, vMin).overlayCoords(packedOverlay).uv2(packedLight).normal(normal, 0, 1, 0).endVertex();
 		buffer.vertex(transform, xMin, yMin, 0).color(red, green, blue, alpha).uv(uMin, vMin).overlayCoords(packedOverlay).uv2(packedLight).normal(normal, 0, 1, 0).endVertex();
 		buffer.vertex(transform, xMin, yMax, 0).color(red, green, blue, alpha).uv(uMin, vMax).overlayCoords(packedOverlay).uv2(packedLight).normal(normal, 0, 1, 0).endVertex();

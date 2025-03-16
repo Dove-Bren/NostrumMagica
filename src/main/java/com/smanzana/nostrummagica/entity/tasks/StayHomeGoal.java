@@ -5,13 +5,13 @@ import java.util.Random;
 
 import com.google.common.base.Predicate;
 
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.ai.controller.MovementController;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.control.MoveControl;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 
-public class StayHomeGoal<T extends CreatureEntity> extends Goal {
+public class StayHomeGoal<T extends PathfinderMob> extends Goal {
 
 	private Predicate<T> filter;
 	private T creature;
@@ -56,14 +56,14 @@ public class StayHomeGoal<T extends CreatureEntity> extends Goal {
 		BlockPos home = creature.getRestrictCenter();
 		if (home != null) {
 			// Try and find a place to move
-			Vector3d targ = null;
+			Vec3 targ = null;
 			int attempts = 20;
 			do {
 				double dist = this.rand.nextDouble() * Math.sqrt(this.maxDistSq);
 				float angle = (float) (this.rand.nextDouble() * (2 * Math.PI));
 				float tilt = (float) (this.rand.nextDouble() * (2 * Math.PI)) * .5f;
 				
-				targ = new Vector3d(
+				targ = new Vec3(
 						home.getX() + (Math.cos(angle) * dist),
 						home.getY() + (Math.cos(tilt) * dist),
 						home.getZ() + (Math.sin(angle) * dist));
@@ -73,7 +73,7 @@ public class StayHomeGoal<T extends CreatureEntity> extends Goal {
 			} while (targ == null && attempts > 0);
 			
 			if (targ == null) {
-				targ = new Vector3d(home.getX() + .5, home.getY() + 1, home.getZ() + .5);
+				targ = new Vec3(home.getX() + .5, home.getY() + 1, home.getZ() + .5);
 			}
 			
 			//this.creature.getNavigator().tryMoveToXYZ(targ.xCoord, targ.yCoord, targ.zCoord, this.speed);
@@ -85,7 +85,7 @@ public class StayHomeGoal<T extends CreatureEntity> extends Goal {
 	 * Returns whether an in-progress Goal should continue executing
 	 */
 	public boolean canContinueToUse() {
-		MovementController mover = creature.getMoveControl();
+		MoveControl mover = creature.getMoveControl();
 		return mover.hasWanted() && ((mover.getWantedX() - creature.getX()) + (mover.getWantedY() - creature.getY()) + (mover.getWantedZ() - creature.getZ()) > 2);
 	}
 }

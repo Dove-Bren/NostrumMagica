@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -12,15 +12,15 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -42,19 +42,19 @@ public class LoreTableGui {
 	
 	private static final int SHINE_LENGTH = 16;
 	
-	public static class LoreTableContainer extends Container {
+	public static class LoreTableContainer extends AbstractContainerMenu {
 		
 		public static final String ID = "lore_table";
 		
 		// Kept just to report to server which TE is doing crafting
-		protected PlayerEntity player;
+		protected Player player;
 		
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
 		protected LoreTableTileEntity table;
 		protected Slot inputSlot;
 		
-		public LoreTableContainer(int windowId, PlayerEntity player, IInventory playerInv, LoreTableTileEntity table) {
+		public LoreTableContainer(int windowId, Player player, Container playerInv, LoreTableTileEntity table) {
 			super(NostrumContainers.LoreTable, windowId);
 			this.player = player;
 			this.table = table;
@@ -104,7 +104,7 @@ public class LoreTableGui {
 					return false;
 				}
 				
-				public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
+				public ItemStack onTake(Player playerIn, ItemStack stack) {
 					table.onTakeItem(playerIn);
 					return super.onTake(playerIn, stack);
 				}
@@ -126,7 +126,7 @@ public class LoreTableGui {
 			
 		}
 		
-		public static final LoreTableContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buf) {
+		public static final LoreTableContainer FromNetwork(int windowId, Inventory playerInv, FriendlyByteBuf buf) {
 			return new LoreTableContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buf));
 		}
 		
@@ -139,7 +139,7 @@ public class LoreTableGui {
 		}
 		
 		@Override
-		public ItemStack quickMoveStack(PlayerEntity playerIn, int fromSlot) {
+		public ItemStack quickMoveStack(Player playerIn, int fromSlot) {
 			@Nonnull ItemStack prev = ItemStack.EMPTY;	
 			Slot slot = (Slot) this.slots.get(fromSlot);
 			
@@ -177,7 +177,7 @@ public class LoreTableGui {
 		}
 		
 		@Override
-		public boolean stillValid(PlayerEntity playerIn) {
+		public boolean stillValid(Player playerIn) {
 			return true;
 		}
 		
@@ -192,7 +192,7 @@ public class LoreTableGui {
 
 		private LoreTableContainer container;
 		
-		public LoreTableGuiContainer(LoreTableContainer container, PlayerInventory playerInv, ITextComponent name) {
+		public LoreTableGuiContainer(LoreTableContainer container, Inventory playerInv, Component name) {
 			super(container, playerInv, name);
 			this.container = container;
 			
@@ -206,7 +206,7 @@ public class LoreTableGui {
 		}
 		
 		@Override
-		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+		protected void renderBg(PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
@@ -226,7 +226,7 @@ public class LoreTableGui {
 		}
 		
 		@Override
-		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			if (container.table.hasLore()) {
 				int u, v;
 				v = GUI_HEIGHT;

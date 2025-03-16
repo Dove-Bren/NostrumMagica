@@ -7,12 +7,12 @@ import com.smanzana.petcommand.api.entity.IEntityPet;
 import com.smanzana.petcommand.api.entity.IRerollablePet;
 import com.smanzana.petcommand.api.pet.PetInfo.PetAction;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 public interface ITameDragon extends IEntityPet, IRerollablePet, IMagicEntity {
 
 	@Override
-	public IPetGUISheet<? extends IEntityPet>[] getContainerSheets(PlayerEntity player);
+	public IPetGUISheet<? extends IEntityPet>[] getContainerSheets(Player player);
 	
 	@Override
 	public PetGUIStatAdapter<? extends ITameDragon> getGUIAdapter();
@@ -34,7 +34,7 @@ public interface ITameDragon extends IEntityPet, IRerollablePet, IMagicEntity {
 	
 	public float getBond();
 	
-	public boolean sharesMana(PlayerEntity player);
+	public boolean sharesMana(Player player);
 	
 	public PetAction getPetAction();
 	

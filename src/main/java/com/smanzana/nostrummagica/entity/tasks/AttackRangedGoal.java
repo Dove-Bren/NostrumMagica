@@ -4,16 +4,16 @@ import java.util.EnumSet;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.item.BowItem;
-import net.minecraft.util.Hand;
+import net.minecraft.world.entity.monster.RangedAttackMob;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.item.BowItem;
+import net.minecraft.world.InteractionHand;
 
-import net.minecraft.entity.ai.goal.Goal.Flag;
+import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
-public class AttackRangedGoal<T extends MobEntity> extends Goal
+public class AttackRangedGoal<T extends Mob> extends Goal
 {
 	protected final T entity;
 	private final double moveSpeedAmp;
@@ -68,7 +68,7 @@ public class AttackRangedGoal<T extends MobEntity> extends Goal
 	 * Called when the target can attack if animation allowed. For skeleton's, this is 'using the bow' item
 	 */
 	protected void startAttackAnimation(T entity) {
-		entity.startUsingItem(Hand.MAIN_HAND);
+		entity.startUsingItem(InteractionHand.MAIN_HAND);
 	}
 	
 	/**
@@ -118,8 +118,8 @@ public class AttackRangedGoal<T extends MobEntity> extends Goal
 	}
 	
 	public void attackTarget(T entity, LivingEntity target, int chargeCount) {
-		if (entity instanceof IRangedAttackMob) {
-			IRangedAttackMob mob = (IRangedAttackMob) this.entity;
+		if (entity instanceof RangedAttackMob) {
+			RangedAttackMob mob = (RangedAttackMob) this.entity;
 			mob.performRangedAttack(target, BowItem.getPowerForTime(chargeCount));
 		} else {
 			NostrumMagica.logger.error("EntityAIAttackRanged tried to attack, but provided entity has no attack");

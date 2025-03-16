@@ -1,9 +1,9 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Font;
 
 public class TableOfContentsPage implements IClickableBookPage {
 
@@ -23,7 +23,7 @@ public class TableOfContentsPage implements IClickableBookPage {
 	}
 	
 	@Override
-	public void draw(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
+	public void draw(BookScreen parent, PoseStack matrixStackIn, Font fonter, int xoffset, int yoffset, int width, int height) {
 		widthCache = width;
 		xCache = xoffset;
 		fontHeightCache = fonter.lineHeight;
@@ -44,7 +44,7 @@ public class TableOfContentsPage implements IClickableBookPage {
 	}
 
 	@Override
-	public void overlay(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
+	public void overlay(BookScreen parent, PoseStack matrixStackIn, Font fonter, int mouseX, int mouseY, int trueX, int trueY) {
 		if (title) {
 			mouseY -= fonter.lineHeight + 10;
 		}

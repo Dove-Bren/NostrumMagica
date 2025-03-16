@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.capabilities;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -26,7 +26,7 @@ public class CapabilityHandler {
 		
 		//if player. Or not. Should get config going. For now, if it's a player make it?
 		//also need to catch death, etc
-		if (event.getObject() instanceof PlayerEntity) {
+		if (event.getObject() instanceof Player) {
 			event.addCapability(CAPABILITY_MAGIC_LOC, new NostrumMagicAttributeProvider(event.getObject()));
 			event.addCapability(CAPABILITY_MANARMOR_LOC, new ManaArmorAttributeProvider(event.getObject()));
 			event.addCapability(CAPABILITY_SPELLCRAFTING_LOC, new SpellCraftingCapabilityProvider());

@@ -1,9 +1,9 @@
 package com.smanzana.nostrummagica.capabilities;
 
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.text.TextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public enum EMagicTier {
 	LOCKED,
@@ -25,16 +25,16 @@ public enum EMagicTier {
 		return getName().getString();
 	}
 	
-	public TextComponent getName() {
-		return new TranslationTextComponent("tier." + this.name().toLowerCase() + ".name");
+	public BaseComponent getName() {
+		return new TranslatableComponent("tier." + this.name().toLowerCase() + ".name");
 	}
 	
-	public INBT toNBT() {
-		return StringNBT.valueOf(this.name().toLowerCase());
+	public Tag toNBT() {
+		return StringTag.valueOf(this.name().toLowerCase());
 	}
 
-	public static final EMagicTier FromNBT(INBT nbt) {
-		StringNBT tag = (StringNBT) nbt;
+	public static final EMagicTier FromNBT(Tag nbt) {
+		StringTag tag = (StringTag) nbt;
 		try {
 			return EMagicTier.valueOf(tag.getAsString().toUpperCase());
 		} catch (Exception e) {

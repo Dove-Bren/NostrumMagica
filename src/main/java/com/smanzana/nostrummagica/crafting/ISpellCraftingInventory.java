@@ -1,10 +1,10 @@
 package com.smanzana.nostrummagica.crafting;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 
-public interface ISpellCraftingInventory extends IInventory {
+public interface ISpellCraftingInventory extends Container {
 
 	public int getScrollSlotIndex();
 	
@@ -39,6 +39,6 @@ public interface ISpellCraftingInventory extends IInventory {
 		this.setScrollSlotContents(ItemStack.EMPTY);
 	}
 	
-	public int getMaxWeight(PlayerEntity crafter);
+	public int getMaxWeight(Player crafter);
 	
 }

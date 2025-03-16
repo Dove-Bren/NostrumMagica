@@ -1,23 +1,23 @@
 package com.smanzana.nostrummagica.client.model;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
 import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity.PlantBossLeafLimb;
 
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.ModelPart;
+import com.mojang.math.Vector3f;
 
 public class ModelPlantBossLeaf extends EntityModel<PlantBossEntity.PlantBossLeafLimb> {
 	
-	private ModelRenderer main;
+	private ModelPart main;
 	
 	public ModelPlantBossLeaf() {
 		
 		this.texHeight = 256;
 		this.texWidth = 256;
-		main = new ModelRenderer(this, 92, 250);
+		main = new ModelPart(this, 92, 250);
 		
 		main.texOffs(92, 250);
 		main.addBox(-16, -4, 0, 32, 2, 4);
@@ -46,7 +46,7 @@ public class ModelPlantBossLeaf extends EntityModel<PlantBossEntity.PlantBossLea
 	}
 	
 	@Override
-	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		matrixStackIn.pushPose();
 		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(90f));
 		main.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);

@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.item.armor;
 
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.NonNullList;
 
 public class ElementalWindArmor extends ElementalArmor {
 
@@ -27,17 +27,17 @@ public class ElementalWindArmor extends ElementalArmor {
 	public static final String ID_FEET_ADEPT = ID_PREFIX + "feet_adept";
 	public static final String ID_FEET_MASTER = ID_PREFIX + "feet_master";
 		
-	public ElementalWindArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
+	public ElementalWindArmor(EquipmentSlot slot, Type type, Item.Properties properties) {
 		super(EMagicElement.WIND, slot, type, properties);
 	}
 	
 	@Override
-	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
 		if (this.allowdedIn(group)) {
 			items.add(new ItemStack(this));
 			
 			// Add an upgraded copy of true chestplates
-			if (this.slot == EquipmentSlotType.CHEST && this.getType() == Type.MASTER) {
+			if (this.slot == EquipmentSlot.CHEST && this.getType() == Type.MASTER) {
 				ItemStack stack = new ItemStack(this);
 				ElementalArmor.SetHasWingUpgrade(stack, true);
 				items.add(stack);

@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.autodungeons.util.DimensionUtils;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -18,18 +18,18 @@ import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import com.mojang.math.Matrix4f;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -69,7 +69,7 @@ public class ObeliskScreen extends Screen {
 	private final Minecraft mc;
 	
 	public ObeliskScreen(ObeliskTileEntity tileEntity) {
-		super(new StringTextComponent("Obelisk Screen"));
+		super(new TextComponent("Obelisk Screen"));
 		this.tileEntity = tileEntity;
 		drawList = ModConfig.config.getObeliskList();
 		
@@ -167,9 +167,9 @@ public class ObeliskScreen extends Screen {
 		}
 		
 		this.addButton(centralButton);
-		for (Widget w : floatingButtons) addButton(w);
-		for (Widget w : listButtons) addButton(w);
-		for (Widget w : listRemoveButtons) addButton(w);
+		for (AbstractWidget w : floatingButtons) addButton(w);
+		for (AbstractWidget w : listButtons) addButton(w);
+		for (AbstractWidget w : listRemoveButtons) addButton(w);
 		
 		for (DestinationButton butt : listButtons) {
 			butt.visible = drawList;
@@ -187,7 +187,7 @@ public class ObeliskScreen extends Screen {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 
 		//GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		Minecraft.getInstance().getTextureManager().bind(background);
@@ -364,7 +364,7 @@ public class ObeliskScreen extends Screen {
 		
 	}
 	
-	private void renderLine(MatrixStack matrixStackIn, DestinationButton center, DestinationButton other, float partialTicks) {
+	private void renderLine(PoseStack matrixStackIn, DestinationButton center, DestinationButton other, float partialTicks) {
 		matrixStackIn.pushPose();
 		//GlStateManager.pushLightingAttributes();
 		matrixStackIn.translate(TEXT_ICON_LENGTH / 2, TEXT_ICON_LENGTH / 2, 0);
@@ -400,7 +400,7 @@ public class ObeliskScreen extends Screen {
 		final float diffPerY = diffY / (segments-1);
 		
 		
-		BufferBuilder buf = Tessellator.getInstance().getBuilder();
+		BufferBuilder buf = Tesselator.getInstance().getBuilder();
 		RenderSystem.enableBlend();
 		RenderSystem.disableTexture();
 		RenderSystem.lineWidth(3f);
@@ -408,7 +408,7 @@ public class ObeliskScreen extends Screen {
         //GlStateManager.disableTexture();
         //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         //GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
-        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
         for (int i = 0; i < segments; i++) {
         	final float X = center.x + (diffPerX * i);
         	final float Y = center.y + (diffPerY * i);
@@ -426,7 +426,7 @@ public class ObeliskScreen extends Screen {
         	
 	        buf.vertex(transform, X, Y, 0).color(r, g, b, alpha).endVertex();
         }
-        Tessellator.getInstance().end();
+        Tesselator.getInstance().end();
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
 		
@@ -458,14 +458,14 @@ public class ObeliskScreen extends Screen {
 		private final int obeliskIndex;
 		
 		public RemoveButton(ObeliskScreen screen, int x, int y, int index) {
-			super(x, y, 13, 13, StringTextComponent.EMPTY, (b) -> {
+			super(x, y, 13, 13, TextComponent.EMPTY, (b) -> {
 				screen.onRemoveClicked((RemoveButton) b);
 			});
 			this.obeliskIndex = index;		
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
 			final float sat = (this.isHovered() ? 1f : .8f);
 			
@@ -496,7 +496,7 @@ public class ObeliskScreen extends Screen {
         public DestinationButton(ObeliskScreen screen, int parPosX, int parPosY, 
         		Location loc, int index, boolean isCenter, boolean isListed, String title,
               boolean isValid, boolean isSelected, @Nullable DestinationButton parentButton) {
-            super(parPosX, parPosY, 13, 13, StringTextComponent.EMPTY, (b) -> {
+            super(parPosX, parPosY, 13, 13, TextComponent.EMPTY, (b) -> {
             	screen.onDestinationClicked(b);
             });
             this.loc = loc;
@@ -515,7 +515,7 @@ public class ObeliskScreen extends Screen {
          * Draws this button to the screen.
          */
         @Override
-        public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
+        public void render(PoseStack matrixStackIn, int parX, int parY, float partialTicks) {
             if (visible) {
                 final Minecraft mc = Minecraft.getInstance();
                 isHovered = parX >= x 
@@ -570,7 +570,7 @@ public class ObeliskScreen extends Screen {
                 
                 if (!isCenter) {
                 	// Draw the name below
-                	FontRenderer fonter = mc.font;
+                	Font fonter = mc.font;
                 	int textWidth = fonter.width(title);
                 	int buttonWidth = TEXT_ICON_LENGTH;
                 	int color = isValid ? 0xB0B0B0 : 0xB05050;
@@ -599,7 +599,7 @@ public class ObeliskScreen extends Screen {
                 	}
                 } else {
                 	final String title = "This Obelisk";
-                	FontRenderer fonter = mc.font;
+                	Font fonter = mc.font;
                 	int textWidth = fonter.width(title);
                 	int xPos = x + (TEXT_ICON_LENGTH / 2) - (textWidth / 2);
             		fonter.draw(matrixStackIn, title, xPos, y - (2 + fonter.lineHeight), 0xB0B0B0);

@@ -5,9 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 
@@ -52,7 +52,7 @@ public class RitualRegistry {
 		ritualListeners.remove(listener);
 	}
 	
-	public void fireRitualPerformed(RitualRecipe ritual, World world, PlayerEntity player, BlockPos pos) {
+	public void fireRitualPerformed(RitualRecipe ritual, Level world, Player player, BlockPos pos) {
 		for (IRitualListener listener : RitualRegistry.instance().ritualListeners) {
 			listener.onRitualPerformed(ritual, world, player, pos);
 		}

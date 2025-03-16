@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.loretag;
 
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 
 /**
  * Subclass of ILoreTagged for blocks that can't be actually set up as ILoreTagged.

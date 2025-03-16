@@ -9,12 +9,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Server is sending a new copy of the spellcrafting capability
@@ -52,7 +52,7 @@ public class SpellCraftingCapabilitySyncMessage {
 		this.stats = stats;
 	}
 
-	public static SpellCraftingCapabilitySyncMessage decode(PacketBuffer buf) {
+	public static SpellCraftingCapabilitySyncMessage decode(FriendlyByteBuf buf) {
 		ISpellCrafting stats = CAPABILITY.getDefaultInstance();
 		final int entID = buf.readVarInt();
 		CAPABILITY.getStorage().readNBT(CAPABILITY, stats, null, buf.readNbt());
@@ -63,9 +63,9 @@ public class SpellCraftingCapabilitySyncMessage {
 				);
 	}
 
-	public static void encode(SpellCraftingCapabilitySyncMessage msg, PacketBuffer buf) {
+	public static void encode(SpellCraftingCapabilitySyncMessage msg, FriendlyByteBuf buf) {
 		buf.writeVarInt(msg.entID);
-		buf.writeNbt((CompoundNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, msg.stats, null));
+		buf.writeNbt((CompoundTag) CAPABILITY.getStorage().writeNBT(CAPABILITY, msg.stats, null));
 	}
 
 }

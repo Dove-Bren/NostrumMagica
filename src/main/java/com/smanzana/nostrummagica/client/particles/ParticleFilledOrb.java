@@ -2,32 +2,32 @@ package com.smanzana.nostrummagica.client.particles;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.Camera;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 
 public class ParticleFilledOrb extends BatchRenderParticle {
 	
 	private static final ResourceLocation TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/effects/filled_orb.png");
 	
 	protected final float maxAlpha;
-	protected Vector3d targetPos; // Absolute position to move to (if targetEntity == null) or offset from entity to go to
+	protected Vec3 targetPos; // Absolute position to move to (if targetEntity == null) or offset from entity to go to
 	protected Entity targetEntity;
 	protected boolean dieOnTarget;
 	
-	public ParticleFilledOrb(ClientWorld worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
+	public ParticleFilledOrb(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
 		rCol = red;
@@ -47,7 +47,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 		return this;
 	}
 	
-	public ParticleFilledOrb setMotion(Vector3d motion) {
+	public ParticleFilledOrb setMotion(Vec3 motion) {
 		return this.setMotion(motion.x, motion.y, motion.z);
 	}
 	
@@ -55,7 +55,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 		return this.setMotion(xVelocity, yVelocity, zVelocity, 0, 0, 0);
 	}
 	
-	public ParticleFilledOrb setMotion(Vector3d motion, Vector3d jitter) {
+	public ParticleFilledOrb setMotion(Vec3 motion, Vec3 jitter) {
 		return this.setMotion(motion.x, motion.y, motion.z, jitter.x, jitter.y, jitter.z);
 	}
 	
@@ -72,14 +72,14 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 		if (this.targetPos == null && ent != null) {
 			final double wRad = ent.getBbWidth() * 2; // double width
 			final double hRad = ent.getBbHeight();
-			this.targetPos = new Vector3d(wRad * (NostrumMagica.rand.nextDouble() - .5),
+			this.targetPos = new Vec3(wRad * (NostrumMagica.rand.nextDouble() - .5),
 					hRad * (NostrumMagica.rand.nextDouble() - .5),
 					wRad * (NostrumMagica.rand.nextDouble() - .5));
 		}
 		return this;
 	}
 	
-	public ParticleFilledOrb setTarget(Vector3d targetPos) {
+	public ParticleFilledOrb setTarget(Vec3 targetPos) {
 		this.targetPos = targetPos;
 		return this;
 	}
@@ -123,7 +123,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 	}
 
 	@Override
-	public void renderBatched(MatrixStack matrixStackIn, IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
+	public void renderBatched(PoseStack matrixStackIn, VertexConsumer buffer, Camera renderInfo, float partialTicks) {
 		BatchRenderParticle.RenderQuad(matrixStackIn, buffer, this, renderInfo, partialTicks, .05f);
 	}
 	
@@ -146,19 +146,19 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 		if (targetEntity != null) {
 			if (targetEntity.isAlive()) {
 				final float period = 20f;
-				Vector3d offset = targetPos == null ? new Vector3d(0,0,0) : targetPos.yRot((float) (Math.PI * 2 * ((float) age % period) / period));
-				Vector3d curVelocity = new Vector3d(xd, yd, zd);
-				Vector3d posDelta = targetEntity.position()
+				Vec3 offset = targetPos == null ? new Vec3(0,0,0) : targetPos.yRot((float) (Math.PI * 2 * ((float) age % period) / period));
+				Vec3 curVelocity = new Vec3(xd, yd, zd);
+				Vec3 posDelta = targetEntity.position()
 						.add(offset.x, offset.y + targetEntity.getBbHeight()/2, offset.z)
 						.subtract(x, y, z);
-				Vector3d idealVelocity = posDelta.normalize().scale(.3);
+				Vec3 idealVelocity = posDelta.normalize().scale(.3);
 				this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 			}
 			// Else just do nothing
 		} else if (targetPos != null) {
-			Vector3d curVelocity = new Vector3d(xd, yd, zd);
-			Vector3d posDelta = targetPos.subtract(x, y, z);
-			Vector3d idealVelocity = posDelta.normalize().scale(.3);
+			Vec3 curVelocity = new Vec3(xd, yd, zd);
+			Vec3 posDelta = targetPos.subtract(x, y, z);
+			Vec3 idealVelocity = posDelta.normalize().scale(.3);
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 		}
 	}
@@ -166,7 +166,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 	public static final class Factory implements INostrumParticleFactory<ParticleFilledOrb> {
 
 		@Override
-		public ParticleFilledOrb createParticle(ClientWorld world, SpawnParams params) {
+		public ParticleFilledOrb createParticle(ClientLevel world, SpawnParams params) {
 			ParticleFilledOrb particle = null;
 			for (int i = 0; i < params.count; i++) {
 				final double spawnX = params.spawnX + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
@@ -185,7 +185,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 					particle.setTarget(params.targetPos);
 				}
 				if (params.velocity != null) {
-					particle.setMotion(params.velocity, params.velocityJitter == null ? Vector3d.ZERO : params.velocityJitter);
+					particle.setMotion(params.velocity, params.velocityJitter == null ? Vec3.ZERO : params.velocityJitter);
 				}
 				if (params.gravityStrength != 0f) {
 					particle.setGravityStrength(params.gravityStrength);

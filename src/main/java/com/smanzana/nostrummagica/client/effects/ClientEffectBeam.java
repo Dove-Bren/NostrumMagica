@@ -1,9 +1,9 @@
 package com.smanzana.nostrummagica.client.effects;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Effect made up of multiple copies of another effect
@@ -14,14 +14,14 @@ public class ClientEffectBeam extends ClientEffect {
 
 	private static class BeamForm implements ClientEffectForm {
 
-		private Vector3d end;
+		private Vec3 end;
 		
-		public BeamForm(Vector3d end) {
+		public BeamForm(Vec3 end) {
 			this.end = end;
 		}
 		
 		@Override
-		public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
+		public void draw(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
 			int unused; // broken. Fix? Or remove?
 //			final int detailCount = Minecraft.isFancyGraphicsEnabled()
 //					? 20
@@ -89,11 +89,11 @@ public class ClientEffectBeam extends ClientEffect {
 		
 	}
 	
-	public ClientEffectBeam(Vector3d origin, Vector3d end, int ticks) {
+	public ClientEffectBeam(Vec3 origin, Vec3 end, int ticks) {
 		super(origin, new BeamForm(end.subtract(origin)), ticks);
 	}
 	
-	public ClientEffectBeam(Vector3d origin, Vector3d end, long ms) {
+	public ClientEffectBeam(Vec3 origin, Vec3 end, long ms) {
 		super(origin, new BeamForm(end.subtract(origin)), ms);
 	}
 	

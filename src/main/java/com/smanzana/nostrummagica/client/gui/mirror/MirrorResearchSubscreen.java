@@ -13,7 +13,7 @@ import java.util.Set;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -35,24 +35,24 @@ import com.smanzana.nostrummagica.util.Curves;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.Font;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import net.minecraft.client.renderer.Rect2i;
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Matrix4f;
+import net.minecraft.world.phys.Vec2;
+import com.mojang.math.Vector3f;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
@@ -62,11 +62,11 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	
 	private static Set<NostrumResearch> seenResearch = null;
 	
-	private final ITextComponent name;
+	private final Component name;
 	private final ItemStack icon;
 	
 	private IMirrorScreen parent;
-	private PlayerEntity player;
+	private Player player;
 	private INostrumMagic attr;
 	private int width;
 	private int height;
@@ -76,7 +76,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	private NostrumResearchTab activeTab;
 	
 	public MirrorResearchSubscreen() {
-		name = new TranslationTextComponent("mirror.tab.research.name");
+		name = new TranslatableComponent("mirror.tab.research.name");
 		icon = new ItemStack(NostrumItems.spellTomePage, 1);
 		
 		researchButtons = new HashMap<>();
@@ -87,7 +87,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	}
 	
 	@Override
-	public ITextComponent getName() {
+	public Component getName() {
 		return name;
 	}
 	
@@ -97,12 +97,12 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	}
 	
 	@Override
-	public boolean isVisible(IMirrorScreen parent, PlayerEntity player) {
+	public boolean isVisible(IMirrorScreen parent, Player player) {
 		return true;
 	}
 
 	@Override
-	public void show(IMirrorScreen parent, PlayerEntity player, int width, int height, int guiLeft, int guiTop) {
+	public void show(IMirrorScreen parent, Player player, int width, int height, int guiLeft, int guiTop) {
 		this.player = player;
 		this.attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
@@ -126,7 +126,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			firstTime = true;
 		}
 		
-		final Rectangle2d bounds = new Rectangle2d(guiLeft, guiTop, width, height);
+		final Rect2i bounds = new Rect2i(guiLeft, guiTop, width, height);
 		for (NostrumResearch research: NostrumResearch.AllResearch()) {
 			final int buttonCenterX = guiLeft + (width/2) + (research.getX() * GRID_SCALE);
 			final int buttonCenterY = guiTop + (height/2) + (research.getY() * GRID_SCALE);
@@ -189,12 +189,12 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	}
 
 	@Override
-	public void hide(IMirrorScreen parent, PlayerEntity player) {
+	public void hide(IMirrorScreen parent, Player player) {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void drawBackground(IMirrorScreen parent, MatrixStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
+	public void drawBackground(IMirrorScreen parent, PoseStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
 		float extra = .1f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
 		float inv = .1f - extra;
 		Minecraft.getInstance().getTextureManager().bind(RES_BACK);
@@ -203,9 +203,9 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	}
 
 	@Override
-	public void drawForeground(IMirrorScreen parent, MatrixStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
+	public void drawForeground(IMirrorScreen parent, PoseStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
 		final Minecraft mc = Minecraft.getInstance();
-		final FontRenderer font = mc.font;
+		final Font font = mc.font;
 		
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(width/2, 20, 0);
@@ -329,7 +329,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		
 		private final MirrorResearchSubscreen subscreen; 
 		private final NostrumResearch research;
-		private final List<ITextComponent> tooltip;
+		private final List<Component> tooltip;
 		private final float fontScale = 0.75f;
 		
 		private ResearchState state;
@@ -337,7 +337,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		private boolean wasHidden;
 		
 		public ResearchButton(MirrorResearchSubscreen subscreen, NostrumResearch research, int x, int y, int width, int height) {
-			super(x, y, width, height, StringTextComponent.EMPTY);
+			super(x, y, width, height, TextComponent.EMPTY);
 			this.subscreen = subscreen;
 			this.research = research;
 			updateResearchState();
@@ -367,7 +367,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			animStartMS = System.currentTimeMillis();
 		}
 		
-		public void drawTreeLines(MatrixStack matrixStackIn, Minecraft mc) {
+		public void drawTreeLines(PoseStack matrixStackIn, Minecraft mc) {
 			if (research.getParentKeys() != null && research.getParentKeys().length != 0) {
 				for (String key : research.getParentKeys()) {
 					NostrumResearch parentResearch = NostrumResearch.lookup(key);
@@ -385,13 +385,13 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			}
 		}
 		
-		private void renderLine(MatrixStack matrixStackIn, ResearchButton other) {
+		private void renderLine(PoseStack matrixStackIn, ResearchButton other) {
 			// Render 2 flat lines with a nice circle-arc between them
 			
 			float alpha = (float) (this.animStartMS == 0 ? 1 : ((double)(System.currentTimeMillis() - animStartMS) / 500.0));
 			
 			matrixStackIn.pushPose();
-			BufferBuilder buf = Tessellator.getInstance().getBuilder();
+			BufferBuilder buf = Tesselator.getInstance().getBuilder();
 	        RenderSystem.enableBlend();
 	        RenderSystem.disableColorLogicOp();
 	        RenderSystem.disableTexture();
@@ -399,29 +399,29 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        //GlStateManager.disableDepth();
 	        RenderSystem.lineWidth(3.5f);
 	        
-	        Vector2f child = new Vector2f(x + ((float) width / 2f), y + ((float) height / 2f));
-	        Vector2f parent = new Vector2f(other.x + ((float) other.width / 2f), other.y + ((float) other.height / 2f));
-	        Vector2f diff = new Vector2f(this.research.getX() - other.research.getX(), this.research.getY() - other.research.getY());
+	        Vec2 child = new Vec2(x + ((float) width / 2f), y + ((float) height / 2f));
+	        Vec2 parent = new Vec2(other.x + ((float) other.width / 2f), other.y + ((float) other.height / 2f));
+	        Vec2 diff = new Vec2(this.research.getX() - other.research.getX(), this.research.getY() - other.research.getY());
 	        
-	        Vector2f myCenter = child; // Stash for later
+	        Vec2 myCenter = child; // Stash for later
 	        
 	        if (child.x == parent.x || child.y == parent.y) {
 	        	// Straight line
 	        	
 	        	if (child.x == parent.x) {
 	        		// vertical line. Shrink both sides in y
-	        		child = new Vector2f(child.x, child.y + (-Math.signum(diff.y) * ((float) height / 2f)));
-	        		parent = new Vector2f(parent.x, parent.y - (-Math.signum(diff.y) * ((float) other.height / 2f)));
+	        		child = new Vec2(child.x, child.y + (-Math.signum(diff.y) * ((float) height / 2f)));
+	        		parent = new Vec2(parent.x, parent.y - (-Math.signum(diff.y) * ((float) other.height / 2f)));
 	        	} else {
 	        		// horizional. "" x
-	        		child = new Vector2f(child.x + (-Math.signum(diff.x) * ((float) width / 2f)), child.y);
-	        		parent = new Vector2f(parent.x - (-Math.signum(diff.x) * ((float) other.width / 2f)), parent.y);
+	        		child = new Vec2(child.x + (-Math.signum(diff.x) * ((float) width / 2f)), child.y);
+	        		parent = new Vec2(parent.x - (-Math.signum(diff.x) * ((float) other.width / 2f)), parent.y);
 	        	}
 	        	
-	        	buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+	        	buf.begin(GL11.GL_LINES, DefaultVertexFormat.POSITION_COLOR);
 		        buf.vertex(child.x, child.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
 		        buf.vertex(parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-		        Tessellator.getInstance().end();
+		        Tesselator.getInstance().end();
 	        } else {
 		        boolean vertical;// = (Math.abs(diff.y) > Math.abs(diff.x));
 		        
@@ -440,29 +440,29 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		        radius = Math.min(Math.max(radius * .5f, 12), 12);//*= .5f;
 		        double radiusX = (diff.x < 0 ? -1 : 1) * radius;
 		        double radiusY = (diff.y < 0 ? -1 : 1) * radius;
-		        Vector2f center = new Vector2f(vertical ? parent.x : child.x, vertical ? child.y : parent.y);
+		        Vec2 center = new Vec2(vertical ? parent.x : child.x, vertical ? child.y : parent.y);
 		        
-		        Vector2f childTo = new Vector2f(vertical ? center.x + (float) radiusX : center.x, vertical ? center.y : center.y + (float) radiusY);
-		        Vector2f parentTo = new Vector2f(vertical ? center.x : center.x - (float) radiusX, vertical ? center.y - (float) radiusY : center.y);
+		        Vec2 childTo = new Vec2(vertical ? center.x + (float) radiusX : center.x, vertical ? center.y : center.y + (float) radiusY);
+		        Vec2 parentTo = new Vec2(vertical ? center.x : center.x - (float) radiusX, vertical ? center.y - (float) radiusY : center.y);
 		        
 		        if (vertical) {
 	        		// vertical at parent. Shrink parent y and child x
-		        	child = new Vector2f(child.x + (-Math.signum(diff.x) * ((float) width / 2f)), child.y);
-	        		parent = new Vector2f(parent.x, parent.y - (-Math.signum(diff.y) * ((float) other.height / 2f)));
+		        	child = new Vec2(child.x + (-Math.signum(diff.x) * ((float) width / 2f)), child.y);
+	        		parent = new Vec2(parent.x, parent.y - (-Math.signum(diff.y) * ((float) other.height / 2f)));
 	        	} else {
 	        		// inverse of above
-	        		child = new Vector2f(child.x, child.y + (-Math.signum(diff.y) * ((float) height / 2f)));
-	        		parent = new Vector2f(parent.x - (-Math.signum(diff.x) * ((float) other.width / 2f)), parent.y);
+	        		child = new Vec2(child.x, child.y + (-Math.signum(diff.y) * ((float) height / 2f)));
+	        		parent = new Vec2(parent.x - (-Math.signum(diff.x) * ((float) other.width / 2f)), parent.y);
 	        	}
 		        
 		        {
 		        	final Matrix4f transform = matrixStackIn.last().pose();
-			        buf.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+			        buf.begin(GL11.GL_LINES, DefaultVertexFormat.POSITION_COLOR);
 			        buf.vertex(transform, child.x, child.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
 			        buf.vertex(transform, childTo.x, childTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
 			        buf.vertex(transform, parentTo.x, parentTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
 			        buf.vertex(transform, parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-			        Tessellator.getInstance().end();
+			        Tesselator.getInstance().end();
 		        }
 		        
 		        // Draw inside curve
@@ -491,13 +491,13 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		        matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(rotate));
 		        {
 		        	final Matrix4f transform = matrixStackIn.last().pose();
-			        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+			        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 			        for (int i = 0; i <= points; i++) {
 			        	float progress = (float) i / (float) points;
-			        	Vector2f point = Curves.alignedArc2D(progress, Vector2f.ZERO, radius, flip);
+			        	Vec2 point = Curves.alignedArc2D(progress, Vec2.ZERO, radius, flip);
 			        	buf.vertex(transform, point.x, point.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
 			        }
-			        Tessellator.getInstance().end();
+			        Tesselator.getInstance().end();
 		        }
 		        matrixStackIn.popPose();
 	        }
@@ -524,7 +524,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		}
 		
 		@Override
-		public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			updateResearchState();
 			
 			if (this.shouldShow()) {
@@ -544,7 +544,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			float alpha = (float) (this.animStartMS == 0 ? 1 : ((double)(System.currentTimeMillis() - animStartMS) / 500.0));
 			final int textureX;
 			final int textureY;
@@ -616,23 +616,23 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 					color[0], color[1], color[2], color[3]);
 			
 			// Now draw icon
-			RenderHelper.turnBackOn();
+			Lighting.turnBackOn();
 			// RenderGuiItem moves 100 forward. Blocks render several z deep.
 			// Squish to 8 deep, and shift back
 			matrixStackIn.scale(1f, 1f, .4f);
 			matrixStackIn.translate(0, 0, -90);
 			RenderFuncs.RenderGUIItem(research.getIconItem(), matrixStackIn, x + (width - 16) / 2, y + (height - 16) / 2);
 			RenderSystem.enableDepthTest();
-			RenderHelper.turnOff();
+			Lighting.turnOff();
 			
 			matrixStackIn.popPose();
 		}
 		
 		@Override
-		public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			if (shouldShow() && this.visible && isHovered()) {
 				final Minecraft mc = Minecraft.getInstance();
-				final FontRenderer font = mc.font;
+				final Font font = mc.font;
 		        matrixStackIn.pushPose();
 		        matrixStackIn.scale(fontScale, fontScale, 1f);
 		        matrixStackIn.translate((int) (mouseX / fontScale) - mouseX, (int) (mouseY / fontScale) - mouseY, 0);
@@ -666,12 +666,12 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			this.updateResearchState();
 		}
 		
-		private List<ITextComponent> genTooltip() {
-			List<ITextComponent> tooltip = new LinkedList<>();
-			tooltip.add(new TranslationTextComponent(research.getNameKey(), new Object[0]).withStyle(TextFormatting.BLUE));
-			tooltip.add(new TranslationTextComponent(research.getDescKey(), new Object[0]).withStyle(TextFormatting.GRAY));
+		private List<Component> genTooltip() {
+			List<Component> tooltip = new LinkedList<>();
+			tooltip.add(new TranslatableComponent(research.getNameKey(), new Object[0]).withStyle(ChatFormatting.BLUE));
+			tooltip.add(new TranslatableComponent(research.getDescKey(), new Object[0]).withStyle(ChatFormatting.GRAY));
 			
-			TextFormatting bad = TextFormatting.RED;
+			ChatFormatting bad = ChatFormatting.RED;
 			boolean first = true;
 			
 	        // Requirements?
@@ -680,12 +680,12 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        		if (!req.matches(subscreen.player)) {
 	        			if (first) {
 							first = false;
-							tooltip.add(new StringTextComponent(""));
-							tooltip.add(new TranslationTextComponent("info.requirement.missing"));
+							tooltip.add(new TextComponent(""));
+							tooltip.add(new TranslatableComponent("info.requirement.missing"));
 						}
-	        			for (ITextComponent line : req.getDescription(subscreen.player)) {
-	        				if (line instanceof TextComponent) {
-	        					tooltip.add(((TextComponent) line).withStyle(bad));
+	        			for (Component line : req.getDescription(subscreen.player)) {
+	        				if (line instanceof BaseComponent) {
+	        					tooltip.add(((BaseComponent) line).withStyle(bad));
 	        				} else {
 	        					tooltip.add(line);
 	        				}
@@ -695,14 +695,14 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        }
 			
 			if (this.state == ResearchState.INACTIVE && subscreen.attr.getResearchPoints() > 0 && NostrumMagica.canPurchaseResearch(subscreen.player, research)) {
-				tooltip.add(new StringTextComponent(" "));
-				tooltip.add(new TranslationTextComponent("info.research.purchase").withStyle(TextFormatting.GREEN));
+				tooltip.add(new TextComponent(" "));
+				tooltip.add(new TranslatableComponent("info.research.purchase").withStyle(ChatFormatting.GREEN));
 			} else if (this.state == ResearchState.COMPLETED) {
-				tooltip.add(new StringTextComponent(" "));
-				tooltip.add(new TranslationTextComponent("info.research.view").withStyle(TextFormatting.GREEN));
+				tooltip.add(new TextComponent(" "));
+				tooltip.add(new TranslatableComponent("info.research.view").withStyle(ChatFormatting.GREEN));
 			} else if (research.isPurchaseDisallowed()) {
-				tooltip.add(new StringTextComponent(" "));
-				tooltip.add(new TranslationTextComponent("info.research.disallowed").withStyle(TextFormatting.DARK_AQUA));
+				tooltip.add(new TextComponent(" "));
+				tooltip.add(new TranslatableComponent("info.research.disallowed").withStyle(ChatFormatting.DARK_AQUA));
 			}
 			
 			return tooltip;
@@ -712,14 +712,14 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	private static final class ResearchMirrorTab implements IMirrorMinorTab {
 		
 		protected final NostrumResearchTab tab;
-		private final ITextComponent name;
+		private final Component name;
 		private final List<NostrumResearch> children;
 		
 		private boolean hasNew;
 		
 		public ResearchMirrorTab(MirrorResearchSubscreen subscreen, NostrumResearchTab tab) {
 			this.tab = tab;
-			this.name = new TranslationTextComponent(tab.getNameKey());
+			this.name = new TranslatableComponent(tab.getNameKey());
 			this.children = new ArrayList<>(32);
 			hasNew = false;
 		}
@@ -738,12 +738,12 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		}
 
 		@Override
-		public ITextComponent getName() {
+		public Component getName() {
 			return name;
 		}
 
 		@Override
-		public void renderTab(IMirrorScreen parent, IMirrorSubscreen subscreen, MatrixStack matrixStackIn, int width, int height) {
+		public void renderTab(IMirrorScreen parent, IMirrorSubscreen subscreen, PoseStack matrixStackIn, int width, int height) {
 			RenderFuncs.RenderGUIItem(tab.getIcon(), matrixStackIn, (width - 16) / 2, (height - 16) / 2);
 		}
 

@@ -37,35 +37,35 @@ import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.SpellUtils;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntitySize;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.Pose;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Direction.Plane;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.BossInfo;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerBossInfo;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Plane;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.BossEvent;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerBossEvent;
 
-public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiPartEntity {
+public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEntity {
 	
 	public static enum BattleState {
 		IDLE, // Not doing anything specific but throwing out attacks and looking mad
@@ -205,12 +205,12 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		return BulletSeedSpell;
 	}
 	
-	protected static final DataParameter<Float[]> LEAF_PITCHES = EntityDataManager.<Float[]>defineId(PlantBossEntity.class, FloatArraySerializer.instance);
-	protected static final DataParameter<Optional<EMagicElement>> WEAK_ELEMENT = EntityDataManager.<Optional<EMagicElement>>defineId(PlantBossEntity.class, OptionalMagicElementDataSerializer.instance);
-	protected static final DataParameter<PlantBossTreeType> TREE_TYPE = EntityDataManager.<PlantBossTreeType>defineId(PlantBossEntity.class, PlantBossTreeTypeSerializer.instance);
-	protected static final DataParameter<Optional<UUID>> BODY_ID = EntityDataManager.defineId(PlantBossEntity.class, DataSerializers.OPTIONAL_UUID);
+	protected static final EntityDataAccessor<Float[]> LEAF_PITCHES = SynchedEntityData.<Float[]>defineId(PlantBossEntity.class, FloatArraySerializer.instance);
+	protected static final EntityDataAccessor<Optional<EMagicElement>> WEAK_ELEMENT = SynchedEntityData.<Optional<EMagicElement>>defineId(PlantBossEntity.class, OptionalMagicElementDataSerializer.instance);
+	protected static final EntityDataAccessor<PlantBossTreeType> TREE_TYPE = SynchedEntityData.<PlantBossTreeType>defineId(PlantBossEntity.class, PlantBossTreeTypeSerializer.instance);
+	protected static final EntityDataAccessor<Optional<UUID>> BODY_ID = SynchedEntityData.defineId(PlantBossEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 	
-	private final ServerBossInfo bossInfo = (ServerBossInfo) new ServerBossInfo(this.getDisplayName(), BossInfo.Color.GREEN, BossInfo.Overlay.NOTCHED_10).setDarkenScreen(true);
+	private final ServerBossEvent bossInfo = (ServerBossEvent) new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.GREEN, BossEvent.BossBarOverlay.NOTCHED_10).setDarkenScreen(true);
 	private final PlantBossLeafLimb[] limbs;
 	private final MultiPartEntityPart<PlantBossEntity>[] parts;
 	protected float eyeHeight;
@@ -235,7 +235,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	protected boolean curlLeaveFrontOpen;
 	
 	@SuppressWarnings("unchecked")
-	public PlantBossEntity(EntityType<? extends PlantBossEntity> type, World worldIn) {
+	public PlantBossEntity(EntityType<? extends PlantBossEntity> type, Level worldIn) {
 		super(type, worldIn);
         this.noCulling = true;
         this.xpReward = 1250;
@@ -295,8 +295,8 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		this.entityData.define(BODY_ID, Optional.empty());
 	}
 	
-	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		return MobEntity.createMobAttributes()
+	public static final AttributeSupplier.Builder BuildAttributes() {
+		return Mob.createMobAttributes()
 	        .add(Attributes.MOVEMENT_SPEED, 0.00D)
 	        .add(Attributes.MAX_HEALTH, 800.0D)
 	        .add(Attributes.ATTACK_DAMAGE, 10.0D)
@@ -327,12 +327,12 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	@Override
-	public void readAdditionalSaveData(CompoundNBT compound) {
+	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 	}
 	
 	@Override
-	public void addAdditionalSaveData(CompoundNBT compound) {
+	public void addAdditionalSaveData(CompoundTag compound) {
     	super.addAdditionalSaveData(compound);
 	}
 	
@@ -421,7 +421,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 				1,
 				this.getX(), this.getY() + this.getBbHeight() + 1, this.getZ(), 1,
 				40, 20,
-				new Vector3d(0, .05, 0), Vector3d.ZERO
+				new Vec3(0, .05, 0), Vec3.ZERO
 				).color(this.getTreeElement().getColor()));
 	}
 	
@@ -430,19 +430,19 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 				count * 10,
 				this.getX(), this.getY() + (this.getBbHeight() / 2), this.getZ(), this.getBbWidth() * 1.5,
 				40, 10,
-				new Vector3d(0, 0, 0), Vector3d.ZERO
+				new Vec3(0, 0, 0), Vec3.ZERO
 				));
 	}
 	
-	protected void spawnWardParticles(@Nonnull Vector3d at, int count) {
+	protected void spawnWardParticles(@Nonnull Vec3 at, int count) {
 		// Calculate vector away from ent to where it got attacked
-		Vector3d bounceDir = at.subtract(this.position()).normalize();
+		Vec3 bounceDir = at.subtract(this.position()).normalize();
 		
 		NostrumParticles.WARD.spawn(this.level, new NostrumParticles.SpawnParams(
 				count * 5,
 				at.x, at.y, at.z, .25,
 				10, 5,
-				bounceDir.scale(.01), new Vector3d(.0025, .0025, .0025)
+				bounceDir.scale(.01), new Vec3(.0025, .0025, .0025)
 				));
 	}
 	
@@ -577,19 +577,19 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	@Override
-	public void startSeenByPlayer(ServerPlayerEntity player) {
+	public void startSeenByPlayer(ServerPlayer player) {
 		super.startSeenByPlayer(player);
 		this.bossInfo.addPlayer(player);
 	}
 
 	@Override
-	public void stopSeenByPlayer(ServerPlayerEntity player) {
+	public void stopSeenByPlayer(ServerPlayer player) {
 		super.stopSeenByPlayer(player);
 		this.bossInfo.removePlayer(player);
 	}
 	
 	@Override
-	public void onSyncedDataUpdated(DataParameter<?> key) {
+	public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
 		super.onSyncedDataUpdated(key);
 //		if (this.world != null && this.world.isRemote) {
 //			if (key == LEAF_PITCHES) {
@@ -669,8 +669,8 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 			return false;
 		}
 		
-		if (source.getEntity() == null || !(source.getEntity() instanceof PlayerEntity)
-				|| !((PlayerEntity) source.getEntity()).isCreative()) {
+		if (source.getEntity() == null || !(source.getEntity() instanceof Player)
+				|| !((Player) source.getEntity()).isCreative()) {
 			amount = Math.min(amount, 10f);
 		}
 		
@@ -707,7 +707,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	@Override
-	public World getWorld() {
+	public Level getWorld() {
 		return this.level;
 	}
 	
@@ -746,7 +746,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 			return;
 		}
 		
-		if (entityIn instanceof PlayerEntity && ((PlayerEntity) entityIn).isSpectator()) {
+		if (entityIn instanceof Player && ((Player) entityIn).isSpectator()) {
 			return;
 		}
 		
@@ -802,10 +802,10 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		@Nullable LivingEntity target = aggroTable.getMainTarget();
 		if (target == null) {
 			// Just try nearby entities
-			AxisAlignedBB searchBox = this.getBoundingBox().inflate(16, 8, 16);
+			AABB searchBox = this.getBoundingBox().inflate(16, 8, 16);
 			List<Entity> ents = this.level.getEntities(this, searchBox, (e) -> {
 				return (e instanceof LivingEntity)
-						&& (!(e instanceof PlayerEntity) || !((PlayerEntity) e).isCreative())
+						&& (!(e instanceof Player) || !((Player) e).isCreative())
 						&& (this.canSee(e));
 				});
 			
@@ -840,7 +840,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	protected void discoverArena() {
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		int remaining;
 		
 		cursor.set(this.getX(), this.getY(), this.getZ()).move(Direction.DOWN);
@@ -907,7 +907,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	
 	protected BlockPos[] scanForPillars() {
 		List<BlockPos> pillars = new ArrayList<>();
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		
 		for (int x = arenaMin.getX(); x <= arenaMax.getX(); x++)
 		for (int z = arenaMin.getZ(); z <= arenaMax.getZ(); z++) {
@@ -926,9 +926,9 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		return pillars.toArray(new BlockPos[0]);
 	}
 	
-	protected boolean isPillarCenter(World world, BlockPos pos) {
+	protected boolean isPillarCenter(Level world, BlockPos pos) {
 		// Lazy; just check if center of a 3x1x3 of pillar blocks
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		int[] xs = new int[] {-1, 0, 1};
 		int[] zs = new int[] {-1, 0, 1};
 		for (int x : xs)
@@ -966,7 +966,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	@Override
-	protected float getStandingEyeHeight(Pose pose, EntitySize size) {
+	protected float getStandingEyeHeight(Pose pose, EntityDimensions size) {
 		if (this.eyeHeight == 0) {
 			return size.height * .85f;
 		}
@@ -1010,7 +1010,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 	}
 	
 	protected void pushEntity(Entity e) {
-		Vector3d awayDir = e.position().subtract(this.position());
+		Vec3 awayDir = e.position().subtract(this.position());
 		double dist = awayDir.lengthSqr();
 		double force = Math.min(.1, Math.max(.5, .1 * (16.0 / dist)));
 		
@@ -1022,7 +1022,7 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		
 		public static final String ID = PlantBossEntity.ID + ".body";
 		
-		public PlantBossBody(EntityType<? extends PlantBossBody> type, World world) {
+		public PlantBossBody(EntityType<? extends PlantBossBody> type, Level world) {
 			super(type, world, "PlantBoss_Body", 3, 3);
 		}
 		
@@ -1075,12 +1075,12 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		
 		public static final String ID = PlantBossEntity.ID + ".leaf";
 		
-		protected static final DataParameter<Integer> INDEX = EntityDataManager.defineId(PlantBossLeafLimb.class, DataSerializers.INT);
+		protected static final EntityDataAccessor<Integer> INDEX = SynchedEntityData.defineId(PlantBossLeafLimb.class, EntityDataSerializers.INT);
 
 		protected PlantBossEntity plant;
 		protected float effectivePitch;
 		
-		public PlantBossLeafLimb(EntityType<?> type, World world) {
+		public PlantBossLeafLimb(EntityType<?> type, Level world) {
 			super(type, world, "PlantBoss_Leaf_Client", 4, 4f / 16f);
 			this.plant = null;
 		}
@@ -1126,15 +1126,15 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 		private float widthCache = 0;
 		private float heightCache = 0;
 		@Override
-		public AxisAlignedBB getBoundingBox() {
+		public AABB getBoundingBox() {
 			if (this.getBbWidth() != widthCache || this.getBbHeight() != heightCache) {
 				this.widthCache = getBbWidth();
 				this.heightCache = getBbHeight();
 				
 				// change BB to match pitch...
-				AxisAlignedBB bb = this.getBoundingBox();
+				AABB bb = this.getBoundingBox();
 				final double centerZ = (bb.minZ + bb.maxZ) / 2;
-				this.setBoundingBox(new AxisAlignedBB(
+				this.setBoundingBox(new AABB(
 						bb.minX, bb.minY, centerZ - 2,
 						bb.maxX, bb.maxY, centerZ + 2
 						));
@@ -1403,9 +1403,9 @@ public class PlantBossEntity extends MobEntity implements ILoreSupplier, IMultiP
 						double d2 = (pillar.getZ() + .5) - parent.getZ();
 						double d1 = (pillar.getY() + 1) - (parent.getY() + parent.getEyeHeight());
 						
-						double d3 = (double)MathHelper.sqrt(d0 * d0 + d2 * d2);
-						float f = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
-						float f1 = (float)(-(MathHelper.atan2(d1, d3) * (180D / Math.PI)));
+						double d3 = (double)Mth.sqrt(d0 * d0 + d2 * d2);
+						float f = (float)(Mth.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
+						float f1 = (float)(-(Mth.atan2(d1, d3) * (180D / Math.PI)));
 						parent.xRot = f1;
 						parent.yRot = f;
 					}

@@ -1,20 +1,20 @@
 package com.smanzana.nostrummagica.util;
 
-import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 
 public final class Curves {
 
-	private static Vector3d bezierInternal(float progress, Vector3d points[], int start, int end) {
+	private static Vec3 bezierInternal(float progress, Vec3 points[], int start, int end) {
 		// base case: 1 point, in which case we just return ourself
 		if (start == end) {
 			return points[start];
 		}
 		
 		// Blend between bezier of 1 fewer node lower and 1 more higher
-		Vector3d blendStart = bezierInternal(progress, points, start, end - 1);
-		Vector3d blendEnd = bezierInternal(progress, points, start + 1, end);
-		return new Vector3d(
+		Vec3 blendStart = bezierInternal(progress, points, start, end - 1);
+		Vec3 blendEnd = bezierInternal(progress, points, start + 1, end);
+		return new Vec3(
 				blendStart.x * (1 - progress) + blendEnd.x * progress,
 				blendStart.y * (1 - progress) + blendEnd.y * progress,
 				blendStart.z * (1 - progress) + blendEnd.z * progress
@@ -30,7 +30,7 @@ public final class Curves {
 	 * @param points
 	 * @return
 	 */
-	public static Vector3d bezier(float progress, Vector3d ... points) {
+	public static Vec3 bezier(float progress, Vec3 ... points) {
 		if (points == null || points.length < 2) {
 			throw new RuntimeException("Invalid number of points for bezier curve");
 		}
@@ -48,7 +48,7 @@ public final class Curves {
 	 * @param flip
 	 * @return
 	 */
-	public static Vector2f alignedArc2D(float progress, double radius, boolean flip) {
+	public static Vec2 alignedArc2D(float progress, double radius, boolean flip) {
 		double relX = Math.cos(progress * 2 * Math.PI);
 		double relY = Math.sin(progress * 2 * Math.PI);
 		
@@ -57,7 +57,7 @@ public final class Curves {
 			relX = relY;
 			relY = r;
 		}
-		return new Vector2f((float) (relX * radius), (float) (relY * radius));
+		return new Vec2((float) (relX * radius), (float) (relY * radius));
 	}
 	
 	/**
@@ -69,18 +69,18 @@ public final class Curves {
 	 * @param flip
 	 * @return
 	 */
-	public static Vector2f alignedArc2D(float progress, Vector2f start, double radius, boolean flip) {
+	public static Vec2 alignedArc2D(float progress, Vec2 start, double radius, boolean flip) {
 		// Find center that is 'radius' units less in X
 		double radiusX = flip ? -radius : radius;
-		Vector2f center = new Vector2f((float) (start.x - radiusX), start.y);
-		return new Vector2f(
+		Vec2 center = new Vec2((float) (start.x - radiusX), start.y);
+		return new Vec2(
 				center.x + (float) (Math.cos(progress * .5 * Math.PI) * radiusX),
 				center.y + (float) (Math.sin(progress * .5 * Math.PI) * radius));
 	}
 	
-	protected static double getMortarVerticalVelocity(Vector3d diff, double startHVelocity, double gravity) {
+	protected static double getMortarVerticalVelocity(Vec3 diff, double startHVelocity, double gravity) {
 		// Distance of a projectile is hVel * timeAirborn. Solve for how long we want to be airborn.
-		final double hDist = Vector3d.ZERO.distanceTo(new Vector3d(diff.x, 0, diff.z));
+		final double hDist = Vec3.ZERO.distanceTo(new Vec3(diff.x, 0, diff.z));
 		final double desiredTime = hDist / startHVelocity;
 		
 		// y at any time t is  y0 + v0 * t - (1/2) * g * (t^2)
@@ -104,55 +104,55 @@ public final class Curves {
 	 * @param gravity
 	 * @return
 	 */
-	public static Vector3d getMortarArcVelocity(Vector3d start, Vector3d end, double startHVelocity, double gravity) {
+	public static Vec3 getMortarArcVelocity(Vec3 start, Vec3 end, double startHVelocity, double gravity) {
 		// TODO have to adjust for tick time instead of continuous real time?
 		
 		if (gravity < 0) {
 			gravity = -gravity; // should be magnitude of pull down
 		}
 		
-		final Vector3d diff = end.subtract(start);
+		final Vec3 diff = end.subtract(start);
 		
 		final double vVel = getMortarVerticalVelocity(diff, startHVelocity, gravity);
 		
 		// Break hVel into x and z
-		return (new Vector3d(diff.x, 0, diff.z).normalize().scale(startHVelocity)).add(0, vVel, 0);
+		return (new Vec3(diff.x, 0, diff.z).normalize().scale(startHVelocity)).add(0, vVel, 0);
 	}
 	
-	public static Vector2f solveQuadraticEquation(float a, float b, float c) {
+	public static Vec2 solveQuadraticEquation(float a, float b, float c) {
 		// (-b +- sqrt(b^2 - 4ac))  /  2a
 		final double sqrt = Math.sqrt(Math.pow(b, 2) - (4 * a * c));
 		
 		final double pos = (-b + sqrt) / (2 *a);
 		final double neg = (-b - sqrt) / (2 *a);
-		return new Vector2f((float) pos, (float) neg);
+		return new Vec2((float) pos, (float) neg);
 	}
 	
 	public static interface ICurve3d {
-		public Vector3d getPosition(float progress);
+		public Vec3 getPosition(float progress);
 	}
 	
 	public static class Bezier implements ICurve3d {
-		public final Vector3d[] points;
-		public Bezier(Vector3d ...points) {
+		public final Vec3[] points;
+		public Bezier(Vec3 ...points) {
 			this.points = points;
 		}
 		
 		@Override
-		public Vector3d getPosition(float progress) {
+		public Vec3 getPosition(float progress) {
 			return Curves.bezier(progress, this.points);
 		}
 	}
 	
 	public static class Mortar implements ICurve3d {
 		public final double startHVelocity;
-		public final Vector3d diff;
+		public final Vec3 diff;
 		public final double gravity;
 		
 		private final double startingYVel;
 		private final double flightTime;
 		
-		public Mortar(double startHVelocity, Vector3d diff, double gravity) {
+		public Mortar(double startHVelocity, Vec3 diff, double gravity) {
 			super();
 			this.startHVelocity = startHVelocity;
 			this.diff = diff;
@@ -162,12 +162,12 @@ public final class Curves {
 			this.gravity = gravity;
 			this.startingYVel = getMortarVerticalVelocity(diff, startHVelocity, gravity);
 			
-			final double hDist = Vector3d.ZERO.distanceTo(new Vector3d(diff.x, 0, diff.z));
+			final double hDist = Vec3.ZERO.distanceTo(new Vec3(diff.x, 0, diff.z));
 			this.flightTime = hDist / startHVelocity;
 		}
 
 		@Override
-		public Vector3d getPosition(float progress) {
+		public Vec3 getPosition(float progress) {
 			// X and Z are easy as it's just linear interpolation based on progress.
 			final double x = this.diff.x() * progress;
 			final double z = this.diff.z() * progress;
@@ -175,7 +175,7 @@ public final class Curves {
 			// Y at any time t is  y0 + v0 * t - (1/2) * g * (t^2)
 			final double time = flightTime * progress;
 			final double y = 0 + (this.startingYVel * time) - (.5 * gravity * (time * time));
-			return new Vector3d(x, y, z);
+			return new Vec3(x, y, z);
 		}
 		
 	}
@@ -191,8 +191,8 @@ public final class Curves {
 		}
 
 		@Override
-		public Vector3d getPosition(float progress) {
-			return new Vector3d(
+		public Vec3 getPosition(float progress) {
+			return new Vec3(
 					Math.cos(Math.PI * 2 * progress) * radiusX,
 					0,
 					Math.sin(Math.PI * 2 * progress) * radiusZ

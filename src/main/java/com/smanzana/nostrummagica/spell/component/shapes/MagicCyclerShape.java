@@ -18,15 +18,15 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Lazy;
 
 /**
@@ -38,14 +38,14 @@ public class MagicCyclerShape extends SpellShape implements ISelectableShape {
 	
 	public static class MagicCyclerShapeInstance extends SpellShapeInstance implements ISpellProjectileShape {
 
-		private final World world;
-		private final Vector3d pos;
+		private final Level world;
+		private final Vec3 pos;
 		private final boolean hitEnts;
 		private final boolean hitBlocks;
 		private final float duration;
 		private final SpellCharacteristics characteristics;
 		
-		public MagicCyclerShapeInstance(ISpellState state, World world, Vector3d pos, boolean hitEnts, boolean hitBlocks, float duration, SpellCharacteristics characteristics) {
+		public MagicCyclerShapeInstance(ISpellState state, Level world, Vec3 pos, boolean hitEnts, boolean hitBlocks, float duration, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -90,7 +90,7 @@ public class MagicCyclerShape extends SpellShape implements ISelectableShape {
 		}
 
 		@Override
-		public void onProjectileEnd(Vector3d pos) {
+		public void onProjectileEnd(Vec3 pos) {
 			getState().triggerFail(new SpellLocation(world, pos));
 		}
 	}
@@ -161,7 +161,7 @@ public class MagicCyclerShape extends SpellShape implements ISelectableShape {
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
+	public boolean shouldTrace(Player player, SpellShapeProperties params) {
 		return false;
 	}
 	

@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.util;
 
-import net.minecraft.util.text.TextComponent;
+import net.minecraft.network.chat.BaseComponent;
 
 public interface IPrettyEnum {
-	public TextComponent getDisplayName();
+	public BaseComponent getDisplayName();
 }

@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelRepeatSwitchTrigger;
 import com.smanzana.nostrummagica.client.model.ModelSwitchTrigger;
@@ -13,14 +13,14 @@ import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity.SwitchHitType;
 import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity.SwitchTriggerType;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Vector3f;
+import net.minecraft.network.chat.Component;
 
 public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 
@@ -31,7 +31,7 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 	private ModelSwitchTrigger modelTimed;
 	private ModelSwitchTrigger modelRepeatable;
 	
-	public RenderSwitchTrigger(EntityRendererManager renderManagerIn) {
+	public RenderSwitchTrigger(EntityRenderDispatcher renderManagerIn) {
 		super(renderManagerIn);
 		this.modelOneTime = new ModelSwitchTrigger();
 		this.modelTimed = new ModelTimedSwitchTrigger();
@@ -51,7 +51,7 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 	}
 	
 	@Override
-	protected void renderNameTag(SwitchTriggerEntity entityIn, ITextComponent displayNameIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	protected void renderNameTag(SwitchTriggerEntity entityIn, Component displayNameIn, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		final String triggerInfo;
 		final String extraInfo;
 		SwitchBlockTileEntity te = entityIn.getLinkedTileEntity();
@@ -80,7 +80,7 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 		renderLivingLabel(entityIn, extraInfo, matrixStackIn, bufferIn, packedLightIn, 0);
 	}
 	
-	protected void renderLivingLabel(Entity entityIn, String label, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, float yOffset) {
+	protected void renderLivingLabel(Entity entityIn, String label, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, float yOffset) {
 		RenderFuncs.drawNameplate(matrixStackIn, bufferIn, entityIn, label, this.getFont(), packedLightIn, yOffset, this.entityRenderDispatcher.camera);
 	}
 	
@@ -108,7 +108,7 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 	}
 	
 	@Override
-	public void render(SwitchTriggerEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(SwitchTriggerEntity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		if (shouldRenderSwitch(entityIn)) {
 			final ModelSwitchTrigger model = getEntityModel(entityIn);
 			final SwitchBlockTileEntity te = entityIn.getLinkedTileEntity();
@@ -173,9 +173,9 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 			matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(spinAngle));
 			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(turnAngle)); // GlStateManager.rotated(angle, 1, 0, 1); WAS x and z?
 	
-			IVertexBuilder baseBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE);
+			VertexConsumer baseBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_BASE);
 			model.renderToBuffer(matrixStackIn, baseBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
-			IVertexBuilder cageBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_CAGE);
+			VertexConsumer cageBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_CAGE);
 			model.renderToBuffer(matrixStackIn, cageBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 			matrixStackIn.popPose();
 		}

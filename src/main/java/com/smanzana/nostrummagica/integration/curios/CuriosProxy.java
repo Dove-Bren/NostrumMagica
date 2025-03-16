@@ -21,13 +21,13 @@ import com.smanzana.nostrummagica.ritual.outcome.OutcomeModifyCenterItemGeneric;
 import com.smanzana.nostrummagica.ritual.outcome.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -252,7 +252,7 @@ public class CuriosProxy {
 		
 		//SetHasWingUpgrade
 		for (EMagicElement elem : new EMagicElement[] {EMagicElement.ICE, EMagicElement.WIND, EMagicElement.LIGHTNING}) {
-			ElementalArmor armor = ElementalArmor.get(elem, EquipmentSlotType.CHEST, ElementalArmor.Type.MASTER);
+			ElementalArmor armor = ElementalArmor.get(elem, EquipmentSlot.CHEST, ElementalArmor.Type.MASTER);
 			ItemStack upgradedStack = new ItemStack(armor);
 			ElementalArmor.SetHasWingUpgrade(upgradedStack, true);
 			
@@ -336,7 +336,7 @@ public class CuriosProxy {
 		registerCurioResearch();
 	}
 	
-	public CurioInventoryWrapper getCurios(PlayerEntity player) {
+	public CurioInventoryWrapper getCurios(Player player) {
 		if (!enabled) {
 			return null;
 		}

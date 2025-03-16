@@ -10,21 +10,21 @@ import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class ProgressionDoorTileEntity extends TileEntity {
+public class ProgressionDoorTileEntity extends BlockEntity {
 	
 	private Set<SpellComponentWrapper> requiredComponents;
 	private int requiredLevel;
@@ -68,7 +68,7 @@ public class ProgressionDoorTileEntity extends TileEntity {
 		return this.requiredTier;
 	}
 	
-	public boolean meetsRequirements(LivingEntity entity, List<ITextComponent> missingDepStrings) {
+	public boolean meetsRequirements(LivingEntity entity, List<Component> missingDepStrings) {
 		boolean meets = true;
 		
 		if (!entity.level.isClientSide) {
@@ -84,41 +84,41 @@ public class ProgressionDoorTileEntity extends TileEntity {
 			if (attr == null) {
 				meets = false;
 				if (missingDepStrings != null)
-					missingDepStrings.add(new TranslationTextComponent("info.door.missing.error"));
+					missingDepStrings.add(new TranslatableComponent("info.door.missing.error"));
 			} else if (this.requiredLevel > 0 && !attr.isUnlocked()) {
 				if (missingDepStrings != null)
-					missingDepStrings.add(new TranslationTextComponent("info.door.missing.unlock"));
+					missingDepStrings.add(new TranslatableComponent("info.door.missing.unlock"));
 				meets = false;
 			} else {
 				if (this.requiredLevel > 0 && attr.getLevel() < this.requiredLevel) {
 					if (missingDepStrings != null)
-						missingDepStrings.add(new TranslationTextComponent("info.door.missing.level", this.requiredLevel));
+						missingDepStrings.add(new TranslatableComponent("info.door.missing.level", this.requiredLevel));
 					meets = false;
 				}
 				if (this.requiredTier != EMagicTier.LOCKED && !attr.getTier().isGreaterOrEqual(this.requiredTier)) {
 					if (missingDepStrings != null)
-						missingDepStrings.add(new TranslationTextComponent("info.door.missing.tier", this.requiredTier.getName()));
+						missingDepStrings.add(new TranslatableComponent("info.door.missing.tier", this.requiredTier.getName()));
 					meets = false;
 				}
 				for (SpellComponentWrapper comp : this.requiredComponents) {
 					if (comp.isShape()) {
 						if (!attr.getShapes().contains(comp.getShape())) {
 							if (missingDepStrings != null)
-								missingDepStrings.add(new TranslationTextComponent("info.door.missing.shape", comp.getShape().getDisplayName()));
+								missingDepStrings.add(new TranslatableComponent("info.door.missing.shape", comp.getShape().getDisplayName()));
 							meets = false;
 						}
 					} else if (comp.isElement()) {
 						Boolean known = attr.getKnownElements().get(comp.getElement());
 						if (known == null || !known) {
 							if (missingDepStrings != null)
-								missingDepStrings.add(new TranslationTextComponent("info.door.missing.element", comp.getElement().getName()));
+								missingDepStrings.add(new TranslatableComponent("info.door.missing.element", comp.getElement().getName()));
 							meets = false;
 						}
 					} else if (comp.isAlteration()) {
 						Boolean known = attr.getAlterations().get(comp.getAlteration());
 						if (known == null || !known) {
 							if (missingDepStrings != null)
-								missingDepStrings.add(new TranslationTextComponent("info.door.missing.alteration", comp.getAlteration().getName()));
+								missingDepStrings.add(new TranslatableComponent("info.door.missing.alteration", comp.getAlteration().getName()));
 							meets = false;
 						}
 					}
@@ -134,14 +134,14 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	private static final String NBT_COMPS = "required_componenets";
 	
 	@Override
-	public void load(BlockState state, CompoundNBT compound) {
+	public void load(BlockState state, CompoundTag compound) {
 		super.load(state, compound);
 		
 		this.requiredLevel = compound.getInt(NBT_LEVEL);
 		this.requiredTier = EMagicTier.FromNBT(compound.get(NBT_TIER));
 		this.requiredComponents.clear();
 		
-		ListNBT list = compound.getList(NBT_COMPS, NBT.TAG_STRING);
+		ListTag list = compound.getList(NBT_COMPS, NBT.TAG_STRING);
 		int count = list.size();
 		for (int i = 0; i < count; i++) {
 			this.requiredComponents.add(SpellComponentWrapper.fromKeyString(list.getString(i)));
@@ -149,8 +149,8 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT compound) {
-		CompoundNBT nbt = super.save(compound);
+	public CompoundTag save(CompoundTag compound) {
+		CompoundTag nbt = super.save(compound);
 		
 		if (this.requiredLevel > 0)
 			nbt.putInt(NBT_LEVEL, this.requiredLevel);
@@ -158,9 +158,9 @@ public class ProgressionDoorTileEntity extends TileEntity {
 		nbt.put(NBT_TIER, this.requiredTier.toNBT());
 		
 		if (!this.requiredComponents.isEmpty()) {
-			ListNBT list = new ListNBT();
+			ListTag list = new ListTag();
 			for (SpellComponentWrapper comp : this.requiredComponents) {
-				list.add(StringNBT.valueOf(comp.getKeyString()));
+				list.add(StringTag.valueOf(comp.getKeyString()));
 			}
 			nbt.put(NBT_COMPS, list);
 		}
@@ -169,17 +169,17 @@ public class ProgressionDoorTileEntity extends TileEntity {
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}

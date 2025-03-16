@@ -5,23 +5,23 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.tile.EntityProxiedTileEntity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
-public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?>> extends MobEntity {
+public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?>> extends Mob {
 	
 	private BlockPos cachePos;
 	private E cacheEntity;
 	
-	protected TileProxyTriggerEntity(EntityType<? extends TileProxyTriggerEntity<E>> type, World worldIn) {
+	protected TileProxyTriggerEntity(EntityType<? extends TileProxyTriggerEntity<E>> type, Level worldIn) {
 		super(type, worldIn);
 		cachePos = null;
 		cacheEntity = null;
@@ -35,8 +35,8 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 		return false;
 	}
 	
-	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		return MobEntity.createMobAttributes()
+	public static final AttributeSupplier.Builder BuildAttributes() {
+		return Mob.createMobAttributes()
 				.add(Attributes.MAX_HEALTH, 1D);
 	}
 	
@@ -104,7 +104,7 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 		if (this.cachePos == null || this.cacheEntity == null || !checkPos.equals(cachePos) || cacheEntity.getTriggerEntity() != this) {
 			cacheEntity = null;
 			this.cachePos = checkPos.immutable();
-			TileEntity te = level.getBlockEntity(cachePos);
+			BlockEntity te = level.getBlockEntity(cachePos);
 			if (te != null && te instanceof EntityProxiedTileEntity) {
 				E ent = (E) te;
 				if (level.isClientSide || ent.getTriggerEntity() == this) {

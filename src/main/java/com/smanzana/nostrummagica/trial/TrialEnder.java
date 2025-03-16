@@ -4,10 +4,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.EntityTeleportEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class TrialEnder extends WorldTrial {
@@ -20,9 +20,9 @@ public class TrialEnder extends WorldTrial {
 	@SubscribeEvent
 	public void onTeleport(EntityTeleportEvent e) {
 		
-		if (e.getEntity() instanceof PlayerEntity) {
+		if (e.getEntity() instanceof Player) {
 
-			Vector3d pos = e.getEntity().position();
+			Vec3 pos = e.getEntity().position();
 			if (pos.distanceToSqr(e.getTargetX(), e.getTargetY(), e.getTargetZ())
 					< 10000)
 				return; // 100x100
@@ -34,7 +34,7 @@ public class TrialEnder extends WorldTrial {
 			if (!attr.hasTrial(this.element))
 				return;
 			
-			this.complete((PlayerEntity) e.getEntity());
+			this.complete((Player) e.getEntity());
 		}
 	}
 	

@@ -5,10 +5,10 @@ import java.util.function.Supplier;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.ReagentAndRuneTransfer;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client has toggled vacuum setting on their rune bag
@@ -19,7 +19,7 @@ public class QuickMoveBagMessage {
 
 	public static void handle(QuickMoveBagMessage message, Supplier<NetworkEvent.Context> ctx) {
 		// Is it on?
-		ServerPlayerEntity sp = ctx.get().getSender();
+		ServerPlayer sp = ctx.get().getSender();
 		ctx.get().setPacketHandled(true);
 		ctx.get().enqueueWork(()-> {
 			if (sp.containerMenu == null || sp.containerMenu.containerId != message.containerID) {
@@ -38,14 +38,14 @@ public class QuickMoveBagMessage {
 		this.containerID = containerID;
 	}
 	
-	public QuickMoveBagMessage(Container container) {
+	public QuickMoveBagMessage(AbstractContainerMenu container) {
 		this(container.containerId);
 	}
-	public static QuickMoveBagMessage decode(PacketBuffer buf) {
+	public static QuickMoveBagMessage decode(FriendlyByteBuf buf) {
 		return new QuickMoveBagMessage(buf.readVarInt());
 	}
 
-	public static void encode(QuickMoveBagMessage msg, PacketBuffer buf) {
+	public static void encode(QuickMoveBagMessage msg, FriendlyByteBuf buf) {
 		buf.writeVarInt(msg.containerID);
 	}
 

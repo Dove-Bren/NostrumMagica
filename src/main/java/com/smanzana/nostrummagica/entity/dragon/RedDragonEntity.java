@@ -35,41 +35,41 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.util.SpellUtils;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.HurtByTargetGoal;
-import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
-import net.minecraft.entity.merchant.villager.VillagerEntity;
-import net.minecraft.entity.monster.GiantEntity;
-import net.minecraft.entity.monster.ZombieEntity;
-import net.minecraft.entity.passive.CowEntity;
-import net.minecraft.entity.passive.PigEntity;
-import net.minecraft.entity.passive.PolarBearEntity;
-import net.minecraft.entity.passive.SheepEntity;
-import net.minecraft.entity.passive.horse.HorseEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.BossInfo;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerBossInfo;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.monster.Giant;
+import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.animal.Cow;
+import net.minecraft.world.entity.animal.Pig;
+import net.minecraft.world.entity.animal.PolarBear;
+import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.BossEvent;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerBossEvent;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEntity, IElementalEntity, ILoreSupplier {
 
 	public static enum DragonBodyPartType {
-		BODY("body", 2.5f, 3f, Vector3d.ZERO),
-		REAR("rear", 2.5f, 3, new Vector3d(0, 0, -2.5f)),
-		HEAD("head", .5f, 2f, new Vector3d(0, 3.0, 1.5f)),
+		BODY("body", 2.5f, 3f, Vec3.ZERO),
+		REAR("rear", 2.5f, 3, new Vec3(0, 0, -2.5f)),
+		HEAD("head", .5f, 2f, new Vec3(0, 3.0, 1.5f)),
 		//TAIL("tail", .5f, .5f, new Vector3d(0, 0, 3.0)),
 		//WING_LEFT("wing_left", 1f, 1f, new Vector3d(-2, 0, 1.0)),
 		//WING_RIGHT("wing_right", 2f, .5f, new Vector3d(2, 0, 1.0)),
@@ -78,9 +78,9 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		private final String name;
 		private final float width;
 		private final float height;
-		private final Vector3d offset;
+		private final Vec3 offset;
 		
-		private DragonBodyPartType(String name, float width, float height, Vector3d offset) {
+		private DragonBodyPartType(String name, float width, float height, Vec3 offset) {
 			this.name = name;
 			this.width = width;
 			this.height = height;
@@ -100,7 +100,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 			return height;
 		}
 		
-		public Vector3d getPartOffset() {
+		public Vec3 getPartOffset() {
 			return offset;
 		}
 	}
@@ -113,8 +113,8 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	
 	public static final String ID = "entity_dragon_red";
 	
-	private static final DataParameter<Integer> DRAGON_PHASE =
-			EntityDataManager.<Integer>defineId(RedDragonEntity.class, DataSerializers.INT);
+	private static final EntityDataAccessor<Integer> DRAGON_PHASE =
+			SynchedEntityData.<Integer>defineId(RedDragonEntity.class, EntityDataSerializers.INT);
 	
 	private static final String DRAGON_SERIAL_PHASE_TOK = "DragonPhase";
 
@@ -172,7 +172,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		}
 	}
 	
-	private final ServerBossInfo bossInfo = (ServerBossInfo)(new ServerBossInfo(this.getDisplayName(), BossInfo.Color.RED, BossInfo.Overlay.NOTCHED_10)).setDarkenScreen(true);
+	private final ServerBossEvent bossInfo = (ServerBossEvent)(new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.NOTCHED_10)).setDarkenScreen(true);
 	
 	// AI. First array is indexed by the phase. Second is just a collection of tasks.
 	private Goal[][] flyingAI;
@@ -186,7 +186,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	
 	private Map<DragonBodyPartType, DragonBodyPart> bodyParts;
 	
-	public RedDragonEntity(EntityType<? extends RedDragonEntity> type, World worldIn) {
+	public RedDragonEntity(EntityType<? extends RedDragonEntity> type, Level worldIn) {
 		super(type, worldIn);
 		this.maxUpStep = 2;
 		this.noCulling = true;
@@ -234,7 +234,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	}
 	
 	@Override
-	public void onSyncedDataUpdated(DataParameter<?> key) {
+	public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
 		super.onSyncedDataUpdated(key);
 		if (key == DRAGON_PHASE) {
 			onPhaseChange();
@@ -280,14 +280,14 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
         	new Goal[] {
     			shadowAttack,
         		new DragonMeleeAttackGoal(this, 1.0D, true),
-        		new WaterAvoidingRandomWalkingGoal(this, 1.0D, 30)
+        		new WaterAvoidingRandomStrollGoal(this, 1.0D, 30)
         	},
         	new Goal[] {
     			shadowAttack,
         		new DragonSpellAttackTask(this, (5 * 5), 20, true, null, DRAGON_CAST_TIME, DSPELL_Fireball),
         		new DragonTakeoffLandGoal(this),
     			new DragonMeleeAttackGoal(this, 1.0D, true),
-        		new WaterAvoidingRandomWalkingGoal(this, 1.0D, 30)
+        		new WaterAvoidingRandomStrollGoal(this, 1.0D, 30)
         	},
         	new Goal[] {
     			shadowAttack,
@@ -297,7 +297,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 				new DragonSpellAttackTask(this, (5 * 12), 10, false, null, DRAGON_CAST_TIME, DSPELL_Speed, DSPELL_Shield),
 				new DragonSpellAttackTask(this, (5 * 10), 20, false, null, DRAGON_CAST_TIME, DSPELL_Weaken),
 				new DragonSpellAttackTask(this, (5 * 45), 20, true, null, DRAGON_CAST_TIME, DSPELL_Curse),
-        		new WaterAvoidingRandomWalkingGoal(this, 1.0D, 30)
+        		new WaterAvoidingRandomStrollGoal(this, 1.0D, 30)
         	}
         		
         };
@@ -306,15 +306,15 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 //		this.goalSelector.addGoal(4, new WaterAvoidingRandomWalkingGoal(this, 1.0D, 30));
         this.targetSelector.addGoal(1, aggroTable);
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
-		this.targetSelector.addGoal(3, new DragonNearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, true));
-		this.targetSelector.addGoal(4, new DragonNearestAttackableTargetGoal<ZombieEntity>(this, ZombieEntity.class, true));
-		this.targetSelector.addGoal(5, new DragonNearestAttackableTargetGoal<SheepEntity>(this, SheepEntity.class, true));
-		this.targetSelector.addGoal(6, new DragonNearestAttackableTargetGoal<CowEntity>(this, CowEntity.class, true));
-		this.targetSelector.addGoal(7, new DragonNearestAttackableTargetGoal<PigEntity>(this, PigEntity.class, true));
-		this.targetSelector.addGoal(8, new DragonNearestAttackableTargetGoal<VillagerEntity>(this, VillagerEntity.class, true));
-		this.targetSelector.addGoal(9, new DragonNearestAttackableTargetGoal<HorseEntity>(this, HorseEntity.class, true));
-		this.targetSelector.addGoal(10, new DragonNearestAttackableTargetGoal<GiantEntity>(this, GiantEntity.class, true));
-		this.targetSelector.addGoal(11, new DragonNearestAttackableTargetGoal<PolarBearEntity>(this, PolarBearEntity.class, true));
+		this.targetSelector.addGoal(3, new DragonNearestAttackableTargetGoal<Player>(this, Player.class, true));
+		this.targetSelector.addGoal(4, new DragonNearestAttackableTargetGoal<Zombie>(this, Zombie.class, true));
+		this.targetSelector.addGoal(5, new DragonNearestAttackableTargetGoal<Sheep>(this, Sheep.class, true));
+		this.targetSelector.addGoal(6, new DragonNearestAttackableTargetGoal<Cow>(this, Cow.class, true));
+		this.targetSelector.addGoal(7, new DragonNearestAttackableTargetGoal<Pig>(this, Pig.class, true));
+		this.targetSelector.addGoal(8, new DragonNearestAttackableTargetGoal<Villager>(this, Villager.class, true));
+		this.targetSelector.addGoal(9, new DragonNearestAttackableTargetGoal<Horse>(this, Horse.class, true));
+		this.targetSelector.addGoal(10, new DragonNearestAttackableTargetGoal<Giant>(this, Giant.class, true));
+		this.targetSelector.addGoal(11, new DragonNearestAttackableTargetGoal<PolarBear>(this, PolarBear.class, true));
 	}
 	
 	@Override
@@ -368,7 +368,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		}
 	}
 	
-	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
+	public static final AttributeSupplier.Builder BuildAttributes() {
 		return RedDragonBaseEntity.BuildBaseRedDragonAttributes()
 	        .add(Attributes.MOVEMENT_SPEED, 0.33D)
 	        .add(Attributes.FLYING_SPEED, 3D)
@@ -414,7 +414,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		return false;
 	}
 	
-	public void readAdditionalSaveData(CompoundNBT compound) {
+	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 
 		if (compound.contains(DRAGON_SERIAL_PHASE_TOK, NBT.TAG_ANY_NUMERIC)) {
@@ -427,7 +427,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		}
 	}
 	
-	public void addAdditionalSaveData(CompoundNBT compound) {
+	public void addAdditionalSaveData(CompoundTag compound) {
     	super.addAdditionalSaveData(compound);
     	compound.putByte(DRAGON_SERIAL_PHASE_TOK, (byte)this.getPhase().ordinal());
 	}
@@ -442,7 +442,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 				continue; // Client, and hasn't attached yet?
 			}
 			
-			Vector3d offset = type.getPartOffset();
+			Vec3 offset = type.getPartOffset();
 			part.moveTo(
 					this.getX() + (Math.cos(rotRad) * offset.x) + (Math.sin(rotRad) * offset.z),
 					this.getY() + offset.y,
@@ -507,12 +507,12 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		this.bossInfo.setPercent(this.getHealth() / this.getMaxHealth());
 	}
 	
-	public void startSeenByPlayer(ServerPlayerEntity player) {
+	public void startSeenByPlayer(ServerPlayer player) {
 		super.startSeenByPlayer(player);
 		this.bossInfo.addPlayer(player);
 	}
 
-	public void stopSeenByPlayer(ServerPlayerEntity player) {
+	public void stopSeenByPlayer(ServerPlayer player) {
 		super.stopSeenByPlayer(player);
 		this.bossInfo.removePlayer(player);
 	}
@@ -594,7 +594,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	}
 
 	@Override
-	public World getWorld() {
+	public Level getWorld() {
 		return this.level;
 	}
 	
@@ -646,7 +646,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		
 		public static final String ID = RedDragonEntity.ID + ".body_part";
 		
-		protected static final DataParameter<DragonBodyPartType> TYPE = EntityDataManager.defineId(DragonBodyPart.class, RedDragonBodyPartTypeSerializer.instance);
+		protected static final EntityDataAccessor<DragonBodyPartType> TYPE = SynchedEntityData.defineId(DragonBodyPart.class, RedDragonBodyPartTypeSerializer.instance);
 		protected @Nullable RedDragonEntity parent;
 		
 		public DragonBodyPart(DragonBodyPartType type, RedDragonEntity parent) {
@@ -655,7 +655,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 			this.parent = parent;
 		}
 		
-		public DragonBodyPart(EntityType<? extends DragonBodyPart> type, World world) {
+		public DragonBodyPart(EntityType<? extends DragonBodyPart> type, Level world) {
 			super(type, world, "DragonPart_Client", 2, 2);
 		}
 		
@@ -674,12 +674,12 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		}
 		
 		@Override
-		protected void readAdditionalSaveData(CompoundNBT compound) {
+		protected void readAdditionalSaveData(CompoundTag compound) {
 			super.readAdditionalSaveData(compound);
 		}
 
 		@Override
-		protected void addAdditionalSaveData(CompoundNBT compound) {
+		protected void addAdditionalSaveData(CompoundTag compound) {
 			super.addAdditionalSaveData(compound);
 		}
 	}

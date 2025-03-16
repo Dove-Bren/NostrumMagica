@@ -4,11 +4,11 @@ import java.util.Optional;
 
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.IDataSerializer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializer;
 
-public class OptionalMagicElementDataSerializer implements IDataSerializer<Optional<EMagicElement>> {
+public class OptionalMagicElementDataSerializer implements EntityDataSerializer<Optional<EMagicElement>> {
 
 	public static final OptionalMagicElementDataSerializer instance = new OptionalMagicElementDataSerializer();
 	
@@ -17,7 +17,7 @@ public class OptionalMagicElementDataSerializer implements IDataSerializer<Optio
 	}
 	
 	@Override
-	public void write(PacketBuffer buf, Optional<EMagicElement> value) {
+	public void write(FriendlyByteBuf buf, Optional<EMagicElement> value) {
 		buf.writeBoolean(value.isPresent());
 		if (value.isPresent()) {
 			buf.writeEnum(value.get());
@@ -25,7 +25,7 @@ public class OptionalMagicElementDataSerializer implements IDataSerializer<Optio
 	}
 
 	@Override
-	public Optional<EMagicElement> read(PacketBuffer buf)  {
+	public Optional<EMagicElement> read(FriendlyByteBuf buf)  {
 		if (buf.readBoolean()) {
 			return Optional.of(buf.readEnum(EMagicElement.class));
 		} else {
@@ -34,8 +34,8 @@ public class OptionalMagicElementDataSerializer implements IDataSerializer<Optio
 	}
 
 	@Override
-	public DataParameter<Optional<EMagicElement>> createAccessor(int id) {
-		return new DataParameter<>(id, this);
+	public EntityDataAccessor<Optional<EMagicElement>> createAccessor(int id) {
+		return new EntityDataAccessor<>(id, this);
 	}
 
 	@Override

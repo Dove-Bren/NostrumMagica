@@ -9,30 +9,30 @@ import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.tile.TeleportRuneTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.pathfinding.PathType;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -51,29 +51,29 @@ public class TeleportRuneBlock extends Block  {
 	}
 	
 	@Override
-	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, BlockGetter worldIn, BlockPos pos, PathComputationType type) {
         return true;
     }
 	
 	@Override
-	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		return VoxelShapes.empty();
+	public VoxelShape getCollisionShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		return Shapes.empty();
 		//return super.getCollisionBoundingBox(blockState, worldIn, pos);
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return RUNE_AABB;
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public BlockRenderType getRenderShape(BlockState state) {
-		return BlockRenderType.MODEL;
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.MODEL;
 	}
 	
 	@Override
-	public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+	public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 		super.setPlacedBy(worldIn, pos, state, placer, stack);
 	}
 	
@@ -81,19 +81,19 @@ public class TeleportRuneBlock extends Block  {
 	
 	
 	@Override
-	public void entityInside(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
+	public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn) {
 		;
 	}
 	
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (worldIn.isClientSide) {
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
-		TileEntity te = worldIn.getBlockEntity(pos);
+		BlockEntity te = worldIn.getBlockEntity(pos);
 		if (te == null || !(te instanceof TeleportRuneTileEntity)) {
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		TeleportRuneTileEntity ent = (TeleportRuneTileEntity) te;
 		
@@ -103,25 +103,25 @@ public class TeleportRuneBlock extends Block  {
 			if (!worldIn.isClientSide) {
 				ent.doTeleport(playerIn);
 			}
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
 		BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
 		if (heldPos == null) {
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
 		if (!playerIn.isCreative()) {
 			// 1) has to be another teleport rune there, and 2) has to be within X blocks
 			if (!NostrumMagica.isBlockLoaded(worldIn, heldPos)) {
-				playerIn.sendMessage(new TranslationTextComponent("info.teleportrune.unloaded"), Util.NIL_UUID);
-				return ActionResultType.SUCCESS;
+				playerIn.sendMessage(new TranslatableComponent("info.teleportrune.unloaded"), Util.NIL_UUID);
+				return InteractionResult.SUCCESS;
 			}
 			
 			BlockState targetState = worldIn.getBlockState(heldPos);
 			if (targetState == null || !(targetState.getBlock() instanceof TeleportRuneBlock)) {
-				playerIn.sendMessage(new TranslationTextComponent("info.teleportrune.norune"), Util.NIL_UUID);
-				return ActionResultType.SUCCESS;
+				playerIn.sendMessage(new TranslatableComponent("info.teleportrune.norune"), Util.NIL_UUID);
+				return InteractionResult.SUCCESS;
 			}
 			
 			int dist = Math.abs(heldPos.getX() - pos.getX())
@@ -130,7 +130,7 @@ public class TeleportRuneBlock extends Block  {
 			
 			boolean hasEnderBelt = false;
 			// Look for lightning belt
-			IInventory baubles = NostrumMagica.instance.curios.getCurios(playerIn);
+			Container baubles = NostrumMagica.instance.curios.getCurios(playerIn);
 			if (baubles != null) {
 				for (int i = 0; i < baubles.getContainerSize(); i++) {
 					ItemStack stack = baubles.getItem(i);
@@ -146,8 +146,8 @@ public class TeleportRuneBlock extends Block  {
 			final double range = TELEPORT_RANGE * (hasEnderBelt ? 2 : 1) * (hasEnderSet ? 2 : 1);
 			
 			if (dist > range) {
-				playerIn.sendMessage(new TranslationTextComponent("info.teleportrune.toofar"), Util.NIL_UUID);
-				return ActionResultType.SUCCESS;
+				playerIn.sendMessage(new TranslatableComponent("info.teleportrune.toofar"), Util.NIL_UUID);
+				return InteractionResult.SUCCESS;
 			}
 		}
 		
@@ -159,13 +159,13 @@ public class TeleportRuneBlock extends Block  {
 		}
 		
 		ent.setTargetPosition(heldPos);
-		playerIn.sendMessage(new TranslationTextComponent("info.generic.block_linked"), Util.NIL_UUID);
+		playerIn.sendMessage(new TranslatableComponent("info.generic.block_linked"), Util.NIL_UUID);
 		
 		// If creative, can target tele tiles that are pointing to other ones. But, if it's not pointing anywhere, we'll conveniently hook them up.
 		// Non-creative placement forces them to be linked to eachother, though.
 		boolean shouldLink = true;
 		if (playerIn.isCreative()) {
-			TileEntity otherTE = worldIn.getBlockEntity(heldPos);
+			BlockEntity otherTE = worldIn.getBlockEntity(heldPos);
 			if (otherTE != null && otherTE instanceof TeleportRuneTileEntity) {
 				TeleportRuneTileEntity otherEnt = (TeleportRuneTileEntity) otherTE;
 				shouldLink = (otherEnt.getOffset() == null);
@@ -174,7 +174,7 @@ public class TeleportRuneBlock extends Block  {
 		
 		if (shouldLink) {
 			BlockPos oldOffset = null;
-			TileEntity otherTE = worldIn.getBlockEntity(heldPos);
+			BlockEntity otherTE = worldIn.getBlockEntity(heldPos);
 			if (otherTE != null && otherTE instanceof TeleportRuneTileEntity) {
 				TeleportRuneTileEntity otherEnt = (TeleportRuneTileEntity) otherTE;
 				oldOffset = otherEnt.getOffset();
@@ -191,7 +191,7 @@ public class TeleportRuneBlock extends Block  {
 			}
 		}
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override
@@ -200,14 +200,14 @@ public class TeleportRuneBlock extends Block  {
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		return new TeleportRuneTileEntity();
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
-		TileEntity te = worldIn.getBlockEntity(pos);
+	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
+		BlockEntity te = worldIn.getBlockEntity(pos);
 		if (te == null || !(te instanceof TeleportRuneTileEntity)) {
 			return;
 		}

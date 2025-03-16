@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.equipment.RuneBag;
@@ -16,17 +16,17 @@ import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.ClickType;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.client.gui.GuiUtils;
@@ -46,7 +46,7 @@ public class RuneBagGui {
 	private static final int BUTTON_VOFFSET = 4;
 	private static final int BUTTON_TEXT_VOFFSET = 175;
 	
-	public static class BagContainer extends Container {
+	public static class BagContainer extends AbstractContainerMenu {
 		
 		public static final String ID = "rune_bag";
 		
@@ -57,7 +57,7 @@ public class RuneBagGui {
 		
 		private int bagIDStart;
 		
-		public BagContainer(int windowId, PlayerInventory playerInv, RuneBag bag, @Nonnull ItemStack stack, int bagPos) {
+		public BagContainer(int windowId, Inventory playerInv, RuneBag bag, @Nonnull ItemStack stack, int bagPos) {
 			super(NostrumContainers.RuneBag, windowId);
 			this.stack = stack;
 			this.inventory = bag.asInventory(stack);
@@ -90,7 +90,7 @@ public class RuneBagGui {
 			}
 		}
 		
-		public static final BagContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+		public static final BagContainer FromNetwork(int windowId, Inventory playerInv, FriendlyByteBuf buffer) {
 			final int slot = buffer.readVarInt();
 			ItemStack stack = playerInv.getItem(slot);
 			if (stack.isEmpty() || !(stack.getItem() instanceof RuneBag)) {
@@ -112,10 +112,10 @@ public class RuneBagGui {
 		}
 		
 		@Override
-		public ItemStack quickMoveStack(PlayerEntity playerIn, int fromSlot) {
+		public ItemStack quickMoveStack(Player playerIn, int fromSlot) {
 			ItemStack prev = ItemStack.EMPTY;	
 			Slot slot = (Slot) this.slots.get(fromSlot);
-			IInventory inv = slot.container;
+			Container inv = slot.container;
 			
 			if (slot.hasItem()) {
 				ItemStack stack = slot.getItem();
@@ -169,12 +169,12 @@ public class RuneBagGui {
 		}
 		
 		@Override
-		public boolean stillValid(PlayerEntity playerIn) {
+		public boolean stillValid(Player playerIn) {
 			return true;
 		}
 		
 		@Override
-		public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+		public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
 			if (slotId < bagIDStart) {
 				if (slotId == bagPos) {
 					return ItemStack.EMPTY;
@@ -182,7 +182,7 @@ public class RuneBagGui {
 			}
 			
 			ItemStack itemstack = ItemStack.EMPTY;
-			PlayerInventory inventoryplayer = player.inventory;
+			Inventory inventoryplayer = player.inventory;
 
 			if (clickTypeIn == ClickType.PICKUP && (dragType == 0 || dragType == 1)
 					&& slotId >= 0 && !inventoryplayer.getCarried().isEmpty()) {
@@ -293,7 +293,7 @@ public class RuneBagGui {
 
 		private BagContainer bag;
 		
-		public BagGui(BagContainer bag, PlayerInventory playerIn, ITextComponent name) {
+		public BagGui(BagContainer bag, Inventory playerIn, Component name) {
 			super(bag, playerIn, name);
 			this.bag = bag;
 			this.imageWidth = GUI_WIDTH;
@@ -301,7 +301,7 @@ public class RuneBagGui {
 		}
 		
 		@Override
-		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+		protected void renderBg(PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
@@ -328,13 +328,13 @@ public class RuneBagGui {
 			
 			if (mouseX >= left && mouseX <= left + BUTTON_WIDTH && 
 					mouseY >= top && mouseY <= top + BUTTON_WIDTH) {
-				GuiUtils.drawHoveringText(matrixStackIn, Lists.newArrayList(new StringTextComponent(RuneBag.isVacuumEnabled(bag.stack) ? "Disable Vacuum" : "Enable Vacuum")),
+				GuiUtils.drawHoveringText(matrixStackIn, Lists.newArrayList(new TextComponent(RuneBag.isVacuumEnabled(bag.stack) ? "Disable Vacuum" : "Enable Vacuum")),
 						mouseX, mouseY, width, height, 200, this.font);
 			}
 		}
 		
 		@Override
-		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			// no labels
 			//super.drawGuiContainerForegroundLayer(matrixStackIn, mouseX, mouseY);
 		}

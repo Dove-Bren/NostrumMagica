@@ -1,12 +1,12 @@
 package com.smanzana.nostrummagica.block;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public interface IPortalBlock {
 
-	public boolean attemptTeleport(World world, BlockPos portalPos, BlockState worldBlock, Entity entity);
+	public boolean attemptTeleport(Level world, BlockPos portalPos, BlockState worldBlock, Entity entity);
 
 }

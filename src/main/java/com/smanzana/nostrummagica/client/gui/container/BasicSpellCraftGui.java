@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCreationContainer;
@@ -24,20 +24,20 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 public class BasicSpellCraftGui {
 	
@@ -72,14 +72,14 @@ public class BasicSpellCraftGui {
 		protected @Nullable SimpleInventoryContainerlet extraInventory;
 		
 		public BasicSpellCraftContainer(int windowId,
-				PlayerEntity crafter, PlayerInventory playerInv, ISpellCraftingInventory tableInventory,
-				BlockPos tablePos, @Nullable IInventory extraInventory) {
+				Player crafter, Inventory playerInv, ISpellCraftingInventory tableInventory,
+				BlockPos tablePos, @Nullable Container extraInventory) {
 			this(NostrumContainers.SpellCreationBasic, windowId, crafter, playerInv, tableInventory, tablePos, extraInventory);
 		}
 
-		protected BasicSpellCraftContainer(ContainerType<? extends SpellCreationContainer> type, int windowId,
-				PlayerEntity crafter, PlayerInventory playerInv, ISpellCraftingInventory tableInventory,
-				BlockPos tablePos, @Nullable IInventory extraInventory) {
+		protected BasicSpellCraftContainer(MenuType<? extends SpellCreationContainer> type, int windowId,
+				Player crafter, Inventory playerInv, ISpellCraftingInventory tableInventory,
+				BlockPos tablePos, @Nullable Container extraInventory) {
 			super(type, windowId, crafter, playerInv, tableInventory, tablePos);
 			
 			this.name = "";
@@ -118,15 +118,15 @@ public class BasicSpellCraftGui {
 			if (extraInventory != null) {
 				this.extraInventory = new SimpleInventoryContainerlet(this::addSlot, extraInventory, HideableSlot::new,
 						POS_CONTAINER_WIDTH, POS_INFOPANEL_VOFFSET + POS_INFOPANEL_HEIGHT, POS_INFOPANEL_WIDTH, POS_CONTAINER_HEIGHT - (POS_INFOPANEL_VOFFSET + POS_INFOPANEL_HEIGHT),
-						new StringTextComponent("Rune Library"));
+						new TextComponent("Rune Library"));
 			}
 			
 		}
 		
-		public static BasicSpellCraftContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+		public static BasicSpellCraftContainer FromNetwork(int windowId, Inventory playerInv, FriendlyByteBuf buffer) {
 			final BasicSpellTableTileEntity te = ContainerUtil.GetPackedTE(buffer);
 			final ISpellCraftingInventory tableInv = te.getSpellCraftingInventory();
-			final @Nullable IInventory extraInv = te.getExtraInventory();
+			final @Nullable Container extraInv = te.getExtraInventory();
 			return new BasicSpellCraftContainer(windowId, playerInv.player, playerInv, tableInv, te.getBlockPos(), extraInv);
 		}
 		
@@ -200,16 +200,16 @@ public class BasicSpellCraftGui {
 		private static final int POS_WEIGHTBAR_WIDTH = 50;
 		private static final int POS_WEIGHTBAR_HEIGHT = 16;
 		
-		protected TextFieldWidget nameField;
+		protected EditBox nameField;
 		protected @Nullable SimpleInventoryWidget extraInventoryWidget;
 		protected @Nullable SpellPartBar partBarWidget;
 		protected @Nullable InfoPanel infoPanelWidget;
-		protected List<Rectangle2d> extraAreas;
+		protected List<Rect2i> extraAreas;
 		
-		private Vector3i[] runeSlots;
-		private Vector3i[] spacerSpots;
+		private Vec3i[] runeSlots;
+		private Vec3i[] spacerSpots;
 		
-		public BasicSpellCraftGuiContainer(BasicSpellCraftContainer container, PlayerInventory playerInv, ITextComponent name) {
+		public BasicSpellCraftGuiContainer(BasicSpellCraftContainer container, Inventory playerInv, Component name) {
 			super(container, playerInv, name);
 			
 			this.imageWidth = POS_CONTAINER_WIDTH;
@@ -218,12 +218,12 @@ public class BasicSpellCraftGui {
 			final int runeSlotCount = getMenu().inventory.getRuneSlotCount();
 			final int totalWidth = (runeSlotCount * POS_SLOT_RUNES_WIDTH) + ((runeSlotCount - 1) * POS_SLOT_RUNES_SPACER_WIDTH);
 			final int runeSlotXOffset = (POS_CONTAINER_WIDTH - totalWidth) / 2;
-			this.runeSlots = new Vector3i[runeSlotCount];
-			this.spacerSpots = new Vector3i[Math.max(0, runeSlotCount-1)];
+			this.runeSlots = new Vec3i[runeSlotCount];
+			this.spacerSpots = new Vec3i[Math.max(0, runeSlotCount-1)];
 			for (int i = 0; i < runeSlotCount; i++) {
-				runeSlots[i] = new Vector3i(-1 + runeSlotXOffset + (i * POS_SLOT_RUNES_WIDTH) + (i * POS_SLOT_RUNES_SPACER_WIDTH), -1 + POS_SLOT_RUNES_VOFFSET, i);
+				runeSlots[i] = new Vec3i(-1 + runeSlotXOffset + (i * POS_SLOT_RUNES_WIDTH) + (i * POS_SLOT_RUNES_SPACER_WIDTH), -1 + POS_SLOT_RUNES_VOFFSET, i);
 				if (i > 0) {
-					spacerSpots[i-1] = new Vector3i(runeSlotXOffset + (i * POS_SLOT_RUNES_WIDTH) + ((i-1) * POS_SLOT_RUNES_SPACER_WIDTH), POS_SLOT_RUNES_VOFFSET, i-1);
+					spacerSpots[i-1] = new Vec3i(runeSlotXOffset + (i * POS_SLOT_RUNES_WIDTH) + ((i-1) * POS_SLOT_RUNES_SPACER_WIDTH), POS_SLOT_RUNES_VOFFSET, i-1);
 				}
 			}
 		}
@@ -237,7 +237,7 @@ public class BasicSpellCraftGui {
 			final int verticalMargin = (height - imageHeight) / 2;
 			
 			// Name input field
-			this.nameField = new TextFieldWidget(mc.font, horizontalMargin + POS_NAME_HOFFSET, verticalMargin + POS_NAME_VOFFSET, POS_NAME_WIDTH, POS_NAME_HEIGHT, StringTextComponent.EMPTY);
+			this.nameField = new EditBox(mc.font, horizontalMargin + POS_NAME_HOFFSET, verticalMargin + POS_NAME_VOFFSET, POS_NAME_WIDTH, POS_NAME_HEIGHT, TextComponent.EMPTY);
 			this.nameField.setMaxLength(SpellCreationGui.MaxNameLength);
 			this.nameField.setResponder((s) -> {
 				getMenu().name = s;
@@ -258,7 +258,7 @@ public class BasicSpellCraftGui {
 			extraMargin += (spaceWidth % POS_ICON_BUTTON_WIDTH) / 2; // Center by adding remainder / 2
 			
 			extraAreas = new ArrayList<>(2);
-			extraAreas.add(new Rectangle2d(extraMargin, verticalMargin, horizontalMargin - extraMargin, ((SpellIcon.numIcons / perRow) + 1) * POS_ICON_BUTTON_HEIGHT));
+			extraAreas.add(new Rect2i(extraMargin, verticalMargin, horizontalMargin - extraMargin, ((SpellIcon.numIcons / perRow) + 1) * POS_ICON_BUTTON_HEIGHT));
 			for (int i = 0; i < SpellIcon.numIcons; i++) {
 				SpellIconButton button = new SpellIconButton(
 						extraMargin + (i % perRow) * POS_ICON_BUTTON_WIDTH,
@@ -276,7 +276,7 @@ public class BasicSpellCraftGui {
 				infoPanelWidget = new InfoPanel(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT);
 				infoPanelWidget.setContent(this::renderSpellPanel);
 				this.addButton(infoPanelWidget);
-				extraAreas.add(new Rectangle2d(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT));
+				extraAreas.add(new Rect2i(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT));
 				{
 					// Weight status
 					infoPanelWidget.addChild(new WeightStatus(this,
@@ -296,13 +296,13 @@ public class BasicSpellCraftGui {
 				final SimpleInventoryContainerlet extraContainer = this.getMenu().extraInventory;
 				this.extraInventoryWidget = new SimpleInventoryWidget(this, extraContainer);
 				this.addButton(this.extraInventoryWidget);
-				extraAreas.add(new Rectangle2d(horizontalMargin + extraContainer.x, verticalMargin + this.getMenu().extraInventory.y, this.getMenu().extraInventory.width, this.getMenu().extraInventory.height));
+				extraAreas.add(new Rect2i(horizontalMargin + extraContainer.x, verticalMargin + this.getMenu().extraInventory.y, this.getMenu().extraInventory.width, this.getMenu().extraInventory.height));
 			}
 			
 			if (infoPanelWidget != null) {
-				Vector3i[] belowSlots = new Vector3i[runeSlots.length];
+				Vec3i[] belowSlots = new Vec3i[runeSlots.length];
 				for (int i = 0; i < runeSlots.length; i++) {
-					belowSlots[i] = new Vector3i(
+					belowSlots[i] = new Vec3i(
 							runeSlots[i].getX(),
 							runeSlots[i].getY() + POS_SLOT_RUNES_WIDTH + 1,
 							runeSlots[i].getZ()
@@ -370,7 +370,7 @@ public class BasicSpellCraftGui {
 		}
 		
 		@Override
-		public List<Rectangle2d> getGuiExtraAreas() {
+		public List<Rect2i> getGuiExtraAreas() {
 			return extraAreas;
 		}
 		
@@ -379,7 +379,7 @@ public class BasicSpellCraftGui {
 		}
 		
 		@Override
-		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+		protected void renderBg(PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
@@ -388,13 +388,13 @@ public class BasicSpellCraftGui {
 			
 			// Manually draw rune slots, since they're not baked onto the sheet
 			final int filledRuneSlots = getMenu().getFilledRuneSlots();
-			for (Vector3i spacerPos : spacerSpots) {
+			for (Vec3i spacerPos : spacerSpots) {
 				matrixStackIn.pushPose();
 				matrixStackIn.translate(horizontalMargin + spacerPos.getX(), verticalMargin + spacerPos.getY(), 0);
 				drawRuneSpacerBackground(matrixStackIn, POS_SLOT_RUNES_SPACER_WIDTH, POS_SLOT_RUNES_SPACER_WIDTH, spacerPos.getZ() < filledRuneSlots-1);
 				matrixStackIn.popPose();
 			}
-			for (Vector3i slotPos : runeSlots) {
+			for (Vec3i slotPos : runeSlots) {
 				matrixStackIn.pushPose();
 				matrixStackIn.translate(horizontalMargin + slotPos.getX(), verticalMargin + slotPos.getY(), 0);
 				drawRuneCellBackground(matrixStackIn, POS_SLOT_RUNES_WIDTH, POS_SLOT_RUNES_WIDTH);
@@ -403,7 +403,7 @@ public class BasicSpellCraftGui {
 		}
 		
 		@Override
-		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			if (!getMenu().hasScroll()) {
 				Minecraft mc = Minecraft.getInstance();
 				final int width = 150;
@@ -415,7 +415,7 @@ public class BasicSpellCraftGui {
 			}
 		}
 		
-		protected void drawRuneCellBackground(MatrixStack matrixStackIn, int width, int height) {
+		protected void drawRuneCellBackground(PoseStack matrixStackIn, int width, int height) {
 			Minecraft.getInstance().getTextureManager().bind(getBackgroundTexture());
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
 					TEX_RUNESLOT_HOFFSET, TEX_RUNESLOT_VOFFSET, TEX_RUNESLOT_WIDTH, TEX_RUNESLOT_HEIGHT,
@@ -424,7 +424,7 @@ public class BasicSpellCraftGui {
 					);
 		}
 		
-		protected void drawRuneSpacerBackground(MatrixStack matrixStackIn, int width, int height, boolean animate) {
+		protected void drawRuneSpacerBackground(PoseStack matrixStackIn, int width, int height, boolean animate) {
 			Minecraft.getInstance().getTextureManager().bind(getBackgroundTexture());
 			
 			if (animate) {

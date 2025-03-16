@@ -6,12 +6,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 
 public enum EAlteration {
 
@@ -81,14 +81,14 @@ public enum EAlteration {
 		return craftItem;
 	}
 	
-	public INBT toNBT() {
-		return StringNBT.valueOf(this.name().toLowerCase());
+	public Tag toNBT() {
+		return StringTag.valueOf(this.name().toLowerCase());
 	}
 	
-	public static final EAlteration FromNBT(INBT nbt) {
+	public static final EAlteration FromNBT(Tag nbt) {
 		EAlteration alteration = EAlteration.INFLICT;
 		try {
-			alteration = EAlteration.valueOf(((StringNBT) nbt).getAsString().toUpperCase());
+			alteration = EAlteration.valueOf(((StringTag) nbt).getAsString().toUpperCase());
 		} catch (Exception e) {
 			;
 		}

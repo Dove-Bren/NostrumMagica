@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.listener;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
 /**
@@ -10,7 +10,7 @@ public abstract class PlayerJumpEvent extends PlayerEvent {
 
 	protected boolean consumed;
 	
-	public PlayerJumpEvent(PlayerEntity player) {
+	public PlayerJumpEvent(Player player) {
 		super(player);
 	}
 	
@@ -20,7 +20,7 @@ public abstract class PlayerJumpEvent extends PlayerEvent {
 	 * the jump press this tick. This is useful for doing things like prevent elytra flying or horse jumping.
 	 */
 	public static class Pre extends PlayerJumpEvent {
-		public Pre(PlayerEntity player) {
+		public Pre(Player player) {
 			super(player);
 		}
 
@@ -37,7 +37,7 @@ public abstract class PlayerJumpEvent extends PlayerEvent {
 	 * Called at the end of the client tick when jump as PRESSED this tick.
 	 */
 	public static class Post extends PlayerJumpEvent {
-		public Post(PlayerEntity player) {
+		public Post(Player player) {
 			super(player);
 		}
 	}

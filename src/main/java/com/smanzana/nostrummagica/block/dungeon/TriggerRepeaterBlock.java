@@ -10,26 +10,26 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.TriggerRepeaterTileEntity;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -48,39 +48,39 @@ public class TriggerRepeaterBlock extends Block implements ITriggeredBlock {
 	// GetHowMuchLightGoesThrough?? Not sure.
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public float getShadeBrightness(BlockState state, IBlockReader worldIn, BlockPos pos) {
+	public float getShadeBrightness(BlockState state, BlockGetter worldIn, BlockPos pos) {
 		return 1.0F;
 	}
 	
 	@Override
-	public boolean propagatesSkylightDown(BlockState state, IBlockReader reader, BlockPos pos) {
+	public boolean propagatesSkylightDown(BlockState state, BlockGetter reader, BlockPos pos) {
 		return true;
 	}
 
 	@Override
-	public BlockRenderType getRenderShape(BlockState state) {
-		return BlockRenderType.INVISIBLE; 
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.INVISIBLE; 
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
-		if (context != ISelectionContext.empty()) {
-			if (context.getEntity() != null && context.getEntity() instanceof PlayerEntity && ((PlayerEntity) context.getEntity()).isCreative()) {
-				return VoxelShapes.block();
+		if (context != CollisionContext.empty()) {
+			if (context.getEntity() != null && context.getEntity() instanceof Player && ((Player) context.getEntity()).isCreative()) {
+				return Shapes.block();
 			}
 		}
 		
-		return VoxelShapes.empty();
+		return Shapes.empty();
 	}
 	
 	@Override
-	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		return VoxelShapes.empty();
+	public VoxelShape getCollisionShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		return Shapes.empty();
 	}
 	
 	@Override
-	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
 		if (worldIn.isClientSide() && NostrumMagica.instance.proxy.getPlayer() != null && NostrumMagica.instance.proxy.getPlayer().isCreative()) {
 			worldIn.addParticle(ParticleTypes.BARRIER, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 0, 0, 0);
 		}
@@ -92,27 +92,27 @@ public class TriggerRepeaterBlock extends Block implements ITriggeredBlock {
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader reader) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter reader) {
 		return new TriggerRepeaterTileEntity();
 	}
 
 	@Override
-	public void trigger(World world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
-		TileEntity te = world.getBlockEntity(blockPos);
+	public void trigger(Level world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
+		BlockEntity te = world.getBlockEntity(blockPos);
 		if (te instanceof TriggerRepeaterTileEntity) {
 			((TriggerRepeaterTileEntity) te).trigger(triggerPos);
 		}
 	}
 	
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (worldIn.isClientSide() || !playerIn.isCreative()) {
-			return playerIn.isCreative() ? ActionResultType.SUCCESS : ActionResultType.FAIL; // in creative, we still want the client to think we ate the interact
+			return playerIn.isCreative() ? InteractionResult.SUCCESS : InteractionResult.FAIL; // in creative, we still want the client to think we ate the interact
 		}
 		
-		TileEntity te = worldIn.getBlockEntity(pos);
+		BlockEntity te = worldIn.getBlockEntity(pos);
 		if (te == null) {
-			return ActionResultType.FAIL;
+			return InteractionResult.FAIL;
 		}
 		
 		TriggerRepeaterTileEntity ent = (TriggerRepeaterTileEntity) te;
@@ -122,31 +122,31 @@ public class TriggerRepeaterBlock extends Block implements ITriggeredBlock {
 		if (heldItem.isEmpty()) {
 			// Display info
 			List<BlockPos> offsets = ent.getOffsets();
-			playerIn.sendMessage(new StringTextComponent("Holding " + offsets.size() + " offsets"), Util.NIL_UUID);
+			playerIn.sendMessage(new TextComponent("Holding " + offsets.size() + " offsets"), Util.NIL_UUID);
 			if (playerIn.isShiftKeyDown()) {
 				for (BlockPos offset : offsets) {
-					playerIn.sendMessage(new StringTextComponent(" > " + offset), Util.NIL_UUID);
+					playerIn.sendMessage(new TextComponent(" > " + offset), Util.NIL_UUID);
 				}
 			}
 		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof PositionCrystal) {
 			BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
 			if (heldPos != null && DimensionUtils.DimEquals(PositionCrystal.getDimension(heldItem), worldIn.dimension())) {
 				ent.addTriggerPoint(heldPos, false);
-				playerIn.sendMessage(new StringTextComponent("Added offset to " + heldPos), Util.NIL_UUID);
+				playerIn.sendMessage(new TextComponent("Added offset to " + heldPos), Util.NIL_UUID);
 				NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 			}
 		} else if (!heldItem.isEmpty() && heldItem.getItem() == Items.PAPER) {
 			// Clear
 			//ent.clearOffsets();
-			playerIn.sendMessage(new StringTextComponent("Cleared offsets"), Util.NIL_UUID);
+			playerIn.sendMessage(new TextComponent("Cleared offsets"), Util.NIL_UUID);
 			NostrumMagicaSounds.DAMAGE_LIGHTNING.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 		} else if (!heldItem.isEmpty() && heldItem.getItem() == Items.FEATHER) {
 			// Cleanup
 			final int count = ent.cleanOffests(playerIn);
-			playerIn.sendMessage(new StringTextComponent("Cleaned " + count + " offsets"), Util.NIL_UUID);
+			playerIn.sendMessage(new TextComponent("Cleaned " + count + " offsets"), Util.NIL_UUID);
 			NostrumMagicaSounds.DAMAGE_WIND.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 		}
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 }

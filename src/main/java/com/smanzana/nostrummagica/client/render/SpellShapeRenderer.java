@@ -7,7 +7,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer.Outline;
 import com.smanzana.nostrummagica.item.ISpellContainerItem;
@@ -16,12 +16,12 @@ import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -75,8 +75,8 @@ public class SpellShapeRenderer {
 		}
 		
 		Minecraft mc = Minecraft.getInstance();
-		ClientPlayerEntity player = mc.player;
-		MatrixStack matrixStackIn = event.getMatrixStack();
+		LocalPlayer player = mc.player;
+		PoseStack matrixStackIn = event.getMatrixStack();
 		final float partialTicks = event.getPartialTicks();
 		
 		// Figure out if we should show a preview
@@ -103,9 +103,9 @@ public class SpellShapeRenderer {
 		}
 		
 		if (preview != null) {
-			IRenderTypeBuffer bufferIn = mc.renderBuffers().bufferSource();
+			MultiBufferSource bufferIn = mc.renderBuffers().bufferSource();
 
-			Vector3d cameraPos = mc.gameRenderer.getMainCamera().getPosition();
+			Vec3 cameraPos = mc.gameRenderer.getMainCamera().getPosition();
 			//Vector3d playerPosOffset = mc.player.getEyePosition(partialTicks).subtract(cameraPos);
 			
 			matrixStackIn.pushPose();
@@ -119,7 +119,7 @@ public class SpellShapeRenderer {
 		}
 	}
 	
-	protected <T extends SpellShapePreviewComponent> void renderComponent(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, float partialTicks, T comp, float red, float green, float blue, float alpha) {
+	protected <T extends SpellShapePreviewComponent> void renderComponent(PoseStack matrixStackIn, MultiBufferSource bufferIn, float partialTicks, T comp, float red, float green, float blue, float alpha) {
 		ISpellShapeComponentRenderer<T> renderer = GetRenderer(comp);
 		if (renderer != null) {
 			renderer.render(matrixStackIn, bufferIn, partialTicks, comp, 1f, 0f, 1f, .3f);
@@ -127,7 +127,7 @@ public class SpellShapeRenderer {
 	}
 	
 	public static interface ISpellShapeComponentRenderer<T extends SpellShapePreviewComponent> {
-		public void render(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, float partialTicks, T component, float red, float green, float blue, float alpha);
+		public void render(PoseStack matrixStackIn, MultiBufferSource bufferIn, float partialTicks, T component, float red, float green, float blue, float alpha);
 	}
 	
 	private static final Map<SpellShapePreviewComponent.Type<?>, ISpellShapeComponentRenderer<?>> ComponentRenderers = new HashMap<>();

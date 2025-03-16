@@ -3,41 +3,41 @@ package com.smanzana.nostrummagica.client.render.layer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.armor.ICapeProvider;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.renderer.Atlases;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.PlayerRenderer;
-import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.entity.model.PlayerModel;
-import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
+import com.mojang.math.Vector3f;
 
-public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
+public class LayerAetherCloak extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
 
-	protected static final IBakedModel GetModel(ResourceLocation model) {
+	protected static final BakedModel GetModel(ResourceLocation model) {
 		Minecraft mc = Minecraft.getInstance();
 		return mc.getModelManager().getModel(model);
 	}
 	
-	protected static final IVertexBuilder GetBuffer(IRenderTypeBuffer typeBuffer, @Nullable RenderType type) {
+	protected static final VertexConsumer GetBuffer(MultiBufferSource typeBuffer, @Nullable RenderType type) {
 		if (type == null) {
-			type = Atlases.translucentCullBlockSheet();
+			type = Sheets.translucentCullBlockSheet();
 		}
 		
 		return typeBuffer.getBuffer(type);
@@ -51,7 +51,7 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 	}
 	
 	@Override
-	public void render(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void render(PoseStack stack, MultiBufferSource typeBuffer, int packedLight, AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		ItemStack capeItem = shouldRender(player);
 		if (!capeItem.isEmpty()) {
 			render(stack, typeBuffer, packedLight, player, capeItem, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
@@ -69,8 +69,8 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 		}
 		
 		// Nothing so far. Check baubles if there're there.
-		if (player instanceof PlayerEntity) {
-			IInventory inventory = NostrumMagica.instance.curios.getCurios((PlayerEntity) player);
+		if (player instanceof Player) {
+			Container inventory = NostrumMagica.instance.curios.getCurios((Player) player);
 			if (inventory != null) {
 				for (int i = 0; i < inventory.getContainerSize(); i++) {
 					ItemStack stack = inventory.getItem(i);
@@ -90,7 +90,7 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 		return ShouldRender(player);
 	}
 	
-	public void render(MatrixStack matrixStack, IRenderTypeBuffer typeBuffer, int packedLight, AbstractClientPlayerEntity player, ItemStack stack, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void render(PoseStack matrixStack, MultiBufferSource typeBuffer, int packedLight, AbstractClientPlayer player, ItemStack stack, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		final ICapeProvider provider = ((ICapeProvider)stack.getItem());
 		
 		// Could dim as it gets less aether? Other effects?
@@ -109,7 +109,7 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 		
 		final float objScale = .425f;
 		final boolean isFlying = player.isFallFlying();
-		final boolean hasChestpiece = (!player.getItemBySlot(EquipmentSlotType.CHEST).isEmpty());
+		final boolean hasChestpiece = (!player.getItemBySlot(EquipmentSlot.CHEST).isEmpty());
 		final @Nullable RenderType[] renderTypes = provider.getCapeRenderTypes(player, stack);
 		final ResourceLocation[] models = provider.getCapeModels(player, stack);
 		if (renderTypes != null && renderTypes.length != models.length) {
@@ -117,10 +117,10 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 		}
 		
 		// Get how 'forward' we're moving for cape rotation
-		Vector3d look = player.getViewVector(ageInTicks % 1f);
+		Vec3 look = player.getViewVector(ageInTicks % 1f);
 		double motionForward = look
 				.subtract(0, look.y, 0)
-				.dot(new Vector3d(player.getDeltaMovement().x, 0, player.getDeltaMovement().z));
+				.dot(new Vec3(player.getDeltaMovement().x, 0, player.getDeltaMovement().z));
 		float rot = -10f;
 		final float moveMaxRot = (!isFlying && motionForward > 0 ? -20f : 10f);
 		//final double yVelOverride = .25;
@@ -140,8 +140,8 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 		
 		int index = 0;
 		for (ResourceLocation model : models) {
-			final IBakedModel bakedModel = GetModel(model);
-			final IVertexBuilder buffer = GetBuffer(typeBuffer, renderTypes == null ? null : renderTypes[index]);
+			final BakedModel bakedModel = GetModel(model);
+			final VertexConsumer buffer = GetBuffer(typeBuffer, renderTypes == null ? null : renderTypes[index]);
 			
 			matrixStack.pushPose();
 			
@@ -160,8 +160,8 @@ public class LayerAetherCloak extends LayerRenderer<AbstractClientPlayerEntity, 
 		matrixStack.popPose();
 	}
 	
-	protected void renderCapeModel(AbstractClientPlayerEntity living, ICapeProvider provider, ItemStack stack, IBakedModel model,
-			MatrixStack matrixStack, IVertexBuilder bufferIn, int packedLightIn, int color) {
+	protected void renderCapeModel(AbstractClientPlayer living, ICapeProvider provider, ItemStack stack, BakedModel model,
+			PoseStack matrixStack, VertexConsumer bufferIn, int packedLightIn, int color) {
 		RenderFuncs.RenderModelWithColor(matrixStack, bufferIn, model, color, packedLightIn, OverlayTexture.NO_OVERLAY);
 	}
 	

@@ -12,8 +12,8 @@ import com.smanzana.nostrummagica.network.message.SpellCooldownMessage;
 import com.smanzana.nostrummagica.network.message.SpellCooldownResetMessage;
 import com.smanzana.nostrummagica.network.message.SpellGlobalCooldownMessage;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Like Vanilla's cooldown tracker, except for spells
@@ -22,17 +22,17 @@ import net.minecraft.entity.player.ServerPlayerEntity;
  */
 public class SpellCooldownTracker {
 
-	private final Map<PlayerEntity, Cooldowns> cooldowns;
+	private final Map<Player, Cooldowns> cooldowns;
 	
 	public SpellCooldownTracker() {
 		this.cooldowns = new HashMap<>();
 	}
 	
-	public @Nonnull Cooldowns getCooldowns(PlayerEntity player) {
+	public @Nonnull Cooldowns getCooldowns(Player player) {
 		return cooldowns.computeIfAbsent(player, (p) -> new Cooldowns());
 	}
 	
-	public @Nullable SpellCooldown getSpellCooldown(PlayerEntity player, Spell spell) {
+	public @Nullable SpellCooldown getSpellCooldown(Player player, Spell spell) {
 		Cooldowns cooldowns = getCooldowns(player);
 		@Nullable SpellCooldown spellCooldown = cooldowns.getSpellCooldown(spell);
 		@Nullable SpellCooldown globalCooldown = cooldowns.getGlobalCooldown();
@@ -49,7 +49,7 @@ public class SpellCooldownTracker {
 		return globalCooldown.endTicks > spellCooldown.endTicks ? globalCooldown : spellCooldown;
 	}
 	
-	public boolean hasCooldown(PlayerEntity player, Spell spell) {
+	public boolean hasCooldown(Player player, Spell spell) {
 		@Nullable SpellCooldown cooldown = this.getSpellCooldown(player, spell);
 		if (cooldown == null) { 
 			return false;
@@ -58,44 +58,44 @@ public class SpellCooldownTracker {
 		return player.tickCount < cooldown.endTicks;
 	}
 	
-	public void setSpellCooldown(PlayerEntity player, Spell spell, int ticks) {
+	public void setSpellCooldown(Player player, Spell spell, int ticks) {
 		SpellCooldown cooldown = new SpellCooldown(player.tickCount, player.tickCount + ticks);
 		cooldowns.computeIfAbsent(player, (p) -> new Cooldowns()).setSpellCooldown(spell, cooldown);
 		notifyPlayer(player, spell, ticks);
 	}
 	
-	public void removeSpellCooldown(PlayerEntity player, Spell spell) {
+	public void removeSpellCooldown(Player player, Spell spell) {
 		setSpellCooldown(player, spell, 0);
 	}
 	
-	public void overrideSpellCooldown(PlayerEntity player, Spell spell, int cooldownTicks) {
+	public void overrideSpellCooldown(Player player, Spell spell, int cooldownTicks) {
 		SpellCooldown cooldown = new SpellCooldown(player.tickCount, player.tickCount + cooldownTicks);
 		cooldowns.computeIfAbsent(player, (p) -> new Cooldowns()).setSpellCooldown(spell, cooldown);
 	}
 	
-	public void setGlobalCooldown(PlayerEntity player, int ticks) {
+	public void setGlobalCooldown(Player player, int ticks) {
 		SpellCooldown cooldown = new SpellCooldown(player.tickCount, player.tickCount + ticks);
 		cooldowns.computeIfAbsent(player, (p) -> new Cooldowns()).setGlobalCooldown(cooldown);
 		notifyPlayer(player, ticks);
 	}
 	
-	public void overrideGlobalCooldown(PlayerEntity player, int cooldownTicks) {
+	public void overrideGlobalCooldown(Player player, int cooldownTicks) {
 		SpellCooldown cooldown = new SpellCooldown(player.tickCount, player.tickCount + cooldownTicks);
 		cooldowns.computeIfAbsent(player, (p) -> new Cooldowns()).setGlobalCooldown(cooldown);
 	}
 	
-	protected void notifyPlayer(PlayerEntity player, Spell spell, int cooldown) {
-		NetworkHandler.sendTo(new SpellCooldownMessage(spell, cooldown), (ServerPlayerEntity) player);
+	protected void notifyPlayer(Player player, Spell spell, int cooldown) {
+		NetworkHandler.sendTo(new SpellCooldownMessage(spell, cooldown), (ServerPlayer) player);
 	}
 	
-	protected void notifyPlayer(PlayerEntity player, int cooldown) {
-		NetworkHandler.sendTo(new SpellGlobalCooldownMessage(cooldown), (ServerPlayerEntity) player);
+	protected void notifyPlayer(Player player, int cooldown) {
+		NetworkHandler.sendTo(new SpellGlobalCooldownMessage(cooldown), (ServerPlayer) player);
 	}
 	
-	public void clearCooldowns(PlayerEntity player) {
+	public void clearCooldowns(Player player) {
 		cooldowns.computeIfAbsent(player, (p) -> new Cooldowns()).clear();
 		if (!player.level.isClientSide()) {
-			NetworkHandler.sendTo(new SpellCooldownResetMessage(), (ServerPlayerEntity) player);
+			NetworkHandler.sendTo(new SpellCooldownResetMessage(), (ServerPlayer) player);
 		}
 	}
 	

@@ -2,10 +2,10 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import java.util.List;
 
-import net.minecraft.client.renderer.Rectangle2d;
+import net.minecraft.client.renderer.Rect2i;
 
 public interface IJEIAwareGuiContainer {
 
-	public List<Rectangle2d> getGuiExtraAreas();
+	public List<Rect2i> getGuiExtraAreas();
 	
 }

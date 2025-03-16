@@ -4,18 +4,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.IWolfAbility;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public class ArcaneWolfAbilitySheet implements IPetGUISheet<ArcaneWolfEntity> {
@@ -29,7 +29,7 @@ public class ArcaneWolfAbilitySheet implements IPetGUISheet<ArcaneWolfEntity> {
 	}
 	
 	@Override
-	public void showSheet(ArcaneWolfEntity wolf, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(ArcaneWolfEntity wolf, Player player, IPetContainer<ArcaneWolfEntity> container, int width, int height, int offsetX, int offsetY) {
 		widgets.clear();
 		List<IWolfAbility> abilities = wolf.getAbilityList();
 		for (int i = 0; i < abilities.size(); i++) {
@@ -39,13 +39,13 @@ public class ArcaneWolfAbilitySheet implements IPetGUISheet<ArcaneWolfEntity> {
 	}
 
 	@Override
-	public void hideSheet(ArcaneWolfEntity wolf, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container) {
+	public void hideSheet(ArcaneWolfEntity wolf, Player player, IPetContainer<ArcaneWolfEntity> container) {
 		widgets.clear();
 	}
 
 	@Override
-	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
-		mc.font.draw(matrixStackIn, TextFormatting.BOLD + "Abilities" + TextFormatting.RESET, 5, 5, 0xFFFFFFFF);
+	public void draw(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+		mc.font.draw(matrixStackIn, ChatFormatting.BOLD + "Abilities" + ChatFormatting.RESET, 5, 5, 0xFFFFFFFF);
 		
 		for (AbilityWidget widget : widgets) {
 			widget.render(matrixStackIn, mouseX, mouseY, partialTicks);
@@ -58,7 +58,7 @@ public class ArcaneWolfAbilitySheet implements IPetGUISheet<ArcaneWolfEntity> {
 	}
 
 	@Override
-	public void handleMessage(CompoundNBT data) {
+	public void handleMessage(CompoundTag data) {
 		
 	}
 
@@ -72,23 +72,23 @@ public class ArcaneWolfAbilitySheet implements IPetGUISheet<ArcaneWolfEntity> {
 	}
 
 	@Override
-	public void overlay(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void overlay(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		for (AbilityWidget widget : widgets) {
 			widget.drawOverlay(mc, matrixStackIn, width, height, mouseX, mouseY);
 		}
 	}
 	
-	private static class AbilityWidget extends Widget {
+	private static class AbilityWidget extends AbstractWidget {
 		
 		private final IWolfAbility ability;
 		
 		public AbilityWidget(IWolfAbility ability, int x, int y, int width, int height) {
-			super(x, y, width, height, StringTextComponent.EMPTY);
+			super(x, y, width, height, TextComponent.EMPTY);
 			this.ability = ability;
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			Minecraft mc = Minecraft.getInstance();
 			
 			matrixStackIn.pushPose();
@@ -108,7 +108,7 @@ public class ArcaneWolfAbilitySheet implements IPetGUISheet<ArcaneWolfEntity> {
 			matrixStackIn.popPose();
 		}
 		
-		public void drawOverlay(Minecraft mc, MatrixStack matrixStackIn, int sheetWidth, int sheetHeight, int mouseX, int mouseY) {
+		public void drawOverlay(Minecraft mc, PoseStack matrixStackIn, int sheetWidth, int sheetHeight, int mouseX, int mouseY) {
 			if (this.isHovered()) {
 				GuiUtils.drawHoveringText(matrixStackIn, Arrays.asList(ability.getDescription()), mouseX, mouseY, sheetWidth, sheetHeight, -1, mc.font);
 			}

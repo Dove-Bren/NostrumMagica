@@ -2,34 +2,34 @@ package com.smanzana.nostrummagica.client.particles;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.Camera;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 
 public class ParticleWard extends BatchRenderParticle {
 	
 	private static final ResourceLocation TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/effects/hexa_shield.png");
 	
 	protected final float maxAlpha;
-	protected Vector3d targetPos; // Absolute position to move to (if targetEntity == null) or offset from entity to go to
+	protected Vec3 targetPos; // Absolute position to move to (if targetEntity == null) or offset from entity to go to
 	protected Entity targetEntity;
 	protected boolean dieOnTarget;
 	protected TargetBehavior entityBehavior;
 	
-	public ParticleWard(ClientWorld worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
+	public ParticleWard(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
 		rCol = red;
@@ -49,7 +49,7 @@ public class ParticleWard extends BatchRenderParticle {
 		return this;
 	}
 	
-	public ParticleWard setMotion(Vector3d motion) {
+	public ParticleWard setMotion(Vec3 motion) {
 		return this.setMotion(motion.x, motion.y, motion.z);
 	}
 	
@@ -57,7 +57,7 @@ public class ParticleWard extends BatchRenderParticle {
 		return this.setMotion(xVelocity, yVelocity, zVelocity, 0, 0, 0);
 	}
 	
-	public ParticleWard setMotion(Vector3d motion, Vector3d jitter) {
+	public ParticleWard setMotion(Vec3 motion, Vec3 jitter) {
 		return this.setMotion(motion.x, motion.y, motion.z, jitter.x, jitter.y, jitter.z);
 	}
 	
@@ -74,14 +74,14 @@ public class ParticleWard extends BatchRenderParticle {
 		if (this.targetPos == null && ent != null) {
 			final double wRad = ent.getBbWidth() * 2; // double width
 			final double hRad = ent.getBbHeight();
-			this.targetPos = new Vector3d(wRad * (NostrumMagica.rand.nextDouble() - .5),
+			this.targetPos = new Vec3(wRad * (NostrumMagica.rand.nextDouble() - .5),
 					hRad * (NostrumMagica.rand.nextDouble() - .5),
 					wRad * (NostrumMagica.rand.nextDouble() - .5));
 		}
 		return this;
 	}
 	
-	public ParticleWard setTarget(Vector3d targetPos) {
+	public ParticleWard setTarget(Vec3 targetPos) {
 		this.targetPos = targetPos;
 		return this;
 	}
@@ -140,7 +140,7 @@ public class ParticleWard extends BatchRenderParticle {
 	}
 
 	@Override
-	public void renderBatched(MatrixStack matrixStackIn, IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
+	public void renderBatched(PoseStack matrixStackIn, VertexConsumer buffer, Camera renderInfo, float partialTicks) {
 		BatchRenderParticle.RenderQuad(matrixStackIn, buffer, this, renderInfo, partialTicks, .1f);
 		//BatchRenderParticle.RenderQuad(buffer, this, renderParams, partialTicks, .05f);
 	}
@@ -164,38 +164,38 @@ public class ParticleWard extends BatchRenderParticle {
 		if (targetEntity != null) {
 			if (targetEntity.isAlive()) {
 				final float period;
-				Vector3d offset;
+				Vec3 offset;
 				if (this.entityBehavior == TargetBehavior.JOIN) {
 					period = 20f;
-					offset = targetPos == null ? Vector3d.ZERO : targetPos.yRot((float) (Math.PI * 2 * ((float) age % period) / period))
+					offset = targetPos == null ? Vec3.ZERO : targetPos.yRot((float) (Math.PI * 2 * ((float) age % period) / period))
 							.add(0, targetEntity.getBbHeight()/2, 0);
 				} else if (this.entityBehavior == TargetBehavior.ORBIT) {
 					period = 20f;
 					//randPeriodOffset = ?
-					offset = (new Vector3d(targetEntity.getBbWidth() * 2, 0, 0)).yRot((float) (Math.PI * 2 * ((float) age % period) / period))
+					offset = (new Vec3(targetEntity.getBbWidth() * 2, 0, 0)).yRot((float) (Math.PI * 2 * ((float) age % period) / period))
 							.add(0, (targetEntity.getBbHeight()/2) + (targetPos == null ? 0 : targetPos.y), 0);
 					
 					// do this better
 					if (this.gravity != 0f) {
 						if (targetPos == null) {
-							targetPos = Vector3d.ZERO;
+							targetPos = Vec3.ZERO;
 						}
 						targetPos = targetPos.add(0, -this.gravity, 0);
 					}
 				} else {
 					throw new RuntimeException("Unsupported particle behavior");
 				}
-				Vector3d curVelocity = new Vector3d(this.xd, this.yd, this.zd);
-				Vector3d posDelta = targetEntity.position()
+				Vec3 curVelocity = new Vec3(this.xd, this.yd, this.zd);
+				Vec3 posDelta = targetEntity.position()
 						.add(offset.x, offset.y, offset.z)
 						.subtract(x, y, z);
-				Vector3d idealVelocity = posDelta.normalize().scale(.3);
+				Vec3 idealVelocity = posDelta.normalize().scale(.3);
 				this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 			}
 		} else if (targetPos != null) {
-			Vector3d curVelocity = new Vector3d(this.xd, this.yd, this.zd);
-			Vector3d posDelta = targetPos.subtract(x, y, z);
-			Vector3d idealVelocity = posDelta.normalize().scale(.3);
+			Vec3 curVelocity = new Vec3(this.xd, this.yd, this.zd);
+			Vec3 posDelta = targetPos.subtract(x, y, z);
+			Vec3 idealVelocity = posDelta.normalize().scale(.3);
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 		}
 	}
@@ -203,7 +203,7 @@ public class ParticleWard extends BatchRenderParticle {
 	public static final class Factory implements INostrumParticleFactory<ParticleWard> {
 
 		@Override
-		public ParticleWard createParticle(ClientWorld world, SpawnParams params) {
+		public ParticleWard createParticle(ClientLevel world, SpawnParams params) {
 			ParticleWard particle = null;
 			for (int i = 0; i < params.count; i++) {
 				final double spawnX = params.spawnX + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
@@ -222,7 +222,7 @@ public class ParticleWard extends BatchRenderParticle {
 					particle.setTarget(params.targetPos);
 				}
 				if (params.velocity != null) {
-					particle.setMotion(params.velocity, params.velocityJitter == null ? Vector3d.ZERO : params.velocityJitter);
+					particle.setMotion(params.velocity, params.velocityJitter == null ? Vec3.ZERO : params.velocityJitter);
 				}
 				if (params.gravityStrength != 0f) {
 					particle.setGravityStrength(params.gravityStrength);

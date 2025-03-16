@@ -13,26 +13,26 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.EffectType;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
-public class SublimationEffect extends Effect {
+public class SublimationEffect extends MobEffect {
 
 	public static final String ID = "sublimation";
 	
 	public SublimationEffect() {
-		super(EffectType.HARMFUL, 0xFFEC6D8E);
+		super(MobEffectCategory.HARMFUL, 0xFFEC6D8E);
 	}
 	
 	@Override
@@ -70,7 +70,7 @@ public class SublimationEffect extends Effect {
 		
 		// Spread
 		if (spread) {
-			final EffectInstance effect = target.getEffect(NostrumEffects.sublimation);
+			final MobEffectInstance effect = target.getEffect(NostrumEffects.sublimation);
 			for (Entity ent : nearbyEnts) {
 				if (!(ent instanceof LivingEntity)) {
 					continue;
@@ -84,7 +84,7 @@ public class SublimationEffect extends Effect {
 					continue;
 				}
 				
-				((LivingEntity) ent).addEffect(new EffectInstance(NostrumEffects.sublimation, effect.getDuration(), effect.getAmplifier()));
+				((LivingEntity) ent).addEffect(new MobEffectInstance(NostrumEffects.sublimation, effect.getDuration(), effect.getAmplifier()));
 				
 				NostrumParticles.FILLED_ORB.spawn(target.level, new SpawnParams(
 						10, target.getX(), target.getY() + target.getBbHeight()/2, target.getZ(), 0,
@@ -96,7 +96,7 @@ public class SublimationEffect extends Effect {
 			NostrumParticles.FILLED_ORB.spawn(target.level, new SpawnParams(
 					50, target.getX(), target.getY() + target.getBbHeight()/2, target.getZ(), 0,
 					30, 10,
-					new Vector3d(0, .1, 0), new Vector3d(.2, .05, .2)
+					new Vec3(0, .1, 0), new Vec3(.2, .05, .2)
 					).color(0xFFEC6D8E).gravity(true));
 			NostrumMagicaSounds.DAMAGE_FIRE.play(target);
 		}
@@ -146,7 +146,7 @@ public class SublimationEffect extends Effect {
 		}
 		
 		if (isFire) {
-			EffectInstance effect = entity.getEffect(NostrumEffects.sublimation);
+			MobEffectInstance effect = entity.getEffect(NostrumEffects.sublimation);
 			if (effect != null) {
 				int amp = effect.getAmplifier();
 				handleFireAttack(entity, source, event.getAmount(), amp);
@@ -155,7 +155,7 @@ public class SublimationEffect extends Effect {
 				// Otherwise, don't reset
 				final boolean lavaSet = ElementalArmor.GetSetCount(entity, EMagicElement.FIRE, ElementalArmor.Type.MASTER) == 4;
 				if (!entity.fireImmune()
-						&& entity.getEffect(Effects.FIRE_RESISTANCE) == null
+						&& entity.getEffect(MobEffects.FIRE_RESISTANCE) == null
 						&& !lavaSet) {
 					entity.invulnerableTime = 0;
 				}

@@ -6,10 +6,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.item.SpellTome;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client has requested a spell be dropped from a spell tome
@@ -19,7 +19,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 public class ClientTomeDropSpellMessage {
 	
 	public static void handle(ClientTomeDropSpellMessage message, Supplier<NetworkEvent.Context> ctx) {
-		final ServerPlayerEntity sp = ctx.get().getSender();
+		final ServerPlayer sp = ctx.get().getSender();
 		ctx.get().setPacketHandled(true);
 		
 		ctx.get().enqueueWork(() -> {
@@ -54,11 +54,11 @@ public class ClientTomeDropSpellMessage {
 		this.spellID = spellID;
 	}
 
-	public static ClientTomeDropSpellMessage decode(PacketBuffer buf) {
+	public static ClientTomeDropSpellMessage decode(FriendlyByteBuf buf) {
 		return new ClientTomeDropSpellMessage(buf.readVarInt(), buf.readVarInt());
 	}
 
-	public static void encode(ClientTomeDropSpellMessage msg, PacketBuffer buf) {
+	public static void encode(ClientTomeDropSpellMessage msg, FriendlyByteBuf buf) {
 		buf.writeVarInt(msg.tomeID);
 		buf.writeVarInt(msg.spellID);
 	}

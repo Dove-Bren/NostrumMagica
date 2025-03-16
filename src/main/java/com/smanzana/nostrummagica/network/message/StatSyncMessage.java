@@ -6,11 +6,11 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client player's attribtes are being refreshed from server
@@ -36,21 +36,21 @@ public class StatSyncMessage {
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	protected CompoundNBT tag;
+	protected CompoundTag tag;
 	
-	public StatSyncMessage(CompoundNBT tag) {
-		this.tag = tag == null ? new CompoundNBT() : tag;
+	public StatSyncMessage(CompoundTag tag) {
+		this.tag = tag == null ? new CompoundTag() : tag;
 	}
 	
 	public StatSyncMessage(INostrumMagic stats) {
-		tag = (CompoundNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, stats, null);
+		tag = (CompoundTag) CAPABILITY.getStorage().writeNBT(CAPABILITY, stats, null);
 	}
 
-	public static StatSyncMessage decode(PacketBuffer buf) {
+	public static StatSyncMessage decode(FriendlyByteBuf buf) {
 		return new StatSyncMessage(buf.readNbt());
 	}
 
-	public static void encode(StatSyncMessage msg, PacketBuffer buf) {
+	public static void encode(StatSyncMessage msg, FriendlyByteBuf buf) {
 		buf.writeNbt(msg.tag);
 	}
 

@@ -9,17 +9,17 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class CommandDebugEffect {
 	
-	public static final SimpleCommandExceptionType EFFECT_NOT_FOUND = new SimpleCommandExceptionType(new TranslationTextComponent("argument.nostrummagica.effect.unknown"));
+	public static final SimpleCommandExceptionType EFFECT_NOT_FOUND = new SimpleCommandExceptionType(new TranslatableComponent("argument.nostrummagica.effect.unknown"));
 	
-	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+	public static final void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(
 				Commands.literal("nostrumdebugeffect")
 					.requires(s -> s.hasPermission(2))
@@ -30,8 +30,8 @@ public class CommandDebugEffect {
 				);
 	}
 
-	private static final int execute(CommandContext<CommandSource> context, final String effectName) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().getPlayerOrException();
+	private static final int execute(CommandContext<CommandSourceStack> context, final String effectName) throws CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
 		
 		SpecialEffect effect;
 		try {
@@ -46,7 +46,7 @@ public class CommandDebugEffect {
 		
 		EffectData data = NostrumMagica.magicEffectProxy.getData(player, effect);
 		if (data == null) {
-			context.getSource().sendSuccess(new StringTextComponent("Player is not under that effect"), true);
+			context.getSource().sendSuccess(new TextComponent("Player is not under that effect"), true);
 		} else {
 			String result = "Effect found with element {"
 					+ (data.getElement() == null ? "NULL" : data.getElement().getName())
@@ -55,7 +55,7 @@ public class CommandDebugEffect {
 					+ "}, and count {"
 					+ data.getCount()
 					+ "}";
-			context.getSource().sendSuccess(new StringTextComponent(result), true);
+			context.getSource().sendSuccess(new TextComponent(result), true);
 		}
 		
 //		if (!(sender.getCommandSenderEntity() instanceof PlayerEntity)) {

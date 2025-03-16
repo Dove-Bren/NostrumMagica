@@ -5,36 +5,36 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 public class TextWidget extends MoveableObscurableWidget {
 	
 	protected final Screen parent;
-	protected final ITextComponent text;
+	protected final Component text;
 	
-	protected @Nullable List<ITextComponent> tooltip;
+	protected @Nullable List<Component> tooltip;
 	protected int color = 0xFFDDDDDD;
 	protected float scale = 1f;
 	protected boolean centered = false;
 	
-	public TextWidget(Screen parent, ITextComponent text, int x, int y, int width, int height) {
-		super(x, y, width, height, StringTextComponent.EMPTY);
+	public TextWidget(Screen parent, Component text, int x, int y, int width, int height) {
+		super(x, y, width, height, TextComponent.EMPTY);
 		this.parent = parent;
 		this.text = text;
 	}
 	
-	public TextWidget tooltip(List<ITextComponent> tooltip) {
+	public TextWidget tooltip(List<Component> tooltip) {
 		this.tooltip = tooltip;
 		return this;
 	}
 	
-	public TextWidget tooltip(ITextComponent tooltip) {
+	public TextWidget tooltip(Component tooltip) {
 		return tooltip(Lists.newArrayList(tooltip));
 	}
 	
@@ -54,9 +54,9 @@ public class TextWidget extends MoveableObscurableWidget {
 	}
 	
 	@Override
-	public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		final Minecraft mc = this.parent.getMinecraft();
-		final FontRenderer font = mc.font;
+		final Font font = mc.font;
 		
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(this.x, this.y, 0);
@@ -72,7 +72,7 @@ public class TextWidget extends MoveableObscurableWidget {
 	}
 	
 	@Override
-	public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+	public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
 		if (this.isHovered() && this.tooltip != null) {
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 100);

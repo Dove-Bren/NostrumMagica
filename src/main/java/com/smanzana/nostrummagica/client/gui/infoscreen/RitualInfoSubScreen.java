@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
@@ -19,17 +19,17 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.renderer.MultiBufferSource;
+import com.mojang.blaze3d.platform.Lighting;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import com.mojang.math.Vector3f;
 import net.minecraftforge.client.ForgeHooksClient;
 
 @SuppressWarnings("deprecation")
@@ -66,7 +66,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 	}
 	
 	@Override
-	public void draw(INostrumMagic attr, Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
+	public void draw(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
 		
 		infopage = (desc != null && !desc.isEmpty());
 		
@@ -263,7 +263,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		
 	}
 	
-	private void drawBlock(MatrixStack matrixStackIn, Minecraft mc, BlockState state, double x, double y, double z) {
+	private void drawBlock(PoseStack matrixStackIn, Minecraft mc, BlockState state, double x, double y, double z) {
 		//GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
 		
 		final int combinedLight = 15728880; // Sampled from GameRenderer
@@ -274,7 +274,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		matrixStackIn.translate(x, y, z);
 		RenderSystem.enableCull();
 		RenderSystem.enableRescaleNormal();
-		RenderHelper.turnOff();
+		Lighting.turnOff();
 		RenderSystem.depthMask(true);
 		//mc.gameRenderer.disableLightmap(); // used to be mc.entityRenderer.... TODO
 		
@@ -282,9 +282,9 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		RenderSystem.enableTexture();
 		RenderSystem.enableAlphaTest();
 		//mc.getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID, "textures/block/ceramic_generic.png"));
-		mc.getTextureManager().bind(AtlasTexture.LOCATION_BLOCKS);
+		mc.getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
 		
-		IRenderTypeBuffer.Impl typebuffer = Minecraft.getInstance().renderBuffers().bufferSource();
+		MultiBufferSource.BufferSource typebuffer = Minecraft.getInstance().renderBuffers().bufferSource();
 		try {
 			RenderFuncs.RenderBlockState(state, matrixStackIn, typebuffer, combinedLight, combinedOverlay);
 		} catch (Exception e) {
@@ -296,7 +296,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		matrixStackIn.popPose();
 	}
 	
-	private void drawCandle(MatrixStack matrixStackIn, Minecraft mc, double x, double y, double z, ReagentType reagent) {
+	private void drawCandle(PoseStack matrixStackIn, Minecraft mc, double x, double y, double z, ReagentType reagent) {
 		drawBlock(matrixStackIn, mc, candle, x, y, z);
 		if (reagent != null) {
 			matrixStackIn.pushPose();
@@ -309,7 +309,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		}
 	}
 	
-	private void drawAltar(MatrixStack matrixStackIn, Minecraft mc, double x, double y, double z, @Nonnull Ingredient item) {
+	private void drawAltar(PoseStack matrixStackIn, Minecraft mc, double x, double y, double z, @Nonnull Ingredient item) {
 		drawBlock(matrixStackIn, mc, altar, x, y, z);
 		if (!item.isEmpty()) {
 			final ItemStack[] matches = item.getItems();
@@ -326,7 +326,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 	}
 
 	@Override
-	public Collection<Widget> getWidgets(int x, int y, int width, int height) {
+	public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
 		return null;
 	}
 

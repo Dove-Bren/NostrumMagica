@@ -9,16 +9,16 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.saveddata.SavedData;
 
 /**
  * Maps between player and their unique offset in the Sorcery dimension.
  * @author Skyler
  *
  */
-public class NostrumDimensionMapper extends WorldSavedData {
+public class NostrumDimensionMapper extends SavedData {
 	
 	public static class NostrumDimensionOffset {
 		
@@ -64,14 +64,14 @@ public class NostrumDimensionMapper extends WorldSavedData {
 			this.offsetZ += 5;
 		}
 		
-		private CompoundNBT asNBT() {
-			CompoundNBT nbt = new CompoundNBT();
+		private CompoundTag asNBT() {
+			CompoundTag nbt = new CompoundTag();
 			nbt.putInt(NBT_X, this.offsetX);
 			nbt.putInt(NBT_Z, this.offsetZ);
 			return nbt;
 		}
 		
-		private static NostrumDimensionOffset fromNBT(CompoundNBT nbt) {
+		private static NostrumDimensionOffset fromNBT(CompoundTag nbt) {
 			int x = nbt.getInt(NBT_X);
 			int z = nbt.getInt(NBT_Z);
 			return new NostrumDimensionOffset(x, z);
@@ -118,17 +118,13 @@ public class NostrumDimensionMapper extends WorldSavedData {
 	private Map<UUID, NostrumDimensionOffset> map;
 	
 	public NostrumDimensionMapper() {
-		this(DATA_NAME);
-	}
-
-	public NostrumDimensionMapper(String name) {
-		super(name);
+		super();
 		
 		this.map = new HashMap<>();
 	}
 
-	@Override
-	public void load(CompoundNBT nbt) {
+	public static NostrumDimensionMapper load(CompoundTag nbt) {
+		NostrumDimensionMapper mapper = new NostrumDimensionMapper();
 		for (String key : nbt.getAllKeys()) {
 			UUID id;
 			
@@ -143,18 +139,19 @@ public class NostrumDimensionMapper extends WorldSavedData {
 				continue;
 			}
 			
-			CompoundNBT tag = nbt.getCompound(key);
-			this.map.put(id, NostrumDimensionOffset.fromNBT(tag));
+			CompoundTag tag = nbt.getCompound(key);
+			mapper.map.put(id, NostrumDimensionOffset.fromNBT(tag));
 		}
 		
-		NostrumMagica.logger.info("Loaded " + map.size() + " dimension offsets");
+		NostrumMagica.logger.info("Loaded " + mapper.map.size() + " dimension offsets");
+		return mapper;
 	}
 
 	@Override
-	public CompoundNBT save(CompoundNBT compound) {
+	public CompoundTag save(CompoundTag compound) {
 		int count = 0;
 		for (Entry<UUID, NostrumDimensionOffset> row : map.entrySet()) {
-			CompoundNBT tag = row.getValue().asNBT();
+			CompoundTag tag = row.getValue().asNBT();
 			compound.put(row.getKey().toString(), tag);
 			count++;
 		}

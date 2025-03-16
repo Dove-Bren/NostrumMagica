@@ -19,18 +19,18 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
 public class WallShape extends AreaShape {
 	
@@ -60,10 +60,10 @@ public class WallShape extends AreaShape {
 		private final SpellCharacteristics characteristics;
 		private final SpellLocation instantLocation;
 		
-		private MutableBoundingBox bounds;
+		private BoundingBox bounds;
 		
 		public WallShapeInstance(ISpellState state, SpellLocation location, WallFacing facing, float radius, boolean lingering, SpellShapeProperties properties, SpellCharacteristics characteristics) {
-			super(state, location.world, new Vector3d(location.hitBlockPos.getX() + .5, location.hitBlockPos.getY(), location.hitBlockPos.getZ() + .5), TICK_RATE, NUM_TICKS, 2*radius, true, affectsEntities(properties), affectsBlocks(properties), characteristics);
+			super(state, location.world, new Vec3(location.hitBlockPos.getX() + .5, location.hitBlockPos.getY(), location.hitBlockPos.getZ() + .5), TICK_RATE, NUM_TICKS, 2*radius, true, affectsEntities(properties), affectsBlocks(properties), characteristics);
 			this.radius = radius;
 			this.facing = facing;
 			this.characteristics = characteristics;
@@ -94,11 +94,11 @@ public class WallShape extends AreaShape {
 			
 			List<LivingEntity> ret = new ArrayList<>();
 			
-			final Vector3d center = new Vector3d(instantLocation.hitBlockPos.getX() + .5, instantLocation.hitBlockPos.getY(), instantLocation.hitBlockPos.getZ() + .5);
+			final Vec3 center = new Vec3(instantLocation.hitBlockPos.getX() + .5, instantLocation.hitBlockPos.getY(), instantLocation.hitBlockPos.getZ() + .5);
 			final float radiusEnts = this.radius + .5f;
 			
 			for (Entity entity : world.getEntities(null, 
-					new AxisAlignedBB(center.x() - radiusEnts,
+					new AABB(center.x() - radiusEnts,
 							center.y() - radiusEnts,
 							center.z() - radiusEnts,
 							center.x() + radiusEnts,
@@ -113,9 +113,9 @@ public class WallShape extends AreaShape {
 			}
 			
 			List<SpellLocation> positions = new ArrayList<>();
-			for (int x = bounds.x0; x <= bounds.x1; x++)
-			for (int y = bounds.y0; y <= bounds.y1; y++)
-			for (int z = bounds.z0; z <= bounds.z1; z++) {
+			for (int x = bounds.minX(); x <= bounds.maxX(); x++)
+			for (int y = bounds.minY(); y <= bounds.maxY(); y++)
+			for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
 				positions.add(new SpellLocation(world, new BlockPos(x, y, z)));
 			}
 			
@@ -131,57 +131,57 @@ public class WallShape extends AreaShape {
 			final double entMaxZ = entity.getZ() + hRadius;
 			final double entMinY = entity.getY();
 			final double entMaxY = entity.getY() + entity.getBbHeight();
-			return entMinX < (bounds.x1+1) && entMaxX > bounds.x0
-					&& entMinY < (bounds.y1+1) && entMaxY >= bounds.y0
-					&& entMinZ < (bounds.z1+1) && entMaxZ > bounds.z0
+			return entMinX < (bounds.maxX()+1) && entMaxX > bounds.minX()
+					&& entMinY < (bounds.maxY()+1) && entMaxY >= bounds.minY()
+					&& entMinZ < (bounds.maxZ()+1) && entMaxZ > bounds.minZ()
 					;
 		}
 
 		@Override
-		protected boolean isInArea(World world, BlockPos pos) {
+		protected boolean isInArea(Level world, BlockPos pos) {
 			return bounds.isInside(pos);
 		}
 
 		@Override
 		protected void doEffect() {
-			final double diffX = (bounds.x1+1) - bounds.x0;
-			final double diffZ = (bounds.z1+1) - bounds.z0;
-			final double diffY = (bounds.y1+1) - bounds.y0;
+			final double diffX = (bounds.maxX()+1) - bounds.minX();
+			final double diffZ = (bounds.maxZ()+1) - bounds.minZ();
+			final double diffY = (bounds.maxY()+1) - bounds.minY();
 			
 			final double yVel = (diffY / (30f));
 			for (int i = 0; i < radius/2 + 1; i++) {
 				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 						1,
-						bounds.x0 + NostrumMagica.rand.nextFloat() * diffX,
-						bounds.y0,
-						bounds.z0 + NostrumMagica.rand.nextFloat() * diffZ,
+						bounds.minX() + NostrumMagica.rand.nextFloat() * diffX,
+						bounds.minY(),
+						bounds.minZ() + NostrumMagica.rand.nextFloat() * diffZ,
 						0, // pos + posjitter
 						40, 10, // lifetime + jitter
-						new Vector3d(0, yVel, 0), null
+						new Vec3(0, yVel, 0), null
 						).color(characteristics.getElement().getColor()));
 			}
 			
 			if (NostrumMagica.rand.nextBoolean()) {
 				// corners
 				
-				for (int x : new int[] {bounds.x0, bounds.x1 + 1})
-				for (int z : new int[] {bounds.z0, bounds.z1 + 1})
+				for (int x : new int[] {bounds.minX(), bounds.maxX() + 1})
+				for (int z : new int[] {bounds.minZ(), bounds.maxZ() + 1})
 				{
 					NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 							1,
 							x,
-							bounds.y0,
+							bounds.minY(),
 							z,
 							0, // pos + posjitter
 							40, 10, // lifetime + jitter
-							new Vector3d(0, yVel, 0), null
+							new Vec3(0, yVel, 0), null
 							).color(characteristics.getElement().getColor()));
 				}
 			}
 		}
 	}
 	
-	protected static final MutableBoundingBox MakeBounds(BlockPos start, WallFacing facing, float radius) {
+	protected static final BoundingBox MakeBounds(BlockPos start, WallFacing facing, float radius) {
 		final int minBlockX;
 		final int maxBlockX;
 		final int minBlockY;
@@ -231,11 +231,11 @@ public class WallShape extends AreaShape {
 			}
 		}
 		
-		return new MutableBoundingBox(minBlockX, minBlockY, minBlockZ,
+		return new BoundingBox(minBlockX, minBlockY, minBlockZ,
 				maxBlockX, maxBlockY, maxBlockZ);
 	}
 	
-	protected static final WallFacing MakeFacing(LivingEntity caster, Vector3d pos, float pitch, float yaw, boolean grounded) {
+	protected static final WallFacing MakeFacing(LivingEntity caster, Vec3 pos, float pitch, float yaw, boolean grounded) {
 		// Get N/S or E/W from target positions
 		final double dz = Math.abs(caster.getZ() - pos.z);
 		final double dx = Math.abs(caster.getX() - pos.x);
@@ -339,7 +339,7 @@ public class WallShape extends AreaShape {
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
+	public boolean shouldTrace(Player player, SpellShapeProperties params) {
 		return false;
 	}
 
@@ -354,14 +354,14 @@ public class WallShape extends AreaShape {
 		
 		// Determine facing based on actual hit position, but use hitPos (where we'll actually place it) to determine if it's grounded
 		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !location.world.isEmptyBlock(location.selectedBlockPos) && location.world.isEmptyBlock(location.selectedBlockPos.above()));
-		MutableBoundingBox bounds = MakeBounds(location.hitBlockPos, facing, radius);
+		BoundingBox bounds = MakeBounds(location.hitBlockPos, facing, radius);
 		
 		// Do block preview if affecting blocks at all
 		if (this.affectsBlocks(properties)) {
 			List<SpellLocation> positions = new ArrayList<>();
-			for (int x = bounds.x0; x <= bounds.x1; x++)
-			for (int y = bounds.y0; y <= bounds.y1; y++)
-			for (int z = bounds.z0; z <= bounds.z1; z++) {
+			for (int x = bounds.minX(); x <= bounds.maxX(); x++)
+			for (int y = bounds.minY(); y <= bounds.maxY(); y++)
+			for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
 				positions.add(new SpellLocation(location.world, new BlockPos(x, y, z)));
 			}
 			state.trigger(null, positions);

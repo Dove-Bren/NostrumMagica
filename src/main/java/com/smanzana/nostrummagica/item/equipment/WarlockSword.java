@@ -34,30 +34,30 @@ import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.nostrummagica.util.SpellUtils;
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTier;
-import net.minecraft.item.Rarity;
-import net.minecraft.item.SwordItem;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -71,14 +71,14 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	private static final UUID WARLOCKBLADE_POTENCY_UUID = UUID.fromString("2d5dd2dc-3f5c-4dce-be8f-fa93627fe560");
 	
 	public WarlockSword() {
-		super(ItemTier.DIAMOND, 3, -2.4F, NostrumItems.PropEquipment().durability(1200).rarity(Rarity.UNCOMMON));
+		super(Tiers.DIAMOND, 3, -2.4F, NostrumItems.PropEquipment().durability(1200).rarity(Rarity.UNCOMMON));
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot equipmentSlot) {
 		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 
-		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
+		if (equipmentSlot == EquipmentSlot.MAINHAND) {
 			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 			builder.putAll(multimap);
 			builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 7, AttributeModifier.Operation.ADDITION));
@@ -129,7 +129,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
 		boolean extra = Screen.hasShiftDown();
@@ -141,25 +141,25 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 				continue;
 			}
 			
-			String str = " + " + elem.getChatColor() + Math.floor(f) + " " + elem.getName() + TextFormatting.RESET + " damage";
+			String str = " + " + elem.getChatColor() + Math.floor(f) + " " + elem.getName() + ChatFormatting.RESET + " damage";
 			if (extra) {
 				str += " (" + Math.floor(100 * (f - Math.floor(f))) + "%)";
 			}
-			tooltip.add(new StringTextComponent(str));
+			tooltip.add(new TextComponent(str));
 		}
 		
 		if (extra) {
-			tooltip.add(new StringTextComponent("Capacity: " + getCapacity(stack)));
+			tooltip.add(new TextComponent("Capacity: " + getCapacity(stack)));
 			if (hasEnderIOTravel(stack)) {
-				tooltip.add(new StringTextComponent("EnderIO Travel Anchor Support").withStyle(TextFormatting.DARK_PURPLE));
+				tooltip.add(new TextComponent("EnderIO Travel Anchor Support").withStyle(ChatFormatting.DARK_PURPLE));
 			}
 		} else {
-			tooltip.add(new StringTextComponent("[Hold Shift]"));			
+			tooltip.add(new TextComponent("[Hold Shift]"));			
 		}
 	}
 	
 	@Override
-	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
 		if (this.allowdedIn(group)) {
 			items.add(addCapacity(new ItemStack(this), 10));
 			items.add(setLevel(setLevel(setLevel(setLevel(
@@ -187,7 +187,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	}
 	
 	public static Float getLevel(ItemStack stack, EMagicElement element) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
 			return 0f;
 		}
@@ -196,12 +196,12 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	}
 	
 	public static ItemStack setLevel(ItemStack stack, EMagicElement element, float level) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		
-		CompoundNBT tag = nbt.getCompound(NBT_LEVELS);
+		CompoundTag tag = nbt.getCompound(NBT_LEVELS);
 		tag.putFloat(element.name().toLowerCase(), Math.max(0, level));
 		nbt.put(NBT_LEVELS, tag);
 		stack.setTag(nbt);
@@ -209,12 +209,12 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	}
 	
 	public static ItemStack addLevel(ItemStack stack, EMagicElement element, float diff) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		
-		CompoundNBT tag = nbt.getCompound(NBT_LEVELS);
+		CompoundTag tag = nbt.getCompound(NBT_LEVELS);
 		float amt = tag.getFloat(element.name().toLowerCase());
 		
 		tag.putFloat(element.name().toLowerCase(), Math.max(0, amt + diff));
@@ -225,7 +225,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	}
 	
 	public static int getCapacity(ItemStack stack) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
 			return 0;
 		}
@@ -234,9 +234,9 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	}
 	
 	public static ItemStack addCapacity(ItemStack stack, int diff) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		
 		int amt = nbt.getInt(NBT_CAPACITY);
@@ -247,7 +247,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	}
 	
 	public static boolean hasEnderIOTravel(ItemStack stack) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
 			return false;
 		}
@@ -256,9 +256,9 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	}
 	
 	public static ItemStack setEnderIOTravel(ItemStack stack, boolean hasTravel) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		
 		nbt.putBoolean(NBT_ENDERIO_TRAVEL_CAP, hasTravel);
@@ -298,7 +298,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 		NostrumParticles.GLOW_ORB.spawn(entity.level, new SpawnParams(
 				3,
 				entity.getX(), entity.getY() + entity.getBbHeight(), entity.getZ(), 1, 30, 5,
-				new Vector3d(0, -0.05, 0), null
+				new Vec3(0, -0.05, 0), null
 				).color(0x80000000 | (0x00FFFFFF & element.getColor())));
 	}
 	
@@ -357,7 +357,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 		}
 	}
 	
-	private boolean canEnderTravel(ItemStack item, PlayerEntity player) {
+	private boolean canEnderTravel(ItemStack item, Player player) {
 		return hasEnderIOTravel(item)//getLevel(item, EMagicElement.ENDER) > 0
 				&& (NostrumMagica.getMagicWrapper(player) != null)
 				&& (NostrumMagica.getMagicWrapper(player).isUnlocked());
@@ -383,7 +383,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 
 		final @Nonnull ItemStack stack = playerIn.getItemInHand(hand);
 		if (playerIn.getAttackStrengthScale(0.5F) > .95) {
@@ -403,11 +403,11 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 			}
 		}
 		
-		return new ActionResult<ItemStack>(ActionResultType.PASS, stack);
+		return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, stack);
 	}
 	
 	@Override
-	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
+	public boolean shouldTrace(Level world, Player player, ItemStack stack) {
 		Map<EMagicElement, Float> power = getLevels(stack);
 		for (EMagicElement elem : EMagicElement.values()) {
 			Float val = power.get(elem);
@@ -419,14 +419,14 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 		return false;
 	}
 
-	protected boolean tryCast(World worldIn, PlayerEntity playerIn, Hand hand, ItemStack stack) {
+	protected boolean tryCast(Level worldIn, Player playerIn, InteractionHand hand, ItemStack stack) {
 		boolean used = false;
 		if (playerIn.getAttackStrengthScale(0.5F) > .95) {
 			
 			// Earlier right-click stuff here
 			if (!worldIn.isClientSide) {
 				// We have a target?
-				RayTraceResult result = RayTrace.raytraceApprox(worldIn, playerIn, playerIn.position().add(0, playerIn.getEyeHeight(), 0),
+				HitResult result = RayTrace.raytraceApprox(worldIn, playerIn, playerIn.position().add(0, playerIn.getEyeHeight(), 0),
 						playerIn.xRot, playerIn.yRot, SeekingBulletShape.MAX_DIST, (ent) -> {
 							if (ent != null && playerIn != ent) {
 								if (ent instanceof ITameableEntity && ((ITameableEntity) ent).getOwner() != null) {
@@ -466,9 +466,9 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 		return used;
 	}
 	
-	public static boolean DoCast(PlayerEntity player) {
+	public static boolean DoCast(Player player) {
 		// Try to find weapon
-		Hand hand = Hand.MAIN_HAND;
+		InteractionHand hand = InteractionHand.MAIN_HAND;
 		@Nonnull ItemStack stack = player.getItemInHand(hand);
 		if (stack.getItem() instanceof WarlockSword) {
 			if (((WarlockSword) stack.getItem()).tryCast(player.level, player, hand, stack)) {
@@ -477,7 +477,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 		}
 		
 		// Try with offhand
-		hand = Hand.OFF_HAND;
+		hand = InteractionHand.OFF_HAND;
 		stack = player.getItemInHand(hand);
 		if (stack.getItem() instanceof WarlockSword) {
 			if (((WarlockSword) stack.getItem()).tryCast(player.level, player, hand, stack)) {
@@ -489,7 +489,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	}
 
 	@Override
-	public double getTraceRange(World world, PlayerEntity player, ItemStack stack) {
+	public double getTraceRange(Level world, Player player, ItemStack stack) {
 		return SeekingBulletShape.MAX_DIST;
 	}
 

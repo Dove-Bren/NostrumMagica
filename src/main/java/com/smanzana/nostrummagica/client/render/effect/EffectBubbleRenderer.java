@@ -1,25 +1,25 @@
 package com.smanzana.nostrummagica.client.render.effect;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.IEffectRenderer;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.EffectType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Matrix3f;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 
 public class EffectBubbleRenderer implements IEffectRenderer {
 	
@@ -31,7 +31,7 @@ public class EffectBubbleRenderer implements IEffectRenderer {
 	private static final float OFFSET_GOOD = .1f;
 	private static final float ORBIT_GOOD = 1f;
 	
-	protected static final float GetDefaultOffset(EffectType type) {
+	protected static final float GetDefaultOffset(MobEffectCategory type) {
 		switch (type) {
 		case BENEFICIAL:
 			return OFFSET_GOOD;
@@ -43,7 +43,7 @@ public class EffectBubbleRenderer implements IEffectRenderer {
 		}
 	}
 	
-	protected static final float GetDefaultOrbit(EffectType type) {
+	protected static final float GetDefaultOrbit(MobEffectCategory type) {
 		switch (type) {
 		case BENEFICIAL:
 			return ORBIT_GOOD;
@@ -55,7 +55,7 @@ public class EffectBubbleRenderer implements IEffectRenderer {
 		}
 	}
 	
-	protected static final float GetDefaultOrbitOffset(Effect effect) {
+	protected static final float GetDefaultOrbitOffset(MobEffect effect) {
 		return (float) (effect.getRegistryName().hashCode() % 60) / 60f;
 	}
 	
@@ -78,11 +78,11 @@ public class EffectBubbleRenderer implements IEffectRenderer {
 		this.alpha = colors[3];
 	}
 	
-	public EffectBubbleRenderer(float yExtraOffset, Effect effect) {
+	public EffectBubbleRenderer(float yExtraOffset, MobEffect effect) {
 		this(yExtraOffset + GetDefaultOffset(effect.getCategory()), GetDefaultOrbit(effect.getCategory()), GetDefaultOrbitOffset(effect), effect.getColor());
 	}
 	
-	public EffectBubbleRenderer(Effect effect) {
+	public EffectBubbleRenderer(MobEffect effect) {
 		this(0f, effect);
 	}
 	
@@ -103,11 +103,11 @@ public class EffectBubbleRenderer implements IEffectRenderer {
 	}
 	
 	@Override
-	public void renderEffectOnEntity(EffectInstance effect, MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void renderEffectOnEntity(MobEffectInstance effect, PoseStack stack, MultiBufferSource typeBuffer, int packedLight, LivingEntity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		final Minecraft mc = Minecraft.getInstance();
-		final ActiveRenderInfo activeInfo = mc.gameRenderer.getMainCamera();
+		final Camera activeInfo = mc.gameRenderer.getMainCamera();
 		
-		final float entYaw = MathHelper.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
+		final float entYaw = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
 		
 		stack.pushPose();
 		
@@ -138,8 +138,8 @@ public class EffectBubbleRenderer implements IEffectRenderer {
 		stack.popPose();
 	}
 	
-	protected void renderOrb(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, float width, float red, float green, float blue, float alpha) {
-		final IVertexBuilder buffer = typeBuffer.getBuffer(RenderType.entityTranslucent(TEX_BUBBLE));
+	protected void renderOrb(PoseStack stack, MultiBufferSource typeBuffer, int packedLight, float width, float red, float green, float blue, float alpha) {
+		final VertexConsumer buffer = typeBuffer.getBuffer(RenderType.entityTranslucent(TEX_BUBBLE));
 		final Matrix4f transform = stack.last().pose();
 		final Matrix3f normal = stack.last().normal();
 		final int packedOverlay = OverlayTexture.NO_OVERLAY;

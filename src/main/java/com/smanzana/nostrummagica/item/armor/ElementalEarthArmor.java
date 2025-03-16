@@ -2,8 +2,8 @@ package com.smanzana.nostrummagica.item.armor;
 
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.Item;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
 
 public class ElementalEarthArmor extends ElementalArmor {
 
@@ -24,7 +24,7 @@ public class ElementalEarthArmor extends ElementalArmor {
 	public static final String ID_FEET_ADEPT = ID_PREFIX + "feet_adept";
 	public static final String ID_FEET_MASTER = ID_PREFIX + "feet_master";
 		
-	public ElementalEarthArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
+	public ElementalEarthArmor(EquipmentSlot slot, Type type, Item.Properties properties) {
 		super(EMagicElement.EARTH, slot, type, properties);
 	}
 	

@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.widget;
 
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.network.chat.Component;
 
 /**
  * Vanilla's widget class has a bad implementation of the mouse released method that
@@ -12,9 +12,9 @@ import net.minecraft.util.text.ITextComponent;
  * @author Skyler
  *
  */
-public abstract class FixedWidget extends Widget {
+public abstract class FixedWidget extends AbstractWidget {
 
-	public FixedWidget(int x, int y, int width, int height, ITextComponent title) {
+	public FixedWidget(int x, int y, int width, int height, Component title) {
 		super(x, y, width, height, title);
 	}
 	

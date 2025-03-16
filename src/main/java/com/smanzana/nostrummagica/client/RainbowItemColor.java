@@ -3,10 +3,10 @@ package com.smanzana.nostrummagica.client;
 import java.awt.Color;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.color.IItemColor;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.world.item.ItemStack;
 
-public class RainbowItemColor implements IItemColor {
+public class RainbowItemColor implements ItemColor {
 	
 	private final int tintIndex;
 	

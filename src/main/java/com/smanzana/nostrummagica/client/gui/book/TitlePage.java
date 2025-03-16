@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Font;
 
 /**
  * Plain text page, except the text is centered and put down a bit
@@ -22,7 +22,7 @@ public class TitlePage implements IBookPage {
 	}
 
 	@Override
-	public void draw(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int xoffset, int yoffset, int width, int height) {
+	public void draw(BookScreen parent, PoseStack matrixStackIn, Font fonter, int xoffset, int yoffset, int width, int height) {
 			if (hoffset == -1) {
 				int w = fonter.width(this.text);
 				hoffset = w/2; 
@@ -31,7 +31,7 @@ public class TitlePage implements IBookPage {
 	}
 
 	@Override
-	public void overlay(BookScreen parent, MatrixStack matrixStackIn, FontRenderer fonter, int mouseX, int mouseY, int trueX, int trueY) {
+	public void overlay(BookScreen parent, PoseStack matrixStackIn, Font fonter, int mouseX, int mouseY, int trueX, int trueY) {
 		;
 	}
 	

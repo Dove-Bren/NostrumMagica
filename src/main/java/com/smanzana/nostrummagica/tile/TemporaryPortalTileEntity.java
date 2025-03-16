@@ -4,14 +4,14 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PortalBlock;
 import com.smanzana.nostrummagica.util.Location;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity implements ITickableTileEntity {
+public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity implements TickableBlockEntity {
 
 	private long endticks;
 	
@@ -39,7 +39,7 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public int getColor() {
-		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.instance.proxy.getPlayer();
 		if (PortalBlock.getRemainingCharge(player) > 0) {
 			return 0x00400000;
 		}
@@ -66,7 +66,7 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 			}
 		}
 		
-		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.instance.proxy.getPlayer();
 		if (PortalBlock.getCooldownTime(player) > 0) {
 			opacity *= 0.5f;
 		}
@@ -75,14 +75,14 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT compound) {
+	public void load(BlockState state, CompoundTag compound) {
 		super.load(state, compound);
 		
 		endticks = compound.getLong("EXPIRE");
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		nbt.putLong("EXPIRE", endticks);

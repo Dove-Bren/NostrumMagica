@@ -6,27 +6,27 @@ import com.google.common.base.Predicate;
 import com.smanzana.petcommand.api.ai.IFollowOwnerGoal;
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.pathfinding.PathNavigator;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 
-import net.minecraft.entity.ai.goal.Goal.Flag;
+import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
-public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> extends Goal implements IFollowOwnerGoal {
+public class FollowOwnerGenericGoal<T extends PathfinderMob & ITameableEntity> extends Goal implements IFollowOwnerGoal {
 	
 	private final T thePet;
 	private LivingEntity theOwner;
-	private World theWorld;
+	private Level theWorld;
 	private final double followSpeed;
-	private final PathNavigator petPathfinder;
+	private final PathNavigation petPathfinder;
 	private int timeToRecalcPath;
 	private float maxDist;
 	private float minDist;
@@ -58,7 +58,7 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 
 		if (entitylivingbase == null) {
 			return false;
-		} else if (entitylivingbase instanceof PlayerEntity && ((PlayerEntity)entitylivingbase).isSpectator()) {
+		} else if (entitylivingbase instanceof Player && ((Player)entitylivingbase).isSpectator()) {
 			return false;
 		} else if (this.thePet.isEntitySitting()) {
 			return false;
@@ -84,8 +84,8 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 	 */
 	public void start() {
 		this.timeToRecalcPath = 0;
-		this.oldWaterCost = this.thePet.getPathfindingMalus(PathNodeType.WATER);
-		this.thePet.setPathfindingMalus(PathNodeType.WATER, 0.0F);
+		this.oldWaterCost = this.thePet.getPathfindingMalus(BlockPathTypes.WATER);
+		this.thePet.setPathfindingMalus(BlockPathTypes.WATER, 0.0F);
 	}
 
 	/**
@@ -94,14 +94,14 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 	public void stop() {
 		this.theOwner = null;
 		this.petPathfinder.stop();
-		this.thePet.setPathfindingMalus(PathNodeType.WATER, this.oldWaterCost);
+		this.thePet.setPathfindingMalus(BlockPathTypes.WATER, this.oldWaterCost);
 	}
 
 	protected boolean isEmptyBlock(BlockPos pos) {
 		return IsEmptyBlock(theWorld, pos);
 	}
 	
-	protected static boolean IsEmptyBlock(World world, BlockPos pos) {
+	protected static boolean IsEmptyBlock(Level world, BlockPos pos) {
 		return world.isEmptyBlock(pos);
 	}
 	
@@ -110,14 +110,14 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 			return false;
 		}
 		
-		final World theWorld = targetEntity.level;
-		int i = MathHelper.floor(targetEntity.getX()) - 2;
-		int j = MathHelper.floor(targetEntity.getZ()) - 2;
-		int k = MathHelper.floor(targetEntity.getBoundingBox().minY);
+		final Level theWorld = targetEntity.level;
+		int i = Mth.floor(targetEntity.getX()) - 2;
+		int j = Mth.floor(targetEntity.getZ()) - 2;
+		int k = Mth.floor(targetEntity.getBoundingBox().minY);
 		
-		BlockPos.Mutable pos1 = new BlockPos.Mutable();
-		BlockPos.Mutable pos2 = new BlockPos.Mutable();
-		BlockPos.Mutable pos3 = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos pos1 = new BlockPos.MutableBlockPos();
+		BlockPos.MutableBlockPos pos2 = new BlockPos.MutableBlockPos();
+		BlockPos.MutableBlockPos pos3 = new BlockPos.MutableBlockPos();
 
 		for (int l = 0; l <= 4; ++l) {
 			for (int i1 = 0; i1 <= 4; ++i1) {
@@ -126,8 +126,8 @@ public class FollowOwnerGenericGoal<T extends CreatureEntity & ITameableEntity> 
 				pos3.set(i + l, k + 1, j + i1);
 				if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && theWorld.getBlockState(new BlockPos(pos1)).isValidSpawn(theWorld, pos1, teleportingEntity.getType()) && IsEmptyBlock(theWorld, pos2) && IsEmptyBlock(theWorld, pos3)) {
 					teleportingEntity.moveTo((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), teleportingEntity.yRot, teleportingEntity.xRot);
-					if (teleportingEntity instanceof MobEntity) {
-						((MobEntity) teleportingEntity).getNavigation().stop();
+					if (teleportingEntity instanceof Mob) {
+						((Mob) teleportingEntity).getNavigation().stop();
 					}
 					return true;
 				}

@@ -8,35 +8,35 @@ import java.util.UUID;
 import com.smanzana.nostrummagica.spell.component.shapes.MagicCyclerShape.MagicCyclerShapeInstance;
 import com.smanzana.nostrummagica.util.Entities;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.EntityRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
 public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 	
 	public static final String ID = "entity_internal_spellsaucer_cycler";
-	protected static final AxisAlignedBB _BoundingBox = new AxisAlignedBB(-.5, -.1, -.5, .5, .1, .5);
+	protected static final AABB _BoundingBox = new AABB(-.5, -.1, -.5, .5, .1, .5);
 	public static final double CYCLER_RADIUS = 1;
 	
-	protected static final DataParameter<Optional<UUID>> SHOOTER = EntityDataManager.<Optional<UUID>>defineId(CyclerSpellSaucerEntity.class, DataSerializers.OPTIONAL_UUID);
+	protected static final EntityDataAccessor<Optional<UUID>> SHOOTER = SynchedEntityData.<Optional<UUID>>defineId(CyclerSpellSaucerEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 	
 	// Cycler:
 	private final int duration;
 	private final boolean onBlocks;
 	private final boolean dieOnImpact;
 	
-	public CyclerSpellSaucerEntity(EntityType<? extends CyclerSpellSaucerEntity> type, World world) {
+	public CyclerSpellSaucerEntity(EntityType<? extends CyclerSpellSaucerEntity> type, Level world) {
 		super(type, world);
 		this.duration = 5;
 		this.onBlocks = false;
@@ -46,7 +46,7 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
         this.xPower = this.yPower = this.zPower = 0;
 	}
 	
-	protected CyclerSpellSaucerEntity(EntityType<? extends CyclerSpellSaucerEntity> type, MagicCyclerShapeInstance trigger, World world, LivingEntity shooter, float speed,
+	protected CyclerSpellSaucerEntity(EntityType<? extends CyclerSpellSaucerEntity> type, MagicCyclerShapeInstance trigger, Level world, LivingEntity shooter, float speed,
 			int duration, boolean onBlocks, boolean dieOnImpact) {
 		super(type, trigger, world, shooter, speed, 1000, 20);
         this.duration = duration; // Long neough to flash so I know things are going on
@@ -63,7 +63,7 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
         this.entityData.set(SHOOTER, Optional.ofNullable(shooter.getUUID()));
 	}
 	
-	public CyclerSpellSaucerEntity(World world, LivingEntity shooter, MagicCyclerShapeInstance trigger, float speed,
+	public CyclerSpellSaucerEntity(Level world, LivingEntity shooter, MagicCyclerShapeInstance trigger, float speed,
 			int duration, boolean onBlocks, boolean dieOnImpact) {
 		this(NostrumEntityTypes.cyclerSpellSaucer, trigger, world, shooter, speed, duration, onBlocks, dieOnImpact);
 	}
@@ -75,7 +75,7 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 	}
 	
 	
-	protected Vector3d getTargetOffsetLoc(float partialTicks) {
+	protected Vec3 getTargetOffsetLoc(float partialTicks) {
 		// Get shooter position
 		if (this.shootingEntity == null) {
 			// Try and do a fixup
@@ -106,10 +106,10 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 			x = y = z = 0;
 		}
 		
-		return new Vector3d(x, y, z);
+		return new Vec3(x, y, z);
 	}
 	
-	public Vector3d getTargetLoc(float partialTicks) {
+	public Vec3 getTargetLoc(float partialTicks) {
 		// Get shooter position
 		if (this.shootingEntity == null) {
 			// Try and do a fixup
@@ -142,7 +142,7 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 				return;
 			}
 			
-			Vector3d pos = this.getTargetLoc(0f);
+			Vec3 pos = this.getTargetLoc(0f);
 			this.setPos(pos.x, pos.y, pos.z);
 			
 //			Vector accel = this.getInstantVelocity();
@@ -172,7 +172,7 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 				}
 				
 				if (ent != null) {
-					RayTraceResult bundledResult = new EntityRayTraceResult(collidedEnts.get(0));
+					HitResult bundledResult = new EntityHitResult(collidedEnts.get(0));
 					this.onHit(bundledResult);
 				}
 			}
@@ -181,7 +181,7 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 			if (this.onBlocks) {
 				// Only trigger on non-air
 				BlockPos blockPos = new BlockPos(getX(), getY(), getZ()); // not using getPosition() since it adds .5 y 
-				RayTraceResult bundledResult = new BlockRayTraceResult(
+				HitResult bundledResult = new BlockHitResult(
 							this.position(), Direction.UP, blockPos, false);
 					
 				this.onHit(bundledResult);
@@ -199,7 +199,7 @@ public class CyclerSpellSaucerEntity extends SpellSaucerEntity {
 		return super.canImpact(entity);
 	}
 	
-	public AxisAlignedBB getCollisionBoundingBox() {
+	public AABB getCollisionBoundingBox() {
 		return _BoundingBox;
 	}
 	

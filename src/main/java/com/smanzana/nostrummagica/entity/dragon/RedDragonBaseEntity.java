@@ -2,27 +2,27 @@ package com.smanzana.nostrummagica.entity.dragon;
 
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap.MutableAttribute;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 
 public abstract class RedDragonBaseEntity extends FlyingDragonEntity {
 
-	private static final DataParameter<Boolean> DRAGON_SLASH =
-			EntityDataManager.<Boolean>defineId(RedDragonBaseEntity.class, DataSerializers.BOOLEAN);
-	private static final DataParameter<Boolean> DRAGON_BITE =
-			EntityDataManager.<Boolean>defineId(RedDragonBaseEntity.class, DataSerializers.BOOLEAN);
-	private static final DataParameter<Boolean> DRAGON_CASTING =
-			EntityDataManager.<Boolean>defineId(RedDragonBaseEntity.class, DataSerializers.BOOLEAN);
+	private static final EntityDataAccessor<Boolean> DRAGON_SLASH =
+			SynchedEntityData.<Boolean>defineId(RedDragonBaseEntity.class, EntityDataSerializers.BOOLEAN);
+	private static final EntityDataAccessor<Boolean> DRAGON_BITE =
+			SynchedEntityData.<Boolean>defineId(RedDragonBaseEntity.class, EntityDataSerializers.BOOLEAN);
+	private static final EntityDataAccessor<Boolean> DRAGON_CASTING =
+			SynchedEntityData.<Boolean>defineId(RedDragonBaseEntity.class, EntityDataSerializers.BOOLEAN);
 	
 	public static long ANIM_SLASH_DUR = 500;
 	
@@ -35,14 +35,14 @@ public abstract class RedDragonBaseEntity extends FlyingDragonEntity {
 	
 	private long castTime;
 	
-	public RedDragonBaseEntity(EntityType<? extends RedDragonBaseEntity> type, World worldIn) {
+	public RedDragonBaseEntity(EntityType<? extends RedDragonBaseEntity> type, Level worldIn) {
 		super(type, worldIn);
         this.noCulling = true;
         this.noPhysics = false;
 	}
 	
 	@Override
-	public void onSyncedDataUpdated(DataParameter<?> key) {
+	public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
 		super.onSyncedDataUpdated(key);
 		if (key == DRAGON_SLASH) {
 			if (this.entityData.get(DRAGON_SLASH)) {
@@ -122,13 +122,13 @@ public abstract class RedDragonBaseEntity extends FlyingDragonEntity {
 		{
 			if (i > 0)
 			{
-				target.knockback((float)i * 0.5F, (double)MathHelper.sin(this.yRot * 0.017453292F), (double)(-MathHelper.cos(this.yRot * 0.017453292F)));
+				target.knockback((float)i * 0.5F, (double)Mth.sin(this.yRot * 0.017453292F), (double)(-Mth.cos(this.yRot * 0.017453292F)));
 				this.setDeltaMovement(this.getDeltaMovement().multiply(.6, 1, .6));
 			}
 
-			if (target instanceof PlayerEntity)
+			if (target instanceof Player)
 			{
-				PlayerEntity entityplayer = (PlayerEntity)target;
+				Player entityplayer = (Player)target;
 				ItemStack itemstack1 = entityplayer.isUsingItem() ? entityplayer.getUseItem() : ItemStack.EMPTY;
 
 				if (!itemstack1.isEmpty() && itemstack1.isShield(entityplayer))
@@ -167,7 +167,7 @@ public abstract class RedDragonBaseEntity extends FlyingDragonEntity {
 		}
 	}
 	
-	protected static final MutableAttribute BuildBaseRedDragonAttributes() {
+	protected static final Builder BuildBaseRedDragonAttributes() {
 		return FlyingDragonEntity.BuildBaseFlyingAttributes();
 	}
 	

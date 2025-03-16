@@ -9,11 +9,11 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class PlayerStat {
 	
@@ -79,11 +79,11 @@ public class PlayerStat {
 	public static final PlayerStat KillsWithMagic = new PlayerStat(NostrumMagica.Loc("kills.totalwithmagic")); 
 
 	private final ResourceLocation id;
-	private final TextComponent name;
+	private final BaseComponent name;
 	
 	public PlayerStat(ResourceLocation id) {
 		this.id = id;
-		this.name = new TranslationTextComponent("stat." + this.id.getNamespace() + "." + this.id.getPath()); 
+		this.name = new TranslatableComponent("stat." + this.id.getNamespace() + "." + this.id.getPath()); 
 	}
 	
 	public @Nonnull ResourceLocation getID() {
@@ -100,7 +100,7 @@ public class PlayerStat {
 		return id.hashCode() * 1773 + 97;
 	}
 
-	public TextComponent getName() {
+	public BaseComponent getName() {
 		return name;
 	}
 	
@@ -111,14 +111,14 @@ public class PlayerStat {
 	}
 	
 	public static class EntityTypeStat extends PlayerStat {
-		private final TextComponent name;
+		private final BaseComponent name;
 		public EntityTypeStat(EntityType<?> type, ResourceLocation idBase) {
 			super(new ResourceLocation(idBase.getNamespace(), idBase.getPath() + "." + type.getRegistryName().getNamespace() + "." + type.getRegistryName().getPath()));
-			this.name = (TextComponent) ((TextComponent) type.getDescription().copy()).append(new StringTextComponent(" ")).append(new TranslationTextComponent("stat." + idBase.getNamespace() + "." + idBase.getPath())); 
+			this.name = (BaseComponent) ((BaseComponent) type.getDescription().copy()).append(new TextComponent(" ")).append(new TranslatableComponent("stat." + idBase.getNamespace() + "." + idBase.getPath())); 
 		}
 
 		@Override
-		public TextComponent getName() {
+		public BaseComponent getName() {
 			return name;
 		}
 	}

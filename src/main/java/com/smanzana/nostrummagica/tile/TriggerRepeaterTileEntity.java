@@ -11,28 +11,28 @@ import com.smanzana.autodungeons.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class TriggerRepeaterTileEntity extends TileEntity implements IOrientedTileEntity {
+public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedTileEntity {
 	
 	private static final String NBT_OFFSET_LIST = "offsets";
 	
 	private List<BlockPos> offsets;
 	
-	protected TriggerRepeaterTileEntity(TileEntityType<? extends TriggerRepeaterTileEntity> type) {
+	protected TriggerRepeaterTileEntity(BlockEntityType<? extends TriggerRepeaterTileEntity> type) {
 		super(type);
 		offsets = new ArrayList<>();
 	}
@@ -61,40 +61,40 @@ public class TriggerRepeaterTileEntity extends TileEntity implements IOrientedTi
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
-	public CompoundNBT save(CompoundNBT compound) {
+	public CompoundTag save(CompoundTag compound) {
 		super.save(compound);
 		
-		ListNBT list = new ListNBT();
+		ListTag list = new ListTag();
 		for (BlockPos offset : offsets) {
-			list.add(NBTUtil.writeBlockPos(offset));
+			list.add(NbtUtils.writeBlockPos(offset));
 		}
 		compound.put(NBT_OFFSET_LIST, list);
 		
 		return compound;
 	}
 	
-	public void load(BlockState state, CompoundNBT compound) {
+	public void load(BlockState state, CompoundTag compound) {
 		super.load(state, compound);
 		
-		ListNBT list = compound.getList(NBT_OFFSET_LIST, NBT.TAG_COMPOUND);
+		ListTag list = compound.getList(NBT_OFFSET_LIST, NBT.TAG_COMPOUND);
 		offsets.clear();
 		for (int i = 0; i < list.size(); i++) {
-			offsets.add(NBTUtil.readBlockPos(list.getCompound(i)));
+			offsets.add(NbtUtils.readBlockPos(list.getCompound(i)));
 		}
 	}
 	
@@ -135,7 +135,7 @@ public class TriggerRepeaterTileEntity extends TileEntity implements IOrientedTi
 		}
 	}
 	
-	public int cleanOffests(@Nullable PlayerEntity feedbackPlayer) {
+	public int cleanOffests(@Nullable Player feedbackPlayer) {
 		Iterator<BlockPos> it = this.offsets.iterator();
 		int count = 0;
 		while (it.hasNext()) {
@@ -144,7 +144,7 @@ public class TriggerRepeaterTileEntity extends TileEntity implements IOrientedTi
 			final BlockState state = level.getBlockState(target);
 			if (state == null || !(state.getBlock() instanceof ITriggeredBlock)) {
 				if (feedbackPlayer != null) {
-					feedbackPlayer.sendMessage(new StringTextComponent("Cleaning out offset " + offset), Util.NIL_UUID);
+					feedbackPlayer.sendMessage(new TextComponent("Cleaning out offset " + offset), Util.NIL_UUID);
 				}
 				it.remove();
 				count++;

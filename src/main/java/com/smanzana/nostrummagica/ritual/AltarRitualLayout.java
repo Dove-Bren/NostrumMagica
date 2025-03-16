@@ -19,15 +19,15 @@ import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.tile.CandleTileEntity;
 import com.smanzana.nostrummagica.tile.IReagentProviderTile;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 /**
  * Ritual input based on itemstack center, extras, and reagent type reagents from candles and altars.
@@ -112,32 +112,32 @@ public class AltarRitualLayout implements IRitualLayout {
 	}
 
 	@Override
-	public ItemStack getCenterItem(World world, BlockPos center) {
+	public ItemStack getCenterItem(Level world, BlockPos center) {
 		return this.centerItem;
 	}
 	
 	@Override
-	public List<ItemStack> getExtraItems(World world, BlockPos center) {
+	public List<ItemStack> getExtraItems(Level world, BlockPos center) {
 		return this.extraItems;
 	}
 
 	@Override
-	public List<ItemStack> getReagentItems(World world, BlockPos center) {
+	public List<ItemStack> getReagentItems(Level world, BlockPos center) {
 		return this.reagentItems;
 	}
 	
 	@Override
-	public void clearIngredients(World world, BlockPos center, RitualRecipe recipePerformed) {
+	public void clearIngredients(Level world, BlockPos center, RitualRecipe recipePerformed) {
 		ClearIngredients(world, center, recipePerformed.getTier());
 	}
 	
 	@Override
-	public void setOutputItems(World world, BlockPos center, Iterable<ItemStack> outputs) {
+	public void setOutputItems(Level world, BlockPos center, Iterable<ItemStack> outputs) {
 		DistributeOutputs(world, center, outputs);
 	}
 	
-	public static final AltarRitualLayout Capture(World world, BlockPos center, EMagicElement element) {
-		final TileEntity centerTE = world.getBlockEntity(center);
+	public static final AltarRitualLayout Capture(Level world, BlockPos center, EMagicElement element) {
+		final BlockEntity centerTE = world.getBlockEntity(center);
 		
 		// Center may be candle or may be altar. It may not be null.
 		if (centerTE == null) {
@@ -184,8 +184,8 @@ public class AltarRitualLayout implements IRitualLayout {
 		return new AltarRitualLayout(tier, element, centerItem, extras, reagents);
 	}
 	
-	protected static final ItemStack GetAltarItem(World world, BlockPos pos) {
-		TileEntity te = world.getBlockEntity(pos);
+	protected static final ItemStack GetAltarItem(Level world, BlockPos pos) {
+		BlockEntity te = world.getBlockEntity(pos);
 		if (te != null && te instanceof AltarTileEntity) {
 			return ((AltarTileEntity) te).getItem();
 		}
@@ -193,8 +193,8 @@ public class AltarRitualLayout implements IRitualLayout {
 		return ItemStack.EMPTY;
 	}
 	
-	protected static final ItemStack GetReagent(World world, BlockPos pos) {
-		TileEntity te = world.getBlockEntity(pos);
+	protected static final ItemStack GetReagent(Level world, BlockPos pos) {
+		BlockEntity te = world.getBlockEntity(pos);
 		if (te != null && te instanceof IReagentProviderTile) {
 			return ReagentItem.CreateStack(((IReagentProviderTile) te).getPresentReagentType(te, world, pos), 1);
 		}
@@ -202,12 +202,12 @@ public class AltarRitualLayout implements IRitualLayout {
 		return ItemStack.EMPTY;
 	}
 	
-	protected static final boolean CheckChalkBlock(World world, BlockPos pos, BlockState state) {
+	protected static final boolean CheckChalkBlock(Level world, BlockPos pos, BlockState state) {
 		return state.getBlock() instanceof ChalkBlock;
 	}
 	
-	private static final boolean CheckChalk(World world, BlockPos center, int[] xCoords, int[] yCoords) {
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+	private static final boolean CheckChalk(Level world, BlockPos center, int[] xCoords, int[] yCoords) {
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		for (int i = 0; i < xCoords.length; i++) {
 			cursor.set(center.getX() + xCoords[i], center.getY(), center.getZ() + yCoords[i]);
 			if (!CheckChalkBlock(world, cursor, world.getBlockState(cursor))) {
@@ -218,35 +218,35 @@ public class AltarRitualLayout implements IRitualLayout {
 		return true;
 	}
 	
-	protected static final boolean CheckChalkTier1(World world, BlockPos center) {
+	protected static final boolean CheckChalkTier1(Level world, BlockPos center) {
 		final int CHALK_XS[] = {-1, 0, 1, -1, 1, -1, 0, 1};
 		final int CHALK_YS[] = {-1, -1, -1, 0, 0, 1, 1, 1};
 		return CheckChalk(world, center, CHALK_XS, CHALK_YS);
 	}
 	
-	protected static final boolean CheckChalkTier2(World world, BlockPos center) {
+	protected static final boolean CheckChalkTier2(Level world, BlockPos center) {
 		final int CHALK_XS[] = {0, -1, 1, -2, 2, -1, 1, 0};
 		final int CHALK_YS[] = {-2, -1, -1, 0, 0, 1, 1, 2};
 		return CheckChalk(world, center, CHALK_XS, CHALK_YS);
 	}
 	
-	protected static final boolean CheckChalkTier3(World world, BlockPos center) {
+	protected static final boolean CheckChalkTier3(Level world, BlockPos center) {
 		final int CHALK_XS[] = {-2, -1, 1, 2, -3, -1, 0, 1, 3, -3, -2, -1, 1, 2, 3, -2, 2, -3, -2, -1, 1, 2, 3, -3, -1, 0, 1, 3, -2, -1, 1, 2};
 		final int CHALK_YS[] = {-3, -3, -3, -3, -2, -2, -2, -2, -2, -1, -1, -1, -1, -1, -1, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3};
 		return CheckChalk(world, center, CHALK_XS, CHALK_YS);
 	}
 	
-	public static final void VisitTier2Candles(World world, BlockPos center, BiConsumer<World, BlockPos> visitor) {
+	public static final void VisitTier2Candles(Level world, BlockPos center, BiConsumer<Level, BlockPos> visitor) {
 		final int CANDLE_XS[] = {-2, -2, 2, 2};
 		final int CANDLE_YS[] = {-2, 2, -2, 2};
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		for (int i = 0; i < CANDLE_XS.length; i++) {
 			cursor.set(center.getX() + CANDLE_XS[i], center.getY(), center.getZ() + CANDLE_YS[i]);
 			visitor.accept(world, cursor);
 		}
 	}
 	
-	protected static final List<ItemStack> CollectTier2Reagents(World world, BlockPos center) {
+	protected static final List<ItemStack> CollectTier2Reagents(Level world, BlockPos center) {
 		final List<ItemStack> reagents = new ArrayList<>(4);
 		VisitTier2Candles(world, center, (w, pos) -> {
 			ItemStack reagent = GetReagent(world, pos);
@@ -257,17 +257,17 @@ public class AltarRitualLayout implements IRitualLayout {
 		return reagents;
 	}
 	
-	protected static final void VisitTier3Extras(World world, BlockPos center, BiConsumer<World, BlockPos> visitor) {
+	protected static final void VisitTier3Extras(Level world, BlockPos center, BiConsumer<Level, BlockPos> visitor) {
 		final int ALTAR_XS[] = {-4, 0, 0, 4};
 		final int ALTAR_YS[] = {0, -4, 4, 0};
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		for (int i = 0; i < ALTAR_XS.length; i++) {
 			cursor.set(center.getX() + ALTAR_XS[i], center.getY(), center.getZ() + ALTAR_YS[i]);
 			visitor.accept(world, cursor);
 		}
 	}
 	
-	protected static final List<ItemStack> CollectTier3Extras(World world, BlockPos center) {
+	protected static final List<ItemStack> CollectTier3Extras(Level world, BlockPos center) {
 		final List<ItemStack> extras = new ArrayList<>(4);
 		VisitTier3Extras(world, center, (w, pos) -> {
 			ItemStack extra = GetAltarItem(world, pos);
@@ -278,22 +278,22 @@ public class AltarRitualLayout implements IRitualLayout {
 		return extras;
 	}
 	
-	protected static final void ClearCandle(World world, BlockPos pos) {
-		TileEntity te = world.getBlockEntity(pos);
+	protected static final void ClearCandle(Level world, BlockPos pos) {
+		BlockEntity te = world.getBlockEntity(pos);
 		if (te != null && te instanceof IReagentProviderTile) {
 			((IReagentProviderTile) te).consumeReagentType(te, world, pos, null);
 		}
 	}
 	
-	protected static final void ClearAltar(World world, BlockPos pos) {
-		TileEntity te;
+	protected static final void ClearAltar(Level world, BlockPos pos) {
+		BlockEntity te;
 		te = world.getBlockEntity(pos);
 		if (te != null && te instanceof AltarTileEntity) {
 			((AltarTileEntity) te).setItem(ItemStack.EMPTY);
 		}
 	}
 	
-	protected static final void ClearIngredients(World world, BlockPos center, int tier) {
+	protected static final void ClearIngredients(Level world, BlockPos center, int tier) {
 		// This is safe to do without actually taking in what was used to match the recipe because we do exact matching.
 		// So a dangerous situation could be if a recipe just wants 1/2/3 extra items even though we have up to 4.
 		// If we didn't do exact matching, we'd possibly incorrectly remove whatever the items were that weren't required.
@@ -309,13 +309,13 @@ public class AltarRitualLayout implements IRitualLayout {
 		}
 	}
 	
-	protected static final void DistributeOutputs(World world, BlockPos center, Iterable<ItemStack> outputs) {
+	protected static final void DistributeOutputs(Level world, BlockPos center, Iterable<ItemStack> outputs) {
 		// If center is candle, just drop items in the world.
 		// Otherwise, try to put in known altar locations. Any leftover, just put in world.
 		List<ItemStack> leftover = Lists.newArrayList(outputs);
 		
 		if (!leftover.isEmpty()) {
-			TileEntity te = world.getBlockEntity(center);
+			BlockEntity te = world.getBlockEntity(center);
 			if (te != null && te instanceof AltarTileEntity) {
 				Iterator<ItemStack> it = leftover.iterator();
 				
@@ -327,7 +327,7 @@ public class AltarRitualLayout implements IRitualLayout {
 				
 				VisitTier3Extras(world, center, (w, pos) -> {
 					if (it.hasNext()) {
-						TileEntity posTE = w.getBlockEntity(pos);
+						BlockEntity posTE = w.getBlockEntity(pos);
 						if (posTE != null && posTE instanceof AltarTileEntity) {
 							if (((AltarTileEntity) posTE).getItem().isEmpty()) {
 								((AltarTileEntity) posTE).setItem(it.next());
@@ -346,7 +346,7 @@ public class AltarRitualLayout implements IRitualLayout {
 		}
 	}
 	
-	public static final boolean AttemptRitual(World world, BlockPos pos, PlayerEntity player, EMagicElement element) {
+	public static final boolean AttemptRitual(Level world, BlockPos pos, Player player, EMagicElement element) {
 		AltarRitualLayout layout = Capture(world, pos, element);
 		
 		for (RitualRecipe ritual : RitualRegistry.instance().getRegisteredRituals()) {
@@ -361,8 +361,8 @@ public class AltarRitualLayout implements IRitualLayout {
 					NostrumMagica.instance.proxy.playRitualEffect(world, pos, result.element == null ? EMagicElement.PHYSICAL : result.element,
 							result.centerItem, result.extraItems, result.reagentItems, result.output);
 					
-					if (player instanceof ServerPlayerEntity) {
-						RitualCriteriaTrigger.Instance.trigger((ServerPlayerEntity) player, ritual.getTitleKey());
+					if (player instanceof ServerPlayer) {
+						RitualCriteriaTrigger.Instance.trigger((ServerPlayer) player, ritual.getTitleKey());
 					}
 					
 					return true;

@@ -1,18 +1,18 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelDragonEgg;
 import com.smanzana.nostrummagica.entity.dragon.DragonEggEntity;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class RenderDragonEgg extends MobRenderer<DragonEggEntity, ModelDragonEgg> {
 
-	public RenderDragonEgg(EntityRendererManager renderManagerIn, float shadowSizeIn) {
+	public RenderDragonEgg(EntityRenderDispatcher renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelDragonEgg(), shadowSizeIn);
 	}
 
@@ -26,7 +26,7 @@ public class RenderDragonEgg extends MobRenderer<DragonEggEntity, ModelDragonEgg
 	}
 	
 	@Override
-	public void render(DragonEggEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(DragonEggEntity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		// Store on the model (instead of passing through as color D:) how cold the egg is
 		final float coldScale = 1f - (entityIn.getHeat() / DragonEggEntity.HEAT_MAX);
 		this.model.setColdScale(coldScale);

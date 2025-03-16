@@ -5,19 +5,19 @@ import java.util.function.Supplier;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.server.ServerLifecycleHooks;
 
 /**
  * Message sent back and forth between client and server to negotiate doing a non-standard player interact with
@@ -50,9 +50,9 @@ public class RemoteInteractMessage {
 		});
 	}
 	
-	protected static void handleClientCheck(ServerPlayerEntity sender, RemoteInteractMessage message) {
+	protected static void handleClientCheck(ServerPlayer sender, RemoteInteractMessage message) {
 		// On the server, check any conditions. Namely, make sure block is loaded
-		final World world = ServerLifecycleHooks.getCurrentServer().getLevel(message.dimension);
+		final Level world = ServerLifecycleHooks.getCurrentServer().getLevel(message.dimension);
 		final boolean success = world != null && NostrumMagica.isBlockLoaded(world, message.pos);
 		
 		NetworkHandler.sendTo(new RemoteInteractMessage(Phase.SERVER_CHECK_RESPONSE, message.dimension, message.pos, message.hand, success), sender);
@@ -61,7 +61,7 @@ public class RemoteInteractMessage {
 	protected static void handleServerCheck(RemoteInteractMessage message) {
 		// Server responded. Make sure it agrees to proceed
 		if (message.success) {
-			PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+			Player player = NostrumMagica.instance.proxy.getPlayer();
 			if (NostrumMagica.instance.proxy.attemptPlayerInteract(player, player.level, message.pos, message.hand, makeFakeHit(message.pos))) {
 				NetworkHandler.sendToServer(new RemoteInteractMessage(Phase.CLIENT_COMMIT, message.dimension, message.pos, message.hand, true));
 			}
@@ -70,24 +70,24 @@ public class RemoteInteractMessage {
 		}
 	}
 	
-	protected static void handleClientCommit(ServerPlayerEntity sender, RemoteInteractMessage message) {
-		final World world = ServerLifecycleHooks.getCurrentServer().getLevel(message.dimension);
+	protected static void handleClientCommit(ServerPlayer sender, RemoteInteractMessage message) {
+		final Level world = ServerLifecycleHooks.getCurrentServer().getLevel(message.dimension);
 		if (world != null && NostrumMagica.isBlockLoaded(world, message.pos)) {
 			NostrumMagica.instance.proxy.attemptPlayerInteract(sender, world, message.pos, message.hand, makeFakeHit(message.pos));
 		}
 	}
 	
-	protected static final BlockRayTraceResult makeFakeHit(BlockPos pos) {
-		return new BlockRayTraceResult(Vector3d.atCenterOf(pos), Direction.UP, pos, true);
+	protected static final BlockHitResult makeFakeHit(BlockPos pos) {
+		return new BlockHitResult(Vec3.atCenterOf(pos), Direction.UP, pos, true);
 	}
 
 	private final Phase phase;
-	private final RegistryKey<World> dimension;
+	private final ResourceKey<Level> dimension;
 	private final BlockPos pos;
-	private final Hand hand;
+	private final InteractionHand hand;
 	private final boolean success;
 	
-	private RemoteInteractMessage(Phase phase, RegistryKey<World> dimension, BlockPos pos, Hand hand, boolean success) {
+	private RemoteInteractMessage(Phase phase, ResourceKey<Level> dimension, BlockPos pos, InteractionHand hand, boolean success) {
 		this.phase = phase;
 		this.dimension = dimension;
 		this.pos = pos;
@@ -95,26 +95,26 @@ public class RemoteInteractMessage {
 		this.success = success;
 	}
 	
-	public RemoteInteractMessage(RegistryKey<World> dimension, BlockPos pos, Hand hand) {
+	public RemoteInteractMessage(ResourceKey<Level> dimension, BlockPos pos, InteractionHand hand) {
 		// Start new volley
 		this(Phase.CLIENT_CHECK, dimension, pos, hand, true);
 	}
 
-	public static RemoteInteractMessage decode(PacketBuffer buf) {
+	public static RemoteInteractMessage decode(FriendlyByteBuf buf) {
 		return new RemoteInteractMessage(
 				buf.readEnum(Phase.class),
-				RegistryKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation()),
+				ResourceKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation()),
 				buf.readBlockPos(),
-				buf.readBoolean() ? Hand.MAIN_HAND : Hand.OFF_HAND,
+				buf.readBoolean() ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND,
 				buf.readBoolean()
 				);
 	}
 
-	public static void encode(RemoteInteractMessage msg, PacketBuffer buf) {
+	public static void encode(RemoteInteractMessage msg, FriendlyByteBuf buf) {
 		buf.writeEnum(msg.phase);
 		buf.writeResourceLocation(msg.dimension.location());
 		buf.writeBlockPos(msg.pos);
-		buf.writeBoolean(msg.hand == Hand.MAIN_HAND ? true : false);
+		buf.writeBoolean(msg.hand == InteractionHand.MAIN_HAND ? true : false);
 		buf.writeBoolean(msg.success);
 	}
 

@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.player.LocalPlayer;
 
 //@Optional.Interface(iface="com.smanzana.musica.IMusicTrack", modid="musica")
 public class NostrumSorceryBattleTrack implements IMusicTrack {
@@ -27,7 +27,7 @@ public class NostrumSorceryBattleTrack implements IMusicTrack {
 	}
 
 	@Override
-	public boolean shouldPlay(ClientPlayerEntity player) {
+	public boolean shouldPlay(LocalPlayer player) {
 		if (player == null || player.level == null || !DimensionUtils.IsSorceryDim(DimensionUtils.GetDimension(player))) {
 			return false;
 		}
@@ -38,12 +38,12 @@ public class NostrumSorceryBattleTrack implements IMusicTrack {
 	}
 	
 	@Override
-	public boolean shouldLoop(ClientPlayerEntity player) {
+	public boolean shouldLoop(LocalPlayer player) {
 		return shouldPlay(player);
 	}
 
 	@Override
-	public MusicSound getSound(ClientPlayerEntity player) {
+	public MusicSound getSound(LocalPlayer player) {
 		if (!didIntro) {
 			didIntro = true;
 			return soundIntro;
@@ -52,7 +52,7 @@ public class NostrumSorceryBattleTrack implements IMusicTrack {
 	}
 	
 	@Override
-	public void onStop(ClientPlayerEntity player) {
+	public void onStop(LocalPlayer player) {
 		this.didIntro = false;
 	}
 

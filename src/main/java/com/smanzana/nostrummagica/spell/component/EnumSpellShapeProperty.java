@@ -3,9 +3,9 @@ package com.smanzana.nostrummagica.spell.component;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.IPrettyEnum;
 
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.text.TextComponent;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.network.chat.BaseComponent;
 
 public class EnumSpellShapeProperty<E extends Enum<E> & IPrettyEnum> extends SpellShapeProperty<E> {
 	
@@ -22,17 +22,17 @@ public class EnumSpellShapeProperty<E extends Enum<E> & IPrettyEnum> extends Spe
 	}
 
 	@Override
-	public E readValue(INBT tag) {
+	public E readValue(Tag tag) {
 		try {
-			return Enum.valueOf(clazz, ((StringNBT) tag).getAsString().toUpperCase());
+			return Enum.valueOf(clazz, ((StringTag) tag).getAsString().toUpperCase());
 		} catch (Exception e) {
 			return this.getDefault();
 		}
 	}
 
 	@Override
-	public INBT writeValue(E value) {
-		return StringNBT.valueOf(value.name().toLowerCase());
+	public Tag writeValue(E value) {
+		return StringTag.valueOf(value.name().toLowerCase());
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class EnumSpellShapeProperty<E extends Enum<E> & IPrettyEnum> extends Spe
 	}
 
 	@Override
-	public TextComponent getDisplayValue(SpellShape shape, E value) {
+	public BaseComponent getDisplayValue(SpellShape shape, E value) {
 		return value.getDisplayName(); 
 	}
 

@@ -8,14 +8,14 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.TextComponent;
 
 public class CommandSetManaArmor {
 	
-	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+	public static final void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(
 				Commands.literal("nostrummanaarmor")
 					.requires(s -> s.hasPermission(2))
@@ -28,12 +28,12 @@ public class CommandSetManaArmor {
 				);
 	}
 
-	private static final int execute(CommandContext<CommandSource> context, boolean engaged, int cost) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().getPlayerOrException();
+	private static final int execute(CommandContext<CommandSourceStack> context, boolean engaged, int cost) throws CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
 		
 		IManaArmor attr = NostrumMagica.getManaArmor(player);
 		if (attr == null) {
-			context.getSource().sendSuccess(new StringTextComponent("Could not find mana armor wrapper"), true);
+			context.getSource().sendSuccess(new TextComponent("Could not find mana armor wrapper"), true);
 			return 1;
 		}
 		

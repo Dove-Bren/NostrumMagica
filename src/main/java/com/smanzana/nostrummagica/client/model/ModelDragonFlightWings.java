@@ -1,21 +1,21 @@
 package com.smanzana.nostrummagica.client.model;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.util.Mth;
 
 public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<T> {
 
-	private /* final */ ModelRenderer rightWing;
-	private final ModelRenderer leftWing;
+	private /* final */ ModelPart rightWing;
+	private final ModelPart leftWing;
 	
-	private static final <T extends LivingEntity> ModelRenderer createWing(EntityModel<T> base) {
-		ModelRenderer wing = new ModelRenderer(base);
+	private static final <T extends LivingEntity> ModelPart createWing(EntityModel<T> base) {
+		ModelPart wing = new ModelPart(base);
 		wing.setPos(0.0F, 0, 0.0F);
 		wing.texOffs(1, 10).addBox(-19, -13, 0, 19, 2, 1, false);
 		wing.texOffs(3, 8).addBox(-17, -14, 0, 15, 1, 1, false);
@@ -54,7 +54,7 @@ public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<
 	 * Sets the models various rotation angles then renders the model.
 	 */
 	@Override
-	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 //		{
 //			this.rightWing = createWing(this);
 //		}
@@ -77,10 +77,10 @@ public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<
 		// 0f - 1f
 		final float livingJitterPerc = (ageInTicks % livingJitterPeriod) / livingJitterPeriod;
 		// -1f - 1f (sin)
-		final float livingJitterMod = MathHelper.sin(3.1415f * 2 * livingJitterPerc);
+		final float livingJitterMod = Mth.sin(3.1415f * 2 * livingJitterPerc);
 		
 		final float wingFlapPerc = ElementalArmor.GetWingFlap((LivingEntity) entityIn, ageInTicks - (int) ageInTicks);
-		final float wingFlapMod = MathHelper.sin(3.1415f * 2 * wingFlapPerc);
+		final float wingFlapMod = Mth.sin(3.1415f * 2 * wingFlapPerc);
 		
 		rightWing.xRot = rightWing.zRot = 0;
 		if (entityIn instanceof LivingEntity && ((LivingEntity)entityIn).isFallFlying()) {

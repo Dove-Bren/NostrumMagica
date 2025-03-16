@@ -3,15 +3,15 @@ package com.smanzana.nostrummagica.crafting;
 import com.smanzana.nostrummagica.item.SpellTomePage;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.SpecialRecipe;
-import net.minecraft.item.crafting.SpecialRecipeSerializer;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
-public class SpellTomePageCombineRecipe extends SpecialRecipe {
+public class SpellTomePageCombineRecipe extends CustomRecipe {
 
 	public static final String SERIALIZER_ID = "manual_recipe_spelltomepagecombine";
 	
@@ -20,12 +20,12 @@ public class SpellTomePageCombineRecipe extends SpecialRecipe {
 	}
 	
 	@Override
-	public SpecialRecipeSerializer<SpellTomePageCombineRecipe> getSerializer() {
+	public SimpleRecipeSerializer<SpellTomePageCombineRecipe> getSerializer() {
 		return NostrumCrafting.spellTomePageCombineSerializer;
 	}
 	
 	@Override
-	public boolean matches(CraftingInventory inv, World worldIn) {
+	public boolean matches(CraftingContainer inv, Level worldIn) {
 		SpellTomeEnhancement enhancement = null;
 		int count = 0;
 		
@@ -59,7 +59,7 @@ public class SpellTomePageCombineRecipe extends SpecialRecipe {
 	}
 
 	@Override
-	public ItemStack assemble(CraftingInventory inv) {
+	public ItemStack assemble(CraftingContainer inv) {
 		SpellTomeEnhancement enhancement = null;
 		int sum = 0;
 		int count = 0;
@@ -109,7 +109,7 @@ public class SpellTomePageCombineRecipe extends SpecialRecipe {
 	}
 
 	@Override
-	public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
+	public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
 		return NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
 	}
 

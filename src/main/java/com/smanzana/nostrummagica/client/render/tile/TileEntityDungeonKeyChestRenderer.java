@@ -1,32 +1,32 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 
-public class TileEntityDungeonKeyChestRenderer extends TileEntityRenderer<DungeonKeyChestTileEntity> {
+public class TileEntityDungeonKeyChestRenderer extends BlockEntityRenderer<DungeonKeyChestTileEntity> {
 
 	public static final ResourceLocation ICON_COPPER_KEY = new ResourceLocation(NostrumMagica.MODID, "textures/models/copper_key.png");
 	public static final ResourceLocation ICON_SILVER_KEY = new ResourceLocation(NostrumMagica.MODID, "textures/models/silver_key.png");
 	private static final ResourceLocation ICON_GLOW = new ResourceLocation(NostrumMagica.MODID, "textures/effects/glow_orb.png");
 	
-	public TileEntityDungeonKeyChestRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+	public TileEntityDungeonKeyChestRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
 		super(rendererDispatcherIn);
 	}
 	
 	@Override
-	public void render(DungeonKeyChestTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
-			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+	public void render(DungeonKeyChestTileEntity tileEntityIn, float partialTicks, PoseStack matrixStackIn,
+			MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		
 		if (tileEntityIn.getOpenTicks() != -1) {
 			final boolean large = tileEntityIn.isLarge();
@@ -42,7 +42,7 @@ public class TileEntityDungeonKeyChestRenderer extends TileEntityRenderer<Dungeo
 				
 				final float xOffset;
 				final float zOffset;
-				final Vector3d tileOffset = tileEntityIn.getCenterOffset();
+				final Vec3 tileOffset = tileEntityIn.getCenterOffset();
 				xOffset = (float) tileOffset.x;
 				zOffset = (float) tileOffset.z;
 				
@@ -55,7 +55,7 @@ public class TileEntityDungeonKeyChestRenderer extends TileEntityRenderer<Dungeo
 				
 				matrixStackIn.pushPose();
 				matrixStackIn.translate(xOffset, yOffset, zOffset);
-				IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.GetBlendedEntity(ICON_GLOW));
+				VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.GetBlendedEntity(ICON_GLOW));
 				RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, this.renderer.camera, radius * glowMult, combinedLightIn, combinedOverlayIn, 1f, 1f, .5f, 1f);
 				buffer = bufferIn.getBuffer(RenderType.entityCutout(icon));
 				RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, this.renderer.camera, radius, combinedLightIn, combinedOverlayIn, 1f, 1f, 1f, 1f);

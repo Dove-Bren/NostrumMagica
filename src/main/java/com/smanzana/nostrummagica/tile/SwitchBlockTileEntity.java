@@ -9,15 +9,15 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTriggerEntity> implements IOrientedTileEntity {
@@ -41,7 +41,7 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	private long triggerWorldTicks;
 	private long cooldownTicks;
 	
-	protected SwitchBlockTileEntity(TileEntityType<? extends SwitchBlockTileEntity> tileType) {
+	protected SwitchBlockTileEntity(BlockEntityType<? extends SwitchBlockTileEntity> tileType) {
 		super(tileType);
 		hitType = SwitchHitType.ANY;
 		triggerType = SwitchTriggerType.ONE_TIME;
@@ -75,12 +75,12 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	private static final String NBT_COOOLDOWN_TICKS = "trigger_cooldown_ticks";
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		nbt.putInt(NBT_HIT_TYPE, this.hitType.ordinal());
 		nbt.putInt(NBT_TRIGGER_TYPE, this.triggerType.ordinal());
-		nbt.put(NBT_OFFSET, NBTUtil.writeBlockPos(this.triggerOffset));
+		nbt.put(NBT_OFFSET, NbtUtils.writeBlockPos(this.triggerOffset));
 		nbt.putLong(NBT_TRIGGER_TICKS, this.triggerWorldTicks);
 		nbt.putLong(NBT_COOOLDOWN_TICKS, cooldownTicks);
 		
@@ -88,7 +88,7 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		int ord = nbt.getInt(NBT_HIT_TYPE);
@@ -110,7 +110,7 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 		if (nbt.contains(NBT_OFFSET, NBT.TAG_LONG)) {
 			this.triggerOffset = WorldUtil.blockPosFromLong1_12_2(nbt.getLong(NBT_OFFSET));
 		} else {
-			this.triggerOffset = NBTUtil.readBlockPos(nbt.getCompound(NBT_OFFSET));
+			this.triggerOffset = NbtUtils.readBlockPos(nbt.getCompound(NBT_OFFSET));
 		}
 		
 		this.triggerWorldTicks = nbt.getLong(NBT_TRIGGER_TICKS);
@@ -257,7 +257,7 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	}
 	
 	@Override
-	protected SwitchTriggerEntity makeTriggerEntity(World world, double x, double y, double z) {
+	protected SwitchTriggerEntity makeTriggerEntity(Level world, double x, double y, double z) {
 		SwitchTriggerEntity ent = new SwitchTriggerEntity(NostrumEntityTypes.switchTrigger, world);
 		ent.setPos(x, y, z);
 		return ent;

@@ -12,18 +12,18 @@ import com.smanzana.nostrummagica.entity.KeySwitchTriggerEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.DyeColor;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.Util;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 
 public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchTriggerEntity> implements IWorldKeyHolder, IUniqueBlueprintTileEntity {
 	
@@ -48,7 +48,7 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	private static final String NBT_TRIGGERED = "triggered";
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		nbt.put(NBT_KEY, this.key.asNBT());
@@ -59,7 +59,7 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		this.key = WorldKey.fromNBT(nbt.getCompound(NBT_KEY));
@@ -106,7 +106,7 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	}
 	
 	@Override
-	protected KeySwitchTriggerEntity makeTriggerEntity(World world, double x, double y, double z) {
+	protected KeySwitchTriggerEntity makeTriggerEntity(Level world, double x, double y, double z) {
 		KeySwitchTriggerEntity ent = new KeySwitchTriggerEntity(NostrumEntityTypes.keySwitchTrigger, world);
 		ent.setPos(x, y, z);
 		return ent;
@@ -122,17 +122,17 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 		AutoDungeons.GetWorldKeys().addKey(getWorldKey());
 		level.setBlockAndUpdate(worldPosition, Blocks.AIR.defaultBlockState());
 
-		for (ServerPlayerEntity player : ((ServerWorld) level).getPlayers((p) -> {
+		for (ServerPlayer player : ((ServerLevel) level).getPlayers((p) -> {
 			return p.distanceToSqr(worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5) < 900;
 		})) {
-			player.sendMessage(new TranslationTextComponent("info.world_key.gotkey"), Util.NIL_UUID);
+			player.sendMessage(new TranslatableComponent("info.world_key.gotkey"), Util.NIL_UUID);
 		}
 		
 		NostrumMagicaSounds.AMBIENT_WOOSH2.play(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
 		NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
 				30, worldPosition.getX() + .5, worldPosition.getY() + 1.5, worldPosition.getZ() + .5, 0,
 				50, 10,
-				Vector3d.ZERO, new Vector3d(.075, .05, .075)
+				Vec3.ZERO, new Vec3(.075, .05, .075)
 				).gravity(-.1f).color(this.getColor().getColorValue() | 0xAA000000));
 	}
 	

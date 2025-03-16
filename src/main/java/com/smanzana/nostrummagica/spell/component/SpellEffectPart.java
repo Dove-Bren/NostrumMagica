@@ -5,8 +5,8 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 
 /**
  * Individual effect part of a spell
@@ -57,9 +57,9 @@ public class SpellEffectPart {
 	private static final String NBT_ALTERATION = "alteration";
 	private static final String NBT_POTENCY = "potency";
 	
-	public CompoundNBT toNBT(@Nullable CompoundNBT tag) {
+	public CompoundTag toNBT(@Nullable CompoundTag tag) {
 		if (tag == null) {
-			tag = new CompoundNBT();
+			tag = new CompoundTag();
 		}
 		
 		tag.putString(NBT_ELEMENT, getElement().name().toLowerCase());
@@ -72,13 +72,13 @@ public class SpellEffectPart {
 		return tag;
 	}
 	
-	public static SpellEffectPart FromNBT(CompoundNBT tag) {
+	public static SpellEffectPart FromNBT(CompoundTag tag) {
 		@Nullable EAlteration alteration = null;
 		EMagicElement element = EMagicElement.PHYSICAL;
 		int elementCount = 1;
 		float potency = 1f;
 		
-		if (tag.contains(NBT_ELEMENT, NBT.TAG_STRING)) {
+		if (tag.contains(NBT_ELEMENT, Tag.TAG_STRING)) {
 			try {
 				element = EMagicElement.valueOf(tag.getString(NBT_ELEMENT).toUpperCase());
 			} catch (Exception e) {
@@ -86,18 +86,18 @@ public class SpellEffectPart {
 			}
 		}
 		
-		if (tag.contains(NBT_ELEMENT_COUNT, NBT.TAG_INT)) {
+		if (tag.contains(NBT_ELEMENT_COUNT, Tag.TAG_INT)) {
 			elementCount = tag.getInt(NBT_ELEMENT_COUNT);
 		}
 		
-		if (tag.contains(NBT_ALTERATION, NBT.TAG_STRING)) {
+		if (tag.contains(NBT_ALTERATION, Tag.TAG_STRING)) {
 			try {
 				alteration = EAlteration.valueOf(tag.getString(NBT_ALTERATION).toUpperCase());
 			} catch (Exception e) {
 				
 			}
 		}
-		if (tag.contains(NBT_POTENCY, NBT.TAG_FLOAT)) {
+		if (tag.contains(NBT_POTENCY, Tag.TAG_FLOAT)) {
 			potency = tag.getFloat(NBT_POTENCY);
 		}
 		

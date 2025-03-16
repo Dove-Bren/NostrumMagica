@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.serializer;
 
 import com.smanzana.nostrummagica.item.equipment.HookshotItem.HookshotType;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.IDataSerializer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializer;
 
-public class HookshotTypeDataSerializer implements IDataSerializer<HookshotType> {
+public class HookshotTypeDataSerializer implements EntityDataSerializer<HookshotType> {
 	
 	public static final HookshotTypeDataSerializer instance = new HookshotTypeDataSerializer();
 	
@@ -15,18 +15,18 @@ public class HookshotTypeDataSerializer implements IDataSerializer<HookshotType>
 	}
 	
 	@Override
-	public void write(PacketBuffer buf, HookshotType value) {
+	public void write(FriendlyByteBuf buf, HookshotType value) {
 		buf.writeEnum(value);
 	}
 
 	@Override
-	public HookshotType read(PacketBuffer buf)  {
+	public HookshotType read(FriendlyByteBuf buf)  {
 		return buf.readEnum(HookshotType.class);
 	}
 
 	@Override
-	public DataParameter<HookshotType> createAccessor(int id) {
-		return new DataParameter<>(id, this);
+	public EntityDataAccessor<HookshotType> createAccessor(int id) {
+		return new EntityDataAccessor<>(id, this);
 	}
 
 	@Override

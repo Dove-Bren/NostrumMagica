@@ -1,20 +1,20 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.SpellBulletEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix3f;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 
 public class RenderSpellBullet extends EntityRenderer<SpellBulletEntity> {
 	
@@ -22,7 +22,7 @@ public class RenderSpellBullet extends EntityRenderer<SpellBulletEntity> {
 	
 	private final float scale;
 
-	public RenderSpellBullet(EntityRendererManager renderManager, float scale) {
+	public RenderSpellBullet(EntityRenderDispatcher renderManager, float scale) {
 		super(renderManager);
 		this.scale = scale;
 	}
@@ -33,7 +33,7 @@ public class RenderSpellBullet extends EntityRenderer<SpellBulletEntity> {
 	}
 	
 	@Override
-	public void render(SpellBulletEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(SpellBulletEntity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		
 		final float[] color = ColorUtil.ARGBToColor(entityIn.getElement().getColor());
 		
@@ -45,7 +45,7 @@ public class RenderSpellBullet extends EntityRenderer<SpellBulletEntity> {
 		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(180.0F));
 		Matrix4f transform = matrixStackIn.last().pose();
 		Matrix3f normal = matrixStackIn.last().normal();
-		IVertexBuilder buffer = bufferIn.getBuffer(RenderType.entityTranslucent(getTextureLocation(entityIn)));
+		VertexConsumer buffer = bufferIn.getBuffer(RenderType.entityTranslucent(getTextureLocation(entityIn)));
 		buffer.vertex(transform, -0.5f, -0.25f, 0.0f).color(color[0], color[1], color[2], color[3]).uv(0, 1f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
 		buffer.vertex(transform, 0.5f, -0.25f, 0.0f).color(color[0], color[1], color[2], color[3]).uv(1f, 1f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();
 		buffer.vertex(transform, 0.5f, 0.75f, 0.0f).color(color[0], color[1], color[2], color[3]).uv(1f, 0f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0.0F, 1.0F, 0.0F).endVertex();

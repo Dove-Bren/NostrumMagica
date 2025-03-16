@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.jei.ingredients.TransmuteSourceIngredientType;
 import com.smanzana.nostrummagica.spell.component.Transmutation.TransmutationRecipe;
@@ -22,10 +22,10 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.resources.ResourceLocation;
 
 public class TransmutationItemCategory implements IRecipeCategory<TransmutationRecipe> {
 
@@ -78,7 +78,7 @@ public class TransmutationItemCategory implements IRecipeCategory<TransmutationR
 	}
 
 	@Override
-	public void draw(TransmutationRecipe recipe, MatrixStack matrixStackIn, double mouseX, double mouseY) {
+	public void draw(TransmutationRecipe recipe, PoseStack matrixStackIn, double mouseX, double mouseY) {
 		// Only thing to draw is the transmutation jump power
 		
 		final int jump = recipe.getLevel();

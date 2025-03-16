@@ -18,20 +18,20 @@ import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
 import com.smanzana.nostrummagica.entity.plantboss.PlantBossBrambleEntity;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntitySpawnPlacementRegistry;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.MobSpawnInfo;
-import net.minecraft.world.gen.Heightmap;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -91,55 +91,55 @@ public class NostrumEntityTypes {
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<EntityType<?>> event) {
 		final IForgeRegistry<EntityType<?>> registry = event.getRegistry();
-    	registry.register(EntityType.Builder.<MagicPhysicalGolemEntity>of(MagicPhysicalGolemEntity::new, EntityClassification.MISC)
+    	registry.register(EntityType.Builder.<MagicPhysicalGolemEntity>of(MagicPhysicalGolemEntity::new, MobCategory.MISC)
 				.sized(0.8F, 1.6F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(MagicPhysicalGolemEntity.ID));
-		registry.register(EntityType.Builder.<MagicLightningGolemEntity>of(MagicLightningGolemEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<MagicLightningGolemEntity>of(MagicLightningGolemEntity::new, MobCategory.MISC)
 				.sized(0.8F, 1.6F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(MagicLightningGolemEntity.ID));
-		registry.register(EntityType.Builder.<MagicFireGolemEntity>of(MagicFireGolemEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<MagicFireGolemEntity>of(MagicFireGolemEntity::new, MobCategory.MISC)
 				.sized(0.8F, 1.6F)
 				.fireImmune()
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(MagicFireGolemEntity.ID));
-		registry.register(EntityType.Builder.<MagicEarthGolemEntity>of(MagicEarthGolemEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<MagicEarthGolemEntity>of(MagicEarthGolemEntity::new, MobCategory.MISC)
 				.sized(0.8F, 1.6F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(MagicEarthGolemEntity.ID));
-		registry.register(EntityType.Builder.<MagicIceGolemEntity>of(MagicIceGolemEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<MagicIceGolemEntity>of(MagicIceGolemEntity::new, MobCategory.MISC)
 				.sized(0.8F, 1.6F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(MagicIceGolemEntity.ID));
-		registry.register(EntityType.Builder.<MagicWindGolemEntity>of(MagicWindGolemEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<MagicWindGolemEntity>of(MagicWindGolemEntity::new, MobCategory.MISC)
 				.sized(0.8F, 1.6F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(MagicWindGolemEntity.ID));
-		registry.register(EntityType.Builder.<MagicEnderGolemEntity>of(MagicEnderGolemEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<MagicEnderGolemEntity>of(MagicEnderGolemEntity::new, MobCategory.MISC)
 				.sized(0.8F, 1.6F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(MagicEnderGolemEntity.ID));
 		
-		EntityType<KoidEntity> koidType = EntityType.Builder.<KoidEntity>of(KoidEntity::new, EntityClassification.MONSTER)
+		EntityType<KoidEntity> koidType = EntityType.Builder.<KoidEntity>of(KoidEntity::new, MobCategory.MONSTER)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.sized(0.8F, 1F)
 			.build("");
 		koidType.setRegistryName(KoidEntity.ID);
 		registry.register(koidType);
 		
-		registry.register(EntityType.Builder.<RedDragonEntity>of(RedDragonEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<RedDragonEntity>of(RedDragonEntity::new, MobCategory.MISC)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.sized(RedDragonEntity.GetBodyWidth(), RedDragonEntity.GetBodyHeight())
 				.fireImmune()
 			.build("").setRegistryName(RedDragonEntity.ID));
-		registry.register(EntityType.Builder.<RedDragonEntity.DragonBodyPart>of(RedDragonEntity.DragonBodyPart::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<RedDragonEntity.DragonBodyPart>of(RedDragonEntity.DragonBodyPart::new, MobCategory.MISC)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.sized(RedDragonEntity.GetBodyWidth(), RedDragonEntity.GetBodyHeight())
 				.fireImmune()
 			.build("").setRegistryName(RedDragonEntity.DragonBodyPart.ID));
 		
-		EntityType<TameRedDragonEntity> tameDragonType = EntityType.Builder.<TameRedDragonEntity>of(TameRedDragonEntity::new, EntityClassification.MONSTER)
+		EntityType<TameRedDragonEntity> tameDragonType = EntityType.Builder.<TameRedDragonEntity>of(TameRedDragonEntity::new, MobCategory.MONSTER)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.sized(6F * .4F, 4.6F * .6F)
 				.fireImmune()
@@ -147,7 +147,7 @@ public class NostrumEntityTypes {
 		tameDragonType.setRegistryName(TameRedDragonEntity.ID);
 		registry.register(tameDragonType);
 		
-		EntityType<ShadowRedDragonEntity> shadowRedDragonType = EntityType.Builder.<ShadowRedDragonEntity>of(ShadowRedDragonEntity::new, EntityClassification.MONSTER)
+		EntityType<ShadowRedDragonEntity> shadowRedDragonType = EntityType.Builder.<ShadowRedDragonEntity>of(ShadowRedDragonEntity::new, MobCategory.MONSTER)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.sized(4F * .6F, 3F * .6F)
 				.fireImmune()
@@ -155,41 +155,41 @@ public class NostrumEntityTypes {
 		shadowRedDragonType.setRegistryName(ShadowRedDragonEntity.ID);
 		registry.register(shadowRedDragonType);
 		
-		registry.register(EntityType.Builder.<DragonEggEntity>of(DragonEggEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<DragonEggEntity>of(DragonEggEntity::new, MobCategory.MISC)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.sized(.45f, .5f)
 			.build("").setRegistryName(DragonEggEntity.ID));
-		registry.register(EntityType.Builder.<PlantBossEntity>of(PlantBossEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<PlantBossEntity>of(PlantBossEntity::new, MobCategory.MISC)
 				.sized(7, 4)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(PlantBossEntity.ID));
-		registry.register(EntityType.Builder.<PlantBossEntity.PlantBossBody>of(PlantBossEntity.PlantBossBody::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<PlantBossEntity.PlantBossBody>of(PlantBossEntity.PlantBossBody::new, MobCategory.MISC)
 				.sized(4.25f /*width 3, but rotates. sqrt(3^2+3^2) = 4.24*/, 4)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(PlantBossEntity.PlantBossBody.ID));
-		registry.register(EntityType.Builder.<PlantBossEntity.PlantBossLeafLimb>of(PlantBossEntity.PlantBossLeafLimb::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<PlantBossEntity.PlantBossLeafLimb>of(PlantBossEntity.PlantBossLeafLimb::new, MobCategory.MISC)
 				.sized(4, 4)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(PlantBossEntity.PlantBossLeafLimb.ID));
-		registry.register(EntityType.Builder.<PlantBossBrambleEntity>of(PlantBossBrambleEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<PlantBossBrambleEntity>of(PlantBossBrambleEntity::new, MobCategory.MISC)
 				.sized(.5f, .75f)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
 			.build("").setRegistryName(PlantBossBrambleEntity.ID));
 		
-		EntityType<SpriteEntity> spriteType = EntityType.Builder.<SpriteEntity>of(SpriteEntity::new, EntityClassification.MONSTER)
+		EntityType<SpriteEntity> spriteType = EntityType.Builder.<SpriteEntity>of(SpriteEntity::new, MobCategory.MONSTER)
 				.sized(1F, 1.75F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("");
 		spriteType.setRegistryName(SpriteEntity.ID);
 		
-		EntityType<LuxEntity> luxType = EntityType.Builder.<LuxEntity>of(LuxEntity::new, EntityClassification.CREATURE)
+		EntityType<LuxEntity> luxType = EntityType.Builder.<LuxEntity>of(LuxEntity::new, MobCategory.CREATURE)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.sized(.5F, .5F)
 			.build("");
 		luxType.setRegistryName(LuxEntity.ID);
 		registry.register(luxType);
 		
-		EntityType<WispEntity> wispType = EntityType.Builder.<WispEntity>of(WispEntity::new, EntityClassification.CREATURE)
+		EntityType<WispEntity> wispType = EntityType.Builder.<WispEntity>of(WispEntity::new, MobCategory.CREATURE)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.sized(.75F, .75F)
 			.build("");
@@ -197,107 +197,107 @@ public class NostrumEntityTypes {
 		registry.register(wispType);
 		registry.register(spriteType);
 		
-		EntityType<WilloEntity> willoType = EntityType.Builder.<WilloEntity>of(WilloEntity::new, EntityClassification.MONSTER)
+		EntityType<WilloEntity> willoType = EntityType.Builder.<WilloEntity>of(WilloEntity::new, MobCategory.MONSTER)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.sized(.75F, .75F)
 			.build("");
 		willoType.setRegistryName(WilloEntity.ID);
 		registry.register(willoType);
 		
-		registry.register(EntityType.Builder.<ArcaneWolfEntity>of(ArcaneWolfEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<ArcaneWolfEntity>of(ArcaneWolfEntity::new, MobCategory.MISC)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.sized(0.7F, 0.95F)
 			.build("").setRegistryName(ArcaneWolfEntity.ID));
 
 		
-    	registry.register(EntityType.Builder.<SpellProjectileEntity>of(SpellProjectileEntity::new, EntityClassification.MISC)
+    	registry.register(EntityType.Builder.<SpellProjectileEntity>of(SpellProjectileEntity::new, MobCategory.MISC)
     			.sized(0.3125F, 0.3125F)
     			.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
     		.build("").setRegistryName(SpellProjectileEntity.ID));
-		registry.register(EntityType.Builder.<ChakramSpellSaucerEntity>of(ChakramSpellSaucerEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<ChakramSpellSaucerEntity>of(ChakramSpellSaucerEntity::new, MobCategory.MISC)
 				.sized(1F, .2F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
 			.build("").setRegistryName(ChakramSpellSaucerEntity.ID));
-		registry.register(EntityType.Builder.<CyclerSpellSaucerEntity>of(CyclerSpellSaucerEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<CyclerSpellSaucerEntity>of(CyclerSpellSaucerEntity::new, MobCategory.MISC)
 				.sized(1F, .2F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
 			.build("").setRegistryName(CyclerSpellSaucerEntity.ID));
-		registry.register(EntityType.Builder.<MagicDamageProjectileEntity>of(MagicDamageProjectileEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<MagicDamageProjectileEntity>of(MagicDamageProjectileEntity::new, MobCategory.MISC)
 				.sized(.3F, .3F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
 			.build("").setRegistryName(MagicDamageProjectileEntity.ID));
-		registry.register(EntityType.Builder.<SwitchTriggerEntity>of(SwitchTriggerEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<SwitchTriggerEntity>of(SwitchTriggerEntity::new, MobCategory.MISC)
 				.sized(.8f, 1.8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(SwitchTriggerEntity.ID));
-		registry.register(EntityType.Builder.<KeySwitchTriggerEntity>of(KeySwitchTriggerEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<KeySwitchTriggerEntity>of(KeySwitchTriggerEntity::new, MobCategory.MISC)
 				.sized(.8f, 1.8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(KeySwitchTriggerEntity.ID));
-		registry.register(EntityType.Builder.<ShrineTriggerEntity.Element>of(ShrineTriggerEntity.Element::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<ShrineTriggerEntity.Element>of(ShrineTriggerEntity.Element::new, MobCategory.MISC)
 				.sized(.8f, .8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(ShrineTriggerEntity.Element.ID));
-		registry.register(EntityType.Builder.<ShrineTriggerEntity.Shape>of(ShrineTriggerEntity.Shape::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<ShrineTriggerEntity.Shape>of(ShrineTriggerEntity.Shape::new, MobCategory.MISC)
 				.sized(.8f, .8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(ShrineTriggerEntity.Shape.ID));
-		registry.register(EntityType.Builder.<ShrineTriggerEntity.Alteration>of(ShrineTriggerEntity.Alteration::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<ShrineTriggerEntity.Alteration>of(ShrineTriggerEntity.Alteration::new, MobCategory.MISC)
 				.sized(.8f, .8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(ShrineTriggerEntity.Alteration.ID));
-		registry.register(EntityType.Builder.<ShrineTriggerEntity.Tier>of(ShrineTriggerEntity.Tier::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<ShrineTriggerEntity.Tier>of(ShrineTriggerEntity.Tier::new, MobCategory.MISC)
 				.sized(.8f, .8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(ShrineTriggerEntity.Tier.ID));
-		registry.register(EntityType.Builder.<CursedGlassTriggerEntity>of(CursedGlassTriggerEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<CursedGlassTriggerEntity>of(CursedGlassTriggerEntity::new, MobCategory.MISC)
 				.sized(3.2f, 3.2f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(CursedGlassTriggerEntity.ID));
-		registry.register(EntityType.Builder.<TameLightning>of(TameLightning::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<TameLightning>of(TameLightning::new, MobCategory.MISC)
 				.sized(0, 0)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(TameLightning.ID));
-		registry.register(EntityType.Builder.<HookShotEntity>of(HookShotEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<HookShotEntity>of(HookShotEntity::new, MobCategory.MISC)
 				.sized(.2f, .2f)
 				.fireImmune()
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
 			.build("").setRegistryName(HookShotEntity.ID));
-		registry.register(EntityType.Builder.<SpellBulletEntity>of(SpellBulletEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<SpellBulletEntity>of(SpellBulletEntity::new, MobCategory.MISC)
 				.sized(0.3125F, 0.3125F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
 			.build("").setRegistryName(SpellBulletEntity.ID));
-		registry.register(EntityType.Builder.<SpellMortarEntity>of(SpellMortarEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<SpellMortarEntity>of(SpellMortarEntity::new, MobCategory.MISC)
 				.sized(0.75F, 0.75F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
 			.build("").setRegistryName(SpellMortarEntity.ID));
-		registry.register(EntityType.Builder.<AreaEffectEntity>of(AreaEffectEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<AreaEffectEntity>of(AreaEffectEntity::new, MobCategory.MISC)
 				.sized(1f, .25f)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(AreaEffectEntity.ID));
-		registry.register(EntityType.Builder.<EnderRodBallEntity>of(EnderRodBallEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<EnderRodBallEntity>of(EnderRodBallEntity::new, MobCategory.MISC)
 				.sized(1.5f, 1.5f)
 				.setTrackingRange(128).setUpdateInterval(5).setShouldReceiveVelocityUpdates(false)
 			.build("").setRegistryName(EnderRodBallEntity.ID));
-		registry.register(EntityType.Builder.<SpellBubbleEntity>of(SpellBubbleEntity::new, EntityClassification.MISC)
+		registry.register(EntityType.Builder.<SpellBubbleEntity>of(SpellBubbleEntity::new, MobCategory.MISC)
     			.sized(0.125F, 0.125F)
     			.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
     		.build("").setRegistryName(SpellBubbleEntity.ID));
 	}
 	
-	private static final boolean netherMobGroundSpawnTest(EntityType<?> type, IWorld world, SpawnReason reason, BlockPos pos, Random rand) {
+	private static final boolean netherMobGroundSpawnTest(EntityType<?> type, LevelAccessor world, MobSpawnType reason, BlockPos pos, Random rand) {
 		return world.getDifficulty() != Difficulty.PEACEFUL && world.getBlockState(pos.below()).getBlock() != Blocks.NETHER_WART_BLOCK;
 	}
 	
 	@SubscribeEvent
 	public static void registerEntityPlacement(FMLCommonSetupEvent event) {
-		EntitySpawnPlacementRegistry.register(koid, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MobEntity::checkMobSpawnRules);
-		EntitySpawnPlacementRegistry.register(tameDragonRed, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, NostrumEntityTypes::netherMobGroundSpawnTest);
-		EntitySpawnPlacementRegistry.register(shadowDragonRed, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, NostrumEntityTypes::netherMobGroundSpawnTest);
-		EntitySpawnPlacementRegistry.register(sprite, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MobEntity::checkMobSpawnRules);
-		EntitySpawnPlacementRegistry.register(wisp, EntitySpawnPlacementRegistry.PlacementType.NO_RESTRICTIONS, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, WispEntity::canSpawnExtraCheck);
-		EntitySpawnPlacementRegistry.register(willo, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, WilloEntity::canSpawnExtraCheck);
-		EntitySpawnPlacementRegistry.register(lux, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING, AnimalEntity::checkAnimalSpawnRules);
+		SpawnPlacements.register(koid, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
+		SpawnPlacements.register(tameDragonRed, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, NostrumEntityTypes::netherMobGroundSpawnTest);
+		SpawnPlacements.register(shadowDragonRed, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, NostrumEntityTypes::netherMobGroundSpawnTest);
+		SpawnPlacements.register(sprite, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
+		SpawnPlacements.register(wisp, SpawnPlacements.Type.NO_RESTRICTIONS, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, WispEntity::canSpawnExtraCheck);
+		SpawnPlacements.register(willo, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, WilloEntity::canSpawnExtraCheck);
+		SpawnPlacements.register(lux, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING, Animal::checkAnimalSpawnRules);
 		
 		// Can't mix buses, so manually register spawn handling to the game bus
 		MinecraftForge.EVENT_BUS.addListener(NostrumEntityTypes::registerSpawns);
@@ -305,7 +305,7 @@ public class NostrumEntityTypes {
 	
 	//@SubscribeEvent registered in #registerEntityPlacement above
 	public static void registerSpawns(BiomeLoadingEvent event) {
-		final Set<BiomeDictionary.Type> types = BiomeDictionary.getTypes(RegistryKey.create(Registry.BIOME_REGISTRY, event.getName()));
+		final Set<BiomeDictionary.Type> types = BiomeDictionary.getTypes(ResourceKey.create(Registry.BIOME_REGISTRY, event.getName()));
 		
 		final boolean magical = types.contains(BiomeDictionary.Type.MAGICAL);
 		final boolean forest = types.contains(BiomeDictionary.Type.FOREST);
@@ -317,29 +317,29 @@ public class NostrumEntityTypes {
 		
 		// koid
 		if (magical || forest || snowy || nether || spooky) {
-			event.getSpawns().getSpawner(EntityClassification.MONSTER).add(new MobSpawnInfo.Spawners(koid, nether ? 12 : 20, 1, 1));
+			event.getSpawns().getSpawner(MobCategory.MONSTER).add(new MobSpawnSettings.SpawnerData(koid, nether ? 12 : 20, 1, 1));
 		}
 		
 		// tameable and shadow dragon natural spawns
 		if (nether) {
-			event.getSpawns().getSpawner(EntityClassification.MONSTER).add(new MobSpawnInfo.Spawners(tameDragonRed, 2, 1, 1));
-			event.getSpawns().getSpawner(EntityClassification.MONSTER).add(new MobSpawnInfo.Spawners(shadowDragonRed, 15, 1, 2));
+			event.getSpawns().getSpawner(MobCategory.MONSTER).add(new MobSpawnSettings.SpawnerData(tameDragonRed, 2, 1, 1));
+			event.getSpawns().getSpawner(MobCategory.MONSTER).add(new MobSpawnSettings.SpawnerData(shadowDragonRed, 15, 1, 2));
 		}
 		
 		// sprite
 		if (nether || magical) {
-			event.getSpawns().getSpawner(EntityClassification.MONSTER).add(new MobSpawnInfo.Spawners(sprite, nether ? 15 : 10, 1, 3));
+			event.getSpawns().getSpawner(MobCategory.MONSTER).add(new MobSpawnSettings.SpawnerData(sprite, nether ? 15 : 10, 1, 3));
 		}
 		
 		// lux
 		if (magical || forest || jungle) {
 			final int weight = magical ? 20 : (forest ? 15 : 10);
-			event.getSpawns().getSpawner(EntityClassification.CREATURE).add(new MobSpawnInfo.Spawners(lux, weight, 1, 3));
+			event.getSpawns().getSpawner(MobCategory.CREATURE).add(new MobSpawnSettings.SpawnerData(lux, weight, 1, 3));
 		}
 		
 		// wisp
 		if (magical || forest || snowy || spooky || nether) {
-			event.getSpawns().getSpawner(EntityClassification.AMBIENT).add(new MobSpawnInfo.Spawners(wisp, nether ? 4 : 1, 1, 1));
+			event.getSpawns().getSpawner(MobCategory.AMBIENT).add(new MobSpawnSettings.SpawnerData(wisp, nether ? 4 : 1, 1, 1));
 		}
 		
 		// willo
@@ -350,7 +350,7 @@ public class NostrumEntityTypes {
 					: spooky ? 14
 					: dry ? 7
 					: 1;
-			event.getSpawns().getSpawner(EntityClassification.MONSTER).add(new MobSpawnInfo.Spawners(willo, weight, 1, 3));
+			event.getSpawns().getSpawner(MobCategory.MONSTER).add(new MobSpawnSettings.SpawnerData(willo, weight, 1, 3));
 		}
 	}
 	

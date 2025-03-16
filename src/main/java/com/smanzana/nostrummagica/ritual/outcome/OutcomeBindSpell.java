@@ -10,14 +10,14 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.util.TextUtils;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 
 public class OutcomeBindSpell implements IRitualOutcome {
 
@@ -26,7 +26,7 @@ public class OutcomeBindSpell implements IRitualOutcome {
 	}
 	
 	@Override
-	public boolean canPerform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout) {
+	public boolean canPerform(Level world, Player player, BlockPos center, IRitualLayout layout) {
 		ItemStack tome = layout.getCenterItem(world, center);
 		ItemStack scroll = ItemStack.EMPTY;
 		List<ItemStack> extras = layout.getExtraItems(world, center);
@@ -45,14 +45,14 @@ public class OutcomeBindSpell implements IRitualOutcome {
 		Spell spell = SpellScroll.GetSpell(scroll);
 		if (spell == null) {
 			if (!player.level.isClientSide) {
-				player.sendMessage(new StringTextComponent("The scroll is missing it's spell..."), Util.NIL_UUID);
+				player.sendMessage(new TextComponent("The scroll is missing it's spell..."), Util.NIL_UUID);
 			}
 			return false;
 		}
 		
 		if (!SpellTome.hasRoom(tome, spell)) {
 			if (!player.level.isClientSide) {
-				player.sendMessage(new TranslationTextComponent("info.tome.full"), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.tome.full"), Util.NIL_UUID);
 			}
 			return false;
 		}
@@ -61,7 +61,7 @@ public class OutcomeBindSpell implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
+	public void perform(Level world, Player player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// Take the spell and tome and begin the player binding
 		
 		// Tome has to be center.
@@ -95,7 +95,7 @@ public class OutcomeBindSpell implements IRitualOutcome {
 	}
 
 	@Override
-	public List<ITextComponent> getDescription() {
+	public List<Component> getDescription() {
 		return TextUtils.GetTranslatedList("ritual.outcome.bind_spell.desc");
 	}
 }

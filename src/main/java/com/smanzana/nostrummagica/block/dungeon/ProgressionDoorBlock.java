@@ -8,19 +8,19 @@ import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.ProgressionDoorTileEntity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 
 public class ProgressionDoorBlock extends MagicDoorBlock {
 
@@ -36,7 +36,7 @@ public class ProgressionDoorBlock extends MagicDoorBlock {
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		if (!this.isMaster(state))
 			return null;
 		
@@ -44,9 +44,9 @@ public class ProgressionDoorBlock extends MagicDoorBlock {
 	}
 	
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (worldIn.isClientSide)
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		
 		BlockPos master = this.getMasterPos(worldIn, state, pos);
 		if (master != null && worldIn.getBlockEntity(master) != null) {
@@ -56,22 +56,22 @@ public class ProgressionDoorBlock extends MagicDoorBlock {
 				ItemStack heldItem = playerIn.getItemInHand(hand);
 				if (!heldItem.isEmpty() && heldItem.getItem() instanceof SpellRune) {
 					te.require(SpellRune.toComponentWrapper(heldItem));
-					return ActionResultType.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
 				if (!heldItem.isEmpty() && heldItem.getItem() instanceof ResourceCrystal) {
 					te.tier(((ResourceCrystal) heldItem.getItem()).getTier());
-					return ActionResultType.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
-				if (heldItem.isEmpty() && hand == Hand.MAIN_HAND) {
+				if (heldItem.isEmpty() && hand == InteractionHand.MAIN_HAND) {
 					te.level((te.getRequiredLevel() + 1) % 15);
-					return ActionResultType.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
 			}
 			
-			List<ITextComponent> missingDepStrings = new LinkedList<>();
+			List<Component> missingDepStrings = new LinkedList<>();
 			if (!((ProgressionDoorTileEntity) worldIn.getBlockEntity(master)).meetsRequirements(playerIn, missingDepStrings)) {
-				playerIn.sendMessage(new TranslationTextComponent("info.door.missing.intro"), Util.NIL_UUID);
-				for (ITextComponent text : missingDepStrings) {
+				playerIn.sendMessage(new TranslatableComponent("info.door.missing.intro"), Util.NIL_UUID);
+				for (Component text : missingDepStrings) {
 					playerIn.sendMessage(text, Util.NIL_UUID);
 				}
 				NostrumMagicaSounds.CAST_FAIL.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
@@ -80,6 +80,6 @@ public class ProgressionDoorBlock extends MagicDoorBlock {
 			}
 		}
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 }

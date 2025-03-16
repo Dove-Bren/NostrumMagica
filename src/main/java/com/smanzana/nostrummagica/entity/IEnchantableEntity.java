@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.entity;
 
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 
 public interface IEnchantableEntity {
 

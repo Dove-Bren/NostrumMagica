@@ -17,28 +17,28 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.server.TicketType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.TicketType;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
-public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity {
+public class ObeliskTileEntity extends BlockEntity implements TickableBlockEntity {
 	
 	protected static final TicketType<BlockPos> ObeliskChunkLoaderType = TicketType.create("nostrum_obelisk_chunkloader", Comparator.comparingLong(BlockPos::asLong));
 	
@@ -77,8 +77,8 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 			return title;
 		}
 		
-		public CompoundNBT toNBT() {
-			CompoundNBT tag = new CompoundNBT();
+		public CompoundTag toNBT() {
+			CompoundTag tag = new CompoundTag();
 			tag.putString(NBT_TITLE, title);
 			tag.put(NBT_LOC, loc.toNBT());
 			
@@ -89,7 +89,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 			return tag;
 		}
 		
-		public static NostrumObeliskTarget fromNBT(CompoundNBT tag) {
+		public static NostrumObeliskTarget fromNBT(CompoundTag tag) {
 			if (tag.contains(NBT_LOC)) {
 				return new NostrumObeliskTarget(Location.FromNBT(tag.getCompound(NBT_LOC)), tag.getString(NBT_TITLE));
 			}
@@ -173,10 +173,10 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
-		ListNBT list = new ListNBT();
+		ListTag list = new ListTag();
 		
 		if (master && targets.size() > 0)
 		for (NostrumObeliskTarget target : targets) {
@@ -200,18 +200,18 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_MASTER, NBT.TAG_BYTE))
 			return;
 
 		this.master = nbt.getBoolean(NBT_MASTER);
-		ListNBT list = nbt.getList(NBT_TARGETS, NBT.TAG_COMPOUND);
+		ListTag list = nbt.getList(NBT_TARGETS, NBT.TAG_COMPOUND);
 		if (list != null && list.size() > 0) {
 			this.targets = new ArrayList<>(list.size());
 			for (int i = 0; i < list.size(); i++) {
-				CompoundNBT tag = list.getCompound(i);
+				CompoundTag tag = list.getCompound(i);
 				targets.add(NostrumObeliskTarget.fromNBT(tag));
 			}
 		}
@@ -248,7 +248,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 			}
 
 			if (!level.isClientSide) {
-				NostrumChunkLoader.unforceChunk((ServerWorld) level, ObeliskChunkLoaderType, getBlockPos());
+				NostrumChunkLoader.unforceChunk((ServerLevel) level, ObeliskChunkLoaderType, getBlockPos());
 			}
 			
 			this.deactivatePortal();
@@ -259,7 +259,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 			int zs[] = new int[] {-ObeliskBlock.TILE_OFFSETH, ObeliskBlock.TILE_OFFSETH, -ObeliskBlock.TILE_OFFSETH, ObeliskBlock.TILE_OFFSETH};
 			for (int i = 0; i < xs.length; i++) {
 				BlockPos base = worldPosition.offset(xs[i], -ObeliskBlock.TILE_OFFSETY, zs[i]);
-				TileEntity te = level.getBlockEntity(base);
+				BlockEntity te = level.getBlockEntity(base);
 				if (te != null && te instanceof ObeliskTileEntity) {
 					ObeliskTileEntity entity = (ObeliskTileEntity) te;
 					if (entity.master)
@@ -281,7 +281,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		return this.upgradeDimension;
 	}
 	
-	public void addTarget(World world, BlockPos pos) {
+	public void addTarget(Level world, BlockPos pos) {
 		this.addTarget(new Location(world, pos));
 	}
 	
@@ -290,7 +290,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		forceUpdate();
 	}
 	
-	public void addTarget(World world, BlockPos pos, String title) {
+	public void addTarget(Level world, BlockPos pos, String title) {
 		this.addTarget(new Location(world, pos), title);
 	}
 	
@@ -305,7 +305,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	
 	public static final boolean IsObeliskPos(Location location) {
 		final BlockPos pos = location.getPos();
-		final World world = ServerLifecycleHooks.getCurrentServer().getLevel(location.getDimension());
+		final Level world = ServerLifecycleHooks.getCurrentServer().getLevel(location.getDimension());
 		
 		if (world.isClientSide()) {
 			return false; // can't load random worlds or chunks on client
@@ -393,7 +393,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		ItemStack item = new ItemStack(NostrumItems.positionToken);
 		PositionToken.setPosition(item, removed.loc.getDimension(), removed.loc.getPos());
 		if (!removed.title.isEmpty() && !removed.title.startsWith("(")) {
-			item.setHoverName(new StringTextComponent(removed.title));
+			item.setHoverName(new TextComponent(removed.title));
 		}
 		spawnItem(item);
 		
@@ -444,7 +444,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		}
 	}
 	
-	public static boolean IsValidObelisk(World world, BlockPos pos) {
+	public static boolean IsValidObelisk(Level world, BlockPos pos) {
 		BlockState state = world.getBlockState(pos);
 		return !(state == null || !(state.getBlock() instanceof ObeliskBlock)
 				|| !ObeliskBlock.blockIsMaster(state));
@@ -457,17 +457,17 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
@@ -478,7 +478,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		if (level.isClientSide)
 			return;
 		
-		NostrumChunkLoader.forceChunk((ServerWorld) level, ObeliskChunkLoaderType, getBlockPos());
+		NostrumChunkLoader.forceChunk((ServerLevel) level, ObeliskChunkLoaderType, getBlockPos());
 	}
 	
 	private void forceUpdate() {
@@ -591,8 +591,8 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		//return this.compWrapper.checkAndWithdraw(getAetherCost(destination));
 	}
 	
-	protected AxisAlignedBB getCaptureBB() {
-		return new AxisAlignedBB(0, 0, 0, 1, 1, 1).move(worldPosition.above());
+	protected AABB getCaptureBB() {
+		return new AABB(0, 0, 0, 1, 1, 1).move(worldPosition.above());
 	}
 	
 	protected boolean intakeItems() {
@@ -626,7 +626,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		final Item item = stack.getItem();
 		if (item instanceof PositionToken) {
 			final BlockPos storedPos = PositionToken.getBlockPosition(stack);
-			final RegistryKey<World> storedDim = PositionToken.getDimension(stack);
+			final ResourceKey<Level> storedDim = PositionToken.getDimension(stack);
 			if (canAcceptTarget(new Location(storedPos, storedDim))) {
 				return true;
 			}
@@ -648,7 +648,7 @@ public class ObeliskTileEntity extends TileEntity implements ITickableTileEntity
 		
 		if (item instanceof PositionToken) {
 			final BlockPos storedPos = PositionToken.getBlockPosition(stack);
-			final RegistryKey<World> storedDim = PositionToken.getDimension(stack);
+			final ResourceKey<Level> storedDim = PositionToken.getDimension(stack);
 			final Location storedLoc = new Location(storedPos, storedDim);
 			
 			if (stack.hasCustomHoverName()) {

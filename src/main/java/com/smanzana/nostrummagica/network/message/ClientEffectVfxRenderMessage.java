@@ -8,11 +8,11 @@ import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.util.Entities;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Server is broadcasting a spell vfx
@@ -24,7 +24,7 @@ public class ClientEffectVfxRenderMessage {
 	public static void handle(ClientEffectVfxRenderMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
 		Minecraft.getInstance().submit(() -> {
-			final World world = NostrumMagica.instance.proxy.getPlayer().level;
+			final Level world = NostrumMagica.instance.proxy.getPlayer().level;
 			LivingEntity caster, target;
 			caster = target = null;
 			
@@ -48,14 +48,14 @@ public class ClientEffectVfxRenderMessage {
 	}
 
 	private final UUID caster;
-	private final Vector3d casterPos;
+	private final Vec3 casterPos;
 	private final UUID target;
-	private final Vector3d targetPos;
+	private final Vec3 targetPos;
 	private final SpellEffectPart effect;
 	
 	public ClientEffectVfxRenderMessage(
-			LivingEntity caster, Vector3d casterPos,
-			LivingEntity target, Vector3d targetPos,
+			LivingEntity caster, Vec3 casterPos,
+			LivingEntity target, Vec3 targetPos,
 			SpellEffectPart effect) {
 		this(caster == null ? null : caster.getUUID(), casterPos,
 				target == null ? null : target.getUUID(), targetPos,
@@ -63,8 +63,8 @@ public class ClientEffectVfxRenderMessage {
 	}
 	
 	public ClientEffectVfxRenderMessage(
-			UUID caster, Vector3d casterPos,
-			UUID target, Vector3d targetPos,
+			UUID caster, Vec3 casterPos,
+			UUID target, Vec3 targetPos,
 			SpellEffectPart effect) {
 		this.caster = caster;
 		this.casterPos = casterPos;
@@ -73,11 +73,11 @@ public class ClientEffectVfxRenderMessage {
 		this.effect = effect;
 	}
 
-	public static ClientEffectVfxRenderMessage decode(PacketBuffer buf) {
+	public static ClientEffectVfxRenderMessage decode(FriendlyByteBuf buf) {
 		final UUID caster;
-		final Vector3d casterPos;
+		final Vec3 casterPos;
 		final UUID target;
-		final Vector3d targetPos;
+		final Vec3 targetPos;
 		final SpellEffectPart effect;
 		
 		if (buf.readBoolean()) {
@@ -87,7 +87,7 @@ public class ClientEffectVfxRenderMessage {
 		}
 		
 		if (buf.readBoolean()) {
-			casterPos = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
+			casterPos = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
 		} else {
 			casterPos = null;
 		}
@@ -99,7 +99,7 @@ public class ClientEffectVfxRenderMessage {
 		}
 		
 		if (buf.readBoolean()) {
-			targetPos = new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
+			targetPos = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
 		} else {
 			targetPos = null;
 		}
@@ -112,7 +112,7 @@ public class ClientEffectVfxRenderMessage {
 				);
 	}
 
-	public static void encode(ClientEffectVfxRenderMessage msg, PacketBuffer buf) {
+	public static void encode(ClientEffectVfxRenderMessage msg, FriendlyByteBuf buf) {
 		buf.writeBoolean(msg.caster != null);
 		if (msg.caster != null) {
 			buf.writeUUID(msg.caster);

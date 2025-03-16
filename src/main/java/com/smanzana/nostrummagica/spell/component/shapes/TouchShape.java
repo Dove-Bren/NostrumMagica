@@ -13,12 +13,12 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
 
@@ -55,14 +55,14 @@ public class TouchShape extends InstantShape implements ISelectableShape {
 	}
 	
 	protected float getTouchRange(ISpellState state, SpellShapeProperties params) {
-		if (state.getSelf() instanceof PlayerEntity) {
-			return getTouchRange((PlayerEntity) state.getSelf(), params);
+		if (state.getSelf() instanceof Player) {
+			return getTouchRange((Player) state.getSelf(), params);
 		} else {
 			return AI_TOUCH_RANGE;
 		}
 	}
 	
-	protected float getTouchRange(PlayerEntity player, SpellShapeProperties params) {
+	protected float getTouchRange(Player player, SpellShapeProperties params) {
 		// This copied from PlayerController#getBlockReachDistance
 		return (float) player.getAttribute(ForgeMod.REACH_DISTANCE.get()).getValue() + (player.isCreative() ? 0 : -.5f);
 	}
@@ -71,10 +71,10 @@ public class TouchShape extends InstantShape implements ISelectableShape {
 	protected TriggerData getTargetData(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		final float range = getTouchRange(state, params);
 		
-		RayTraceResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, pitch, yaw, range, 
+		HitResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, pitch, yaw, range, 
 				this.affectsEntities(params) ? new RayTrace.OtherLiving(state.getCaster()) : (e) -> false);
 		
-		if (trace == null || trace.getType() == RayTraceResult.Type.MISS) {
+		if (trace == null || trace.getType() == HitResult.Type.MISS) {
 			final boolean ignoreAirHits = getIgnoreAirHits(params);
 			if (ignoreAirHits || !this.affectsBlocks(params)) {
 				return new TriggerData(null, null);
@@ -84,13 +84,13 @@ public class TouchShape extends InstantShape implements ISelectableShape {
 			}
 		}
 		
-		if (trace.getType() == RayTraceResult.Type.ENTITY
+		if (trace.getType() == HitResult.Type.ENTITY
 				&& this.affectsEntities(params)
 				&& null != RayTrace.livingFromRaytrace(trace)
 				&& !RayTrace.livingFromRaytrace(trace).is(state.getSelf())) {
 			// Cast is safe from 'onlyLiving' option in trace
 			return new TriggerData(Lists.newArrayList(RayTrace.livingFromRaytrace(trace)), null);
-		} else if (trace.getType() == RayTraceResult.Type.BLOCK
+		} else if (trace.getType() == HitResult.Type.BLOCK
 				&& this.affectsBlocks(params)) {
 			return new TriggerData(null, Lists.newArrayList(new SpellLocation(location.world, trace)));
 		} else {
@@ -109,12 +109,12 @@ public class TouchShape extends InstantShape implements ISelectableShape {
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
+	public boolean shouldTrace(Player player, SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(PlayerEntity player, SpellShapeProperties params) {
+	public double getTraceRange(Player player, SpellShapeProperties params) {
 		return getTouchRange(player, params);
 	}
 

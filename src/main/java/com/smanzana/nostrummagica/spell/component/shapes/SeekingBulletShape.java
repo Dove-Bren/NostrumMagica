@@ -19,19 +19,19 @@ import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.petcommand.api.PetFuncs;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
 /**
  * Projectile that slowly follows and then continues spell once it has collided.
@@ -46,8 +46,8 @@ public class SeekingBulletShape extends SpellShape {
 	
 	public class SeekingBulletShapeInstance extends SpellShape.SpellShapeInstance {
 
-		private final World world;
-		private final Vector3d pos;
+		private final Level world;
+		private final Vec3 pos;
 		
 		// Just initial parameters for setup
 		private final float pitch;
@@ -55,7 +55,7 @@ public class SeekingBulletShape extends SpellShape {
 		private final boolean ignoreAllies;
 		private final SpellCharacteristics characteristics;
 		
-		public SeekingBulletShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, boolean ignoreAllies, SpellCharacteristics characteristics) {
+		public SeekingBulletShapeInstance(ISpellState state, Level world, Vec3 pos, float pitch, float yaw, boolean ignoreAllies, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -67,30 +67,30 @@ public class SeekingBulletShape extends SpellShape {
 		
 		@Override
 		public void spawn(LivingEntity caster) {
-			final Vector3d start = this.getState().getSelf().getEyePosition(0f);
-			final Vector3d dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
+			final Vec3 start = this.getState().getSelf().getEyePosition(0f);
+			final Vec3 dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
 			LivingEntity target = FindTarget(this.getState().getSelf(), start, dir, this.ignoreAllies);
 			
 			// Get axis from where target is
 			Direction.Axis axis = Direction.Axis.Y;
-			Vector3d forwardDir = dir;
+			Vec3 forwardDir = dir;
 			if (target != null) {
-				Vector3d vec = target.position().subtract(getState().getSelf().position());
+				Vec3 vec = target.position().subtract(getState().getSelf().position());
 				forwardDir = vec.normalize();
 				axis = Direction.getNearest((float) vec.x, (float) vec.y, (float) vec.z).getAxis();
 			}
 			
-			Vector3d startMotion;
+			Vec3 startMotion;
 			
 			// For players, start with motion ortho to forward
-			if (getState().getSelf() instanceof PlayerEntity) {
+			if (getState().getSelf() instanceof Player) {
 				startMotion = forwardDir
 						.yRot(30f * (NostrumMagica.rand.nextBoolean() ? 1 : -1))
 						.xRot(/*-15f*/ + NostrumMagica.rand.nextFloat() * 30f);
 			}
 			// For non-players, fire mostly up
 			else {
-				startMotion = (new Vector3d(0, 1, 0)).normalize()
+				startMotion = (new Vec3(0, 1, 0)).normalize()
 						.yRot(360f * NostrumMagica.rand.nextFloat());
 			}
 			
@@ -138,12 +138,12 @@ public class SeekingBulletShape extends SpellShape {
 		}
 	}
 	
-	protected static final @Nullable LivingEntity FindTarget(LivingEntity self, Vector3d start, Vector3d direction, boolean ignoreAllies) {
+	protected static final @Nullable LivingEntity FindTarget(LivingEntity self, Vec3 start, Vec3 direction, boolean ignoreAllies) {
 		// Do a little more work of getting a good vector for things
 		// that aren't players
 		LivingEntity target;
-		if (self instanceof MobEntity && ((MobEntity) self).getTarget() != null) {
-			MobEntity ent = (MobEntity) self;
+		if (self instanceof Mob && ((Mob) self).getTarget() != null) {
+			Mob ent = (Mob) self;
 			target = ent.getTarget(); // We already know target
 		} else {
 			target = null; // Solve for target with raytrace
@@ -151,7 +151,7 @@ public class SeekingBulletShape extends SpellShape {
 		
 		if (target == null && start != null && direction != null) {
 			// Ray trace
-			RayTraceResult mop = RayTrace.raytraceApprox(self.level, self, start, direction, MAX_DIST, (ent) -> {
+			HitResult mop = RayTrace.raytraceApprox(self.level, self, start, direction, MAX_DIST, (ent) -> {
 				if (self == ent) {
 					return false;
 				}
@@ -213,12 +213,12 @@ public class SeekingBulletShape extends SpellShape {
 	}
 
 	// Copied from vanilla entity class
-	public static final Vector3d getVectorForRotation(float pitch, float yaw) {
-        float f = MathHelper.cos(-yaw * 0.017453292F - (float)Math.PI);
-        float f1 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
-        float f2 = -MathHelper.cos(-pitch * 0.017453292F);
-        float f3 = MathHelper.sin(-pitch * 0.017453292F);
-        return new Vector3d((double)(f1 * f2), (double)f3, (double)(f * f2));
+	public static final Vec3 getVectorForRotation(float pitch, float yaw) {
+        float f = Mth.cos(-yaw * 0.017453292F - (float)Math.PI);
+        float f1 = Mth.sin(-yaw * 0.017453292F - (float)Math.PI);
+        float f2 = -Mth.cos(-pitch * 0.017453292F);
+        float f3 = Mth.sin(-pitch * 0.017453292F);
+        return new Vec3((double)(f1 * f2), (double)f3, (double)(f * f2));
     }
 
 	@Override
@@ -242,12 +242,12 @@ public class SeekingBulletShape extends SpellShape {
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
+	public boolean shouldTrace(Player player, SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(PlayerEntity player, SpellShapeProperties params) {
+	public double getTraceRange(Player player, SpellShapeProperties params) {
 		return MAX_DIST;
 	}
 	
@@ -263,8 +263,8 @@ public class SeekingBulletShape extends SpellShape {
 	
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
-		final Vector3d start = state.getSelf().getEyePosition(0f);
-		final Vector3d dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
+		final Vec3 start = state.getSelf().getEyePosition(0f);
+		final Vec3 dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
 		@Nullable LivingEntity target = FindTarget(state.getSelf(), start, dir, getIgnoresAllies(properties));
 		if (target != null) {
 			state.trigger(Lists.newArrayList(target), null);

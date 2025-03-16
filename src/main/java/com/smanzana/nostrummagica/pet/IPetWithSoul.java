@@ -10,11 +10,11 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
 public interface IPetWithSoul {
 
@@ -22,7 +22,7 @@ public interface IPetWithSoul {
 	
 	public @Nonnull UUID getWorldID();
 	
-	public CompoundNBT serializeNBT();
+	public CompoundTag serializeNBT();
 
 	
 	/**
@@ -35,7 +35,7 @@ public interface IPetWithSoul {
 	 * @param snapshot
 	 * @return
 	 */
-	public static @Nullable Entity CreatePetFromSnapshot(World world, Vector3d pos, CompoundNBT snapshot) {
+	public static @Nullable Entity CreatePetFromSnapshot(Level world, Vec3 pos, CompoundTag snapshot) {
 		// return AnvilChunkLoader.readWorldEntityPos(snapshot, world, pos.x, pos.y, pos.z, worldSpawn);
 		
 		// Could use "EntityType.loadEntityRecursive" which is more like readWorldEntityPos in that it handles passengers,

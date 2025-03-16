@@ -1,13 +1,13 @@
 package com.smanzana.nostrummagica.effect;
 
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 
-public class MagicWeaknessEffect extends Effect {
+public class MagicWeaknessEffect extends MobEffect {
 
 	public static final String ID = "magic_weakness";
 	
 	public MagicWeaknessEffect() {
-		super(EffectType.HARMFUL, 0xFF5E8ABE);
+		super(MobEffectCategory.HARMFUL, 0xFF5E8ABE);
 	}
 }

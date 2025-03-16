@@ -12,10 +12,10 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class SpellKnowledgeRequirement implements IRequirement{
 
@@ -28,7 +28,7 @@ public class SpellKnowledgeRequirement implements IRequirement{
 	}
 
 	@Override
-	public boolean matches(PlayerEntity player) {
+	public boolean matches(Player player) {
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		return attr.hasKnowledge(element, alteration);
 	}
@@ -39,9 +39,9 @@ public class SpellKnowledgeRequirement implements IRequirement{
 	}
 
 	@Override
-	public List<ITextComponent> getDescription(PlayerEntity player) {
+	public List<Component> getDescription(Player player) {
 		SpellAction action = Spell.solveAction(alteration, element, 1);
-		return Lists.newArrayList(new TranslationTextComponent("info.requirement.spellknowledge", 
-				action.getName().withStyle(TextFormatting.DARK_PURPLE)));
+		return Lists.newArrayList(new TranslatableComponent("info.requirement.spellknowledge", 
+				action.getName().withStyle(ChatFormatting.DARK_PURPLE)));
 	}
 }

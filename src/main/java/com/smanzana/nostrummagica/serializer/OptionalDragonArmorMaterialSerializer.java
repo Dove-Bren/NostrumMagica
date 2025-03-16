@@ -5,11 +5,11 @@ import java.util.Optional;
 import com.smanzana.nostrummagica.item.armor.DragonArmor;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonArmorMaterial;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.IDataSerializer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializer;
 
-public final class OptionalDragonArmorMaterialSerializer implements IDataSerializer<Optional<DragonArmor.DragonArmorMaterial>> {
+public final class OptionalDragonArmorMaterialSerializer implements EntityDataSerializer<Optional<DragonArmor.DragonArmorMaterial>> {
 	
 	public static final OptionalDragonArmorMaterialSerializer instance = new OptionalDragonArmorMaterialSerializer();
 	
@@ -18,7 +18,7 @@ public final class OptionalDragonArmorMaterialSerializer implements IDataSeriali
 	}
 	
 	@Override
-	public void write(PacketBuffer buf, Optional<DragonArmor.DragonArmorMaterial> value) {
+	public void write(FriendlyByteBuf buf, Optional<DragonArmor.DragonArmorMaterial> value) {
 		buf.writeBoolean(value.isPresent());
 		if (value.isPresent()) {
 			buf.writeEnum(value.get());
@@ -26,13 +26,13 @@ public final class OptionalDragonArmorMaterialSerializer implements IDataSeriali
 	}
 
 	@Override
-	public Optional<DragonArmor.DragonArmorMaterial> read(PacketBuffer buf)  {
+	public Optional<DragonArmor.DragonArmorMaterial> read(FriendlyByteBuf buf)  {
 		return buf.readBoolean() ? Optional.of(buf.readEnum(DragonArmor.DragonArmorMaterial.class)) : Optional.empty();
 	}
 
 	@Override
-	public DataParameter<Optional<DragonArmor.DragonArmorMaterial>> createAccessor(int id) {
-		return new DataParameter<>(id, this);
+	public EntityDataAccessor<Optional<DragonArmor.DragonArmorMaterial>> createAccessor(int id) {
+		return new EntityDataAccessor<>(id, this);
 	}
 
 	@Override

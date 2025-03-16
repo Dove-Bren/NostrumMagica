@@ -6,13 +6,13 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.Camera;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -45,14 +45,14 @@ public class ParticleBatchRenderer {
 		batch.add(particle);
 	}
 	
-	public void renderBatch(MatrixStack matrixStackIn, float partialTicks) {
+	public void renderBatch(PoseStack matrixStackIn, float partialTicks) {
 		if (!batch.isEmpty()) {
 			Collections.sort(batch);
 			BatchRenderParticle last = null;
 			final Minecraft mc = Minecraft.getInstance();
-			final ActiveRenderInfo renderInfo = mc.gameRenderer.getMainCamera();
+			final Camera renderInfo = mc.gameRenderer.getMainCamera();
 			
-			Tessellator tessellator = Tessellator.getInstance();
+			Tesselator tessellator = Tesselator.getInstance();
 			BufferBuilder buffer = tessellator.getBuilder();
 			
 			for (BatchRenderParticle next : batch) {
@@ -65,7 +65,7 @@ public class ParticleBatchRenderer {
 					
 					mc.getTextureManager().bind(next.getTexture());
 					next.setupBatchedRender();
-					buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP);
+					buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP);
 				}
 
 				matrixStackIn.pushPose();

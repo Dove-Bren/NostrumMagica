@@ -2,25 +2,25 @@ package com.smanzana.nostrummagica.effect;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierManager;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.EffectType;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
-public class FastFallEffect extends Effect {
+public class FastFallEffect extends MobEffect {
 
 	public static final String ID = "fast_fall";
 	private static final double MAX_VEL = 3.0;
 	
 	public FastFallEffect() {
-		super(EffectType.HARMFUL, 0xFFAAB855);
+		super(MobEffectCategory.HARMFUL, 0xFFAAB855);
 	}
 	
 	public boolean isDurationEffectTick(int duration, int amp) {
@@ -33,7 +33,7 @@ public class FastFallEffect extends Effect {
 //			return;
 //		}
 		
-		final Vector3d motion = entity.getDeltaMovement();
+		final Vec3 motion = entity.getDeltaMovement();
 		if (motion.y < 0 && motion.y > -MAX_VEL) {
 			final double y = Math.max(-MAX_VEL, motion.y * 1.4);
 			entity.setDeltaMovement(motion.x, y, motion.z);
@@ -42,12 +42,12 @@ public class FastFallEffect extends Effect {
 	}
 	
 	@Override
-	public void addAttributeModifiers(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
+	public void addAttributeModifiers(LivingEntity entity, AttributeMap attributeMap, int amplifier) {
 		super.addAttributeModifiers(entity, attributeMap, amplifier);
 	}
 	
 	@Override
-	public void removeAttributeModifiers(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
+	public void removeAttributeModifiers(LivingEntity entityLivingBaseIn, AttributeMap attributeMapIn, int amplifier) {
 		super.removeAttributeModifiers(entityLivingBaseIn, attributeMapIn, amplifier);
     }
 	
@@ -59,7 +59,7 @@ public class FastFallEffect extends Effect {
 			return;
 		}
 		
-		EffectInstance effect = ent.getEffect(NostrumEffects.fastFall);
+		MobEffectInstance effect = ent.getEffect(NostrumEffects.fastFall);
 		if (effect != null && effect.getDuration() > 0) {
 			event.setDistance(event.getDistance() + 1 * (1 + effect.getAmplifier()));
 		}

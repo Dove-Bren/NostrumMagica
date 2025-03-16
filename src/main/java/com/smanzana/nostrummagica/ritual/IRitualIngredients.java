@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.ritual;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Ingredient;
 
 public interface IRitualIngredients {
 	

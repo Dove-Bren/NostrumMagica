@@ -1,13 +1,13 @@
 package com.smanzana.nostrummagica.client.effects;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Effect made up of multiple copies of another effect
@@ -18,8 +18,8 @@ public class ClientEffectMajorSphere extends ClientEffect {
 
 	private static class MajorSphereForm implements ClientEffectForm {
 		
-		private static IBakedModel MODEL_CLOUDY;
-		private static IBakedModel MODEL_SCALY;
+		private static BakedModel MODEL_CLOUDY;
+		private static BakedModel MODEL_SCALY;
 		private static ResourceLocation LOC_CLOUDY = new ResourceLocation(NostrumMagica.MODID, "effect/orb_cloudy");
 		private static ResourceLocation LOC_SCALY = new ResourceLocation(NostrumMagica.MODID, "effect/orb_scaled");
 
@@ -33,9 +33,9 @@ public class ClientEffectMajorSphere extends ClientEffect {
 		
 		@SuppressWarnings("deprecation")
 		@Override
-		public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
+		public void draw(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
 			
-			final IBakedModel model;
+			final BakedModel model;
 			if (cloudy) {
 				if (MODEL_CLOUDY == null) {
 					MODEL_CLOUDY = mc.getBlockRenderer().getBlockModelShaper().getModelManager().getModel(LOC_CLOUDY);
@@ -58,7 +58,7 @@ public class ClientEffectMajorSphere extends ClientEffect {
 //			GlStateManager.enableTexture();
 //			GlStateManager.color4f(0f, 0f, 0f, 0f);
 //			GlStateManager.color4f(1f, 1f, 1f, 1f);
-			Minecraft.getInstance().getTextureManager().bind(AtlasTexture.LOCATION_BLOCKS);
+			Minecraft.getInstance().getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
 			final int light = ClientEffectForm.InferLightmap(matrixStackIn, mc);
 			
 			// outside
@@ -80,11 +80,11 @@ public class ClientEffectMajorSphere extends ClientEffect {
 	}
 	
 	// Scale in 'blocks' radius
-	public ClientEffectMajorSphere(Vector3d origin, float scale, boolean cloudy, int ticks) {
+	public ClientEffectMajorSphere(Vec3 origin, float scale, boolean cloudy, int ticks) {
 		super(origin, new MajorSphereForm(scale, cloudy), ticks);
 	}
 	
-	public ClientEffectMajorSphere(Vector3d origin, float scale, boolean cloudy, long ms) {
+	public ClientEffectMajorSphere(Vec3 origin, float scale, boolean cloudy, long ms) {
 		super(origin, new MajorSphereForm(scale, cloudy), ms);
 	}
 	

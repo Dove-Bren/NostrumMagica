@@ -8,12 +8,12 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -61,13 +61,13 @@ public class SpellCraftingCapability implements ISpellCrafting {
 		}
 	
 		@Override
-		public INBT writeNBT(Capability<ISpellCrafting> capability, ISpellCrafting instanceIn, Direction side) {
+		public Tag writeNBT(Capability<ISpellCrafting> capability, ISpellCrafting instanceIn, Direction side) {
 			SpellCraftingCapability instance = (SpellCraftingCapability) instanceIn;
-			CompoundNBT nbt = new CompoundNBT();
+			CompoundTag nbt = new CompoundTag();
 			
-			ListNBT list = new ListNBT();
+			ListTag list = new ListTag();
 			for (SpellCraftPattern pattern : instance.getKnownPatterns()) {
-				list.add(StringNBT.valueOf(pattern.getRegistryName().toString()));
+				list.add(StringTag.valueOf(pattern.getRegistryName().toString()));
 			}
 			nbt.put(NBT_PATTERNS, list);
 			
@@ -75,14 +75,14 @@ public class SpellCraftingCapability implements ISpellCrafting {
 		}
 
 		@Override
-		public void readNBT(Capability<ISpellCrafting> capability, ISpellCrafting instanceIn, Direction side, INBT nbtIn) {
+		public void readNBT(Capability<ISpellCrafting> capability, ISpellCrafting instanceIn, Direction side, Tag nbtIn) {
 			SpellCraftingCapability instance = (SpellCraftingCapability) instanceIn;
 			instance.clearAll();
 			
 			if (nbtIn.getId() == NBT.TAG_COMPOUND) {
-				CompoundNBT nbt = (CompoundNBT) nbtIn;
+				CompoundTag nbt = (CompoundTag) nbtIn;
 				
-				ListNBT patternList = nbt.getList(NBT_PATTERNS, NBT.TAG_STRING);
+				ListTag patternList = nbt.getList(NBT_PATTERNS, NBT.TAG_STRING);
 				for (int i = 0; i < patternList.size(); i++) {
 					ResourceLocation key = new ResourceLocation(patternList.getString(i));
 					@Nullable SpellCraftPattern pattern = SpellCraftPattern.Get(key);

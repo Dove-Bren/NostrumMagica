@@ -1,23 +1,23 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.tile.CandleTileEntity;
 import com.smanzana.nostrummagica.util.NonNullEnumMap;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.world.item.ItemStack;
+import com.mojang.math.Vector3f;
 
-public class TileEntityCandleRenderer extends TileEntityRenderer<CandleTileEntity> {
+public class TileEntityCandleRenderer extends BlockEntityRenderer<CandleTileEntity> {
 
 	private NonNullEnumMap<ReagentType, ItemStack> itemCache;
 	
-	public TileEntityCandleRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+	public TileEntityCandleRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
 		super(rendererDispatcherIn);
 		
 		itemCache = new NonNullEnumMap<>(ReagentType.class, ItemStack.EMPTY);
@@ -27,8 +27,8 @@ public class TileEntityCandleRenderer extends TileEntityRenderer<CandleTileEntit
 	}
 	
 	@Override
-	public void render(CandleTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
-			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+	public void render(CandleTileEntity tileEntityIn, float partialTicks, PoseStack matrixStackIn,
+			MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
 		final ItemStack item = itemCache.get(tileEntityIn.getReagentType());
 		

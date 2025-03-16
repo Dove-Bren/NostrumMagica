@@ -14,10 +14,10 @@ import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.item.MagicCharm;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
+import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellPlate;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellTome;
-import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.item.equipment.AspectedWeapon;
 import com.smanzana.nostrummagica.spell.EAlteration;
@@ -26,17 +26,17 @@ import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.tile.NostrumTileEntities;
 
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.EquipmentSlotType.Group;
-import net.minecraft.item.Item;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlot.Type;
+import net.minecraft.world.item.Item;
 
 public class PortingUtil {
 	
-	public static final @Nullable SpellRune FindRuneFrom1_12_2(CompoundNBT tag) {
+	public static final @Nullable SpellRune FindRuneFrom1_12_2(CompoundTag tag) {
 		tag = tag.getCompound("tag");
 		
 		SpellRune rune;
@@ -197,8 +197,8 @@ public class PortingUtil {
 		AddNameTransform1_12_2("nostrummagica:magicfeetbase", NostrumItems.mageArmorFeet);
 		
 		for (EMagicElement element : EMagicElement.values()) {
-			for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-				if (slot.getType() != Group.ARMOR) {
+			for (EquipmentSlot slot : EquipmentSlot.values()) {
+				if (slot.getType() != Type.ARMOR) {
 					continue;
 				}
 				
@@ -277,7 +277,7 @@ public class PortingUtil {
 		return null;
 	}
 	
-	public static final CompoundNBT fixupItemTag1_12_2(CompoundNBT itemTag) {
+	public static final CompoundTag fixupItemTag1_12_2(CompoundTag itemTag) {
 		final String id = itemTag.getString("id");
 		final int damage = itemTag.getInt("Damage");
 		
@@ -300,8 +300,8 @@ public class PortingUtil {
 		return itemTag;
 	}
 	
-	public static final CompoundNBT fixupChest1_12_2(CompoundNBT chestTag) {
-		ListNBT list = chestTag.getList("Items", NBT.TAG_COMPOUND);
+	public static final CompoundTag fixupChest1_12_2(CompoundTag chestTag) {
+		ListTag list = chestTag.getList("Items", Tag.TAG_COMPOUND);
 		if (list != null) {
 			for (int i = 0; i < list.size(); i++) {
 				fixupItemTag1_12_2(list.getCompound(i));
@@ -316,7 +316,7 @@ public class PortingUtil {
 		return chestTag;
 	}
 	
-	public static final CompoundNBT fixupAltar1_12_2(CompoundNBT altarTag) {
+	public static final CompoundTag fixupAltar1_12_2(CompoundTag altarTag) {
 		if (altarTag.contains("item")) {
 			altarTag.put("item", fixupItemTag1_12_2(altarTag.getCompound("item")));
 		} else {
@@ -351,15 +351,15 @@ public class PortingUtil {
 		return null;
 	}
 	
-	public static final CompoundNBT fixupProgDoor1_12_2(CompoundNBT progDoorTag) {
+	public static final CompoundTag fixupProgDoor1_12_2(CompoundTag progDoorTag) {
 		if (progDoorTag.contains("required_componenets")) { // Yup that typo is real
-			ListNBT list = progDoorTag.getList("required_componenets", NBT.TAG_STRING);
+			ListTag list = progDoorTag.getList("required_componenets", Tag.TAG_STRING);
 			for (int i = 0; i < list.size(); i++) {
 				final String keyString = list.getString(i);
 				final @Nullable String fixupString = fixupSpellComponentWrapperKey(keyString);
 				
 				if (fixupString != null) {
-					list.set(i, StringNBT.valueOf(fixupString));
+					list.set(i, StringTag.valueOf(fixupString));
 				}
 			}
 		}
@@ -367,7 +367,7 @@ public class PortingUtil {
 		return progDoorTag;
 	}
 	
-	public static final CompoundNBT fixupSymbolEntity1_12_2(CompoundNBT symbolTag) {
+	public static final CompoundTag fixupSymbolEntity1_12_2(CompoundTag symbolTag) {
 		// Note: this is similar to how runes used to store this info, instead of
 		// with a SpellComponentWrapper.
 		final String oldName = symbolTag.getString("key");
@@ -385,7 +385,7 @@ public class PortingUtil {
 		return symbolTag;
 	}
 	
-	public static final CompoundNBT fixupTileEntity_12_2(CompoundNBT teTag) {
+	public static final CompoundTag fixupTileEntity_12_2(CompoundTag teTag) {
 		final String id = teTag.getString("id");
 		
 		// Chests and their inventory need a fixup
@@ -408,7 +408,7 @@ public class PortingUtil {
 		return teTag;
 	}
 	
-	public static @Nullable UUID readNBTUUID(CompoundNBT nbt, String key) {
+	public static @Nullable UUID readNBTUUID(CompoundTag nbt, String key) {
 		if (nbt.contains(key)) {
 			return nbt.getUUID(key);
 		}
@@ -417,7 +417,7 @@ public class PortingUtil {
 		
 	}
 	
-	public static @Nullable UUID readNBTUUID_14_4(CompoundNBT nbt, String key) {
+	public static @Nullable UUID readNBTUUID_14_4(CompoundTag nbt, String key) {
 		// Prior to 1.16, UUIDs were saved as two longs. It'd do like
 		// "nbt.putUniqueID": nbt.putString(key + "_least", id.highbits); nbt.putString(key + "_most", ...)
 		//

@@ -4,11 +4,11 @@ import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client has selected they want to remove a target from the obelisk
@@ -21,9 +21,9 @@ public class ObeliskRemoveMessage {
 		// Get from and to
 		// Validate to is an obelisk and then try to update it
 		ctx.get().setPacketHandled(true);
-		ServerPlayerEntity player = ctx.get().getSender();
+		ServerPlayer player = ctx.get().getSender();
 		ctx.get().enqueueWork(() -> {
-			TileEntity te = player.level.getBlockEntity(message.pos);
+			BlockEntity te = player.level.getBlockEntity(message.pos);
 			if (te != null && te instanceof ObeliskTileEntity) {
 				((ObeliskTileEntity) te).removeTargetIndex(message.index);
 			}
@@ -38,11 +38,11 @@ public class ObeliskRemoveMessage {
 		this.index = index;
 	}
 
-	public static ObeliskRemoveMessage decode(PacketBuffer buf) {
+	public static ObeliskRemoveMessage decode(FriendlyByteBuf buf) {
 		return new ObeliskRemoveMessage(buf.readBlockPos(), buf.readVarInt());
 	}
 
-	public static void encode(ObeliskRemoveMessage msg, PacketBuffer buf) {
+	public static void encode(ObeliskRemoveMessage msg, FriendlyByteBuf buf) {
 		buf.writeBlockPos(msg.pos);
 		buf.writeVarInt(msg.index);
 	}

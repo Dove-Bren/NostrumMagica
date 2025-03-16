@@ -6,9 +6,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.Spell;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Server is informing the client of a cooldown
@@ -20,7 +20,7 @@ public class SpellCooldownMessage {
 	public static void handle(SpellCooldownMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
 		
-		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.instance.proxy.getPlayer();
 		
 		if (player == null) {
 			// Haven't finished loading. Just drop it
@@ -46,11 +46,11 @@ public class SpellCooldownMessage {
 		this.cooldownTicks = cooldownTicks;
 	}
 	
-	public static SpellCooldownMessage decode(PacketBuffer buf) {
+	public static SpellCooldownMessage decode(FriendlyByteBuf buf) {
 		return new SpellCooldownMessage(NostrumMagica.instance.getSpellRegistry().lookup(buf.readVarInt()), buf.readVarInt());
 	}
 
-	public static void encode(SpellCooldownMessage msg, PacketBuffer buf) {
+	public static void encode(SpellCooldownMessage msg, FriendlyByteBuf buf) {
 		buf.writeVarInt(msg.spell.getRegistryID());
 		buf.writeVarInt(msg.cooldownTicks);
 	}

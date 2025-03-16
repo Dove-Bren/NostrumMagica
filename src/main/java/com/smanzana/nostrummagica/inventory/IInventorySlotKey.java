@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.inventory;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface IInventorySlotKey<T> {
 

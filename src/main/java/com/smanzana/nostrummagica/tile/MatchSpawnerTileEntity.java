@@ -14,16 +14,16 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.Constants.NBT;
 
 public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements IOrientedTileEntity {
@@ -36,7 +36,7 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	
 	private UUID unlinkedEntID;
 	
-	protected MatchSpawnerTileEntity(TileEntityType<? extends MatchSpawnerTileEntity> type) {
+	protected MatchSpawnerTileEntity(BlockEntityType<? extends MatchSpawnerTileEntity> type) {
 		super(type);
 	}
 	
@@ -91,7 +91,7 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	}
 	
 	protected boolean shouldSpawnMatch(BlockState state) {
-		for (PlayerEntity player : ((ServerWorld) level).players()) {
+		for (Player player : ((ServerLevel) level).players()) {
 			if (!player.isSpectator() && !player.isCreative() && player.distanceToSqr(worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5) < MatchSpawnerBlock.SPAWN_DIST_SQ) {
 				return true;
 			}
@@ -137,11 +137,11 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		if (triggerOffset != null) {
-			nbt.put(NBT_TRIGGER_OFFSET, NBTUtil.writeBlockPos(triggerOffset));
+			nbt.put(NBT_TRIGGER_OFFSET, NbtUtils.writeBlockPos(triggerOffset));
 		}
 		if (entity != null) {
 			nbt.putUUID(NBT_ENTITY_ID, entity.getUUID());
@@ -153,7 +153,7 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt.hasUUID(NBT_ENTITY_ID)) {
@@ -164,7 +164,7 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 			// Legacy!
 			this.triggerOffset = WorldUtil.blockPosFromLong1_12_2(nbt.getLong(NBT_TRIGGER_OFFSET));
 		} else if (nbt.contains(NBT_TRIGGER_OFFSET)) {
-			this.triggerOffset = NBTUtil.readBlockPos(nbt.getCompound(NBT_TRIGGER_OFFSET));
+			this.triggerOffset = NbtUtils.readBlockPos(nbt.getCompound(NBT_TRIGGER_OFFSET));
 		}
 	}
 	

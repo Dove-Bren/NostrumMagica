@@ -9,15 +9,15 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.StatSyncMessage;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.server.command.EnumArgument;
 
 public class CommandGiveSkillpoint {
 	
-	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+	public static final void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(
 				Commands.literal("nostrumskillpoint")
 					.requires(s -> s.hasPermission(2))
@@ -28,36 +28,36 @@ public class CommandGiveSkillpoint {
 				);
 	}
 
-	private static final int execute(CommandContext<CommandSource> context) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().getPlayerOrException();
+	private static final int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
-			context.getSource().sendSuccess(new StringTextComponent("Could not find magic wrapper for player"), true);
+			context.getSource().sendSuccess(new TextComponent("Could not find magic wrapper for player"), true);
 			return 1;
 		}
 		
 		attr.addSkillPoint();
 		NetworkHandler.sendTo(
 				new StatSyncMessage(attr)
-				, (ServerPlayerEntity) player);
+				, (ServerPlayer) player);
 		
 		return 0;
 	}
 	
-	private static final int execute(CommandContext<CommandSource> context, EMagicElement element) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().getPlayerOrException();
+	private static final int execute(CommandContext<CommandSourceStack> context, EMagicElement element) throws CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
-			context.getSource().sendSuccess(new StringTextComponent("Could not find magic wrapper for player"), true);
+			context.getSource().sendSuccess(new TextComponent("Could not find magic wrapper for player"), true);
 			return 1;
 		}
 		
 		attr.addElementalSkillPoint(element);
 		NetworkHandler.sendTo(
 				new StatSyncMessage(attr)
-				, (ServerPlayerEntity) player);
+				, (ServerPlayer) player);
 		
 		return 0;
 	}

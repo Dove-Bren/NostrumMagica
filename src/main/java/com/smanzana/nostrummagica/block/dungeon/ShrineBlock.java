@@ -9,21 +9,21 @@ import com.smanzana.nostrummagica.item.SpellRune.ElementSpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.ShapeSpellRune;
 import com.smanzana.nostrummagica.tile.ShrineTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -47,20 +47,20 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public BlockRenderType getRenderShape(BlockState state) {
-		return BlockRenderType.MODEL;
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.MODEL;
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return BASE_AABB;
 	}
 	
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		
-		if (hand != Hand.MAIN_HAND || !playerIn.isCreative()) {
-			return ActionResultType.PASS;
+		if (hand != InteractionHand.MAIN_HAND || !playerIn.isCreative()) {
+			return InteractionResult.PASS;
 		}
 		
 		return handleConfigure(worldIn, pos, state, playerIn, playerIn.getItemInHand(hand));
@@ -76,11 +76,11 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 	 * @param stack
 	 * @return
 	 */
-	protected abstract ActionResultType handleConfigure(World world, BlockPos pos, BlockState state, PlayerEntity player, ItemStack stack);
+	protected abstract InteractionResult handleConfigure(Level world, BlockPos pos, BlockState state, Player player, ItemStack stack);
 	
 	@SuppressWarnings("unchecked")
-	protected @Nullable E getTileEntity(World world, BlockPos pos, BlockState state) {
-		TileEntity te = world.getBlockEntity(pos);
+	protected @Nullable E getTileEntity(Level world, BlockPos pos, BlockState state) {
+		BlockEntity te = world.getBlockEntity(pos);
 		if (te == null || !(te instanceof ShrineTileEntity))
 			return null;
 		
@@ -99,24 +99,24 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 		}
 		
 		@Override
-		public ShrineTileEntity.Element createTileEntity(BlockState state, IBlockReader world) {
+		public ShrineTileEntity.Element createTileEntity(BlockState state, BlockGetter world) {
 			ShrineTileEntity.Element ent = new ShrineTileEntity.Element();
 			return ent;
 		}
 
 		@Override
-		protected ActionResultType handleConfigure(World world, BlockPos pos, BlockState state, PlayerEntity player, ItemStack heldItem) {
+		protected InteractionResult handleConfigure(Level world, BlockPos pos, BlockState state, Player player, ItemStack heldItem) {
 			ShrineTileEntity.Element tile = getTileEntity(world, pos, state);
 			if (tile == null) {
-				return ActionResultType.FAIL;
+				return InteractionResult.FAIL;
 			}
 			
 			if (!heldItem.isEmpty() && heldItem.getItem() instanceof ElementSpellRune) {
 				tile.setElement(SpellRune.getElement(heldItem));
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 			
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		}
 	}
 	
@@ -132,24 +132,24 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 		}
 		
 		@Override
-		public ShrineTileEntity.Shape createTileEntity(BlockState state, IBlockReader world) {
+		public ShrineTileEntity.Shape createTileEntity(BlockState state, BlockGetter world) {
 			ShrineTileEntity.Shape ent = new ShrineTileEntity.Shape();
 			return ent;
 		}
 
 		@Override
-		protected ActionResultType handleConfigure(World world, BlockPos pos, BlockState state, PlayerEntity player, ItemStack heldItem) {
+		protected InteractionResult handleConfigure(Level world, BlockPos pos, BlockState state, Player player, ItemStack heldItem) {
 			ShrineTileEntity.Shape tile = getTileEntity(world, pos, state);
 			if (tile == null) {
-				return ActionResultType.FAIL;
+				return InteractionResult.FAIL;
 			}
 			
 			if (!heldItem.isEmpty() && heldItem.getItem() instanceof ShapeSpellRune) {
 				tile.setShape(SpellRune.getShapePart(heldItem).getShape());
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 			
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		}
 	}
 	
@@ -165,24 +165,24 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 		}
 		
 		@Override
-		public ShrineTileEntity.Alteration createTileEntity(BlockState state, IBlockReader world) {
+		public ShrineTileEntity.Alteration createTileEntity(BlockState state, BlockGetter world) {
 			ShrineTileEntity.Alteration ent = new ShrineTileEntity.Alteration();
 			return ent;
 		}
 
 		@Override
-		protected ActionResultType handleConfigure(World world, BlockPos pos, BlockState state, PlayerEntity player, ItemStack heldItem) {
+		protected InteractionResult handleConfigure(Level world, BlockPos pos, BlockState state, Player player, ItemStack heldItem) {
 			ShrineTileEntity.Alteration tile = getTileEntity(world, pos, state);
 			if (tile == null) {
-				return ActionResultType.FAIL;
+				return InteractionResult.FAIL;
 			}
 			
 			if (!heldItem.isEmpty() && heldItem.getItem() instanceof AlterationSpellRune) {
 				tile.setAlteration(SpellRune.getAlteration(heldItem));
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 			
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		}
 	}
 	
@@ -198,24 +198,24 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 		}
 		
 		@Override
-		public ShrineTileEntity.Tier createTileEntity(BlockState state, IBlockReader world) {
+		public ShrineTileEntity.Tier createTileEntity(BlockState state, BlockGetter world) {
 			ShrineTileEntity.Tier ent = new ShrineTileEntity.Tier();
 			return ent;
 		}
 
 		@Override
-		protected ActionResultType handleConfigure(World world, BlockPos pos, BlockState state, PlayerEntity player, ItemStack heldItem) {
+		protected InteractionResult handleConfigure(Level world, BlockPos pos, BlockState state, Player player, ItemStack heldItem) {
 			ShrineTileEntity.Tier tile = getTileEntity(world, pos, state);
 			if (tile == null) {
-				return ActionResultType.FAIL;
+				return InteractionResult.FAIL;
 			}
 			
 			if (!heldItem.isEmpty() && heldItem.getItem() instanceof ResourceCrystal) {
 				tile.setTier(((ResourceCrystal) heldItem.getItem()).getTier());
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 			
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		}
 	}
 }

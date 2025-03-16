@@ -4,23 +4,23 @@ import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryLookupCodec;
-import net.minecraft.world.Blockreader;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.provider.CheckerboardBiomeProvider;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.Heightmap.Type;
-import net.minecraft.world.gen.WorldGenRegion;
-import net.minecraft.world.gen.feature.structure.StructureManager;
-import net.minecraft.world.gen.settings.DimensionStructuresSettings;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.RegistryLookupCodec;
+import net.minecraft.world.level.NoiseColumn;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.CheckerboardColumnBiomeSource;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.Heightmap.Types;
+import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.levelgen.StructureSettings;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -34,15 +34,15 @@ public class EmptyChunkGen extends ChunkGenerator {
 	
 	public static final Codec<EmptyChunkGen> CODEC = RecordCodecBuilder.create(instance -> instance.group( 
 		RegistryLookupCodec.create(Registry.BIOME_REGISTRY).forGetter(EmptyChunkGen::getBiomeRegistry),
-		ResourceLocation.CODEC.xmap(s -> RegistryKey.create(Registry.BIOME_REGISTRY, s), k -> k.location()).fieldOf("biome").forGetter(EmptyChunkGen::getBiome)
+		ResourceLocation.CODEC.xmap(s -> ResourceKey.create(Registry.BIOME_REGISTRY, s), k -> k.location()).fieldOf("biome").forGetter(EmptyChunkGen::getBiome)
 	).apply(instance, EmptyChunkGen::new));
 	
 	protected final Registry<Biome> biomeRegistry;
-	protected final RegistryKey<Biome> biome;
+	protected final ResourceKey<Biome> biome;
 	
-	public EmptyChunkGen(Registry<Biome> biomes, RegistryKey<Biome> biome) {
-		super(new CheckerboardBiomeProvider(Lists.newArrayList(() ->biomes.getOrThrow(biome)), 1),
-				new DimensionStructuresSettings(false));
+	public EmptyChunkGen(Registry<Biome> biomes, ResourceKey<Biome> biome) {
+		super(new CheckerboardColumnBiomeSource(Lists.newArrayList(() ->biomes.getOrThrow(biome)), 1),
+				new StructureSettings(false));
 		this.biomeRegistry = biomes;
 		this.biome = biome;
 	}
@@ -51,12 +51,12 @@ public class EmptyChunkGen extends ChunkGenerator {
 		return biomeRegistry;
 	}
 	
-	public RegistryKey<Biome> getBiome() {
+	public ResourceKey<Biome> getBiome() {
 		return biome;
 	}
 
 	@Override
-	public void buildSurfaceAndBedrock(WorldGenRegion region, IChunk chunkIn) {
+	public void buildSurfaceAndBedrock(WorldGenRegion region, ChunkAccess chunkIn) {
 		;
 	}
 
@@ -91,7 +91,7 @@ public class EmptyChunkGen extends ChunkGenerator {
 //	}
 	
 	@Override
-	public int getBaseHeight(int x, int z, Type heightmapType) {
+	public int getBaseHeight(int x, int z, Types heightmapType) {
 		return 0;
 	}
 
@@ -107,13 +107,13 @@ public class EmptyChunkGen extends ChunkGenerator {
 	}
 
 	@Override
-	public void fillFromNoise(IWorld p_230352_1_, StructureManager p_230352_2_, IChunk p_230352_3_) { // Actual generator?
+	public void fillFromNoise(LevelAccessor p_230352_1_, StructureFeatureManager p_230352_2_, ChunkAccess p_230352_3_) { // Actual generator?
 		; // Do nothing
 	}
 
 	@Override
-	public IBlockReader getBaseColumn(int p_230348_1_, int p_230348_2_) { // I'm not sure what this is? Reader for a single x/z column?
-		return new Blockreader(new BlockState[] {Blocks.AIR.defaultBlockState()});
+	public BlockGetter getBaseColumn(int p_230348_1_, int p_230348_2_) { // I'm not sure what this is? Reader for a single x/z column?
+		return new NoiseColumn(new BlockState[] {Blocks.AIR.defaultBlockState()});
 	}
 	
 }

@@ -10,8 +10,8 @@ import java.util.Random;
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.saveddata.SavedData;
 
 /**
  * Tags spells with IDs so that looking them up from the tome is easier.
@@ -22,7 +22,7 @@ import net.minecraft.world.storage.WorldSavedData;
  * @author Skyler
  *
  */
-public class SpellRegistry extends WorldSavedData {
+public class SpellRegistry extends SavedData {
 
 	public static final String DATA_NAME =  NostrumMagica.MODID + "_SpellData";
 	
@@ -31,11 +31,7 @@ public class SpellRegistry extends WorldSavedData {
 	private static final Random rand = new Random();
 	
 	public SpellRegistry() {
-		this(DATA_NAME);
-	}
-	
-	public SpellRegistry(String name) {
-		super(name);
+		super();
 
 		registry = new HashMap<>();
 		transients = new LinkedList<>();
@@ -145,9 +141,14 @@ public class SpellRegistry extends WorldSavedData {
 		
 		this.setDirty();
 	}
+	
+	public static SpellRegistry Load(CompoundTag nbt) {
+		SpellRegistry registry = new SpellRegistry();
+		registry.load(nbt);
+		return registry;
+	}
 
-	@Override
-	public void load(CompoundNBT nbt) {
+	public void load(CompoundTag nbt) {
 		synchronized(this) {
 			this.registry.clear();
 			this.transients.clear();
@@ -171,7 +172,7 @@ public class SpellRegistry extends WorldSavedData {
 	}
 
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		
 		NostrumMagica.logger.info("Saving Spell registry");
 		

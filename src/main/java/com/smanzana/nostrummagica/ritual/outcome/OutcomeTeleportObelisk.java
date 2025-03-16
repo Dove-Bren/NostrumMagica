@@ -16,15 +16,15 @@ import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.util.TextUtils;
 
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 
 public class OutcomeTeleportObelisk implements IRitualOutcome {
 
@@ -33,7 +33,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
+	public void perform(Level world, Player player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// Teleport the player to the obelisk pointed at by the center item
 		// Must have magic unlocked, maybe?
 		
@@ -51,7 +51,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 		
 		BlockPos pos = PositionCrystal.getBlockPosition(centerItem);
 		if (pos == null) {
-			player.sendMessage(new TranslationTextComponent("info.teleport_obelisk.fail", new Object[0]), Util.NIL_UUID);
+			player.sendMessage(new TranslatableComponent("info.teleport_obelisk.fail", new Object[0]), Util.NIL_UUID);
 			return;
 		}
 		
@@ -59,10 +59,10 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 			final BlockPos to = pos.above();
 			final Location dest = new Location(world, to);
 			if (attr.hasEnhancedTeleport()) {
-				TileEntity te = world.getBlockEntity(pos);
+				BlockEntity te = world.getBlockEntity(pos);
 				if (te == null || !(te instanceof ObeliskTileEntity)) {
 					NostrumMagica.logger.error("Something went wrong! Source obelisk does not seem to exist or have the provided target obelisk...");
-					player.sendMessage(new TranslationTextComponent("info.teleport_obelisk.fail"), Util.NIL_UUID);
+					player.sendMessage(new TranslatableComponent("info.teleport_obelisk.fail"), Util.NIL_UUID);
 					return;
 				}
 				
@@ -74,7 +74,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 			} else {
 				// Validate obelisks
 				if (ObeliskTileEntity.IsObeliskPos(dest)) {
-					player.sendMessage(new TranslationTextComponent("info.obelisk.dne"), Util.NIL_UUID);
+					player.sendMessage(new TranslatableComponent("info.obelisk.dne"), Util.NIL_UUID);
 					return;
 				}
 				
@@ -88,7 +88,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 				if (targ != null) {
 					//doEffects(world, to);
 				} else {
-					player.sendMessage(new TranslationTextComponent("info.obelisk.noroom"), Util.NIL_UUID);
+					player.sendMessage(new TranslatableComponent("info.obelisk.noroom"), Util.NIL_UUID);
 				}
 			}
 			
@@ -113,7 +113,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 	}
 
 	@Override
-	public List<ITextComponent> getDescription() {
+	public List<Component> getDescription() {
 		return TextUtils.GetTranslatedList("ritual.outcome.teleport_obelisk.desc");
 	}
 }

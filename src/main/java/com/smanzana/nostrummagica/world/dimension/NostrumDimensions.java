@@ -3,10 +3,10 @@ package com.smanzana.nostrummagica.world.dimension;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
 
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.Level;
 
 public class NostrumDimensions {
 
@@ -18,13 +18,13 @@ public class NostrumDimensions {
 		NostrumSorceryDimension.RegisterListener();
 	}
 	
-	private static RegistryKey<World> DimensionCache = null;
+	private static ResourceKey<Level> DimensionCache = null;
 	private static String DimensionCacheInput = null;
-	public static final RegistryKey<World> GetSorceryDimension() {
+	public static final ResourceKey<Level> GetSorceryDimension() {
 		final String name = ModConfig.config.getSorceryDimension();
 		if (!name.equals(DimensionCacheInput)) {
 			DimensionCacheInput = name;
-			DimensionCache = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(name));
+			DimensionCache = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(name));
 		}
 		return DimensionCache;
 	}

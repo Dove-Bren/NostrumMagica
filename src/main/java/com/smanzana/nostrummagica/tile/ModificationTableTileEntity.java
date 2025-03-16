@@ -12,15 +12,15 @@ import com.smanzana.nostrummagica.item.equipment.WarlockSword;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class ModificationTableTileEntity extends TileEntity implements IInventory {
+public class ModificationTableTileEntity extends BlockEntity implements Container {
 
 	private static final String NBT_INV = "modtable";
 	
@@ -106,16 +106,16 @@ public class ModificationTableTileEntity extends TileEntity implements IInventor
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return true;
 	}
 
 	@Override
-	public void startOpen(PlayerEntity player) {
+	public void startOpen(Player player) {
 	}
 
 	@Override
-	public void stopOpen(PlayerEntity player) {
+	public void stopOpen(Player player) {
 	}
 
 	@Override
@@ -144,33 +144,33 @@ public class ModificationTableTileEntity extends TileEntity implements IInventor
 	
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
-		CompoundNBT compound = new CompoundNBT();
+		CompoundTag compound = new CompoundTag();
 		
 		for (int i = 0; i < getContainerSize(); i++) {
 			if (getItem(i).isEmpty())
 				continue;
 			
-			CompoundNBT tag = new CompoundNBT();
+			CompoundTag tag = new CompoundTag();
 			compound.put(i + "", getItem(i).save(tag));
 		}
 		
 		if (nbt == null)
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		
 		nbt.put(NBT_INV, compound);
 		return nbt;
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_INV, NBT.TAG_COMPOUND))
 			return;
 		this.clearContent();
-		CompoundNBT items = nbt.getCompound(NBT_INV);
+		CompoundTag items = nbt.getCompound(NBT_INV);
 		for (String key : items.getAllKeys()) {
 			int id;
 			try {

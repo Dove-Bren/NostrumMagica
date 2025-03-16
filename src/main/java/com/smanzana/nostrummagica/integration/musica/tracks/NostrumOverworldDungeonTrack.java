@@ -7,8 +7,8 @@ import com.smanzana.musica.music.MusicSound;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
 
 //@Optional.Interface(iface="com.smanzana.musica.IMusicTrack", modid="musica")
 public class NostrumOverworldDungeonTrack implements IMusicTrack {
@@ -29,17 +29,17 @@ public class NostrumOverworldDungeonTrack implements IMusicTrack {
 	}
 
 	@Override
-	public boolean shouldPlay(ClientPlayerEntity player) {
+	public boolean shouldPlay(LocalPlayer player) {
 		return player != null && DimensionUtils.IsOverworld(DimensionUtils.GetDimension(player));
 	}
 	
 	@Override
-	public boolean shouldLoop(ClientPlayerEntity player) {
+	public boolean shouldLoop(LocalPlayer player) {
 		return shouldPlay(player);
 	}
 
 	@Override
-	public MusicSound getSound(ClientPlayerEntity player) {
+	public MusicSound getSound(LocalPlayer player) {
 		if (!didIntro) {
 			didIntro = true;
 			return soundIntro;
@@ -58,7 +58,7 @@ public class NostrumOverworldDungeonTrack implements IMusicTrack {
 	}
 	
 	@Override
-	public void onStop(ClientPlayerEntity player) {
+	public void onStop(LocalPlayer player) {
 		this.didIntro = false; // Reset
 		this.startPos = null;
 	}

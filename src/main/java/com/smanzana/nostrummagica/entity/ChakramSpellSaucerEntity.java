@@ -1,26 +1,26 @@
 package com.smanzana.nostrummagica.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
 public class ChakramSpellSaucerEntity extends SpellSaucerEntity {
 	
 	public static final String ID = "entity_internal_spellsaucer_chakram";
 	
-	public ChakramSpellSaucerEntity(EntityType<? extends ChakramSpellSaucerEntity> type, World world) {
+	public ChakramSpellSaucerEntity(EntityType<? extends ChakramSpellSaucerEntity> type, Level world) {
 		super(type, world);
 	}
 	
-	protected ChakramSpellSaucerEntity(EntityType<? extends ChakramSpellSaucerEntity> type, ISpellProjectileShape trigger, World world, LivingEntity shooter, float speed, double maxDistance) {
+	protected ChakramSpellSaucerEntity(EntityType<? extends ChakramSpellSaucerEntity> type, ISpellProjectileShape trigger, Level world, LivingEntity shooter, float speed, double maxDistance) {
 		super(type, trigger, world, shooter, speed, maxDistance);
 	}
 	
-	protected ChakramSpellSaucerEntity(EntityType<? extends ChakramSpellSaucerEntity> type, ISpellProjectileShape trigger, World world, LivingEntity shooter,
-			Vector3d from, Vector3d direction,
+	protected ChakramSpellSaucerEntity(EntityType<? extends ChakramSpellSaucerEntity> type, ISpellProjectileShape trigger, Level world, LivingEntity shooter,
+			Vec3 from, Vec3 direction,
 			float speedFactor, double maxDistance) {
 		super(type, trigger, shooter.level, shooter, from, direction, speedFactor, maxDistance, -1);
 //		direction = direction.normalize();
@@ -50,12 +50,12 @@ public class ChakramSpellSaucerEntity extends SpellSaucerEntity {
 //        }
 	}
 	
-	public ChakramSpellSaucerEntity(ISpellProjectileShape trigger, World world, LivingEntity shooter, float speed, double maxDistance) {
+	public ChakramSpellSaucerEntity(ISpellProjectileShape trigger, Level world, LivingEntity shooter, float speed, double maxDistance) {
 		super(NostrumEntityTypes.chakramSpellSaucer, trigger, world, shooter, speed, maxDistance);
 	}
 	
-	public ChakramSpellSaucerEntity(ISpellProjectileShape trigger, World world, LivingEntity shooter,
-			Vector3d from, Vector3d direction,
+	public ChakramSpellSaucerEntity(ISpellProjectileShape trigger, Level world, LivingEntity shooter,
+			Vec3 from, Vec3 direction,
 			float speedFactor, double maxDistance) {
 		super(NostrumEntityTypes.chakramSpellSaucer, trigger, shooter.level, shooter, from, direction, speedFactor, maxDistance, -1);
 	}

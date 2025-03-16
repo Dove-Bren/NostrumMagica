@@ -1,23 +1,23 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelHookShot;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.entity.HookShotEntity;
 import com.smanzana.nostrummagica.util.Projectiles;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.culling.ClippingHelper;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Matrix4f;
+import net.minecraft.world.phys.Vec3;
+import com.mojang.math.Vector3f;
 
 public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 	
@@ -26,7 +26,7 @@ public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 
 	private ModelHookShot model;
 	
-	public RenderHookShot(EntityRendererManager renderManagerIn) {
+	public RenderHookShot(EntityRenderDispatcher renderManagerIn) {
 		super(renderManagerIn);
 		
 		this.model = new ModelHookShot();
@@ -38,11 +38,11 @@ public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 	}
 	
 	@Override
-	public boolean shouldRender(HookShotEntity livingEntity, ClippingHelper camera, double camX, double camY, double camZ) {
+	public boolean shouldRender(HookShotEntity livingEntity, Frustum camera, double camX, double camY, double camZ) {
 		return true;
 	}
 	
-	private void renderChain(MatrixStack matrixStackIn, IVertexBuilder wr, Vector3f cordOffset, float segments, Vector3f perSeg) {
+	private void renderChain(PoseStack matrixStackIn, VertexConsumer wr, Vector3f cordOffset, float segments, Vector3f perSeg) {
 		final int wholeSegments = (int) segments;
 		final float partialSegment = segments - wholeSegments;
 		float vh;
@@ -91,7 +91,7 @@ public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 	}
 	
 	@Override
-	public void render(HookShotEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(HookShotEntity entity, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		final float texLen = .2f;
 		final float chainWidth = .1f;
 		final LivingEntity shooter = entity.getCaster();
@@ -100,11 +100,11 @@ public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 		
 		// First, render chain
 		if (shooter != null) {
-			Vector3d offset = Projectiles.getVectorForRotation(shooter.xRot - 90f, shooter.yHeadRot + 90f).scale(.1);
-			final Vector3d diff = shooter.getEyePosition(partialTicks).add(offset).subtract(entity.getEyePosition(partialTicks));
-			final float totalLength = (float) diff.distanceTo(new Vector3d(0,0,0));
+			Vec3 offset = Projectiles.getVectorForRotation(shooter.xRot - 90f, shooter.yHeadRot + 90f).scale(.1);
+			final Vec3 diff = shooter.getEyePosition(partialTicks).add(offset).subtract(entity.getEyePosition(partialTicks));
+			final float totalLength = (float) diff.distanceTo(new Vec3(0,0,0));
 			final float segments = totalLength / texLen;
-			final Vector3d perSegD = diff.scale(1.0/segments);
+			final Vec3 perSegD = diff.scale(1.0/segments);
 			final Vector3f cordOffset = new Vector3f(perSegD.normalize().scale(chainWidth).yRot(90f));
 			final Vector3f cordVOffset = new Vector3f(perSegD.normalize().scale(chainWidth).xRot(90f));
 			final Vector3f perSeg = new Vector3f(perSegD);
@@ -114,13 +114,13 @@ public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 			
 			// Our texture is symmetric up and down, so we'll cheat and use a quad strip and just flip
 			// UVs depending on where we're at in the chain
-			IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.HOOKSHOT_CHAIN);
+			VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.HOOKSHOT_CHAIN);
 			renderChain(matrixStackIn, buffer, cordOffset, segments, perSeg);
 			renderChain(matrixStackIn, buffer, cordVOffset, segments, perSeg);
 		}
 		
 		// then, render hook
-		IVertexBuilder buffer = bufferIn.getBuffer(model.renderType(this.getTextureLocation(entity)));
+		VertexConsumer buffer = bufferIn.getBuffer(model.renderType(this.getTextureLocation(entity)));
 		model.renderToBuffer(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 		
 		matrixStackIn.popPose();

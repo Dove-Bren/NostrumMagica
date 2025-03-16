@@ -2,15 +2,15 @@ package com.smanzana.nostrummagica.inventory;
 
 import java.util.Objects;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 
 public class EquipmentSlotKey implements IInventorySlotKey<LivingEntity> {
 	
-	private final EquipmentSlotType slot;
+	private final EquipmentSlot slot;
 	
-	public EquipmentSlotKey(EquipmentSlotType slot) {
+	public EquipmentSlotKey(EquipmentSlot slot) {
 		this.slot = slot;
 	}
 
@@ -39,7 +39,7 @@ public class EquipmentSlotKey implements IInventorySlotKey<LivingEntity> {
 		return Objects.hash(slot);
 	}
 	
-	public EquipmentSlotType getSlotType() {
+	public EquipmentSlot getSlotType() {
 		return this.slot;
 	}
 

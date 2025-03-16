@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 public class SpellShapeProperties {
 
@@ -52,12 +52,12 @@ public class SpellShapeProperties {
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T> void writeRow(CompoundNBT nbt, SpellShapeProperty<T> property, Object value) {
+	protected <T> void writeRow(CompoundTag nbt, SpellShapeProperty<T> property, Object value) {
 		nbt.put(property.getName(), property.writeValue((T)value));
 	}
 	
-	public CompoundNBT toNBT() {
-		CompoundNBT nbt = new CompoundNBT();
+	public CompoundTag toNBT() {
+		CompoundTag nbt = new CompoundTag();
 		for (Entry<SpellShapeProperty<?>, Object> row : this.properties.entrySet()) {
 			writeRow(nbt, row.getKey(), row.getValue());
 		}
@@ -79,7 +79,7 @@ public class SpellShapeProperties {
 		}
 	}
 	
-	public SpellShapeProperties fromNBT(CompoundNBT nbt) {
+	public SpellShapeProperties fromNBT(CompoundTag nbt) {
 		for (String key : nbt.getAllKeys()) {
 			SpellShapeProperty<?> property = findProperty(key);
 			if (property != null) {

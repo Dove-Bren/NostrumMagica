@@ -2,10 +2,10 @@ package com.smanzana.nostrummagica.spell.component;
 
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.nbt.ByteNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponent;
+import net.minecraft.nbt.ByteTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.BaseComponent;
 
 public class BooleanSpellShapeProperty extends SpellShapeProperty<Boolean> {
 	
@@ -21,13 +21,13 @@ public class BooleanSpellShapeProperty extends SpellShapeProperty<Boolean> {
 	}
 
 	@Override
-	public Boolean readValue(INBT tag) {
-		return tag instanceof ByteNBT ? (((ByteNBT) tag).getAsByte() != 0) : getDefault();
+	public Boolean readValue(Tag tag) {
+		return tag instanceof ByteTag ? (((ByteTag) tag).getAsByte() != 0) : getDefault();
 	}
 
 	@Override
-	public INBT writeValue(Boolean value) {
-		return ByteNBT.valueOf(value);
+	public Tag writeValue(Boolean value) {
+		return ByteTag.valueOf(value);
 	}
 
 	@Override
@@ -36,8 +36,8 @@ public class BooleanSpellShapeProperty extends SpellShapeProperty<Boolean> {
 	}
 
 	@Override
-	public TextComponent getDisplayValue(SpellShape shape, Boolean value) {
-		return new StringTextComponent(value ? "On" : "Off"); 
+	public BaseComponent getDisplayValue(SpellShape shape, Boolean value) {
+		return new TextComponent(value ? "On" : "Off"); 
 	}
 
 	@Override

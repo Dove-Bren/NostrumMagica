@@ -4,38 +4,38 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.entity.TileProxyTriggerEntity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
-public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?>> extends TileEntity implements ITickableTileEntity {
+public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?>> extends BlockEntity implements TickableBlockEntity {
 
 	private E triggerEntity;
 	
-	protected EntityProxiedTileEntity(TileEntityType<? extends EntityProxiedTileEntity<E>> type) {
+	protected EntityProxiedTileEntity(BlockEntityType<? extends EntityProxiedTileEntity<E>> type) {
 		super(type);
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
@@ -45,7 +45,7 @@ public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?
 		setChanged();
 	}
 	
-	protected abstract E makeTriggerEntity(World world, double x, double y, double z);
+	protected abstract E makeTriggerEntity(Level world, double x, double y, double z);
 	
 	public @Nullable E getTriggerEntity() {
 		return this.triggerEntity;
@@ -53,8 +53,8 @@ public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?
 	
 	public abstract void trigger(@Nullable LivingEntity entity, DamageSource source, float damage);
 	
-	protected Vector3d getEntityOffset() {
-		return new Vector3d(.5, 0, .5);
+	protected Vec3 getEntityOffset() {
+		return new Vec3(.5, 0, .5);
 	}
 	
 	protected boolean shouldHaveProxy() {
@@ -69,7 +69,7 @@ public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?
 		
 		if (shouldHaveProxy()) {
 			// Create entity here if it doesn't exist
-			Vector3d offset = this.getEntityOffset();
+			Vec3 offset = this.getEntityOffset();
 			if (triggerEntity == null || !triggerEntity.isAlive() || triggerEntity.level != this.level
 					|| triggerEntity.distanceToSqr(worldPosition.getX() + offset.x(), worldPosition.getY() + offset.y(), worldPosition.getZ() + offset.z()) > 1.5) {
 				// Entity is dead OR is too far away
@@ -89,14 +89,14 @@ public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		return nbt;
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 	}
 }

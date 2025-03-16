@@ -57,37 +57,38 @@ import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.tile.TeleportRuneTileEntity;
 import com.smanzana.nostrummagica.util.Projectiles;
 
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.monster.SpiderEntity;
-import net.minecraft.entity.passive.WolfEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.Container;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Spider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
-import net.minecraftforge.event.entity.living.EntityTeleportEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -110,7 +111,7 @@ import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.LogicalSidedProvider;
+import net.minecraftforge.fmllegacy.LogicalSidedProvider;
 
 /**
  * I lied. It's actually the one and only listener. It listens to time, too. And
@@ -189,13 +190,13 @@ public class PlayerListener {
 	}
 	
 	private class ProximityInfo {
-		public World world;
+		public Level world;
 		
 		// Proximity based
-		public Vector3d position;
+		public Vec3 position;
 		public double proximity;
 		
-		public ProximityInfo(World world, Vector3d position, double proximity) {
+		public ProximityInfo(Level world, Vec3 position, double proximity) {
 			this.world = world;
 			this.position = position;
 			this.proximity = proximity;
@@ -203,12 +204,12 @@ public class PlayerListener {
 	}
 	
 	private class PositionInfo {
-		public World world;
+		public Level world;
 		
 		// Tile based
 		public Collection<BlockPos> blocks;
 		
-		public PositionInfo(World world, Collection<BlockPos> blocks) {
+		public PositionInfo(Level world, Collection<BlockPos> blocks) {
 			this.world = world;
 			this.blocks = blocks;
 		}
@@ -321,7 +322,7 @@ public class PlayerListener {
 	 * @param range negative just won't work. :)
 	 */
 	public void registerProximity(IGenericListener listener, 
-			World world, Vector3d pos, double range) {
+			Level world, Vec3 pos, double range) {
 		proximityInfos.put(listener,
 				new ProximityInfo(world, pos, range));
 	}
@@ -334,7 +335,7 @@ public class PlayerListener {
 	 * @param blocks
 	 */
 	public void registerPosition(IGenericListener listener,
-			World world, Collection<BlockPos> blocks) {
+			Level world, Collection<BlockPos> blocks) {
 		positionInfos.put(listener,
 				new PositionInfo(world, blocks));
 	}
@@ -373,7 +374,7 @@ public class PlayerListener {
 	 * @param higher If true, triggers when food is greater than or equal to. Otherwise, LTE
 	 */
 	public void registerFood(IGenericListener listener,
-			PlayerEntity player, int level, boolean higher) {
+			Player player, int level, boolean higher) {
 		foodInfos.put(listener,
 				new FoodInfo(player, level, higher));
 	}
@@ -450,7 +451,7 @@ public class PlayerListener {
 			}
 		}
 		
-		if (ent instanceof PlayerEntity) {
+		if (ent instanceof Player) {
 			Iterator<Entry<IGenericListener, FoodInfo>> it = foodInfos.entrySet().iterator();
 			while (it.hasNext()) {
 				Entry<IGenericListener, FoodInfo> entry = it.next();
@@ -460,7 +461,7 @@ public class PlayerListener {
 				if (entry.getValue().entity.getUUID() != ent.getUUID())
 					continue;
 				
-				int level = ((PlayerEntity) ent).getFoodData().getFoodLevel();
+				int level = ((Player) ent).getFoodData().getFoodLevel();
 				int thresh = entry.getValue().threshold;
 				
 				if (entry.getValue().higher) {
@@ -565,8 +566,8 @@ public class PlayerListener {
 						event.setCanceled(true);
 						if (isLava && living.tickCount % 4 == 0) {
 							attr.addMana(-manaCost);
-							if (living instanceof PlayerEntity) {
-								NostrumMagica.instance.proxy.sendMana((PlayerEntity) living);
+							if (living instanceof Player) {
+								NostrumMagica.instance.proxy.sendMana((Player) living);
 							}
 						}
 						return;
@@ -591,8 +592,8 @@ public class PlayerListener {
 		if (event.getAmount() > 0f && event.getSource() instanceof EntityDamageSource && !((EntityDamageSource) event.getSource()).isThorns()) {
 			Entity source = ((EntityDamageSource) event.getSource()).getEntity();
 			
-			if (source instanceof ProjectileEntity) {
-				source = ((ProjectileEntity) source).getOwner(); //getShooter();
+			if (source instanceof Projectile) {
+				source = ((Projectile) source).getOwner(); //getShooter();
 			}
 			
 			if (source instanceof LivingEntity) {
@@ -613,8 +614,8 @@ public class PlayerListener {
 								action.apply(livingTarget, livingSource, 1.0f, ISpellLogBuilder.Dummy);
 						}
 					}
-					if (NostrumMagica.instance.curios.isEnabled() && livingTarget instanceof PlayerEntity) {
-						IInventory inv = NostrumMagica.instance.curios.getCurios((PlayerEntity) livingTarget);
+					if (NostrumMagica.instance.curios.isEnabled() && livingTarget instanceof Player) {
+						Container inv = NostrumMagica.instance.curios.getCurios((Player) livingTarget);
 						if (inv != null) {
 							for (int i = 0; i < inv.getContainerSize(); i++) {
 								ItemStack stack = inv.getItem(i);
@@ -644,8 +645,8 @@ public class PlayerListener {
 							action.apply(livingSource, livingTarget, 1.0f, ISpellLogBuilder.Dummy);
 					}
 				}
-				if (NostrumMagica.instance.curios.isEnabled() && livingSource instanceof PlayerEntity) {
-					IInventory inv = NostrumMagica.instance.curios.getCurios((PlayerEntity) livingSource);
+				if (NostrumMagica.instance.curios.isEnabled() && livingSource instanceof Player) {
+					Container inv = NostrumMagica.instance.curios.getCurios((Player) livingSource);
 					if (inv != null) {
 						for (int i = 0; i < inv.getContainerSize(); i++) {
 							ItemStack stack = inv.getItem(i);
@@ -733,9 +734,9 @@ public class PlayerListener {
 			// If any players nearby have fire master skill, they can regain mana
 			for (Entity e : event.getEntityLiving().getCommandSenderWorld().getEntities(event.getEntity(), event.getEntity().getBoundingBox().inflate(10), (e) -> true)) {
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(e);
-				if (e instanceof PlayerEntity && attr != null && attr.hasSkill(NostrumSkills.Fire_Master)) {
+				if (e instanceof Player && attr != null && attr.hasSkill(NostrumSkills.Fire_Master)) {
 					final LivingEntity source = event.getEntityLiving();
-					regenMana((PlayerEntity) e);
+					regenMana((Player) e);
 					NostrumParticles.FILLED_ORB.spawn(e.level, new SpawnParams(
 							5, source.getX(), source.getY() + .75, source.getZ(), 0,
 							40, 0,
@@ -756,7 +757,7 @@ public class PlayerListener {
 		if (attr != null && attr.isUnlocked()) {
 			if (event.getState().getBlock() instanceof ILoreTagged) {
 				attr.giveBasicLore((ILoreTagged) event.getState().getBlock());
-			} else if (event.getState().getBlock().is(BlockTags.LEAVES)) {
+			} else if (event.getState().is(BlockTags.LEAVES)) {
 				attr.giveBasicLore(LoreRegistry.Leaves.instance());
 			}
 		}
@@ -767,7 +768,7 @@ public class PlayerListener {
 		if (event.isCanceled())
 			return;
 
-		if (event.getSource() != null && event.getSource().getEntity() != null && event.getSource().getEntity() instanceof PlayerEntity) {
+		if (event.getSource() != null && event.getSource().getEntity() != null && event.getSource().getEntity() instanceof Player) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getSource().getEntity());
 			
 			if (attr != null && attr.isUnlocked()) {
@@ -785,9 +786,9 @@ public class PlayerListener {
 			
 		}
 		
-		if (event.getEntityLiving() instanceof PlayerEntity) {
+		if (event.getEntityLiving() instanceof Player) {
 			NostrumMagica.instance.getSpellCooldownTracker(event.getEntityLiving().level)
-				.clearCooldowns((PlayerEntity) event.getEntityLiving());
+				.clearCooldowns((Player) event.getEntityLiving());
 		}
 	}
 	
@@ -830,7 +831,7 @@ public class PlayerListener {
 			}
 				
 		}
-		if (event.getEntityLiving() instanceof SpiderEntity) {
+		if (event.getEntityLiving() instanceof Spider) {
 			for (int i = 0; i <= event.getLootingLevel(); i++) {
 				if (NostrumMagica.rand.nextFloat() <= 0.4f) {
 					ItemEntity entity = new ItemEntity(event.getEntity().level,
@@ -849,7 +850,7 @@ public class PlayerListener {
 		if (e.isCanceled())
 			return;
 		
-		PlayerEntity player = e.getPlayer();
+		Player player = e.getPlayer();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
 		if (attr != null && attr.isUnlocked()) {
@@ -864,8 +865,8 @@ public class PlayerListener {
 	
 	@SubscribeEvent
 	public void onTame(AnimalTameEvent e) {
-		if (e.getAnimal() instanceof WolfEntity) {
-			PlayerEntity player = e.getTamer();
+		if (e.getAnimal() instanceof Wolf) {
+			Player player = e.getTamer();
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr != null && !attr.hasLore(ArcaneWolfEntity.WolfTameLore.instance())) {
 				attr.giveBasicLore(ArcaneWolfEntity.WolfTameLore.instance());
@@ -876,14 +877,14 @@ public class PlayerListener {
 	@SubscribeEvent
 	public void onEntityVisibilityCheck(LivingVisibilityEvent event) {
 		if (event.getLookingEntity() != null && event.getLookingEntity() instanceof LivingEntity) {
-			final EffectInstance instance = ((LivingEntity) event.getLookingEntity()).getEffect(NostrumEffects.mobBlindness);
+			final MobEffectInstance instance = ((LivingEntity) event.getLookingEntity()).getEffect(NostrumEffects.mobBlindness);
 			if (instance != null && instance.getDuration() > 0) {
 				event.modifyVisibility(Math.max(0, .2 - (0.1 * instance.getAmplifier())));
 			}
 		}
 	}
 	
-	protected boolean shouldIgnoreVacuum(PlayerEntity player) {
+	protected boolean shouldIgnoreVacuum(Player player) {
 		return !ModConfig.config.vacuumWhileSneaking()
 				&& player.isShiftKeyDown();
 	}
@@ -893,10 +894,10 @@ public class PlayerListener {
 		if (e.isCanceled())
 			return;
 		
-		if (!(e.getEntityLiving() instanceof PlayerEntity))
+		if (!(e.getEntityLiving() instanceof Player))
 			return; // It SAYS EntityItemPickup, so just in case...
 		
-		PlayerEntity player = e.getPlayer();
+		Player player = e.getPlayer();
 		ItemStack addedItem = e.getItem().getItem();
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
@@ -912,7 +913,7 @@ public class PlayerListener {
 		
 		if (e.getItem().getItem().getItem() instanceof ReagentItem) {
 			int originalSize = addedItem.getCount();
-			for (ItemStack item : player.inventory.offhand) {
+			for (ItemStack item : player.getInventory().offhand) {
 				// Silly but prefer offhand
 				if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
 					if (!shouldIgnoreVacuum(player) && ReagentBag.isVacuumEnabled(item)) {
@@ -922,14 +923,14 @@ public class PlayerListener {
 						}
 						if (addedItem.isEmpty()) {
 							e.setCanceled(true);
-							e.getItem().remove();
+							e.getItem().discard();
 							return;
 						}
 						originalSize = addedItem.getCount();
 					}
 				}
 			}
-			for (ItemStack item : player.inventory.items) {
+			for (ItemStack item : player.getInventory().items) {
 				if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
 					if (!shouldIgnoreVacuum(player) && ReagentBag.isVacuumEnabled(item)) {
 						addedItem = ReagentBag.addItem(item, addedItem);
@@ -938,7 +939,7 @@ public class PlayerListener {
 						}
 						if (addedItem.isEmpty()) {
 							e.setCanceled(true);
-							e.getItem().remove();
+							e.getItem().discard();
 							return;
 						}
 						originalSize = addedItem.getCount();
@@ -946,7 +947,7 @@ public class PlayerListener {
 				}
 			}
 			
-			IInventory curios = NostrumMagica.instance.curios.getCurios(player);
+			Container curios = NostrumMagica.instance.curios.getCurios(player);
 			if (curios != null) {
 				for (int i = 0; i < curios.getContainerSize(); i++) {
 					ItemStack equip = curios.getItem(i);
@@ -961,7 +962,7 @@ public class PlayerListener {
 						}
 						if (addedItem.isEmpty()) {
 							e.setCanceled(true);
-							e.getItem().remove();
+							e.getItem().discard();
 							return;
 						}
 						originalSize = addedItem.getCount();
@@ -978,7 +979,7 @@ public class PlayerListener {
 		
 		if (e.getItem().getItem().getItem() instanceof SpellRune) {
 			int originalSize = addedItem.getCount();
-			for (ItemStack item : player.inventory.offhand) {
+			for (ItemStack item : player.getInventory().offhand) {
 				// Silly but prefer offhand
 				if (!item.isEmpty() && item.getItem() instanceof RuneBag) {
 					if (!shouldIgnoreVacuum(player) && RuneBag.isVacuumEnabled(item)) {
@@ -988,14 +989,14 @@ public class PlayerListener {
 						}
 						if (addedItem.isEmpty()) {
 							e.setCanceled(true);
-							e.getItem().remove();
+							e.getItem().discard();
 							return;
 						}
 						originalSize = addedItem.getCount();
 					}
 				}
 			}
-			for (ItemStack item : player.inventory.items) {
+			for (ItemStack item : player.getInventory().items) {
 				if (!item.isEmpty() && item.getItem() instanceof RuneBag) {
 					if (!shouldIgnoreVacuum(player) && RuneBag.isVacuumEnabled(item)) {
 						addedItem = RuneBag.addItem(item, addedItem);
@@ -1004,7 +1005,7 @@ public class PlayerListener {
 						}
 						if (addedItem.isEmpty()) {
 							e.setCanceled(true);
-							e.getItem().remove();
+							e.getItem().discard();
 							return;
 						}
 						originalSize = addedItem.getCount();
@@ -1022,12 +1023,12 @@ public class PlayerListener {
 			// Regain mana
 			if (tickCount % 10 == 0) {
 				
-				for (ServerWorld world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getAllLevels()) {
+				for (ServerLevel world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getAllLevels()) {
 					if (world.players().isEmpty()) {
 						continue;
 					}
 					
-					for (PlayerEntity player : world.players()) {
+					for (Player player : world.players()) {
 						regenMana(player);
 					}
 				}
@@ -1060,27 +1061,23 @@ public class PlayerListener {
 			
 			PortalBlock.serverTick();
 			TeleportRuneTileEntity.tickChargeMap();
-			for (ServerWorld world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getAllLevels()) {
+			for (ServerLevel world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getAllLevels()) {
 				ElementalArmor.ServerWorldTick(world);
 			}
 		} else if (event.phase == Phase.END) {
-			for (ServerWorld world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getAllLevels()) {
+			for (ServerLevel world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getAllLevels()) {
 				// Do cursed fire check
-				world.getEntities()
-					.filter(e -> e instanceof LivingEntity) // should be fast
-					.map(e -> (LivingEntity) e)
-					.filter(e -> e.getEffect(NostrumEffects.cursedFire) != null) // faster than checking world's blockstate?
-					.filter(e -> e.isInWaterRainOrBubble())
+				world.getEntities(EntityTypeTest.forClass(LivingEntity.class), e -> e.getEffect(NostrumEffects.cursedFire) != null && e.isInWaterRainOrBubble())
 					.forEach(e -> {
 						e.removeEffect(NostrumEffects.cursedFire);
-						world.playSound(null, e.getX(), e.getY(), e.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundCategory.NEUTRAL, 1f, 1f);
+						world.playSound(null, e.getX(), e.getY(), e.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 1f, 1f);
 					});
 				
 				if (world.players().isEmpty()) {
 					continue;
 				}
 				
-				for (PlayerEntity player : world.players()) {
+				for (Player player : world.players()) {
 					checkTickSkills(player);
 				}
 			}
@@ -1089,7 +1086,7 @@ public class PlayerListener {
 		}
 	}
 	
-	private void checkTickSkills(PlayerEntity entity) {
+	private void checkTickSkills(Player entity) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
 		if (attr == null) {
 			return;
@@ -1098,7 +1095,7 @@ public class PlayerListener {
 		// Physical gives shield when armor is reduced
 		if (attr.hasSkill(NostrumSkills.Physical_Adept)) {
 			if (entity.isAlive() && entity.getHealth() > 0f && entity.getArmorValue() < getLastTickArmor(entity)) {
-				entity.addEffect(new EffectInstance(NostrumEffects.physicalShield, 20 * 15, 0));
+				entity.addEffect(new MobEffectInstance(NostrumEffects.physicalShield, 20 * 15, 0));
 			}
 		}
 		
@@ -1114,11 +1111,11 @@ public class PlayerListener {
 		}
 	}
 	
-	private void regenMana(PlayerEntity player) {
+	private void regenMana(Player player) {
 		regenMana(player, 1);
 	} 
 	
-	private void regenMana(PlayerEntity player, int base) {
+	private void regenMana(Player player, int base) {
 		// Called 2 times a second
 		INostrumMagic stats = NostrumMagica.getMagicWrapper(player);
 		
@@ -1149,7 +1146,7 @@ public class PlayerListener {
 			return;
 		}
 		
-		NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) event.getPlayer());
+		NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) event.getPlayer());
 	}
 	
 	@SubscribeEvent
@@ -1158,7 +1155,7 @@ public class PlayerListener {
 		if (attr != null)
 			attr.clearFamiliars();
 		
-		if (event.getEntityLiving() instanceof PlayerEntity) {
+		if (event.getEntityLiving() instanceof Player) {
 			// Make sure to do on both sides
 			NostrumMagica.instance.getSpellCooldownTracker(event.getEntityLiving().level)
 				.clearCooldowns(event.getPlayer());
@@ -1172,7 +1169,7 @@ public class PlayerListener {
 	
 	@SubscribeEvent
 	public void onXPPickup(PlayerXpEvent.PickupXp event) {
-		PlayerEntity player = event.getPlayer();
+		Player player = event.getPlayer();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		int xp = event.getOrb().value;
 		if (attr != null) {
@@ -1187,7 +1184,7 @@ public class PlayerListener {
 				}
 			}
 			// Possibly use baubles
-			IInventory baubles = NostrumMagica.instance.curios.getCurios(player);
+			Container baubles = NostrumMagica.instance.curios.getCurios(player);
 			if (xp != 0)	
 			if (baubles != null) {
 				for (int i = 0; i < baubles.getContainerSize(); i++) {
@@ -1205,7 +1202,7 @@ public class PlayerListener {
 				}
 			}
 			if (xp != 0)
-			for (ItemStack item : player.inventory.items) {
+			for (ItemStack item : player.getInventory().items) {
 				if (item.isEmpty())
 					continue;
 				int leftover = tryThanos(player, item, xp);
@@ -1237,20 +1234,20 @@ public class PlayerListener {
 		final boolean hasLightningSet = ElementalArmor.GetSetCount(living, EMagicElement.LIGHTNING, ElementalArmor.Type.MASTER) == 4;
 		if (hasLightningSet) {
 			// Alternate between buff and attack modes
-			EffectInstance boostEffect = living.getEffect(NostrumEffects.lightningCharge);
-			EffectInstance attackEffect = living.getEffect(NostrumEffects.lightningAttack);
+			MobEffectInstance boostEffect = living.getEffect(NostrumEffects.lightningCharge);
+			MobEffectInstance attackEffect = living.getEffect(NostrumEffects.lightningAttack);
 			boolean tooSoon = (boostEffect == null ? (attackEffect == null ? 0 : attackEffect.getDuration()) : boostEffect.getDuration())
 					> (20 * 30 - 5);
 			
 			if (!tooSoon) {
 				if (boostEffect != null) {
 					living.removeEffect(NostrumEffects.lightningCharge);
-					living.addEffect(new EffectInstance(NostrumEffects.lightningAttack, 20 * 30, 0));
+					living.addEffect(new MobEffectInstance(NostrumEffects.lightningAttack, 20 * 30, 0));
 				} else {
 					if (attackEffect != null) {
 						living.removeEffect(NostrumEffects.lightningAttack);
 					}
-					living.addEffect(new EffectInstance(NostrumEffects.lightningCharge, 20 * 30, 0));
+					living.addEffect(new MobEffectInstance(NostrumEffects.lightningCharge, 20 * 30, 0));
 				}
 			}
 			
@@ -1261,7 +1258,7 @@ public class PlayerListener {
 			// If any players nearby have lightning master skill, they can regain mana
 			for (Entity ent : e.getEntity().getCommandSenderWorld().getEntities(e.getEntity(), e.getEntity().getBoundingBox().inflate(10), (ent) -> true)) {
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(ent);
-				if (ent instanceof PlayerEntity && attr != null) {
+				if (ent instanceof Player && attr != null) {
 					int mana = 0;
 					final LivingEntity source = (LivingEntity) e.getEntity();
 					if (attr.hasSkill(NostrumSkills.Lightning_Master)) {
@@ -1273,7 +1270,7 @@ public class PlayerListener {
 					}
 					
 					if (mana > 0) {
-						regenMana((PlayerEntity) ent, mana);
+						regenMana((Player) ent, mana);
 						NostrumParticles.FILLED_ORB.spawn(ent.level, new SpawnParams(
 								5, source.getX(), source.getY() + .75, source.getZ(), 0,
 								40, 0,
@@ -1292,7 +1289,7 @@ public class PlayerListener {
 			return;
 		}
 		
-		PlayerEntity player = e.getPlayer();
+		Player player = e.getPlayer();
 		if (player.level.isClientSide) {
 			return;
 		}
@@ -1313,7 +1310,7 @@ public class PlayerListener {
 		}
 	}
 	
-	private int tryThanos(PlayerEntity player, ItemStack item, int xp) {
+	private int tryThanos(Player player, ItemStack item, int xp) {
 		if (item.getItem() instanceof ThanosStaff) {
 			return ThanosStaff.addXP(item, xp);
 		} else if (item.getItem() instanceof ThanoPendant) {
@@ -1342,8 +1339,8 @@ public class PlayerListener {
 		}
 	}
 	
-	protected Map<Entity, Vector3d> lastPosCache = new HashMap<>();
-	protected Map<Entity, Vector3d> lastMoveCache = new HashMap<>();
+	protected Map<Entity, Vec3> lastPosCache = new HashMap<>();
+	protected Map<Entity, Vec3> lastMoveCache = new HashMap<>();
 	protected Map<LivingEntity, Integer> lastArmorCache = new HashMap<>();
 	
 	protected void addEntity(Entity ent) {
@@ -1365,26 +1362,26 @@ public class PlayerListener {
 	 * @param ent
 	 * @return
 	 */
-	public Vector3d getLastTickPos(Entity ent) {
+	public Vec3 getLastTickPos(Entity ent) {
 		addEntity(ent);
 		return lastPosCache.get(ent);
 	}
 	
-	public Vector3d getLastMove(Entity ent) {
+	public Vec3 getLastMove(Entity ent) {
 		addEntity(ent);
 		return lastMoveCache.get(ent);
 	}
 	
 	protected void updateTrackedEntities() {
 		// Look at entities being tracked. If dead or removed, remove from tracking. Else stash their current positions.
-		Iterator<Entry<Entity, Vector3d>> it = lastPosCache.entrySet().iterator();
+		Iterator<Entry<Entity, Vec3>> it = lastPosCache.entrySet().iterator();
 		while (it.hasNext()) {
-			Entry<Entity, Vector3d> entry = it.next();
+			Entry<Entity, Vec3> entry = it.next();
 			if (entry.getKey() == null || !entry.getKey().isAlive()) {
 				it.remove();
 			} else {
-				Vector3d last = entry.getValue();
-				Vector3d cur = entry.getKey().position();
+				Vec3 last = entry.getValue();
+				Vec3 cur = entry.getKey().position();
 				entry.setValue(cur);
 				if (last.distanceToSqr(cur) > .025) {
 					// Update movement
@@ -1417,7 +1414,7 @@ public class PlayerListener {
 		if (event.getEntity().level.isClientSide()) {
 			return;
 		}
-		if (event.getEntity() instanceof PlayerEntity && ((PlayerEntity) event.getEntity()).isCreative()) {
+		if (event.getEntity() instanceof Player && ((Player) event.getEntity()).isCreative()) {
 			return;
 		}
 		final LivingEntity ent = (LivingEntity) event.getEntity();
@@ -1429,8 +1426,8 @@ public class PlayerListener {
 		if (attr != null) {
 			if (attr.hasSkill(NostrumSkills.Ender_Adept)) {
 				ent.heal(2f);
-				if (ent instanceof PlayerEntity) {
-					((PlayerEntity) ent).getFoodData().eat(2, 2);
+				if (ent instanceof Player) {
+					((Player) ent).getFoodData().eat(2, 2);
 				}
 			}
 		}
@@ -1440,11 +1437,11 @@ public class PlayerListener {
 	public void onTeleport(NostrumTeleportedOtherEvent event) {
 		final Entity ent = event.getEntity();
 		final LivingEntity causingEntity = event.getCausingEntity();
-		if (causingEntity != null && causingEntity != ent && causingEntity instanceof PlayerEntity && ent instanceof LivingEntity) {
+		if (causingEntity != null && causingEntity != ent && causingEntity instanceof Player && ent instanceof LivingEntity) {
 			INostrumMagic causerAttr = NostrumMagica.getMagicWrapper(causingEntity);
 			if (causerAttr != null) {
 				if (causerAttr.hasSkill(NostrumSkills.Ender_Master)) {
-					regenMana((PlayerEntity) causingEntity, 20);
+					regenMana((Player) causingEntity, 20);
 					NostrumParticles.FILLED_ORB.spawn(ent.level, new SpawnParams(
 							5, ent.getX(), ent.getY() + .75, ent.getZ(), 0,
 							40, 0,
@@ -1462,11 +1459,11 @@ public class PlayerListener {
 		lastSpell.put(event.getCaster(), event.getSpell());
 		
 		// Let this be the thing that updates spell cooldowns
-		if (event.getCastResult().succeeded && event.getCaster() instanceof PlayerEntity && !event.getCaster().level.isClientSide() && !event.getCaster().isDeadOrDying()) {
+		if (event.getCastResult().succeeded && event.getCaster() instanceof Player && !event.getCaster().level.isClientSide() && !event.getCaster().isDeadOrDying()) {
 			final int cooldown = SpellCasting.CalculateSpellCooldown(event.getCastResult());
 			final int globalCooldown = SpellCasting.CalculateGlobalSpellCooldown(event.getCastResult());
-			NostrumMagica.instance.getSpellCooldownTracker(event.getCaster().level).setSpellCooldown((PlayerEntity) event.getCaster(), event.getSpell(), cooldown);
-			NostrumMagica.instance.getSpellCooldownTracker(event.getCaster().level).setGlobalCooldown((PlayerEntity) event.getCaster(), globalCooldown);
+			NostrumMagica.instance.getSpellCooldownTracker(event.getCaster().level).setSpellCooldown((Player) event.getCaster(), event.getSpell(), cooldown);
+			NostrumMagica.instance.getSpellCooldownTracker(event.getCaster().level).setGlobalCooldown((Player) event.getCaster(), globalCooldown);
 		}
 	}
 	
@@ -1491,7 +1488,7 @@ public class PlayerListener {
 			return;
 		}
 		
-		if (event.getEntityLiving() instanceof PlayerEntity) {
+		if (event.getEntityLiving() instanceof Player) {
 			// Automatically handled
 			return;
 		}
@@ -1501,15 +1498,15 @@ public class PlayerListener {
 			return;
 		}
 		
-		final @Nullable EffectInstance oldEffect = event.getOldPotionEffect();
-		final EffectInstance newEffect = event.getPotionEffect();
+		final @Nullable MobEffectInstance oldEffect = event.getOldPotionEffect();
+		final MobEffectInstance newEffect = event.getPotionEffect();
 		
 		// Simulate merge. Copied in essence from LivingEntity#addPotionEffect()
-		final EffectInstance mergedEffect;
+		final MobEffectInstance mergedEffect;
 		if (oldEffect == null) {
 			mergedEffect = newEffect;
 		} else {
-			EffectInstance oldCopy = new EffectInstance(oldEffect);
+			MobEffectInstance oldCopy = new MobEffectInstance(oldEffect);
 			if (oldCopy.update(newEffect)) {
 				mergedEffect = oldCopy;
 			} else {
@@ -1528,7 +1525,7 @@ public class PlayerListener {
 			return;
 		}
 		
-		if (event.getEntityLiving() instanceof PlayerEntity) {
+		if (event.getEntityLiving() instanceof Player) {
 			// Automatically handled
 			return;
 		}
@@ -1538,7 +1535,7 @@ public class PlayerListener {
 			return;
 		}
 		
-		final EffectInstance removedEffect = event.getPotionEffect();
+		final MobEffectInstance removedEffect = event.getPotionEffect();
 		if (removedEffect != null) {
 			NetworkHandler.sendToAllTracking(new VanillaEffectSyncMessage(ent.getId(), removedEffect.getEffect()), ent);
 		}
@@ -1546,7 +1543,7 @@ public class PlayerListener {
 	
 	@SubscribeEvent(priority=EventPriority.LOWEST)
 	public void onEntityEffectRemoved(PotionExpiryEvent event) {
-		if (event.getEntityLiving() instanceof PlayerEntity) {
+		if (event.getEntityLiving() instanceof Player) {
 			// Automatically handled
 			return;
 		}
@@ -1556,7 +1553,7 @@ public class PlayerListener {
 			return;
 		}
 		
-		final EffectInstance removedEffect = event.getPotionEffect();
+		final MobEffectInstance removedEffect = event.getPotionEffect();
 		if (removedEffect != null) {
 			NetworkHandler.sendToAllTracking(new VanillaEffectSyncMessage(ent.getId(), removedEffect.getEffect()), ent);
 		}

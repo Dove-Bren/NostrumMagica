@@ -8,24 +8,24 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.MatchSpawnerTileEntity;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.EnderEyeItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.EnderEyeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -47,7 +47,7 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		super.createBlockStateDefinition(builder);
 		builder.add(TRIGGERED);
 	}
@@ -72,23 +72,23 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		return new MatchSpawnerTileEntity();
 	}
 	
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (worldIn.isClientSide) {
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
-		if (hand != Hand.MAIN_HAND) {
-			return ActionResultType.SUCCESS;
+		if (hand != InteractionHand.MAIN_HAND) {
+			return InteractionResult.SUCCESS;
 		}
 		
-		TileEntity te = worldIn.getBlockEntity(pos);
+		BlockEntity te = worldIn.getBlockEntity(pos);
 		if (te == null || !(te instanceof MatchSpawnerTileEntity)) {
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
 		MatchSpawnerTileEntity ent = (MatchSpawnerTileEntity) te;
@@ -96,7 +96,7 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 		if (playerIn.isCreative()) {
 			ItemStack heldItem = playerIn.getItemInHand(hand);
 			if (heldItem.isEmpty()) {
-				playerIn.sendMessage(new StringTextComponent("Currently set to " + state.getValue(MOB).getSerializedName()), Util.NIL_UUID);
+				playerIn.sendMessage(new TextComponent("Currently set to " + state.getValue(MOB).getSerializedName()), Util.NIL_UUID);
 			} else if (heldItem.getItem() instanceof EssenceItem) {
 				Type type = null;
 				switch (EssenceItem.findType(heldItem)) {
@@ -134,7 +134,7 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 					ent.setTriggerPosition(heldPos.getX(), heldPos.getY(), heldPos.getZ());
 					NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 				}
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			} else if (heldItem.getItem() instanceof EnderEyeItem) {
 				BlockPos loc = (ent.getTriggerOffset() == null ? null : ent.getTriggerOffset().immutable().offset(pos));
 				if (loc != null) {
@@ -142,13 +142,13 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 					if (atState != null && atState.getBlock() instanceof ITriggeredBlock) {
 						playerIn.teleportTo(loc.getX(), loc.getY(), loc.getZ());
 					} else {
-						playerIn.sendMessage(new StringTextComponent("Not pointed at valid triggered block!"), Util.NIL_UUID);
+						playerIn.sendMessage(new TextComponent("Not pointed at valid triggered block!"), Util.NIL_UUID);
 					}
 				}
 			}
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
-		return ActionResultType.FAIL;
+		return InteractionResult.FAIL;
 	}
 }

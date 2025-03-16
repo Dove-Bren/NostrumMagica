@@ -7,11 +7,11 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Server is refreshing client's view on a player's mana
@@ -24,7 +24,7 @@ public class ManaMessage {
 		ctx.get().setPacketHandled(true);
 		NostrumMagica.instance.proxy.applyOverride();
 		
-		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.instance.proxy.getPlayer();
 		
 		if (player == null) {
 			// Haven't finished loading. Just drop it
@@ -32,7 +32,7 @@ public class ManaMessage {
 		}
 		
 		Minecraft.getInstance().submit(() -> {
-			PlayerEntity realPlayer = player.level.getPlayerByUUID(message.uuid);
+			Player realPlayer = player.level.getPlayerByUUID(message.uuid);
 		
 			if (realPlayer == null) {
 				// Not in this world. Who cares
@@ -56,7 +56,7 @@ public class ManaMessage {
 	private final UUID uuid;
 	private final int mana;
 	
-	public ManaMessage(PlayerEntity player, int mana) {
+	public ManaMessage(Player player, int mana) {
 		this(player.getUUID(), mana);
 	}
 	
@@ -65,11 +65,11 @@ public class ManaMessage {
 		this.mana = mana;
 	}
 
-	public static ManaMessage decode(PacketBuffer buf) {
+	public static ManaMessage decode(FriendlyByteBuf buf) {
 		return new ManaMessage(buf.readUUID(), buf.readVarInt());
 	}
 
-	public static void encode(ManaMessage msg, PacketBuffer buf) {
+	public static void encode(ManaMessage msg, FriendlyByteBuf buf) {
 		buf.writeUUID(msg.uuid);
 		buf.writeVarInt(msg.mana);
 	}

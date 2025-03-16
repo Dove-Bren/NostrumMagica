@@ -3,21 +3,21 @@ package com.smanzana.nostrummagica.block;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.tile.ObeliskPortalTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 
 public class ObeliskPortal extends TeleportationPortalBlock {
 	
@@ -38,7 +38,7 @@ public class ObeliskPortal extends TeleportationPortalBlock {
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		if (isMaster(state)) {
 			return new ObeliskPortalTileEntity();
 		}
@@ -47,22 +47,22 @@ public class ObeliskPortal extends TeleportationPortalBlock {
 	}
 	
 	@Override
-	protected void teleportEntity(World worldIn, BlockPos portalPos, Entity entityIn) {
-		TileEntity te = worldIn.getBlockEntity(portalPos.below());
+	protected void teleportEntity(Level worldIn, BlockPos portalPos, Entity entityIn) {
+		BlockEntity te = worldIn.getBlockEntity(portalPos.below());
 		if (te != null && te instanceof ObeliskTileEntity) {
 			ObeliskTileEntity ent = (ObeliskTileEntity) te;
 			if (ent.deductForTeleport(ent.getCurrentTarget())) {
 				super.teleportEntity(worldIn, portalPos, entityIn);
 			} else {
-				if (entityIn instanceof PlayerEntity) {
-					((PlayerEntity) entityIn).sendMessage(new TranslationTextComponent("info.obelisk.aetherfail"), Util.NIL_UUID);
+				if (entityIn instanceof Player) {
+					((Player) entityIn).sendMessage(new TranslatableComponent("info.obelisk.aetherfail"), Util.NIL_UUID);
 				}
 			}
 		}
 	}
 	
 	@Override
-	protected boolean canTeleport(World worldIn, BlockPos portalPos, Entity entityIn) {
+	protected boolean canTeleport(Level worldIn, BlockPos portalPos, Entity entityIn) {
 		// Specifically disallow EntityItems so that we can stuck suck up position crystals
 		if (entityIn == null || entityIn instanceof ItemEntity) {
 			return false;
@@ -83,7 +83,7 @@ public class ObeliskPortal extends TeleportationPortalBlock {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		pos = getMaster(state, pos); // find master
 		
 		BlockState parentState = worldIn.getBlockState(pos.below());
@@ -91,6 +91,6 @@ public class ObeliskPortal extends TeleportationPortalBlock {
 			parentState.getBlock().use(parentState, worldIn, pos.below(), player, handIn, hit);
 		}
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 }

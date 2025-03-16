@@ -4,10 +4,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Equipment that affects spell casting.
@@ -35,9 +35,9 @@ public interface ISpellEquipment {
 		}
 		
 		// Possibly use baubles (for players)
-		if (entity instanceof PlayerEntity) {
-			final PlayerEntity playerCast = (PlayerEntity) entity;
-			IInventory curios = NostrumMagica.instance.curios.getCurios(playerCast);
+		if (entity instanceof Player) {
+			final Player playerCast = (Player) entity;
+			Container curios = NostrumMagica.instance.curios.getCurios(playerCast);
 			if (curios != null) {
 				for (int i = 0; i < curios.getContainerSize(); i++) {
 					ItemStack equip = curios.getItem(i);

@@ -8,16 +8,16 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.arguments.DimensionArgument;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.DimensionArgument;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
 
 public class CommandSetDimension {
 	
-	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+	public static final void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(
 				Commands.literal("tpdm")
 					.requires(s -> s.hasPermission(2))
@@ -27,12 +27,12 @@ public class CommandSetDimension {
 				);
 	}
 
-	private static final int execute(CommandContext<CommandSource> context, ServerWorld world) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().getPlayerOrException();
+	private static final int execute(CommandContext<CommandSourceStack> context, ServerLevel world) throws CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null) {
-			context.getSource().sendSuccess(new StringTextComponent("Could not find magic wrapper for player"), true);
+			context.getSource().sendSuccess(new TextComponent("Could not find magic wrapper for player"), true);
 			return 1;
 		}
 		
@@ -51,10 +51,10 @@ public class CommandSetDimension {
 					player.changeDimension(world);
 				}
 			} else {
-				context.getSource().sendSuccess(new StringTextComponent("That dimension doesn't seem to exist!"), true);
+				context.getSource().sendSuccess(new TextComponent("That dimension doesn't seem to exist!"), true);
 			}
 		} else {
-			context.getSource().sendSuccess(new StringTextComponent("You must be in creative to execute this command!"), true);
+			context.getSource().sendSuccess(new TextComponent("You must be in creative to execute this command!"), true);
 		}
 		
 		return 0;

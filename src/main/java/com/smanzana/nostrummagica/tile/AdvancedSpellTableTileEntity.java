@@ -7,10 +7,10 @@ import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 
 public class AdvancedSpellTableTileEntity extends BasicSpellTableTileEntity {
 
@@ -40,7 +40,7 @@ public class AdvancedSpellTableTileEntity extends BasicSpellTableTileEntity {
 	}
 
 	@Override
-	public int getMaxWeight(PlayerEntity crafter) {
+	public int getMaxWeight(Player crafter) {
 		return 5;
 	}
 	
@@ -50,24 +50,24 @@ public class AdvancedSpellTableTileEntity extends BasicSpellTableTileEntity {
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return true;
 	}
 
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		return nbt;
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 	}
 	
 	@Override
-	public Spell craft(PlayerEntity crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
+	public Spell craft(Player crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
 		return super.craft(crafter, inventory, name, iconIndex, pattern);
 	}
 }

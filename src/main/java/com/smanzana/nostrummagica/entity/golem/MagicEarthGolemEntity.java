@@ -9,12 +9,12 @@ import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.potion.Effects;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.level.Level;
 
 public class MagicEarthGolemEntity extends MagicGolemEntity {
 	
@@ -41,7 +41,7 @@ public class MagicEarthGolemEntity extends MagicGolemEntity {
 		}
 	}
 
-	public MagicEarthGolemEntity(EntityType<MagicEarthGolemEntity> type, World worldIn) {
+	public MagicEarthGolemEntity(EntityType<MagicEarthGolemEntity> type, Level worldIn) {
 		super(type, worldIn, EMagicElement.EARTH, true, false, true);
 	}
 
@@ -63,7 +63,7 @@ public class MagicEarthGolemEntity extends MagicGolemEntity {
 		if (targ != target)
 			this.setTarget(target);
 		
-		boolean canStrength = target.getEffect(Effects.DAMAGE_BOOST) == null;
+		boolean canStrength = target.getEffect(MobEffects.DAMAGE_BOOST) == null;
 		boolean canShield = target.getEffect(NostrumEffects.physicalShield) == null;
 		
 		Spell spell;
@@ -85,11 +85,11 @@ public class MagicEarthGolemEntity extends MagicGolemEntity {
 
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
-		return target.getEffect(Effects.DAMAGE_BOOST) == null
+		return target.getEffect(MobEffects.DAMAGE_BOOST) == null
 				|| target.getEffect(NostrumEffects.physicalShield) == null;
 	}
 
-	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
+	public static final AttributeSupplier.Builder BuildAttributes() {
 		return MagicGolemEntity.BuildBaseAttributes()
 				.add(Attributes.MOVEMENT_SPEED, 0.20D)
 

@@ -12,11 +12,11 @@ import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.BlockPos;
 
 public class MysticSpellTableTileEntity extends BasicSpellTableTileEntity {
 
@@ -46,7 +46,7 @@ public class MysticSpellTableTileEntity extends BasicSpellTableTileEntity {
 	}
 
 	@Override
-	public int getMaxWeight(PlayerEntity crafter) {
+	public int getMaxWeight(Player crafter) {
 		return 10;
 	}
 	
@@ -56,28 +56,28 @@ public class MysticSpellTableTileEntity extends BasicSpellTableTileEntity {
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return true;
 	}
 
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		return nbt;
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 	}
 	
 	@Override
-	public Spell craft(PlayerEntity crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
+	public Spell craft(Player crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
 		return super.craft(crafter, inventory, name, iconIndex, pattern);
 	}
 
-	public static SpellCraftPattern[] CalculatePatternChoices(PlayerEntity crafter,
+	public static SpellCraftPattern[] CalculatePatternChoices(Player crafter,
 			ISpellCraftingInventory tableInventory, BlockPos tablePos) {
 		@Nullable ISpellCrafting crafting = NostrumMagica.getSpellCrafting(crafter);
 		Collection<SpellCraftPattern> values = crafting == null ? new ArrayList<>(0) : crafting.getKnownPatterns();

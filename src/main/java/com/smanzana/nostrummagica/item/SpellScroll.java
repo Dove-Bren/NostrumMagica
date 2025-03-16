@@ -19,20 +19,20 @@ import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -55,7 +55,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getItemInHand(hand);
 		
 		if (playerIn.isShiftKeyDown()) {
@@ -64,27 +64,27 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 			if (spell != null && worldIn.isClientSide()) {
 				NostrumMagica.instance.proxy.openSpellScreen(spell);
 			}
-			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
 		}
 		
 		if (worldIn.isClientSide()) {
-			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
 		}
 		
 		if (itemStackIn.isEmpty())
-			return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStackIn);
 		
 		if (!itemStackIn.hasTag())
-			return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStackIn);
 		
-		CompoundNBT nbt = itemStackIn.getTag();
+		CompoundTag nbt = itemStackIn.getTag();
 		
 		if (!nbt.contains(NBT_SPELL, NBT.TAG_INT))
-			return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStackIn);
 		
 		Spell spell = GetSpell(itemStackIn);
 		if (spell == null)
-			return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStackIn);
 		
 		SpellCastResult result = SpellCasting.AttemptScrollCast(spell, playerIn);
 		if (result.succeeded) {
@@ -96,7 +96,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 			// Using a scroll has more cooldown than noticing other spells being cast.
 			playerIn.getCooldowns().addCooldown(this.getItem(), SpellCasting.CalculateSpellCooldown(spell, playerIn, result.summary) * 2);
 			
-			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) playerIn);
+			NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) playerIn);
 		}
 
 		if (itemStackIn.getDamageValue() > itemStackIn.getMaxDamage() // Old way, I think never happens?
@@ -105,7 +105,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 			NostrumMagica.instance.getSpellRegistry().evict(spell);
 		}
 		
-		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
+		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
 		
     }
 	
@@ -113,16 +113,16 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellScroll))
 			return;
 		
-		CompoundNBT nbt = itemStack.getTag();
+		CompoundTag nbt = itemStack.getTag();
 		
 		if (nbt == null)
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		
 		nbt.putInt(NBT_SPELL, spell.getRegistryID());
 		nbt.putInt(NBT_DURABILITY, GetMaxUses(spell));
 		
 		itemStack.setTag(nbt);
-		itemStack.setHoverName(new StringTextComponent(spell.getName()));
+		itemStack.setHoverName(new TextComponent(spell.getName()));
 		itemStack.enchant(Enchantments.POWER_ARROWS, 1);
 	}
 	
@@ -130,7 +130,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellScroll))
 			return null;
 		
-		CompoundNBT nbt = itemStack.getTag();		
+		CompoundTag nbt = itemStack.getTag();		
 		if (nbt == null)
 			return null;
 		
@@ -155,7 +155,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellScroll))
 			return 1;
 		
-		CompoundNBT nbt = itemStack.getTag();		
+		CompoundTag nbt = itemStack.getTag();		
 		if (nbt == null || !nbt.contains(NBT_DURABILITY, NBT.TAG_INT))
 			return 15; // old default
 		
@@ -183,7 +183,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		}
 	}
 	
-	protected int getCastDurabilityCost(PlayerEntity caster, Spell spell) {
+	protected int getCastDurabilityCost(Player caster, Spell spell) {
 		// By default, cost durability-1 of the scroll so that it has exactly 2 casts.
 		// With skill, take a constant base here (5).
 		// With another skill, take less constant.
@@ -230,12 +230,12 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		;
 	}
 	
 	@Override
-	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
+	public boolean shouldTrace(Level world, Player player, ItemStack stack) {
 		Spell spell = GetSpell(stack);
 		return spell == null ? false : spell.shouldTrace(player);
 	}
@@ -246,7 +246,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	}
 
 	@Override
-	public double getTraceRange(World world, PlayerEntity player, ItemStack stack) {
+	public double getTraceRange(Level world, Player player, ItemStack stack) {
 		Spell spell = GetSpell(stack);
 		return spell == null ? 0 : spell.getTraceRange(player);
 	}
@@ -262,7 +262,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		// Note that our r-click handler will actually replace this result with a larger one if it's a scroll that
 		// cast the spell.
 		final SpellCastResult result = event.getCastResult();
-		if (result.succeeded && result.caster != null && result.caster instanceof PlayerEntity && !result.caster.isDeadOrDying()) {
+		if (result.succeeded && result.caster != null && result.caster instanceof Player && !result.caster.isDeadOrDying()) {
 			// Vulnerability: vanilla's tracker only returns us progress which means we can't REALLY check if our new
 			// cooldown time is going to be less than what's already there.
 			// If we blindly PUT, player's can get around long cooldowns by casting a short-cooldown spell after
@@ -273,8 +273,8 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 			// good time to let it be overriden.
 			
 			final int cooldownTicks = SpellCasting.CalculateSpellCooldown(result);
-			if (((PlayerEntity) result.caster).getCooldowns().getCooldownPercent(NostrumItems.spellScroll, 0f) <= .25f) {
-				((PlayerEntity) result.caster).getCooldowns().addCooldown(NostrumItems.spellScroll, cooldownTicks);
+			if (((Player) result.caster).getCooldowns().getCooldownPercent(NostrumItems.spellScroll, 0f) <= .25f) {
+				((Player) result.caster).getCooldowns().addCooldown(NostrumItems.spellScroll, cooldownTicks);
 			}
 		}
 	}

@@ -7,20 +7,20 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.book.BookScreen;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.audio.SoundHandler;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.AbstractButton;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -42,7 +42,7 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 	}
 	
 	@Override
-	public void draw(INostrumMagic attr, Minecraft mc, MatrixStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
+	public void draw(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
 		int len = mc.font.width(desc);
 		mc.font.drawShadow(matrixStackIn, desc, x + (width / 2) + (-len / 2), y, 0xFFFFFFFF);
 		
@@ -69,7 +69,7 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 	
 	private void paginate(String input, int pageWidth, int pageHeight) {
 		Minecraft mc = Minecraft.getInstance();
-		FontRenderer fonter = mc.font;
+		Font fonter = mc.font;
 		final int maxLines = (pageHeight / (LINE_HEIGHT_EXTRA + fonter.lineHeight)) - 1;
 		int count;
 		List<String[]> pages = new LinkedList<>();
@@ -127,7 +127,7 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 	}
 
 	@Override
-	public Collection<Widget> getWidgets(int x, int y, int width, int height) {
+	public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
 		return Lists.newArrayList(
 				new NextPageButton(this.screen, 0, 0, false),
 				new NextPageButton(this.screen, 0, 0, true),
@@ -139,14 +139,14 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 		private final boolean isNextButton;
 
 		public NextPageButton(InfoScreen screen, int parPosX, int parPosY, boolean parIsNextButton) {
-			super(parPosX, parPosY, 23, 13, StringTextComponent.EMPTY);
+			super(parPosX, parPosY, 23, 13, TextComponent.EMPTY);
 			this.width = 23;
 			this.height = 13;
 			isNextButton = parIsNextButton;
 		}
 
 		@Override
-		public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
+		public void render(PoseStack matrixStackIn, int parX, int parY, float partialTicks) {
 			if (visible) {
 				boolean isButtonPressed = (parX >= this.x 
 						&& parY >= this.y 
@@ -185,11 +185,11 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 	@OnlyIn(Dist.CLIENT)
     class HomeButton extends AbstractButton {
 		public HomeButton(InfoScreen screen, int parPosX, int parPosY) {
-            super(parPosX, parPosY, 23, 13, StringTextComponent.EMPTY);
+            super(parPosX, parPosY, 23, 13, TextComponent.EMPTY);
 		}
 
         @Override
-        public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
+        public void render(PoseStack matrixStackIn, int parX, int parY, float partialTicks) {
         	if (visible) {
         		boolean isButtonPressed = (parX >= this.x 
         				&& parY >= this.y 
@@ -212,8 +212,8 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
             }
         }
         
-        public void playPressSound(SoundHandler soundHandlerIn) {
-        	soundHandlerIn.play(SimpleSound.forUI(NostrumMagicaSounds.UI_TICK.getEvent(), 1.0F));
+        public void playPressSound(SoundManager soundHandlerIn) {
+        	soundHandlerIn.play(SimpleSoundInstance.forUI(NostrumMagicaSounds.UI_TICK.getEvent(), 1.0F));
         }
 		
 		@Override

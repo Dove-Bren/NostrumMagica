@@ -5,15 +5,15 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.tile.KeySwitchBlockTileEntity;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap.MutableAttribute;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder;
+import net.minecraft.world.level.Level;
 
 public class KeySwitchTriggerEntity extends TileProxyTriggerEntity<KeySwitchBlockTileEntity> {
 	
 	public static final String ID = "entity_key_switch_trigger";
 	
-	public KeySwitchTriggerEntity(EntityType<? extends KeySwitchTriggerEntity> type, World worldIn) {
+	public KeySwitchTriggerEntity(EntityType<? extends KeySwitchTriggerEntity> type, Level worldIn) {
 		super(type, worldIn);
 	}
 	
@@ -33,7 +33,7 @@ public class KeySwitchTriggerEntity extends TileProxyTriggerEntity<KeySwitchBloc
 		}
 	}
 	
-	public static final MutableAttribute BuildKeySwitchAttributes() {
+	public static final Builder BuildKeySwitchAttributes() {
 		return SwitchTriggerEntity.BuildAttributes();
 	}
 }

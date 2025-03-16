@@ -18,16 +18,16 @@ import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.Projectiles;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Lazy;
 
 /**
@@ -39,15 +39,15 @@ public class MagicCutterShape extends SpellShape implements ISelectableShape {
 
 	public static class MagicCutterShapeInstance extends SpellShapeInstance implements ISpellProjectileShape {
 
-		private final World world;
-		private final Vector3d pos;
+		private final Level world;
+		private final Vec3 pos;
 		private final float pitch;
 		private final float yaw;
 		private final boolean hitEnts;
 		private final boolean hitBlocks;
 		private final SpellCharacteristics characteristics;
 		
-		public MagicCutterShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, boolean hitEnts, boolean hitBlocks, SpellCharacteristics characteristics) {
+		public MagicCutterShapeInstance(ISpellState state, Level world, Vec3 pos, float pitch, float yaw, boolean hitEnts, boolean hitBlocks, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -62,9 +62,9 @@ public class MagicCutterShape extends SpellShape implements ISelectableShape {
 		public void spawn(LivingEntity caster) {
 			// Do a little more work of getting a good vector for things
 			// that aren't players
-			final Vector3d dir;
-			if (caster instanceof MobEntity && ((MobEntity) caster).getTarget() != null) {
-				MobEntity ent = (MobEntity) caster  ;
+			final Vec3 dir;
+			if (caster instanceof Mob && ((Mob) caster).getTarget() != null) {
+				Mob ent = (Mob) caster  ;
 				dir = ent.getTarget().position().add(0.0, ent.getBbHeight() / 2.0, 0.0)
 						.subtract(caster.getX(), caster.getY() + caster.getEyeHeight(), caster.getZ());
 			} else {
@@ -107,7 +107,7 @@ public class MagicCutterShape extends SpellShape implements ISelectableShape {
 		}
 
 		@Override
-		public void onProjectileEnd(Vector3d pos) {
+		public void onProjectileEnd(Vec3 pos) {
 			getState().triggerFail(new SpellLocation(world, pos));
 		}
 	}
@@ -158,12 +158,12 @@ public class MagicCutterShape extends SpellShape implements ISelectableShape {
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
+	public boolean shouldTrace(Player player, SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(PlayerEntity player, SpellShapeProperties params) {
+	public double getTraceRange(Player player, SpellShapeProperties params) {
 		return PROJECTILE_RANGE;
 	}
 	
@@ -181,29 +181,29 @@ public class MagicCutterShape extends SpellShape implements ISelectableShape {
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final boolean hitEnts = affectsEntities(properties);
 		final boolean hitBlocks = affectsBlocks(properties);
-		final Vector3d dir;
+		final Vec3 dir;
 		final LivingEntity self = state.getSelf();
-		if (self instanceof MobEntity && ((MobEntity) self).getTarget() != null) {
-			MobEntity ent = (MobEntity) self  ;
+		if (self instanceof Mob && ((Mob) self).getTarget() != null) {
+			Mob ent = (Mob) self  ;
 			dir = ent.getTarget().position().add(0.0, ent.getBbHeight() / 2.0, 0.0)
 					.subtract(self.getX(), self.getY() + self.getEyeHeight(), self.getZ());
 		} else {
 			dir = Projectiles.getVectorForRotation(pitch, yaw);
 		}
 		
-		RayTraceResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, dir, (float) PROJECTILE_RANGE, hitEnts ? new RayTrace.OtherLiving(state.getSelf()) : e -> false);
-		if (trace.getType() == RayTraceResult.Type.BLOCK && hitBlocks) {
-			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), Vector3d.atCenterOf(RayTrace.blockPosFromResult(trace))));
+		HitResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, dir, (float) PROJECTILE_RANGE, hitEnts ? new RayTrace.OtherLiving(state.getSelf()) : e -> false);
+		if (trace.getType() == HitResult.Type.BLOCK && hitBlocks) {
+			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), Vec3.atCenterOf(RayTrace.blockPosFromResult(trace))));
 			state.trigger(null, Lists.newArrayList(new SpellLocation(location.world, trace)));
 			return true;
-		} else if (trace.getType() == RayTraceResult.Type.ENTITY && RayTrace.livingFromRaytrace(trace) != null && hitEnts) {
+		} else if (trace.getType() == HitResult.Type.ENTITY && RayTrace.livingFromRaytrace(trace) != null && hitEnts) {
 			final LivingEntity living = RayTrace.livingFromRaytrace(trace);
 			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), living.position().add(0, living.getBbHeight() / 2, 0)));
 			state.trigger(Lists.newArrayList(living), null);
 			return true;
 		} else {
-			final Vector3d dest = location.shooterPosition.add(dir.normalize().scale(PROJECTILE_RANGE));
-			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), new Vector3d((int) dest.x() + .5, (int) dest.y() + .5, (int) dest.z() + .5)));
+			final Vec3 dest = location.shooterPosition.add(dir.normalize().scale(PROJECTILE_RANGE));
+			builder.add(new SpellShapePreviewComponent.Line(location.shooterPosition.add(0, -.25, 0), new Vec3((int) dest.x() + .5, (int) dest.y() + .5, (int) dest.z() + .5)));
 			return true;
 		}
 	}

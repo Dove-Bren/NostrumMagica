@@ -9,18 +9,18 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -101,21 +101,21 @@ public class SpellPlate extends Item implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		final int capacity = getCapacity(stack);
 		final int slots = getSlots(stack);
-		tooltip.add(new TranslationTextComponent("info.tome.slots", slots));
+		tooltip.add(new TranslatableComponent("info.tome.slots", slots));
 		if (capacity > 0) {
-			tooltip.add(new TranslationTextComponent("info.tome.capacity", capacity));
+			tooltip.add(new TranslatableComponent("info.tome.capacity", capacity));
 		}
 		
 		List<SpellTomeEnhancementWrapper> enhancements = getEnhancements(stack);
 		if (enhancements != null && !enhancements.isEmpty()) {
-			tooltip.add(new StringTextComponent(""));
+			tooltip.add(new TextComponent(""));
 			for (SpellTomeEnhancementWrapper enhance : enhancements) {
 				tooltip.add(
-						new TranslationTextComponent(enhance.getEnhancement().getNameFormat())
-						.append(new StringTextComponent(" " + toRoman(enhance.getLevel())))
+						new TranslatableComponent(enhance.getEnhancement().getNameFormat())
+						.append(new TextComponent(" " + toRoman(enhance.getLevel())))
 				);
 			}
 		}
@@ -219,12 +219,12 @@ public class SpellPlate extends Item implements ILoreTagged {
 			return null;
 		
 		List<SpellTomeEnhancementWrapper> enhancements = new LinkedList<>();
-		ListNBT list = stack.getTag().getList(NBT_ENHANCEMENTS, NBT.TAG_COMPOUND);
+		ListTag list = stack.getTag().getList(NBT_ENHANCEMENTS, NBT.TAG_COMPOUND);
 		if (list == null || list.isEmpty())
 			return enhancements;
 		
 		for (int i = 0; i < list.size(); i++) {
-			CompoundNBT tag = list.getCompound(i);
+			CompoundTag tag = list.getCompound(i);
 			String key = tag.getString(NBT_ENHANCEMENT_TYPE);
 			SpellTomeEnhancement enhance = SpellTomeEnhancement.lookupEnhancement(key);
 			if (enhance == null)
@@ -239,9 +239,9 @@ public class SpellPlate extends Item implements ILoreTagged {
 	}
 	
 	public static void setCapacity(ItemStack stack, int capacity) {
-		CompoundNBT tag = stack.getTag();
+		CompoundTag tag = stack.getTag();
 		if (tag == null) {
-			tag = new CompoundNBT();
+			tag = new CompoundTag();
 		}
 		
 		tag.putInt(NBT_CAPACITY, capacity);
@@ -250,9 +250,9 @@ public class SpellPlate extends Item implements ILoreTagged {
 	}
 	
 	public static void setSlots(ItemStack stack, int slots) {
-		CompoundNBT tag = stack.getTag();
+		CompoundTag tag = stack.getTag();
 		if (tag == null) {
-			tag = new CompoundNBT();
+			tag = new CompoundTag();
 		}
 		
 		tag.putInt(NBT_SLOTS, slots);
@@ -261,15 +261,15 @@ public class SpellPlate extends Item implements ILoreTagged {
 	}
 	
 	public static void setEnhancements(ItemStack stack, List<SpellTomeEnhancementWrapper> enhancements) {
-		CompoundNBT tag = stack.getTag();
+		CompoundTag tag = stack.getTag();
 		if (tag == null) {
-			tag = new CompoundNBT();
+			tag = new CompoundTag();
 		}
 		
 		if (enhancements != null && enhancements.size() > 0) {
-			ListNBT list = new ListNBT();
+			ListTag list = new ListTag();
 			for (SpellTomeEnhancementWrapper enhance : enhancements) {
-				CompoundNBT subtag = new CompoundNBT();
+				CompoundTag subtag = new CompoundTag();
 				subtag.putString(NBT_ENHANCEMENT_TYPE, enhance.getEnhancement().getTitleKey());
 				subtag.putInt(NBT_ENHANCEMENT_LEVEL, enhance.getLevel());
 				list.add(subtag);
@@ -289,7 +289,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
 		if (this.allowdedIn(group)) {
 			ItemStack stack = new ItemStack(this);
 			setCapacity(stack, 5);

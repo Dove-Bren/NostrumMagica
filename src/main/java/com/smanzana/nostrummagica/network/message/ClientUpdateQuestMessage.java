@@ -8,11 +8,11 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.progression.quest.NostrumQuest;
 
 import io.netty.handler.codec.DecoderException;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client has requested a quest become active or completed
@@ -22,7 +22,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 public class ClientUpdateQuestMessage {
 	
 	public static void handle(ClientUpdateQuestMessage message, Supplier<NetworkEvent.Context> ctx) {
-		final ServerPlayerEntity sp = ctx.get().getSender();
+		final ServerPlayer sp = ctx.get().getSender();
 		ctx.get().setPacketHandled(true);
 		ctx.get().enqueueWork(() -> {
 			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
@@ -48,7 +48,7 @@ public class ClientUpdateQuestMessage {
 		this.quest = quest;
 	}
 
-	public static ClientUpdateQuestMessage decode(PacketBuffer buf) {
+	public static ClientUpdateQuestMessage decode(FriendlyByteBuf buf) {
 		final String id = buf.readUtf(32767);
 		NostrumQuest quest = NostrumQuest.lookup(id);
 		if (quest == null) {
@@ -57,7 +57,7 @@ public class ClientUpdateQuestMessage {
 		return new ClientUpdateQuestMessage(quest);
 	}
 
-		public static void encode(ClientUpdateQuestMessage msg, PacketBuffer buf) {
+		public static void encode(ClientUpdateQuestMessage msg, FriendlyByteBuf buf) {
 		buf.writeUtf(msg.quest.getKey());
 	}
 

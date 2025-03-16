@@ -7,17 +7,17 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -35,10 +35,10 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	public static ItemStack Create(SpellTomeEnhancement enhancement, int level) {
 		ItemStack stack = new ItemStack(NostrumItems.spellTomePage);
 		
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		
 		if (nbt == null)
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		
 		nbt.putInt(NBT_LEVEL, level);
 		nbt.putString(NBT_TYPE, enhancement.getTitleKey());
@@ -69,14 +69,14 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		SpellTomeEnhancement enhance = getEnhancement(stack);
 		if (enhance == null)
 			return;
 		int level = getLevel(stack);
 		
-		tooltip.add(new TranslationTextComponent(enhance.getNameFormat())
-				.append(new StringTextComponent(" " + toRoman(level))));
+		tooltip.add(new TranslatableComponent(enhance.getNameFormat())
+				.append(new TextComponent(" " + toRoman(level))));
 	}
 	
 	public static String toRoman(int num) {
@@ -155,7 +155,7 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
 		if (this.allowdedIn(group)) {
 			for (SpellTomeEnhancement enhancement : SpellTomeEnhancement.getEnhancements()) {
 				items.add(Create(enhancement, 1));

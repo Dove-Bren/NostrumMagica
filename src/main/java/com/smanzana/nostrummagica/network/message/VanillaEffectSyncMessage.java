@@ -6,12 +6,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Server is informing a client of a status effect that is affecting an entity other than the
@@ -24,10 +24,10 @@ import net.minecraftforge.fml.network.NetworkEvent;
 public class VanillaEffectSyncMessage {
 	
 	public final int entityID;
-	public final @Nonnull Effect effect;
-	public final @Nullable EffectInstance instance;
+	public final @Nonnull MobEffect effect;
+	public final @Nullable MobEffectInstance instance;
 	
-	private VanillaEffectSyncMessage(int entityID, Effect effect, @Nullable EffectInstance instance) {
+	private VanillaEffectSyncMessage(int entityID, MobEffect effect, @Nullable MobEffectInstance instance) {
 		this.entityID = entityID;
 		this.effect = effect;
 		this.instance = instance;
@@ -37,19 +37,19 @@ public class VanillaEffectSyncMessage {
 		}
 	}
 
-	public VanillaEffectSyncMessage(int entityID, @Nonnull EffectInstance effect) {
+	public VanillaEffectSyncMessage(int entityID, @Nonnull MobEffectInstance effect) {
 		this(entityID, effect.getEffect(), effect);
 	}
 
-	public VanillaEffectSyncMessage(Entity entity, @Nonnull EffectInstance effect) {
+	public VanillaEffectSyncMessage(Entity entity, @Nonnull MobEffectInstance effect) {
 		this(entity.getId(), effect.getEffect(), effect);
 	}
 	
-	public VanillaEffectSyncMessage(int entityID, @Nonnull Effect effect) {
+	public VanillaEffectSyncMessage(int entityID, @Nonnull MobEffect effect) {
 		this(entityID, effect, null);
 	}
 	
-	public VanillaEffectSyncMessage(Entity entity, @Nonnull Effect effect) {
+	public VanillaEffectSyncMessage(Entity entity, @Nonnull MobEffect effect) {
 		this(entity.getId(), effect, null);
 	}
 
@@ -79,19 +79,19 @@ public class VanillaEffectSyncMessage {
 		});
 	}
 	
-	public static VanillaEffectSyncMessage decode(PacketBuffer buf) {
+	public static VanillaEffectSyncMessage decode(FriendlyByteBuf buf) {
 		final int entityID = buf.readVarInt();
 		final int effectID = buf.readVarInt();
-		final Effect effect = Effect.byId(effectID);
+		final MobEffect effect = MobEffect.byId(effectID);
 		if (effect == null) {
 			throw new RuntimeException("Unrecognized effect in sync message: " + effectID);
 		}
 		
-		final @Nullable EffectInstance instance;
+		final @Nullable MobEffectInstance instance;
 		if (buf.readBoolean()) {
 			final int duration = buf.readVarInt();
 			final int amp = buf.readVarInt();
-			instance = new EffectInstance(effect, duration, amp);
+			instance = new MobEffectInstance(effect, duration, amp);
 		} else {
 			instance = null;
 		}
@@ -99,9 +99,9 @@ public class VanillaEffectSyncMessage {
 		return new VanillaEffectSyncMessage(entityID, effect, instance);
 	}
 
-	public static void encode(VanillaEffectSyncMessage msg, PacketBuffer buf) {
+	public static void encode(VanillaEffectSyncMessage msg, FriendlyByteBuf buf) {
 		buf.writeVarInt(msg.entityID);
-		buf.writeVarInt(Effect.getId(msg.effect));
+		buf.writeVarInt(MobEffect.getId(msg.effect));
 		buf.writeBoolean(msg.instance != null);
 		if (msg.instance != null) {
 			buf.writeVarInt(msg.instance.getDuration());

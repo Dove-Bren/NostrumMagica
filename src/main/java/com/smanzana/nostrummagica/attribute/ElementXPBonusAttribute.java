@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.attribute;
 import com.smanzana.nostrummagica.attribute.IPrintableAttribute.IPercentageAttribute;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.ai.attributes.RangedAttribute;
+import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 
 public class ElementXPBonusAttribute extends RangedAttribute implements IPercentageAttribute {
 	

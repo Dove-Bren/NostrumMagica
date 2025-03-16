@@ -9,7 +9,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.spell.EAlteration;
@@ -19,9 +19,9 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.Camera;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -39,9 +39,9 @@ public class ClientEffectRenderer {
 	public static interface ClientShapeEffectFactory {
 		
 		public ClientEffect build(LivingEntity caster,
-			Vector3d sourcePosition,
+			Vec3 sourcePosition,
 			LivingEntity target,
-			Vector3d destPosition,
+			Vec3 destPosition,
 			SpellShapeProperties properties,
 			SpellCharacteristics characteristics);
 	}
@@ -49,9 +49,9 @@ public class ClientEffectRenderer {
 	public static interface ClientActionEffectFactory {
 		
 		public ClientEffect build(LivingEntity caster,
-			Vector3d sourcePosition,
+			Vec3 sourcePosition,
 			LivingEntity target,
-			Vector3d destPosition,
+			Vec3 destPosition,
 			SpellEffectPart effect);
 	}
 
@@ -94,14 +94,14 @@ public class ClientEffectRenderer {
 		}
 
 		Minecraft mc = Minecraft.getInstance();
-		final ActiveRenderInfo renderInfo = mc.gameRenderer.getMainCamera();
-		MatrixStack stack = event.getMatrixStack();//RenderFuncs.makeNewMatrixStack(renderInfo);
+		final Camera renderInfo = mc.gameRenderer.getMainCamera();
+		PoseStack stack = event.getMatrixStack();//RenderFuncs.makeNewMatrixStack(renderInfo);
 		
 		stack.pushPose();
 		
 //		 Set up render space. Effects want to render at absolute world positions,
 //		 so don't actually offset at all
-		Vector3d playerOffset = renderInfo.getPosition();
+		Vec3 playerOffset = renderInfo.getPosition();
 		//Vector3d playerOffset = mc.thePlayer.getPositionVec();
 		stack.translate(-playerOffset.x, -playerOffset.y, -playerOffset.z);
 		
@@ -132,9 +132,9 @@ public class ClientEffectRenderer {
 	
 	public void spawnEffect(SpellShape shape,
 			LivingEntity caster,
-			Vector3d sourcePosition,
+			Vec3 sourcePosition,
 			LivingEntity target,
-			Vector3d destPosition,
+			Vec3 destPosition,
 			SpellShapeProperties properties,
 			SpellCharacteristics characteristics) {
 		ClientShapeEffectFactory factory = registeredShapeEffects.get(shape);
@@ -155,9 +155,9 @@ public class ClientEffectRenderer {
 	
 	public void spawnEffect(SpellEffectPart effect,
 			LivingEntity caster,
-			Vector3d sourcePosition,
+			Vec3 sourcePosition,
 			LivingEntity target,
-			Vector3d destPosition) {
+			Vec3 destPosition) {
 		ClientActionEffectFactory factory = registeredActionEffects.get(effect.getAlteration());
 		if (factory == null) {
 			if (!DidWarned) {

@@ -3,22 +3,22 @@ package com.smanzana.nostrummagica.effect;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
-public class BonusJumpEffect extends Effect {
+public class BonusJumpEffect extends MobEffect {
 
 	public static final String ID = "bonus_jump";
 	
 	public BonusJumpEffect() {
-		super(EffectType.BENEFICIAL, 0xFFD1CDD6);
+		super(MobEffectCategory.BENEFICIAL, 0xFFD1CDD6);
 		this.addAttributeModifier(NostrumAttributes.bonusJump, "d10d2bfa-1b89-47a0-ade5-5b4d1cc9c48d", 1, AttributeModifier.Operation.ADDITION);
 	}
 	
@@ -29,7 +29,7 @@ public class BonusJumpEffect extends Effect {
 		}
 		
 		if (event.getDistance() > 0) {
-			EffectInstance effect = event.getEntityLiving().getEffect(NostrumEffects.bonusJump);
+			MobEffectInstance effect = event.getEntityLiving().getEffect(NostrumEffects.bonusJump);
 			if (effect != null && effect.getDuration() > 0) {
 				// Reduce by 1.5 blocks per level, plus an additional .25 blocks per .1 jump velocity over normal.
 //				final float baseVelocity = 0.42F; // from LivingEntity

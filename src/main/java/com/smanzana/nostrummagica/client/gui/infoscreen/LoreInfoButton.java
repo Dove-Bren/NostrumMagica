@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.item.SpellRune;
@@ -15,16 +15,16 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.inventory.InventoryScreen;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import com.mojang.blaze3d.platform.Lighting;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 public class LoreInfoButton extends InfoButton {
 
@@ -45,7 +45,7 @@ public class LoreInfoButton extends InfoButton {
 	}
 
 	@Override
-	public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		final Minecraft mc = Minecraft.getInstance();
 		float tint = 1f;
 		if (mouseX >= this.x 
@@ -93,17 +93,17 @@ public class LoreInfoButton extends InfoButton {
 		} else if (iconEntity != null) {
 			int x = this.x + (width / 2);
 			int y = this.y + (width - 1);
-			RenderHelper.turnOff();
+			Lighting.turnOff();
 			InventoryScreen.renderEntityInInventory(x, y,
 					(int) (width * .4), (float)(this.x) - mouseX, (float)(this.y) - mouseY, (LivingEntity)iconEntity);
 		}
 	}
 
-	private List<ITextComponent> desc = new ArrayList<>(1);
+	private List<Component> desc = new ArrayList<>(1);
 	@Override
-	public List<ITextComponent> getDescription() {
+	public List<Component> getDescription() {
 		if (desc.isEmpty())
-			desc.add(new StringTextComponent(lore.getLoreDisplayName()));
+			desc.add(new TextComponent(lore.getLoreDisplayName()));
 		
 		return desc;
 	}

@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.client.gui.mirror;
 
 import com.smanzana.nostrummagica.client.gui.book.BookScreen;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.AbstractWidget;
 
 public interface IMirrorScreen {
 
-	public void addWidget(Widget widget);
+	public void addWidget(AbstractWidget widget);
 	
 	public void resetWidgets();
 	

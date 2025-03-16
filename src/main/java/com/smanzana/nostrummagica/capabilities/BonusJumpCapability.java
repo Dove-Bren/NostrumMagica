@@ -4,10 +4,10 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -55,9 +55,9 @@ public class BonusJumpCapability implements IBonusJumpCapability {
 		}
 	
 		@Override
-		public INBT writeNBT(Capability<IBonusJumpCapability> capability, IBonusJumpCapability instanceIn, Direction side) {
+		public Tag writeNBT(Capability<IBonusJumpCapability> capability, IBonusJumpCapability instanceIn, Direction side) {
 			BonusJumpCapability instance = (BonusJumpCapability) instanceIn;
-			CompoundNBT nbt = new CompoundNBT();
+			CompoundTag nbt = new CompoundTag();
 			
 			nbt.putInt(NBT_COUNT, instance.getCount());
 			
@@ -65,12 +65,12 @@ public class BonusJumpCapability implements IBonusJumpCapability {
 		}
 
 		@Override
-		public void readNBT(Capability<IBonusJumpCapability> capability, IBonusJumpCapability instanceIn, Direction side, INBT nbtIn) {
+		public void readNBT(Capability<IBonusJumpCapability> capability, IBonusJumpCapability instanceIn, Direction side, Tag nbtIn) {
 			BonusJumpCapability instance = (BonusJumpCapability) instanceIn;
 			
 			instance.resetCount();
 			if (nbtIn.getId() == NBT.TAG_COMPOUND) {
-				instance.jumpCount = ((CompoundNBT) nbtIn).getInt(NBT_COUNT);
+				instance.jumpCount = ((CompoundTag) nbtIn).getInt(NBT_COUNT);
 			}
 		}
 	}
@@ -84,7 +84,7 @@ public class BonusJumpCapability implements IBonusJumpCapability {
 			return;
 		}
 		
-		final PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		final Player player = NostrumMagica.instance.proxy.getPlayer();
 		if (player == null || !player.isOnGround()) {
 			return;
 		}

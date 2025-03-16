@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBillboard;
@@ -12,23 +12,23 @@ import com.smanzana.nostrummagica.tile.KeySwitchBlockTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Vector3f;
+import net.minecraft.network.chat.Component;
 
-public class RenderKeySwitchTrigger extends LivingRenderer<KeySwitchTriggerEntity, ModelKeySwitchTrigger> {
+public class RenderKeySwitchTrigger extends LivingEntityRenderer<KeySwitchTriggerEntity, ModelKeySwitchTrigger> {
 
 	private static final ResourceLocation CAGE_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/block/key_cage.png");
 	private static final ResourceLocation KEY_TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/item/key.png");
 
 	protected ModelBillboard iconModel;
 	
-	public RenderKeySwitchTrigger(EntityRendererManager renderManagerIn) {
+	public RenderKeySwitchTrigger(EntityRenderDispatcher renderManagerIn) {
 		super(renderManagerIn, new ModelKeySwitchTrigger(), .1f);
 		iconModel = new ModelBillboard();
 		iconModel.setRadius(.25f);
@@ -45,7 +45,7 @@ public class RenderKeySwitchTrigger extends LivingRenderer<KeySwitchTriggerEntit
 	}
 	
 	@Override
-	protected void renderNameTag(KeySwitchTriggerEntity entityIn, ITextComponent displayNameIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	protected void renderNameTag(KeySwitchTriggerEntity entityIn, Component displayNameIn, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		final Minecraft mc = Minecraft.getInstance();
 		final double ticks = entityIn.level.getGameTime();
 		final String info;
@@ -100,7 +100,7 @@ public class RenderKeySwitchTrigger extends LivingRenderer<KeySwitchTriggerEntit
 	}
 	
 	@Override
-	public void render(KeySwitchTriggerEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(KeySwitchTriggerEntity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		// Draw switch box, which is model passed to parent
 		final double spinIdle = 3.0; // seconds per turn
 		final double spinActivated = 3.0;
@@ -125,7 +125,7 @@ public class RenderKeySwitchTrigger extends LivingRenderer<KeySwitchTriggerEntit
 		matrixStackIn.pushPose();
 		// replicate the transforms from living rendere. Could be in preRenderCallback
 		matrixStackIn.translate(0, 1.5f, 0);
-		IVertexBuilder buffer = bufferIn.getBuffer(iconModel.renderType(KEY_TEXT));
+		VertexConsumer buffer = bufferIn.getBuffer(iconModel.renderType(KEY_TEXT));
 		iconModel.renderToBuffer(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 		matrixStackIn.popPose();
 		matrixStackIn.popPose();

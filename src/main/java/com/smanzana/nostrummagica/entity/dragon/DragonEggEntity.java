@@ -12,29 +12,29 @@ import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.block.HayBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.HayBlock;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.Util;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 
-public class DragonEggEntity extends MobEntity implements ILoreSupplier {
+public class DragonEggEntity extends Mob implements ILoreSupplier {
 	
 	public static final String ID = "entity_dragon_egg";
 	
-	protected static final DataParameter<Float> HEAT  = EntityDataManager.<Float>defineId(DragonEggEntity.class, DataSerializers.FLOAT);
-	protected static final DataParameter<Optional<UUID>> PLAYER  = EntityDataManager.<Optional<UUID>>defineId(DragonEggEntity.class, DataSerializers.OPTIONAL_UUID);
+	protected static final EntityDataAccessor<Float> HEAT  = SynchedEntityData.<Float>defineId(DragonEggEntity.class, EntityDataSerializers.FLOAT);
+	protected static final EntityDataAccessor<Optional<UUID>> PLAYER  = SynchedEntityData.<Optional<UUID>>defineId(DragonEggEntity.class, EntityDataSerializers.OPTIONAL_UUID);
 	
 	private static final String NBT_AGE_TIMER = "age";
 	private static final String NBT_DRAGON_TYPE = "spawn_type";
@@ -47,12 +47,12 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 	private IDragonSpawnData<? extends ITameDragon> spawnData;
 	private int ageTimer;
 
-	public DragonEggEntity(EntityType<? extends DragonEggEntity> type, World worldIn) {
+	public DragonEggEntity(EntityType<? extends DragonEggEntity> type, Level worldIn) {
 		super(type, worldIn);
 		ageTimer = 20 * 60 * 5; // Base hatching time. Can be overriden by saved NBT
 	}
 	
-	public DragonEggEntity(EntityType<? extends DragonEggEntity> type, World worldIn, PlayerEntity player, IDragonSpawnData<? extends ITameDragon> spawnData) {
+	public DragonEggEntity(EntityType<? extends DragonEggEntity> type, Level worldIn, Player player, IDragonSpawnData<? extends ITameDragon> spawnData) {
 		this(type, worldIn);
 		this.spawnData = spawnData;
 		
@@ -69,8 +69,8 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 		this.entityData.define(PLAYER, Optional.<UUID>empty());
 	}
 
-	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		return MobEntity.createMobAttributes()
+	public static final AttributeSupplier.Builder BuildAttributes() {
+		return Mob.createMobAttributes()
 				.add(Attributes.MAX_HEALTH, 2D)
 				.add(Attributes.ARMOR, 0D);
 	}
@@ -98,7 +98,7 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 	
 	@Override
 	protected void doPush(Entity entity) {
-		if (entity instanceof ITameDragon || entity instanceof PlayerEntity) {
+		if (entity instanceof ITameDragon || entity instanceof Player) {
 			
 		} else {
 			super.doPush(entity);
@@ -116,7 +116,7 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 	}
 	
 	@Override
-	public void addAdditionalSaveData(CompoundNBT compound) {
+	public void addAdditionalSaveData(CompoundTag compound) {
 		super.addAdditionalSaveData(compound);
 		
 		compound.putFloat(NBT_HEAT, this.getHeat());
@@ -128,7 +128,7 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 		}
 		
 		if (this.spawnData != null) {
-			CompoundNBT dataTag = new CompoundNBT();
+			CompoundTag dataTag = new CompoundTag();
 			this.spawnData.writeToNBT(dataTag);
 			compound.put(NBT_DRAGON_DATA, dataTag);
 			compound.putString(NBT_DRAGON_TYPE, spawnData.getKey());
@@ -136,7 +136,7 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 	}
 	
 	@Override
-	public void readAdditionalSaveData(CompoundNBT compound) {
+	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 		
 		if (compound.contains(NBT_HEAT)) {
@@ -176,9 +176,9 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 				this.setHeat(this.getHeat() - heatLoss);
 				
 				if (this.getHeat() <= 0f) {
-					PlayerEntity player = this.getPlayer();
+					Player player = this.getPlayer();
 					if (player != null) {
-						player.sendMessage(new TranslationTextComponent("info.egg.death.cold"), Util.NIL_UUID);
+						player.sendMessage(new TranslatableComponent("info.egg.death.cold"), Util.NIL_UUID);
 					}
 					
 					this.hurt(DamageSource.STARVE, 9999f);
@@ -190,9 +190,9 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 		}
 	}
 	
-	protected PlayerEntity getPlayer() {
+	protected Player getPlayer() {
 		UUID id = getPlayerID();
-		PlayerEntity player = null;
+		Player player = null;
 		
 		if (id != null) {
 			player = this.level.getPlayerByUUID(id);
@@ -231,9 +231,9 @@ public class DragonEggEntity extends MobEntity implements ILoreSupplier {
 		if (this.spawnData != null) {
 			this.level.addFreshEntity((LivingEntity) this.spawnData.spawnDragon(level, getX(), getY(), getZ()));
 			
-			PlayerEntity player = this.getPlayer();
+			Player player = this.getPlayer();
 			if (player != null) {
-				player.sendMessage(new TranslationTextComponent("info.egg.hatch"), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.egg.hatch"), Util.NIL_UUID);
 			}
 		}
 		

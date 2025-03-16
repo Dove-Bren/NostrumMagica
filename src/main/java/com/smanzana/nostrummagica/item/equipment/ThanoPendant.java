@@ -11,17 +11,17 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -71,10 +71,10 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellEquipment {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		tooltip.add(new TranslationTextComponent("item.nostrummagica.info.thanos.desc"));
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+		tooltip.add(new TranslatableComponent("item.nostrummagica.info.thanos.desc"));
 		int charges = thanosGetWholeCharges(stack);
-		tooltip.add(new TranslationTextComponent("item.nostrummagica.info.thanos.charges", charges).withStyle(TextFormatting.GREEN));
+		tooltip.add(new TranslatableComponent("item.nostrummagica.info.thanos.charges", charges).withStyle(ChatFormatting.GREEN));
 	}
 
 	@Override
@@ -125,9 +125,9 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellEquipment {
 		if (stack.isEmpty())
 			return;
 		
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null)
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		
 		nbt.putInt(NBT_THANOS_XP, xp);
 		stack.setTag(nbt);
@@ -141,7 +141,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellEquipment {
 		if (stack.isEmpty() || !stack.hasTag())
 			return 0;
 		
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		return nbt.getInt(NBT_THANOS_XP);
 	}
 
@@ -156,7 +156,7 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellEquipment {
 		
 		int charges = thanosGetWholeCharges(stack);
 		if (charges > 0) {
-			if (!(caster instanceof PlayerEntity) || !((PlayerEntity) caster).isCreative()) {
+			if (!(caster instanceof Player) || !((Player) caster).isCreative()) {
 				thanosSpendCharge(stack);
 			}
 			summary.addReagentCost(-1f);

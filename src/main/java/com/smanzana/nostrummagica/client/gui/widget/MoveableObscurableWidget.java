@@ -1,13 +1,13 @@
 package com.smanzana.nostrummagica.client.gui.widget;
 
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
 
 public class MoveableObscurableWidget extends ObscurableWidget implements IMoveableWidget {
 
 	protected final int startX;
 	protected final int startY;
 	
-	public MoveableObscurableWidget(int x, int y, int width, int height, ITextComponent label) {
+	public MoveableObscurableWidget(int x, int y, int width, int height, Component label) {
 		super(x, y, width, height, label);
 		this.startX = x;
 		this.startY = y;

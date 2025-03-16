@@ -10,18 +10,18 @@ import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class CommandEnhanceTome {
 	
-	public static final SimpleCommandExceptionType ENHANCEMENT_NOT_FOUND = new SimpleCommandExceptionType(new TranslationTextComponent("argument.nostrummagica.enhancement.unknown"));
+	public static final SimpleCommandExceptionType ENHANCEMENT_NOT_FOUND = new SimpleCommandExceptionType(new TranslatableComponent("argument.nostrummagica.enhancement.unknown"));
 	
-	public static final void register(CommandDispatcher<CommandSource> dispatcher) {
+	public static final void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(
 				Commands.literal("nostrumenhance")
 					.requires(s -> s.hasPermission(2))
@@ -33,12 +33,12 @@ public class CommandEnhanceTome {
 				);
 	}
 
-	private static final int execute(CommandContext<CommandSource> context, String enhancementName, int level) throws CommandSyntaxException {
-		ServerPlayerEntity player = context.getSource().getPlayerOrException();
+	private static final int execute(CommandContext<CommandSourceStack> context, String enhancementName, int level) throws CommandSyntaxException {
+		ServerPlayer player = context.getSource().getPlayerOrException();
 		
 		ItemStack tome = player.getMainHandItem();
 		if (tome.isEmpty() || !(tome.getItem() instanceof SpellTome)) {
-			context.getSource().sendSuccess(new StringTextComponent("No tome found in your hands!"), true);
+			context.getSource().sendSuccess(new TextComponent("No tome found in your hands!"), true);
 			return 1;
 		}
 		

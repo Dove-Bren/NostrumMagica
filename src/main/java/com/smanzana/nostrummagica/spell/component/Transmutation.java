@@ -12,13 +12,13 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 
 public class Transmutation {
 
@@ -375,7 +375,7 @@ public class Transmutation {
 			return this.jumpLevel;
 		}
 		
-		public boolean isRevealed(@Nullable PlayerEntity player) {
+		public boolean isRevealed(@Nullable Player player) {
 			if (player == null) {
 				return !this.revealedRecipe; // If no player, default to only the non-revealed recipes
 			}
@@ -433,7 +433,7 @@ public class Transmutation {
 			
 		}
 		
-		public boolean isRevealed(@Nonnull PlayerEntity player, int level) {
+		public boolean isRevealed(@Nonnull Player player, int level) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr != null) {
 				return attr.hasTransmuteKnowledge(this.getName(), level);

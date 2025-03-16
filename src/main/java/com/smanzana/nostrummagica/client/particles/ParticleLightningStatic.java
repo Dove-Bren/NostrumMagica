@@ -2,21 +2,21 @@ package com.smanzana.nostrummagica.client.particles;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.Camera;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 
 public class ParticleLightningStatic extends BatchRenderParticle {
 	
@@ -34,14 +34,14 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	};
 	
 	protected final float maxAlpha;
-	protected Vector3d targetPos;
+	protected Vec3 targetPos;
 	protected Entity targetEntity;
 	protected boolean dieOnTarget;
 	
 	protected int type;
 	protected int ticksExisted;
 	
-	public ParticleLightningStatic(ClientWorld worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
+	public ParticleLightningStatic(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
 		rCol = red;
@@ -63,7 +63,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 		return this;
 	}
 	
-	public ParticleLightningStatic setMotion(Vector3d motion) {
+	public ParticleLightningStatic setMotion(Vec3 motion) {
 		return this.setMotion(motion.x, motion.y, motion.z);
 	}
 	
@@ -71,7 +71,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 		return this.setMotion(xVelocity, yVelocity, zVelocity, 0, 0, 0);
 	}
 	
-	public ParticleLightningStatic setMotion(Vector3d motion, Vector3d jitter) {
+	public ParticleLightningStatic setMotion(Vec3 motion, Vec3 jitter) {
 		return this.setMotion(motion.x, motion.y, motion.z, jitter.x, jitter.y, jitter.z);
 	}
 	
@@ -88,7 +88,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 		return this;
 	}
 	
-	public ParticleLightningStatic setTarget(Vector3d targetPos) {
+	public ParticleLightningStatic setTarget(Vec3 targetPos) {
 		this.targetPos = targetPos;
 		return this;
 	}
@@ -151,7 +151,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	}
 
 	@Override
-	public void renderBatched(MatrixStack matrixStackIn, IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
+	public void renderBatched(PoseStack matrixStackIn, VertexConsumer buffer, Camera renderInfo, float partialTicks) {
 		BatchRenderParticle.RenderQuad(matrixStackIn, buffer, this, renderInfo, partialTicks, .05f);
 	}
 	
@@ -172,14 +172,14 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 		this.alpha *= maxAlpha;
 		
 		if (targetEntity != null && targetEntity.isAlive()) {
-			Vector3d curVelocity = new Vector3d(this.xd, this.yd, this.zd);
-			Vector3d posDelta = targetEntity.position().add(0, targetEntity.getBbHeight()/2, 0).subtract(x, y, z);
-			Vector3d idealVelocity = posDelta.normalize().scale(.3);
+			Vec3 curVelocity = new Vec3(this.xd, this.yd, this.zd);
+			Vec3 posDelta = targetEntity.position().add(0, targetEntity.getBbHeight()/2, 0).subtract(x, y, z);
+			Vec3 idealVelocity = posDelta.normalize().scale(.3);
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 		} else if (targetPos != null) {
-			Vector3d curVelocity = new Vector3d(this.xd, this.yd, this.zd);
-			Vector3d posDelta = targetPos.subtract(x, y, z);
-			Vector3d idealVelocity = posDelta.normalize().scale(.3);
+			Vec3 curVelocity = new Vec3(this.xd, this.yd, this.zd);
+			Vec3 posDelta = targetPos.subtract(x, y, z);
+			Vec3 idealVelocity = posDelta.normalize().scale(.3);
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 		}
 	}
@@ -187,7 +187,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 	public static final class Factory implements INostrumParticleFactory<ParticleLightningStatic> {
 
 		@Override
-		public ParticleLightningStatic createParticle(ClientWorld world, SpawnParams params) {
+		public ParticleLightningStatic createParticle(ClientLevel world, SpawnParams params) {
 			ParticleLightningStatic particle = null;
 			for (int i = 0; i < params.count; i++) {
 				final double spawnX = params.spawnX + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
@@ -206,7 +206,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 					particle.setTarget(params.targetPos);
 				}
 				if (params.velocity != null) {
-					particle.setMotion(params.velocity, params.velocityJitter == null ? Vector3d.ZERO : params.velocityJitter);
+					particle.setMotion(params.velocity, params.velocityJitter == null ? Vec3.ZERO : params.velocityJitter);
 				}
 				if (params.gravityStrength != 0f) {
 					particle.setGravityStrength(params.gravityStrength);

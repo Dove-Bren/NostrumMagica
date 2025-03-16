@@ -6,10 +6,10 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.potion.Effect;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public abstract class SpellLogEffectLine {
 
@@ -25,9 +25,9 @@ public abstract class SpellLogEffectLine {
 	
 	public abstract boolean isHarmful();
 	
-	public abstract ITextComponent getName();
+	public abstract Component getName();
 	
-	public abstract ITextComponent getDescription();
+	public abstract Component getDescription();
 	
 	public abstract float getTotalDamage();
 	
@@ -54,15 +54,15 @@ public abstract class SpellLogEffectLine {
 	
 	public static class Damage extends NumericSpellLogEffectLine {
 
-		private final TranslationTextComponent name;
-		private final TranslationTextComponent desc;
+		private final TranslatableComponent name;
+		private final TranslatableComponent desc;
 		private final EMagicElement element;
 		
 		public Damage(float base, float total, @Nullable EMagicElement element, List<SpellLogModifier> modifiers) {
 			super(base, total, modifiers);
 			
-			name = new TranslationTextComponent("spelllog.damage.name");
-			desc = new TranslationTextComponent("spelllog.damage.desc", String.format("%.1f", base), String.format("%.1f", total), element == null ? "" : (element.getName() + " "));
+			name = new TranslatableComponent("spelllog.damage.name");
+			desc = new TranslatableComponent("spelllog.damage.desc", String.format("%.1f", base), String.format("%.1f", total), element == null ? "" : (element.getName() + " "));
 			this.element = element;
 		}
 
@@ -72,7 +72,7 @@ public abstract class SpellLogEffectLine {
 		}
 
 		@Override
-		public ITextComponent getDescription() {
+		public Component getDescription() {
 			return desc;
 		}
 
@@ -91,22 +91,22 @@ public abstract class SpellLogEffectLine {
 		}
 
 		@Override
-		public ITextComponent getName() {
+		public Component getName() {
 			return name;
 		}
 	}
 	
 	public static class Heal extends NumericSpellLogEffectLine {
 
-		private final TranslationTextComponent name;
-		private final TranslationTextComponent desc;
+		private final TranslatableComponent name;
+		private final TranslatableComponent desc;
 		private final EMagicElement element;
 		
 		public Heal(float base, float total, @Nullable EMagicElement element, List<SpellLogModifier> modifiers) {
 			super(base, total, modifiers);
 
-			name = new TranslationTextComponent("spelllog.heal.name");
-			desc = new TranslationTextComponent("spelllog.heal.desc", String.format("%.1f", base), String.format("%.1f", total), element == null ? "" : (element.getName() + " "));
+			name = new TranslatableComponent("spelllog.heal.name");
+			desc = new TranslatableComponent("spelllog.heal.desc", String.format("%.1f", base), String.format("%.1f", total), element == null ? "" : (element.getName() + " "));
 			this.element = element;
 		}
 
@@ -116,7 +116,7 @@ public abstract class SpellLogEffectLine {
 		}
 
 		@Override
-		public ITextComponent getDescription() {
+		public Component getDescription() {
 			return desc;
 		}
 
@@ -135,24 +135,24 @@ public abstract class SpellLogEffectLine {
 		}
 
 		@Override
-		public ITextComponent getName() {
+		public Component getName() {
 			return name;
 		}
 	}
 	
 	public static class Status extends NumericSpellLogEffectLine {
 		
-		private final Effect effect;
-		private final TranslationTextComponent name;
-		private final TranslationTextComponent desc;
+		private final MobEffect effect;
+		private final TranslatableComponent name;
+		private final TranslatableComponent desc;
 		
-		public Status(Effect effect, float base, float total, List<SpellLogModifier> modifiers) {
+		public Status(MobEffect effect, float base, float total, List<SpellLogModifier> modifiers) {
 			super(base, total, modifiers);
 			this.effect = effect;
 
-			final ITextComponent effectName = effect.getDisplayName().copy().withStyle(this.isHarmful() ? TextFormatting.RED : TextFormatting.DARK_BLUE);
-			name = new TranslationTextComponent("spelllog.status.name", effectName);
-			desc = new TranslationTextComponent("spelllog.status.desc", effectName, base, total);
+			final Component effectName = effect.getDisplayName().copy().withStyle(this.isHarmful() ? ChatFormatting.RED : ChatFormatting.DARK_BLUE);
+			name = new TranslatableComponent("spelllog.status.name", effectName);
+			desc = new TranslatableComponent("spelllog.status.desc", effectName, base, total);
 		}
 
 		@Override
@@ -161,7 +161,7 @@ public abstract class SpellLogEffectLine {
 		}
 
 		@Override
-		public ITextComponent getDescription() {
+		public Component getDescription() {
 			return desc;
 		}
 
@@ -176,20 +176,20 @@ public abstract class SpellLogEffectLine {
 		}
 
 		@Override
-		public ITextComponent getName() {
+		public Component getName() {
 			return name;
 		}
 	}
 	
 	public static class General extends SpellLogEffectLine {
 
-		private final ITextComponent name;
-		private final ITextComponent description;
+		private final Component name;
+		private final Component description;
 		private final boolean harmful;
 		private final float damage;
 		private final float heal;
 
-		public General(boolean harmful, float damage, float heal, ITextComponent name, ITextComponent description, List<SpellLogModifier> modifiers) {
+		public General(boolean harmful, float damage, float heal, Component name, Component description, List<SpellLogModifier> modifiers) {
 			super(modifiers);
 			this.description = description;
 			this.harmful = harmful;
@@ -198,7 +198,7 @@ public abstract class SpellLogEffectLine {
 			this.name = name;
 		}
 
-		public General(boolean harmful, ITextComponent name, ITextComponent description, List<SpellLogModifier> modifiers) {
+		public General(boolean harmful, Component name, Component description, List<SpellLogModifier> modifiers) {
 			this(harmful, 0f, 0f, name, description, modifiers);
 		}
 
@@ -208,7 +208,7 @@ public abstract class SpellLogEffectLine {
 		}
 
 		@Override
-		public ITextComponent getDescription() {
+		public Component getDescription() {
 			return this.description;
 		}
 
@@ -223,7 +223,7 @@ public abstract class SpellLogEffectLine {
 		}
 
 		@Override
-		public ITextComponent getName() {
+		public Component getName() {
 			return name;
 		}
 		

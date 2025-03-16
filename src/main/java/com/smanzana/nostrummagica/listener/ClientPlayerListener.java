@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.block.PortalBlock;
 import com.smanzana.nostrummagica.capabilities.IBonusJumpCapability;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
@@ -57,7 +57,7 @@ public class ClientPlayerListener extends PlayerListener {
 	@SubscribeEvent
 	public void onTick(ClientTickEvent event) {
 		final Minecraft mc = Minecraft.getInstance();
-		final @Nullable ClientPlayerEntity player = mc.player;
+		final @Nullable LocalPlayer player = mc.player;
 		
 		if (event.phase == Phase.START) {
 			if (mc.player != null) {
@@ -75,7 +75,7 @@ public class ClientPlayerListener extends PlayerListener {
 	@SubscribeEvent
 	public void onJumpInput(PlayerJumpEvent.Pre event) {
 		// Evaluate double jump
-		final ClientPlayerEntity player = (ClientPlayerEntity) event.getPlayer();
+		final LocalPlayer player = (LocalPlayer) event.getPlayer();
 		if (!event.isConsumed() && !player.isOnGround()) {
 			final int extraJumps = (int) event.getPlayer().getAttributeValue(NostrumAttributes.bonusJump);
 			if (extraJumps > 0) {

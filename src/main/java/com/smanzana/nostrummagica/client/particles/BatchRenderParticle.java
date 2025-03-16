@@ -1,27 +1,27 @@
 package com.smanzana.nostrummagica.client.particles;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.particle.IParticleRenderType;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class BatchRenderParticle extends Particle implements Comparable<BatchRenderParticle> {
 
 	private int unused; // Remove this whole class and replace with one of the other IParticleRenderTypes (sprite one?)
 	
-	public BatchRenderParticle(ClientWorld worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn,
+	public BatchRenderParticle(ClientLevel worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn,
 			double ySpeedIn, double zSpeedIn) {
 		super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
 	}
 	
-	public BatchRenderParticle(ClientWorld worldIn, double xCoordIn, double yCoordIn, double zCoordIn) {
+	public BatchRenderParticle(ClientLevel worldIn, double xCoordIn, double yCoordIn, double zCoordIn) {
 		super(worldIn, xCoordIn, yCoordIn, zCoordIn);
 	}
 
@@ -30,7 +30,7 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	 * Note: rotation should be saved from original render call
 	 * @param renderInfo TODO
 	 */
-	public abstract void renderBatched(MatrixStack matrixStackIn, IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks);
+	public abstract void renderBatched(PoseStack matrixStackIn, VertexConsumer buffer, Camera renderInfo, float partialTicks);
 	
 	/**
 	 * Return the texture to use when rendering this particle
@@ -65,7 +65,7 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	public abstract int compareTo(BatchRenderParticle o);
 	
 	@Override
-	public void render(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
+	public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
 		
 		// Just don't render if too far away
 		final double maxDistSQ = 60 * 60;
@@ -75,8 +75,8 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	}
 	
 	@Override
-	public IParticleRenderType getRenderType() {
-		return IParticleRenderType.CUSTOM;
+	public ParticleRenderType getRenderType() {
+		return ParticleRenderType.CUSTOM;
 	}
 	
 	public double getPosX() {
@@ -91,8 +91,8 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 		return this.z;
 	}
 	
-	public static void RenderQuad(MatrixStack matrixStackIn, IVertexBuilder buffer, BatchRenderParticle particle, ActiveRenderInfo renderInfo, float partialTicks, float scale) {
-		Vector3d originPos = renderInfo.getPosition();
+	public static void RenderQuad(PoseStack matrixStackIn, VertexConsumer buffer, BatchRenderParticle particle, Camera renderInfo, float partialTicks, float scale) {
+		Vec3 originPos = renderInfo.getPosition();
 		final float offsetX = (float)((particle.xo + (particle.getPosX() - particle.xo) * partialTicks) - originPos.x()); // could use MathHelper.lerp
 		final float offsetY = (float)((particle.yo + (particle.getPosY() - particle.yo) * partialTicks) - originPos.y());
 		final float offsetZ = (float)((particle.zo + (particle.getPosZ() - particle.zo) * partialTicks) - originPos.z());

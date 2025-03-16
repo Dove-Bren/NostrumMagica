@@ -4,27 +4,27 @@ import com.smanzana.nostrummagica.block.RuneLibraryBlock;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.util.Inventories;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
-public class RuneLibraryTileEntity extends TileEntity {
+public class RuneLibraryTileEntity extends BlockEntity {
 
 	private static final String NBT_INVENTORY = "inventory";
 	
-	private final Inventory inventory;
+	private final SimpleContainer inventory;
 	
 	public RuneLibraryTileEntity() {
 		super(NostrumTileEntities.RuneLibraryType);
-		this.inventory = new Inventory(27) {
+		this.inventory = new SimpleContainer(27) {
 			@Override
 			public boolean canPlaceItem(int index, ItemStack stack) {
 				return stack.isEmpty() || stack.getItem() instanceof SpellRune;
@@ -36,7 +36,7 @@ public class RuneLibraryTileEntity extends TileEntity {
 		});
 	}
 	
-	public IInventory getInventory() {
+	public Container getInventory() {
 		return inventory;
 	}
 	
@@ -72,7 +72,7 @@ public class RuneLibraryTileEntity extends TileEntity {
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		nbt.put(NBT_INVENTORY, Inventories.serializeInventory(inventory));
@@ -81,7 +81,7 @@ public class RuneLibraryTileEntity extends TileEntity {
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt == null)

@@ -9,22 +9,22 @@ import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.equipment.ReagentBag;
 import com.smanzana.nostrummagica.item.equipment.RuneBag;
 
-import net.minecraft.client.gui.screen.inventory.CreativeScreen.CreativeContainer;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.ItemPickerMenu;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public final class ReagentAndRuneTransfer {
 	
-	public static final boolean ShouldAddTo(PlayerEntity player, Container container) {
+	public static final boolean ShouldAddTo(Player player, AbstractContainerMenu container) {
 		// Disallow when it's the player inventory container
 		if (container == player.inventoryMenu) {
 			return false;
 		}
-		if (player.level.isClientSide() && container instanceof CreativeContainer) {
+		if (player.level.isClientSide() && container instanceof ItemPickerMenu) {
 			return false;
 		}
 		if (container instanceof ReagentBagGui.BagContainer) {
@@ -38,7 +38,7 @@ public final class ReagentAndRuneTransfer {
 		for (Slot slot : container.slots) {
 			if (slot.container == player.inventory) {
 				final int slotIdx = slot.getSlotIndex();
-				if (PlayerInventory.isHotbarSlot(slotIdx) || slotIdx >= 36) {
+				if (Inventory.isHotbarSlot(slotIdx) || slotIdx >= 36) {
 					continue; // hotbar or armor slot
 				}
 				
@@ -65,7 +65,7 @@ public final class ReagentAndRuneTransfer {
 		return false;
 	}
 	
-	public static final List<ItemStack> FindReagentBags(PlayerEntity player) {
+	public static final List<ItemStack> FindReagentBags(Player player) {
 		List<ItemStack> ret = new ArrayList<>();
 		
 		for (ItemStack item : player.inventory.items) {
@@ -79,7 +79,7 @@ public final class ReagentAndRuneTransfer {
 			}
 		}
 		
-		IInventory curios = NostrumMagica.instance.curios.getCurios(player);
+		Container curios = NostrumMagica.instance.curios.getCurios(player);
 		if (curios != null) {
 			for (int i = 0; i < curios.getContainerSize(); i++) {
 				ItemStack equip = curios.getItem(i);
@@ -96,7 +96,7 @@ public final class ReagentAndRuneTransfer {
 		return ret;
 	}
 	
-	public static final List<ItemStack> FindRuneBags(PlayerEntity player) {
+	public static final List<ItemStack> FindRuneBags(Player player) {
 		List<ItemStack> ret = new ArrayList<>();
 		
 		for (ItemStack item : player.inventory.items) {
@@ -110,7 +110,7 @@ public final class ReagentAndRuneTransfer {
 			}
 		}
 		
-		IInventory curios = NostrumMagica.instance.curios.getCurios(player);
+		Container curios = NostrumMagica.instance.curios.getCurios(player);
 		if (curios != null) {
 			for (int i = 0; i < curios.getContainerSize(); i++) {
 				ItemStack equip = curios.getItem(i);
@@ -127,7 +127,7 @@ public final class ReagentAndRuneTransfer {
 		return ret;
 	}
 	
-	public static final void ProcessContainerItems(PlayerEntity player, Container container) {
+	public static final void ProcessContainerItems(Player player, AbstractContainerMenu container) {
 		List<ItemStack> reagentBags = FindReagentBags(player);
 		List<ItemStack> runeBags = FindRuneBags(player);
 		

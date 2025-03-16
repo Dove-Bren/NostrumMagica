@@ -28,23 +28,23 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTier;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -55,11 +55,11 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 	private static final float CAST_RANGE = SeekingBulletShape.MAX_DIST;
 	
 	public AspectedFireWeapon() {
-		super(ItemTier.GOLD, 5, -2.6F, NostrumItems.PropEquipment().durability(1240));
+		super(Tiers.GOLD, 5, -2.6F, NostrumItems.PropEquipment().durability(1240));
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot equipmentSlot) {
 		return super.getDefaultAttributeModifiers(equipmentSlot);
     }
 	
@@ -102,14 +102,14 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 	public void apply(LivingEntity caster, Spell spell, SpellCastSummary summary, ItemStack stack) {
 		// We provide -10% mana cost reduct
 		summary.addCostRate(-.1f);
-		ItemStacks.damageItem(stack, caster, caster.getItemInHand(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+		ItemStacks.damageItem(stack, caster, caster.getItemInHand(InteractionHand.MAIN_HAND) == stack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND, 1);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
-		tooltip.add(new StringTextComponent("Mana Cost Discount: 10%"));
+		tooltip.add(new TextComponent("Mana Cost Discount: 10%"));
 	}
 	
 	protected void doCastEffect(LivingEntity caster, LivingEntity target) {
@@ -117,15 +117,15 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 			return;
 		}
 		
-		final Vector3d casterPos = caster.position().add(0, caster.getEyeHeight(), 0);
-		final Vector3d targetPos = target.position().add(0, target.getBbHeight()/2, 0); 
-		Vector3d diff = targetPos.subtract(casterPos);
+		final Vec3 casterPos = caster.position().add(0, caster.getEyeHeight(), 0);
+		final Vec3 targetPos = target.position().add(0, target.getBbHeight()/2, 0); 
+		Vec3 diff = targetPos.subtract(casterPos);
 		
 		// Could go discrete increments, but just divide and stretch
 		final int intervals = 10;
 		for (int i = 0; i < intervals; i++) {
-			Vector3d offset = diff.scale((float) i/ (float) intervals);
-			final Vector3d pos = casterPos.add(offset);
+			Vec3 offset = diff.scale((float) i/ (float) intervals);
+			final Vec3 pos = casterPos.add(offset);
 			NostrumParticles.GLOW_ORB.spawn(caster.level, new SpawnParams(
 					1,
 					pos.x, pos.y, pos.z, 0, 30, 5,
@@ -136,7 +136,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 	
 	protected @Nullable LivingEntity getCastTarget(LivingEntity caster) {
 		// We have a target?
-		RayTraceResult result = RayTrace.raytraceApprox(caster.level, caster, caster.position().add(0, caster.getEyeHeight(), 0),
+		HitResult result = RayTrace.raytraceApprox(caster.level, caster, caster.position().add(0, caster.getEyeHeight(), 0),
 				caster.xRot, caster.yRot, CAST_RANGE, (ent) -> {
 					return ent != null
 							&& ent != caster
@@ -155,7 +155,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 		final boolean hasSkill = attr.hasSkill(NostrumSkills.Fire_Weapon);
 		
 		if (hasBonus) {
-			caster.addEffect(new EffectInstance(NostrumEffects.soulVampire, 20 * 5, 0));
+			caster.addEffect(new MobEffectInstance(NostrumEffects.soulVampire, 20 * 5, 0));
 		}
 		
 		final List<LivingEntity> targets;
@@ -168,7 +168,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 		}
 		
 		for (LivingEntity targ : targets) {
-			targ.addEffect(new EffectInstance(NostrumEffects.soulDrain, 20 * 5, 0));
+			targ.addEffect(new MobEffectInstance(NostrumEffects.soulDrain, 20 * 5, 0));
 			if (hasBonus) {
 				targ.setSecondsOnFire(1);
 				targ.setRemainingFireTicks(105);
@@ -180,7 +180,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 		return true;
 	}
 	
-	protected boolean castRod(World worldIn, LivingEntity caster) {
+	protected boolean castRod(Level worldIn, LivingEntity caster) {
 		@Nullable LivingEntity target = getCastTarget(caster);
 		if (target != null) {
 			return castOn(caster, target);
@@ -190,18 +190,18 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 	}
 	
 	@Override
-	public ActionResultType interactLivingEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+	public InteractionResult interactLivingEntity(ItemStack stack, Player playerIn, LivingEntity target, InteractionHand hand) {
 		if (!playerIn.level.isClientSide()) {
 			if (castOn(playerIn, target)) {
-				ItemStacks.damageItem(stack, playerIn, playerIn.getMainHandItem() == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+				ItemStacks.damageItem(stack, playerIn, playerIn.getMainHandItem() == stack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND, 1);
 			}
 		}
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override
-	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
+	public boolean shouldTrace(Level world, Player player, ItemStack stack) {
 		return true;
 	}
 
@@ -216,14 +216,14 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 	}
 
 	@Override
-	protected void fireChargedWeapon(World worldIn, LivingEntity playerIn, Hand hand, ItemStack stack) {
+	protected void fireChargedWeapon(Level worldIn, LivingEntity playerIn, InteractionHand hand, ItemStack stack) {
 		if (!worldIn.isClientSide() && castRod(worldIn, playerIn)) {
 			ItemStacks.damageItem(stack, playerIn, hand, 1);
 		}
 	}
 
 	@Override
-	public double getTraceRange(World world, PlayerEntity player, ItemStack stack) {
+	public double getTraceRange(Level world, Player player, ItemStack stack) {
 		return CAST_RANGE;
 	}
 

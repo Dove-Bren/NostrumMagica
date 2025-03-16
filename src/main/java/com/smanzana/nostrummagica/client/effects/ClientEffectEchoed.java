@@ -1,10 +1,10 @@
 package com.smanzana.nostrummagica.client.effects;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Effect made by displaying multiple other effects with slight time offsets
@@ -17,14 +17,14 @@ public class ClientEffectEchoed extends ClientEffect {
 	private float span;
 	private ClientEffect effect;
 	
-	public ClientEffectEchoed(Vector3d origin, ClientEffect effect, int ticks, int count, float span) {
+	public ClientEffectEchoed(Vec3 origin, ClientEffect effect, int ticks, int count, float span) {
 		super(origin, null, ticks);
 		this.count = count;
 		this.span = span;
 		this.effect = effect;
 	}
 	
-	public ClientEffectEchoed(Vector3d origin, ClientEffect effect, long ms, int count, float span) {
+	public ClientEffectEchoed(Vec3 origin, ClientEffect effect, long ms, int count, float span) {
 		super(origin, null, ms);
 		this.count = count;
 		this.span = span;
@@ -32,7 +32,7 @@ public class ClientEffectEchoed extends ClientEffect {
 	}
 	
 	@Override
-	protected void drawForm(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
 		// Span is centered on actual progress.
 		// So at start and at end there will be part chopped off
 		// Calculate that part now and ignore in loop

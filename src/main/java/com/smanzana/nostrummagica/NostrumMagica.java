@@ -70,35 +70,34 @@ import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
 import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 import com.smanzana.petcommand.api.PetFuncs;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.boss.dragon.EnderDragonPartEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.boss.EnderDragonPart;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityEvent;
-import net.minecraftforge.event.entity.living.EntityTeleportEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraftforge.fmllegacy.server.ServerLifecycleHooks;
+import net.minecraftforge.fmlserverevents.FMLServerStoppedEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 
 @Mod(NostrumMagica.MODID)
@@ -115,11 +114,11 @@ public class NostrumMagica {
 	public final MusicaProxy musica;
 	public final MinecoloniesProxy minecolonies;
 
-	public static ItemGroup creativeTab;
-	public static ItemGroup equipmentTab;
-	public static ItemGroup enhancementTab;
-	public static ItemGroup runeTab;
-	public static ItemGroup dungeonTab;
+	public static CreativeModeTab creativeTab;
+	public static CreativeModeTab equipmentTab;
+	public static CreativeModeTab enhancementTab;
+	public static CreativeModeTab runeTab;
+	public static CreativeModeTab dungeonTab;
 	public static Logger logger = LogManager.getLogger(MODID);
 	public static PlayerListener playerListener;
 	public static PlayerStatListener statListener;
@@ -157,7 +156,7 @@ public class NostrumMagica {
 		statListener = new PlayerStatListener();
 		itemSetListener = new ItemSetListener();
 
-		NostrumMagica.creativeTab = new ItemGroup(MODID) {
+		NostrumMagica.creativeTab = new CreativeModeTab(MODID) {
 			@Override
 			@OnlyIn(Dist.CLIENT)
 			public ItemStack makeIcon() {
@@ -165,7 +164,7 @@ public class NostrumMagica {
 			}
 		};
 		
-		NostrumMagica.equipmentTab = new ItemGroup(MODID + "_equipment") {
+		NostrumMagica.equipmentTab = new CreativeModeTab(MODID + "_equipment") {
 			@Override
 			@OnlyIn(Dist.CLIENT)
 			public ItemStack makeIcon() {
@@ -173,7 +172,7 @@ public class NostrumMagica {
 			}
 		};
 		
-		NostrumMagica.enhancementTab = new ItemGroup(MODID + "_enhancements") {
+		NostrumMagica.enhancementTab = new CreativeModeTab(MODID + "_enhancements") {
 			@Override
 			@OnlyIn(Dist.CLIENT)
 			public ItemStack makeIcon() {
@@ -181,7 +180,7 @@ public class NostrumMagica {
 			}
 		};
 
-		NostrumMagica.runeTab = new ItemGroup(MODID + "_runes") {
+		NostrumMagica.runeTab = new CreativeModeTab(MODID + "_runes") {
 			@Override
 			@OnlyIn(Dist.CLIENT)
 			public ItemStack makeIcon() {
@@ -189,7 +188,7 @@ public class NostrumMagica {
 			}
 		};
 		
-		NostrumMagica.dungeonTab = new ItemGroup(MODID + "_dungeon") {
+		NostrumMagica.dungeonTab = new CreativeModeTab(MODID + "_dungeon") {
 			@Override
 			@OnlyIn(Dist.CLIENT)
 			public ItemStack makeIcon() {
@@ -255,16 +254,16 @@ public class NostrumMagica {
 		return e.getCapability(BonusJumpCapabilityProvider.CAPABILITY).orElse(null);
 	}
 
-	public static ItemStack findTome(PlayerEntity entity, int tomeID) {
+	public static ItemStack findTome(Player entity, int tomeID) {
 		// We look in mainhand first, then offhand, then just down
 		// hotbar.
-		for (ItemStack item : entity.inventory.items) {
+		for (ItemStack item : entity.getInventory().items) {
 			if (!item.isEmpty() && item.getItem() instanceof SpellTome)
 				if (SpellTome.getTomeID(item) == tomeID)
 					return item;
 		}
 
-		for (ItemStack item : entity.inventory.offhand) {
+		for (ItemStack item : entity.getInventory().offhand) {
 			if (!item.isEmpty() && item.getItem() instanceof SpellTome)
 				if (SpellTome.getTomeID(item) == tomeID)
 					return item;
@@ -273,7 +272,7 @@ public class NostrumMagica {
 		return ItemStack.EMPTY;
 	}
 
-	public static @Nonnull ItemStack getCurrentTome(PlayerEntity entity) {
+	public static @Nonnull ItemStack getCurrentTome(Player entity) {
 		// We look in mainhand first, then offhand, then just down
 		// hotbar.
 		ItemStack tome = ItemStack.EMPTY;
@@ -286,7 +285,7 @@ public class NostrumMagica {
 		} else {
 			// hotbar is items 0-8
 			int count = 0;
-			for (ItemStack stack : entity.inventory.items) {
+			for (ItemStack stack : entity.getInventory().items) {
 				if (!stack.isEmpty() && stack.getItem() instanceof SpellTome) {
 					tome = stack;
 					break;
@@ -301,7 +300,7 @@ public class NostrumMagica {
 		return tome;
 	}
 
-	public static @Nonnull Spell[] getCurrentSpellLoadout(PlayerEntity player) {
+	public static @Nonnull Spell[] getCurrentSpellLoadout(Player player) {
 		if (player == null) {
 			return new Spell[0];
 		}
@@ -316,30 +315,30 @@ public class NostrumMagica {
 		return spells;
 	}
 
-	public static int getReagentCount(PlayerEntity player, ReagentType type) {
+	public static int getReagentCount(Player player, ReagentType type) {
 		int count = 0;
-		for (ItemStack item : player.inventory.items) {
+		for (ItemStack item : player.getInventory().items) {
 			if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
 				count += ReagentBag.getReagentCount(item, type);
 			}
 		}
-		for (ItemStack item : player.inventory.offhand) {
+		for (ItemStack item : player.getInventory().offhand) {
 			if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
 				count += ReagentBag.getReagentCount(item, type);
 			}
 		}
-		for (ItemStack item : player.inventory.items) {
+		for (ItemStack item : player.getInventory().items) {
 			if (!item.isEmpty() && item.getItem() instanceof ReagentItem && ReagentItem.FindType(item) == type) {
 				count += item.getCount();
 			}
 		}
-		for (ItemStack item : player.inventory.offhand) {
+		for (ItemStack item : player.getInventory().offhand) {
 			if (!item.isEmpty() && item.getItem() instanceof ReagentBag && ReagentItem.FindType(item) == type) {
 				count += item.getCount();
 			}
 		}
 		
-		IInventory curios = NostrumMagica.instance.curios.getCurios(player);
+		Container curios = NostrumMagica.instance.curios.getCurios(player);
 		if (curios != null) {
 			for (int i = 0; i < curios.getContainerSize(); i++) {
 				ItemStack equip = curios.getItem(i);
@@ -356,11 +355,11 @@ public class NostrumMagica {
 		return count;
 	}
 
-	public static boolean removeReagents(PlayerEntity player, ReagentType type, int count) {
+	public static boolean removeReagents(Player player, ReagentType type, int count) {
 		if (getReagentCount(player, type) < count)
 			return false;
 		
-		IInventory curios = NostrumMagica.instance.curios.getCurios(player);
+		Container curios = NostrumMagica.instance.curios.getCurios(player);
 		if (curios != null) {
 			for (int i = 0; i < curios.getContainerSize(); i++) {
 				ItemStack equip = curios.getItem(i);
@@ -379,8 +378,8 @@ public class NostrumMagica {
 		}
 
 		if (count != 0)
-		for (int i = 0; i < player.inventory.getContainerSize(); i++) {
-			ItemStack item = player.inventory.getItem(i);
+		for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+			ItemStack item = player.getInventory().getItem(i);
 			if (item.isEmpty())
 				continue;
 
@@ -394,7 +393,7 @@ public class NostrumMagica {
 						break;
 					} else {
 						count -= item.getCount();
-						player.inventory.setItem(i, ItemStack.EMPTY);
+						player.getInventory().setItem(i, ItemStack.EMPTY);
 					}
 				}
 			}
@@ -406,7 +405,7 @@ public class NostrumMagica {
 		return count == 0;
 	}
 
-	public static List<NostrumQuest> getActiveQuests(PlayerEntity player) {
+	public static List<NostrumQuest> getActiveQuests(Player player) {
 		return getActiveQuests(getMagicWrapper(player));
 	}
 
@@ -424,7 +423,7 @@ public class NostrumMagica {
 		return list;
 	}
 
-	public static List<NostrumQuest> getCompletedQuests(PlayerEntity player) {
+	public static List<NostrumQuest> getCompletedQuests(Player player) {
 		return getCompletedQuests(getMagicWrapper(player));
 	}
 
@@ -442,7 +441,7 @@ public class NostrumMagica {
 		return list;
 	}
 
-	public static List<NostrumResearch> getCompletedResearch(PlayerEntity player) {
+	public static List<NostrumResearch> getCompletedResearch(Player player) {
 		return getCompletedResearch(getMagicWrapper(player));
 	}
 
@@ -526,7 +525,7 @@ public class NostrumMagica {
 	 * @param quest
 	 * @return
 	 */
-	public static boolean getQuestAvailable(PlayerEntity player, NostrumQuest quest) {
+	public static boolean getQuestAvailable(Player player, NostrumQuest quest) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 
 		if (attr == null)
@@ -552,7 +551,7 @@ public class NostrumMagica {
 	 * @param quest
 	 * @return
 	 */
-	public static boolean canTakeQuest(PlayerEntity player, NostrumQuest quest) {
+	public static boolean canTakeQuest(Player player, NostrumQuest quest) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return false;
@@ -591,7 +590,7 @@ public class NostrumMagica {
 		return true;
 	}
 
-	public static boolean getResearchVisible(PlayerEntity player, NostrumResearch research) {
+	public static boolean getResearchVisible(Player player, NostrumResearch research) {
 		// Visible if any of parents is finished (unless hidden)
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
@@ -624,7 +623,7 @@ public class NostrumMagica {
 		return false;
 	}
 
-	public static boolean canPurchaseResearch(PlayerEntity player, NostrumResearch research) {
+	public static boolean canPurchaseResearch(Player player, NostrumResearch research) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return false;
@@ -660,7 +659,7 @@ public class NostrumMagica {
 		return true;
 	}
 
-	public static boolean canCast(Spell spell, INostrumMagic attr, @Nonnull List<ITextComponent> problemsOut) {
+	public static boolean canCast(Spell spell, INostrumMagic attr, @Nonnull List<Component> problemsOut) {
 		boolean success = true;
 
 		Map<EMagicElement, EElementalMastery> neededMasteries = new EnumMap<>(EMagicElement.class);
@@ -706,7 +705,7 @@ public class NostrumMagica {
 			final EElementalMastery currentMastery = attr.getElementalMastery(elem);
 			if (!currentMastery.isGreaterOrEqual(neededMastery)) {
 				success = false;
-				problemsOut.add(new TranslationTextComponent("info.spell.low_mastery", neededMastery.getName(), elem.getName(), currentMastery.getName()));
+				problemsOut.add(new TranslatableComponent("info.spell.low_mastery", neededMastery.getName(), elem.getName(), currentMastery.getName()));
 			}
 		}
 
@@ -729,7 +728,7 @@ public class NostrumMagica {
 		}).stream().map(ent -> (ITameDragon) ent).collect(Collectors.toList());
 	}
 
-	public static @Nullable Entity getEntityByUUID(World world, UUID id) {
+	public static @Nullable Entity getEntityByUUID(Level world, UUID id) {
 		return Entities.FindEntity(world, id);
 	}
 
@@ -773,38 +772,38 @@ public class NostrumMagica {
 	 * @param player
 	 * @return
 	 */
-	public static BlockPos getOrCreatePlayerDimensionSpawn(PlayerEntity player) {
+	public static BlockPos getOrCreatePlayerDimensionSpawn(Player player) {
 		NostrumDimensionMapper mapper = getDimensionMapper(player.level);
 
 		// Either register or fetch existing mapping
 		return mapper.register(player.getUUID()).getCenterPos(NostrumSorceryDimension.SPAWN_Y);
 	}
 
-	public static NostrumDimensionMapper getDimensionMapper(World worldAccess) {
+	public static NostrumDimensionMapper getDimensionMapper(Level worldAccess) {
 		if (worldAccess.isClientSide) {
 			throw new RuntimeException("Accessing dimension mapper before a world has been loaded!");
 		}
 
-		NostrumDimensionMapper mapper = (NostrumDimensionMapper) ((ServerWorld) worldAccess).getServer().getLevel(World.OVERWORLD)
+		NostrumDimensionMapper mapper = (NostrumDimensionMapper) ((ServerLevel) worldAccess).getServer().getLevel(Level.OVERWORLD)
 				.getDataStorage()
-				.computeIfAbsent(NostrumDimensionMapper::new, NostrumDimensionMapper.DATA_NAME);
+				.computeIfAbsent(NostrumDimensionMapper::load, NostrumDimensionMapper::new, NostrumDimensionMapper.DATA_NAME);
 
 		serverDimensionMapper = mapper;
 		return mapper;
 	}
 
-	private void initSpellRegistry(World world) {
-		spellRegistry = (SpellRegistry) ((ServerWorld) world).getServer().getLevel(World.OVERWORLD).getDataStorage().computeIfAbsent(SpellRegistry::new,
+	private void initSpellRegistry(Level world) {
+		spellRegistry = (SpellRegistry) ((ServerLevel) world).getServer().getLevel(Level.OVERWORLD).getDataStorage().computeIfAbsent(SpellRegistry::Load, SpellRegistry::new,
 				SpellRegistry.DATA_NAME);
 	}
 
-	private void initPetSoulRegistry(World world) {
-		petSoulRegistry = (PetSoulRegistry) ((ServerWorld) world).getServer().getLevel(World.OVERWORLD).getDataStorage().computeIfAbsent(PetSoulRegistry::new,
+	private void initPetSoulRegistry(Level world) {
+		petSoulRegistry = (PetSoulRegistry) ((ServerLevel) world).getServer().getLevel(Level.OVERWORLD).getDataStorage().computeIfAbsent(PetSoulRegistry::Load, PetSoulRegistry::new,
 				PetSoulRegistry.DATA_NAME);
 	}
 
-	private void initPlayerStats(World world) {
-		playerStats = (PlayerStatTracker) ((ServerWorld) world).getServer().getLevel(World.OVERWORLD).getDataStorage().computeIfAbsent(PlayerStatTracker::new,
+	private void initPlayerStats(Level world) {
+		playerStats = (PlayerStatTracker) ((ServerLevel) world).getServer().getLevel(Level.OVERWORLD).getDataStorage().computeIfAbsent(PlayerStatTracker::Load, PlayerStatTracker::new,
 				PlayerStatTracker.DATA_NAME);
 	}
 
@@ -827,7 +826,7 @@ public class NostrumMagica {
 
 		} else {
 			// force an exception here if this is wrong
-			ServerWorld world = (ServerWorld) event.getWorld();
+			ServerLevel world = (ServerLevel) event.getWorld();
 			
 			// Do the correct initialization for persisted data
 			initSpellRegistry(world);
@@ -855,9 +854,9 @@ public class NostrumMagica {
 		PortalBlock.resetTimers();
 	}
 
-	public static final boolean isBlockLoaded(World world, BlockPos pos) {
+	public static final boolean isBlockLoaded(Level world, BlockPos pos) {
 		// TODO in the past, this didn't actually work. Does it now??
-		return world.getChunkSource().isEntityTickingChunk(new ChunkPos(pos));
+		return world.isLoaded(pos);
 	}
 
 	public static boolean IsSameTeam(LivingEntity ent1, LivingEntity ent2) {
@@ -881,9 +880,9 @@ public class NostrumMagica {
 		}
 		
 		// EnderDragons are multipart but with no interface anymore
-		if (entityOrSubEntity instanceof EnderDragonPartEntity) {
-			if (((EnderDragonPartEntity) entityOrSubEntity).parentMob instanceof LivingEntity) {
-				return (LivingEntity) ((EnderDragonPartEntity) entityOrSubEntity).parentMob;
+		if (entityOrSubEntity instanceof EnderDragonPart) {
+			if (((EnderDragonPart) entityOrSubEntity).parentMob instanceof LivingEntity) {
+				return (LivingEntity) ((EnderDragonPart) entityOrSubEntity).parentMob;
 			}
 		}
 
@@ -909,10 +908,10 @@ public class NostrumMagica {
     public static class NostrumTeleportedOtherEvent extends EntityEvent {
     	
     	private final LivingEntity causingEntity;
-    	private final Vector3d from;
-    	private final Vector3d to;
+    	private final Vec3 from;
+    	private final Vec3 to;
     	
-    	public NostrumTeleportedOtherEvent(Entity entity, LivingEntity causingEntity, Vector3d from, Vector3d to) {
+    	public NostrumTeleportedOtherEvent(Entity entity, LivingEntity causingEntity, Vec3 from, Vec3 to) {
     		super(entity);
     		this.causingEntity = causingEntity;
     		this.from = from;
@@ -923,11 +922,11 @@ public class NostrumMagica {
     		return this.causingEntity;
     	}
 
-		public Vector3d getFrom() {
+		public Vec3 getFrom() {
 			return from;
 		}
 
-		public Vector3d getTo() {
+		public Vec3 getTo() {
 			return to;
 		}
     	
@@ -939,13 +938,13 @@ public class NostrumMagica {
 		return event;
 	}
 	
-	public static NostrumTeleportedOtherEvent fireTeleprotedOtherEvent(Entity entity, LivingEntity cause, Vector3d from, Vector3d to) {
+	public static NostrumTeleportedOtherEvent fireTeleprotedOtherEvent(Entity entity, LivingEntity cause, Vec3 from, Vec3 to) {
 		NostrumTeleportedOtherEvent event = new NostrumTeleportedOtherEvent(entity, cause, from, to);
 		MinecraftForge.EVENT_BUS.post(event);
 		return event;
 	}
 
-	public static boolean attemptTeleport(Location target, PlayerEntity player, boolean allowPortal,
+	public static boolean attemptTeleport(Location target, Player player, boolean allowPortal,
 			boolean spawnBristle, @Nullable LivingEntity causingEntity) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		boolean success = false;
@@ -954,7 +953,7 @@ public class NostrumMagica {
 			BlockPos portal = TemporaryTeleportationPortalBlock.spawnNearby(player.getCommandSenderWorld(), player.blockPosition().above(), 4, true,
 					target, 20 * 30);
 			if (portal != null) {
-				final World targetWorld = ServerLifecycleHooks.getCurrentServer().getLevel(target.getDimension());
+				final Level targetWorld = ServerLifecycleHooks.getCurrentServer().getLevel(target.getDimension());
 				final Location localPortalPos = new Location(player.getCommandSenderWorld(), portal);
 				TemporaryTeleportationPortalBlock.spawnNearby(targetWorld, target.getPos(), 4, true, localPortalPos, 20 * 30);
 				success = true;
@@ -971,7 +970,7 @@ public class NostrumMagica {
 		}
 
 		if (success && spawnBristle) {
-			final World targetWorld = ServerLifecycleHooks.getCurrentServer().getLevel(target.getDimension());
+			final Level targetWorld = ServerLifecycleHooks.getCurrentServer().getLevel(target.getDimension());
 			float dist = 2 + NostrumMagica.rand.nextFloat() * 2;
 			float dir = NostrumMagica.rand.nextFloat();
 			double dirD = dir * 2 * Math.PI;
@@ -986,7 +985,7 @@ public class NostrumMagica {
 		return success;
 	}
 	
-	public SpellCooldownTracker getSpellCooldownTracker(World world) {
+	public SpellCooldownTracker getSpellCooldownTracker(Level world) {
 		if (world.isClientSide()) {
 			if (client_spellCooldownTracker == null) {
 				client_spellCooldownTracker = new SpellCooldownTracker();

@@ -5,12 +5,12 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -31,7 +31,7 @@ public class ClientEffect {
 		}
 	}
 
-	final protected Vector3d origin;
+	final protected Vec3 origin;
 	final private ClientEffectForm form;
 
 	protected long startTime;
@@ -42,7 +42,7 @@ public class ClientEffect {
 	
 	protected List<ClientEffectModifier> modifiers;
 	
-	private ClientEffect(Vector3d origin, ClientEffectForm form) {
+	private ClientEffect(Vec3 origin, ClientEffectForm form) {
 		existedMS = 0;
 		existedTicks = 0;
 		startTime = 0;
@@ -51,12 +51,12 @@ public class ClientEffect {
 		modifiers = new LinkedList<>();
 	}
 	
-	public ClientEffect(Vector3d origin, ClientEffectForm form, int durationTicks) {
+	public ClientEffect(Vec3 origin, ClientEffectForm form, int durationTicks) {
 		this(origin, form);
 		this.durationTicks = durationTicks;
 	}
 	
-	public ClientEffect(Vector3d origin, ClientEffectForm form, long durationMS) {
+	public ClientEffect(Vec3 origin, ClientEffectForm form, long durationMS) {
 		this(origin, form);
 		this.durationMS = durationMS;
 	}
@@ -66,7 +66,7 @@ public class ClientEffect {
 		return this;
 	}
 	
-	public boolean displayTick(Minecraft mc, MatrixStack matrixStackIn, float partialTicks) {
+	public boolean displayTick(Minecraft mc, PoseStack matrixStackIn, float partialTicks) {
 		long sysTime = System.currentTimeMillis();
 		if (startTime == 0)
 			startTime = sysTime;
@@ -116,7 +116,7 @@ public class ClientEffect {
 //		RenderSystem.disableFog();
 	}
 	
-	protected void drawForm(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
 
 		if (!this.modifiers.isEmpty())
 		for (ClientEffectModifier mod : modifiers) {
@@ -126,7 +126,7 @@ public class ClientEffect {
 		form.draw(matrixStackIn, mc, partialTicks, detail.getColor());
 	}
 	
-	protected void preModHook(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
+	protected void preModHook(PoseStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		if (!this.modifiers.isEmpty())
 		for (ClientEffectModifier mod : modifiers) {
 			mod.earlyApply(matrixStackIn, detail, progress, partialTicks);

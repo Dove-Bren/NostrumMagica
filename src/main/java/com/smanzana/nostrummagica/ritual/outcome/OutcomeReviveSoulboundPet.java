@@ -5,21 +5,21 @@ import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 
 public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
 
 	public OutcomeReviveSoulboundPet() {
 		super(new IEntityFactory() {
 			@Override
-			public void spawn(World world, Vector3d pos, PlayerEntity invoker, ItemStack centerItem) {
+			public void spawn(Level world, Vec3 pos, Player invoker, ItemStack centerItem) {
 				PetSoulItem.SpawnPet(centerItem, world, pos.add(0, 1, 0));
 //				EntityKoid koid = new EntityKoid(world);
 //				koid.setPosition(pos.x, pos.y, pos.z);
@@ -35,14 +35,14 @@ public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
 	}
 	
 	@Override
-	public void perform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
+	public void perform(Level world, Player player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		if (world.isClientSide)
 			return;
 		
 		super.perform(world, player, center, layout, recipe);
 		
 		// Also return soul item to center pedestal
-		TileEntity te;
+		BlockEntity te;
 		te = world.getBlockEntity(center);
 		if (te != null && te instanceof AltarTileEntity) {
 			((AltarTileEntity) te).setItem(layout.getCenterItem(world, center).copy());
@@ -50,21 +50,21 @@ public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
 	}
 	
 	@Override
-	public boolean canPerform(World world, PlayerEntity player, BlockPos center, IRitualLayout layout) {
+	public boolean canPerform(Level world, Player player, BlockPos center, IRitualLayout layout) {
 		// Must have PetSoulItem in center, and must have valid soul.
 		final ItemStack centerItem = layout.getCenterItem(world, center);
 		if (centerItem.isEmpty() || !(centerItem.getItem() instanceof PetSoulItem)) {
-			player.sendMessage(new TranslationTextComponent("info.respawn_soulbound_pet.fail.baditem", new Object[0]), Util.NIL_UUID);
+			player.sendMessage(new TranslatableComponent("info.respawn_soulbound_pet.fail.baditem", new Object[0]), Util.NIL_UUID);
 			return false;
 		}
 		
 		PetSoulItem item = (PetSoulItem) centerItem.getItem();
 		if (item.getPetSoulID(centerItem) == null) {
-			player.sendMessage(new TranslationTextComponent("info.respawn_soulbound_pet.fail.baditem", new Object[0]), Util.NIL_UUID);
+			player.sendMessage(new TranslatableComponent("info.respawn_soulbound_pet.fail.baditem", new Object[0]), Util.NIL_UUID);
 			return false;
 		}
 		
-		if (!item.canSpawnEntity(world, player, Vector3d.atCenterOf(center), centerItem)) {
+		if (!item.canSpawnEntity(world, player, Vec3.atCenterOf(center), centerItem)) {
 			return false;
 		}
 		

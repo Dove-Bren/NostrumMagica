@@ -6,8 +6,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PortalBlock;
 import com.smanzana.nostrummagica.util.Location;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -20,7 +20,7 @@ public class ObeliskPortalTileEntity extends TeleportationPortalTileEntity {
 	@Override
 	public @Nullable Location getTarget() {
 		// Defer to obelisk below us
-		TileEntity te = level.getBlockEntity(worldPosition.below());
+		BlockEntity te = level.getBlockEntity(worldPosition.below());
 		if (te != null && te instanceof ObeliskTileEntity) {
 			Location target = ((ObeliskTileEntity) te).getCurrentTarget();
 			if (target != null) {
@@ -35,7 +35,7 @@ public class ObeliskPortalTileEntity extends TeleportationPortalTileEntity {
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public int getColor() {
-		TileEntity te = level.getBlockEntity(worldPosition.below());
+		BlockEntity te = level.getBlockEntity(worldPosition.below());
 		if (te != null && te instanceof ObeliskTileEntity && ((ObeliskTileEntity) te).hasOverride()) {
 			return 0x0000FF50;
 		}
@@ -51,7 +51,7 @@ public class ObeliskPortalTileEntity extends TeleportationPortalTileEntity {
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public float getOpacity() {
-		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.instance.proxy.getPlayer();
 		if (PortalBlock.getCooldownTime(player) > 0) {
 			return 0.5f;
 		}

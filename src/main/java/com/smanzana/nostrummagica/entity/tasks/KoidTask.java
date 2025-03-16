@@ -16,12 +16,12 @@ import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 
-import net.minecraft.entity.ai.goal.Goal.Flag;
+import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 public class KoidTask extends Goal {
 	
@@ -504,8 +504,8 @@ public class KoidTask extends Goal {
                 }
                 
                 if (koid.isOnGround()) {
-                	Vector3d forward = getForward(koid);
-                	Vector3d right = getForward(koid).xRot(90.0f);
+                	Vec3 forward = getForward(koid);
+                	Vec3 right = getForward(koid).xRot(90.0f);
                 	double mag = strafeBack ? -.1 : 0;
                 	double x, y, z;
                 	x = forward.x * mag;
@@ -612,21 +612,21 @@ public class KoidTask extends Goal {
 		return vec2f;
 	}
 
-	private static Vector3d getForward(LivingEntity entity) {
+	private static Vec3 getForward(LivingEntity entity) {
 		return fromPitchYawVector(getPitchYaw(entity));
 	}
 	
-	public static Vector3d fromPitchYawVector(Vec2f vector) {
+	public static Vec3 fromPitchYawVector(Vec2f vector) {
 		return fromPitchYaw(vector.pitch, vector.yaw);
 	}
 	
-	public static Vector3d fromPitchYaw(float p_189986_0_, float p_189986_1_)
+	public static Vec3 fromPitchYaw(float p_189986_0_, float p_189986_1_)
     {
-        float f = MathHelper.cos(-p_189986_1_ * 0.017453292F - (float)Math.PI);
-        float f1 = MathHelper.sin(-p_189986_1_ * 0.017453292F - (float)Math.PI);
-        float f2 = -MathHelper.cos(-p_189986_0_ * 0.017453292F);
-        float f3 = MathHelper.sin(-p_189986_0_ * 0.017453292F);
-        return new Vector3d((double)(f1 * f2), (double)f3, (double)(f * f2));
+        float f = Mth.cos(-p_189986_1_ * 0.017453292F - (float)Math.PI);
+        float f1 = Mth.sin(-p_189986_1_ * 0.017453292F - (float)Math.PI);
+        float f2 = -Mth.cos(-p_189986_0_ * 0.017453292F);
+        float f3 = Mth.sin(-p_189986_0_ * 0.017453292F);
+        return new Vec3((double)(f1 * f2), (double)f3, (double)(f * f2));
     }
 	
 }

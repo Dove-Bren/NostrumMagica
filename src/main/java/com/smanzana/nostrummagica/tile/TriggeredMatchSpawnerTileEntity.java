@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.tile;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.nbt.CompoundTag;
 
 public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
 	
@@ -28,7 +28,7 @@ public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		nbt.putBoolean(NBT_TRIGGERED, isTriggered());
@@ -37,7 +37,7 @@ public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		this.triggered = nbt.getBoolean(NBT_TRIGGERED);

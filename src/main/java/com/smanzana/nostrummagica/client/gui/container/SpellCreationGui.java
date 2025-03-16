@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -43,25 +43,25 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.AbstractButton;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.ClickType;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -69,13 +69,13 @@ public class SpellCreationGui {
 	
 	public static final int MaxNameLength = 20;
 	
-	public static abstract class SpellCreationContainer extends net.minecraft.inventory.container.Container {
+	public static abstract class SpellCreationContainer extends net.minecraft.world.inventory.AbstractContainerMenu {
 		
 		protected static class ScrollSlot extends Slot {
 			
 			private final SpellCreationContainer container;
 			
-			public ScrollSlot(SpellCreationContainer container, IInventory inventory, int idx, int x, int y) {
+			public ScrollSlot(SpellCreationContainer container, Container inventory, int idx, int x, int y) {
 				super(inventory, idx, x, y);
 				this.container = container;
 			}
@@ -94,7 +94,7 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
+			public ItemStack onTake(Player playerIn, ItemStack stack) {
 				container.validate();
 				return super.onTake(playerIn, stack);
 			}
@@ -111,7 +111,7 @@ public class SpellCreationGui {
 			private RuneSlot next;
 			private final SpellCreationContainer container;
 			
-			public RuneSlot(SpellCreationContainer container, RuneSlot prev, IInventory inventoryIn, int index, int x, int y) {
+			public RuneSlot(SpellCreationContainer container, RuneSlot prev, Container inventoryIn, int index, int x, int y) {
 				super(inventoryIn, index, x, y);
 				this.prev = prev;
 				this.container = container;
@@ -165,7 +165,7 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public @Nonnull ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
+			public @Nonnull ItemStack onTake(Player playerIn, ItemStack stack) {
 				// This is called AFTER things have been changed or swapped
 				// Which means we just look to see if we have an item.
 				// If not, take item from next
@@ -192,19 +192,19 @@ public class SpellCreationGui {
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
 		protected final ISpellCraftingInventory inventory;
-		protected final PlayerEntity player;
+		protected final Player player;
 		protected final SpellCraftContext context; // Made once for efficiency
 		
 		protected final List<Consumer<Spell>> spellListeners;
 		protected boolean hasScroll; // has an acceptable scroll
 		protected boolean spellValid; // grammar checks out
-		protected final List<ITextComponent> spellErrorStrings; // Updated on validate(); what's wrong?
-		protected final List<ITextComponent> reagentStrings; // Updated on validate; what reagents will be used. Only filled if successful
+		protected final List<Component> spellErrorStrings; // Updated on validate(); what's wrong?
+		protected final List<Component> reagentStrings; // Updated on validate; what reagents will be used. Only filled if successful
 		protected final List<SpellPartSummary> parts; // Updated on validate; what spell parts make up our spell?
 		protected int lastManaCost;
 		protected int lastWeight;
 		
-		public SpellCreationContainer(ContainerType<? extends SpellCreationContainer> type, int windowId, PlayerEntity crafter, PlayerInventory playerInv, ISpellCraftingInventory tableInventory, BlockPos tablePos) {
+		public SpellCreationContainer(MenuType<? extends SpellCreationContainer> type, int windowId, Player crafter, Inventory playerInv, ISpellCraftingInventory tableInventory, BlockPos tablePos) {
 			super(type, windowId);
 			this.inventory = tableInventory;
 			this.player = crafter;
@@ -248,19 +248,19 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		public boolean stillValid(PlayerEntity playerIn) {
+		public boolean stillValid(Player playerIn) {
 			return true;
 		}
 		
 		@Override
-		public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+		public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
 			checkScroll();
 			ItemStack ret = super.clicked(slotId, dragType, clickTypeIn, player);
 			return ret;
 		}
 		
 		@Override
-		public ItemStack quickMoveStack(PlayerEntity playerIn, int fromSlot) {
+		public ItemStack quickMoveStack(Player playerIn, int fromSlot) {
 			Slot slot = (Slot) this.slots.get(fromSlot);
 			
 			if (slot != null && slot.hasItem()) {
@@ -328,11 +328,11 @@ public class SpellCreationGui {
 			return !this.spellValid;
 		}
 		
-		public List<ITextComponent> getProblems() {
+		public List<Component> getProblems() {
 			return this.spellErrorStrings;
 		}
 		
-		public List<ITextComponent> getReagentStrings() {
+		public List<Component> getReagentStrings() {
 			return this.reagentStrings;
 		}
 		
@@ -408,14 +408,14 @@ public class SpellCreationGui {
 			this.lastWeight = spell.getWeight();
 			
 			if (this.lastWeight > this.getMaxWeight()) {
-				this.spellErrorStrings.add(new StringTextComponent("Too much weight"));
+				this.spellErrorStrings.add(new TextComponent("Too much weight"));
 				return null;
 			}
 			
-			List<ITextComponent> problems = new ArrayList<>();
+			List<Component> problems = new ArrayList<>();
 			if (!getCraftContext().magic.hasSkill(NostrumSkills.Spellcraft_Proxy) && !NostrumMagica.canCast(spell, this.context.magic, problems)) {
-				this.spellErrorStrings.add(new StringTextComponent("You could not cast this spell:"));
-				for (ITextComponent problem : problems) {
+				this.spellErrorStrings.add(new TextComponent("You could not cast this spell:"));
+				for (Component problem : problems) {
 					this.spellErrorStrings.add(problem);
 				}
 				return null;
@@ -427,8 +427,8 @@ public class SpellCreationGui {
 			return spell;
 		}
 		
-		public static Spell craftSpell(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String name, int iconIdx, ISpellCraftingInventory inventory, PlayerEntity crafter,
-				List<ITextComponent> spellErrorStrings, List<ITextComponent> reagentStrings, List<SpellPartSummary> parts,
+		public static Spell craftSpell(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String name, int iconIdx, ISpellCraftingInventory inventory, Player crafter,
+				List<Component> spellErrorStrings, List<Component> reagentStrings, List<SpellPartSummary> parts,
 				boolean deductReagents) {
 			boolean fail = false;
 			//INostrumMagic attr = NostrumMagica.getMagicWrapper(crafter);
@@ -449,17 +449,17 @@ public class SpellCreationGui {
 			parts.clear();
 			
 			if (locked) {
-				spellErrorStrings.add(new StringTextComponent("The runes on the board don't respond to your hands"));
+				spellErrorStrings.add(new TextComponent("The runes on the board don't respond to your hands"));
 				return null;
 			}
 			
 			if (name.trim().isEmpty()) {
-				spellErrorStrings.add(new StringTextComponent("Must have a name"));
+				spellErrorStrings.add(new TextComponent("Must have a name"));
 				fail = true;
 			}
 			
 			if (iconIdx < 0) {
-				spellErrorStrings.add(new StringTextComponent("Must have a spell icon selected"));
+				spellErrorStrings.add(new TextComponent("Must have a spell icon selected"));
 				fail = true;
 			}
 			
@@ -479,7 +479,7 @@ public class SpellCreationGui {
 			if (fail || spell == null) {
 				// Dump raw errors into output strings and return
 				for (String error : rawSpellErrors) {
-					spellErrorStrings.add(new StringTextComponent(error));
+					spellErrorStrings.add(new TextComponent(error));
 				}
 				return null;
 			}
@@ -495,11 +495,11 @@ public class SpellCreationGui {
 				
 				final int available = NostrumMagica.getReagentCount(crafter, type);
 				if (available < count) {
-					spellErrorStrings.add(new StringTextComponent("Need " + (count-available) + " more " + type.prettyName()));
-					reagentStrings.add(new StringTextComponent(count + " " + type.prettyName()).withStyle(TextFormatting.DARK_RED));
+					spellErrorStrings.add(new TextComponent("Need " + (count-available) + " more " + type.prettyName()));
+					reagentStrings.add(new TextComponent(count + " " + type.prettyName()).withStyle(ChatFormatting.DARK_RED));
 					fail = true;
 				} else {
-					reagentStrings.add(new StringTextComponent(count + " " + type.prettyName()));
+					reagentStrings.add(new TextComponent(count + " " + type.prettyName()));
 				}
 			}
 			
@@ -518,7 +518,7 @@ public class SpellCreationGui {
 					
 					if (!NostrumMagica.removeReagents(crafter, type, count)) {
 						System.out.println("Couldn't take all " + type.name());
-						spellErrorStrings.add(new StringTextComponent("Need more " + type.prettyName()));
+						spellErrorStrings.add(new TextComponent("Need more " + type.prettyName()));
 						return null;
 					}
 					
@@ -647,7 +647,7 @@ public class SpellCreationGui {
 			private final SpellGui<?> gui;
 			
 			public SpellIconButton(int x, int y, int width, int height, int val, SpellGui<?> gui) {
-				super(x, y, width, height, StringTextComponent.EMPTY, (b) -> {
+				super(x, y, width, height, TextComponent.EMPTY, (b) -> {
 					gui.iconButtonClicked((SpellIconButton) b);
 				});
 				this.value = val;
@@ -655,7 +655,7 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
 				float tint = 1f;
 				mc.getTextureManager().bind(TEXT_UTILS);
@@ -693,7 +693,7 @@ public class SpellCreationGui {
 			private final SpellGui<?> gui;
 			
 			public SubmitButton(SpellGui<?> gui, int x, int y, int width, int height) {
-				super(x, y, width, height, StringTextComponent.EMPTY);
+				super(x, y, width, height, TextComponent.EMPTY);
 				this.gui = gui;
 			}
 
@@ -703,14 +703,14 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+			public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
 				if (!gui.getMenu().hasProblems()) {
 					gui.renderComponentTooltip(matrixStackIn, gui.getMenu().getReagentStrings(), mouseX, mouseY);
 				}
 			}
 			
 			@Override
-			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
 				mc.getTextureManager().bind(TEXT_UTILS);
 				final int u, v, wu, hv;
@@ -744,25 +744,25 @@ public class SpellCreationGui {
 			}
 		}
 		
-		protected static class SpellStatusIcon extends Widget {
+		protected static class SpellStatusIcon extends AbstractWidget {
 			
 			private final SpellGui<?> gui;
 			
 			public SpellStatusIcon(SpellGui<?> gui, int x, int y, int width, int height) {
-				super(x, y, width, height, StringTextComponent.EMPTY);
+				super(x, y, width, height, TextComponent.EMPTY);
 				this.gui = gui;
 			}
 			
 			@Override
-			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+			public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
 				if (gui.getMenu().hasProblems()) {
-					List<ITextComponent> problems = gui.getMenu().getProblems();
+					List<Component> problems = gui.getMenu().getProblems();
 					gui.renderComponentTooltip(matrixStackIn, problems, mouseX, mouseY);
 				}
 			}
 			
 			@Override
-			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
 				mc.getTextureManager().bind(TEXT_UTILS);
 				final int u, v, wu, hv;
@@ -792,24 +792,24 @@ public class SpellCreationGui {
 			}
 		}
 		
-		protected static class WeightStatus extends Widget {
+		protected static class WeightStatus extends AbstractWidget {
 			
 			private final SpellGui<?> gui;
 			
 			public WeightStatus(SpellGui<?> gui, int x, int y, int width, int height) {
-				super(x, y, width, height, StringTextComponent.EMPTY);
+				super(x, y, width, height, TextComponent.EMPTY);
 				this.gui = gui;
 			}
 			
 			@Override
-			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+			public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
 				final int weight = gui.getMenu().getCurrentWeight();
 				final int maxWeight = gui.getMenu().getMaxWeight();
-				gui.renderTooltip(matrixStackIn, new TranslationTextComponent("info.spellcraft.weight_tooltip", weight, maxWeight), mouseX, mouseY);
+				gui.renderTooltip(matrixStackIn, new TranslatableComponent("info.spellcraft.weight_tooltip", weight, maxWeight), mouseX, mouseY);
 			}
 			
 			@Override
-			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
 				final int weight = gui.getMenu().getCurrentWeight();
 				final int maxWeight = gui.getMenu().getMaxWeight();
@@ -879,20 +879,20 @@ public class SpellCreationGui {
 			}
 		}
 		
-		protected static class PatternIcon extends Widget {
+		protected static class PatternIcon extends AbstractWidget {
 
 			private final SpellGui<?> gui;
 			
 			public PatternIcon(SpellGui<?> gui, int x, int y, int width, int height) {
-				super(x, y, width, height, StringTextComponent.EMPTY);
+				super(x, y, width, height, TextComponent.EMPTY);
 				this.gui = gui;
 			}
 			
 			@Override
-			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+			public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
 				final SpellCraftPattern pattern = gui.getMenu().getCraftPattern();
 				if (pattern != null) {
-					List<ITextComponent> tooltip = new ArrayList<>(4);
+					List<Component> tooltip = new ArrayList<>(4);
 					tooltip.add(pattern.getName());
 					tooltip = pattern.addDescription(tooltip);
 					gui.renderComponentTooltip(matrixStackIn, tooltip, mouseX, mouseY);
@@ -900,7 +900,7 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
 				
 				// Background
@@ -936,40 +936,40 @@ public class SpellCreationGui {
 			private final SpellGui<?> gui;
 			private final SpellPartSummary part;
 			
-			private final List<ITextComponent> tooltip;
+			private final List<Component> tooltip;
 			private final int color;
 			private final @Nullable IHoverHandler onHover;
 			
 			private boolean wasHovered;
 			
 			public SpellPartSegment(SpellGui<?> gui, IHoverHandler onHover, SpellPartSummary part, int x, int y, int width, int height) {
-				super(x, y, width, height, StringTextComponent.EMPTY);
+				super(x, y, width, height, TextComponent.EMPTY);
 				this.gui = gui;
 				this.onHover = onHover;
 				this.part = part;
 				
 				this.tooltip = new ArrayList<>(4);
 				if (part.isError()) {
-					tooltip.add(new StringTextComponent("Error"));
+					tooltip.add(new TextComponent("Error"));
 					color = 0xFFFF0000;
 				} else if (part.isShape()) {
 					color = 0xFFCCCC44;
-					tooltip.add(new StringTextComponent("Shape"));
+					tooltip.add(new TextComponent("Shape"));
 				} else {
 					color = part.getEffect().getElement().getColor();
-					tooltip.add(new StringTextComponent("Effect"));
+					tooltip.add(new TextComponent("Effect"));
 				}
 			}
 			
 			@Override
-			public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+			public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
 				if (tooltip != null) {
 					gui.renderComponentTooltip(matrixStackIn, tooltip, mouseX, mouseY);
 				}
 			}
 			
 			@Override
-			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				RenderFuncs.drawRect(matrixStackIn, x, y, x + width, y + height, 0xFF404040);
 				RenderFuncs.drawRect(matrixStackIn, x + 1, y + 1, x + width - 1, y + height - 1, color);
 
@@ -1012,17 +1012,17 @@ public class SpellCreationGui {
 		protected static class SpellPartBar extends com.smanzana.nostrummagica.client.gui.widget.ParentWidget {
 			
 			public static interface IHoverHandler {
-				public void onHover(@Nullable SpellPartSummary summary, MatrixStack matrixStackIn, int mouseX, int mouseY);
+				public void onHover(@Nullable SpellPartSummary summary, PoseStack matrixStackIn, int mouseX, int mouseY);
 			}
 			
 			private final SpellGui<?> gui;
 			private final List<SpellPartSegment> bars;
-			private final Vector3i[] slots;
+			private final Vec3i[] slots;
 			private final int slotWidth;
 			private final @Nullable IHoverHandler onHover;
 			
-			public SpellPartBar(SpellGui<?> gui, Vector3i[] slots, int slotWidth, @Nullable IHoverHandler onHover) {
-				super(gui.getGuiLeft(), gui.topPos, gui.imageWidth, gui.imageHeight, StringTextComponent.EMPTY);
+			public SpellPartBar(SpellGui<?> gui, Vec3i[] slots, int slotWidth, @Nullable IHoverHandler onHover) {
+				super(gui.getGuiLeft(), gui.topPos, gui.imageWidth, gui.imageHeight, TextComponent.EMPTY);
 				this.gui = gui;
 				this.bars = new ArrayList<>(slots.length);
 				this.slots = slots;
@@ -1042,8 +1042,8 @@ public class SpellCreationGui {
 					final int y;
 					final int barHeight;
 					
-					final Vector3i startSlot = slots[part.getStartIdx()];
-					final Vector3i endSlot = slots[part.getLastIdx()];
+					final Vec3i startSlot = slots[part.getStartIdx()];
+					final Vec3i endSlot = slots[part.getLastIdx()];
 					startX = startSlot.getX();
 					endX = endSlot.getX() + slotWidth;
 					y = startSlot.getY();
@@ -1056,7 +1056,7 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				; // INVISIBLE
 			}
 		}
@@ -1064,7 +1064,7 @@ public class SpellCreationGui {
 		public static class InfoPanel extends ParentWidget {
 			
 			public static interface InfoPanelContent {
-				public void render(MatrixStack matrixStackIn, int width, int height, float partialTicks);
+				public void render(PoseStack matrixStackIn, int width, int height, float partialTicks);
 			}
 			
 			protected float red;
@@ -1075,7 +1075,7 @@ public class SpellCreationGui {
 			protected InfoPanelContent content;
 			
 			public InfoPanel(int x, int y, int width, int height) {
-				super(x, y, width, height, StringTextComponent.EMPTY);
+				super(x, y, width, height, TextComponent.EMPTY);
 				color(0xFFFFFFFF);
 			}
 			
@@ -1097,7 +1097,7 @@ public class SpellCreationGui {
 				return this;
 			}
 			
-			protected void renderBackground(MatrixStack matrixStackIn) {
+			protected void renderBackground(PoseStack matrixStackIn) {
 				Minecraft.getInstance().getTextureManager().bind(TEXT_UTILS);
 				
 				// Note: hardcoding border size to be 4
@@ -1115,7 +1115,7 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				matrixStackIn.pushPose();
 				matrixStackIn.translate(x, y, 0);
 				renderBackground(matrixStackIn);
@@ -1124,7 +1124,7 @@ public class SpellCreationGui {
 					// Find how much to offset tby based on children
 					final int margin = 4;
 					int yOffset = 0;
-					for (Widget child : this.children) {
+					for (AbstractWidget child : this.children) {
 						yOffset = Math.max(yOffset, (child.y + child.getHeight()) - this.y);
 					}
 					
@@ -1139,7 +1139,7 @@ public class SpellCreationGui {
 			}
 		}
 		
-		protected static final void drawScrollMessage(MatrixStack matrixStackIn, int width, int height, FontRenderer fonter) {
+		protected static final void drawScrollMessage(PoseStack matrixStackIn, int width, int height, Font fonter) {
 			final String message = "Insert Blank Scroll";
 			final int msgWidth = fonter.width(message);
 			
@@ -1149,7 +1149,7 @@ public class SpellCreationGui {
 		
 		private T container;
 		
-		public SpellGui(T container, PlayerInventory playerInv, ITextComponent name) {
+		public SpellGui(T container, Inventory playerInv, Component name) {
 			super(container, playerInv, name);
 			this.container = container;
 		}
@@ -1160,12 +1160,12 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+		protected void renderBg(PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			super.renderLabels(matrixStackIn, mouseX, mouseY);
 		}
 		
 		@Override
-		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			;			
 		}
 		
@@ -1183,7 +1183,7 @@ public class SpellCreationGui {
 		protected abstract void onSubmit();
 
 		@Override
-		public abstract List<Rectangle2d> getGuiExtraAreas();
+		public abstract List<Rect2i> getGuiExtraAreas();
 		
 		protected static boolean isValidChar(int codepoint) {
 			return Character.isAlphabetic(codepoint) || Character.isDigit(codepoint) || Character.isSpaceChar(codepoint);
@@ -1212,17 +1212,17 @@ public class SpellCreationGui {
 			return action;
 		}
 		
-		protected void drawAffectEntity(MatrixStack matrixStackIn, int width, int height, float[] color) {
+		protected void drawAffectEntity(PoseStack matrixStackIn, int width, int height, float[] color) {
 			SpellComponentIcon.get(NostrumSpellShapes.AtFeet)
 				.draw(matrixStackIn, 0, 0, width, height, color[0], color[1], color[2], color[3]);
 		}
 		
-		protected void drawAffectBlock(MatrixStack matrixStackIn, int width, int height, float[] color) {
+		protected void drawAffectBlock(PoseStack matrixStackIn, int width, int height, float[] color) {
 			SpellComponentIcon.get(NostrumSpellShapes.Proximity)
 				.draw(matrixStackIn, 0, 0, width, height, color[0], color[1], color[2], color[3]);
 		}
 		
-		protected void drawElementalBoost(MatrixStack matrixStackIn, int width, int height, EMagicElement element) {
+		protected void drawElementalBoost(PoseStack matrixStackIn, int width, int height, EMagicElement element) {
 			Minecraft.getInstance().getTextureManager().bind(TEXT_UTILS);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 					TEX_BOOST_HOFFSET, TEX_BOOST_VOFFSET, TEX_BOOST_WIDTH, TEX_BOOST_HEIGHT,
@@ -1232,7 +1232,7 @@ public class SpellCreationGui {
 				.draw(matrixStackIn, width/2, 0, width/2, height);
 		}
 		
-		protected void drawElementalPenalty(MatrixStack matrixStackIn, int width, int height, EMagicElement element) {
+		protected void drawElementalPenalty(PoseStack matrixStackIn, int width, int height, EMagicElement element) {
 			Minecraft.getInstance().getTextureManager().bind(TEXT_UTILS);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 					TEX_PENALTY_HOFFSET, TEX_PENALTY_VOFFSET, TEX_PENALTY_WIDTH, TEX_PENALTY_HEIGHT,
@@ -1242,9 +1242,9 @@ public class SpellCreationGui {
 				.draw(matrixStackIn, width/2, 0, width/2, height);
 		}
 		
-		protected final void renderSpellPanel(MatrixStack matrixStackIn, int width, int height, float partialTicks) {
+		protected final void renderSpellPanel(PoseStack matrixStackIn, int width, int height, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
-			final FontRenderer fontRenderer = mc.font;
+			final Font fontRenderer = mc.font;
 			final T container = this.getMenu();
 			final String summaryText = "Summary";
 			final int summaryTextWidth = fontRenderer.width(summaryText);
@@ -1265,16 +1265,16 @@ public class SpellCreationGui {
 			if (!container.getReagentStrings().isEmpty()) {
 				fontRenderer.draw(matrixStackIn, "Reagents:", 0, 0, 0xFF000000);
 				matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
-				for (ITextComponent string : container.getReagentStrings()) {
+				for (Component string : container.getReagentStrings()) {
 					fontRenderer.draw(matrixStackIn, string, 4, 0, 0xFF000000); //drawTextComponent()
 					matrixStackIn.translate(0, fontRenderer.lineHeight, 0);
 				}
 			}
 		}
 		
-		protected void renderModifierPanel(@Nullable ISpellCraftModifier modifier, MatrixStack matrixStackIn, int width, int height, float partialTicks) {
+		protected void renderModifierPanel(@Nullable ISpellCraftModifier modifier, PoseStack matrixStackIn, int width, int height, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
-			final FontRenderer fontRenderer = mc.font;
+			final Font fontRenderer = mc.font;
 			final String modifierText = "Modifier";
 			final int modifierTextWidth = fontRenderer.width(modifierText);
 			fontRenderer.draw(matrixStackIn, modifierText, ((width-8) - modifierTextWidth)/2, 0, 0xFF000000);
@@ -1283,9 +1283,9 @@ public class SpellCreationGui {
 			matrixStackIn.scale(.5f, .5f, 1f);
 			
 			if (modifier != null) {
-				List<ITextComponent> lines = new ArrayList<>(4);
+				List<Component> lines = new ArrayList<>(4);
 				lines = modifier.getDetails(lines);
-				for (ITextComponent line : lines) {
+				for (Component line : lines) {
 					fontRenderer.draw(matrixStackIn, line, 0, 0, 0xFF000000);
 					matrixStackIn.translate(0, fontRenderer.lineHeight + 1, 0);
 				}
@@ -1295,9 +1295,9 @@ public class SpellCreationGui {
 			}
 		}
 		
-		protected void renderSpellPartPanel(SpellPartSummary part, MatrixStack matrixStackIn, int width, int height, float partialTicks) {
+		protected void renderSpellPartPanel(SpellPartSummary part, PoseStack matrixStackIn, int width, int height, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
-			final FontRenderer fontRenderer = mc.font;
+			final Font fontRenderer = mc.font;
 			final String titleText = part.isError() ? "Error" : part.isShape() ? "Shape" : "Effect";
 			final int titleTextWidth = fontRenderer.width(titleText);
 			matrixStackIn.pushPose();

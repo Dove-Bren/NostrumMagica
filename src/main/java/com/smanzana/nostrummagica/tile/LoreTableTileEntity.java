@@ -8,15 +8,15 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class LoreTableTileEntity extends TileEntity implements ITickableTileEntity {
+public class LoreTableTileEntity extends BlockEntity implements TickableBlockEntity {
 
 	private @Nonnull ItemStack item;
 	private float progress;
@@ -46,7 +46,7 @@ public class LoreTableTileEntity extends TileEntity implements ITickableTileEnti
 		return (this.lorekey != null);
 	}
 	
-	public void onTakeItem(PlayerEntity player) {
+	public void onTakeItem(Player player) {
 		if (hasLore()) {
 			String lore = takeLore();
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
@@ -94,11 +94,11 @@ public class LoreTableTileEntity extends TileEntity implements ITickableTileEnti
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		if (nbt == null)
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		
 		if (!item.isEmpty())
 			nbt.put("item", item.serializeNBT());
@@ -112,7 +112,7 @@ public class LoreTableTileEntity extends TileEntity implements ITickableTileEnti
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt == null)

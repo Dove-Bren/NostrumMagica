@@ -3,22 +3,22 @@ package com.smanzana.nostrummagica.client.gui.widget;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.network.chat.Component;
 
 public abstract class ParentWidget extends MoveableObscurableWidget {
 	
-	protected final List<Widget> children;
+	protected final List<AbstractWidget> children;
 	
-	public ParentWidget(int x, int y, int width, int height, ITextComponent title) {
+	public ParentWidget(int x, int y, int width, int height, Component title) {
 		super(x, y, width, height, title);
 		children = new ArrayList<>();
 	}
 	
-	public void addChild(Widget child) {
+	public void addChild(AbstractWidget child) {
 		children.add(child);
 	}
 	
@@ -27,10 +27,10 @@ public abstract class ParentWidget extends MoveableObscurableWidget {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		if (this.visible) {
-			for (Widget widget : children) {
+			for (AbstractWidget widget : children) {
 				widget.render(matrixStack, mouseX, mouseY, partialTicks);
 			}
 		}
@@ -44,14 +44,14 @@ public abstract class ParentWidget extends MoveableObscurableWidget {
 	 * @param mouseY
 	 * @param partialTicks
 	 */
-	protected void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	protected void renderForeground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		
 	}
 	
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		// Try children first since they're probably on TOP of the widget
-		for (Widget widget : children) {
+		for (AbstractWidget widget : children) {
 			if (widget.mouseClicked(mouseX, mouseY, button)) {
 				return true;
 			}
@@ -64,7 +64,7 @@ public abstract class ParentWidget extends MoveableObscurableWidget {
 	@Override
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		// Try children first since they're probably on TOP of the widget
-		for (Widget widget : children) {
+		for (AbstractWidget widget : children) {
 			if (widget.mouseReleased(mouseX, mouseY, button)) {
 				// Vanilla is dumb and has 'am I under it' checks in mouse click but not for mouse released. That means
 				// things blindly return 'true' to whether they've handled it or not.
@@ -80,7 +80,7 @@ public abstract class ParentWidget extends MoveableObscurableWidget {
 	@Override
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
 		// Try children first since they're probably on TOP of the widget
-		for (Widget widget : children) {
+		for (AbstractWidget widget : children) {
 			if (widget.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
 				// Like 'mouseReleased', vanilla classes blindly 'handle' thi s. So do all children even if one returns true.
 				//return true;
@@ -94,7 +94,7 @@ public abstract class ParentWidget extends MoveableObscurableWidget {
 	@Override
 	public void mouseMoved(double mouseX, double mouseY) {
 		// Try children first since they're probably on TOP of the widget
-		for (Widget widget : children) {
+		for (AbstractWidget widget : children) {
 			widget.mouseMoved(mouseX, mouseY);
 		}
 	}
@@ -102,7 +102,7 @@ public abstract class ParentWidget extends MoveableObscurableWidget {
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
 		// Try children first since they're probably on TOP of the widget
-		for (Widget widget : children) {
+		for (AbstractWidget widget : children) {
 			if (widget.mouseScrolled(mouseX, mouseY, delta)) {
 				return true;
 			}
@@ -115,7 +115,7 @@ public abstract class ParentWidget extends MoveableObscurableWidget {
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		// Try children first since they're probably on TOP of the widget
-		for (Widget widget : children) {
+		for (AbstractWidget widget : children) {
 			if (widget.keyPressed(keyCode, scanCode, modifiers)) {
 				return true;
 			}
@@ -128,7 +128,7 @@ public abstract class ParentWidget extends MoveableObscurableWidget {
 	@Override
 	public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
 		// Try children first since they're probably on TOP of the widget
-		for (Widget widget : children) {
+		for (AbstractWidget widget : children) {
 			if (widget.keyReleased(keyCode, scanCode, modifiers)) {
 				return true;
 			}
@@ -141,7 +141,7 @@ public abstract class ParentWidget extends MoveableObscurableWidget {
 	@Override
 	public boolean charTyped(char codePoint, int modifiers) {
 		// Try children first since they're probably on TOP of the widget
-		for (Widget widget : children) {
+		for (AbstractWidget widget : children) {
 			if (widget.charTyped(codePoint, modifiers)) {
 				return true;
 			}
@@ -158,9 +158,9 @@ public abstract class ParentWidget extends MoveableObscurableWidget {
 		final int xDiff = x - this.getStartingX();
 		final int yDiff = y - this.getStartingY();
 		
-		final Rectangle2d bounds = new Rectangle2d(x, y, this.width, this.height);
+		final Rect2i bounds = new Rect2i(x, y, this.width, this.height);
 		
-		for (Widget widget : children) {
+		for (AbstractWidget widget : children) {
 			if (widget instanceof ObscurableWidget) {
 				((ObscurableWidget) widget).setBounds(bounds);
 			}

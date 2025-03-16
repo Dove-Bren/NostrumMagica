@@ -1,15 +1,15 @@
 package com.smanzana.nostrummagica.item;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockNamedItem;
-import net.minecraft.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.ItemNameBlockItem;
+import net.minecraft.world.item.Item;
 
 /**
  * Seeds for ginseng, mandrake, and essence, which can be planted and grown
  * @author Skyler
  *
  */
-public class ReagentSeed extends BlockNamedItem {
+public class ReagentSeed extends ItemNameBlockItem {
 	
 	public static final String ID_MANDRAKE_SEED = "reagentseed_mandrake";
 	public static final String ID_GINSENG_SEED = "reagentseed_ginseng";

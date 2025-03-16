@@ -3,10 +3,10 @@ package com.smanzana.nostrummagica.entity.dragon;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -31,7 +31,7 @@ public enum DragonGambit {
 	private final int texOffsetY;
 	
 	// Only the client uses these
-	private List<ITextComponent> desc;
+	private List<Component> desc;
 	private String transName;
 	
 	private DragonGambit(String unlocName, int texOffsetX, int texOffsetY) {
@@ -55,15 +55,15 @@ public enum DragonGambit {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public List<ITextComponent> getDesc() {
+	public List<Component> getDesc() {
 		if (this.desc == null) {
-			String raw = I18n.get("gambit." + getUnlocName() + ".desc", "" + TextFormatting.DARK_GREEN + TextFormatting.BOLD, TextFormatting.RESET);
+			String raw = I18n.get("gambit." + getUnlocName() + ".desc", "" + ChatFormatting.DARK_GREEN + ChatFormatting.BOLD, ChatFormatting.RESET);
 			String[] lines = raw.split("\\|");
 			
 			this.desc = new ArrayList<>(lines.length + 1);
-			desc.add(new StringTextComponent(getName()).withStyle(TextFormatting.BLUE).withStyle(TextFormatting.BOLD));
+			desc.add(new TextComponent(getName()).withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.BOLD));
 			for (String line : lines) {
-				desc.add(new StringTextComponent(line));
+				desc.add(new TextComponent(line));
 			}
 		}
 		

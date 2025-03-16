@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity.DragonEquipmentInventory;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
@@ -11,9 +11,9 @@ import com.smanzana.petcommand.api.client.petgui.PetGUIRenderHelper;
 import com.smanzana.petcommand.api.client.petgui.sheet.PetInventorySheet;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class RedDragonInventorySheet extends PetInventorySheet<TameRedDragonEntity> {
 	
@@ -22,7 +22,7 @@ public class RedDragonInventorySheet extends PetInventorySheet<TameRedDragonEnti
 	}
 	
 	@Override
-	public void showSheet(TameRedDragonEntity dragon, PlayerEntity player, IPetContainer<TameRedDragonEntity> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(TameRedDragonEntity dragon, Player player, IPetContainer<TameRedDragonEntity> container, int width, int height, int offsetX, int offsetY) {
 		super.showSheet(dragon, player, container, width, height, offsetX, offsetY);
 		
 		final int cellWidth = 18;
@@ -52,7 +52,7 @@ public class RedDragonInventorySheet extends PetInventorySheet<TameRedDragonEnti
 	}
 
 	@Override
-	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void draw(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		super.draw(matrixStackIn, mc, partialTicks, width, height, mouseX, mouseY);
 		
 		// Draw sheet

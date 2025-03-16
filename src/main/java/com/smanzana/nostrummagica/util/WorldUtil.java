@@ -12,23 +12,23 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableSet;
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.PaneBlock;
-import net.minecraft.block.StairsBlock;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.SectionPos;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.gen.WorldGenRegion;
-import net.minecraft.world.gen.feature.structure.Structure;
-import net.minecraft.world.gen.feature.structure.StructurePiece;
-import net.minecraft.world.gen.feature.structure.StructureStart;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.IronBarsBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.core.SectionPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.structure.StructurePiece;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraft.server.level.ServerLevel;
 
 public class WorldUtil {
 
@@ -39,7 +39,7 @@ public class WorldUtil {
 		 * @param pos
 		 * @return
 		 */
-		public boolean scan(IBlockReader access, BlockPos pos);
+		public boolean scan(BlockGetter access, BlockPos pos);
 	}
 	
 	/**
@@ -51,7 +51,7 @@ public class WorldUtil {
 	 * @param scanner
 	 * @return number of positions scanned
 	 */
-	public static final int ScanBlocks(World world, BlockPos pos1, BlockPos pos2, IWorldScanner scanner) {
+	public static final int ScanBlocks(Level world, BlockPos pos1, BlockPos pos2, IWorldScanner scanner) {
 		int count = 0;
 		
 		final BlockPos min = new BlockPos(Math.min(pos1.getX(), pos2.getX()),
@@ -77,7 +77,7 @@ public class WorldUtil {
 		// we have some blocks in beginChunkX (and Z).
 		// We may have some blocks in endChunkX+1 (and Z)
 		// beginChunkX may start with a portion of blocks known as beginChunkOffsetX
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		for (int chunkX = beginChunkX; chunkX <= endChunkX; chunkX++)
 		for (int chunkZ = beginChunkZ; chunkZ <= endChunkZ; chunkZ++) {
 			final int baseX = (chunkX << 4);
@@ -129,7 +129,7 @@ public class WorldUtil {
 		 * @param distance
 		 * @return
 		 */
-		public boolean canVisit(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos, BlockState state, int distance);
+		public boolean canVisit(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos, BlockState state, int distance);
 		
 		/**
 		 * Actually visit a block/pos.
@@ -143,7 +143,7 @@ public class WorldUtil {
 		 * @param walkCount
 		 * @return
 		 */
-		public boolean walk(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos, BlockState state, int distance, int walkCount);
+		public boolean walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos, BlockState state, int distance, int walkCount);
 	}
 	
 	/**
@@ -154,7 +154,7 @@ public class WorldUtil {
 	 * @param maxIterations
 	 * @return The final pos iterated over.
 	 */
-	public static BlockPos WalkConnectedBlocks(IBlockReader world, BlockPos start, IBlockWalker walker, int maxIterations) {
+	public static BlockPos WalkConnectedBlocks(BlockGetter world, BlockPos start, IBlockWalker walker, int maxIterations) {
 		final BlockState startState = world.getBlockState(start);
 		final Set<BlockPos> visited = new HashSet<>();
 		final List<BlockPos> next = new LinkedList<>(); // Doing breadthfirst/queue, so linked
@@ -199,13 +199,13 @@ public class WorldUtil {
 	 * Good old-fashioned manhattan distance
 	 * @return
 	 */
-	public static final int getBlockDistance(Vector3i pos1, Vector3i pos2) {
+	public static final int getBlockDistance(Vec3i pos1, Vec3i pos2) {
 		return Math.abs(pos1.getX() - pos2.getX())
 				+ Math.abs(pos1.getY() - pos2.getY())
 				+ Math.abs(pos1.getZ() - pos2.getZ());
 	}
 	
-	private static final int NUM_X_BITS = 1 + MathHelper.log2(MathHelper.smallestEncompassingPowerOfTwo(30000000));
+	private static final int NUM_X_BITS = 1 + Mth.log2(Mth.smallestEncompassingPowerOfTwo(30000000));
 	private static final int NUM_Z_BITS = NUM_X_BITS;
 	private static final int NUM_Y_BITS = 64 - NUM_X_BITS - NUM_Z_BITS;
 	private static final int Y_SHIFT = 0 + NUM_Z_BITS;
@@ -232,11 +232,11 @@ public class WorldUtil {
 			}
 			
 			// Some main cases I know of
-			if (block instanceof PaneBlock) {
+			if (block instanceof IronBarsBlock) {
 				return true;
 			}
 			
-			if (block instanceof StairsBlock) {
+			if (block instanceof StairBlock) {
 				return true;
 			}
 		}
@@ -263,7 +263,7 @@ public class WorldUtil {
 	 * 					 AKA check one giant bounding box for the whole structure instead of checking if the position is actually in a structure piece.
 	 * @return
 	 */
-	public static final boolean IsInStructure(ServerWorld world, BlockPos pos, Structure<?> structure, boolean insideCheck) {
+	public static final boolean IsInStructure(ServerLevel world, BlockPos pos, StructureFeature<?> structure, boolean insideCheck) {
 		return GetContainingStructure(world, pos, structure, insideCheck).isValid();
 	}
 	
@@ -276,18 +276,18 @@ public class WorldUtil {
 	 * 					 AKA check one giant bounding box for the whole structure instead of checking if the position is actually in a structure piece.
 	 * @return
 	 */
-	public static final @Nonnull StructureStart<?> GetContainingStructure(ServerWorld world, BlockPos pos, Structure<?> structure, boolean insideCheck) {
+	public static final @Nonnull StructureStart<?> GetContainingStructure(ServerLevel world, BlockPos pos, StructureFeature<?> structure, boolean insideCheck) {
 		return world.structureFeatureManager().getStructureAt(pos, insideCheck, structure);
 	}
 	
-	public static final @Nullable StructurePiece GetContainingStructurePiece(ServerWorld world, BlockPos pos, Structure<?> structure, boolean insideCheck) {
+	public static final @Nullable StructurePiece GetContainingStructurePiece(ServerLevel world, BlockPos pos, StructureFeature<?> structure, boolean insideCheck) {
 		return world.structureFeatureManager().startsForFeature(SectionPos.of(pos), structure).filter((start) -> {
 	         return start.getBoundingBox().isInside(pos);
 	      }).flatMap(start -> start.getPieces().stream()).filter(piece -> piece.getBoundingBox().isInside(pos))
 				.findFirst().orElse(null);
 	}
 	
-	public static final boolean IsWorldGen(IWorld world) {
+	public static final boolean IsWorldGen(LevelAccessor world) {
 		return world instanceof WorldGenRegion;
 	}
 }

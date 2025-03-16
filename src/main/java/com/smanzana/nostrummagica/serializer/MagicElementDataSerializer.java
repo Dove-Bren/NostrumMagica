@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.serializer;
 
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.IDataSerializer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializer;
 
-public class MagicElementDataSerializer implements IDataSerializer<EMagicElement> {
+public class MagicElementDataSerializer implements EntityDataSerializer<EMagicElement> {
 
 	public static final MagicElementDataSerializer instance = new MagicElementDataSerializer();
 	
@@ -15,18 +15,18 @@ public class MagicElementDataSerializer implements IDataSerializer<EMagicElement
 	}
 	
 	@Override
-	public void write(PacketBuffer buf, EMagicElement value) {
+	public void write(FriendlyByteBuf buf, EMagicElement value) {
 		buf.writeEnum(value);
 	}
 
 	@Override
-	public EMagicElement read(PacketBuffer buf)  {
+	public EMagicElement read(FriendlyByteBuf buf)  {
 		return buf.readEnum(EMagicElement.class);
 	}
 
 	@Override
-	public DataParameter<EMagicElement> createAccessor(int id) {
-		return new DataParameter<>(id, this);
+	public EntityDataAccessor<EMagicElement> createAccessor(int id) {
+		return new EntityDataAccessor<>(id, this);
 	}
 
 	@Override

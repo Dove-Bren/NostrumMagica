@@ -8,24 +8,24 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.TriggerRepeaterTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 
 /**
  * Block that fires a trigger event when receiving redstone input.
@@ -45,13 +45,13 @@ public class RedstoneTriggerBlock extends TriggerRepeaterBlock {
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		super.createBlockStateDefinition(builder);
 		builder.add(POWERED, ONCE);
 	}
 	
 	@Override
-	public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
 		if (worldIn.isClientSide() && NostrumMagica.instance.proxy.getPlayer() != null && NostrumMagica.instance.proxy.getPlayer().isCreative()) {
 			worldIn.addParticle(ParticleTypes.BARRIER, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 0, 0, 0);
 		}
@@ -63,20 +63,20 @@ public class RedstoneTriggerBlock extends TriggerRepeaterBlock {
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader reader) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter reader) {
 		return new TriggerRepeaterTileEntity();
 	}
 
 	@Override
-	public void trigger(World world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
-		TileEntity te = world.getBlockEntity(blockPos);
+	public void trigger(Level world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
+		BlockEntity te = world.getBlockEntity(blockPos);
 		if (te instanceof TriggerRepeaterTileEntity) {
 			((TriggerRepeaterTileEntity) te).trigger(triggerPos);
 		}
 	}
 	
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (!worldIn.isClientSide() && playerIn.isCreative()) {
 		
 			ItemStack heldItem = playerIn.getItemInHand(hand);
@@ -85,9 +85,9 @@ public class RedstoneTriggerBlock extends TriggerRepeaterBlock {
 				// Toggle 'once'
 				final boolean newOnce = !state.getValue(ONCE);
 				worldIn.setBlockAndUpdate(pos, state.setValue(ONCE, newOnce));
-				playerIn.sendMessage(new StringTextComponent("Changed to " + (newOnce ? "ONCE" : "REPEATABLE")), Util.NIL_UUID);
+				playerIn.sendMessage(new TextComponent("Changed to " + (newOnce ? "ONCE" : "REPEATABLE")), Util.NIL_UUID);
 				NostrumMagicaSounds.CAST_CONTINUE.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 		}
 		
@@ -95,12 +95,12 @@ public class RedstoneTriggerBlock extends TriggerRepeaterBlock {
 	}
 	
 	@Override
-	public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {
+	public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, @Nullable Direction side) {
 		return true;
 	}
 	
 	@Override
-	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
+	public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving) {
 		if (!worldIn.isClientSide()) {
 			final boolean isPowered = state.getValue(POWERED);
 			final boolean once = state.getValue(ONCE);

@@ -1,20 +1,20 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBaked;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.entity.EnderRodBallEntity;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Vector3f;
 
 public class RenderEnderRodBall extends EntityRenderer<EnderRodBallEntity> {
 	
@@ -22,7 +22,7 @@ public class RenderEnderRodBall extends EntityRenderer<EnderRodBallEntity> {
 	
 	protected ModelBaked<EnderRodBallEntity> ballOrb;
 
-	public RenderEnderRodBall(EntityRendererManager renderManagerIn) {
+	public RenderEnderRodBall(EntityRenderDispatcher renderManagerIn) {
 		super(renderManagerIn);
 		this.ballOrb = new ModelBaked<>(NostrumRenderTypes::GetBlendedEntity, BALL_MODEL);
 	}
@@ -30,18 +30,18 @@ public class RenderEnderRodBall extends EntityRenderer<EnderRodBallEntity> {
 	@SuppressWarnings("deprecation")
 	@Override
 	public ResourceLocation getTextureLocation(EnderRodBallEntity entity) {
-		return AtlasTexture.LOCATION_BLOCKS;
+		return TextureAtlas.LOCATION_BLOCKS;
 	}
 	
 	@Override
-	public void render(EnderRodBallEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(EnderRodBallEntity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		// Render orb three times with different alphas and sizes to do a glow effect.
 		final float time = entityIn.tickCount + partialTicks;
 		//134, 80, 185
 		final float red = .525f;
 		final float green = .314f;
 		final float blue = .725f;
-		IVertexBuilder buffer = bufferIn.getBuffer(RenderType.entityCutout(getTextureLocation(entityIn)));
+		VertexConsumer buffer = bufferIn.getBuffer(RenderType.entityCutout(getTextureLocation(entityIn)));
 		
 		matrixStackIn.pushPose();
 		

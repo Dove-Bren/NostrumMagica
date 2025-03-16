@@ -16,31 +16,31 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.LightningBoltEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.IServerWorldInfo;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -116,36 +116,36 @@ public class MagicCharm extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		
 		final ItemStack stack = playerIn.getItemInHand(hand);
 		
 		if (worldIn.isClientSide)
-			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, stack);
 		
 		boolean used = false;
 		
 		switch (element) {
 		case EARTH:
-			used = doEarth(playerIn, (ServerWorld) worldIn);
+			used = doEarth(playerIn, (ServerLevel) worldIn);
 			break;
 		case ENDER:
-			used = doEnder((ServerPlayerEntity) playerIn, (ServerWorld) worldIn);
+			used = doEnder((ServerPlayer) playerIn, (ServerLevel) worldIn);
 			break;
 		case FIRE:
-			used = doFire(playerIn, (ServerWorld) worldIn);
+			used = doFire(playerIn, (ServerLevel) worldIn);
 			break;
 		case ICE:
-			used = doIce(playerIn, (ServerWorld) worldIn);
+			used = doIce(playerIn, (ServerLevel) worldIn);
 			break;
 		case LIGHTNING:
-			used = doLightning(playerIn, (ServerWorld) worldIn);
+			used = doLightning(playerIn, (ServerLevel) worldIn);
 			break;
 		case PHYSICAL:
-			used = doPhysical(playerIn, (ServerWorld) worldIn);
+			used = doPhysical(playerIn, (ServerLevel) worldIn);
 			break;
 		case WIND:
-			used = doWind(playerIn, (ServerWorld) worldIn);
+			used = doWind(playerIn, (ServerLevel) worldIn);
 			break;
 		}
 		
@@ -153,10 +153,10 @@ public class MagicCharm extends Item implements ILoreTagged {
 			stack.shrink(1);			
 		}
 		
-		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
+		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, stack);
 	}
 	
-	private boolean doEarth(PlayerEntity player, ServerWorld world) {
+	private boolean doEarth(Player player, ServerLevel world) {
 		
 		if (DimensionUtils.IsSorceryDim(world)) {
 			return false;
@@ -194,7 +194,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return true;
 	}
 	
-	private boolean doFire(PlayerEntity player, ServerWorld world) {
+	private boolean doFire(Player player, ServerLevel world) {
 		
 		if (DimensionUtils.IsSorceryDim(world)) {
 			return false;
@@ -235,16 +235,16 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return true;
 	}
 	
-	private boolean doIce(PlayerEntity player, ServerWorld world) {
-		player.addEffect(new EffectInstance(NostrumEffects.magicShield, 20 * 60 * 2, 0));
-		player.addEffect(new EffectInstance(NostrumEffects.physicalShield, 20 * 60 * 2, 0));
+	private boolean doIce(Player player, ServerLevel world) {
+		player.addEffect(new MobEffectInstance(NostrumEffects.magicShield, 20 * 60 * 2, 0));
+		player.addEffect(new MobEffectInstance(NostrumEffects.physicalShield, 20 * 60 * 2, 0));
 		
 		NostrumMagicaSounds.DAMAGE_ICE.play(world, player.getX(), player.getY(), player.getZ());
 		return true;
 	}
 	
-	private boolean doWind(PlayerEntity player, ServerWorld world) {
-		AxisAlignedBB bb = new AxisAlignedBB(
+	private boolean doWind(Player player, ServerLevel world) {
+		AABB bb = new AABB(
 				player.getX() - 3,
 				player.getY() - 1,
 				player.getZ() - 3,
@@ -254,7 +254,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		List<Entity> entities = world.getEntities(player, bb);
 		if (entities != null && !entities.isEmpty())
 			for (Entity e : entities) {
-				Vector3d vec = e.position().subtract(player.position().add(0, -1, 0));
+				Vec3 vec = e.position().subtract(player.position().add(0, -1, 0));
 				vec = vec.normalize();
 				vec = vec.scale(2);
 				e.lerpMotion(vec.x, vec.y, vec.z);
@@ -264,7 +264,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return true;
 	}
 	
-	private boolean doEnder(ServerPlayerEntity player, ServerWorld world) { 
+	private boolean doEnder(ServerPlayer player, ServerLevel world) { 
 		if (DimensionUtils.InDimension(player, player.getRespawnDimension())) {
 			@Nullable BlockPos posOpt = player.getRespawnPosition();
 			BlockPos pos;
@@ -311,9 +311,9 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return false;
 	}
 	
-	private boolean doPhysical(PlayerEntity player, ServerWorld world) {
-		player.addEffect(new EffectInstance(
-				Effects.MOVEMENT_SPEED,
+	private boolean doPhysical(Player player, ServerLevel world) {
+		player.addEffect(new MobEffectInstance(
+				MobEffects.MOVEMENT_SPEED,
 				20 * 30,
 				1
 				));
@@ -323,9 +323,9 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return true;
 	}
 	
-	private boolean doLightning(PlayerEntity player, ServerWorld world) {
+	private boolean doLightning(Player player, ServerLevel world) {
 		if (world.isRaining()) {
-			AxisAlignedBB bb = new AxisAlignedBB(
+			AABB bb = new AABB(
 					player.getX() - 5,
 					player.getY() - 2,
 					player.getZ() - 5,
@@ -335,14 +335,14 @@ public class MagicCharm extends Item implements ILoreTagged {
 			List<Entity> entities = world.getEntitiesOfClass(LivingEntity.class, bb);
 			if (entities != null && !entities.isEmpty())
 				for (Entity e : entities) {
-					LightningBoltEntity bolt = new LightningBoltEntity(EntityType.LIGHTNING_BOLT, world);
+					LightningBolt bolt = new LightningBolt(EntityType.LIGHTNING_BOLT, world);
 					bolt.setPos(e.getX(), e.getY(), e.getZ());
 					bolt.setVisualOnly(false);
 					world.addFreshEntity(bolt); // TODO nostrum lightning?
 				}
 		} else {
 			world.getLevelData().setRaining(true);
-			((IServerWorldInfo) world.getLevelData()).setThundering(true);
+			((ServerLevelData) world.getLevelData()).setThundering(true);
 		}
 		
 		NostrumMagicaSounds.DAMAGE_LIGHTNING.play(world, player.getX(), player.getY(), player.getZ());
@@ -358,11 +358,11 @@ public class MagicCharm extends Item implements ILoreTagged {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		if (element == EMagicElement.ENDER) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.instance.proxy.getPlayer());
 			if (attr != null && attr.hasEnhancedTeleport()) {
-				tooltip.add(new TranslationTextComponent("info.endercharm.enhanced"));
+				tooltip.add(new TranslatableComponent("info.endercharm.enhanced"));
 			}
 		}
 	}

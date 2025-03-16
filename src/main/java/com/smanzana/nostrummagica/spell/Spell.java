@@ -41,24 +41,24 @@ import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
 import com.smanzana.nostrummagica.util.NonNullEnumMap;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.Constants.NBT;
 
 /**
  * A collection of spell shapes and effects.
@@ -84,7 +84,7 @@ public class Spell {
 	
 	protected static class SpellState implements ISpellState {
 		
-		private static final ITextComponent LABEL_MOD_EFF = new TranslationTextComponent("spelllogmod.nostrummagica.efficiency");
+		private static final Component LABEL_MOD_EFF = new TranslatableComponent("spelllogmod.nostrummagica.efficiency");
 		
 		protected final Spell spell;
 		protected final LivingEntity caster;
@@ -184,7 +184,7 @@ public class Spell {
 			}
 		}
 		
-		protected void playContinueEffect(World world, Vector3d where) {
+		protected void playContinueEffect(Level world, Vec3 where) {
 			NostrumMagicaSounds.CAST_CONTINUE.play(world, where.x(), where.y(), where.z());
 		}
 		
@@ -192,7 +192,7 @@ public class Spell {
 			NostrumMagicaSounds.CAST_CONTINUE.play(at);
 		}
 		
-		protected void spawnShape(SpellShapePart shape, LivingEntity targ, World world, SpellLocation location) {
+		protected void spawnShape(SpellShapePart shape, LivingEntity targ, Level world, SpellLocation location) {
 			// instantiate trigger in world
 			if (world == null)
 				world = targ.level;
@@ -202,8 +202,8 @@ public class Spell {
 			}
 			
 			this.shapeInstance = shape.getShape().createInstance(this, targ, location,
-					(targ == null ? -90.0f : targ.xRot),
-					(targ == null ? 0.0f : targ.yRot),
+					(targ == null ? -90.0f : targ.getXRot()),
+					(targ == null ? 0.0f : targ.getYRot()),
 					shape.getProperties(), spell.getCharacteristics());
 			this.shapeInstance.spawn(caster);
 		}
@@ -215,16 +215,16 @@ public class Spell {
 			return spawn;
 		}
 		
-		protected void doFailEffect(World world, Vector3d pos) {
+		protected void doFailEffect(Level world, Vec3 pos) {
 			NostrumMagicaSounds.CAST_FAIL.play(world, pos.x(), pos.y(), pos.z());
-			((ServerWorld) world).sendParticles(ParticleTypes.SMOKE, pos.x(), pos.y(), pos.z(), 10, 0, 0, 0, .05);
+			((ServerLevel) world).sendParticles(ParticleTypes.SMOKE, pos.x(), pos.y(), pos.z(), 10, 0, 0, 0, .05);
 		}
 		
 		protected float getTargetEfficiencyBonus(LivingEntity caster, LivingEntity target, SpellEffectPart effect, SpellAction action, float base, ISpellLogBuilder log) {
 			float bonus = 0f;
 			
 			if (effect.getElement() != EMagicElement.PHYSICAL) {
-				final Effect boostEffect = ElementalSpellBoostEffect.GetForElement(effect.getElement().getOpposite());
+				final MobEffect boostEffect = ElementalSpellBoostEffect.GetForElement(effect.getElement().getOpposite());
 				if (target.getEffect(boostEffect) != null) {
 					final float amt = .25f * (1 + target.getEffect(boostEffect).getAmplifier());
 					bonus += amt;
@@ -380,7 +380,7 @@ public class Spell {
 					if (!affectedPos.isEmpty())
 					for (SpellLocation affectPos : affectedPos) {
 						NostrumMagica.instance.proxy.spawnSpellEffectVfx(affectPos.world, part,
-								caster, null, null, new Vector3d(affectPos.selectedBlockPos.getX() + .5, affectPos.selectedBlockPos.getY(), affectPos.selectedBlockPos.getZ() + .5)
+								caster, null, null, new Vec3(affectPos.selectedBlockPos.getX() + .5, affectPos.selectedBlockPos.getY(), affectPos.selectedBlockPos.getZ() + .5)
 								);
 					}
 				}
@@ -395,8 +395,8 @@ public class Spell {
 			if (anySuccess) {
 				if (attr != null && attr.hasSkill(NostrumSkills.Spellcasting_ElemLinger)) {
 					for (Entry<LivingEntity, EMagicElement> entry : entityLastElement.entrySet()) {
-						final Effect effect = ElementalSpellBoostEffect.GetForElement(entry.getValue());
-						entry.getKey().addEffect(new EffectInstance(effect, 20 * 5, 0));
+						final MobEffect effect = ElementalSpellBoostEffect.GetForElement(entry.getValue());
+						entry.getKey().addEffect(new MobEffectInstance(effect, 20 * 5, 0));
 					}
 				}
 			} else {
@@ -471,7 +471,7 @@ public class Spell {
 		}
 
 		@Override
-		protected void spawnShape(SpellShapePart shape, LivingEntity targ, World world, SpellLocation location) {
+		protected void spawnShape(SpellShapePart shape, LivingEntity targ, Level world, SpellLocation location) {
 			// For every spawned shape, we should get their special preview parts.
 			// Doing this may recurse into triggering this state, but that's alright.
 			// Automatically add the target/targetPos to the preview if provided, though.
@@ -483,8 +483,8 @@ public class Spell {
 			}
 			
 			shape.getShape().addToPreview(previewBuilder, this, targ, location,
-					(targ == null ? -90.0f : targ.xRot),
-					(targ == null ? 0.0f : targ.yRot),
+					(targ == null ? -90.0f : targ.getXRot()),
+					(targ == null ? 0.0f : targ.getYRot()),
 					shape.getProperties(), this.spell.getCharacteristics());
 		}
 		
@@ -502,12 +502,12 @@ public class Spell {
 		}
 
 		@Override
-		protected void doFailEffect(World world, Vector3d pos) {
+		protected void doFailEffect(Level world, Vec3 pos) {
 			;
 		}
 
 		@Override
-		protected void playContinueEffect(World world, Vector3d where) {
+		protected void playContinueEffect(Level world, Vec3 where) {
 			;
 		}
 
@@ -657,7 +657,7 @@ public class Spell {
 		}
 		
 		final ISpellLogBuilder logger;
-		if (caster instanceof PlayerEntity && NostrumMagica.instance.proxy.hasIntegratedServer()) {
+		if (caster instanceof Player && NostrumMagica.instance.proxy.hasIntegratedServer()) {
 			SpellLogEntry log = new SpellLogEntry(this, caster);
 			logger = new SpellLogBuilder(log);
 		} else {
@@ -667,11 +667,11 @@ public class Spell {
 		state.trigger(Lists.newArrayList(caster), null);
 		
 		NostrumMagicaSounds.CAST_LAUNCH.play(caster);
-		if (caster instanceof PlayerEntity) {
-			PlayerStatTracker.Update((PlayerEntity) caster, (stats) -> stats.incrStat(PlayerStat.SpellsCast).addStat(PlayerStat.TotalSpellWeight, weight));
+		if (caster instanceof Player) {
+			PlayerStatTracker.Update((Player) caster, (stats) -> stats.incrStat(PlayerStat.SpellsCast).addStat(PlayerStat.TotalSpellWeight, weight));
 			
-			if (caster instanceof ServerPlayerEntity) {
-				CastSpellCriteriaTrigger.Instance.trigger((ServerPlayerEntity) caster);
+			if (caster instanceof ServerPlayer) {
+				CastSpellCriteriaTrigger.Instance.trigger((ServerPlayer) caster);
 			}
 		}
 	}
@@ -813,7 +813,7 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction().status(Effects.WEAKNESS, duration, amp)
+			return new SpellAction().status(MobEffects.WEAKNESS, duration, amp)
 					.status(NostrumEffects.magicWeakness, duration, amp, (caster, target, eff) -> {
 						// Only apply with physical inflict skill
 						INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
@@ -832,20 +832,20 @@ public class Spell {
 				}
 			}).name("rooted");
 		case ENDER:
-			return new SpellAction().status(Effects.BLINDNESS, duration, amp).status(NostrumEffects.mobBlindness, duration, amp, (caster, target, eff) -> {
+			return new SpellAction().status(MobEffects.BLINDNESS, duration, amp).status(NostrumEffects.mobBlindness, duration, amp, (caster, target, eff) -> {
 				// With the inflict skill (or if non-player), apply to mobs
-				if (target instanceof MobEntity) {
+				if (target instanceof Mob) {
 					INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-					if (!(caster instanceof PlayerEntity) || (attr != null && attr.hasSkill(NostrumSkills.Ender_Inflict))) {
+					if (!(caster instanceof Player) || (attr != null && attr.hasSkill(NostrumSkills.Ender_Inflict))) {
 						return true;
 					}
 				}
 				return false;
 			}).resetTarget((caster, target, eff) -> {
 				// With the inflict skill, reset target to none
-				if (target instanceof MobEntity) {
+				if (target instanceof Mob) {
 					INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-					if (!(caster instanceof PlayerEntity) || (attr != null && attr.hasSkill(NostrumSkills.Ender_Inflict))) {
+					if (!(caster instanceof Player) || (attr != null && attr.hasSkill(NostrumSkills.Ender_Inflict))) {
 						return true;
 					}
 				}
@@ -879,7 +879,7 @@ public class Spell {
 				return false;
 			}).name("frostbite");
 		case LIGHTNING:
-			return new SpellAction().status(Effects.MOVEMENT_SLOWDOWN, (int) (duration * .7), amp)
+			return new SpellAction().status(MobEffects.MOVEMENT_SLOWDOWN, (int) (duration * .7), amp)
 					.status(NostrumEffects.immobilize, 30 + (10 * elementCount) , amp, (caster, target, eff) -> {
 						// Only apply with lightning inflict skill
 						INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
@@ -890,7 +890,7 @@ public class Spell {
 					})
 					.name("slowness");
 		case WIND:
-			return new SpellAction().status(Effects.POISON, duration, amp).name("poison");
+			return new SpellAction().status(MobEffects.POISON, duration, amp).name("poison");
 		}
 		
 		return null;
@@ -901,13 +901,13 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction().status(Effects.DAMAGE_RESISTANCE, duration, amp).name("resistance");
+			return new SpellAction().status(MobEffects.DAMAGE_RESISTANCE, duration, amp).name("resistance");
 		case EARTH:
-			return new SpellAction().status(Effects.DAMAGE_BOOST, duration, amp).name("strength");
+			return new SpellAction().status(MobEffects.DAMAGE_BOOST, duration, amp).name("strength");
 		case ENDER:
-			return new SpellAction().status(Effects.INVISIBILITY, duration, amp).name("invisibility");
+			return new SpellAction().status(MobEffects.INVISIBILITY, duration, amp).name("invisibility");
 		case FIRE:
-			return new SpellAction().status(Effects.FIRE_RESISTANCE, duration, amp).name("fireresist");
+			return new SpellAction().status(MobEffects.FIRE_RESISTANCE, duration, amp).name("fireresist");
 		case ICE:
 			return new SpellAction().dispel(elementCount * (int) (Math.pow(3, elementCount - 1))).name("dispel");
 		case LIGHTNING:
@@ -924,7 +924,7 @@ public class Spell {
 		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction().status(Effects.ABSORPTION, duration * 5, amp).name("lifeboost");
+			return new SpellAction().status(MobEffects.ABSORPTION, duration * 5, amp).name("lifeboost");
 		case EARTH:
 			return new SpellAction().status(NostrumEffects.physicalShield, duration, (caster, target, eff) -> {
 				// With the support skill, give 2 extra levels of shield
@@ -951,8 +951,8 @@ public class Spell {
 		case LIGHTNING:
 			return new SpellAction().pull(5 * elementCount, elementCount).name("pull");
 		case WIND:
-			return new SpellAction().status(Effects.MOVEMENT_SPEED, duration, amp)
-					.status(Effects.DIG_SPEED, duration, amp, (caster, target, eff) -> {
+			return new SpellAction().status(MobEffects.MOVEMENT_SPEED, duration, amp)
+					.status(MobEffects.DIG_SPEED, duration, amp, (caster, target, eff) -> {
 						// With the support skill, also give haste
 						INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 						if (attr != null && attr.hasSkill(NostrumSkills.Wind_Support)) {
@@ -979,7 +979,7 @@ public class Spell {
 				return false;
 			}).name("food");
 		case EARTH:
-			return new SpellAction().status(Effects.REGENERATION, duration, amp).name("regen");
+			return new SpellAction().status(MobEffects.REGENERATION, duration, amp).name("regen");
 		case ENDER:
 			return new SpellAction().swap().swapStatus((caster, target, eff) -> {
 				// Only apply with ender growth skill
@@ -992,7 +992,7 @@ public class Spell {
 		case FIRE:
 			return new SpellAction().dropEquipment(elementCount, (caster, target, eff) -> {
 				// Only apply with fire growth skill AND if a mob
-				if (target instanceof MobEntity) {
+				if (target instanceof Mob) {
 					INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 					if (attr != null && attr.hasSkill(NostrumSkills.Fire_Growth)) {
 						return true;
@@ -1003,7 +1003,7 @@ public class Spell {
 		case ICE:
 			return new SpellAction().heal(4f * elementCount).name("heal");
 		case LIGHTNING:
-			return new SpellAction().status(Effects.JUMP, duration, amp)
+			return new SpellAction().status(MobEffects.JUMP, duration, amp)
 					.status(NostrumEffects.bonusJump, duration, 0, (caster, target, eff) -> {
 						// With the growth skill, also give jump boost
 						INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
@@ -1079,7 +1079,7 @@ public class Spell {
 					return !NostrumMagica.IsSameTeam(caster, target);
 				}
 				return true;
-			}).status(Effects.SLOW_FALLING, duration, amp, (caster, target, eff) -> {
+			}).status(MobEffects.SLOW_FALLING, duration, amp, (caster, target, eff) -> {
 				// With the corrupt skill, apply slowfall to friendlies
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 				if (attr != null && attr.hasSkill(NostrumSkills.Wind_Corrupt)) {
@@ -1099,23 +1099,23 @@ public class Spell {
 	private static final String NBT_EFFECT_LIST = "effects";
 	private static final String NBT_ICON_INDEX = "ico_index";
 	
-	public CompoundNBT toNBT() {
-		CompoundNBT compound = new CompoundNBT();
+	public CompoundTag toNBT() {
+		CompoundTag compound = new CompoundTag();
 		compound.putString(NBT_SPELL_NAME, name);
 		compound.putInt(NBT_ICON_INDEX, iconIndex);
 		compound.putInt(NBT_MANA_COST, manaCost);
 		compound.putInt(NBT_WEIGHT, weight);
 		
-		ListNBT list = new ListNBT();
+		ListTag list = new ListTag();
 		for (SpellShapePart part : shapes) {
-			CompoundNBT tag = part.toNBT(null);
+			CompoundTag tag = part.toNBT(null);
 			list.add(tag);
 		}
 		compound.put(NBT_SHAPE_LIST, list);
 		
-		list = new ListNBT();
+		list = new ListTag();
 		for (SpellEffectPart part : parts) {
-			CompoundNBT tag = part.toNBT(null);
+			CompoundTag tag = part.toNBT(null);
 			list.add(tag);
 		}
 		compound.put(NBT_EFFECT_LIST, list);
@@ -1130,7 +1130,7 @@ public class Spell {
 	 * @param id
 	 * @return
 	 */
-	public static Spell fromNBT(CompoundNBT nbt, int id) {
+	public static Spell fromNBT(CompoundTag nbt, int id) {
 		if (nbt == null)
 			return null;
 		
@@ -1150,15 +1150,15 @@ public class Spell {
 		spell.registryID = id;
 		spell.iconIndex = index;
 		
-		ListNBT list = nbt.getList(NBT_SHAPE_LIST, NBT.TAG_COMPOUND);
+		ListTag list = nbt.getList(NBT_SHAPE_LIST, Tag.TAG_COMPOUND);
 		for (int i = 0; i < list.size(); i++) {
-			CompoundNBT tag = list.getCompound(i);
+			CompoundTag tag = list.getCompound(i);
 			spell.addPart(SpellShapePart.FromNBT(tag));
 		}
 		
-		list = nbt.getList(NBT_EFFECT_LIST, NBT.TAG_COMPOUND);
+		list = nbt.getList(NBT_EFFECT_LIST, Tag.TAG_COMPOUND);
 		for (int i = 0; i < list.size(); i++) {
-			CompoundNBT tag = list.getCompound(i);
+			CompoundTag tag = list.getCompound(i);
 			spell.addPart(SpellEffectPart.FromNBT(tag));
 		}
 		
@@ -1247,7 +1247,7 @@ public class Spell {
 	 * For example, seeking bullet needs the player to be looking at an enemy to select who to go after.
 	 * @return
 	 */
-	public boolean shouldTrace(PlayerEntity player) {
+	public boolean shouldTrace(Player player) {
 		if (!getSpellShapeParts().isEmpty()) {
 			SpellShapePart firstShape = getSpellShapeParts().get(0);
 			return firstShape.getShape().shouldTrace(player, firstShape.getProperties());
@@ -1256,7 +1256,7 @@ public class Spell {
 		return false;
 	}
 	
-	public double getTraceRange(PlayerEntity player) {
+	public double getTraceRange(Player player) {
 		if (!getSpellShapeParts().isEmpty()) {
 			SpellShapePart firstShape = getSpellShapeParts().get(0);
 			return firstShape.getShape().getTraceRange(player, firstShape.getProperties());

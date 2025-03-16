@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.gui.petgui.arcanewolf;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.ArcaneWolfElementalType;
@@ -16,14 +16,14 @@ import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
 import com.smanzana.petcommand.api.client.petgui.PetGUIRenderHelper;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -72,11 +72,11 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 	private static int GUI_GEM_SPARK_HEIGHT = 21;
 	
 	protected final ArcaneWolfEntity pet;
-	protected final Inventory localInv;
+	protected final SimpleContainer localInv;
 	
 	public ArcaneWolfTrainingSheet(ArcaneWolfEntity pet) {
 		this.pet = pet;
-		localInv = new Inventory(5);
+		localInv = new SimpleContainer(5);
 	}
 	
 	protected SlotMode getSlotMode(ArcaneWolfEntity wolf) {
@@ -264,7 +264,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		}
 	}
 	
-	protected void onSlotChange(ArcaneWolfEntity wolf, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container) {
+	protected void onSlotChange(ArcaneWolfEntity wolf, Player player, IPetContainer<ArcaneWolfEntity> container) {
 		
 		// See if all slots are filled and if we should start training
 		final SlotMode mode = getSlotMode(wolf);
@@ -307,7 +307,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 	}
 	
 	@Override
-	public void showSheet(ArcaneWolfEntity pet, PlayerEntity player, IPetContainer<ArcaneWolfEntity> petContainer, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(ArcaneWolfEntity pet, Player player, IPetContainer<ArcaneWolfEntity> petContainer, int width, int height, int offsetX, int offsetY) {
 		final int cellWidth = 18;
 		final int invRow = 9;
 		final int invWidth = cellWidth * invRow;
@@ -351,7 +351,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 			petContainer.addSheetSlot(slotIn);
 		}
 		
-		IInventory playerInv = player.inventory;
+		Container playerInv = player.inventory;
 		for (int i = 0; i < playerInvSize; i++) {
 			Slot slotIn = new Slot(playerInv, (i + 9) % 36, leftOffset + offsetX + (cellWidth * (i % invRow)),
 					(i < 27 ? 0 : 10) + playerTopOffset + offsetY + (cellWidth * (i / invRow)));
@@ -360,13 +360,13 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 	}
 
 	@Override
-	public void hideSheet(ArcaneWolfEntity pet, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container) {
+	public void hideSheet(ArcaneWolfEntity pet, Player player, IPetContainer<ArcaneWolfEntity> container) {
 		container.dropContainerInventory(localInv);
 		container.clearSlots();
 	}
 
 	@Override
-	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void draw(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		// Draw sheet
 		matrixStackIn.pushPose();
 		{
@@ -593,7 +593,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 	}
 
 	@Override
-	public void handleMessage(CompoundNBT data) {
+	public void handleMessage(CompoundTag data) {
 		
 	}
 
@@ -608,7 +608,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 	}
 
 	@Override
-	public void overlay(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void overlay(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		
 	}
 

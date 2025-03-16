@@ -2,17 +2,17 @@ package com.smanzana.nostrummagica.client.gui.widget;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.network.chat.Component;
 
 public abstract class ObscurableWidget extends FixedWidget {
 
-	protected @Nullable Rectangle2d bounds;
+	protected @Nullable Rect2i bounds;
 	protected boolean hidden;
 	
-	public ObscurableWidget(int x, int y, int width, int height, ITextComponent label) {
+	public ObscurableWidget(int x, int y, int width, int height, Component label) {
 		super(x, y, width, height, label);
 		bounds = null;
 		hidden = false;
@@ -26,12 +26,12 @@ public abstract class ObscurableWidget extends FixedWidget {
 		return this.hidden;
 	}
 	
-	public void setBounds(Rectangle2d bounds) {
+	public void setBounds(Rect2i bounds) {
 		this.bounds = bounds;
 	}
 	
 	public void setBounds(int x, int y, int width, int height) {
-		setBounds(new Rectangle2d(x, y, width, height));
+		setBounds(new Rect2i(x, y, width, height));
 	}
 	
 	public void setX(int x) {
@@ -58,7 +58,7 @@ public abstract class ObscurableWidget extends FixedWidget {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+	public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		// Check bounds
 		this.visible = !isHidden() && inBounds();
 		super.render(matrixStack, mouseX, mouseY, partialTicks);

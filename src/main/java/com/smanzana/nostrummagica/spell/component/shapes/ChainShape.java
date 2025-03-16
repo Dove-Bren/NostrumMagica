@@ -24,19 +24,19 @@ import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 
 public class ChainShape extends InstantShape implements ISelectableShape {
 
@@ -72,7 +72,7 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 		private final Map<LivingEntity, List<LivingEntity>> entLinks;
 		private final Map<SpellLocation, List<SpellLocation>> blockLinks;
 		
-		public ChainTriggerData(List<LivingEntity> targets, World world, List<SpellLocation> locations,
+		public ChainTriggerData(List<LivingEntity> targets, Level world, List<SpellLocation> locations,
 				Map<LivingEntity, List<LivingEntity>> entityLinks,
 				Map<SpellLocation, List<SpellLocation>> blockLinks) {
 			super(targets, locations);
@@ -89,7 +89,7 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 		}
 	}
 	
-	protected void getEntLinks(List<LivingEntity> entsAffected, Map<LivingEntity, List<LivingEntity>> entLinks, LivingEntity target, World world, double radius, int arc, boolean teamLock) {
+	protected void getEntLinks(List<LivingEntity> entsAffected, Map<LivingEntity, List<LivingEntity>> entLinks, LivingEntity target, Level world, double radius, int arc, boolean teamLock) {
 		final Set<Entity> seen = new HashSet<>();
 		final List<LivingEntity> next = new ArrayList<>(arc * 2);
 		
@@ -112,7 +112,7 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 			
 			// Find any other eligible entities around them
 			List<Entity> entities = world.getEntities((Entity) null, 
-					new AxisAlignedBB(center.getX() - radius,
+					new AABB(center.getX() - radius,
 								center.getY() - radius,
 								center.getZ() - radius,
 								center.getX() + radius,
@@ -172,13 +172,13 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 		WorldUtil.WalkConnectedBlocks(location.world, location.selectedBlockPos, new IBlockWalker() {
 
 			@Override
-			public boolean canVisit(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos, BlockState state, int distance) {
+			public boolean canVisit(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos, BlockState state, int distance) {
 				return blocksAreSimilar(startState, state);
 			}
 
 			@Override
-			public boolean walk(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos, BlockState state, int distance, int walkCount) {
-				final SpellLocation loc = new SpellLocation((World) world, pos);
+			public boolean walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos, BlockState state, int distance, int walkCount) {
+				final SpellLocation loc = new SpellLocation((Level) world, pos);
 				locsAffected.add(loc);
 				locLinks.computeIfAbsent(location, (l) -> new ArrayList<>()).add(loc);
 				
@@ -195,7 +195,7 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 	@Override
 	protected ChainTriggerData getTargetData(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		double radius = 7.0;
-		World world = location.world;
+		Level world = location.world;
 		if (world == null)
 			world = state.getSelf().getCommandSenderWorld();
 		int arc = getMaxArcs(params) + 1; // +1 to include center
@@ -211,9 +211,9 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 				firstEnt = entity;
 			} else {
 				// Find nearest start entity
-				final Vector3d center = location.hitPosition;
+				final Vec3 center = location.hitPosition;
 				List<Entity> entities = world.getEntities((Entity) null, 
-						new AxisAlignedBB(center.x() - radius,
+						new AABB(center.x() - radius,
 									center.y() - radius,
 									center.z() - radius,
 									center.x() + radius,
@@ -288,7 +288,7 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
+	public boolean shouldTrace(Player player, SpellShapeProperties params) {
 		return false;
 	}
 	
@@ -311,8 +311,8 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 					
 					final List<LivingEntity> affected = data.entLinks.get(source);
 					if (affected != null && affected.contains(target)) {
-						final Vector3d sourcePos = source.getPosition(partialTicks).add(0, source.getBbHeight() / 2, 0);
-						final Vector3d targetPos = target.getPosition(partialTicks).add(0, target.getBbHeight() / 2, 0);
+						final Vec3 sourcePos = source.getPosition(partialTicks).add(0, source.getBbHeight() / 2, 0);
+						final Vec3 targetPos = target.getPosition(partialTicks).add(0, target.getBbHeight() / 2, 0);
 						builder.add(new SpellShapePreviewComponent.Line(sourcePos, targetPos));
 					}
 				}

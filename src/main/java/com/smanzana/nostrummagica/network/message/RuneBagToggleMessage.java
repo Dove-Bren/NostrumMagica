@@ -6,12 +6,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.item.equipment.RuneBag;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client has toggled vacuum setting on their rune bag
@@ -22,7 +22,7 @@ public class RuneBagToggleMessage {
 
 	public static void handle(RuneBagToggleMessage message, Supplier<NetworkEvent.Context> ctx) {
 		// Is it on?
-		ServerPlayerEntity sp = ctx.get().getSender();
+		ServerPlayer sp = ctx.get().getSender();
 		ctx.get().setPacketHandled(true);
 		ctx.get().enqueueWork(()-> {
 			ItemStack bag;
@@ -49,11 +49,11 @@ public class RuneBagToggleMessage {
 		this.isOn = isOn;
 	}
 
-	public static RuneBagToggleMessage decode(PacketBuffer buf) {
+	public static RuneBagToggleMessage decode(FriendlyByteBuf buf) {
 		return new RuneBagToggleMessage(buf.readBoolean(), buf.readBoolean());
 	}
 
-	public static void encode(RuneBagToggleMessage msg, PacketBuffer buf) {
+	public static void encode(RuneBagToggleMessage msg, FriendlyByteBuf buf) {
 		buf.writeBoolean(msg.isMainHand);
 		buf.writeBoolean(msg.isOn);
 	}

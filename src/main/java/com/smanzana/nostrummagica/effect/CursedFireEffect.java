@@ -4,18 +4,18 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 
-public class CursedFireEffect extends Effect {
+public class CursedFireEffect extends MobEffect {
 
 	public static final String ID = "cursed_fire";
 	
 	public CursedFireEffect() {
-		super(EffectType.HARMFUL, 0xFFB028B9);
+		super(MobEffectCategory.HARMFUL, 0xFFB028B9);
 		
 		this.addAttributeModifier(Attributes.ATTACK_SPEED,
 				"30886707-7d8b-424d-b1f5-ccf8b4dd8173", -.2D, AttributeModifier.Operation.MULTIPLY_TOTAL);

@@ -3,16 +3,16 @@ package com.smanzana.nostrummagica.criteria;
 import com.google.gson.JsonObject;
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.advancements.criterion.AbstractCriterionTrigger;
-import net.minecraft.advancements.criterion.CriterionInstance;
-import net.minecraft.advancements.criterion.EntityPredicate;
-import net.minecraft.advancements.criterion.EntityPredicate.AndPredicate;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.loot.ConditionArrayParser;
-import net.minecraft.loot.ConditionArraySerializer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
+import net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance;
+import net.minecraft.advancements.critereon.EntityPredicate;
+import net.minecraft.advancements.critereon.EntityPredicate.Composite;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.advancements.critereon.DeserializationContext;
+import net.minecraft.advancements.critereon.SerializationContext;
+import net.minecraft.resources.ResourceLocation;
 
-public class RitualCriteriaTrigger extends AbstractCriterionTrigger<RitualCriteriaTrigger.Instance> {
+public class RitualCriteriaTrigger extends SimpleCriterionTrigger<RitualCriteriaTrigger.Instance> {
 
 	private static final ResourceLocation ID = NostrumMagica.Loc("ritual");
 	public static final RitualCriteriaTrigger Instance = new RitualCriteriaTrigger();
@@ -23,22 +23,22 @@ public class RitualCriteriaTrigger extends AbstractCriterionTrigger<RitualCriter
 	}
 	
 	@Override
-	public RitualCriteriaTrigger.Instance createInstance(JsonObject json, EntityPredicate.AndPredicate entityPredicate, ConditionArrayParser conditionsParser) {
+	public RitualCriteriaTrigger.Instance createInstance(JsonObject json, EntityPredicate.Composite entityPredicate, DeserializationContext conditionsParser) {
 		final String ritual = json.get("ritual").getAsString();
 		return new Instance(entityPredicate, ritual);
 	}
 	
-	public void trigger(ServerPlayerEntity player, String ritual) {
+	public void trigger(ServerPlayer player, String ritual) {
 		this.trigger(player, (instance) -> {
 			return instance.test(ritual);
 		});
 	}
 	
-	public static class Instance extends CriterionInstance {
+	public static class Instance extends AbstractCriterionTriggerInstance {
 		
 		private final String ritualKey;
 
-		public Instance(AndPredicate playerCondition, String ritualKey) {
+		public Instance(Composite playerCondition, String ritualKey) {
 			super(RitualCriteriaTrigger.ID, playerCondition);
 			this.ritualKey = ritualKey;
 		}
@@ -48,7 +48,7 @@ public class RitualCriteriaTrigger extends AbstractCriterionTrigger<RitualCriter
 		}
 		
 		@Override
-		public JsonObject serializeToJson(ConditionArraySerializer conditions) {
+		public JsonObject serializeToJson(SerializationContext conditions) {
 			JsonObject obj = super.serializeToJson(conditions);
 			obj.addProperty("ritual", this.ritualKey);
 			return obj;

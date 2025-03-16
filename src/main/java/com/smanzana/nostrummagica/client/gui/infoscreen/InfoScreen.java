@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -16,11 +16,11 @@ import com.smanzana.nostrummagica.client.gui.StackableScreen;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.AbstractButton;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.client.gui.GuiUtils;
@@ -41,7 +41,7 @@ public class InfoScreen extends StackableScreen {
 	private List<TabButton> tabs;
 	private List<InfoButton> infoButtons;
 	private IInfoSubScreen subscreen;
-	private List<Widget> subscreenButtons;
+	private List<AbstractWidget> subscreenButtons;
 	
 	protected int globButtonID = 0;
 	
@@ -145,7 +145,7 @@ public class InfoScreen extends StackableScreen {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 
 		RenderFuncs.drawRect(matrixStackIn, 0, 0, width, height, 0xFF000000);
 		
@@ -192,7 +192,7 @@ public class InfoScreen extends StackableScreen {
 		// Only show sub buttons if mouseY is lower than button  vertical offset
 		if (mouseY > POS_SUBSCREEN_VOFFSET) {
 			for (int i = 0; i < this.buttons.size(); ++i) {
-				Widget w = this.buttons.get(i);
+				AbstractWidget w = this.buttons.get(i);
 				if (w instanceof IForegroundRenderable) {
 					((IForegroundRenderable)this.buttons.get(i)).renderForeground(matrixStackIn, mouseX, mouseY, partialTicks);
 				}
@@ -200,7 +200,7 @@ public class InfoScreen extends StackableScreen {
 		}
 		
 		for (int i = 0; i < this.tabs.size(); ++i) {
-			Widget w = this.buttons.get(i);
+			AbstractWidget w = this.buttons.get(i);
 			if (w instanceof IForegroundRenderable) {
 				((IForegroundRenderable)this.buttons.get(i)).renderForeground(matrixStackIn, mouseX, mouseY, partialTicks);
 			}
@@ -236,14 +236,14 @@ public class InfoScreen extends StackableScreen {
 			
 			yOffset += POS_SUBSCREEN_VOFFSET;
 						
-			Collection<Widget> screenbutts = subscreen.getWidgets(xOffset, yOffset, width - xOffset, height - yOffset);
+			Collection<AbstractWidget> screenbutts = subscreen.getWidgets(xOffset, yOffset, width - xOffset, height - yOffset);
 			if (screenbutts != null && !screenbutts.isEmpty())
 				this.subscreenButtons.addAll(screenbutts);
 		}
 		
 		if (!this.subscreenButtons.isEmpty() && this.subscreenButtons.stream().allMatch(b -> b.x == 0 && b.y == 0)) {
 			int i = 0;
-			for (Widget butt : subscreenButtons) {
+			for (AbstractWidget butt : subscreenButtons) {
 				butt.x = i;
 				i += butt.getWidth() + 2;
 				butt.y = this.height - 15;
@@ -253,9 +253,9 @@ public class InfoScreen extends StackableScreen {
 		this.buttons.clear();
 		this.children.clear();
 		
-		for (Widget w : this.tabs) { this.addButton(w); }
-		for (Widget w : this.infoButtons) { this.addButton(w); }
-		for (Widget w : this.subscreenButtons) { this.addButton(w); }
+		for (AbstractWidget w : this.tabs) { this.addButton(w); }
+		for (AbstractWidget w : this.infoButtons) { this.addButton(w); }
+		for (AbstractWidget w : this.subscreenButtons) { this.addButton(w); }
 //		this.buttons.addAll(this.tabs);
 //		this.buttons.addAll(this.infoButtons);
 //		this.buttons.addAll(this.subscreenButtons);
@@ -271,9 +271,9 @@ public class InfoScreen extends StackableScreen {
 		this.buttons.clear();
 		this.children.clear();
 		
-		for (Widget w : this.tabs) { this.addButton(w); }
-		for (Widget w : this.infoButtons) { this.addButton(w); }
-		for (Widget w : this.subscreenButtons) { this.addButton(w); }
+		for (AbstractWidget w : this.tabs) { this.addButton(w); }
+		for (AbstractWidget w : this.infoButtons) { this.addButton(w); }
+		for (AbstractWidget w : this.subscreenButtons) { this.addButton(w); }
 //		this.buttons.addAll(this.tabs);
 //		this.buttons.addAll(this.infoButtons);
 //		this.buttons.addAll(this.subscreenButtons);
@@ -346,11 +346,11 @@ public class InfoScreen extends StackableScreen {
 		private static final int TEXT_BUTTON_TAB_WIDTH = 32;
         private InfoScreenTab tab;
         private List<InfoButton> buttons;
-        private List<ITextComponent> desc;
+        private List<Component> desc;
 
         public TabButton(int parPosX, int parPosY, 
         		INostrumMagic attr, InfoScreenTab tab) {
-            super(parPosX, parPosY, TEXT_BUTTON_TAB_WIDTH, TEXT_BUTTON_TAB_WIDTH, StringTextComponent.EMPTY);
+            super(parPosX, parPosY, TEXT_BUTTON_TAB_WIDTH, TEXT_BUTTON_TAB_WIDTH, TextComponent.EMPTY);
             this.tab = tab;
             this.buttons = tab.getButtons(InfoScreen.this, attr);
             
@@ -362,7 +362,7 @@ public class InfoScreen extends StackableScreen {
             if (name.contains("_")) {
             	name = name.substring(name.indexOf('_') + 1);
             }
-            desc.add(new StringTextComponent(name.substring(0, 1).toUpperCase() + name.toLowerCase().substring(1)));
+            desc.add(new TextComponent(name.substring(0, 1).toUpperCase() + name.toLowerCase().substring(1)));
         }
         
         public List<InfoButton> getButtons() {
@@ -373,7 +373,7 @@ public class InfoScreen extends StackableScreen {
          * Draws this button to the screen.
          */
         @Override
-        public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
+        public void render(PoseStack matrixStackIn, int parX, int parY, float partialTicks) {
             if (visible)
             {
             	final int itemLength = 18;
@@ -401,7 +401,7 @@ public class InfoScreen extends StackableScreen {
             }
         }
         
-    	public void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+    	public void renderForeground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
     		if (mouseX >= this.x && mouseY > this.y
     			&& mouseX <= this.x + this.width
     			&& mouseY <= this.y + this.height) {

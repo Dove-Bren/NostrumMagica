@@ -10,37 +10,37 @@ import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.NonNullEnumMap;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.EntitySize;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.Pose;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap.MutableAttribute;
-import net.minecraft.entity.ai.controller.FlyingMovementController;
-import net.minecraft.entity.monster.MonsterEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.pathfinding.FlyingNodeProcessor;
-import net.minecraft.pathfinding.FlyingPathNavigator;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder;
+import net.minecraft.world.entity.ai.control.FlyingMoveControl;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.level.pathfinder.FlyNodeEvaluator;
+import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public abstract class DragonEntity extends MonsterEntity {
+public abstract class DragonEntity extends Monster {
 	
 	//protected EntitySize size;
 	//protected AxisAlignedBB entityBBOverride;
 	
-	public DragonEntity(EntityType<? extends DragonEntity> type, World worldIn) {
+	public DragonEntity(EntityType<? extends DragonEntity> type, Level worldIn) {
         super(type, worldIn);
     }
 	
@@ -103,17 +103,17 @@ public abstract class DragonEntity extends MonsterEntity {
     }
 
 	@Override
-    protected float getStandingEyeHeight(Pose pose, EntitySize size) {
+    protected float getStandingEyeHeight(Pose pose, EntityDimensions size) {
         return this.getBbHeight() * 0.95F;
     }
 
     @Override
-    public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand) {
-        return ActionResultType.PASS;
+    public InteractionResult /*processInteract*/ mobInteract(Player player, InteractionHand hand) {
+        return InteractionResult.PASS;
     }
 
 	@Override
-    public boolean canBeLeashed(PlayerEntity player) {
+    public boolean canBeLeashed(Player player) {
         return false;
     }
 
@@ -131,7 +131,7 @@ public abstract class DragonEntity extends MonsterEntity {
 	
 	public abstract boolean isCasting();
 	
-	static class DragonFlyMoveHelper extends FlyingMovementController {
+	static class DragonFlyMoveHelper extends FlyingMoveControl {
         protected final DragonEntity parentEntity;
         //private double lastDist;
         //private int courseChangeCooldown;
@@ -142,16 +142,16 @@ public abstract class DragonEntity extends MonsterEntity {
         }
     }
 	
-	static public class FlyNodeProcessor extends FlyingNodeProcessor {
+	static public class FlyNodeProcessor extends FlyNodeEvaluator {
 	}
 	
-	static public class PathNavigatorDragonFlier extends FlyingPathNavigator {
-	    public PathNavigatorDragonFlier(MobEntity entitylivingIn, World worldIn) {
+	static public class PathNavigatorDragonFlier extends FlyingPathNavigation {
+	    public PathNavigatorDragonFlier(Mob entitylivingIn, Level worldIn) {
 	        super(entitylivingIn, worldIn);
 	    }
 	}
 	
-	public static class DragonEquipmentInventory implements IInventory {
+	public static class DragonEquipmentInventory implements Container {
 		
 		public static interface IChangeListener {
 			/**
@@ -205,18 +205,18 @@ public abstract class DragonEntity extends MonsterEntity {
 			}
 		}
 		
-		public CompoundNBT serializeNBT() {
-			CompoundNBT tag = new CompoundNBT();
+		public CompoundTag serializeNBT() {
+			CompoundTag tag = new CompoundTag();
 			writeToNBT(tag);
 			return tag;
 		}
 		
-		public void writeToNBT(CompoundNBT nbt) {
-			ListNBT list = new ListNBT();
+		public void writeToNBT(CompoundTag nbt) {
+			ListTag list = new ListTag();
 			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
 				@Nonnull ItemStack stack = getStackInSlot(slot);
 				if (!stack.isEmpty()) {
-					CompoundNBT wrapper = new CompoundNBT();
+					CompoundTag wrapper = new CompoundTag();
 					wrapper.putString(NBT_SLOT, slot.name().toLowerCase());
 					wrapper.put(NBT_ITEM, stack.serializeNBT());
 					list.add(wrapper);
@@ -226,12 +226,12 @@ public abstract class DragonEntity extends MonsterEntity {
 			nbt.put(NBT_LIST, list);
 		}
 		
-		public void readFromNBT(CompoundNBT nbt) {
+		public void readFromNBT(CompoundTag nbt) {
 			this.clearContent();
 			
-			ListNBT list = nbt.getList(NBT_LIST, NBT.TAG_COMPOUND);
+			ListTag list = nbt.getList(NBT_LIST, NBT.TAG_COMPOUND);
 			for (int i = 0; i < list.size(); i++) {
-				CompoundNBT wrapper = list.getCompound(i);
+				CompoundTag wrapper = list.getCompound(i);
 				try {
 					DragonEquipmentSlot slot = DragonEquipmentSlot.valueOf(wrapper.getString(NBT_SLOT).toUpperCase());
 					ItemStack stack = ItemStack.of(wrapper.getCompound(NBT_ITEM));
@@ -247,7 +247,7 @@ public abstract class DragonEntity extends MonsterEntity {
 			}
 		}
 		
-		public static DragonEquipmentInventory FromNBT(CompoundNBT nbt) {
+		public static DragonEquipmentInventory FromNBT(CompoundTag nbt) {
 			DragonEquipmentInventory inventory = new DragonEquipmentInventory();
 			inventory.readFromNBT(nbt);
 			return inventory;
@@ -304,17 +304,17 @@ public abstract class DragonEntity extends MonsterEntity {
 		}
 
 		@Override
-		public boolean stillValid(PlayerEntity player) {
+		public boolean stillValid(Player player) {
 			return true;
 		}
 
 		@Override
-		public void startOpen(PlayerEntity player) {
+		public void startOpen(Player player) {
 			;
 		}
 
 		@Override
-		public void stopOpen(PlayerEntity player) {
+		public void stopOpen(Player player) {
 			;
 		}
 
@@ -355,7 +355,7 @@ public abstract class DragonEntity extends MonsterEntity {
 	}
 	
 	@Override
-	public @Nonnull ItemStack getItemBySlot(EquipmentSlotType slot) {
+	public @Nonnull ItemStack getItemBySlot(EquipmentSlot slot) {
 		// Adapt to dragon equipment slot system to take advantage of vanilla's equipment tracking
 		// and attribute system
 		final DragonEquipmentSlot dragonSlot = DragonEquipmentSlot.FindForSlot(slot);
@@ -367,8 +367,8 @@ public abstract class DragonEntity extends MonsterEntity {
 		}
 	}
 	
-	protected static final MutableAttribute BuildBaseDragonAttributes() {
-		return MonsterEntity.createMonsterAttributes();
+	protected static final Builder BuildBaseDragonAttributes() {
+		return Monster.createMonsterAttributes();
 	}
 	
 }

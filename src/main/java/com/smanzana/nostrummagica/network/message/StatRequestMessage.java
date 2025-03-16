@@ -6,9 +6,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client is requesting the stats for an entity
@@ -19,7 +19,7 @@ public class StatRequestMessage {
 
 	public static void handle(StatRequestMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
-		final ServerPlayerEntity sp = ctx.get().getSender();
+		final ServerPlayer sp = ctx.get().getSender();
 		
 		ctx.get().enqueueWork(() -> {
 			INostrumMagic att = NostrumMagica.getMagicWrapper(sp);
@@ -39,11 +39,11 @@ public class StatRequestMessage {
 		
 	}
 	
-	public static StatRequestMessage decode(PacketBuffer buf) {
+	public static StatRequestMessage decode(FriendlyByteBuf buf) {
 		return new StatRequestMessage();
 	}
 
-	public static void encode(StatRequestMessage msg, PacketBuffer buf) {
+	public static void encode(StatRequestMessage msg, FriendlyByteBuf buf) {
 		;
 	}
 

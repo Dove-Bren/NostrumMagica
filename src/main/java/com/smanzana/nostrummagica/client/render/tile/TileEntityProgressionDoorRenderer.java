@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -12,29 +12,29 @@ import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.tile.ProgressionDoorTileEntity;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Matrix3f;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 
-public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<ProgressionDoorTileEntity> {
+public class TileEntityProgressionDoorRenderer extends BlockEntityRenderer<ProgressionDoorTileEntity> {
 
 	public static final ResourceLocation TEX_GEM_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/gui/brass.png");
 	public static final ResourceLocation TEX_PLATE_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/block/ceramic_generic.png");
 	
-	public TileEntityProgressionDoorRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+	public TileEntityProgressionDoorRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
 		super(rendererDispatcherIn);
 	}
 	
 	@Override
-	public void render(ProgressionDoorTileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
-			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+	public void render(ProgressionDoorTileEntity tileEntityIn, float partialTicks, PoseStack matrixStackIn,
+			MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		final Minecraft mc = Minecraft.getInstance();
 		final double time = (double)tileEntityIn.getLevel().getGameTime() + partialTicks;
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(mc.player);
@@ -54,7 +54,7 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 		
 		// Draw lock symbol
 		{
-			final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.PROGRESSION_DOOR_LOCK);
+			final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.PROGRESSION_DOOR_LOCK);
 			
 			matrixStackIn.pushPose();
 			
@@ -145,7 +145,7 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 					final float plateHalfLength = imageHalfLength * 2;
 					final float radius = .75f;
 					
-					IVertexBuilder buffer = bufferIn.getBuffer(RenderType.entityCutoutNoCull(TEX_PLATE_LOC));
+					VertexConsumer buffer = bufferIn.getBuffer(RenderType.entityCutoutNoCull(TEX_PLATE_LOC));
 					
 					double effAngle = angle + (.04f * Math.cos(2 * Math.PI * (time % wiggleTicks) / wiggleTicks));
 					float vx = (float) (Math.cos(effAngle) * radius);
@@ -190,7 +190,7 @@ public class TileEntityProgressionDoorRenderer extends TileEntityRenderer<Progre
 			matrixStackIn.translate(0, 1.25, drawZ);
 			matrixStackIn.scale(-VANILLA_FONT_SCALE * 2, -VANILLA_FONT_SCALE * 2, VANILLA_FONT_SCALE * 2);
 			
-			FontRenderer fonter = this.renderer.font;
+			Font fonter = this.renderer.font;
 			fonter.drawInBatch(val, fonter.width(val) / -2, 0, color, false, matrixStackIn.last().pose(), bufferIn, false, 0x0, combinedLightIn);
 			matrixStackIn.popPose();
 		}

@@ -7,23 +7,23 @@ import com.smanzana.nostrummagica.entity.WispEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.ToolType;
 
 public class ManiCrystalBlock extends Block {
@@ -63,7 +63,7 @@ public class ManiCrystalBlock extends Block {
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(FACING);
 	}
 	
@@ -101,7 +101,7 @@ public class ManiCrystalBlock extends Block {
 //	}
 	
 	@Override
-	public void randomTick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
+	public void randomTick(BlockState state, ServerLevel worldIn, BlockPos pos, Random random) {
 		if (worldIn.isClientSide) {
 			return;
 		}
@@ -113,7 +113,7 @@ public class ManiCrystalBlock extends Block {
 		if (getLevel() > 0 && (getLevel() >= 2 || random.nextInt(2) <= getLevel())) {
 			
 			// Check if there are too many already
-			if (worldIn.getEntitiesOfClass(WispEntity.class, VoxelShapes.block().bounds().move(pos).inflate(20)).size() > 5) {
+			if (worldIn.getEntitiesOfClass(WispEntity.class, Shapes.block().bounds().move(pos).inflate(20)).size() > 5) {
 				return;
 			}
 			
@@ -137,7 +137,7 @@ public class ManiCrystalBlock extends Block {
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		switch (state.getValue(FACING)) {
 		case DOWN:
 			return HANGING_AABB;
@@ -156,12 +156,12 @@ public class ManiCrystalBlock extends Block {
 	}
 	
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return this.defaultBlockState().setValue(FACING, context.getClickedFace());
 	}
 	
 	@Override
-	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld world, BlockPos pos, BlockPos facingPos) {
+	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor world, BlockPos pos, BlockPos facingPos) {
 		if (!world.isClientSide()) {
 			Direction myFacing = stateIn.getValue(FACING);
 			if (myFacing == Direction.UP || myFacing == Direction.DOWN) {
@@ -182,28 +182,28 @@ public class ManiCrystalBlock extends Block {
 	 * Get a useful offset for this crystal for things like effects to go to to go 'to' the crystal
 	 * @return
 	 */
-	public Vector3d getCrystalTipOffset(BlockState state) {
+	public Vec3 getCrystalTipOffset(BlockState state) {
 		Direction facing = state.getValue(FACING);
-		Vector3d offset = Vector3d.ZERO;
+		Vec3 offset = Vec3.ZERO;
 		if (facing != null) {
 			switch (facing) {
 			case DOWN:
-				offset = new Vector3d(.5, .55, .5);
+				offset = new Vec3(.5, .55, .5);
 				break;
 			case UP:
-				offset = new Vector3d(.5, .8, .5);
+				offset = new Vec3(.5, .8, .5);
 				break;
 			case EAST:
-				offset = new Vector3d(.16, .5, .5);
+				offset = new Vec3(.16, .5, .5);
 				break;
 			case WEST:
-				offset = new Vector3d(1-.16, .5, .5);
+				offset = new Vec3(1-.16, .5, .5);
 				break;
 			case NORTH:
-				offset = new Vector3d(.5, .5, 1-.16);
+				offset = new Vec3(.5, .5, 1-.16);
 				break;
 			case SOUTH:
-				offset = new Vector3d(.5, .5, .16);
+				offset = new Vec3(.5, .5, .16);
 				break;
 			}
 		}

@@ -1,23 +1,23 @@
 package com.smanzana.nostrummagica.client.effects;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector4f;
+import net.minecraft.core.BlockPos;
+import com.mojang.math.Matrix4f;
+import net.minecraft.world.phys.Vec3;
+import com.mojang.math.Vector4f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public interface ClientEffectForm {
 	
-	public static void drawModel(MatrixStack matrixStackIn, IBakedModel model, int color, int packedLightIn) {
+	public static void drawModel(PoseStack matrixStackIn, BakedModel model, int color, int packedLightIn) {
 //		GlStateManager.disableBlend();
 //		//GlStateManager.disableAlphaTest();
 //		GlStateManager.disableTexture();
@@ -54,20 +54,20 @@ public interface ClientEffectForm {
 		//GlStateManager.depthMask(true);
 	}
 	
-	public static int InferLightmap(MatrixStack matrixStackIn, Minecraft mc) {
+	public static int InferLightmap(PoseStack matrixStackIn, Minecraft mc) {
 		if (mc.level != null) {
-			final Vector3d camera = mc.gameRenderer.getMainCamera().getPosition();
+			final Vec3 camera = mc.gameRenderer.getMainCamera().getPosition();
 			// Get position from final transform on matrix stack
 			final Matrix4f transform = matrixStackIn.last().pose();
 			final Vector4f origin = new Vector4f(1, 1, 1, 1); // I think this is right...
 			origin.transform(transform);
 			final BlockPos pos = new BlockPos(camera.x() + origin.x(), camera.y() + origin.y(), camera.z() + origin.z());
-			return WorldRenderer.getLightColor(mc.level, pos);
+			return LevelRenderer.getLightColor(mc.level, pos);
 		} else {
 			return 0; // Same default as particle
 		}
 	}
 
-	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int color);
+	public void draw(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int color);
 	
 }

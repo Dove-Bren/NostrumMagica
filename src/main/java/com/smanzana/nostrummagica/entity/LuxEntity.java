@@ -29,72 +29,72 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BushBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.AgeableEntity;
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntitySize;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MoverType;
-import net.minecraft.entity.Pose;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.controller.MovementController;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.HurtByTargetGoal;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.BushBlock;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.AgableMob;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.MoveControl;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameableEntity*/ {
+public class LuxEntity extends Animal implements ILoreSupplier/*, ITameableEntity*/ {
 	
 	public static final String ID = "entity_lux";
 	
 	protected static final double LUX_HOME_DISTANCE_SQ = 144;
 	protected static final double LUX_HOME_FORGET_DISTANCE_SQ = 400;
-	protected static final DataParameter<Optional<BlockPos>> HOME  = EntityDataManager.<Optional<BlockPos>>defineId(LuxEntity.class, DataSerializers.OPTIONAL_BLOCK_POS);
+	protected static final EntityDataAccessor<Optional<BlockPos>> HOME  = SynchedEntityData.<Optional<BlockPos>>defineId(LuxEntity.class, EntityDataSerializers.OPTIONAL_BLOCK_POS);
 	//protected static final DataParameter<Optional<UUID>> OWNER = EntityDataManager.<Optional<UUID>>createKey(EntityLux.class, DataSerializers.OPTIONAL_UNIQUE_ID);
-	protected static final DataParameter<ItemStack> POLLINATED_ITEM = EntityDataManager.<ItemStack>defineId(LuxEntity.class, DataSerializers.ITEM_STACK);
-	protected static final DataParameter<Integer> COMMUNITY_SCORE = EntityDataManager.<Integer>defineId(LuxEntity.class, DataSerializers.INT);
+	protected static final EntityDataAccessor<ItemStack> POLLINATED_ITEM = SynchedEntityData.<ItemStack>defineId(LuxEntity.class, EntityDataSerializers.ITEM_STACK);
+	protected static final EntityDataAccessor<Integer> COMMUNITY_SCORE = SynchedEntityData.<Integer>defineId(LuxEntity.class, EntityDataSerializers.INT);
 	
 	// For display
-	protected static final DataParameter<Boolean> ROOSTING = EntityDataManager.<Boolean>defineId(LuxEntity.class, DataSerializers.BOOLEAN);
+	protected static final EntityDataAccessor<Boolean> ROOSTING = SynchedEntityData.<Boolean>defineId(LuxEntity.class, EntityDataSerializers.BOOLEAN);
 	
 	public static final String LoreKey = "nostrum__lux";
 	
 	private int idleCooldown;
 	private long swingStartTicks; // client only
 	
-	public LuxEntity(EntityType<? extends LuxEntity> type, World worldIn) {
+	public LuxEntity(EntityType<? extends LuxEntity> type, Level worldIn) {
 		super(type, worldIn);
 		this.setNoGravity(true);
 		this.noPhysics = true;
@@ -103,7 +103,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		idleCooldown = NostrumMagica.rand.nextInt(20 * 30) + (20 * 10);
 	}
 	
-	public LuxEntity(EntityType<? extends LuxEntity> type, World worldIn, BlockPos homePos) {
+	public LuxEntity(EntityType<? extends LuxEntity> type, Level worldIn, BlockPos homePos) {
 		this(type, worldIn);
 		this.restrictTo(homePos, (int) LUX_HOME_DISTANCE_SQ);
 		this.setHome(homePos);
@@ -171,7 +171,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			}
 			
 			@Override
-			public void moveToclosestPlayer(CreatureEntity tempted, PlayerEntity player) {
+			public void moveToclosestPlayer(PathfinderMob tempted, Player player) {
 				if (tempted.distanceToSqr(player) < 6.25D) {
 					//this.temptedEntity.getMoveHelper(). no such thing as stop
 				} else {
@@ -217,8 +217,8 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setAlertOthers(LuxEntity.class));
 	}
 	
-	public static final AttributeModifierMap.MutableAttribute BuildAttributes(){
-		return AnimalEntity.createMobAttributes()
+	public static final AttributeSupplier.Builder BuildAttributes(){
+		return Animal.createMobAttributes()
 			.add(Attributes.MOVEMENT_SPEED, 0.2D)
 			.add(Attributes.MAX_HEALTH, 4.0D)
 			.add(Attributes.ARMOR, 0.0D)
@@ -250,7 +250,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		return 1F;
 	}
 
-	protected float getStandingEyeHeight(Pose pose, EntitySize size)
+	protected float getStandingEyeHeight(Pose pose, EntityDimensions size)
 	{
 		return this.getBbHeight() * 0.5F;
 	}
@@ -267,11 +267,11 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		return flag;
 	}
 
-	public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
-		return ActionResultType.PASS;
+	public InteractionResult /*processInteract*/ mobInteract(Player player, InteractionHand hand, @Nonnull ItemStack stack) {
+		return InteractionResult.PASS;
 	}
 
-	public boolean canBeLeashed(PlayerEntity player) {
+	public boolean canBeLeashed(Player player) {
 		return false;
 	}
 	
@@ -291,7 +291,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 							1,
 							getX(), getY() + getBbHeight()/2, getZ(),
 							0.05, 40, 10,
-							new Vector3d(0, -.1, 0),
+							new Vec3(0, -.1, 0),
 							null
 							).color(.3f, .7f - darken, 1f - darken, .9f - darken));
 				}
@@ -331,7 +331,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 					}
 					
 					// Poll for nearby lux and update community score
-					final AxisAlignedBB bb = new AxisAlignedBB(
+					final AABB bb = new AABB(
 							getX() - 32, getY() - 32, getZ() - 32, getX() + 32, getY() + 32, getZ() + 32
 							);
 					final int count = level.getEntitiesOfClass(LuxEntity.class, bb).size();
@@ -409,7 +409,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	}
 	
 	@Override
-	public void readAdditionalSaveData(CompoundNBT compound) {
+	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 		if (compound.contains("home", NBT.TAG_LONG)) {
 			setHome(BlockPos.of(compound.getLong("home"))); // Warning: can break if save used across game versions
@@ -435,7 +435,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	}
 	
 	@Override
-	public void addAdditionalSaveData(CompoundNBT compound) {
+	public void addAdditionalSaveData(CompoundTag compound) {
 		super.addAdditionalSaveData(compound);
 		
 		BlockPos homePos = this.getHome();
@@ -484,7 +484,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		return super.hurt(source, amount);
 	}
 	
-	private void playEffect(IParticleData particle) {
+	private void playEffect(ParticleOptions particle) {
 		
 		for (int i = 0; i < 15; ++i) {
 			double d0 = this.random.nextGaussian() * 0.02D;
@@ -495,7 +495,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	}
 	
 	// Adapted from the wisp move helper
-	static protected class LuxMoveHelper extends MovementController {
+	static protected class LuxMoveHelper extends MoveControl {
 		private final LuxEntity parentEntity;
 		private int courseChangeCooldown;
 
@@ -506,17 +506,17 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 
 		@Override
 		public void tick() {
-			if (this.operation == MovementController.Action.MOVE_TO) {
+			if (this.operation == MoveControl.Operation.MOVE_TO) {
 				double d0 = this.getWantedX() - this.parentEntity.getX();
 				double d1 = this.getWantedY() - this.parentEntity.getY();
 				double d2 = this.getWantedZ() - this.parentEntity.getZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 
-				d3 = (double)MathHelper.sqrt(d3);
+				d3 = (double)Mth.sqrt(d3);
 				
 				if (Math.abs(d3) < .1) {
-					this.parentEntity.setDeltaMovement(Vector3d.ZERO);
-					this.operation = MovementController.Action.WAIT;
+					this.parentEntity.setDeltaMovement(Vec3.ZERO);
+					this.operation = MoveControl.Operation.WAIT;
 					return;
 				} else if (courseChangeCooldown-- <= 0) {
 					float basespeed = (float) this.parentEntity.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
@@ -529,7 +529,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 							(d2 / d3) * moveSpeed
 							);
 					
-					float f9 = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
+					float f9 = (float)(Mth.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
 					this.mob.yRot = this.rotlerp(this.mob.yRot, f9, 90.0F);
 				}
 			}
@@ -538,7 +538,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	
 	// Copied from EntityFlying class
 		@Override
-		public void travel(Vector3d how) {
+		public void travel(Vec3 how) {
 			if (this.isInWater()) {
 				this.moveRelative(0.02F, how);
 				this.move(MoverType.SELF, this.getDeltaMovement());
@@ -552,7 +552,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 
 				if (this.onGround) {
 					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
-					BlockPos underPos = new BlockPos(MathHelper.floor(this.getX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getZ()));
+					BlockPos underPos = new BlockPos(Mth.floor(this.getX()), Mth.floor(this.getBoundingBox().minY) - 1, Mth.floor(this.getZ()));
 					BlockState underState = this.level.getBlockState(underPos);
 					f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
 				}
@@ -563,7 +563,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 
 				if (this.onGround) {
 					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
-					BlockPos underPos = new BlockPos(MathHelper.floor(this.getX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getZ()));
+					BlockPos underPos = new BlockPos(Mth.floor(this.getX()), Mth.floor(this.getBoundingBox().minY) - 1, Mth.floor(this.getZ()));
 					BlockState underState = this.level.getBlockState(underPos);
 					f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
 				}
@@ -575,7 +575,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 			this.animationSpeedOld = this.animationSpeed;
 			double d1 = this.getX() - this.xo;
 			double d0 = this.getZ() - this.zo;
-			float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
+			float f2 = Mth.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 			if (f2 > 1.0F) {
 				f2 = 1.0F;
@@ -594,7 +594,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	}
 	
 	@Override
-	public boolean checkSpawnRules(IWorld world, SpawnReason spawnReason) {
+	public boolean checkSpawnRules(LevelAccessor world, MobSpawnType spawnReason) {
 		return super.checkSpawnRules(world, spawnReason);
 	}
 	
@@ -611,7 +611,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		 * Returns whether the Goal should begin execution.
 		 */
 		public boolean canUse() {
-			MovementController MovementController = this.parentEntity.getMoveControl();
+			MoveControl MovementController = this.parentEntity.getMoveControl();
 
 			if (cooldownTicks > 0) {
 				if (!MovementController.hasWanted()) {
@@ -656,7 +656,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 				final double d2 = this.parentEntity.getZ() + (double)((random.nextFloat() * 2.0F - 1.0F) * radius);
 				
 				// Check specific spot
-				BlockPos.Mutable cursor = new BlockPos.Mutable();
+				BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 				cursor.set(d0, d1, d2);
 				
 				if (!parentEntity.level.isEmptyBlock(cursor)) {
@@ -771,7 +771,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 						parentEntity.setPos(roostPos.getX() + .5, roostPos.getY() - (parentEntity.getBbHeight()), roostPos.getZ() + .5);
 					}
 					
-					parentEntity.setDeltaMovement(Vector3d.ZERO);
+					parentEntity.setDeltaMovement(Vec3.ZERO);
 					parentEntity.startRoosting();
 				} else if (!parentEntity.getMoveControl().hasWanted()) {
 					this.parentEntity.getMoveControl().setWantedPosition(
@@ -858,7 +858,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 				return false;
 			}
 			
-			MovementController MovementController = this.parentEntity.getMoveControl();
+			MoveControl MovementController = this.parentEntity.getMoveControl();
 
 			if (!MovementController.hasWanted()) {
 				return true;
@@ -1035,7 +1035,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		// Do longer search nearby
 		List<BlockPos> leaves = new ArrayList<>();
 		BlockPos center = (homePos == null ? blockPosition() : homePos);
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		final int radius = 10;
 		for (int x = -radius; x <= radius; x++)
 		for (int z = -radius; z <= radius; z++)
@@ -1081,7 +1081,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 		List<BlockPos> flowers = new ArrayList<>();
 		final BlockPos homePos = this.getHome();
 		final BlockPos center = (homePos == null ? blockPosition() : homePos);
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		final int radius = 10;
 		for (int x = -radius; x <= radius; x++)
 		for (int z = -radius; z <= radius; z++)
@@ -1117,7 +1117,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 				}
 			}
 			
-			((ServerWorld) level).sendParticles(ParticleTypes.HAPPY_VILLAGER,
+			((ServerLevel) level).sendParticles(ParticleTypes.HAPPY_VILLAGER,
 					getX(),
 					getY() + getBbHeight() / 2,
 					getZ(),
@@ -1157,7 +1157,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	
 	protected void onPollinationComplete(ItemStack stack) {
 		// If over bare grass, plant flower. Otherwise, drop
-		BlockPos.Mutable cursor = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 		cursor.set(this.blockPosition());
 		while (cursor.getY() > 0) {
 			BlockState state = level.getBlockState(cursor);
@@ -1182,7 +1182,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 				&& ((BushBlock) flowerState.getBlock()).canSurvive(flowerState, level, cursor.immutable())) {
 			level.setBlockAndUpdate(cursor.immutable(), flowerState);
 			
-			((ServerWorld) level).sendParticles(ParticleTypes.HAPPY_VILLAGER,
+			((ServerLevel) level).sendParticles(ParticleTypes.HAPPY_VILLAGER,
 					cursor.getX() + .5,
 					cursor.getY() + .5,
 					cursor.getZ() + .5,
@@ -1227,7 +1227,7 @@ public class LuxEntity extends AnimalEntity implements ILoreSupplier/*, ITameabl
 	}
 
 	@Override
-	public AgeableEntity /*createChild*/ getBreedOffspring(ServerWorld world, AgeableEntity ageable) {
+	public AgableMob /*createChild*/ getBreedOffspring(ServerLevel world, AgableMob ageable) {
 		return null;
 	}
 

@@ -7,10 +7,10 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.effect.MobEffectInstance;
 
 public class EssenceItem extends Item implements ILoreTagged, IEnchantableItem {
 
@@ -116,7 +116,7 @@ public class EssenceItem extends Item implements ILoreTagged, IEnchantableItem {
 		}
 		entity.removeEffectNoUpdate(NostrumEffects.magicBuff);
 		NostrumMagica.magicEffectProxy.applyMagicBuff(entity, this.element, amt, count);
-		entity.addEffect(new EffectInstance(NostrumEffects.magicBuff, 60 * 20, (int) (amt - 1)));
+		entity.addEffect(new MobEffectInstance(NostrumEffects.magicBuff, 60 * 20, (int) (amt - 1)));
 		return new Result(true, ItemStack.EMPTY);
 	}
 }

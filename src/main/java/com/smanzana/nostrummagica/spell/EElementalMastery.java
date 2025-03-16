@@ -1,9 +1,9 @@
 package com.smanzana.nostrummagica.spell;
 
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public enum EElementalMastery {
 	UNKNOWN,
@@ -11,20 +11,20 @@ public enum EElementalMastery {
 	ADEPT,
 	MASTER;
 	
-	private final ITextComponent name;
+	private final Component name;
 	
 	private EElementalMastery() {
-		name = new TranslationTextComponent("mastery." + this.getTranslationKey() + ".name");
+		name = new TranslatableComponent("mastery." + this.getTranslationKey() + ".name");
 	}
 	
-	public INBT toNBT() {
-		return StringNBT.valueOf(this.name());
+	public Tag toNBT() {
+		return StringTag.valueOf(this.name());
 	}
 	
-	public static EElementalMastery fromNBT(INBT nbt) {
+	public static EElementalMastery fromNBT(Tag nbt) {
 		try {
 			return EElementalMastery.valueOf(
-					((StringNBT) nbt).getAsString().toUpperCase()
+					((StringTag) nbt).getAsString().toUpperCase()
 				);
 		} catch (Exception e) {
 			return EElementalMastery.NOVICE;
@@ -35,7 +35,7 @@ public enum EElementalMastery {
 		return this.name().toLowerCase();
 	}
 	
-	public ITextComponent getName() {
+	public Component getName() {
 		return name;
 	}
 	

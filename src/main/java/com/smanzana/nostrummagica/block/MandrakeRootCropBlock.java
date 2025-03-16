@@ -2,18 +2,18 @@ package com.smanzana.nostrummagica.block;
 
 import com.smanzana.nostrummagica.item.NostrumItems;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CropsBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.Item;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.item.Item;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.BlockGetter;
 
-public class MandrakeRootCropBlock extends CropsBlock {
+public class MandrakeRootCropBlock extends CropBlock {
 
 	private static final VoxelShape[] AABB = new VoxelShape[] {Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16*0.125D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16*0.1875D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16*0.25D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16*0.3125D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16*0.375D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16*0.4375D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8D, 16.0D), Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16*0.5625D, 16.0D)};
 
@@ -30,7 +30,7 @@ public class MandrakeRootCropBlock extends CropsBlock {
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return AABB[((Integer)state.getValue(this.getAgeProperty())).intValue()];
 	}
 

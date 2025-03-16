@@ -8,20 +8,20 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.IContainerProvider;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIntArray;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuConstructor;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -30,10 +30,10 @@ public class ContainerUtil {
 	@SuppressWarnings("unchecked")
 	@OnlyIn(Dist.CLIENT)
 	@Nullable
-	public static final <T extends TileEntity> T GetPackedTE(@Nonnull PacketBuffer buffer) {
+	public static final <T extends BlockEntity> T GetPackedTE(@Nonnull FriendlyByteBuf buffer) {
 		BlockPos pos = buffer.readBlockPos();
 		final Minecraft mc = Minecraft.getInstance();
-		TileEntity teRaw = mc.level.getBlockEntity(pos);
+		BlockEntity teRaw = mc.level.getBlockEntity(pos);
 		
 		if (teRaw != null) {
 			return (T) teRaw;
@@ -41,39 +41,39 @@ public class ContainerUtil {
 		return null;
 	}
 	
-	public static final <T extends TileEntity> void PackTE(@Nonnull PacketBuffer buffer, @Nonnull T tileEntity) {
+	public static final <T extends BlockEntity> void PackTE(@Nonnull FriendlyByteBuf buffer, @Nonnull T tileEntity) {
 		buffer.writeBlockPos(tileEntity.getBlockPos());
 	}
 	
-	public static interface IPackedContainerProvider extends INamedContainerProvider {
-		public Consumer<PacketBuffer> getData();
+	public static interface IPackedContainerProvider extends MenuProvider {
+		public Consumer<FriendlyByteBuf> getData();
 	}
 
-	public static IPackedContainerProvider MakeProvider(String name, IContainerProvider provider, Consumer<PacketBuffer> dataFunc) {
+	public static IPackedContainerProvider MakeProvider(String name, MenuConstructor provider, Consumer<FriendlyByteBuf> dataFunc) {
 		return new IPackedContainerProvider() {
 
 			@Override
-			public Container createMenu(int windowId, PlayerInventory playerInv, PlayerEntity player) {
+			public AbstractContainerMenu createMenu(int windowId, Inventory playerInv, Player player) {
 				return provider.createMenu(windowId, playerInv, player);
 			}
 
 			@Override
-			public ITextComponent getDisplayName() {
-				return new TranslationTextComponent("container." + NostrumMagica.MODID + "." + name + ".name");
+			public Component getDisplayName() {
+				return new TranslatableComponent("container." + NostrumMagica.MODID + "." + name + ".name");
 			}
 
 			@Override
-			public Consumer<PacketBuffer> getData() {
+			public Consumer<FriendlyByteBuf> getData() {
 				return dataFunc;
 			}
 		};
 	}
 	
-	public static interface AutoContainerFields extends IIntArray {
+	public static interface AutoContainerFields extends ContainerData {
 		
 	}
 	
-	public static interface IAutoContainerInventory extends IInventory, AutoContainerFields {
+	public static interface IAutoContainerInventory extends Container, AutoContainerFields {
 		
 		public int getFieldCount();
 		
@@ -92,7 +92,7 @@ public class ContainerUtil {
 		
 		protected final @Nonnull Consumer<NoisySlot> listener;
 		
-		public NoisySlot(IInventory inventoryIn, int index, int xPosition, int yPosition, @Nonnull Consumer<NoisySlot> listener) {
+		public NoisySlot(Container inventoryIn, int index, int xPosition, int yPosition, @Nonnull Consumer<NoisySlot> listener) {
 			super(inventoryIn, index, xPosition, yPosition);
 			this.listener = listener;
 		}

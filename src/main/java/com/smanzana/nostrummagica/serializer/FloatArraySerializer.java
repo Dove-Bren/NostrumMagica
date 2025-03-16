@@ -1,15 +1,15 @@
 package com.smanzana.nostrummagica.serializer;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.IDataSerializer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializer;
 
 /**
  * Doesn't support null Floats. Serializes them as 0.
  * @author Skyler
  *
  */
-public class FloatArraySerializer implements IDataSerializer<Float[]> {
+public class FloatArraySerializer implements EntityDataSerializer<Float[]> {
 
 	public static final FloatArraySerializer instance = new FloatArraySerializer();
 	
@@ -18,7 +18,7 @@ public class FloatArraySerializer implements IDataSerializer<Float[]> {
 	}
 	
 	@Override
-	public void write(PacketBuffer buf, Float[] value) {
+	public void write(FriendlyByteBuf buf, Float[] value) {
 		buf.writeInt(value.length);
 		for (Float f : value) {
 			final float fv = (f == null) ? 0 : f.floatValue();
@@ -27,7 +27,7 @@ public class FloatArraySerializer implements IDataSerializer<Float[]> {
 	}
 
 	@Override
-	public Float[] read(PacketBuffer buf)  {
+	public Float[] read(FriendlyByteBuf buf)  {
 		int len = buf.readInt();
 		Float[] array = new Float[len];
 		for (int i = 0; i < len; i++) {
@@ -37,8 +37,8 @@ public class FloatArraySerializer implements IDataSerializer<Float[]> {
 	}
 
 	@Override
-	public DataParameter<Float[]> createAccessor(int id) {
-		return new DataParameter<>(id, this);
+	public EntityDataAccessor<Float[]> createAccessor(int id) {
+		return new EntityDataAccessor<>(id, this);
 	}
 
 	@Override

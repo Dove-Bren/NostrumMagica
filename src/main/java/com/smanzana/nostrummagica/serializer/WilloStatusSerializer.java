@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.serializer;
 
 import com.smanzana.nostrummagica.entity.WilloEntity.WilloStatus;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.IDataSerializer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializer;
 
-public final class WilloStatusSerializer implements IDataSerializer<WilloStatus> {
+public final class WilloStatusSerializer implements EntityDataSerializer<WilloStatus> {
 	
 	public static WilloStatusSerializer instance = new WilloStatusSerializer();
 	
@@ -15,18 +15,18 @@ public final class WilloStatusSerializer implements IDataSerializer<WilloStatus>
 	}
 	
 	@Override
-	public void write(PacketBuffer buf, WilloStatus value) {
+	public void write(FriendlyByteBuf buf, WilloStatus value) {
 		buf.writeEnum(value);
 	}
 
 	@Override
-	public WilloStatus read(PacketBuffer buf)  {
+	public WilloStatus read(FriendlyByteBuf buf)  {
 		return buf.readEnum(WilloStatus.class);
 	}
 
 	@Override
-	public DataParameter<WilloStatus> createAccessor(int id) {
-		return new DataParameter<>(id, this);
+	public EntityDataAccessor<WilloStatus> createAccessor(int id) {
+		return new EntityDataAccessor<>(id, this);
 	}
 
 	@Override

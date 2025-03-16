@@ -15,7 +15,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -62,44 +62,44 @@ import com.smanzana.nostrummagica.spell.component.Transmutation;
 import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MainWindow;
+import net.minecraft.world.level.block.state.BlockState;
+import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldVertexBufferUploader;
-import net.minecraft.client.renderer.entity.LivingRenderer;
-import net.minecraft.client.renderer.entity.PlayerRenderer;
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.settings.PointOfView;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.BufferUploader;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.model.EntityModel;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.CameraType;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.RayTraceResult.Type;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.HitResult.Type;
+import com.mojang.math.Matrix4f;
+import net.minecraft.world.phys.Vec3;
+import com.mojang.math.Vector3f;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 import net.minecraftforge.client.event.DrawHighlightEvent;
 import net.minecraftforge.client.event.RenderBlockOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -112,7 +112,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class OverlayRenderer extends AbstractGui {
+public class OverlayRenderer extends GuiComponent {
 	
 	private static final ResourceLocation GUI_ICONS = new ResourceLocation(NostrumMagica.MODID, "textures/gui/icons.png");
 	private static final int GUI_ORB_WIDTH = 9;
@@ -155,8 +155,8 @@ public class OverlayRenderer extends AbstractGui {
 	@SubscribeEvent
 	public void onRender(RenderGameOverlayEvent.Pre event) {
 		Minecraft mc = Minecraft.getInstance();
-		ClientPlayerEntity player = mc.player;
-		MainWindow window = event.getWindow();
+		LocalPlayer player = mc.player;
+		Window window = event.getWindow();
 		
 		if (event.getType() == ElementType.CROSSHAIRS) {
 			if (ModConfig.config.displayHookshotCrosshair()) {
@@ -170,7 +170,7 @@ public class OverlayRenderer extends AbstractGui {
 				}
 				
 				HookshotType type = HookshotItem.GetType(hookshot);
-				RayTraceResult result = RayTrace.raytrace(player.level, player, player.getEyePosition(event.getPartialTicks()),
+				HitResult result = RayTrace.raytrace(player.level, player, player.getEyePosition(event.getPartialTicks()),
 						player.xRot, player.yRot, (float) HookshotItem.GetMaxDistance(type),
 						new Predicate<Entity>() {
 
@@ -213,9 +213,9 @@ public class OverlayRenderer extends AbstractGui {
 	@SubscribeEvent
 	public void onRender(RenderGameOverlayEvent.Post event) {
 		Minecraft mc = Minecraft.getInstance();
-		ClientPlayerEntity player = mc.player;
-		MainWindow window = event.getWindow();
-		MatrixStack matrixStackIn = event.getMatrixStack();
+		LocalPlayer player = mc.player;
+		Window window = event.getWindow();
+		PoseStack matrixStackIn = event.getMatrixStack();
 		
 		if (event.getType() == ElementType.EXPERIENCE) {
 			
@@ -263,7 +263,7 @@ public class OverlayRenderer extends AbstractGui {
 				
 				if (!held.isEmpty()) {
 					final double range = ((IRaytraceOverlay) held.getItem()).getTraceRange(player.level, player, held);
-					RayTraceResult result = RayTrace.raytraceApprox(player.level, player, player.getEyePosition(event.getPartialTicks()),
+					HitResult result = RayTrace.raytraceApprox(player.level, player, player.getEyePosition(event.getPartialTicks()),
 							player.xRot, player.yRot, (float) range,
 							new Predicate<Entity>() {
 	
@@ -336,27 +336,27 @@ public class OverlayRenderer extends AbstractGui {
 				// Render dungeon air overlay
 				{
 					final Matrix4f transform = matrixStackIn.last().pose();
-					Tessellator tessellator = Tessellator.getInstance();
+					Tesselator tessellator = Tesselator.getInstance();
 					BufferBuilder bufferbuilder = tessellator.getBuilder();
 					RenderSystem.enableBlend();
 					RenderSystem.disableTexture();
 					//GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 					RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 					final float depth = -91f;
-					bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+					bufferbuilder.begin(7, DefaultVertexFormat.POSITION_COLOR);
 					bufferbuilder.vertex(transform, 0, event.getWindow().getGuiScaledHeight(), depth).color(.3f, 0, .3f, .2f).endVertex();
 					bufferbuilder.vertex(transform, event.getWindow().getGuiScaledWidth(), event.getWindow().getGuiScaledHeight(), depth).color(.3f, 0, .3f, .2f).endVertex();
 					bufferbuilder.vertex(transform, event.getWindow().getGuiScaledWidth(), 0, depth).color(.3f, 0, .3f, .2f).endVertex();
 					bufferbuilder.vertex(transform, 0, 0, depth).color(.3f, 0, .3f, .2f).endVertex();
 					bufferbuilder.end();
-					WorldVertexBufferUploader.end(bufferbuilder);
+					BufferUploader.end(bufferbuilder);
 					RenderSystem.enableTexture();
 				}
 			}
 		}
 	}
 	
-	private void renderOrbsInternal(MatrixStack matrixStackIn, int whole, int pieces, int x, int y, float red, float green, float blue, float alpha) {
+	private void renderOrbsInternal(PoseStack matrixStackIn, int whole, int pieces, int x, int y, float red, float green, float blue, float alpha) {
 		int i = 0;
 		Minecraft mc = Minecraft.getInstance();
 		mc.getTextureManager().bind(GUI_ICONS);
@@ -382,7 +382,7 @@ public class OverlayRenderer extends AbstractGui {
 		}
 	}
 	
-	private void renderManaOrbs(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window, INostrumMagic attr) {
+	private void renderManaOrbs(PoseStack matrixStackIn, LocalPlayer player, Window window, INostrumMagic attr) {
 		int hudXAnchor = window.getGuiScaledWidth() / 2 + 89;
 		int hudYAnchor = window.getGuiScaledHeight() - 49;
 		
@@ -511,7 +511,7 @@ public class OverlayRenderer extends AbstractGui {
 		
 	}
 	
-	private void renderManaBar(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window, INostrumMagic attr) {
+	private void renderManaBar(PoseStack matrixStackIn, LocalPlayer player, Window window, INostrumMagic attr) {
 		Minecraft mc = Minecraft.getInstance();
 		int hudXAnchor = window.getGuiScaledWidth() - (10 + GUI_BAR_WIDTH);
 		int hudYAnchor = 10 + (GUI_BAR_HEIGHT);
@@ -529,7 +529,7 @@ public class OverlayRenderer extends AbstractGui {
 		RenderSystem.disableBlend();
 		
 		if (ModConfig.config.displayManaText()) {
-			FontRenderer fonter = mc.font;
+			Font fonter = mc.font;
 			int centerx = hudXAnchor + (int) (.5 * GUI_BAR_WIDTH);
 			String str = "" + attr.getMana();
 			int width = fonter.width(str);
@@ -548,7 +548,7 @@ public class OverlayRenderer extends AbstractGui {
 		}
 	}
 	
-	private void renderSpellLoadoutSlot(MatrixStack matrixStackIn, @Nullable Spell spell, String binding, int width, int height) {
+	private void renderSpellLoadoutSlot(PoseStack matrixStackIn, @Nullable Spell spell, String binding, int width, int height) {
 		// Probably going to draw icon, and spell name real small on top of it?
 		RenderFuncs.drawRect(matrixStackIn, 0, 0, width, height, 0xFF000000);
 		RenderFuncs.drawRect(matrixStackIn, 1, 1, width-1, height-1, 0x80404040);
@@ -596,7 +596,7 @@ public class OverlayRenderer extends AbstractGui {
 	private String getBindingForSlot(int slot) {
 		String binding = null;
 		ClientProxy proxy = (ClientProxy) NostrumMagica.instance.proxy;
-		@Nullable KeyBinding key = null;
+		@Nullable KeyMapping key = null;
 		switch (slot) {
 		case 0:
 			key = proxy.getBindingCast1();
@@ -621,7 +621,7 @@ public class OverlayRenderer extends AbstractGui {
 		return binding;
 	}
 	
-	private void renderSpellSlide(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window, INostrumMagic attr) {
+	private void renderSpellSlide(PoseStack matrixStackIn, LocalPlayer player, Window window, INostrumMagic attr) {
 		// Bottom left spell slide
 		// Spell name
 		Minecraft mc = Minecraft.getInstance();
@@ -692,7 +692,7 @@ public class OverlayRenderer extends AbstractGui {
 	private final Map<ReagentType, ItemStack> reagentStacks = new EnumMap<>(ReagentType.class);
 	private final List<ReagentType> lastReagentsUsed = new ArrayList<>(ReagentType.values().length);
 	
-	protected void tickReagentCounts(PlayerEntity player) {
+	protected void tickReagentCounts(Player player) {
 		boolean changedThisTick = false;
 		for (ReagentType type : ReagentType.values()) {
 			Integer last = lastReagentCounts.get(type);
@@ -726,7 +726,7 @@ public class OverlayRenderer extends AbstractGui {
 		return reagentStacks.get(type);
 	}
 	
-	private void renderReagentTracker(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window, INostrumMagic attr, FontRenderer fonter) {
+	private void renderReagentTracker(PoseStack matrixStackIn, LocalPlayer player, Window window, INostrumMagic attr, Font fonter) {
 		tickReagentCounts(player);
 		
 		final ReagentHUDMode mode = ModConfig.config.displayReagentMode();
@@ -879,17 +879,17 @@ public class OverlayRenderer extends AbstractGui {
 		matrixStackIn.popPose();
 	}
 	
-	private void renderArmorOverlay(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window) {
+	private void renderArmorOverlay(PoseStack matrixStackIn, LocalPlayer player, Window window) {
 		// Clone calc of left y offset, since it's not passed through
 		int left_height = 39;
-		ModifiableAttributeInstance attrMaxHealth = player.getAttribute(Attributes.MAX_HEALTH);
+		AttributeInstance attrMaxHealth = player.getAttribute(Attributes.MAX_HEALTH);
         float healthMax = (float)attrMaxHealth.getValue();
         if (ModConfig.config.displayArmorOverlayOneLine()) {
         	// Cap to 20 -- one full row
         	healthMax = Math.min(20f, healthMax);
         }
-        float absorb = MathHelper.ceil(player.getAbsorptionAmount());
-		int healthRows = MathHelper.ceil((healthMax + absorb) / 2.0F / 10.0F);
+        float absorb = Mth.ceil(player.getAbsorptionAmount());
+		int healthRows = Mth.ceil((healthMax + absorb) / 2.0F / 10.0F);
         int rowHeight = Math.max(10 - (healthRows - 2), 3);
 
         left_height += (healthRows * rowHeight);
@@ -915,7 +915,7 @@ public class OverlayRenderer extends AbstractGui {
 		matrixStackIn.popPose();
 	}
 	
-	private void renderShieldOverlay(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow window) {
+	private void renderShieldOverlay(PoseStack matrixStackIn, LocalPlayer player, Window window) {
 		double physical = 0;
 		double magical = 0;
 		EffectData data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.SHIELD_PHYSICAL);
@@ -971,7 +971,7 @@ public class OverlayRenderer extends AbstractGui {
         }
 	}
 	
-	private void renderHookshotCrosshair(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow scaledResolution, boolean entity) {
+	private void renderHookshotCrosshair(PoseStack matrixStackIn, LocalPlayer player, Window scaledResolution, boolean entity) {
 		final float red;
 		final float green;
 		final float blue;
@@ -1030,7 +1030,7 @@ public class OverlayRenderer extends AbstractGui {
 		matrixStackIn.popPose();
 	}
 	
-	private void renderCrosshairTargetOverlay(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow scaledResolution) {
+	private void renderCrosshairTargetOverlay(PoseStack matrixStackIn, LocalPlayer player, Window scaledResolution) {
 		matrixStackIn.pushPose();
 		RenderSystem.enableBlend();
 		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
@@ -1051,12 +1051,12 @@ public class OverlayRenderer extends AbstractGui {
 		matrixStackIn.popPose();
 	}
 	
-	private void renderContingencyShield(MatrixStack matrixStackIn, ClientPlayerEntity player, MainWindow scaledResolution, int typeOffset, int xoffset, float timer) {
+	private void renderContingencyShield(PoseStack matrixStackIn, LocalPlayer player, Window scaledResolution, int typeOffset, int xoffset, float timer) {
 		Minecraft mc = Minecraft.getInstance();
 		final int left = (scaledResolution.getGuiScaledWidth() / 2 + 91) + 10 + (xoffset * GUI_CONTINGENCY_ICON_LENGTH);
 		final int top = scaledResolution.getGuiScaledHeight() - (2 + GUI_CONTINGENCY_ICON_LENGTH);
 		final float borderScale = 1.07f;
-		final BufferBuilder buffer = Tessellator.getInstance().getBuilder();
+		final BufferBuilder buffer = Tesselator.getInstance().getBuilder();
 		final int width = GUI_CONTINGENCY_ICON_LENGTH; // for readability
 		final int height = GUI_CONTINGENCY_ICON_LENGTH; // for readability
 		
@@ -1076,7 +1076,7 @@ public class OverlayRenderer extends AbstractGui {
 		matrixStackIn.scale(borderScale, borderScale, borderScale);
 		{
 			final Matrix4f transform = matrixStackIn.last().pose();
-			buffer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR_TEX);
+			buffer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR_TEX);
 			
 			final float uMin = ((float) (GUI_CONTINGENCY_ICON_OFFSETX + (3 * GUI_CONTINGENCY_ICON_LENGTH))) / 256f;
 			final float uMax = ((float) (GUI_CONTINGENCY_ICON_OFFSETX + (4 * GUI_CONTINGENCY_ICON_LENGTH))) / 256f;
@@ -1115,7 +1115,7 @@ public class OverlayRenderer extends AbstractGui {
 			}
 			
 			
-			Tessellator.getInstance().end();
+			Tesselator.getInstance().end();
 		}
 		
 //		blit(0, 0,
@@ -1132,7 +1132,7 @@ public class OverlayRenderer extends AbstractGui {
 		matrixStackIn.popPose();
 	}
 	
-	private void renderCursedFireOverlay(MatrixStack matrixStackIn, PlayerEntity player, MainWindow window) {
+	private void renderCursedFireOverlay(PoseStack matrixStackIn, Player player, Window window) {
 		final Minecraft mc = Minecraft.getInstance();
 		final float width = window.getGuiScaledWidth() / 2;
 		
@@ -1196,24 +1196,24 @@ public class OverlayRenderer extends AbstractGui {
 		List<EquipmentSet> sets = GetSetsForItem(event.getItemStack());
 		if (!sets.isEmpty()) {
 			final Minecraft mc = Minecraft.getInstance();
-			final PlayerEntity player = mc.player;
+			final Player player = mc.player;
 			
-			List<ITextComponent> lines = event.getToolTip();
+			List<Component> lines = event.getToolTip();
 			for (EquipmentSet set : sets) {
 				lines.addAll(1, makeSetLines(event.getItemStack(), player, set));
 			}
 		}
 	}
 	
-	protected List<ITextComponent> makeSetLines(ItemStack stack, PlayerEntity player, EquipmentSet set) {
-		List<ITextComponent> lines = new ArrayList<>();
+	protected List<Component> makeSetLines(ItemStack stack, Player player, EquipmentSet set) {
+		List<Component> lines = new ArrayList<>();
 		final boolean showFull = Screen.hasShiftDown();
 		final int count = NostrumMagica.itemSetListener.getActiveSetCount(player, set);
 		final int maxCount = set.getFullSetCount();
 		final String countStr = (showFull ? " (Complete)" : String.format(" (%d/%d)", count, maxCount));
 		
-		lines.add(set.getName().copy().withStyle(TextFormatting.DARK_PURPLE)
-				.append(new StringTextComponent(countStr).withStyle((showFull || count >= maxCount) ? TextFormatting.GOLD : TextFormatting.DARK_AQUA)));
+		lines.add(set.getName().copy().withStyle(ChatFormatting.DARK_PURPLE)
+				.append(new TextComponent(countStr).withStyle((showFull || count >= maxCount) ? ChatFormatting.GOLD : ChatFormatting.DARK_AQUA)));
 
 		// If player is wearing the set, display bonuses
 		if (showFull || NostrumMagica.itemSetListener.getCurrentSets(player).contains(set)) {
@@ -1230,12 +1230,12 @@ public class OverlayRenderer extends AbstractGui {
 					AttributeModifier modifier = entry.getValue();
 					
 					if (entry.getKey() instanceof IPrintableAttribute) {
-						ITextComponent line = ((IPrintableAttribute) entry.getKey()).formatModifier(modifier);
+						Component line = ((IPrintableAttribute) entry.getKey()).formatModifier(modifier);
 						if (line != null) {
 							lines.add(line);
 						}
 					} else {
-						ITextComponent line = IPrintableAttribute.formatAttributeValueVanilla(entry.getKey(), modifier);
+						Component line = IPrintableAttribute.formatAttributeValueVanilla(entry.getKey(), modifier);
 						if (line != null) {
 							lines.add(line);
 						}
@@ -1243,15 +1243,15 @@ public class OverlayRenderer extends AbstractGui {
 				}
 			}
 			
-			List<ITextComponent> extras = set.getExtraBonuses(showFull ? maxCount : count);
+			List<Component> extras = set.getExtraBonuses(showFull ? maxCount : count);
 			if (extras != null && !extras.isEmpty()) {
-				extras.forEach(t -> lines.add(t.copy().withStyle(TextFormatting.DARK_AQUA)));
+				extras.forEach(t -> lines.add(t.copy().withStyle(ChatFormatting.DARK_AQUA)));
 			}
 		}
 		return lines;
 	}
 	
-	private void renderLoreIcon(MatrixStack matrixStackIn, Boolean loreIsDeep) {
+	private void renderLoreIcon(PoseStack matrixStackIn, Boolean loreIsDeep) {
 		RenderFuncs.RenderGUIItem(new ItemStack(NostrumItems.spellScroll), matrixStackIn);
 		
 		if (loreIsDeep != null) {
@@ -1266,21 +1266,21 @@ public class OverlayRenderer extends AbstractGui {
 		}
 	}
 	
-	private void renderEnchantableIcon(MatrixStack matrixStackIn) {
+	private void renderEnchantableIcon(PoseStack matrixStackIn) {
 		Minecraft mc = Minecraft.getInstance();
 		RenderSystem.enableBlend();
 		mc.getTextureManager().bind(GUI_ICONS);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 6, 6, 192, 32, 32, 32, 12, 12, 256, 256);
 	}
 	
-	private void renderConfigurableIcon(MatrixStack matrixStackIn) {
+	private void renderConfigurableIcon(PoseStack matrixStackIn) {
 		Minecraft mc = Minecraft.getInstance();
 		RenderSystem.enableBlend();
 		mc.getTextureManager().bind(GUI_ICONS);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 8, 8, 160, 32, 32, 32, 8, 8, 256, 256);
 	}
 	
-	private void renderTransmutableIcon(MatrixStack matrixStackIn) {
+	private void renderTransmutableIcon(PoseStack matrixStackIn) {
 		Minecraft mc = Minecraft.getInstance();
 		RenderSystem.enableBlend();
 		mc.getTextureManager().bind(GUI_ICONS);
@@ -1300,7 +1300,7 @@ public class OverlayRenderer extends AbstractGui {
 			return; // no highlights
 		}
 		
-		final MatrixStack matrixStackIn = event.getMatrixStack();
+		final PoseStack matrixStackIn = event.getMatrixStack();
 		
 		// Lore icon
 		final ILoreTagged tag;
@@ -1374,17 +1374,17 @@ public class OverlayRenderer extends AbstractGui {
 //		renderLoreIcon(attr.hasFullLore(tag));
 	}
 	
-	protected void renderRoots(MatrixStack matrixStackIn, LivingEntity entity) {
+	protected void renderRoots(PoseStack matrixStackIn, LivingEntity entity) {
 		if (entity.tickCount % 4 == 0) {
 			EffectData data = NostrumMagica.magicEffectProxy.getData(entity, SpecialEffect.ROOTED);
 			if (data != null && data.getCount() != 0) {
 				final ClientEffect effect = new ClientEffectAnimated(entity.position(), 1000L,
 						new ClientEffect[] {
-							new ClientEffect(Vector3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_0, 0, 0, 0), 1500L),
-							new ClientEffect(Vector3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_1, 0, 0, 0), 1500L),
-							new ClientEffect(Vector3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_2, 0, 0, 0), 1500L),
-							new ClientEffect(Vector3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_3, 0, 0, 0), 1500L),
-							new ClientEffect(Vector3d.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_4, 0, 0, 0), 1500L),
+							new ClientEffect(Vec3.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_0, 0, 0, 0), 1500L),
+							new ClientEffect(Vec3.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_1, 0, 0, 0), 1500L),
+							new ClientEffect(Vec3.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_2, 0, 0, 0), 1500L),
+							new ClientEffect(Vec3.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_3, 0, 0, 0), 1500L),
+							new ClientEffect(Vec3.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_4, 0, 0, 0), 1500L),
 						},
 						new float[] {
 							.1f,
@@ -1402,11 +1402,11 @@ public class OverlayRenderer extends AbstractGui {
 		}
 	}
 	
-	private static final Map<LivingRenderer<?, ?>, Boolean> LivingInjectedSet = new WeakHashMap<>();
+	private static final Map<LivingEntityRenderer<?, ?>, Boolean> LivingInjectedSet = new WeakHashMap<>();
 	
 	@SubscribeEvent
 	public <T extends LivingEntity, M extends EntityModel<T>> void onEntityRender(RenderLivingEvent.Pre<T, M> event) {
-		final LivingRenderer<T, M> renderer = event.getRenderer();
+		final LivingEntityRenderer<T, M> renderer = event.getRenderer();
 		if (!LivingInjectedSet.containsKey(renderer)) {
 			LivingInjectedSet.put(renderer, true);
 			renderer.addLayer(new EntityEffectLayer<T, M>(renderer));
@@ -1419,7 +1419,7 @@ public class OverlayRenderer extends AbstractGui {
 	public void onEntityRender(RenderLivingEvent.Post<LivingEntity, EntityModel<LivingEntity>> event) {
 		if (!renderRecurseMarker) {
 			final LivingEntity entity = event.getEntity();
-			final MatrixStack matrixStackIn = event.getMatrixStack();
+			final PoseStack matrixStackIn = event.getMatrixStack();
 			
 			//final float partialTicks = event.getPartialRenderTick();
 			renderRecurseMarker = true;
@@ -1435,7 +1435,7 @@ public class OverlayRenderer extends AbstractGui {
 		// Copy of what vanilla uses to figure out if it should render the render entity:
 		Minecraft mc = Minecraft.getInstance();
 		final boolean shouldRenderMe = (
-				mc.options.getCameraType() != PointOfView.FIRST_PERSON
+				mc.options.getCameraType() != CameraType.FIRST_PERSON
 				|| (mc.getCameraEntity() instanceof LivingEntity && ((LivingEntity)mc.getCameraEntity()).isSleeping())
 				);
 		
@@ -1483,7 +1483,7 @@ public class OverlayRenderer extends AbstractGui {
 	
 	@SubscribeEvent
 	public void onBlockHighlight(DrawHighlightEvent.HighlightBlock event) {
-		if (event.isCanceled() || event.getTarget().getType() != RayTraceResult.Type.BLOCK) {
+		if (event.isCanceled() || event.getTarget().getType() != HitResult.Type.BLOCK) {
 			return;
 		}
 		
@@ -1494,8 +1494,8 @@ public class OverlayRenderer extends AbstractGui {
 		
 		// Dungeon Air wants no overlay
 		if (state.getBlock() instanceof DungeonAirBlock) {
-			if (!(event.getInfo().getEntity() instanceof PlayerEntity)
-					|| ((PlayerEntity) event.getInfo().getEntity()).isCreative()) {
+			if (!(event.getInfo().getEntity() instanceof Player)
+					|| ((Player) event.getInfo().getEntity()).isCreative()) {
 				event.setCanceled(true);
 				return;
 			}

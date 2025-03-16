@@ -9,27 +9,27 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.BreakableBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.StateContainer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.HalfTransparentBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.Tags;
 
-public class CursedIceBlock extends BreakableBlock {
+public class CursedIceBlock extends HalfTransparentBlock {
 
 	public static final String ID = "cursed_ice";
 	private static final IntegerProperty LEVEL = IntegerProperty.create("level", 0, 2);
@@ -49,7 +49,7 @@ public class CursedIceBlock extends BreakableBlock {
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(LEVEL);
 	}
 	
@@ -72,7 +72,7 @@ public class CursedIceBlock extends BreakableBlock {
 	}
 	
 	@Override
-	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
+	public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
 		int level = state.getValue(LEVEL);
 		
 		// Don't grow is in Sorcery dim
@@ -109,7 +109,7 @@ public class CursedIceBlock extends BreakableBlock {
 		}
     }
 	
-	public void stepOn(World worldIn, BlockPos pos, Entity entityIn) {
+	public void stepOn(Level worldIn, BlockPos pos, Entity entityIn) {
 		
 		if (!worldIn.isClientSide) {
 			int amp = 0;
@@ -118,7 +118,7 @@ public class CursedIceBlock extends BreakableBlock {
 			
 			if (entityIn instanceof LivingEntity && ((LivingEntity) entityIn).getEffect(NostrumEffects.magicResist) == null) {
 				LivingEntity living = (LivingEntity) entityIn;
-				living.addEffect(new EffectInstance(NostrumEffects.frostbite,
+				living.addEffect(new MobEffectInstance(NostrumEffects.frostbite,
 						45, amp));
 			}
 		}

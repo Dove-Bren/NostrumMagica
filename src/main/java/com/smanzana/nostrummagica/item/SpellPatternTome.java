@@ -14,22 +14,22 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -85,47 +85,47 @@ public class SpellPatternTome extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		final @Nonnull ItemStack stack = playerIn.getItemInHand(hand);
 		if (playerIn.isShiftKeyDown()) {
-			return new ActionResult<ItemStack>(ActionResultType.PASS, stack);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, stack);
 		}
 		
 		SpellCraftPattern pattern = this.getPattern(stack);
 		if (pattern == null) {
-			playerIn.sendMessage(new StringTextComponent("This pattern tome doesn't appear to have a pattern in it."), Util.NIL_UUID);
-			return new ActionResult<ItemStack>(ActionResultType.FAIL, stack);
+			playerIn.sendMessage(new TextComponent("This pattern tome doesn't appear to have a pattern in it."), Util.NIL_UUID);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.FAIL, stack);
 		}
 		
 		ISpellCrafting attr = NostrumMagica.getSpellCrafting(playerIn);
 		if (!worldIn.isClientSide && attr != null) {
 			if (attr.getKnownPatterns().contains(pattern)) {
-				playerIn.sendMessage(new TranslationTextComponent("info.pattern.already_know", pattern.getName()), Util.NIL_UUID);
+				playerIn.sendMessage(new TranslatableComponent("info.pattern.already_know", pattern.getName()), Util.NIL_UUID);
 			} else {
 				attr.addPattern(pattern);
 				NostrumMagicaSounds.LORE.play(null, playerIn.level, playerIn.getX(), playerIn.getY(), playerIn.getZ());
 				stack.shrink(1);
-				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) playerIn);
-				playerIn.sendMessage(new TranslationTextComponent("info.pattern.learn", pattern.getName()), Util.NIL_UUID);
+				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) playerIn);
+				playerIn.sendMessage(new TranslatableComponent("info.pattern.learn", pattern.getName()), Util.NIL_UUID);
 				
 			}
-			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, stack);
 		}
 		
-		return new ActionResult<ItemStack>(ActionResultType.PASS, stack);
+		return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, stack);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		SpellCraftPattern pattern = this.getPattern(stack);
 		if (pattern != null) {
-			tooltip.add(new TranslationTextComponent("info.pattern.usage", pattern.getName()));
+			tooltip.add(new TranslatableComponent("info.pattern.usage", pattern.getName()));
 		}
 	}
 	
 	@Override
-	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
 		if (this.allowdedIn(group)) {
 			
 			for (SpellCraftPattern pattern : SpellCraftPattern.GetAll()) {

@@ -4,49 +4,49 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.Direction;
-import net.minecraft.util.EntityDamageSource;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.Direction;
+import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 public class PlantBossBrambleEntity extends Entity {
 	
 	public static final String ID = "entity_plant_boss.bramble";
 
-	protected static final DataParameter<Float> WIDTH = EntityDataManager.<Float>defineId(PlantBossBrambleEntity.class, DataSerializers.FLOAT);
-	protected static final DataParameter<Float> DEPTH = EntityDataManager.<Float>defineId(PlantBossBrambleEntity.class, DataSerializers.FLOAT);
-	protected static final DataParameter<Float> HEIGHT = EntityDataManager.<Float>defineId(PlantBossBrambleEntity.class, DataSerializers.FLOAT);
-	protected static final DataParameter<Direction> FACING = EntityDataManager.<Direction>defineId(PlantBossBrambleEntity.class, DataSerializers.DIRECTION);
+	protected static final EntityDataAccessor<Float> WIDTH = SynchedEntityData.<Float>defineId(PlantBossBrambleEntity.class, EntityDataSerializers.FLOAT);
+	protected static final EntityDataAccessor<Float> DEPTH = SynchedEntityData.<Float>defineId(PlantBossBrambleEntity.class, EntityDataSerializers.FLOAT);
+	protected static final EntityDataAccessor<Float> HEIGHT = SynchedEntityData.<Float>defineId(PlantBossBrambleEntity.class, EntityDataSerializers.FLOAT);
+	protected static final EntityDataAccessor<Direction> FACING = SynchedEntityData.<Direction>defineId(PlantBossBrambleEntity.class, EntityDataSerializers.DIRECTION);
 	
 	protected PlantBossEntity plant;
 	protected float distance;
 	protected BlockPos startPos;
 	
-	protected AxisAlignedBB entityBBOverride;
+	protected AABB entityBBOverride;
 	
-	public PlantBossBrambleEntity(EntityType<PlantBossBrambleEntity> type, World worldIn) {
+	public PlantBossBrambleEntity(EntityType<PlantBossBrambleEntity> type, Level worldIn) {
 		super(type, worldIn);
 	}
 	
-	public PlantBossBrambleEntity(EntityType<PlantBossBrambleEntity> type, World worldIn, PlantBossEntity plant, float length) {
+	public PlantBossBrambleEntity(EntityType<PlantBossBrambleEntity> type, Level worldIn, PlantBossEntity plant, float length) {
 		this(type, worldIn, plant, length, .5f, .75f);
 	}
 	
-	public PlantBossBrambleEntity(EntityType<PlantBossBrambleEntity> type, World worldIn, PlantBossEntity plant, float width, float depth, float height) {
+	public PlantBossBrambleEntity(EntityType<PlantBossBrambleEntity> type, Level worldIn, PlantBossEntity plant, float width, float depth, float height) {
 		this(type, worldIn);
 		this.plant = plant;
 		this.setDims(width, depth, height);
@@ -121,7 +121,7 @@ public class PlantBossBrambleEntity extends Entity {
 	}
 	
 	@Override
-	public void onSyncedDataUpdated(DataParameter<?> key) {
+	public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
 		super.onSyncedDataUpdated(key);
 		if (this.level != null && this.level.isClientSide) {
 			if (key == WIDTH
@@ -141,17 +141,17 @@ public class PlantBossBrambleEntity extends Entity {
 	}
 	
 	@Override
-	public boolean saveAsPassenger(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundTag compound) {
 		return false;
 	}
 	
 	@Override
-	public void readAdditionalSaveData(CompoundNBT compound) {
+	public void readAdditionalSaveData(CompoundTag compound) {
 		//super.readEntityFromNBT(compound);
 	}
 	
 	@Override
-	public void addAdditionalSaveData(CompoundNBT compound) {
+	public void addAdditionalSaveData(CompoundTag compound) {
     	//super.writeEntityToNBT(compound);
 	}
 	
@@ -170,7 +170,7 @@ public class PlantBossBrambleEntity extends Entity {
 			entity.removeEffect(NostrumEffects.rooted);
 			entity.doHurtTarget(this);
 			entity.hurt(new BrambleDamageSource(this.plant), 6f);
-			entity.knockback(1f, (double)MathHelper.sin(this.yRot * 0.017453292F), (double)(-MathHelper.cos(this.yRot * 0.017453292F)));
+			entity.knockback(1f, (double)Mth.sin(this.yRot * 0.017453292F), (double)(-Mth.cos(this.yRot * 0.017453292F)));
 		}
 	}
 	
@@ -189,7 +189,7 @@ public class PlantBossBrambleEntity extends Entity {
 					this.remove();
 				}
 				
-				Vector3d motion = Vector3d.atLowerCornerOf(this.getFacing().getNormal())
+				Vec3 motion = Vec3.atLowerCornerOf(this.getFacing().getNormal())
 						.scale(.2)
 						;
 				this.teleportTo(getX() + motion.x, getY() + motion.y, getZ() + motion.z);
@@ -212,7 +212,7 @@ public class PlantBossBrambleEntity extends Entity {
 		final float w = turned ? this.getBrambleDepth() : this.getBrambleWidth();
 		final float h = this.getBrambleHeight();
 		final float d = turned ? this.getBrambleWidth() : this.getBrambleDepth();
-		this.entityBBOverride = new AxisAlignedBB(
+		this.entityBBOverride = new AABB(
 				this.getX() - (w/2f),
 				this.getY(),
 				this.getZ() - (d/2f),
@@ -223,13 +223,13 @@ public class PlantBossBrambleEntity extends Entity {
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox() {
+	public AABB getBoundingBox() {
 		checkBoundingBox();
 		return this.entityBBOverride;
 	}
 
 	@Override
-	public IPacket<?> getAddEntityPacket() {
+	public Packet<?> getAddEntityPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 	
@@ -240,9 +240,9 @@ public class PlantBossBrambleEntity extends Entity {
 		}
 		
 		@Override
-		public ITextComponent getLocalizedDeathMessage(LivingEntity entityLivingBaseIn) {
+		public Component getLocalizedDeathMessage(LivingEntity entityLivingBaseIn) {
 	        String untranslated = "death.attack.plantboss.bramble";
-	        return new TranslationTextComponent(untranslated, new Object[] {entityLivingBaseIn.getDisplayName(), this.entity.getDisplayName()});
+	        return new TranslatableComponent(untranslated, new Object[] {entityLivingBaseIn.getDisplayName(), this.entity.getDisplayName()});
 	    }
 	}
 }

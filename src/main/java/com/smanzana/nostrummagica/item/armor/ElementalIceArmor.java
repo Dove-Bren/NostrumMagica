@@ -13,16 +13,16 @@ import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.SnowballEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.Snowball;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -46,20 +46,20 @@ public class ElementalIceArmor extends ElementalArmor {
 	public static final String ID_FEET_ADEPT = ID_PREFIX + "feet_adept";
 	public static final String ID_FEET_MASTER = ID_PREFIX + "feet_master";
 		
-	public ElementalIceArmor(EquipmentSlotType slot, Type type, Item.Properties properties) {
+	public ElementalIceArmor(EquipmentSlot slot, Type type, Item.Properties properties) {
 		super(EMagicElement.ICE, slot, type, properties);
-		if (slot == EquipmentSlotType.CHEST) {
+		if (slot == EquipmentSlot.CHEST) {
 			MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, this::onEntityDamage);
 		}
 	}
 	
 	@Override
-	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
 		if (this.allowdedIn(group)) {
 			items.add(new ItemStack(this));
 			
 			// Add an upgraded copy of true chestplates
-			if (this.slot == EquipmentSlotType.CHEST && this.getType() == Type.MASTER) {
+			if (this.slot == EquipmentSlot.CHEST && this.getType() == Type.MASTER) {
 				ItemStack stack = new ItemStack(this);
 				ElementalArmor.SetHasWingUpgrade(stack, true);
 				items.add(stack);
@@ -72,7 +72,7 @@ public class ElementalIceArmor extends ElementalArmor {
 			return;
 		}
 		
-		if (event.getSource().getDirectEntity() instanceof SnowballEntity
+		if (event.getSource().getDirectEntity() instanceof Snowball
 				&& event.getSource().getEntity() != null
 				&& event.getSource().getEntity() instanceof LivingEntity) {
 			// If shooter has full blizzard set...
@@ -103,7 +103,7 @@ public class ElementalIceArmor extends ElementalArmor {
 					
 					if (attr != null && attr.hasSkill(NostrumSkills.Ice_Adept)) {
 						if (NostrumMagica.rand.nextBoolean()) {
-							entity.addEffect(new EffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1), 0));
+							entity.addEffect(new MobEffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1), 0));
 						}
 					}
 					event.getSource().getDirectEntity().remove();
@@ -116,12 +116,12 @@ public class ElementalIceArmor extends ElementalArmor {
 							).gravity(true).color(EMagicElement.ICE.getColor()));
 				} else {
 					SpellDamage.DamageEntity(entity, EMagicElement.ICE, 1f, thrower);
-					entity.addEffect(new EffectInstance(Effects.MOVEMENT_SLOWDOWN, 20 * 15, 3));
+					entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20 * 15, 3));
 					
 					NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
 							10, entity.getX(), entity.getY() + entity.getBbHeight()/2, entity.getZ(), 0,
 							40, 10,
-							new Vector3d(0, .1, 0), new Vector3d(.1, .05, .1)
+							new Vec3(0, .1, 0), new Vec3(.1, .05, .1)
 							).gravity(true).color(EMagicElement.ICE.getColor()));
 				}
 			}

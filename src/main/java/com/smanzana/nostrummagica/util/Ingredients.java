@@ -8,8 +8,8 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.equipment.MageBlade;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.crafting.NBTIngredient;
 
 public class Ingredients {
@@ -35,7 +35,7 @@ public class Ingredients {
 		}
 
 		public MageBladeIngredientWrapper(EMagicElement element) {
-			super(Stream.of(new Ingredient.SingleItemList(makeMatchStack(element))));
+			super(Stream.of(new Ingredient.ItemValue(makeMatchStack(element))));
 			this.element = element;
 		}
 		

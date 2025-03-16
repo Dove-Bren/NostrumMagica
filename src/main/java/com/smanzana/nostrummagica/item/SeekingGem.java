@@ -17,21 +17,21 @@ import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
 
 /**
  * Solidified position crystal for obelisk linking
@@ -41,12 +41,12 @@ import net.minecraft.world.World;
 public class SeekingGem extends Item implements ILoreTagged {
 	
 	public static interface IChestFilter {
-		public boolean test(World world, BlockPos pos, BlockState state);
+		public boolean test(Level world, BlockPos pos, BlockState state);
 	}
 	
 	protected static final IChestFilter IS_DUNGEONCHEST = (world, pos, state) -> state.getBlock() instanceof DungeonKeyChestBlock && !state.getValue(DungeonKeyChestBlock.OPEN);
 	
-	public static @Nullable BlockPos FindKeyChest(World world, MutableBoundingBox bounds, BlockPos center, @Nullable IChestFilter chestFilterIn) {
+	public static @Nullable BlockPos FindKeyChest(Level world, BoundingBox bounds, BlockPos center, @Nullable IChestFilter chestFilterIn) {
 		final IChestFilter chestFilter = chestFilterIn != null
 				? chestFilterIn
 				: IS_DUNGEONCHEST; 
@@ -81,7 +81,7 @@ public class SeekingGem extends Item implements ILoreTagged {
 		super(props);
 	}
 	
-	protected @Nullable BlockPos attemptDungeonSeek(PlayerEntity playerIn, World worldIn, ItemStack gem, DungeonRecord dungeon) {
+	protected @Nullable BlockPos attemptDungeonSeek(Player playerIn, Level worldIn, ItemStack gem, DungeonRecord dungeon) {
 		if (dungeon != null && dungeon.currentRoom != null) {
 			return FindKeyChest(worldIn, dungeon.currentRoom.getBounds(), playerIn.blockPosition(), (world, pos, state) -> {
 				if (!IS_DUNGEONCHEST.test(world, pos, state)) {
@@ -89,7 +89,7 @@ public class SeekingGem extends Item implements ILoreTagged {
 				}
 				
 				// Also make sure its key matches the dungeon!
-				TileEntity te = world.getBlockEntity(pos);
+				BlockEntity te = world.getBlockEntity(pos);
 				if (te == null || !(te instanceof DungeonKeyChestTileEntity)) {
 					return false;
 				}
@@ -102,7 +102,7 @@ public class SeekingGem extends Item implements ILoreTagged {
 		return null;
 	}
 	
-	protected boolean doSeek(World world, PlayerEntity player, ItemStack stack) {
+	protected boolean doSeek(Level world, Player player, ItemStack stack) {
 		DungeonRecord dungeon = AutoDungeons.GetDungeonTracker().getDungeon(player);
 		if (dungeon != null) {
 			// Only do work on client side!
@@ -120,32 +120,32 @@ public class SeekingGem extends Item implements ILoreTagged {
 			return true;
 		} else {
 			if (world.isClientSide) {
-				player.sendMessage(new StringTextComponent("It doesn't seem to do anything here..."), Util.NIL_UUID);
+				player.sendMessage(new TextComponent("It doesn't seem to do anything here..."), Util.NIL_UUID);
 			}
 		}
 		return false;
 	}
 	
 	@Override
-	public ActionResultType useOn(ItemUseContext context) {
-		final World worldIn = context.getLevel();
-		final PlayerEntity playerIn = context.getPlayer();
+	public InteractionResult useOn(UseOnContext context) {
+		final Level worldIn = context.getLevel();
+		final Player playerIn = context.getPlayer();
 		if (doSeek(worldIn, playerIn, context.getItemInHand())) {
-			if (playerIn instanceof ServerPlayerEntity) {
-				CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayerEntity)playerIn, context.getItemInHand());
+			if (playerIn instanceof ServerPlayer) {
+				CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer)playerIn, context.getItemInHand());
 			}
 		}
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		if (doSeek(worldIn, playerIn, playerIn.getItemInHand(hand))) {
-			if (playerIn instanceof ServerPlayerEntity) {
-				CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayerEntity)playerIn, playerIn.getItemInHand(hand));
+			if (playerIn instanceof ServerPlayer) {
+				CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer)playerIn, playerIn.getItemInHand(hand));
 			}
 		}
-		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, playerIn.getItemInHand(hand));
+		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, playerIn.getItemInHand(hand));
 	}
 
 	@Override

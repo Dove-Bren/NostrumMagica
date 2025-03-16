@@ -141,23 +141,23 @@ import com.smanzana.nostrummagica.world.gen.NostrumFeatures;
 import com.smanzana.nostrummagica.world.gen.NostrumStructures;
 
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.block.Blocks;
-import net.minecraft.command.CommandSource;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.passive.WolfEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.potion.Effects;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.GenerationStage;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -359,48 +359,48 @@ public class ModInit {
 		{
 			recipe = RitualRecipe.createTier1("buff.luck", new ItemStack(Items.RABBIT_FOOT), EMagicElement.PHYSICAL,
 					ReagentType.SPIDER_SILK, new ResearchRequirement("boon"),
-					new OutcomePotionEffect(Effects.LUCK, 0, 120 * 20));
+					new OutcomePotionEffect(MobEffects.LUCK, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.speed", new ItemStack(Items.ARROW), EMagicElement.WIND,
 					ReagentType.SKY_ASH, new ResearchRequirement("boon"),
-					new OutcomePotionEffect(Effects.MOVEMENT_SPEED, 0, 120 * 20));
+					new OutcomePotionEffect(MobEffects.MOVEMENT_SPEED, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.strength", new ItemStack(Items.IRON_SWORD), EMagicElement.FIRE,
 					ReagentType.MANDRAKE_ROOT, new ResearchRequirement("boon"),
-					new OutcomePotionEffect(Effects.DAMAGE_BOOST, 0, 120 * 20));
+					new OutcomePotionEffect(MobEffects.DAMAGE_BOOST, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.leaping",
 					new ItemStack(Blocks.QUARTZ_STAIRS), EMagicElement.LIGHTNING,
 					ReagentType.MANI_DUST, new ResearchRequirement("boon"),
-					new OutcomePotionEffect(Effects.JUMP, 0, 120 * 20));
+					new OutcomePotionEffect(MobEffects.JUMP, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.regen", new ItemStack(Items.GOLDEN_APPLE), EMagicElement.EARTH,
 					ReagentType.GINSENG, new ResearchRequirement("boon"),
-					new OutcomePotionEffect(Effects.REGENERATION, 0, 120 * 20));
+					new OutcomePotionEffect(MobEffects.REGENERATION, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.fireresist", new ItemStack(Items.MAGMA_CREAM), EMagicElement.FIRE,
 					ReagentType.CRYSTABLOOM, new ResearchRequirement("boon"),
-					new OutcomePotionEffect(Effects.FIRE_RESISTANCE, 0, 120 * 20));
+					new OutcomePotionEffect(MobEffects.FIRE_RESISTANCE, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.invisibility", new ItemStack(Items.ENDER_EYE), EMagicElement.ENDER,
 					ReagentType.GRAVE_DUST, new ResearchRequirement("boon"),
-					new OutcomePotionEffect(Effects.INVISIBILITY, 0, 120 * 20));
+					new OutcomePotionEffect(MobEffects.INVISIBILITY, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.nightvision", new ItemStack(Items.GOLDEN_CARROT),
 					EMagicElement.PHYSICAL, ReagentType.BLACK_PEARL, new ResearchRequirement("boon"),
-					new OutcomePotionEffect(Effects.NIGHT_VISION, 0, 120 * 20));
+					new OutcomePotionEffect(MobEffects.NIGHT_VISION, 0, 120 * 20));
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.waterbreathing", new ItemStack(Items.SALMON), EMagicElement.ICE,
 					ReagentType.MANI_DUST, new ResearchRequirement("boon"),
-					new OutcomePotionEffect(Effects.WATER_BREATHING, 0, 120 * 20));
+					new OutcomePotionEffect(MobEffects.WATER_BREATHING, 0, 120 * 20));
 			registry.register(recipe);
 		}
 
@@ -632,7 +632,7 @@ public class ModInit {
 						Ingredient.of(Tags.Items.INGOTS_GOLD) },
 				new ResearchRequirement("summonkoids"), new OutcomeSpawnEntity(new IEntityFactory() {
 					@Override
-					public void spawn(World world, Vector3d pos, PlayerEntity invoker, ItemStack centerItem) {
+					public void spawn(Level world, Vec3 pos, Player invoker, ItemStack centerItem) {
 						KoidEntity koid = new KoidEntity(NostrumEntityTypes.koid, world);
 						koid.setPos(pos.x, pos.y, pos.z);
 						world.addFreshEntity(koid);
@@ -989,8 +989,8 @@ public class ModInit {
 				new OutcomeSpawnItem(new ItemStack(NostrumBlocks.mysticSpellTable))));
 		
 		// Rituals for mage armor
-		for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-			if (slot == EquipmentSlotType.OFFHAND || slot == EquipmentSlotType.MAINHAND) {
+		for (EquipmentSlot slot : EquipmentSlot.values()) {
+			if (slot == EquipmentSlot.OFFHAND || slot == EquipmentSlot.MAINHAND) {
 				continue;
 			}
 			
@@ -1039,8 +1039,8 @@ public class ModInit {
 					continue; // Master armors below
 				}
 				
-				for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-					if (slot == EquipmentSlotType.OFFHAND || slot == EquipmentSlotType.MAINHAND) {
+				for (EquipmentSlot slot : EquipmentSlot.values()) {
+					if (slot == EquipmentSlot.OFFHAND || slot == EquipmentSlot.MAINHAND) {
 						continue;
 					}
 
@@ -1085,8 +1085,8 @@ public class ModInit {
 
 		// True and corrupted elemental armors
 		for (EMagicElement elem : EMagicElement.values()) {
-			for (EquipmentSlotType slot : EquipmentSlotType.values()) {
-				if (slot == EquipmentSlotType.OFFHAND || slot == EquipmentSlotType.MAINHAND) {
+			for (EquipmentSlot slot : EquipmentSlot.values()) {
+				if (slot == EquipmentSlot.OFFHAND || slot == EquipmentSlot.MAINHAND) {
 					continue;
 				}
 
@@ -1469,7 +1469,7 @@ public class ModInit {
 						Ingredient.of(NostrumTags.Items.SlabKind),
 						Ingredient.of(NostrumTags.Items.ReagentManiDust) },
 				new ResearchRequirement("wolf_transformation"), new OutcomeApplyTransformation(20 * 60, (e) -> {
-					return e instanceof WolfEntity;
+					return e instanceof Wolf;
 				})));
 
 		// Paradox Mirror
@@ -1881,14 +1881,14 @@ public class ModInit {
 				.reference("ritual::mage_armor", "ritual.mage_armor.name")
 				.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
 				.build("enchanted_armor", NostrumResearchTab.OUTFITTING, Size.GIANT, -2, 0, true,
-						new ItemStack(ElementalArmor.get(EMagicElement.FIRE, EquipmentSlotType.CHEST, ElementalArmor.Type.MASTER)));
+						new ItemStack(ElementalArmor.get(EMagicElement.FIRE, EquipmentSlot.CHEST, ElementalArmor.Type.MASTER)));
 
 		NostrumResearch.startBuilding().parent("enchanted_armor").hiddenParent("kind_infusion")
 				.hiddenParent("fierce_infusion")
 				.hiddenParent("vani")
 				.reference("ritual::spawn_enchanted_armor", "ritual.spawn_enchanted_armor.name")
 				.build("enchanted_armor_adv", NostrumResearchTab.OUTFITTING, Size.LARGE, -1, 3, true,
-						new ItemStack(ElementalArmor.get(EMagicElement.ENDER, EquipmentSlotType.CHEST, ElementalArmor.Type.MASTER)));
+						new ItemStack(ElementalArmor.get(EMagicElement.ENDER, EquipmentSlot.CHEST, ElementalArmor.Type.MASTER)));
 
 		NostrumResearch.startBuilding().parent("enchanted_armor").lore(TameRedDragonEntity.TameRedDragonLore.instance())
 				.reference("ritual::craft_dragonarmor_body_iron", "ritual.craft_dragonarmor_body_iron.name")
@@ -2111,7 +2111,7 @@ public class ModInit {
 	
 	public static final void registerCommands(RegisterCommandsEvent event) {
 		// Note: not in ModInit because it's not a MOD bus event. Commands get registered when data is reloaded.
-		final CommandDispatcher<CommandSource> dispatcher = event.getDispatcher();
+		final CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
 		
 		CommandTestConfig.register(dispatcher);
 		CommandTestConfig.register(dispatcher);
@@ -2145,23 +2145,23 @@ public class ModInit {
 	
 	public static final void onBiomeLoad(BiomeLoadingEvent event) {
 		// Note: not in ModInit because it's not a MOD bus event.
-		Biome.Category category = event.getCategory();
+		Biome.BiomeCategory category = event.getCategory();
 		
-		if (category == Biome.Category.THEEND) {
+		if (category == Biome.BiomeCategory.THEEND) {
 			return;
 		}
 		
-		if (category == Biome.Category.NETHER) {
+		if (category == Biome.BiomeCategory.NETHER) {
 			return;
 		}
 		
 		// Filter this list maybe?
 		final BiomeGenerationSettingsBuilder gen = event.getGeneration();
-		gen.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, NostrumFeatures.CONFFEATURE_FLOWER_CRYSTABLOOM);
-		gen.addFeature(GenerationStage.Decoration.VEGETAL_DECORATION, NostrumFeatures.CONFFEATURE_FLOWER_MIDNIGHTIRIS);
+		gen.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, NostrumFeatures.CONFFEATURE_FLOWER_CRYSTABLOOM);
+		gen.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, NostrumFeatures.CONFFEATURE_FLOWER_MIDNIGHTIRIS);
 		
-		gen.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, NostrumFeatures.CONFFEATURE_ORE_MANI);
-		gen.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, NostrumFeatures.CONFFEATURE_ORE_ESSORE);
+		gen.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, NostrumFeatures.CONFFEATURE_ORE_MANI);
+		gen.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, NostrumFeatures.CONFFEATURE_ORE_ESSORE);
 		
 		gen.addStructureStart(NostrumStructures.CONFIGURED_DUNGEON_PORTAL);
 		gen.addStructureStart(NostrumStructures.CONFIGURED_DUNGEON_DRAGON);

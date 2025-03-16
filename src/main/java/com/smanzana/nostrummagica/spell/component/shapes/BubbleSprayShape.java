@@ -21,15 +21,15 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.util.Projectiles;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
 /**
  * Create a spray of magic bubbles that continue the spell on collision.
@@ -41,15 +41,15 @@ public class BubbleSprayShape extends SpellShape {
 	
 	public class BubbleSprayShapeInstance extends SpellShapeInstance implements ISpellProjectileShape {
 
-		private final World world;
-		private final Vector3d pos;
+		private final Level world;
+		private final Vec3 pos;
 		private final float pitch;
 		private final float yaw;
 		private final SpellCharacteristics characteristics;
 		private final float rangeScale;
 		private final int bubbleCount;
 		
-		public BubbleSprayShapeInstance(ISpellState state, World world, Vector3d pos, float pitch, float yaw, float rangeScale, int bubbleCount, SpellCharacteristics characteristics) {
+		public BubbleSprayShapeInstance(ISpellState state, Level world, Vec3 pos, float pitch, float yaw, float rangeScale, int bubbleCount, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -64,9 +64,9 @@ public class BubbleSprayShape extends SpellShape {
 		public void spawn(LivingEntity caster) {
 			// Do a little more work of getting a good vector for things
 			// that aren't players
-			final Vector3d dir;
-			if (caster instanceof MobEntity && ((MobEntity) caster).getTarget() != null) {
-				MobEntity ent = (MobEntity) caster  ;
+			final Vec3 dir;
+			if (caster instanceof Mob && ((Mob) caster).getTarget() != null) {
+				Mob ent = (Mob) caster  ;
 				dir = ent.getTarget().position().add(0.0, ent.getBbHeight() / 2.0, 0.0)
 						.subtract(caster.getX(), caster.getY() + caster.getEyeHeight(), caster.getZ());
 			} else {
@@ -79,7 +79,7 @@ public class BubbleSprayShape extends SpellShape {
 			final float range = SPRAY_RANGE_BASE * rangeScaleSqrt;
 			
 			for (int i = 0; i < bubbleCount; i++) {
-				final Vector3d shootDir = dir.add(rand.nextGaussian() * (double)0.0075F * (double)inaccuracy, rand.nextGaussian() * (double)0.0075F * (double)inaccuracy, rand.nextGaussian() * (double)0.0075F * (double)inaccuracy);
+				final Vec3 shootDir = dir.add(rand.nextGaussian() * (double)0.0075F * (double)inaccuracy, rand.nextGaussian() * (double)0.0075F * (double)inaccuracy, rand.nextGaussian() * (double)0.0075F * (double)inaccuracy);
 				final float thisRange = (range / 4f) * (.25f + ( rand.nextFloat() * 1f));
 				SpellBubbleEntity bubble = new SpellBubbleEntity(BubbleSprayShapeInstance.this,
 						getState().getSelf(),
@@ -111,7 +111,7 @@ public class BubbleSprayShape extends SpellShape {
 		}
 		
 		@Override
-		public void onProjectileEnd(Vector3d lastPos) {
+		public void onProjectileEnd(Vec3 lastPos) {
 			getState().triggerFail(new SpellLocation(world, lastPos));
 		}
 		
@@ -194,12 +194,12 @@ public class BubbleSprayShape extends SpellShape {
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
+	public boolean shouldTrace(Player player, SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(PlayerEntity player, SpellShapeProperties params) {
+	public double getTraceRange(Player player, SpellShapeProperties params) {
 		return SPRAY_RANGE_BASE * this.getRangeMod(params);
 	}
 	

@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.WolfTypeCapability;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -14,16 +14,16 @@ import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.vector.Vector4f;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import com.mojang.math.Vector4f;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
@@ -37,18 +37,18 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 	}
 	
 	@Override
-	public void showSheet(ArcaneWolfEntity wolf, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container, int width, int height, int offsetX, int offsetY) {
+	public void showSheet(ArcaneWolfEntity wolf, Player player, IPetContainer<ArcaneWolfEntity> container, int width, int height, int offsetX, int offsetY) {
 		
 	}
 
 	@Override
-	public void hideSheet(ArcaneWolfEntity wolf, PlayerEntity player, IPetContainer<ArcaneWolfEntity> container) {
+	public void hideSheet(ArcaneWolfEntity wolf, Player player, IPetContainer<ArcaneWolfEntity> container) {
 		
 	}
 
 	@Override
-	public void draw(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
-		FontRenderer fonter = mc.font;
+	public void draw(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+		Font fonter = mc.font;
 		int x = 0;
 		int y = 5;
 		int w;
@@ -65,7 +65,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		//final int 
 		String str;
 		
-		str = TextFormatting.BOLD + "Attributes" + TextFormatting.RESET;
+		str = ChatFormatting.BOLD + "Attributes" + ChatFormatting.RESET;
 		x = 5;
 		fonter.draw(matrixStackIn, str, x, y, categoryColor);
 		
@@ -122,7 +122,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		
 		y += largeMargin;
 		
-		str = TextFormatting.BOLD + "Training" + TextFormatting.RESET;
+		str = ChatFormatting.BOLD + "Training" + ChatFormatting.RESET;
 		x = 5;
 		fonter.draw(matrixStackIn, str, x, y, categoryColor);
 		y += h + mediumMargin;
@@ -182,7 +182,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		
 		y += largeMargin;
 		
-		str = TextFormatting.BOLD + "Movement" + TextFormatting.RESET;
+		str = ChatFormatting.BOLD + "Movement" + ChatFormatting.RESET;
 		x = 5;
 		fonter.draw(matrixStackIn, str, x, y, categoryColor);
 		y += h + mediumMargin;
@@ -203,7 +203,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		
 		y += largeMargin;
 		
-		str = TextFormatting.BOLD + "Capabilities" + TextFormatting.RESET;
+		str = ChatFormatting.BOLD + "Capabilities" + ChatFormatting.RESET;
 		x = 5;
 		fonter.draw(matrixStackIn, str, x, y, categoryColor);
 		y += h + mediumMargin;
@@ -222,7 +222,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 				final int widgetWidth = (int) dims.x();
 				final int widgetHeight = (int) dims.y();
 				final String key = "Can be ridden upon, and is even strong enough to jump!";
-				widgetCollection.add(new CapabilityTooltip(new StringTextComponent(key), x, y, widgetWidth, widgetHeight));
+				widgetCollection.add(new CapabilityTooltip(new TextComponent(key), x, y, widgetWidth, widgetHeight));
 			}
 			
 			y += h + smallMargin;
@@ -242,7 +242,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 						final int widgetWidth = (int) dims.x();
 						final int widgetHeight = (int) dims.y();
 						final String key = "info.tamed_arcane_wolf.capability." + cap.getKey() + ".desc";
-						widgetCollection.add(new CapabilityTooltip(new TranslationTextComponent(key), x, y, widgetWidth, widgetHeight));
+						widgetCollection.add(new CapabilityTooltip(new TranslatableComponent(key), x, y, widgetWidth, widgetHeight));
 					}
 					
 					y += h + smallMargin;
@@ -250,7 +250,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 			}
 		}
 		
-		for (Widget widget : this.widgets) {
+		for (AbstractWidget widget : this.widgets) {
 			widget.render(matrixStackIn, mouseX, mouseY, partialTicks);
 		}
 		
@@ -262,7 +262,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 	}
 
 	@Override
-	public void handleMessage(CompoundNBT data) {
+	public void handleMessage(CompoundTag data) {
 		
 	}
 
@@ -276,27 +276,27 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 	}
 
 	@Override
-	public void overlay(MatrixStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
+	public void overlay(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int width, int height, int mouseX, int mouseY) {
 		for (CapabilityTooltip widget : widgets) {
 			widget.drawOverlay(mc, matrixStackIn, width, height, mouseX, mouseY);
 		}
 	}
 	
-	private static class CapabilityTooltip extends Widget {
+	private static class CapabilityTooltip extends AbstractWidget {
 		
-		private final ITextComponent tooltip;
+		private final Component tooltip;
 		
-		public CapabilityTooltip(ITextComponent tooltip, int x, int y, int width, int height) {
-			super(x, y, width, height, StringTextComponent.EMPTY);
+		public CapabilityTooltip(Component tooltip, int x, int y, int width, int height) {
+			super(x, y, width, height, TextComponent.EMPTY);
 			this.tooltip = tooltip;
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialsTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialsTicks) {
 			;
 		}
 		
-		public void drawOverlay(Minecraft mc, MatrixStack matrixStackIn, int sheetWidth, int sheetHeight, int mouseX, int mouseY) {
+		public void drawOverlay(Minecraft mc, PoseStack matrixStackIn, int sheetWidth, int sheetHeight, int mouseX, int mouseY) {
 			if (this.isHovered()) {
 				GuiUtils.drawHoveringText(matrixStackIn, Arrays.asList(this.tooltip), mouseX, mouseY, sheetWidth, sheetHeight, -1, mc.font);
 			}

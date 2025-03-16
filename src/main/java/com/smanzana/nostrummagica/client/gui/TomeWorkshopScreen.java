@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -14,15 +14,15 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.AbstractButton;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 
 public class TomeWorkshopScreen extends Screen {
 	
@@ -88,7 +88,7 @@ public class TomeWorkshopScreen extends Screen {
 	
 	private static final int TEXT_BACKGROUND_COLOR = 0xFF272A2A;
 	
-	private final PlayerInventory playerInv;
+	private final Inventory playerInv;
 	
 	// Positioning variables
 	private int gui_width;
@@ -112,8 +112,8 @@ public class TomeWorkshopScreen extends Screen {
 	private PageFlipButton leftFlip;
 	private PageFlipButton rightFlip;
 
-	public TomeWorkshopScreen(PlayerEntity player) {
-		super(new StringTextComponent("Tome Workshop"));
+	public TomeWorkshopScreen(Player player) {
+		super(new TextComponent("Tome Workshop"));
 		this.playerInv = player.inventory;
 		this.spellSlotWidgets = new ArrayList<>();
 		this.spellLibraryWidgets = new ArrayList<>();
@@ -206,7 +206,7 @@ public class TomeWorkshopScreen extends Screen {
 		return true;
 	}
 	
-	protected void removeWidget(Widget widget) {
+	protected void removeWidget(AbstractWidget widget) {
 		// This is dumb
 		this.children.remove(widget);
 		this.buttons.remove(widget);
@@ -312,10 +312,10 @@ public class TomeWorkshopScreen extends Screen {
 	}
 	
 	protected void refreshTomeScreen() {
-		for (Widget widget : spellSlotWidgets) {
+		for (AbstractWidget widget : spellSlotWidgets) {
 			this.removeWidget(widget);
 		}
-		for (Widget widget : spellLibraryWidgets) {
+		for (AbstractWidget widget : spellLibraryWidgets) {
 			this.removeWidget(widget);
 		}
 		this.spellSlotWidgets.clear();
@@ -561,7 +561,7 @@ public class TomeWorkshopScreen extends Screen {
 		}
 	}
 	
-	public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		this.renderBackground(matrixStackIn);
 		
 		final Minecraft mc = Minecraft.getInstance();
@@ -667,7 +667,7 @@ public class TomeWorkshopScreen extends Screen {
 		//super.render(matrixStack, mouseX, mouseY, partialTicks);
 	}
 	
-	protected void renderSpellSlide(MatrixStack matrixStackIn, Spell spell, int width, int height, float partialTicks) {
+	protected void renderSpellSlide(PoseStack matrixStackIn, Spell spell, int width, int height, float partialTicks) {
 		final Minecraft mc = getMinecraft();
 		final int iconLen = Math.min(32, height-2);
 		final int yMargin = Math.max(0, (iconLen+2) - height) / 2; // Get how much vertical space that means we have
@@ -687,7 +687,7 @@ public class TomeWorkshopScreen extends Screen {
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(iconLen + 3, 1, 0);
 		matrixStackIn.scale(.5f, .5f, 1f);
-		mc.font.draw(matrixStackIn, TextFormatting.BOLD + name, 0, y, 0xFF000000);
+		mc.font.draw(matrixStackIn, ChatFormatting.BOLD + name, 0, y, 0xFF000000);
 		y += mc.font.lineHeight;
 		mc.font.draw(matrixStackIn, "Mana: " + spell.getManaCost(), 0, y, 0xFF202020);
 		y += mc.font.lineHeight;
@@ -695,7 +695,7 @@ public class TomeWorkshopScreen extends Screen {
 		matrixStackIn.popPose();
 	}
 	
-	protected void renderItemTooltip(MatrixStack matrixStackIn, ItemStack stack, int x, int y) {
+	protected void renderItemTooltip(PoseStack matrixStackIn, ItemStack stack, int x, int y) {
 		this.renderTooltip(matrixStackIn, stack, x, y);
 	}
 	
@@ -709,7 +709,7 @@ public class TomeWorkshopScreen extends Screen {
 		
 		public SpellLibraryPane(TomeWorkshopScreen screen, Spell spell, int idx, int x, int y, int width, int height) {
 			//int x, int y, int width, int height, ITextComponent title
-			super(x, y, width, height, StringTextComponent.EMPTY);
+			super(x, y, width, height, TextComponent.EMPTY);
 			this.screen = screen;
 			this.spell = spell;
 			this.idx = idx;
@@ -732,7 +732,7 @@ public class TomeWorkshopScreen extends Screen {
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(x, y, 0);
@@ -767,7 +767,7 @@ public class TomeWorkshopScreen extends Screen {
 			matrixStackIn.popPose();
 		}
 		
-		public void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderForeground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			
 		}
 	}
@@ -781,7 +781,7 @@ public class TomeWorkshopScreen extends Screen {
 		
 		public SpellSlotPane(TomeWorkshopScreen screen, int idx, int x, int y, int width, int height) {
 			//int x, int y, int width, int height, ITextComponent title
-			super(x, y, width, height, StringTextComponent.EMPTY);
+			super(x, y, width, height, TextComponent.EMPTY);
 			this.screen = screen;
 			this.idx = idx;
 			this.selected = false;
@@ -818,7 +818,7 @@ public class TomeWorkshopScreen extends Screen {
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
 			
 			matrixStackIn.pushPose();
@@ -858,7 +858,7 @@ public class TomeWorkshopScreen extends Screen {
 			matrixStackIn.popPose();
 		}
 		
-		public void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderForeground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			
 		}
 	}
@@ -866,12 +866,12 @@ public class TomeWorkshopScreen extends Screen {
 	protected static class PretendInventorySlot extends AbstractButton {
 		
 		private final TomeWorkshopScreen screen;
-		private final PlayerInventory inventory;
+		private final Inventory inventory;
 		private final int slotIdx;
 		private boolean selected;
 		
-		public PretendInventorySlot(TomeWorkshopScreen screen, PlayerInventory inventory, int slotIdx, int x, int y, int width, int height) {
-			super(x, y, width, height, StringTextComponent.EMPTY);
+		public PretendInventorySlot(TomeWorkshopScreen screen, Inventory inventory, int slotIdx, int x, int y, int width, int height) {
+			super(x, y, width, height, TextComponent.EMPTY);
 			this.screen = screen;
 			this.inventory = inventory;
 			this.slotIdx = slotIdx;
@@ -887,7 +887,7 @@ public class TomeWorkshopScreen extends Screen {
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(this.x, this.y, 0);
 			ItemStack slotStack = this.inventory.getItem(this.slotIdx);
@@ -914,7 +914,7 @@ public class TomeWorkshopScreen extends Screen {
 			matrixStackIn.popPose();
 		}
 		
-		public void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderForeground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			if (this.isHovered) {
 				ItemStack slotStack = this.inventory.getItem(this.slotIdx);
 				if (!slotStack.isEmpty()) {
@@ -931,7 +931,7 @@ public class TomeWorkshopScreen extends Screen {
 		private boolean pressed;
 		
 		public Scrollbar(TomeWorkshopScreen screen, int x, int y, int width, int height) {
-			super(x, y, width, height, StringTextComponent.EMPTY);
+			super(x, y, width, height, TextComponent.EMPTY);
 			this.screen = screen;
 		}
 		
@@ -950,7 +950,7 @@ public class TomeWorkshopScreen extends Screen {
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
 			
 			matrixStackIn.pushPose();
@@ -981,7 +981,7 @@ public class TomeWorkshopScreen extends Screen {
 		private final boolean isLeft;
 		
 		public PageFlipButton(TomeWorkshopScreen screen, boolean isLeft, int x, int y, int width, int height) {
-			super(x, y, width, height, StringTextComponent.EMPTY);
+			super(x, y, width, height, TextComponent.EMPTY);
 			this.screen = screen;
 			this.isLeft = isLeft;
 		}
@@ -992,7 +992,7 @@ public class TomeWorkshopScreen extends Screen {
 		}
 		
 		@Override
-		public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			final Minecraft mc = Minecraft.getInstance();
 			
 			// Figure out if disasbled. Should be doing somewhere else...

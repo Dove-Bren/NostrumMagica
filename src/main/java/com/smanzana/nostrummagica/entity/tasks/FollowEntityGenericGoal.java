@@ -2,26 +2,26 @@ package com.smanzana.nostrummagica.entity.tasks;
 
 import java.util.EnumSet;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.pathfinding.PathNavigator;
-import net.minecraft.pathfinding.PathNodeType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 
-import net.minecraft.entity.ai.goal.Goal.Flag;
+import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
-public class FollowEntityGenericGoal<T extends MobEntity> extends Goal {
+public class FollowEntityGenericGoal<T extends Mob> extends Goal {
 	
 	private final T entity;
 	private LivingEntity theTarget;
-	private World world;
+	private Level world;
 	private final double followSpeed;
-	private final PathNavigator petPathfinder;
+	private final PathNavigation petPathfinder;
 	private int timeToRecalcPath;
 	private float maxDist;
 	private float minDist;
@@ -62,7 +62,7 @@ public class FollowEntityGenericGoal<T extends MobEntity> extends Goal {
 
 		if (entitylivingbase == null) {
 			return false;
-		} else if (entitylivingbase instanceof PlayerEntity && ((PlayerEntity)entitylivingbase).isSpectator()) {
+		} else if (entitylivingbase instanceof Player && ((Player)entitylivingbase).isSpectator()) {
 			return false;
 		} else if (!this.canFollow(entity)) {
 			return false;
@@ -86,8 +86,8 @@ public class FollowEntityGenericGoal<T extends MobEntity> extends Goal {
 	 */
 	public void start() {
 		this.timeToRecalcPath = 0;
-		this.oldWaterCost = this.entity.getPathfindingMalus(PathNodeType.WATER);
-		this.entity.setPathfindingMalus(PathNodeType.WATER, 0.0F);
+		this.oldWaterCost = this.entity.getPathfindingMalus(BlockPathTypes.WATER);
+		this.entity.setPathfindingMalus(BlockPathTypes.WATER, 0.0F);
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class FollowEntityGenericGoal<T extends MobEntity> extends Goal {
 	public void stop() {
 		this.theTarget = null;
 		this.petPathfinder.stop();
-		this.entity.setPathfindingMalus(PathNodeType.WATER, this.oldWaterCost);
+		this.entity.setPathfindingMalus(BlockPathTypes.WATER, this.oldWaterCost);
 	}
 	
 	protected boolean canTeleportToBlock(BlockPos pos) {
@@ -117,11 +117,11 @@ public class FollowEntityGenericGoal<T extends MobEntity> extends Goal {
 				if (!this.petPathfinder.moveTo(this.theTarget, this.followSpeed) && this.canTeleport) {
 					if (!this.entity.isLeashed()) {
 						if (this.entity.distanceToSqr(this.theTarget) >= 144.0D) {
-							int i = MathHelper.floor(this.theTarget.getX()) - 2;
-							int j = MathHelper.floor(this.theTarget.getZ()) - 2;
-							int k = MathHelper.floor(this.theTarget.getBoundingBox().minY);
+							int i = Mth.floor(this.theTarget.getX()) - 2;
+							int j = Mth.floor(this.theTarget.getZ()) - 2;
+							int k = Mth.floor(this.theTarget.getBoundingBox().minY);
 							
-							BlockPos.Mutable pos1 = new BlockPos.Mutable();
+							BlockPos.MutableBlockPos pos1 = new BlockPos.MutableBlockPos();
 
 							for (int l = 0; l <= 4; ++l) {
 								for (int i1 = 0; i1 <= 4; ++i1) {

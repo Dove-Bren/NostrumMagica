@@ -13,16 +13,16 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.tile.CandleTileEntity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 /**
  * One for each element, except physical
@@ -119,40 +119,40 @@ public class InfusedGemItem extends Item implements ILoreTagged, IEnchantableIte
 	}
 	
 	@Override
-	public ActionResultType useOn(ItemUseContext context) {
+	public InteractionResult useOn(UseOnContext context) {
 		//if (worldIn.isRemote)
 			//return ActionResultType.SUCCESS;
 		
-		final PlayerEntity playerIn = context.getPlayer();
+		final Player playerIn = context.getPlayer();
 		final BlockPos pos = context.getClickedPos();
 		final @Nonnull ItemStack stack = context.getItemInHand();
-		final World worldIn = context.getLevel();
+		final Level worldIn = context.getLevel();
 		BlockState state = worldIn.getBlockState(pos);
 		if (state.getBlock() == null)
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		
-		TileEntity te = worldIn.getBlockEntity(pos);
+		BlockEntity te = worldIn.getBlockEntity(pos);
 		if (state.getBlock() instanceof CandleBlock) {
 			if (!(te instanceof CandleTileEntity))
-				return ActionResultType.PASS;
+				return InteractionResult.PASS;
 			
  			if (AltarRitualLayout.AttemptRitual(worldIn, pos, playerIn, element)) {
  				stack.shrink(1);
  			}
  			
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		} else if (state.getBlock() instanceof AltarBlock) {
 			if (!(te instanceof AltarTileEntity))
-				return ActionResultType.PASS;
+				return InteractionResult.PASS;
 			
 			if (AltarRitualLayout.AttemptRitual(worldIn, pos, playerIn, element)) {
 				stack.shrink(1);
 			}
 			
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
 	}
 
 	@Override

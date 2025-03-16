@@ -1,13 +1,13 @@
 package com.smanzana.nostrummagica.world.gen;
 
-import net.minecraft.world.gen.feature.BlockClusterFeatureConfig;
-import net.minecraft.world.gen.feature.DefaultFlowersFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration;
+import net.minecraft.world.level.levelgen.feature.DefaultFlowerFeature;
 
-public class NostrumFlowerGenerator extends DefaultFlowersFeature {
+public class NostrumFlowerGenerator extends DefaultFlowerFeature {
 	
 	int unused; // DELETE?
 	public NostrumFlowerGenerator() {
-		super(BlockClusterFeatureConfig.CODEC);
+		super(RandomPatchConfiguration.CODEC);
 	}
 
 //	@Override

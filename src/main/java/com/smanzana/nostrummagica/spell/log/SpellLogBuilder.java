@@ -12,12 +12,12 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class SpellLogBuilder implements ISpellLogBuilder {
 	
@@ -48,14 +48,14 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 		public EffectBuilder element(@Nullable EMagicElement elem) { throw new IllegalStateException("Building the wrong type of effect"); }
 		
 		// Effect
-		public EffectBuilder effect(Effect effect) { throw new IllegalStateException("Building the wrong type of effect"); }
+		public EffectBuilder effect(MobEffect effect) { throw new IllegalStateException("Building the wrong type of effect"); }
 		public EffectBuilder baseDuration(int duration) { throw new IllegalStateException("Building the wrong type of effect"); }
 		public EffectBuilder finalDuration(int duration) { throw new IllegalStateException("Building the wrong type of effect"); }
 		
 		// General
 		public EffectBuilder harmful(boolean harmful) { throw new IllegalStateException("Building the wrong type of effect"); }
-		public EffectBuilder name(ITextComponent name) { throw new IllegalStateException("Building the wrong type of effect"); }
-		public EffectBuilder desc(ITextComponent desc) { throw new IllegalStateException("Building the wrong type of effect"); }
+		public EffectBuilder name(Component name) { throw new IllegalStateException("Building the wrong type of effect"); }
+		public EffectBuilder desc(Component desc) { throw new IllegalStateException("Building the wrong type of effect"); }
 	}
 	
 	private static final class DamageEffectBuilder extends EffectBuilder {
@@ -138,7 +138,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 	
 	private static final class StatusEffectBuilder extends EffectBuilder {
 		
-		private Effect effect;
+		private MobEffect effect;
 		private int baseDuration;
 		private int finalDuration;
 		
@@ -149,7 +149,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 		}
 		
 		@Override
-		public EffectBuilder effect(Effect effect) {
+		public EffectBuilder effect(MobEffect effect) {
 			this.effect = effect;
 			return this;
 		}
@@ -179,8 +179,8 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 		
 		private float amtDmg;
 		private float amtHeal;
-		private ITextComponent name;
-		private ITextComponent desc;
+		private Component name;
+		private Component desc;
 		private boolean harmful;
 		
 		public GeneralEffectBuilder(List<SpellLogModifier> baseModifiers) {
@@ -210,13 +210,13 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 		}
 		
 		@Override
-		public EffectBuilder name(ITextComponent name) {
+		public EffectBuilder name(Component name) {
 			this.name = name;
 			return this;
 		}
 		
 		@Override
-		public EffectBuilder desc(ITextComponent desc) {
+		public EffectBuilder desc(Component desc) {
 			this.desc = desc;
 			return this;
 		}
@@ -435,7 +435,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 	}
 
 	@Override
-	public SpellLogBuilder statusStart(Effect effect, int baseDuration) {
+	public SpellLogBuilder statusStart(MobEffect effect, int baseDuration) {
 		if (this.buildingEffectLine) {
 			throw new IllegalStateException("Previous effect was not finished");
 		}
@@ -456,7 +456,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 	}
 
 	@Override
-	public SpellLogBuilder generalEffectStart(ITextComponent name, ITextComponent description, boolean harmful) {
+	public SpellLogBuilder generalEffectStart(Component name, Component description, boolean harmful) {
 		if (this.buildingEffectLine) {
 			throw new IllegalStateException("Previous effect was not finished");
 		}
@@ -477,7 +477,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 	}
 
 	@Override
-	public SpellLogBuilder effectMod(ITextComponent label, float amt, ESpellLogModifierType type) {
+	public SpellLogBuilder effectMod(Component label, float amt, ESpellLogModifierType type) {
 		if (!this.buildingEffectLine || this.effectBuilder == null) {
 			throw new IllegalStateException("Wasn't building an effect line, so can't add a modifier");
 		}
@@ -506,7 +506,7 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 	}
 	
 	@Override
-	public ISpellLogBuilder addGlobalModifier(ITextComponent label, float amt, ESpellLogModifierType type) {
+	public ISpellLogBuilder addGlobalModifier(Component label, float amt, ESpellLogModifierType type) {
 		getModifiers().add(SpellLogModifier.Make(label, amt, type));
 		return this;
 	}
@@ -520,9 +520,9 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 		return this.modifierStack.get(this.modifierStack.size() - 1);
 	}
 	
-	protected ITextComponent makeSkillLabel(Skill skill) {
-		return new StringTextComponent("")
-			.append(new TranslationTextComponent("spelllogmod.nostrummagica.skill").withStyle(TextFormatting.GOLD))
+	protected Component makeSkillLabel(Skill skill) {
+		return new TextComponent("")
+			.append(new TranslatableComponent("spelllogmod.nostrummagica.skill").withStyle(ChatFormatting.GOLD))
 			.append(skill.getName().copy());
 	}
 	

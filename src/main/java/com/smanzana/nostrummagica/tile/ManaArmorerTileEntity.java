@@ -18,21 +18,21 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 
-public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEntity {
+public class ManaArmorerTileEntity extends BlockEntity implements TickableBlockEntity {
 	
 	private static final int MAX_CRYSTALS = 8;
 	private static final int MAX_CRYSTAL_RADIUS = 8;
@@ -132,8 +132,8 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 			// Re-check requirement before continuing in case player's mana has changed!
 			if (attr.getMaxMana() > this.calcManaBurnAmt(entity)) {
 				armor.setHasArmor(true, calcManaBurnAmt(entity));
-				if (entity instanceof ServerPlayerEntity) {
-					NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity)entity);
+				if (entity instanceof ServerPlayer) {
+					NostrumMagica.instance.proxy.syncPlayer((ServerPlayer)entity);
 				}
 			}
 		}
@@ -194,7 +194,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	
 	private void scanCrystalLayer(Set<BlockPos> positions, int radius) {
 		// Lazy way; just make sure one coord is == radius
-		BlockPos.Mutable pos = new BlockPos.Mutable();
+		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		for (int x = -radius; x <= radius; x++)
 		for (int y = -radius; y <= radius; y++)
 		for (int z = -radius; z <= radius; z++) {
@@ -242,14 +242,14 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 				1,
 				entity.getX(), entity.getY() + entity.getEyeHeight() / 2f, entity.getZ(), .25,
 				40, 0,
-				new Vector3d(worldPosition.getX() + .5, worldPosition.getY() + .75, worldPosition.getZ() + .5)
+				new Vec3(worldPosition.getX() + .5, worldPosition.getY() + .75, worldPosition.getZ() + .5)
 				).color(0xFF5511FF));
 	}
 	
 	protected void doManaEffectCrystal(LivingEntity entity, BlockPos crystal) {
 		BlockState state = entity.level.getBlockState(crystal);
-		Vector3d offset = NostrumBlocks.maniCrystalBlock.getCrystalTipOffset(state);
-		Vector3d crystalPos = new Vector3d(crystal.getX() + offset.x, crystal.getY() + offset.y, crystal.getZ() + offset.z);
+		Vec3 offset = NostrumBlocks.maniCrystalBlock.getCrystalTipOffset(state);
+		Vec3 crystalPos = new Vec3(crystal.getX() + offset.x, crystal.getY() + offset.y, crystal.getZ() + offset.z);
 		
 		NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
 				1,
@@ -262,7 +262,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 				1,
 				crystalPos.x, crystalPos.y, crystalPos.z, 0,
 				40, 0,
-				new Vector3d(worldPosition.getX() + .5, worldPosition.getY() + .75, worldPosition.getZ() + .5)
+				new Vec3(worldPosition.getX() + .5, worldPosition.getY() + .75, worldPosition.getZ() + .5)
 				).color(0xFF5511FF));
 	}
 	
@@ -281,7 +281,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 				100,
 				entity.getX(), entity.getY() + entity.getEyeHeight() / 2f, entity.getZ(), 1,
 				40, 20,
-				Vector3d.ZERO, new Vector3d(0, .01, 0)
+				Vec3.ZERO, new Vec3(0, .01, 0)
 				).color(0xFF5511FF));
 	}
 	
@@ -354,10 +354,10 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 				
 				float freq = .5f + .5f * this.getManaProgress();
 				level.playSound(NostrumMagica.instance.proxy.getPlayer(), worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5,
-						SoundEvents.NOTE_BLOCK_XYLOPHONE, SoundCategory.BLOCKS,
+						SoundEvents.NOTE_BLOCK_XYLOPHONE, SoundSource.BLOCKS,
 						.25f, freq + .5f);
 				level.playSound(NostrumMagica.instance.proxy.getPlayer(), worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5,
-						SoundEvents.NOTE_BLOCK_CHIME, SoundCategory.BLOCKS,
+						SoundEvents.NOTE_BLOCK_CHIME, SoundSource.BLOCKS,
 						.25f, freq + .25f);
 			}
 		} else if (this.rotationProg > 0f) {
@@ -399,7 +399,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	private static final String NBT_TARGET_MANA = "target_mana";
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		if (this.getActiveEntity() != null) {
@@ -413,7 +413,7 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt == null)
@@ -425,24 +425,24 @@ public class ManaArmorerTileEntity extends TileEntity implements ITickableTileEn
 		if (nbt.hasUUID(NBT_ENTITY_ID)) {
 			UUID id = nbt.getUUID(NBT_ENTITY_ID);
 			if (id != null && this.level != null) {
-				PlayerEntity player = this.level.getPlayerByUUID(id);
+				Player player = this.level.getPlayerByUUID(id);
 				this.activeEntity = player;
 			}
 		}
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}

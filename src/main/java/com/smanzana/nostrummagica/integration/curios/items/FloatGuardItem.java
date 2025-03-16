@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.integration.curios.items;
 
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Effects;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.effect.MobEffects;
 
 public class FloatGuardItem extends NostrumCurio {
 
@@ -16,7 +16,7 @@ public class FloatGuardItem extends NostrumCurio {
 	
 	@Override
 	public void onWornTick(ItemStack stack, LivingEntity player) {
-		player.removeEffect(Effects.LEVITATION);
+		player.removeEffect(MobEffects.LEVITATION);
 		player.removeEffect(NostrumEffects.rooted);
 	}
 	

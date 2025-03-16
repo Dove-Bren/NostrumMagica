@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.smanzana.nostrummagica.spell.SpellLocation;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 
 /**
  * One discrete 'stage' of the spell. Maps to 'shapes' in the actual spell, where each stage

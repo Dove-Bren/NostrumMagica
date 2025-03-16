@@ -7,10 +7,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class TierRequirement implements IRequirement{
 
@@ -21,7 +21,7 @@ public class TierRequirement implements IRequirement{
 	}
 
 	@Override
-	public boolean matches(PlayerEntity player) {
+	public boolean matches(Player player) {
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		return attr.getTier().isGreaterOrEqual(this.tier);
 	}
@@ -32,8 +32,8 @@ public class TierRequirement implements IRequirement{
 	}
 
 	@Override
-	public List<ITextComponent> getDescription(PlayerEntity player) {
-		return Lists.newArrayList(new TranslationTextComponent("info.requirement.tier", 
-				tier.getName().withStyle(TextFormatting.DARK_PURPLE)));
+	public List<Component> getDescription(Player player) {
+		return Lists.newArrayList(new TranslatableComponent("info.requirement.tier", 
+				tier.getName().withStyle(ChatFormatting.DARK_PURPLE)));
 	}
 }

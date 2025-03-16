@@ -9,25 +9,25 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.util.Entities;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntitySize;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.Pose;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.DamageSource;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity implements IMultiPartEntityPart<T> {
 	
-	protected static final DataParameter<Optional<UUID>> PARENT_ID = EntityDataManager.<Optional<UUID>>defineId(MultiPartEntityPart.class, DataSerializers.OPTIONAL_UUID);
-	protected static final DataParameter<String> PART_NAME = EntityDataManager.defineId(MultiPartEntityPart.class, DataSerializers.STRING);
+	protected static final EntityDataAccessor<Optional<UUID>> PARENT_ID = SynchedEntityData.<Optional<UUID>>defineId(MultiPartEntityPart.class, EntityDataSerializers.OPTIONAL_UUID);
+	protected static final EntityDataAccessor<String> PART_NAME = SynchedEntityData.defineId(MultiPartEntityPart.class, EntityDataSerializers.STRING);
 
-	protected EntitySize size;
+	protected EntityDimensions size;
 	protected int orphanTicks;
 	protected @Nullable T parentCache = null;
 	
@@ -39,7 +39,7 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 		this.setSize(width, height);
 	}
 	
-	public MultiPartEntityPart(EntityType<?> type, World world, String name, float width, float height) {
+	public MultiPartEntityPart(EntityType<?> type, Level world, String name, float width, float height) {
 		super(type, world);
 		
 		this.setSize(width, height);
@@ -103,7 +103,7 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 	}
 
 	@Override
-	protected void readAdditionalSaveData(CompoundNBT compound) {
+	protected void readAdditionalSaveData(CompoundTag compound) {
 		// This handles the initial spawn if the server entity has already changed values
 		final String name = compound.getString("name");
 		final UUID parentID = compound.hasUUID("parentID") ? compound.getUUID("parentID") : null;
@@ -112,19 +112,19 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 	}
 
 	@Override
-	protected void addAdditionalSaveData(CompoundNBT compound) {
+	protected void addAdditionalSaveData(CompoundTag compound) {
 		compound.putString("name", this.getPartName());
 		compound.putUUID("parentID", getParentID());
 	}
 	
 	@Override
-	public boolean saveAsPassenger(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundTag compound) {
 		// Don't save! We generate each time
 		return false;
 	}
 
 	@Override
-	public IPacket<?> getAddEntityPacket() {
+	public Packet<?> getAddEntityPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 	
@@ -145,7 +145,7 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 	}
 	
 	@Override
-	public EntitySize getDimensions(Pose poseIn) {
+	public EntityDimensions getDimensions(Pose poseIn) {
 		return this.size;
 	}
 	
@@ -166,12 +166,12 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 		}
 	}
 	
-	public void setSize(EntitySize size) {
+	public void setSize(EntityDimensions size) {
 		this.size = size;
 		this.refreshDimensions();
 	}
 	
 	public void setSize(float width, float height) {
-		this.setSize(EntitySize.scalable(width, height));
+		this.setSize(EntityDimensions.scalable(width, height));
 	}
 }

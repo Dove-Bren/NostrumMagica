@@ -9,9 +9,9 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.network.chat.Component;
 
 public interface ISpellLogBuilder {
 	
@@ -33,15 +33,15 @@ public interface ISpellLogBuilder {
 	
 	public default ISpellLogBuilder healFinish(float finalHeal) { return this; }
 	
-	public default ISpellLogBuilder statusStart(Effect effect, int baseDuration) { return this; }
+	public default ISpellLogBuilder statusStart(MobEffect effect, int baseDuration) { return this; }
 	
 	public default ISpellLogBuilder statusFinish(int finalDuration) { return this; }
 	
-	public default ISpellLogBuilder generalEffectStart(ITextComponent name, ITextComponent description, boolean harmful) { return this; }
+	public default ISpellLogBuilder generalEffectStart(Component name, Component description, boolean harmful) { return this; }
 	
 	public default ISpellLogBuilder generalEffectFinish(float finalDmg, float finalHeal) { return this; }
 	
-	public default ISpellLogBuilder effectMod(ITextComponent label, float amt, ESpellLogModifierType type) { return this; }
+	public default ISpellLogBuilder effectMod(Component label, float amt, ESpellLogModifierType type) { return this; }
 	
 	public default ISpellLogBuilder effectMod(Skill skill, float amt, ESpellLogModifierType type) { return this; }
 	
@@ -49,7 +49,7 @@ public interface ISpellLogBuilder {
 	
 	public default ISpellLogBuilder popModifierStack() { return this; }
 	
-	public default ISpellLogBuilder addGlobalModifier(ITextComponent label, float amt, ESpellLogModifierType type) { return this; }
+	public default ISpellLogBuilder addGlobalModifier(Component label, float amt, ESpellLogModifierType type) { return this; }
 
 	public default ISpellLogBuilder addGlobalModifier(Skill skill, float amt, ESpellLogModifierType type) { return this; }
 	

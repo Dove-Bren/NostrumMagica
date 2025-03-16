@@ -3,12 +3,12 @@ package com.smanzana.nostrummagica.progression.requirement;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.Component;
 
 public interface IRequirement {
 	
-	public abstract boolean matches(PlayerEntity player);
+	public abstract boolean matches(Player player);
 	
 	/**
 	 * Check if this requirement can ever be satisfied. For example, quest requirements
@@ -17,13 +17,13 @@ public interface IRequirement {
 	 */
 	public abstract boolean isValid();
 	
-	public List<ITextComponent> getDescription(PlayerEntity player);
+	public List<Component> getDescription(Player player);
 	
 	public static IRequirement AND(IRequirement ... requirements) {
 		return new IRequirement() {
 
 			@Override
-			public boolean matches(PlayerEntity player) {
+			public boolean matches(Player player) {
 				for (IRequirement req : requirements) {
 					if (!req.matches(player)) {
 						return false;
@@ -43,8 +43,8 @@ public interface IRequirement {
 			}
 
 			@Override
-			public List<ITextComponent> getDescription(PlayerEntity player) {
-				List<ITextComponent> list = new ArrayList<>();
+			public List<Component> getDescription(Player player) {
+				List<Component> list = new ArrayList<>();
 				for (IRequirement req : requirements) {
 					list.addAll(req.getDescription(player));
 				}

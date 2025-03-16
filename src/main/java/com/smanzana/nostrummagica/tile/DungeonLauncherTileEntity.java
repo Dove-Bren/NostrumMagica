@@ -14,44 +14,44 @@ import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.Inventories;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ArrowItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.TippedArrowItem;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.ArrowItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TippedArrowItem;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 
-public class DungeonLauncherTileEntity extends TileEntity implements ITickableTileEntity {
+public class DungeonLauncherTileEntity extends BlockEntity implements TickableBlockEntity {
 
 	private static final String NBT_INVENTORY = "inventory";
 	protected static final int DEFAULT_COOLDOWN = 20 * 3;
 	
-	private final Inventory inventory;
+	private final SimpleContainer inventory;
 	
 	private int cooldownTicks;
 	private int ticksExisted;
 	
 	public DungeonLauncherTileEntity() {
 		super(NostrumTileEntities.DungeonLauncherTileType);
-		this.inventory = new Inventory(9) {
+		this.inventory = new SimpleContainer(9) {
 			@Override
 			public void setChanged() {
 				DungeonLauncherTileEntity.this.setChanged();
@@ -60,7 +60,7 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 		cooldownTicks = 0;
 	}
 	
-	public IInventory getInventory() {
+	public Container getInventory() {
 		return inventory;
 	}
 	
@@ -81,7 +81,7 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 	}
 	
 	protected boolean canSeeEntity(LivingEntity entity) {
-		return !entity.isSpectator() && (entity instanceof PlayerEntity || entity instanceof MobEntity) && !(entity instanceof TileProxyTriggerEntity);
+		return !entity.isSpectator() && (entity instanceof Player || entity instanceof Mob) && !(entity instanceof TileProxyTriggerEntity);
 	}
 	
 	protected boolean checkForEntity() {
@@ -126,7 +126,7 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 			gz = 1;
 			break;
 		}
-		List<LivingEntity> ents = level.getEntitiesOfClass(LivingEntity.class, VoxelShapes.block().bounds().move(worldPosition).expandTowards(dx, dy, dz).inflate(gx, gy, gz), this::canSeeEntity);
+		List<LivingEntity> ents = level.getEntitiesOfClass(LivingEntity.class, Shapes.block().bounds().move(worldPosition).expandTowards(dx, dy, dz).inflate(gx, gy, gz), this::canSeeEntity);
 		return ents != null && !ents.isEmpty();
 	}
 	
@@ -138,28 +138,28 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 		this.cooldownTicks = this.ticksExisted + cooldown;
 	}
 	
-	protected Vector3d getFirePos() {
+	protected Vec3 getFirePos() {
 		final float startDistance = 1f;
 		final BlockPos pos = this.getBlockPos();
 		final Direction direction = level.getBlockState(pos).getValue(PutterBlock.FACING);
 		switch (direction) {
 		case DOWN:
-			return new Vector3d(pos.getX() + .5, pos.getY() - startDistance, pos.getZ() + .5);
+			return new Vec3(pos.getX() + .5, pos.getY() - startDistance, pos.getZ() + .5);
 		case EAST:
 		default:
-			return new Vector3d(pos.getX() + 1 + startDistance, pos.getY() + .5, pos.getZ() + .5);
+			return new Vec3(pos.getX() + 1 + startDistance, pos.getY() + .5, pos.getZ() + .5);
 		case NORTH:
-			return new Vector3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() - startDistance);
+			return new Vec3(pos.getX() + .5, pos.getY() + .5, pos.getZ() - startDistance);
 		case SOUTH:
-			return new Vector3d(pos.getX() + .5, pos.getY() + .5, pos.getZ() + 1 + startDistance);
+			return new Vec3(pos.getX() + .5, pos.getY() + .5, pos.getZ() + 1 + startDistance);
 		case UP:
-			return new Vector3d(pos.getX() + .5, pos.getY() + 1 + startDistance, pos.getZ() + .5);
+			return new Vec3(pos.getX() + .5, pos.getY() + 1 + startDistance, pos.getZ() + .5);
 		case WEST:
-			return new Vector3d(pos.getX() - startDistance, pos.getY() + .5, pos.getZ() + .5);
+			return new Vec3(pos.getX() - startDistance, pos.getY() + .5, pos.getZ() + .5);
 		}
 	}
 	
-	protected float getFireSpeed(ProjectileEntity projectile) {
+	protected float getFireSpeed(Projectile projectile) {
 		float speed = 1.4f; // base
 		if (projectile instanceof MagicDamageProjectileEntity) {
 			// Change speed based on element
@@ -185,28 +185,28 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 		return speed;
 	}
 	
-	protected float getFireInaccuracy(ProjectileEntity projectile) {
+	protected float getFireInaccuracy(Projectile projectile) {
 		return 1f;
 	}
 	
 	protected void fire() {
-		final Vector3d source = getFirePos();
-		ProjectileEntity projectile = this.makeProjectile(getLevel(), source.x(), source.y(), source.z());
+		final Vec3 source = getFirePos();
+		Projectile projectile = this.makeProjectile(getLevel(), source.x(), source.y(), source.z());
 		if (projectile != null) {
-			final Vector3d direction = source.subtract(Vector3d.atCenterOf(this.getBlockPos())).normalize();
+			final Vec3 direction = source.subtract(Vec3.atCenterOf(this.getBlockPos())).normalize();
 			projectile.shoot(direction.x(), direction.y(), direction.z(), getFireSpeed(projectile), getFireInaccuracy(projectile));
 			getLevel().addFreshEntity(projectile);
 			playFireEffect(projectile, direction);
 		}
 	}
 	
-	protected void playFireEffect(ProjectileEntity projectile, Vector3d direction) {
-		projectile.level.playSound(null, this.getBlockPos(), SoundEvents.FIRECHARGE_USE, SoundCategory.BLOCKS, 1f, 1f);
-		((ServerWorld) projectile.level).sendParticles(ParticleTypes.SMOKE, projectile.getX(), projectile.getY(), projectile.getZ(),
+	protected void playFireEffect(Projectile projectile, Vec3 direction) {
+		projectile.level.playSound(null, this.getBlockPos(), SoundEvents.FIRECHARGE_USE, SoundSource.BLOCKS, 1f, 1f);
+		((ServerLevel) projectile.level).sendParticles(ParticleTypes.SMOKE, projectile.getX(), projectile.getY(), projectile.getZ(),
 				10, direction.x(), direction.y(), direction.z(), .2f);
 	}
 	
-	protected @Nullable ProjectileEntity makeProjectile(World world, double x, double y, double z) {
+	protected @Nullable Projectile makeProjectile(Level world, double x, double y, double z) {
 		ItemStack stack = getRandomHeldItem();
 		if (stack.isEmpty()) {
 			return null;
@@ -216,13 +216,13 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 			EMagicElement element = InfusedGemItem.GetElement(stack);
 			return makeElementalProjectile(world, x, y, z, element);
 		} else if (stack.getItem() instanceof TippedArrowItem) {
-			ArrowEntity arrow = new ArrowEntity(world, x, y, z);
-			arrow.pickup = AbstractArrowEntity.PickupStatus.DISALLOWED;
+			Arrow arrow = new Arrow(world, x, y, z);
+			arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
 			arrow.setEffectsFromItem(stack);
 			return arrow; 
 		} else if (stack.getItem() instanceof ArrowItem) {
-			ArrowEntity arrow = new ArrowEntity(world, x, y, z);
-			arrow.pickup = AbstractArrowEntity.PickupStatus.DISALLOWED;
+			Arrow arrow = new Arrow(world, x, y, z);
+			arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
 			return arrow;
 		}
 		
@@ -230,7 +230,7 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 		return null;
 	}
 	
-	protected MagicDamageProjectileEntity makeElementalProjectile(World world, double x, double y, double z, EMagicElement element) {
+	protected MagicDamageProjectileEntity makeElementalProjectile(Level world, double x, double y, double z, EMagicElement element) {
 		MagicDamageProjectileEntity proj = new MagicDamageProjectileEntity(NostrumEntityTypes.magicDamageProjectile, world);
 		proj.setPos(x, y, z);
 		proj.setElement(element);
@@ -256,7 +256,7 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		nbt.put(NBT_INVENTORY, Inventories.serializeInventory(inventory));
@@ -265,7 +265,7 @@ public class DungeonLauncherTileEntity extends TileEntity implements ITickableTi
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt == null)

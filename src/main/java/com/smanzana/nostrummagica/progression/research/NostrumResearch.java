@@ -22,10 +22,10 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Represents a piece of research a player can complete.
@@ -205,7 +205,7 @@ public class NostrumResearch {
 	 * Note: This doesn't deduct research points from the player.
 	 * @param research
 	 */
-	public static void unlockResearch(PlayerEntity player, NostrumResearch research) {
+	public static void unlockResearch(Player player, NostrumResearch research) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return;
@@ -220,7 +220,7 @@ public class NostrumResearch {
 			NostrumMagicaSounds.SUCCESS_RESEARCH.play(player.level, player.getX(), player.getY(), player.getZ());
 			NostrumMagicaSounds.UI_RESEARCH.play(player.level, player.getX(), player.getY(), player.getZ());
 		} else {
-			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
+			NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
 		}
 	}
 

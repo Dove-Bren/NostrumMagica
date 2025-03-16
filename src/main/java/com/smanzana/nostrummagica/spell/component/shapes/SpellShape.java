@@ -15,14 +15,14 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.TextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.fml.event.lifecycle.IModBusEvent;
+import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 /**
@@ -140,12 +140,12 @@ public abstract class SpellShape {
 		return key;
 	}
 	
-	public TextComponent getDisplayName() {
-		return new TranslationTextComponent("shape." + this.getShapeKey() + ".name");
+	public BaseComponent getDisplayName() {
+		return new TranslatableComponent("shape." + this.getShapeKey() + ".name");
 	}
 	
-	public TextComponent getDescription() {
-		return new TranslationTextComponent("shape." + this.getShapeKey() + ".desc");
+	public BaseComponent getDescription() {
+		return new TranslatableComponent("shape." + this.getShapeKey() + ".desc");
 	}
 	
 	/**
@@ -227,7 +227,7 @@ public abstract class SpellShape {
 	 * @param player TODO
 	 * @return
 	 */
-	public abstract boolean shouldTrace(PlayerEntity player, SpellShapeProperties params);
+	public abstract boolean shouldTrace(Player player, SpellShapeProperties params);
 	
 	/**
 	 * if {@link #shouldTrace(PlayerEntity, SpellPartProperties)} is true, how far to trace
@@ -235,7 +235,7 @@ public abstract class SpellShape {
 	 * @param params
 	 * @return
 	 */
-	public double getTraceRange(PlayerEntity player, SpellShapeProperties params) {
+	public double getTraceRange(Player player, SpellShapeProperties params) {
 		return 0;
 	}
 	

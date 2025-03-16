@@ -11,11 +11,11 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.NetUtils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.ParticleType;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -67,7 +67,7 @@ public enum NostrumParticles {
 		return factory;
 	}
 	
-	public void spawn(World world, SpawnParams params) {
+	public void spawn(Level world, SpawnParams params) {
 		Spawn(this, world, params);
 	}
 	
@@ -80,7 +80,7 @@ public enum NostrumParticles {
 		return null;
 	}
 	
-	public static void Spawn(NostrumParticles type, World world, SpawnParams params) {
+	public static void Spawn(NostrumParticles type, Level world, SpawnParams params) {
 		if (!world.isClientSide) {
 			NetworkHandler.sendToAllAround(new SpawnNostrumParticleMessage(type, params),
 					new TargetPoint(params.spawnX, params.spawnY, params.spawnZ, 50, world.dimension())
@@ -91,7 +91,7 @@ public enum NostrumParticles {
 					<  50 * 50) {
 				INostrumParticleFactory<?> factory = type.getFactory();
 				if (factory != null) {
-					factory.createParticle((ClientWorld) world, params);
+					factory.createParticle((ClientLevel) world, params);
 				}
 			}
 		}
@@ -134,11 +134,11 @@ public enum NostrumParticles {
 		public final int lifetimeJitter;
 		
 		// One of the below is required
-		public final @Nullable Vector3d velocity;
-		public final @Nullable Vector3d targetPos;
+		public final @Nullable Vec3 velocity;
+		public final @Nullable Vec3 targetPos;
 		public final @Nullable Integer targetEntID;
 		
-		public final @Nullable Vector3d velocityJitter; // 0-1 where 1 is completely random
+		public final @Nullable Vec3 velocityJitter; // 0-1 where 1 is completely random
 		
 		// Rest is completely optional and may or may not be used
 		public @Nullable Integer color; // ARGB
@@ -148,7 +148,7 @@ public enum NostrumParticles {
 		public float orbitRadius;
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
-				Vector3d velocity, Vector3d velocityJitter) {
+				Vec3 velocity, Vec3 velocityJitter) {
 			super();
 			this.count = count;
 			this.spawnX = spawnX;
@@ -168,7 +168,7 @@ public enum NostrumParticles {
 		}
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
-				Vector3d targetPos) {
+				Vec3 targetPos) {
 			super();
 			this.count = count;
 			this.spawnX = spawnX;
@@ -208,7 +208,7 @@ public enum NostrumParticles {
 		}
 		
 		protected static SpawnParams UnpackSpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
-				@Nullable Vector3d velocity, @Nullable Vector3d velocityJitter, @Nullable Vector3d targetPos, int targetEntID,
+				@Nullable Vec3 velocity, @Nullable Vec3 velocityJitter, @Nullable Vec3 targetPos, int targetEntID,
 				@Nullable Integer color, boolean dieOnTarget, float gravityStrength, TargetBehavior targetBehavior, float orbitRadius
 				) {
 			final SpawnParams params;
@@ -282,9 +282,9 @@ public enum NostrumParticles {
 		private static final String NBT_TARGET_BEHAVIOR = "target_behavior";
 		private static final String NBT_ORBIT_RADIUS = "orbit_radius";
 		
-		public static CompoundNBT WriteNBT(SpawnParams params, @Nullable CompoundNBT tag) {
+		public static CompoundTag WriteNBT(SpawnParams params, @Nullable CompoundTag tag) {
 			if (tag == null) {
-				tag = new CompoundNBT();
+				tag = new CompoundTag();
 			}
 			
 			tag.putInt(NBT_COUNT, params.count);
@@ -299,7 +299,7 @@ public enum NostrumParticles {
 			tag.putFloat(NBT_ORBIT_RADIUS, params.orbitRadius);
 			
 			if (params.velocity != null) {
-				CompoundNBT subtag = new CompoundNBT();
+				CompoundTag subtag = new CompoundTag();
 				subtag.putDouble("x", params.velocity.x);
 				subtag.putDouble("y", params.velocity.y);
 				subtag.putDouble("z", params.velocity.z);
@@ -307,7 +307,7 @@ public enum NostrumParticles {
 			}
 			
 			if (params.velocityJitter != null) {
-				CompoundNBT subtag = new CompoundNBT();
+				CompoundTag subtag = new CompoundTag();
 				subtag.putDouble("x", params.velocityJitter.x);
 				subtag.putDouble("y", params.velocityJitter.y);
 				subtag.putDouble("z", params.velocityJitter.z);
@@ -315,7 +315,7 @@ public enum NostrumParticles {
 			}
 			
 			if (params.targetPos != null) {
-				CompoundNBT subtag = new CompoundNBT();
+				CompoundTag subtag = new CompoundTag();
 				subtag.putDouble("x", params.targetPos.x);
 				subtag.putDouble("y", params.targetPos.y);
 				subtag.putDouble("z", params.targetPos.z);
@@ -337,11 +337,11 @@ public enum NostrumParticles {
 			return tag;
 		}
 		
-		public CompoundNBT toNBT(@Nullable CompoundNBT tag) {
+		public CompoundTag toNBT(@Nullable CompoundTag tag) {
 			return WriteNBT(this, tag);
 		}
 		
-		public static SpawnParams FromNBT(CompoundNBT tag) {
+		public static SpawnParams FromNBT(CompoundTag tag) {
 			final int count = tag.getInt(NBT_COUNT);
 			final double spawnX = tag.getDouble(NBT_SPAWN_X);
 			final double spawnY = tag.getDouble(NBT_SPAWN_Y);
@@ -352,14 +352,14 @@ public enum NostrumParticles {
 			
 			final SpawnParams params;
 			if (tag.contains(NBT_VELOCITY, NBT.TAG_COMPOUND)) {
-				CompoundNBT subtag = tag.getCompound(NBT_VELOCITY);
+				CompoundTag subtag = tag.getCompound(NBT_VELOCITY);
 				final double velocityX = subtag.getDouble("x");
 				final double velocityY = subtag.getDouble("y");
 				final double velocityZ = subtag.getDouble("z");
-				final Vector3d velocityJitter;
+				final Vec3 velocityJitter;
 				if (tag.contains(NBT_VELOCITY_JITTER)) {
 					subtag = tag.getCompound(NBT_VELOCITY_JITTER);
-					velocityJitter = new Vector3d(
+					velocityJitter = new Vec3(
 							subtag.getDouble("x"),
 							subtag.getDouble("y"),
 							subtag.getDouble("z"));
@@ -370,11 +370,11 @@ public enum NostrumParticles {
 						count,
 						spawnX, spawnY, spawnZ, spawnJitter,
 						lifetime, lifetimeJitter,
-						new Vector3d(velocityX, velocityY, velocityZ),
+						new Vec3(velocityX, velocityY, velocityZ),
 						velocityJitter
 						);
 			} else if (tag.contains(NBT_TARGET_POS, NBT.TAG_COMPOUND)) {
-				CompoundNBT subtag = tag.getCompound(NBT_TARGET_POS);
+				CompoundTag subtag = tag.getCompound(NBT_TARGET_POS);
 				final double targetX = subtag.getDouble("x");
 				final double targetY = subtag.getDouble("y");
 				final double targetZ = subtag.getDouble("z");
@@ -382,7 +382,7 @@ public enum NostrumParticles {
 						count,
 						spawnX, spawnY, spawnZ, spawnJitter,
 						lifetime, lifetimeJitter,
-						new Vector3d(targetX, targetY, targetZ)
+						new Vec3(targetX, targetY, targetZ)
 						);
 			} else if (tag.contains(NBT_TARGET_ENT_ID, NBT.TAG_INT)) {
 				final int ID = tag.getInt(NBT_TARGET_ENT_ID);
@@ -397,7 +397,7 @@ public enum NostrumParticles {
 						count,
 						spawnX, spawnY, spawnZ, spawnJitter,
 						lifetime, lifetimeJitter,
-						new Vector3d(0, .1, 0), null
+						new Vec3(0, .1, 0), null
 						);
 			}
 			

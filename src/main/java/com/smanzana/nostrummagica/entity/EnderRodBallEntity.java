@@ -3,13 +3,13 @@ package com.smanzana.nostrummagica.entity;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.IPacket;
-import net.minecraft.util.DamageSource;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 public class EnderRodBallEntity extends Entity {
@@ -18,11 +18,11 @@ public class EnderRodBallEntity extends Entity {
 	
 	private final @Nullable LivingEntity owner;
 	
-	public EnderRodBallEntity(EntityType<? extends EnderRodBallEntity> type, World worldIn) {
+	public EnderRodBallEntity(EntityType<? extends EnderRodBallEntity> type, Level worldIn) {
 		this(type, worldIn, null);
 	}
 	
-	public EnderRodBallEntity(EntityType<? extends EnderRodBallEntity> type, World worldIn, @Nullable LivingEntity owner) {
+	public EnderRodBallEntity(EntityType<? extends EnderRodBallEntity> type, Level worldIn, @Nullable LivingEntity owner) {
 		super(type, worldIn);
 		this.setNoGravity(true);
 		this.setInvulnerable(true);
@@ -35,13 +35,13 @@ public class EnderRodBallEntity extends Entity {
 	}
 	
 	@Override
-	public boolean saveAsPassenger(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundTag compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
 	}
 	
 	@Override
-	public IPacket<?> getAddEntityPacket() {
+	public Packet<?> getAddEntityPacket() {
 		return NetworkHooks.getEntitySpawningPacket(this);
 	}
 	
@@ -70,12 +70,12 @@ public class EnderRodBallEntity extends Entity {
 	}
 
 	@Override
-	protected void readAdditionalSaveData(CompoundNBT compound) {
+	protected void readAdditionalSaveData(CompoundTag compound) {
 		;
 	}
 
 	@Override
-	protected void addAdditionalSaveData(CompoundNBT compound) {
+	protected void addAdditionalSaveData(CompoundTag compound) {
 		;
 	}
 	

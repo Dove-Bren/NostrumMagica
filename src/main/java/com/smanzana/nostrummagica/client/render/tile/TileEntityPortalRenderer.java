@@ -1,38 +1,38 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PortalBlock.NostrumPortalTileEntityBase;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
+import com.mojang.math.Vector3f;
 
-public class TileEntityPortalRenderer extends TileEntityRenderer<NostrumPortalTileEntityBase> {
+public class TileEntityPortalRenderer extends BlockEntityRenderer<NostrumPortalTileEntityBase> {
 
 	public static final ResourceLocation TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/block/portal.png");
 	
-	public TileEntityPortalRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+	public TileEntityPortalRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
 		super(rendererDispatcherIn);
 	}
 	
 	@Override
-	public void render(NostrumPortalTileEntityBase tileEntityIn, float partialTicks, MatrixStack matrixStackIn,
-			IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+	public void render(NostrumPortalTileEntityBase tileEntityIn, float partialTicks, PoseStack matrixStackIn,
+			MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		
 		// Want to rotate to camera but only around Y. Before th is was a atan between z and x..
 		// I THINK now it's using the active render info's look vector and chopping out the Y, and then
 		// doing the same thing.
-		final ActiveRenderInfo renderInfo = this.renderer.camera;
-		Vector3d posOffset = Vector3d.atCenterOf(tileEntityIn.getBlockPos()).subtract(renderInfo.getPosition());
+		final Camera renderInfo = this.renderer.camera;
+		Vec3 posOffset = Vec3.atCenterOf(tileEntityIn.getBlockPos()).subtract(renderInfo.getPosition());
 		float rotY = (float) (Math.atan2(posOffset.z(), posOffset.x()) / (2 * Math.PI));
 		rotY *= -360f;
 		rotY += 180f;
@@ -48,7 +48,7 @@ public class TileEntityPortalRenderer extends TileEntityRenderer<NostrumPortalTi
 		final float horizontalRadius = .6f;
 		final float verticalRadius = 1.2f;
 		
-		final IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.NOSTRUM_PORTAL);
+		final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.NOSTRUM_PORTAL);
 		
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(.5, 1.2, .5);

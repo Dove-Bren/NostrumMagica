@@ -8,12 +8,12 @@ import com.smanzana.nostrummagica.client.gui.container.RuneShaperGui;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client has clicked to submit a rune shaper operation
@@ -26,8 +26,8 @@ public class RuneShaperMessage {
 		// Verify the block, and then try to forward to the shaper container
 		ctx.get().setPacketHandled(true);
 		ctx.get().enqueueWork(() -> {
-			PlayerEntity sp = ctx.get().getSender();
-			World world = sp.level;
+			Player sp = ctx.get().getSender();
+			Level world = sp.level;
 			
 			// Get the TE
 			BlockState state = world.getBlockState(message.pos);
@@ -57,7 +57,7 @@ public class RuneShaperMessage {
 		this.propertyValueIdx = propertyValueIdx;
 	}
 
-	public static RuneShaperMessage decode(PacketBuffer buf) {
+	public static RuneShaperMessage decode(FriendlyByteBuf buf) {
 		final BlockPos pos = buf.readBlockPos();
 		final String shapeKey = buf.readUtf();
 		final String propName = buf.readUtf();
@@ -76,7 +76,7 @@ public class RuneShaperMessage {
 		return new RuneShaperMessage(pos, shape, prop, idx);
 	}
 
-	public static void encode(RuneShaperMessage msg, PacketBuffer buf) {
+	public static void encode(RuneShaperMessage msg, FriendlyByteBuf buf) {
 		buf.writeBlockPos(msg.pos);
 		buf.writeUtf(msg.shape.getShapeKey());
 		buf.writeUtf(msg.property.getName());

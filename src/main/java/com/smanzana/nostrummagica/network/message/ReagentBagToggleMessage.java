@@ -6,12 +6,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.item.equipment.ReagentBag;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client has toggled vacuum setting on their reagent bag
@@ -24,7 +24,7 @@ public class ReagentBagToggleMessage {
 	public static void handle(ReagentBagToggleMessage message, Supplier<NetworkEvent.Context> ctx) {
 		// Is it on?
 		ctx.get().setPacketHandled(true);
-		ServerPlayerEntity sp = ctx.get().getSender();
+		ServerPlayer sp = ctx.get().getSender();
 		
 		boolean main = message.isMainHand;
 		boolean value = message.isOn;
@@ -57,11 +57,11 @@ public class ReagentBagToggleMessage {
 		this.isOn = isOn;
 	}
 
-	public static ReagentBagToggleMessage decode(PacketBuffer buf) {
+	public static ReagentBagToggleMessage decode(FriendlyByteBuf buf) {
 		return new ReagentBagToggleMessage(buf.readBoolean(), buf.readBoolean());
 	}
 
-	public static void encode(ReagentBagToggleMessage msg, PacketBuffer buf) {
+	public static void encode(ReagentBagToggleMessage msg, FriendlyByteBuf buf) {
 		buf.writeBoolean(msg.isMainHand);
 		buf.writeBoolean(msg.isOn);
 	}

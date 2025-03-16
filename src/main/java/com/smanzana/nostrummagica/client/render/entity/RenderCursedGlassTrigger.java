@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.client.model.ModelCursedGlass;
 import com.smanzana.nostrummagica.entity.SwitchTriggerEntity;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -10,20 +10,20 @@ import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.model.ModelBakery;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 
 public class RenderCursedGlassTrigger extends RenderSwitchTrigger {
 	
 	private /*final*/ ModelCursedGlass model;
 	
-	public RenderCursedGlassTrigger(EntityRendererManager renderManagerIn) {
+	public RenderCursedGlassTrigger(EntityRenderDispatcher renderManagerIn) {
 		super(renderManagerIn);
 		this.model = new ModelCursedGlass();
 	}
@@ -39,7 +39,7 @@ public class RenderCursedGlassTrigger extends RenderSwitchTrigger {
 	}
 	
 	@Override
-	protected void renderNameTag(SwitchTriggerEntity entityIn, ITextComponent displayNameIn, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	protected void renderNameTag(SwitchTriggerEntity entityIn, Component displayNameIn, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		super.renderNameTag(entityIn, displayNameIn, matrixStackIn, bufferIn, packedLightIn);
 		
 		final SwitchBlockTileEntity raw = entityIn.getLinkedTileEntity();
@@ -80,7 +80,7 @@ public class RenderCursedGlassTrigger extends RenderSwitchTrigger {
 	}
 	
 	@Override
-	public void render(SwitchTriggerEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(SwitchTriggerEntity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		final SwitchBlockTileEntity raw = entityIn.getLinkedTileEntity();
 		if (raw == null || !(raw instanceof CursedGlassTileEntity)) {
 			return;
@@ -91,7 +91,7 @@ public class RenderCursedGlassTrigger extends RenderSwitchTrigger {
 		
 		// Render damage indicator
 		if (!te.isBroken()) {
-			model.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderTypeLookup.getRenderType(Blocks.AIR.defaultBlockState(), false)), packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
+			model.renderToBuffer(matrixStackIn, bufferIn.getBuffer(ItemBlockRenderTypes.getRenderType(Blocks.AIR.defaultBlockState(), false)), packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 			
 			final float[] color = ColorUtil.ARGBToColor(te.getRequiredElement() == null ? 0xFFFFFFFF : te.getRequiredElement().getColor());
 			final float glowPeriod = 20 * 3;
@@ -112,7 +112,7 @@ public class RenderCursedGlassTrigger extends RenderSwitchTrigger {
 			// ModelBakery.DESTROY_RENDER_TYPES.get(k3)
 			if (damageProg > 0f) {
 				final int renderIdx = (int) Math.max(0, Math.min(9, damageProg * 10));
-				IVertexBuilder buffer = bufferIn.getBuffer(ModelBakery.DESTROY_TYPES.get(renderIdx));
+				VertexConsumer buffer = bufferIn.getBuffer(ModelBakery.DESTROY_TYPES.get(renderIdx));
 				RenderFuncs.drawUnitCube(matrixStackIn, buffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 			}
 			

@@ -3,22 +3,22 @@ package com.smanzana.nostrummagica.effect;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
-public class SteelSkinEffect extends Effect {
+public class SteelSkinEffect extends MobEffect {
 
 	public static final String ID = "steel_skin";
 	
 	public SteelSkinEffect() {
-		super(EffectType.BENEFICIAL, 0xFF394653); 
+		super(MobEffectCategory.BENEFICIAL, 0xFF394653); 
 	}
 	
 	public boolean isDurationEffectTick(int duration, int amp) {
@@ -29,7 +29,7 @@ public class SteelSkinEffect extends Effect {
 	public static void onEntityAttack(LivingHurtEvent event) {
 		if (event.getAmount() > 0f && !event.isCanceled()) {
 			LivingEntity ent = event.getEntityLiving();
-			EffectInstance effect = ent.getEffect(NostrumEffects.steelSkin);
+			MobEffectInstance effect = ent.getEffect(NostrumEffects.steelSkin);
 			
 			if (effect != null && effect.getDuration() > 0) {
 				final int reduc = 2 * (effect.getAmplifier() + 1);

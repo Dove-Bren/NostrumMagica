@@ -8,26 +8,26 @@ import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CropsBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameterSets;
-import net.minecraft.loot.LootParameters;
-import net.minecraft.state.IntegerProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.BlockGetter;
 
-public class EssenceCropBlock extends CropsBlock {
+public class EssenceCropBlock extends CropBlock {
 
 	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
 	private static final VoxelShape[] AABB = new VoxelShape[] {Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.165D, 16.0D), Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.275D, 16.0D), Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.275D, 16.0D), Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.275D, 16.0D), Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.7D, 16.0D), Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.7D, 16.0D), Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.7D, 16.0D), Block.box(16.0 * 0.0D, 16.0 * 0.0D, 16.0 * 0.0D, 16.0D, 16.0 * 0.8D, 16.0D)};
@@ -45,7 +45,7 @@ public class EssenceCropBlock extends CropsBlock {
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(AGE);
 	}
 	
@@ -59,7 +59,7 @@ public class EssenceCropBlock extends CropsBlock {
 		return NostrumItems.reagentSeedEssence;
 	}
 	
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return AABB[((Integer)state.getValue(this.getAgeProperty())).intValue()];
 	}
 	
@@ -70,12 +70,12 @@ public class EssenceCropBlock extends CropsBlock {
 
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		final LootContext context = builder.withParameter(LootParameters.BLOCK_STATE, state).create(LootParameterSets.BLOCK);
+		final LootContext context = builder.withParameter(LootContextParams.BLOCK_STATE, state).create(LootContextParamSets.BLOCK);
 		final List<ItemStack> loot = new ArrayList<>();
         final int age = getAge(state);
         final int fortune;
-		if (context.hasParam(LootParameters.TOOL)) {
-			fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, context.getParamOrNull(LootParameters.TOOL));
+		if (context.hasParam(LootContextParams.TOOL)) {
+			fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, context.getParamOrNull(LootContextParams.TOOL));
 		} else {
 			 fortune = 0;
 		}

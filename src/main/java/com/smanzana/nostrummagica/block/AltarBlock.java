@@ -9,29 +9,29 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.pathfinding.PathType;
-import net.minecraft.tileentity.IHopper;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.EntityPredicates;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.block.entity.Hopper;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 
 public class AltarBlock extends Block {
 	
@@ -48,13 +48,13 @@ public class AltarBlock extends Block {
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		return ALTAR_AABB;
 	}
 	
 	@Override
-	public BlockRenderType getRenderShape(BlockState state) {
-		return BlockRenderType.MODEL;
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.MODEL;
 	}
 	
 //	@Override
@@ -73,7 +73,7 @@ public class AltarBlock extends Block {
 //	}
 	
 	@Override
-	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, BlockGetter worldIn, BlockPos pos, PathComputationType type) {
 		return false;
 	}
 	
@@ -83,19 +83,19 @@ public class AltarBlock extends Block {
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		return new AltarTileEntity();
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (state.getBlock() != newState.getBlock()) {
-			TileEntity te = world.getBlockEntity(pos);
+			BlockEntity te = world.getBlockEntity(pos);
 			if (te != null) {
 				AltarTileEntity altar = (AltarTileEntity) te;
 				if (altar.getItem() != null) {
-					InventoryHelper.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), altar.getItem());
+					Containers.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), altar.getItem());
 				}
 			}
 			
@@ -106,31 +106,31 @@ public class AltarBlock extends Block {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public boolean triggerEvent(BlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
+	public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int eventID, int eventParam) {
 		super.triggerEvent(state, worldIn, pos, eventID, eventParam);
-		TileEntity tileentity = worldIn.getBlockEntity(pos);
+		BlockEntity tileentity = worldIn.getBlockEntity(pos);
         return tileentity == null ? false : tileentity.triggerEvent(eventID, eventParam);
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void onPlace(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
+	public void onPlace(BlockState state, Level worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
 		if (!worldIn.getBlockTicks().hasScheduledTick(pos, this)) {
 			worldIn.getBlockTicks().scheduleTick(pos, this, TICK_DELAY);
 		}
 		
 		if (!worldIn.isClientSide()) {
-			this.tick(oldState, (ServerWorld) worldIn, pos, this.RANDOM);
+			this.tick(oldState, (ServerLevel) worldIn, pos, this.RANDOM);
 		}
 		
 		super.onPlace(state, worldIn, pos, oldState, isMoving);
 	}
 	
-	protected List<ItemEntity> getCapturableItems(World worldIn, BlockPos altarPos) {
+	protected List<ItemEntity> getCapturableItems(Level worldIn, BlockPos altarPos) {
 		// Copied from HopperTileEntity
-		return IHopper.SUCK.toAabbs().stream().flatMap((box) -> {
+		return Hopper.SUCK.toAabbs().stream().flatMap((box) -> {
 			return worldIn.getEntitiesOfClass(ItemEntity.class, box.move(altarPos.getX() - .5, altarPos.getY() - .5, altarPos.getZ() - .5),
-					EntityPredicates.ENTITY_STILL_ALIVE).stream();
+					EntitySelector.ENTITY_STILL_ALIVE).stream();
 		}).collect(Collectors.toList());
 				
 				
@@ -139,8 +139,8 @@ public class AltarBlock extends Block {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random rand) {
-		TileEntity te = worldIn.getBlockEntity(pos);
+	public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
+		BlockEntity te = worldIn.getBlockEntity(pos);
 		if (te != null && te instanceof AltarTileEntity && ((AltarTileEntity) te).getItem().isEmpty()) {
 			AltarTileEntity altar = (AltarTileEntity) te;
 			List<ItemEntity> items = getCapturableItems(worldIn, pos);
@@ -163,14 +163,14 @@ public class AltarBlock extends Block {
 	}
 	
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (worldIn.isClientSide()) {
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
-		TileEntity te = worldIn.getBlockEntity(pos);
+		BlockEntity te = worldIn.getBlockEntity(pos);
 		if (te == null)
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		
 		ItemStack heldItem = playerIn.getItemInHand(hand);
 		
@@ -179,9 +179,9 @@ public class AltarBlock extends Block {
 			// Accepting items
 			if (!heldItem.isEmpty()) {
 				altar.setItem(heldItem.split(1));
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			} else
-				return ActionResultType.PASS;
+				return InteractionResult.PASS;
 		} else {
 			// Has an item
 			if (heldItem.isEmpty()) {
@@ -204,9 +204,9 @@ public class AltarBlock extends Block {
 					}
 				}
 				altar.setItem(ItemStack.EMPTY);
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			} else
-				return ActionResultType.FAIL;
+				return InteractionResult.FAIL;
 		}
 		
 	}

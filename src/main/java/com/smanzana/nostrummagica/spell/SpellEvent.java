@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.spell;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.eventbus.api.Event;
 
 public abstract class SpellEvent extends Event {

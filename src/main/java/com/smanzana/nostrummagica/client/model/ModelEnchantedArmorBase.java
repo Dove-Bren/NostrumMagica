@@ -1,26 +1,26 @@
 package com.smanzana.nostrummagica.client.model;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import net.minecraft.client.renderer.entity.model.BipedModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EquipmentSlot;
 
-public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<T> {
+public class ModelEnchantedArmorBase<T extends LivingEntity> extends HumanoidModel<T> {
 	
 	private static final int TEXTURE_WIDTH = 129;
 	private static final int TEXTURE_HEIGHT = 96;
 
-	private ModelRenderer head;
-	private ModelRenderer body;
-	private ModelRenderer armLeft;
-	private ModelRenderer armRight;
-	private ModelRenderer legLeft;
-	private ModelRenderer legRight;
-	private ModelRenderer bootLeft;
-	private ModelRenderer bootRight;
+	private ModelPart head;
+	private ModelPart body;
+	private ModelPart armLeft;
+	private ModelPart armRight;
+	private ModelPart legLeft;
+	private ModelPart legRight;
+	private ModelPart bootLeft;
+	private ModelPart bootRight;
 	
 	// Level is number of other set pieces. 0 is base, 4 is max coolness.
 	public ModelEnchantedArmorBase(float scale, int level) {
@@ -28,7 +28,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 		
 		scale = 0.01f;
 		
-		head = new ModelRenderer(this, 0, 0);
+		head = new ModelPart(this, 0, 0);
 		head.addBox(-5, -9, -5, 10, 10, 10, scale);
 		head.texOffs(0, 0);
 		head.addBox(-6, -9, -2, 1, 5, 4, scale);
@@ -78,7 +78,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 		
 
 		
-		body = new ModelRenderer(this, 0, 27);
+		body = new ModelPart(this, 0, 27);
 		body.addBox(-5.0F, 0F, -3.01F, 10, 12, 6);
 		
 		// Test feature growth 2
@@ -115,7 +115,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 			
 			// Belt Tassels
 			{
-				ModelRenderer tasselRight = new ModelRenderer(this, 0, 0);
+				ModelPart tasselRight = new ModelPart(this, 0, 0);
 				// Lie about texture size to get more resolution on tassels
 				tasselRight.setTexSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselRight.texOffs(66 / 3, 48 / 3);
@@ -126,7 +126,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 				tasselRight.zRot = 0.125f;
 				body.addChild(tasselRight);
 				
-				ModelRenderer tasselLeft = new ModelRenderer(this, 0, 0);
+				ModelPart tasselLeft = new ModelPart(this, 0, 0);
 				tasselLeft.setTexSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselLeft.texOffs(66 / 3, 48 / 3);
 				tasselLeft.mirror = true;
@@ -140,7 +140,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 		}
 		
 		
-		armLeft = new ModelRenderer(this, 0, 45);
+		armLeft = new ModelPart(this, 0, 45);
 		armLeft.addBox(-1F, -2.50F, -3F, 4, 9, 6, scale);
 		armLeft.texOffs(20, 45);
 		armLeft.addBox(3.0F, -3.50F, -2F, 1, 3, 4, scale);
@@ -166,7 +166,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 			body.addBox(5, -3.5f, -1, 2, 1, 3, scale * 1.5f);
 		}
 		
-		armRight = new ModelRenderer(this, 0, 45);
+		armRight = new ModelPart(this, 0, 45);
 		armRight.addBox(-3.0F, -2.50F, -3F, 4, 9, 6, scale);
 		armRight.texOffs(20, 45);
 		armRight.addBox(-4.0F, -3.50F, -2F, 1, 3, 4, scale);
@@ -200,7 +200,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 		if (level >= 4) {
 			// Shoulder Tassels
 			{
-				ModelRenderer tasselRight = new ModelRenderer(this, 0, 0);
+				ModelPart tasselRight = new ModelPart(this, 0, 0);
 				tasselRight.setTexSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselRight.texOffs(66 / 3, 0 / 3);
 				tasselRight.addBox(0 + (-11F), 0 + (.5F), 0 + (-2F), 1, 5, 5, scale);
@@ -208,7 +208,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 //				tasselRight.offsetY = (.5F/16F);
 //				tasselRight.offsetZ = (-2F/16F);
 				body.addChild(tasselRight);
-				tasselRight = new ModelRenderer(this, 0, 0);
+				tasselRight = new ModelPart(this, 0, 0);
 				tasselRight.setTexSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselRight.texOffs(66 / 3, 30 / 3);
 				tasselRight.addBox(0 + (-11F), 0 + (.5F), 0.01f + (3F), 6, 5, 1, scale);
@@ -217,7 +217,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 //				tasselRight.offsetZ = (3F/16F);
 				body.addChild(tasselRight);
 				
-				ModelRenderer tasselLeft = new ModelRenderer(this, 0, 0);
+				ModelPart tasselLeft = new ModelPart(this, 0, 0);
 				tasselLeft.mirror = true;
 				tasselLeft.setTexSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselLeft.texOffs(66 / 3, 0 / 3);
@@ -227,7 +227,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 //				tasselLeft.offsetZ = (-2F/16F);
 				body.addChild(tasselLeft);
 				tasselLeft.mirror = true;
-				tasselLeft = new ModelRenderer(this, 0, 0);
+				tasselLeft = new ModelPart(this, 0, 0);
 				tasselLeft.setTexSize(TEXTURE_WIDTH / 3, TEXTURE_HEIGHT / 3);
 				tasselLeft.texOffs(66 / 3, 30 / 3);
 				tasselLeft.addBox(0 + (5F), 0 + (.5F), 0.01f + (3F), 6, 5, 1, scale);
@@ -238,14 +238,14 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 			}
 		}
 		
-		legLeft = new ModelRenderer(this, 0, 60);
+		legLeft = new ModelPart(this, 0, 60);
 		legLeft.addBox(-2F, -.95F, -3F, 5, 10, 6, scale);
 		
-		legRight = new ModelRenderer(this, 0, 60);
+		legRight = new ModelPart(this, 0, 60);
 		legRight.addBox(-3F, -.99F, -3F, 5, 10, 6, scale);
 		legRight.mirror = true;
 		
-		bootLeft = new ModelRenderer(this, 0, 76);
+		bootLeft = new ModelPart(this, 0, 76);
 		bootLeft.addBox(-2F, 10F, -4F, 4, 2, 7, scale * .9f);
 		bootLeft.texOffs(0, 85);
 		bootLeft.addBox(-2F, 7F, -3F, 5, 3, 6, scale * .9f);
@@ -260,7 +260,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 			bootLeft.addBox(4, 8, 0, 1, 1, 4, scale * .9f);
 		}
 		
-		bootRight = new ModelRenderer(this, 0, 76);
+		bootRight = new ModelPart(this, 0, 76);
 		bootRight.addBox(-2F, 10.1F, -4F, 4, 2, 7, scale * .9f);
 		bootRight.texOffs(0, 85);
 		bootRight.addBox(-3F, 7.1F, -3F, 5, 3, 6, scale * .9f);
@@ -291,7 +291,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 	}
 	
 	@Override
-	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		body.visible = false;
 		head.visible = false;
 		hat.visible = false;
@@ -400,7 +400,7 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 		matrixStackIn.popPose();
 	}
 	
-	protected void copyOffsetAndRots(ModelRenderer to, ModelRenderer from) {
+	protected void copyOffsetAndRots(ModelPart to, ModelPart from) {
 //		to.offsetX = from.offsetX;
 //		to.offsetY = from.offsetY;
 //		to.offsetZ = from.offsetZ;
@@ -416,10 +416,10 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends BipedModel<
 	 * Sets all parts but the related ones invisible for rendering.
 	 * @param slot The slot we're about to render
 	 */
-	public void setVisibleFrom(EquipmentSlotType slot) {
-		bootLeft.visible = bootRight.visible = (slot == EquipmentSlotType.FEET);
-		legLeft.visible = legRight.visible = (slot == EquipmentSlotType.LEGS);
-		body.visible = armLeft.visible = armRight.visible = (slot == EquipmentSlotType.CHEST);
-		head.visible = (slot == EquipmentSlotType.HEAD);
+	public void setVisibleFrom(EquipmentSlot slot) {
+		bootLeft.visible = bootRight.visible = (slot == EquipmentSlot.FEET);
+		legLeft.visible = legRight.visible = (slot == EquipmentSlot.LEGS);
+		body.visible = armLeft.visible = armRight.visible = (slot == EquipmentSlot.CHEST);
+		head.visible = (slot == EquipmentSlot.HEAD);
 	}
 }

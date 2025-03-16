@@ -5,18 +5,18 @@ import javax.annotation.Nonnull;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class SpellCraftContext {
 	
-	public final @Nonnull PlayerEntity player;
-	public final @Nonnull World world;
+	public final @Nonnull Player player;
+	public final @Nonnull Level world;
 	public final @Nonnull BlockPos pos;
 	public final @Nonnull INostrumMagic magic;
 	
-	public SpellCraftContext(@Nonnull PlayerEntity player, @Nonnull World world, @Nonnull BlockPos pos) {
+	public SpellCraftContext(@Nonnull Player player, @Nonnull Level world, @Nonnull BlockPos pos) {
 		this.player = player;
 		this.world = world;
 		this.pos = pos;

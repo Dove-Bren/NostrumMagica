@@ -7,10 +7,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class ResearchRequirement implements IRequirement{
 
@@ -21,7 +21,7 @@ public class ResearchRequirement implements IRequirement{
 	}
 
 	@Override
-	public boolean matches(PlayerEntity player) {
+	public boolean matches(Player player) {
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		return attr.getCompletedResearches().contains(researchKey);
 	}
@@ -32,8 +32,8 @@ public class ResearchRequirement implements IRequirement{
 	}
 
 	@Override
-	public List<ITextComponent> getDescription(PlayerEntity player) {
-		return Lists.newArrayList(new TranslationTextComponent("info.requirement.research", 
-				new TranslationTextComponent("research." + researchKey + ".name").withStyle(TextFormatting.DARK_AQUA)));
+	public List<Component> getDescription(Player player) {
+		return Lists.newArrayList(new TranslatableComponent("info.requirement.research", 
+				new TranslatableComponent("research." + researchKey + ".name").withStyle(ChatFormatting.DARK_AQUA)));
 	}
 }

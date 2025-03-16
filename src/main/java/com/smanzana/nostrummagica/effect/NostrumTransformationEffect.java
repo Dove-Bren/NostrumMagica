@@ -1,10 +1,10 @@
 package com.smanzana.nostrummagica.effect;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.EffectType;
-import net.minecraft.util.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.damagesource.DamageSource;
 
 /**
  * Way to mark entities for later transformation.
@@ -12,12 +12,12 @@ import net.minecraft.util.DamageSource;
  * @author Skyler
  *
  */
-public class NostrumTransformationEffect extends Effect {
+public class NostrumTransformationEffect extends MobEffect {
 
 	public static final String ID = "transformation";
 	
 	public NostrumTransformationEffect() {
-		super(EffectType.NEUTRAL, 0xFF000000);
+		super(MobEffectCategory.NEUTRAL, 0xFF000000);
 	}
 	
 	public boolean isDurationEffectTick(int duration, int amp) {
@@ -32,7 +32,7 @@ public class NostrumTransformationEffect extends Effect {
     }
 	
 	@Override
-	public boolean shouldRender(EffectInstance effect) {
+	public boolean shouldRender(MobEffectInstance effect) {
 		return false;
 	}
 	

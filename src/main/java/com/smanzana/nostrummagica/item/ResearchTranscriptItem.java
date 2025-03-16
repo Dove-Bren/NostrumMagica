@@ -13,22 +13,22 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.NonNullList;
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -84,54 +84,54 @@ public class ResearchTranscriptItem extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		final @Nonnull ItemStack stack = playerIn.getItemInHand(hand);
 		if (playerIn.isShiftKeyDown()) {
-			return new ActionResult<ItemStack>(ActionResultType.PASS, stack);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, stack);
 		}
 		
 		NostrumResearch research = getResearch(stack);
 		if (research == null) {
-			playerIn.sendMessage(new StringTextComponent("This transcript doesn't appear to have a valid research in it."), Util.NIL_UUID);
-			return new ActionResult<ItemStack>(ActionResultType.FAIL, stack);
+			playerIn.sendMessage(new TextComponent("This transcript doesn't appear to have a valid research in it."), Util.NIL_UUID);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.FAIL, stack);
 		}
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (!worldIn.isClientSide && attr != null) {
 			if (attr.getCompletedResearches().contains(research.getKey())) {
-				playerIn.sendMessage(new TranslationTextComponent("info.research.already_know", new TranslationTextComponent(research.getNameKey())), Util.NIL_UUID);
+				playerIn.sendMessage(new TranslatableComponent("info.research.already_know", new TranslatableComponent(research.getNameKey())), Util.NIL_UUID);
 			} else {
 				attr.completeResearch(research.getKey());
 				NostrumMagicaSounds.LORE.play(null, playerIn.level, playerIn.getX(), playerIn.getY(), playerIn.getZ());
 				stack.shrink(1);
-				NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) playerIn);
-				playerIn.sendMessage(new TranslationTextComponent("info.research.learn", new TranslationTextComponent(research.getNameKey())), Util.NIL_UUID);
+				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) playerIn);
+				playerIn.sendMessage(new TranslatableComponent("info.research.learn", new TranslatableComponent(research.getNameKey())), Util.NIL_UUID);
 				
 			}
-			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, stack);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, stack);
 		}
 		
-		return new ActionResult<ItemStack>(ActionResultType.PASS, stack);
+		return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, stack);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		NostrumResearch research = this.getResearch(stack);
 		if (research != null) {
-			tooltip.add(new TranslationTextComponent("item.nostrummagica." + ID + ".desc", new TranslationTextComponent(research.getNameKey()).withStyle(TextFormatting.BLUE)));
+			tooltip.add(new TranslatableComponent("item.nostrummagica." + ID + ".desc", new TranslatableComponent(research.getNameKey()).withStyle(ChatFormatting.BLUE)));
 			
-			final PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+			final Player player = NostrumMagica.instance.proxy.getPlayer();
 			INostrumMagic attr = player == null ? null : NostrumMagica.getMagicWrapper(player);
 			if (attr != null && attr.getCompletedResearches().contains(research.getKey())) {
-				tooltip.add(new StringTextComponent(" "));
-				tooltip.add(new StringTextComponent("Already Researched").withStyle(TextFormatting.RED));
+				tooltip.add(new TextComponent(" "));
+				tooltip.add(new TextComponent("Already Researched").withStyle(ChatFormatting.RED));
 			}
 		}
 	}
 	
 	@Override
-	public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
 		if (this.allowdedIn(group)) {
 			
 			for (String key: CREATIVE_RESEARCHES) {

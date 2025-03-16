@@ -16,16 +16,16 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Affect all entities in a ring around the caster.
@@ -80,10 +80,10 @@ public class RingShape extends BurstShape {
 		final float innerRadius = getInnerRadius(param);
 		final float outerRadius = getOuterRadius(param);
 		double radiusEnts = outerRadius + .5;
-		final Vector3d centerPos = location.hitPosition;
+		final Vec3 centerPos = location.hitPosition;
 		
 		for (Entity entity : location.world.getEntities(null, 
-				new AxisAlignedBB(centerPos.x() - radiusEnts,
+				new AABB(centerPos.x() - radiusEnts,
 						centerPos.y() - radiusEnts,
 						centerPos.z() - radiusEnts,
 						centerPos.x() + radiusEnts,
@@ -91,7 +91,7 @@ public class RingShape extends BurstShape {
 						centerPos.z() + radiusEnts))) {
 			LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
 			if (living != null) {
-				final Vector3d diff = entity.position().subtract(centerPos);
+				final Vec3 diff = entity.position().subtract(centerPos);
 				final double distFlat = Math.sqrt(Math.abs(Math.pow(diff.x(), 2)) + Math.abs(Math.pow(diff.z(), 2)));
 				if (distFlat <= radiusEnts
 						&& distFlat >= innerRadius
@@ -181,7 +181,7 @@ public class RingShape extends BurstShape {
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
+	public boolean shouldTrace(Player player, SpellShapeProperties params) {
 		return false;
 	}
 	

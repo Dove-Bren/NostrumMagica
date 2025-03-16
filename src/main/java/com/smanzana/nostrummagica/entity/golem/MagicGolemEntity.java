@@ -14,45 +14,45 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.AgeableEntity;
-import net.minecraft.entity.CreatureEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntitySize;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.Pose;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.goal.FollowOwnerGoal;
-import net.minecraft.entity.ai.goal.HurtByTargetGoal;
-import net.minecraft.entity.ai.goal.LookAtGoal;
-import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
-import net.minecraft.entity.ai.goal.OwnerHurtByTargetGoal;
-import net.minecraft.entity.ai.goal.OwnerHurtTargetGoal;
-import net.minecraft.entity.ai.goal.SwimGoal;
-import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.AgableMob;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 
-public abstract class MagicGolemEntity extends TameableEntity implements ILoreSupplier, IElementalEntity {
+public abstract class MagicGolemEntity extends TamableAnimal implements ILoreSupplier, IElementalEntity {
 
 	Entity e;
-	private static final DataParameter<Float> DATA_HEALTH_ID = EntityDataManager.<Float>defineId(MagicGolemEntity.class, DataSerializers.FLOAT);
+	private static final EntityDataAccessor<Float> DATA_HEALTH_ID = SynchedEntityData.<Float>defineId(MagicGolemEntity.class, EntityDataSerializers.FLOAT);
 	protected static final int ROSE_DROP_DENOM = 12500;
 
 	protected boolean isMelee;
@@ -65,7 +65,7 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
 	
 	private int expireTicks;
 	
-    protected MagicGolemEntity(EntityType<? extends MagicGolemEntity> type, World worldIn, EMagicElement element, boolean melee, boolean range, boolean buff) {
+    protected MagicGolemEntity(EntityType<? extends MagicGolemEntity> type, Level worldIn, EMagicElement element, boolean melee, boolean range, boolean buff) {
         super(type, worldIn);
         this.setTame(true);
         
@@ -105,21 +105,21 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
 
     protected void registerGoals()
     {
-        this.goalSelector.addGoal(1, new SwimGoal(this));
+        this.goalSelector.addGoal(1, new FloatGoal(this));
         //this.goalSelector.addGoal(3, new EntityAIAttackMelee(this, 1.0D, true));
         gTask = new GolemTask(this);
         this.goalSelector.addGoal(2, gTask);
         this.goalSelector.addGoal(3, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F, true));
-        this.goalSelector.addGoal(4, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
-        this.goalSelector.addGoal(5, new LookAtGoal(this, PlayerEntity.class, 8.0F));
+        this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 1.0D));
+        this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.targetSelector.addGoal(1, new OwnerHurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new OwnerHurtTargetGoal(this));
         this.targetSelector.addGoal(3, new HurtByTargetGoal(this).setAlertOthers(MagicGolemEntity.class));
         this.targetSelector.addGoal(1, new GolemAIFindEntityNearestPlayer(this));
     }
     
-    protected static final AttributeModifierMap.MutableAttribute BuildBaseAttributes() {
-    	return AnimalEntity.createMobAttributes()
+    protected static final AttributeSupplier.Builder BuildBaseAttributes() {
+    	return Animal.createMobAttributes()
     			.add(Attributes.ATTACK_DAMAGE, 2.0)
     			;
     }
@@ -153,7 +153,7 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
         return 0.4F;
     }
 
-    protected float getStandingEyeHeight(Pose pose, EntitySize size) {
+    protected float getStandingEyeHeight(Pose pose, EntityDimensions size) {
         return this.getBbHeight() * 0.8F;
     }
 
@@ -167,8 +167,8 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
         return flag;
     }
 
-    public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
-        return ActionResultType.PASS;
+    public InteractionResult /*processInteract*/ mobInteract(Player player, InteractionHand hand, @Nonnull ItemStack stack) {
+        return InteractionResult.PASS;
     }
 
     /**
@@ -182,7 +182,7 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
     /**
      * Returns true if the mob is currently able to mate with the specified mob.
      */
-    public boolean canMate(AnimalEntity otherAnimal) {
+    public boolean canMate(Animal otherAnimal) {
         return false;
     }
 
@@ -190,12 +190,12 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
         return target != owner;
     }
 
-    public boolean canBeLeashed(PlayerEntity player) {
+    public boolean canBeLeashed(Player player) {
         return false;
     }
 
 	@Override
-	public AgeableEntity /*createChild*/ getBreedOffspring(ServerWorld world, AgeableEntity ageable) {
+	public AgableMob /*createChild*/ getBreedOffspring(ServerLevel world, AgableMob ageable) {
 		return null;
 	}
 	
@@ -277,19 +277,19 @@ public abstract class MagicGolemEntity extends TameableEntity implements ILoreSu
 		return this.element;
 	}
 	
-	private static class GolemAIFindEntityNearestPlayer extends NearestAttackableTargetGoal<PlayerEntity> {
+	private static class GolemAIFindEntityNearestPlayer extends NearestAttackableTargetGoal<Player> {
 
-		protected MobEntity rood; // parent doesn't expose
+		protected Mob rood; // parent doesn't expose
 		
-		public GolemAIFindEntityNearestPlayer(CreatureEntity entityLivingIn) {
-			super(entityLivingIn, PlayerEntity.class, true);
+		public GolemAIFindEntityNearestPlayer(PathfinderMob entityLivingIn) {
+			super(entityLivingIn, Player.class, true);
 			this.rood = entityLivingIn;
 		}
 		
 		@Override
 		public boolean canUse() {
-			if (rood instanceof TameableEntity) {
-				if (((TameableEntity) rood).getOwner() != null)
+			if (rood instanceof TamableAnimal) {
+				if (((TamableAnimal) rood).getOwner() != null)
 					return false;
 			}
 			

@@ -3,17 +3,17 @@ package com.smanzana.nostrummagica.integration.jei.ingredients;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.spell.component.Transmutation.TransmutationSource;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class TransmuteSourceJEIRenderer implements IIngredientRenderer<TransmutationSource> {
 	
@@ -26,7 +26,7 @@ public class TransmuteSourceJEIRenderer implements IIngredientRenderer<Transmuta
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, int xPosition, int yPosition, TransmutationSource ingredient) {
+	public void render(PoseStack matrixStackIn, int xPosition, int yPosition, TransmutationSource ingredient) {
 		if (ingredient == null)
 			return;
 		
@@ -63,12 +63,12 @@ public class TransmuteSourceJEIRenderer implements IIngredientRenderer<Transmuta
 	}
 
 	@Override
-	public List<ITextComponent> getTooltip(TransmutationSource ingredient, ITooltipFlag flag) {
-		return Lists.newArrayList(new TranslationTextComponent("info.jei.recipe.transmute.unknown"));
+	public List<Component> getTooltip(TransmutationSource ingredient, TooltipFlag flag) {
+		return Lists.newArrayList(new TranslatableComponent("info.jei.recipe.transmute.unknown"));
 	}
 
 	@Override
-	public FontRenderer getFontRenderer(Minecraft minecraft, TransmutationSource ingredient) {
+	public Font getFontRenderer(Minecraft minecraft, TransmutationSource ingredient) {
 		return minecraft.font;
 	}
 	

@@ -18,15 +18,15 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Lazy;
 
 public class FieldShape extends AreaShape {
@@ -36,11 +36,11 @@ public class FieldShape extends AreaShape {
 		private static final int TICK_RATE = 5;
 		private static final int NUM_TICKS = (20 * 10) / TICK_RATE; // 20 seconds
 
-		private final Vector3d origin;
+		private final Vec3 origin;
 		private final float radius;
 		private final SpellCharacteristics characteristics;
 		
-		public FieldShapeInstance(ISpellState state, World world, Vector3d pos, float radius, boolean continuous, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+		public FieldShapeInstance(ISpellState state, Level world, Vec3 pos, float radius, boolean continuous, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 			super(state, world, pos, TICK_RATE, NUM_TICKS, radius + .75f, continuous, affectsEntities(properties), affectsBlocks(properties), characteristics);
 			this.radius = radius;
 			this.origin = pos;
@@ -55,12 +55,12 @@ public class FieldShape extends AreaShape {
 		@Override
 		protected boolean isInArea(LivingEntity entity) {
 			return Math.abs(entity.getY() - origin.y()) < 1
-					&& origin.distanceTo(new Vector3d(entity.getX(), origin.y, entity.getZ())) <= radius; // compare against our y for horizontal distance.
+					&& origin.distanceTo(new Vec3(entity.getX(), origin.y, entity.getZ())) <= radius; // compare against our y for horizontal distance.
 			// .75 wiggle room in listener means you can't be way below.
 		}
 
 		@Override
-		protected boolean isInArea(World world, BlockPos pos) {
+		protected boolean isInArea(Level world, BlockPos pos) {
 			return pos.getY() == origin.y() &&
 					(Math.abs((Math.floor(origin.x) + .5) - (pos.getX() + .5))
 					+ Math.abs((Math.floor(origin.z) + .5) - (pos.getZ() + .5))) <= radius;
@@ -189,7 +189,7 @@ public class FieldShape extends AreaShape {
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
+	public boolean shouldTrace(Player player, SpellShapeProperties params) {
 		return false;
 	}
 

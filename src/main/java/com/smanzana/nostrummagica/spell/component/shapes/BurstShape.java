@@ -17,16 +17,16 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 
 public class BurstShape extends InstantShape implements ISelectableShape {
 
@@ -63,10 +63,10 @@ public class BurstShape extends InstantShape implements ISelectableShape {
 
 		if (this.affectsEntities(param)) {
 			double radiusEnts = getRadius(param) + .5;
-			final Vector3d center = location.hitPosition;
+			final Vec3 center = location.hitPosition;
 		
 			for (Entity entity : location.world.getEntities(null, 
-					new AxisAlignedBB(center.x() - radiusEnts,
+					new AABB(center.x() - radiusEnts,
 							center.y() - radiusEnts,
 							center.z() - radiusEnts,
 							center.x() + radiusEnts,
@@ -74,7 +74,7 @@ public class BurstShape extends InstantShape implements ISelectableShape {
 							center.z() + radiusEnts))) {
 				LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
 				if (living != null)
-					if (Math.abs(entity.position().distanceTo(new Vector3d(center.x(), center.y(), center.z()))) <= radiusEnts)
+					if (Math.abs(entity.position().distanceTo(new Vec3(center.x(), center.y(), center.z()))) <= radiusEnts)
 						ret.add(living);
 			}
 		}
@@ -156,7 +156,7 @@ public class BurstShape extends InstantShape implements ISelectableShape {
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
+	public boolean shouldTrace(Player player, SpellShapeProperties params) {
 		return false;
 	}
 	

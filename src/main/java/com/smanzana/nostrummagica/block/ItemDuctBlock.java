@@ -4,31 +4,31 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.tile.ItemDuctTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.IWaterLoggable;
-import net.minecraft.block.SixWayBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.pathfinding.PathType;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.PipeBlock;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 /**
@@ -37,7 +37,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
  *
  */
 @SuppressWarnings("deprecation")
-public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
+public class ItemDuctBlock extends PipeBlock implements SimpleWaterloggedBlock {
 	
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	
@@ -165,7 +165,7 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(NORTH, SOUTH, EAST, WEST, UP, DOWN, WATERLOGGED);
 	}
 	
@@ -176,16 +176,16 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 	 * @deprecated call via {@link IBlockState#onBlockEventReceived(World,BlockPos,int,int)} whenever possible.
 	 * Implementing/overriding is fine.
 	 */
-	public boolean triggerEvent(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+	public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
 		super.triggerEvent(state, worldIn, pos, id, param);
-		TileEntity tileentity = worldIn.getBlockEntity(pos);
+		BlockEntity tileentity = worldIn.getBlockEntity(pos);
 		return tileentity == null ? false : tileentity.triggerEvent(id, param);
 	}
 
 	@Nullable
-	public INamedContainerProvider getMenuProvider(BlockState state, World worldIn, BlockPos pos) {
-		TileEntity tileentity = worldIn.getBlockEntity(pos);
-		return tileentity instanceof INamedContainerProvider ? (INamedContainerProvider)tileentity : null;
+	public MenuProvider getMenuProvider(BlockState state, Level worldIn, BlockPos pos) {
+		BlockEntity tileentity = worldIn.getBlockEntity(pos);
+		return tileentity instanceof MenuProvider ? (MenuProvider)tileentity : null;
 	}
 	
 	@Override
@@ -194,12 +194,12 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		return new ItemDuctTileEntity();
 	}
 	
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return this.defaultBlockState()
 				.setValue(NORTH, canConnect(context.getLevel(), context.getClickedPos(), Direction.NORTH))
 				.setValue(SOUTH, canConnect(context.getLevel(), context.getClickedPos(), Direction.SOUTH))
@@ -209,7 +209,7 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 				.setValue(DOWN, canConnect(context.getLevel(), context.getClickedPos(), Direction.DOWN));
 	}
 	
-	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
+	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
 		if (state.getValue(WATERLOGGED)) {
 			worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
 		}
@@ -218,12 +218,12 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 		return state.setValue(PROPERTY_BY_DIRECTION.get(facing), connect);
 	}
 	
-	protected boolean canConnect(IWorldReader world, BlockPos centerPos, Direction direction) {
+	protected boolean canConnect(LevelReader world, BlockPos centerPos, Direction direction) {
 		// Should be whether there's another pipe or anything else with an inventory?
 		final BlockPos atPos = centerPos.relative(direction);
-		@Nullable TileEntity te = world.getBlockEntity(atPos);
+		@Nullable BlockEntity te = world.getBlockEntity(atPos);
 		if (te != null) {
-			if (te instanceof IInventory) {
+			if (te instanceof Container) {
 				return true;
 			}
 			if (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent()) {
@@ -235,7 +235,7 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 	}
 	
 	@Override
-	public boolean canSurvive(BlockState state, IWorldReader worldIn, BlockPos pos) {
+	public boolean canSurvive(BlockState state, LevelReader worldIn, BlockPos pos) {
 		return true;
 	}
 	
@@ -288,8 +288,8 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 	}
 	
 	@Override
-	public int getAnalogOutputSignal(BlockState blockState, World worldIn, BlockPos pos) {
-		final TileEntity tileentity = worldIn.getBlockEntity(pos);
+	public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
+		final BlockEntity tileentity = worldIn.getBlockEntity(pos);
 		final int output;
 
 		if (tileentity instanceof ItemDuctTileEntity) {
@@ -299,7 +299,7 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 			if (frac <= 0.0f) {
 				output = 0;
 			} else {
-				output = 1 + MathHelper.floor(frac * 14);
+				output = 1 + Mth.floor(frac * 14);
 			}
 		} else {
 			output = 0;
@@ -309,13 +309,13 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 	}
 	
 	@Override
-	public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
 		if (newState.getBlock() != state.getBlock()) {
-			TileEntity tileentity = worldIn.getBlockEntity(pos);
+			BlockEntity tileentity = worldIn.getBlockEntity(pos);
 	
 			if (tileentity instanceof ItemDuctTileEntity) {
 				for (ItemStack stack : ((ItemDuctTileEntity) tileentity).getAllItems()) {
-					InventoryHelper.dropItemStack(worldIn, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, stack);
+					Containers.dropItemStack(worldIn, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, stack);
 				}
 				worldIn.updateNeighbourForOutputSignal(pos, this);
 			}
@@ -325,12 +325,12 @@ public class ItemDuctBlock extends SixWayBlock implements IWaterLoggable {
 	}
 	
 	@Override
-	public BlockRenderType getRenderShape(BlockState state) {
-		return BlockRenderType.MODEL;
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.MODEL;
 	}
 	
 	@Override
-	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, BlockGetter worldIn, BlockPos pos, PathComputationType type) {
 		return false;
 	}
 	

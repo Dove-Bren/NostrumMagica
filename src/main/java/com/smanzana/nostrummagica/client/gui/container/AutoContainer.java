@@ -4,8 +4,8 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.util.ContainerUtil.IAutoContainerInventory;
 
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -14,11 +14,11 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Skyler
  *
  */
-public abstract class AutoContainer extends Container {
+public abstract class AutoContainer extends AbstractContainerMenu {
 
 	private final @Nullable IAutoContainerInventory inventory;
 	
-	public AutoContainer(ContainerType<? extends AutoContainer> type, int windowId, @Nullable IAutoContainerInventory inventory) {
+	public AutoContainer(MenuType<? extends AutoContainer> type, int windowId, @Nullable IAutoContainerInventory inventory) {
 		super(type, windowId);
 		this.inventory = inventory;
 		if (inventory != null) {

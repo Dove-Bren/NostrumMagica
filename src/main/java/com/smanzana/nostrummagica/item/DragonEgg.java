@@ -9,17 +9,17 @@ import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.item.Rarity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 
 /**
  * Dragon spawning egg
@@ -35,26 +35,26 @@ public class DragonEgg extends Item implements ILoreTagged {
 	}
 	
 	@Override
-	public ActionResultType useOn(ItemUseContext context) {
-		final World worldIn = context.getLevel();
+	public InteractionResult useOn(UseOnContext context) {
+		final Level worldIn = context.getLevel();
 		final BlockPos pos = context.getClickedPos();
-		final PlayerEntity playerIn = context.getPlayer();
+		final Player playerIn = context.getPlayer();
 		
 		if (worldIn.isClientSide)
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		
 		if (pos == null)
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		
-		BlockPos.Mutable checkPos = new BlockPos.Mutable().set(pos);
+		BlockPos.MutableBlockPos checkPos = new BlockPos.MutableBlockPos().set(pos);
 		checkPos.setY(checkPos.getY() + 1);
 		if (!worldIn.isEmptyBlock(checkPos)) {
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		}
 		
 		checkPos.setY(checkPos.getY() + 1);
 		if (!worldIn.isEmptyBlock(checkPos)) {
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		}
 		
 		// Spawn
@@ -65,7 +65,7 @@ public class DragonEgg extends Item implements ILoreTagged {
 		
 		DragonEggEntity egg = new DragonEggEntity(NostrumEntityTypes.dragonEgg, worldIn, playerIn, TameRedDragonEntity.rollRandomStats());
 		egg.setPos(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5);
-		egg.finalizeSpawn((ServerWorld) worldIn, worldIn.getCurrentDifficultyAt(pos), SpawnReason.EVENT, null, null);
+		egg.finalizeSpawn((ServerLevel) worldIn, worldIn.getCurrentDifficultyAt(pos), MobSpawnType.EVENT, null, null);
 		worldIn.addFreshEntity(egg);
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
@@ -73,13 +73,13 @@ public class DragonEgg extends Item implements ILoreTagged {
 			attr.giveFullLore(egg.getLoreTag());
 		}
 		
-		playerIn.sendMessage(new TranslationTextComponent("info.egg.place"), Util.NIL_UUID);
+		playerIn.sendMessage(new TranslatableComponent("info.egg.place"), Util.NIL_UUID);
 		
 		if (!playerIn.isCreative()) {
 			context.getItemInHand().shrink(1);
 		}
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 	
 	@Override

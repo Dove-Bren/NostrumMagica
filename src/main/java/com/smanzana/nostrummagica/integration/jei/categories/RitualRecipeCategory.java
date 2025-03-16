@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.integration.jei.categories;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -29,16 +29,16 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Vector3f;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 
 public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 
@@ -99,7 +99,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 	}
 
 	@Override
-	public void draw(RitualRecipe recipe, MatrixStack matrixStackIn, double mouseX, double mouseY) {
+	public void draw(RitualRecipe recipe, PoseStack matrixStackIn, double mouseX, double mouseY) {
 		final Minecraft minecraft = Minecraft.getInstance();
 		matrixStackIn.pushPose();
 		
@@ -131,7 +131,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 		matrixStackIn.popPose();
 		
 		if (!canPerform(recipe)) {
-			minecraft.font.draw(matrixStackIn, TextFormatting.BOLD + "x" + TextFormatting.RESET, 108, 70, 0xFFAA0000);
+			minecraft.font.draw(matrixStackIn, ChatFormatting.BOLD + "x" + ChatFormatting.RESET, 108, 70, 0xFFAA0000);
 		}
 		
 		
@@ -263,18 +263,18 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 		return null;
 	}
 	
-	private List<ITextComponent> tooltipEmpty = new ArrayList<>();
+	private List<Component> tooltipEmpty = new ArrayList<>();
 
 	@Override
-	public List<ITextComponent> getTooltipStrings(RitualRecipe ritual, double mouseX, double mouseY) {
+	public List<Component> getTooltipStrings(RitualRecipe ritual, double mouseX, double mouseY) {
 		//108, 70
 		if (!canPerform(ritual)
 				&& mouseX > 101 && mouseX < 124
 				&& mouseY > 66 && mouseY < 85) {
-			List<ITextComponent> tooltip = TextUtils.GetTranslatedList("info.jei.recipe.ritual.invalid", TextFormatting.BOLD + "" + TextFormatting.RED, TextFormatting.BLACK);
-			List<ITextComponent> extras = ritual.getRequirement() == null ? null : ritual.getRequirement().getDescription(NostrumMagica.instance.proxy.getPlayer());
+			List<Component> tooltip = TextUtils.GetTranslatedList("info.jei.recipe.ritual.invalid", ChatFormatting.BOLD + "" + ChatFormatting.RED, ChatFormatting.BLACK);
+			List<Component> extras = ritual.getRequirement() == null ? null : ritual.getRequirement().getDescription(NostrumMagica.instance.proxy.getPlayer());
 			if (extras != null) {
-				extras.forEach(t -> tooltip.add(new StringTextComponent(" - ").append(t)));
+				extras.forEach(t -> tooltip.add(new TextComponent(" - ").append(t)));
 			}
 			return tooltip;
 		}
@@ -285,7 +285,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 	protected boolean canPerform(RitualRecipe ritual) {
 		// Check whether this ritual can be performed
 		boolean canPerform = true;
-		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.instance.proxy.getPlayer();
 		if (player != null) {
 			// Client side, so check if player has unlocked the ritual
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);

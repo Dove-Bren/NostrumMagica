@@ -4,10 +4,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.util.Curves.ICurve3d;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class SpellShapePreviewComponent {
 	
@@ -72,31 +72,31 @@ public abstract class SpellShapePreviewComponent {
 	
 	public abstract static class Span extends SpellShapePreviewComponent {
 
-		protected final Vector3d start;
-		protected final Vector3d end;
+		protected final Vec3 start;
+		protected final Vec3 end;
 		
-		protected Span(Type<? extends Span> type, Vector3d start, Vector3d end) {
+		protected Span(Type<? extends Span> type, Vec3 start, Vec3 end) {
 			super(type);
 			this.start = start;
 			this.end = end;
 		}
 		
-		public Vector3d getStart() {
+		public Vec3 getStart() {
 			return this.start;
 		}
 		
-		public Vector3d getEnd() {
+		public Vec3 getEnd() {
 			return this.end;
 		}
 	}
 	
 	public static class Line extends Span {
 		
-		protected Line(Type<? extends Line> type, Vector3d start, Vector3d end) {
+		protected Line(Type<? extends Line> type, Vec3 start, Vec3 end) {
 			super(type, start, end);
 		}
 		
-		public Line(Vector3d start, Vector3d end) {
+		public Line(Vec3 start, Vec3 end) {
 			this(LINE, start, end);
 		}
 	}
@@ -105,12 +105,12 @@ public abstract class SpellShapePreviewComponent {
 		
 		protected final float width;
 		
-		protected AoELine(Type<? extends AoELine> type, Vector3d start, Vector3d end, float width) {
+		protected AoELine(Type<? extends AoELine> type, Vec3 start, Vec3 end, float width) {
 			super(type, start, end);
 			this.width = width;
 		}
 		
-		public AoELine(Vector3d start, Vector3d end, float width) {
+		public AoELine(Vec3 start, Vec3 end, float width) {
 			this(AOE_LINE, start, end, width);
 		}
 		
@@ -123,12 +123,12 @@ public abstract class SpellShapePreviewComponent {
 		
 		protected final ICurve3d curve;
 		
-		protected Curve(Type<? extends Curve> type, Vector3d start, Vector3d end, ICurve3d curve) {
+		protected Curve(Type<? extends Curve> type, Vec3 start, Vec3 end, ICurve3d curve) {
 			super(type, start, end);
 			this.curve = curve;
 		}
 		
-		public Curve(Vector3d start, Vector3d end, ICurve3d curve) {
+		public Curve(Vec3 start, Vec3 end, ICurve3d curve) {
 			this(CURVE, start, end, curve);
 		}
 		
@@ -139,20 +139,20 @@ public abstract class SpellShapePreviewComponent {
 	
 	public static class Disk extends SpellShapePreviewComponent {
 
-		protected final Vector3d start;
+		protected final Vec3 start;
 		protected final float radius;
 		
-		protected Disk(Type<? extends Disk> type, Vector3d start, float radius) {
+		protected Disk(Type<? extends Disk> type, Vec3 start, float radius) {
 			super(type);
 			this.start = start;
 			this.radius = radius;
 		}
 		
-		public Disk(Vector3d start, float radius) {
+		public Disk(Vec3 start, float radius) {
 			this(DISK, start, radius);
 		}
 		
-		public Vector3d getStart() {
+		public Vec3 getStart() {
 			return this.start;
 		}
 		
@@ -163,19 +163,19 @@ public abstract class SpellShapePreviewComponent {
 	
 	public static class Box extends Span {
 
-		protected Box(Type<? extends Span> type, Vector3d boundsMin, Vector3d boundsMax) {
+		protected Box(Type<? extends Span> type, Vec3 boundsMin, Vec3 boundsMax) {
 			super(type, boundsMin, boundsMax);
 		}
 
-		protected Box(Type<? extends Span> type, MutableBoundingBox bounds) {
-			super(type, new Vector3d(bounds.x0, bounds.y0, bounds.z0), new Vector3d(bounds.x1, bounds.y1, bounds.z1));
+		protected Box(Type<? extends Span> type, BoundingBox bounds) {
+			super(type, new Vec3(bounds.minX(), bounds.minY(), bounds.minZ()), new Vec3(bounds.maxX(), bounds.maxY(), bounds.maxZ()));
 		}
 		
-		public Box(Vector3d boundsMin, Vector3d boundsMax) {
+		public Box(Vec3 boundsMin, Vec3 boundsMax) {
 			this(BOX, boundsMin, boundsMax);
 		}
 		
-		public Box(MutableBoundingBox bounds) {
+		public Box(BoundingBox bounds) {
 			this(BOX, bounds);
 		}
 	}

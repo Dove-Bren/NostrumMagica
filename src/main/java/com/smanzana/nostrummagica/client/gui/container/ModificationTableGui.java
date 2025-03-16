@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.item.NostrumItems;
@@ -24,21 +24,21 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.Tags;
@@ -77,13 +77,13 @@ public class ModificationTableGui {
 	private static final int SUBMIT_TEXT_HOFFSET = 0;
 	private static final int SUBMIT_TEXT_VOFFSET = 221;
 	
-	public static class ModificationTableContainer extends Container {
+	public static class ModificationTableContainer extends AbstractContainerMenu {
 		
 		public static final String ID = "modification_table";
 		
 		// Kept just to report to server which TE is doing crafting
 		protected BlockPos pos;
-		protected PlayerEntity player;
+		protected Player player;
 		
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
@@ -103,7 +103,7 @@ public class ModificationTableGui {
 		protected boolean hasFloat;
 		protected SpellComponentWrapper component;
 		
-		public ModificationTableContainer(int windowId, PlayerEntity player, IInventory playerInv, ModificationTableTileEntity tableInventory, BlockPos pos) {
+		public ModificationTableContainer(int windowId, Player player, Container playerInv, ModificationTableTileEntity tableInventory, BlockPos pos) {
 			super(NostrumContainers.ModificationTable, windowId);
 			this.inventory = tableInventory;
 			this.player = player;
@@ -134,7 +134,7 @@ public class ModificationTableGui {
 				}
 				
 				@Override
-				public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
+				public ItemStack onTake(Player playerIn, ItemStack stack) {
 					validate();
 					floatIndex = 0;
 					return super.onTake(playerIn, stack);
@@ -158,7 +158,7 @@ public class ModificationTableGui {
 			validate();
 		}
 		
-		public static final ModificationTableContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buf) {
+		public static final ModificationTableContainer FromNetwork(int windowId, Inventory playerInv, FriendlyByteBuf buf) {
 			return new ModificationTableContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buf), buf.readBlockPos());
 		}
 		
@@ -172,7 +172,7 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		public @Nonnull ItemStack quickMoveStack(PlayerEntity playerIn, int fromSlot) {
+		public @Nonnull ItemStack quickMoveStack(Player playerIn, int fromSlot) {
 			Slot slot = (Slot) this.slots.get(fromSlot);
 			
 			if (slot != null && slot.hasItem()) {
@@ -210,7 +210,7 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		public boolean stillValid(PlayerEntity playerIn) {
+		public boolean stillValid(Player playerIn) {
 			return true;
 		}
 		
@@ -322,7 +322,7 @@ public class ModificationTableGui {
 		
 		private Button submitButton;
 		
-		public ModificationGui(ModificationTableContainer container, PlayerInventory playerInv, ITextComponent name) {
+		public ModificationGui(ModificationTableContainer container, Inventory playerInv, Component name) {
 			super(container, playerInv, name);
 			this.container = container;
 			this.imageWidth = GUI_WIDTH;
@@ -349,7 +349,7 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+		protected void renderBg(PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			if (localModIndex != container.modIndex) {
 				this.refreshButtons();
 				this.localModIndex = container.modIndex;
@@ -370,7 +370,7 @@ public class ModificationTableGui {
 				y = verticalMargin + PANEL_VOFFSET + 10;
 				ItemStack tome = container.inventory.getMainSlot();
 				if (!tome.isEmpty()) {
-					ITextComponent nameComp = tome.getHoverName();
+					Component nameComp = tome.getHoverName();
 					String name = nameComp == null ? null : nameComp.getString();
 					if (name == null || name.length() == 0)
 						name = "Spell Tome";
@@ -428,7 +428,7 @@ public class ModificationTableGui {
 				final ItemStack wand = container.inventory.getMainSlot();
 				final ItemStack input = container.inventory.getInputSlot();
 				if (!wand.isEmpty()) {
-					final List<ITextComponent> info;
+					final List<Component> info;
 					if (input.isEmpty()) {
 						if (CasterWandItem.GetSpell(wand) == null) {
 							info = TextUtils.GetTranslatedList("modification.caster_wand.intro");
@@ -447,7 +447,7 @@ public class ModificationTableGui {
 					}
 					
 					x = horizontalMargin + PANEL_HOFFSET + 5;
-					for (ITextComponent line : info) {
+					for (Component line : info) {
 						mc.font.draw(matrixStackIn, line, x, y, 0xFFFFFFFF);
 						y += mc.font.lineHeight + 1;
 					}
@@ -507,7 +507,7 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			if (container.isValid) {
@@ -596,7 +596,7 @@ public class ModificationTableGui {
 			private ModificationGui gui;
 			
 			public ToggleButton(int x, int y, boolean val, ModificationGui gui) {
-				super(x, y, 200, 20, StringTextComponent.EMPTY, (b) -> {
+				super(x, y, 200, 20, TextComponent.EMPTY, (b) -> {
 					gui.onToggleButton((ToggleButton)b);
 				});
 				this.val = val;
@@ -606,7 +606,7 @@ public class ModificationTableGui {
 			}
 			
 			@Override
-			public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
+			public void render(PoseStack matrixStackIn, int parX, int parY, float partialTicks) {
 				if (visible) {
 					
 					float tint = 1f;
@@ -637,7 +637,7 @@ public class ModificationTableGui {
 			private ModificationGui gui;
 			
 			public FloatButton(int x, int y, int val, float actual, ModificationGui gui) {
-				super(x, y, 200, 20, StringTextComponent.EMPTY, (b) -> {
+				super(x, y, 200, 20, TextComponent.EMPTY, (b) -> {
 					gui.onFloatButton((FloatButton) b);
 				});
 				this.val = val;
@@ -648,7 +648,7 @@ public class ModificationTableGui {
 			}
 			
 			@Override
-			public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
+			public void render(PoseStack matrixStackIn, int parX, int parY, float partialTicks) {
 				if (visible) {
 					
 					// In scroll mode, float buttons are buttons that match spell icon idx
@@ -683,7 +683,7 @@ public class ModificationTableGui {
 			private ModificationGui gui;
 			
 			public SubmitButton(int x, int y, ModificationGui gui) {
-				super(x, y, 200, 20, StringTextComponent.EMPTY, (b) -> {
+				super(x, y, 200, 20, TextComponent.EMPTY, (b) -> {
 					gui.onSubmitButton();
 				});
 				this.width = LARGE_BUTTON_WIDTH;
@@ -692,7 +692,7 @@ public class ModificationTableGui {
 			}
 			
 			@Override
-			public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
+			public void render(PoseStack matrixStackIn, int parX, int parY, float partialTicks) {
 				if (visible) {
 					
 					float tint = 1f;
@@ -721,7 +721,7 @@ public class ModificationTableGui {
 		private ItemStack required = ItemStack.EMPTY;
 		private ModificationTableContainer container;
 
-		public InputSlot(ModificationTableContainer container, IInventory inventoryIn, int index, int x, int y) {
+		public InputSlot(ModificationTableContainer container, Container inventoryIn, int index, int x, int y) {
 			super(inventoryIn, index, x, y);
 			this.container = container;
 		}
@@ -748,7 +748,7 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
+		public ItemStack onTake(Player playerIn, ItemStack stack) {
 			container.validate();
 			return super.onTake(playerIn, stack);
 		}

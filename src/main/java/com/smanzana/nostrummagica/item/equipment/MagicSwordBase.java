@@ -5,15 +5,15 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.item.ItemTier;
-import net.minecraft.item.SwordItem;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.SwordItem;
 
 public class MagicSwordBase extends SwordItem implements ILoreTagged {
 
 	public static final String ID = "magicswordbase";
 	
 	public MagicSwordBase() {
-		super(ItemTier.WOOD, 1, -2.4F, NostrumItems.PropEquipment().durability(5));
+		super(Tiers.WOOD, 1, -2.4F, NostrumItems.PropEquipment().durability(5));
 	}
 	
 	public String getModelID() {

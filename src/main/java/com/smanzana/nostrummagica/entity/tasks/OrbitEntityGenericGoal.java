@@ -5,12 +5,12 @@ import java.util.EnumSet;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.controller.MovementController;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.control.MoveControl;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 /**
  * Movement AI to orbit around the owner.
@@ -19,20 +19,20 @@ import net.minecraft.world.World;
  *
  * @param <T>
  */
-public class OrbitEntityGenericGoal<T extends MobEntity> extends Goal {
+public class OrbitEntityGenericGoal<T extends Mob> extends Goal {
 	
 	private static final double DEFAULT_WOBBLE = 5 * 20;
 	private static final int DEFAULT_BUMPS = 1;
 	
 	protected final T ent;
 	protected LivingEntity orbitTarget;
-	protected World theWorld;
+	protected Level theWorld;
 	protected final double orbitDistance;
 	protected final double assembleSpeed;
 	protected final double orbitPeriod;
 	protected final double ringWobbleSpeed;
 	protected final int ringWobbleBumps;
-	protected final MovementController entMovementHelper;
+	protected final MoveControl entMovementHelper;
 	protected final Predicate<? super T> startPred;
 	protected final Predicate<? super T> continuePred;
 	
@@ -74,7 +74,7 @@ public class OrbitEntityGenericGoal<T extends MobEntity> extends Goal {
 
 		if (entitylivingbase == null) {
 			return false;
-		} else if (entitylivingbase instanceof PlayerEntity && ((PlayerEntity)entitylivingbase).isSpectator()) {
+		} else if (entitylivingbase instanceof Player && ((Player)entitylivingbase).isSpectator()) {
 			return false;
 //		} else if (this.ent.getMoveHelper().isUpdating()
 //				&& ent.getDistanceSq(ent.getMoveHelper().getX(), ent.getMoveHelper().getY(), ent.getMoveHelper().getZ()) > 1.0) {

@@ -2,14 +2,14 @@ package com.smanzana.nostrummagica.entity;
 
 import com.smanzana.nostrummagica.spell.component.shapes.MortarShape.MortarShapeInstance;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
 public class SpellMortarEntity extends SpellProjectileEntity {
 	
@@ -17,12 +17,12 @@ public class SpellMortarEntity extends SpellProjectileEntity {
 	
 	private double gravity;
 	
-	public SpellMortarEntity(EntityType<? extends SpellMortarEntity> type, World world) {
+	public SpellMortarEntity(EntityType<? extends SpellMortarEntity> type, Level world) {
 		super(type, world);
 	}
 	
 	public SpellMortarEntity(EntityType<? extends SpellMortarEntity> type, MortarShapeInstance trigger, LivingEntity shooter,
-			World world, Vector3d start, Vector3d velocity,
+			Level world, Vec3 start, Vec3 velocity,
 			float speedFactor, double gravity) {
 		super(type, trigger, world, shooter, start, velocity, speedFactor, 1000);
 		this.xPower = 0; // Force custom acceleration
@@ -69,7 +69,7 @@ public class SpellMortarEntity extends SpellProjectileEntity {
 	}
 
 	@Override
-	protected void onHit(RayTraceResult result) {
+	protected void onHit(HitResult result) {
 //		if (world.isRemote)
 //			return;
 //		
@@ -101,7 +101,7 @@ public class SpellMortarEntity extends SpellProjectileEntity {
 	}
 	
 	@Override
-	public boolean saveAsPassenger(CompoundNBT compound) {
+	public boolean saveAsPassenger(CompoundTag compound) {
 		// Returning false means we won't be saved. That's what we want.
 		return false;
     }
@@ -112,7 +112,7 @@ public class SpellMortarEntity extends SpellProjectileEntity {
 	}
 	
 	@Override
-	protected IParticleData getTrailParticle() {
+	protected ParticleOptions getTrailParticle() {
 		return ParticleTypes.WITCH;
 	}
 }

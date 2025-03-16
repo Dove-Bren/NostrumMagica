@@ -3,16 +3,16 @@ package com.smanzana.nostrummagica.world.gen;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.WorldGenRegistries;
-import net.minecraft.world.gen.blockplacer.SimpleBlockPlacer;
-import net.minecraft.world.gen.blockstateprovider.SimpleBlockStateProvider;
-import net.minecraft.world.gen.feature.BlockClusterFeatureConfig;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.Features;
-import net.minecraft.world.gen.feature.OreFeatureConfig;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.world.level.levelgen.feature.blockplacers.SimpleBlockPlacer;
+import net.minecraft.world.level.levelgen.feature.stateproviders.SimpleStateProvider;
+import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.data.worldgen.Features;
+import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -41,26 +41,26 @@ public class NostrumFeatures {
 		
 		// Register configured features
 		CONFFEATURE_FLOWER_CRYSTABLOOM = registerConfiguredFeature(NostrumMagica.Loc(ID_FLOWER_CRYSTABLOOM), Feature.FLOWER.configured(
-				(new BlockClusterFeatureConfig.Builder(new SimpleBlockStateProvider(NostrumBlocks.crystabloom.defaultBlockState()), SimpleBlockPlacer.INSTANCE))
+				(new RandomPatchConfiguration.GrassConfigurationBuilder(new SimpleStateProvider(NostrumBlocks.crystabloom.defaultBlockState()), SimpleBlockPlacer.INSTANCE))
 				.tries(32).build()
-			).decorated(Features.Placements.ADD_32).decorated(Features.Placements.HEIGHTMAP_SQUARE));
+			).decorated(Features.Decorators.ADD_32).decorated(Features.Decorators.HEIGHTMAP_SQUARE));
 		
 		CONFFEATURE_FLOWER_MIDNIGHTIRIS = registerConfiguredFeature(NostrumMagica.Loc(ID_FLOWER_MIDNIGHTIRIS), Feature.FLOWER.configured(
-				(new BlockClusterFeatureConfig.Builder(new SimpleBlockStateProvider(NostrumBlocks.midnightIris.defaultBlockState()), SimpleBlockPlacer.INSTANCE))
+				(new RandomPatchConfiguration.GrassConfigurationBuilder(new SimpleStateProvider(NostrumBlocks.midnightIris.defaultBlockState()), SimpleBlockPlacer.INSTANCE))
 				.tries(48).build()
-			).decorated(Features.Placements.ADD_32).decorated(Features.Placements.HEIGHTMAP_SQUARE));
+			).decorated(Features.Decorators.ADD_32).decorated(Features.Decorators.HEIGHTMAP_SQUARE));
 		
 		CONFFEATURE_ORE_MANI = registerConfiguredFeature(NostrumMagica.Loc(ID_ORE_MANI), Feature.ORE.configured(
-				new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, NostrumBlocks.maniOre.defaultBlockState(), 9))
+				new OreConfiguration(OreConfiguration.Predicates.NATURAL_STONE, NostrumBlocks.maniOre.defaultBlockState(), 9))
 				.range(128).squared().count(15));
 		
 		CONFFEATURE_ORE_ESSORE = registerConfiguredFeature(NostrumMagica.Loc(ID_ORE_ESSORE), Feature.ORE.configured(
-				new OreFeatureConfig(OreFeatureConfig.FillerBlockType.NATURAL_STONE, NostrumBlocks.essenceOre.defaultBlockState(), 4))
+				new OreConfiguration(OreConfiguration.Predicates.NATURAL_STONE, NostrumBlocks.essenceOre.defaultBlockState(), 4))
 				.range(60).squared().count(8));
 	}
 	
 	private static ConfiguredFeature<?, ?> registerConfiguredFeature(ResourceLocation id, ConfiguredFeature<?, ?> feature) {
-		Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, id, feature);
+		Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, id, feature);
 		return feature;
 	}
 	

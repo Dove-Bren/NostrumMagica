@@ -16,22 +16,22 @@ import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.LadderBlock;
-import net.minecraft.block.RedstoneWallTorchBlock;
-import net.minecraft.block.StairsBlock;
-import net.minecraft.block.WallTorchBlock;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.LadderBlock;
+import net.minecraft.world.level.block.RedstoneWallTorchBlock;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.WallTorchBlock;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.server.level.WorldGenRegion;
 
 /**
  * Room with all known blocks and bounds at compile-time.
@@ -51,14 +51,14 @@ public abstract class StaticRoom implements IDungeonRoom {
 			this.wrappedState = state;
 		}
 		
-		public void set(IWorld world, BlockPos pos, Direction rotation) {
+		public void set(LevelAccessor world, BlockPos pos, Direction rotation) {
 			final Block block = wrappedState.getBlock();
 			BlockState state = this.wrappedState;
 			
-			if (block instanceof HorizontalBlock) {
-				Direction cur = state.getValue(HorizontalBlock.FACING);
+			if (block instanceof HorizontalDirectionalBlock) {
+				Direction cur = state.getValue(HorizontalDirectionalBlock.FACING);
 				cur = rotate(cur, rotation);
-				state = state.setValue(HorizontalBlock.FACING, cur);
+				state = state.setValue(HorizontalDirectionalBlock.FACING, cur);
 			} else if (block instanceof WallTorchBlock) {
 				Direction cur = state.getValue(WallTorchBlock.FACING);
 				cur = rotate(cur, rotation);
@@ -71,10 +71,10 @@ public abstract class StaticRoom implements IDungeonRoom {
 				Direction cur = state.getValue(LadderBlock.FACING);
 				cur = rotate(cur, rotation);
 				state = state.setValue(LadderBlock.FACING, cur);
-			} else if (block instanceof StairsBlock) {
-				Direction cur = state.getValue(StairsBlock.FACING);
+			} else if (block instanceof StairBlock) {
+				Direction cur = state.getValue(StairBlock.FACING);
 				cur = rotate(cur, rotation);
-				state = state.setValue(StairsBlock.FACING, cur);
+				state = state.setValue(StairBlock.FACING, cur);
 			}
 			world.setBlock(pos, state, 2);
 			if (world instanceof WorldGenRegion && WorldUtil.blockNeedsGenFixup(state)) {
@@ -182,7 +182,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public boolean canSpawnAt(IWorld world, BlueprintLocation start) {
+	public boolean canSpawnAt(LevelAccessor world, BlueprintLocation start) {
 		int relMinX = locMinX;
 		int relMinY = locMinY;
 		int relMinZ = locMinZ;
@@ -229,8 +229,8 @@ public abstract class StaticRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public void spawn(IWorld world, BlueprintLocation start, @Nullable MutableBoundingBox bounds, UUID dungeonID) {
-		Set<IChunk> chunks = new HashSet<>();
+	public void spawn(LevelAccessor world, BlueprintLocation start, @Nullable BoundingBox bounds, UUID dungeonID) {
+		Set<ChunkAccess> chunks = new HashSet<>();
 		
 		// Get inversions based on rotation
 		int modX = 1;
@@ -393,7 +393,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 		}
 	}
 	
-	protected void applyBlockOverrides(IWorld world, BlockPos worldPos, BlockPos dataPos, StaticBlockState defaultState) {
+	protected void applyBlockOverrides(LevelAccessor world, BlockPos worldPos, BlockPos dataPos, StaticBlockState defaultState) {
 		
 	}
 	
@@ -403,12 +403,12 @@ public abstract class StaticRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public MutableBoundingBox getBounds(BlueprintLocation entry) {
+	public BoundingBox getBounds(BlueprintLocation entry) {
 		// TODO stash and store these
 		BlueprintLocation corner1 = NostrumDungeon.asRotated(entry, new BlockPos(locMinX, locMinY, locMinZ), Direction.NORTH);
 		BlueprintLocation corner2 = NostrumDungeon.asRotated(entry, new BlockPos(locMaxX, locMaxY, locMaxZ), Direction.NORTH);
 		
-		return new MutableBoundingBox(corner1.getPos(), corner2.getPos());
+		return new BoundingBox(corner1.getPos(), corner2.getPos());
 	}
 	
 	public int getRoomWeight() {

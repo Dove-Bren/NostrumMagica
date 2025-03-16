@@ -13,26 +13,26 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierManager;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.EffectType;
-import net.minecraft.util.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraftforge.event.entity.living.EntityTeleportEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
-public class DisruptionEffect extends Effect {
+public class DisruptionEffect extends MobEffect {
 
 	public static final String ID = "disruption";
 	
 	private static final Map<LivingEntity, Integer> lastDamage = new HashMap<>();
 	
 	public DisruptionEffect() {
-		super(EffectType.HARMFUL, 0xFF916F82);
+		super(MobEffectCategory.HARMFUL, 0xFF916F82);
 	}
 	
 	public boolean isDurationEffectTick(int duration, int amp) {
@@ -40,12 +40,12 @@ public class DisruptionEffect extends Effect {
 	}
 
 	@Override
-	public void addAttributeModifiers(LivingEntity entity, AttributeModifierManager attributeMap, int amplifier) {
+	public void addAttributeModifiers(LivingEntity entity, AttributeMap attributeMap, int amplifier) {
 		super.addAttributeModifiers(entity, attributeMap, amplifier);
 	}
 	
 	@Override
-	public void removeAttributeModifiers(LivingEntity entityLivingBaseIn, AttributeModifierManager attributeMapIn, int amplifier) {
+	public void removeAttributeModifiers(LivingEntity entityLivingBaseIn, AttributeMap attributeMapIn, int amplifier) {
 		super.removeAttributeModifiers(entityLivingBaseIn, attributeMapIn, amplifier);
     }
 	
@@ -69,7 +69,7 @@ public class DisruptionEffect extends Effect {
 		if (event.getEntity().level.isClientSide()) {
 			return;
 		}
-		if (event.getEntity() instanceof PlayerEntity && ((PlayerEntity) event.getEntity()).isCreative()) {
+		if (event.getEntity() instanceof Player && ((Player) event.getEntity()).isCreative()) {
 			return;
 		}
 		final LivingEntity living = (LivingEntity) event.getEntity();
@@ -81,7 +81,7 @@ public class DisruptionEffect extends Effect {
 			cause = null;
 		}
 		
-		EffectInstance effect = living.getEffect(NostrumEffects.disruption);
+		MobEffectInstance effect = living.getEffect(NostrumEffects.disruption);
 		if (effect != null && effect.getDuration() > 0) {
 			NostrumMagicaSounds.CAST_FAIL.play(living.level, living.getX(), living.getY(), living.getZ());
 			boolean damaged = false;

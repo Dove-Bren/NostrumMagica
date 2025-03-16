@@ -2,8 +2,8 @@ package com.smanzana.nostrummagica.spell.component;
 
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.BaseComponent;
 
 /**
  * A @FloatSpellShapeProperty but that displays as percentages
@@ -17,7 +17,7 @@ public class PercentSpellShapeProperty extends FloatSpellShapeProperty {
 	}
 
 	@Override
-	public TextComponent getDisplayValue(SpellShape shape, Float value) {
-		return new StringTextComponent(String.format("%.0f%%", 100 * value)); 
+	public BaseComponent getDisplayValue(SpellShape shape, Float value) {
+		return new TextComponent(String.format("%.0f%%", 100 * value)); 
 	}
 }

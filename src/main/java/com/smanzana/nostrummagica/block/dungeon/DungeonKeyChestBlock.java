@@ -12,42 +12,42 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.pathfinding.PathType;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.Level;
 
-public abstract class DungeonKeyChestBlock extends HorizontalBlock implements ILargeKeyMarker {
+public abstract class DungeonKeyChestBlock extends HorizontalDirectionalBlock implements ILargeKeyMarker {
 	
-	public static DirectionProperty FACING = HorizontalBlock.FACING;
+	public static DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	public static BooleanProperty OPEN = BooleanProperty.create("open");
 	
 	protected DungeonKeyChestBlock(Block.Properties props) {
@@ -57,29 +57,29 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock implements IL
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		super.createBlockStateDefinition(builder);
 		builder.add(FACING, OPEN);
 	}
 	
 	@Override
-	public abstract VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context);
+	public abstract VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context);
 	
 	@Override
-	public boolean isPathfindable(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
+	public boolean isPathfindable(BlockState state, BlockGetter worldIn, BlockPos pos, PathComputationType type) {
 		return false;
 	}
 	
-	protected void setOpen(BlockState state, World worldIn, BlockPos pos) {
+	protected void setOpen(BlockState state, Level worldIn, BlockPos pos) {
 		worldIn.setBlockAndUpdate(pos, state.setValue(OPEN, true));
 	}
 	
-	public abstract void makeDungeonChest(IWorld worldIn, BlockPos pos, Direction facing, DungeonInstance dungeon);
+	public abstract void makeDungeonChest(LevelAccessor worldIn, BlockPos pos, Direction facing, DungeonInstance dungeon);
 	
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		if (state.getValue(OPEN)) {
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		}
 		
 		if (!worldIn.isClientSide()) {
@@ -89,9 +89,9 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock implements IL
 				if (record != null) {
 					WorldKey key = chest.isLarge() ? record.instance.getLargeKey() : record.instance.getSmallKey();
 					chest.setWorldKey(key);
-					player.sendMessage(new StringTextComponent("Set to dungeon key"), Util.NIL_UUID);
+					player.sendMessage(new TextComponent("Set to dungeon key"), Util.NIL_UUID);
 				} else {
-					player.sendMessage(new StringTextComponent("Not in a dungeon, so no key to set"), Util.NIL_UUID);
+					player.sendMessage(new TextComponent("Not in a dungeon, so no key to set"), Util.NIL_UUID);
 				}
 			} else {
 				chest.open(player);
@@ -99,7 +99,7 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock implements IL
 			}
 		}
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 	
 	@Override
@@ -108,29 +108,29 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock implements IL
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		return new DungeonKeyChestTileEntity();
 	}
 	
 	@Override
-	public BlockRenderType getRenderShape(BlockState state) {
-		return BlockRenderType.MODEL;
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.MODEL;
 	}
 	
 	@Override
 	@Nullable
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
+	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
 	}
 	
 	@Override
-	public boolean triggerEvent(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+	public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
 		DungeonKeyChestTileEntity tileentity = (DungeonKeyChestTileEntity) worldIn.getBlockEntity(pos);
 		return tileentity == null ? false : tileentity.triggerEvent(id, param);
 	}
 
 	@Override
-	public void setKey(IWorld world, BlockState state, BlockPos pos, WorldKey key, DungeonRoomInstance instance, MutableBoundingBox bounds) {
+	public void setKey(LevelAccessor world, BlockState state, BlockPos pos, WorldKey key, DungeonRoomInstance instance, BoundingBox bounds) {
 		DungeonKeyChestTileEntity tileentity = (DungeonKeyChestTileEntity) world.getBlockEntity(pos);
 		tileentity.setWorldKey(key, WorldUtil.IsWorldGen(world));
 	}
@@ -156,7 +156,7 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock implements IL
 		}
 
 		@Override
-		public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 			final boolean open = state.getValue(OPEN);
 			
 			switch (state.getValue(FACING)) {
@@ -171,12 +171,12 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock implements IL
 			case UP:
 			case DOWN:
 			default:
-				return VoxelShapes.block();
+				return Shapes.block();
 			}
 		}
 
 		@Override
-		public void makeDungeonChest(IWorld worldIn, BlockPos pos, Direction facing, DungeonInstance dungeon) {
+		public void makeDungeonChest(LevelAccessor worldIn, BlockPos pos, Direction facing, DungeonInstance dungeon) {
 			final boolean isWorldGen = WorldUtil.IsWorldGen(worldIn);
 			// This is pretty dumb, but terrain gen will 'defer' tile entities under normal circumstances. By default,
 			// our setBlockState below will during world gen, too.
@@ -229,13 +229,13 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock implements IL
 		}
 		
 		@Override
-		protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+		protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 			super.createBlockStateDefinition(builder);
 			builder.add(SLAVE);
 		}
 
 		@Override
-		public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 			
 			final boolean master = !state.getValue(SLAVE);
 			final boolean open = state.getValue(OPEN);
@@ -257,31 +257,31 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock implements IL
 			case UP:
 			case DOWN:
 			default:
-				return VoxelShapes.block();
+				return Shapes.block();
 			}
 		}
 		
-		public VoxelShape getWholeShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+		public VoxelShape getWholeShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 			// Put slave one together too
 			final boolean slave = state.getValue(SLAVE);
 			final VoxelShape base = this.getShape(state, worldIn, pos, context);
-			final Vector3i offset;
+			final Vec3i offset;
 			if (slave) {
 				offset = this.getMasterPos(pos, state).subtract(pos);
 			} else {
 				offset = this.getSlavePos(pos, state).subtract(pos);
 			}
 			final VoxelShape otherBase = this.getShape(state.setValue(SLAVE, !slave), worldIn, pos, context);
-			return VoxelShapes.or(base, otherBase.move(offset.getX(), offset.getY(), offset.getZ()));
+			return Shapes.or(base, otherBase.move(offset.getX(), offset.getY(), offset.getZ()));
 		}
 		
 		@Override
-		public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 			if (state.getValue(SLAVE)) {
 				final BlockPos masterPos = getMasterPos(pos, state);
 				final BlockState masterState = worldIn.getBlockState(masterPos);
 				if (masterState.getBlock() != this) {
-					return ActionResultType.FAIL;
+					return InteractionResult.FAIL;
 				} else {
 					return this.use(masterState, worldIn, masterPos, player, handIn, hit);
 				}
@@ -337,26 +337,26 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock implements IL
 			}
 		}
 		
-		protected void makeChild(IWorld worldIn, BlockPos pos, BlockState state) {
+		protected void makeChild(LevelAccessor worldIn, BlockPos pos, BlockState state) {
 			if (!state.getValue(SLAVE)) {
 				worldIn.setBlock(getSlavePos(pos, state), state.setValue(SLAVE, true), 3);
 			}
 		}
 		
 		@Override
-		public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+		public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
 			makeChild(worldIn, pos, state);
 		}
 		
 		@Override
-		public boolean canSurvive(BlockState state, IWorldReader world, BlockPos pos) {
+		public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
 			return world.isEmptyBlock(pos) && world.isEmptyBlock(getSlavePos(pos, state));
 		}
 		
 		@Override
 		@Nullable
-		public BlockState getStateForPlacement(BlockItemUseContext context) {
-			final World world = context.getLevel();
+		public BlockState getStateForPlacement(BlockPlaceContext context) {
+			final Level world = context.getLevel();
 			final BlockPos pos = context.getClickedPos();
 			final BlockState state = super.getStateForPlacement(context);
 			if (!canSurvive(state, world, pos)) {
@@ -367,7 +367,7 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock implements IL
 		}
 		
 		@Override
-		protected void setOpen(BlockState state, World worldIn, BlockPos pos) {
+		protected void setOpen(BlockState state, Level worldIn, BlockPos pos) {
 			if (!state.getValue(SLAVE)) {
 				final BlockPos slavePos = getSlavePos(pos, state);
 				setOpen(worldIn.getBlockState(slavePos), worldIn, slavePos);
@@ -376,7 +376,7 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock implements IL
 		}
 		
 		@Override
-		public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos changedPos) {
+		public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos changedPos) {
 			if (stateIn.getValue(SLAVE)) {
 				// If it was master position that changed, react
 				if (changedPos.equals(getMasterPos(currentPos, stateIn)) && facingState.getBlock() != this) {
@@ -392,7 +392,7 @@ public abstract class DungeonKeyChestBlock extends HorizontalBlock implements IL
 		}
 
 		@Override
-		public void makeDungeonChest(IWorld worldIn, BlockPos pos, Direction facing, DungeonInstance dungeon) {
+		public void makeDungeonChest(LevelAccessor worldIn, BlockPos pos, Direction facing, DungeonInstance dungeon) {
 			final boolean isWorldGen = WorldUtil.IsWorldGen(worldIn);
 			// This is pretty dumb, but terrain gen will 'defer' tile entities under normal circumstances. By default,
 			// our setBlockState below will during world gen, too.

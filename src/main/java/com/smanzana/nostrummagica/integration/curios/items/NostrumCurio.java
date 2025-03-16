@@ -13,7 +13,7 @@ import org.apache.commons.lang3.Validate;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -26,20 +26,20 @@ import com.smanzana.nostrummagica.network.message.StatSyncMessage;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -123,7 +123,7 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
 		if (this.desckey == null) {
@@ -137,17 +137,17 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 		}
 		
 		// Format with placeholders for blue and red formatting
-		String translation = I18n.get(trans, TextFormatting.GRAY, TextFormatting.BLUE, TextFormatting.DARK_RED);
+		String translation = I18n.get(trans, ChatFormatting.GRAY, ChatFormatting.BLUE, ChatFormatting.DARK_RED);
 		if (translation.trim().isEmpty())
 			return;
 		String lines[] = translation.split("\\|");
 		for (String line : lines) {
-			tooltip.add(new StringTextComponent(line));
+			tooltip.add(new TextComponent(line));
 		}
 	}
 
 	@Override
-	public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
+	public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
 		return INostrumCurio.initCapabilities(stack, nbt);
 	}
 	
@@ -191,9 +191,9 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 		
 		if (this.manaBonus != 0) attr.addManaBonus(this.attribID, this.manaBonus);
 		
-		if (entity instanceof ServerPlayerEntity) {
+		if (entity instanceof ServerPlayer) {
 			NetworkHandler.sendTo(
-					new StatSyncMessage(attr), (ServerPlayerEntity) entity);
+					new StatSyncMessage(attr), (ServerPlayer) entity);
 		}
 		
 	}
@@ -207,9 +207,9 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 		
 		attr.removeManaBonus(this.attribID);
 		
-		if (entity instanceof ServerPlayerEntity) {
+		if (entity instanceof ServerPlayer) {
 			NetworkHandler.sendTo(
-					new StatSyncMessage(attr), (ServerPlayerEntity) entity);
+					new StatSyncMessage(attr), (ServerPlayer) entity);
 		}
 	}
 
@@ -272,6 +272,6 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void doRender(ItemStack stack, MatrixStack matrixStackIn, int index, IRenderTypeBuffer bufferIn, int packedLightIn, LivingEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {}
+	public void doRender(ItemStack stack, PoseStack matrixStackIn, int index, MultiBufferSource bufferIn, int packedLightIn, LivingEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {}
 	
 }

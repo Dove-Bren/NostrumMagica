@@ -12,11 +12,11 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierS
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 
 public class ClientPredefinedEffect {
 
@@ -26,7 +26,7 @@ public class ClientPredefinedEffect {
 		ELDRICH_BLAST,
 	}
 	
-	public static void Spawn(Vector3d offset, PredefinedEffect type, int duration, @Nullable Entity ent) {
+	public static void Spawn(Vec3 offset, PredefinedEffect type, int duration, @Nullable Entity ent) {
 		ClientEffect effect = null;
 		switch (type) {
 		case SOUL_DAGGER_STAB:
@@ -47,7 +47,7 @@ public class ClientPredefinedEffect {
 			.modify(new ClientEffectModifierColor(0xFF80EEFF, 0xFF404060))
 			.modify(new ClientEffectModifierGrow(scale, 1f, scale, 1f, .1f))
 			//.modify(new ClientEffectModifierTranslate(0, 0, 0))
-			.modify(new ClientEffectModifierMove(new Vector3d(2, 2, 0), new Vector3d(0, 0, 0), 0f, .1f))
+			.modify(new ClientEffectModifierMove(new Vec3(2, 2, 0), new Vec3(0, 0, 0), 0f, .1f))
 			.modify(new ClientEffectModifierGrow(2f, 0f, 2f, 1f, .05f))
 			.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .75f))
 			;
@@ -71,7 +71,7 @@ public class ClientPredefinedEffect {
 	public static void SpawnRitualEffect(BlockPos pos, EMagicElement element, ItemStack center, @Nullable List<ItemStack> extras, List<ItemStack> reagents, ItemStack output) {
 		Minecraft.getInstance().submit(() -> {
 			ClientEffectRenderer.instance().addEffect(ClientEffectRitual.Create(
-					new Vector3d(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
+					new Vec3(pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5),
 					element, center, extras, reagents, output
 					));
 		});

@@ -9,24 +9,24 @@ import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
 public class ReagentItem extends Item implements ILoreTagged, ICapabilityProvider {
 
-	public static enum ReagentType implements IStringSerializable {
+	public static enum ReagentType implements StringRepresentable {
 		// Do not rearrange.
 		MANDRAKE_ROOT(ID_SUFFIX_MANDRAKE_ROOT),
 		SPIDER_SILK(ID_SUFFIX_SPIDER_SILK),
@@ -150,7 +150,7 @@ public class ReagentItem extends Item implements ILoreTagged, ICapabilityProvide
     }
     
     @Override
-    public ActionResultType useOn(ItemUseContext context) {
+    public InteractionResult useOn(UseOnContext context) {
     	final @Nonnull ItemStack stack = context.getItemInHand();
     	ReagentType type = FindType(stack);
     	
@@ -164,21 +164,21 @@ public class ReagentItem extends Item implements ILoreTagged, ICapabilityProvide
     	}
     	
     	if (type == ReagentType.CRYSTABLOOM) {
-    		final World worldIn = context.getLevel();
+    		final Level worldIn = context.getLevel();
     		final BlockPos pos = context.getClickedPos();
-    		final PlayerEntity playerIn = context.getPlayer();
+    		final Player playerIn = context.getPlayer();
     		final Direction facing = context.getClickedFace();
     		BlockState state = worldIn.getBlockState(pos);
 	        if (facing == Direction.UP && playerIn.mayUseItemAt(pos.relative(facing), facing, stack) && state.getBlock().canSustainPlant(state, worldIn, pos, Direction.UP, NostrumBlocks.crystabloom) && worldIn.isEmptyBlock(pos.above())) {
 	        	worldIn.setBlockAndUpdate(pos.above(), NostrumBlocks.crystabloom.defaultBlockState());
 	            stack.shrink(1);
-	            return ActionResultType.SUCCESS;
+	            return InteractionResult.SUCCESS;
 	        } else {
-	        	return ActionResultType.FAIL;
+	        	return InteractionResult.FAIL;
 	        }
     	}
     	
-    	return ActionResultType.PASS;
+    	return InteractionResult.PASS;
 	}
 
 	@Override
@@ -219,7 +219,7 @@ public class ReagentItem extends Item implements ILoreTagged, ICapabilityProvide
 	}
 	
 	@Override
-	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundNBT nbt) {
+	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
 		return this::getCapability;
 	}
 }

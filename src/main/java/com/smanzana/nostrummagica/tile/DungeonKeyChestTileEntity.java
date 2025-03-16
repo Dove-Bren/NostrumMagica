@@ -10,20 +10,20 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.Vec3;
 
-public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHolder {
+public class DungeonKeyChestTileEntity extends BlockEntity implements IWorldKeyHolder {
 	
 	private WorldKey key;
 	private boolean triggered;
@@ -43,17 +43,17 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
@@ -67,7 +67,7 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 	private static final String NBT_TRIGGERED = "triggered";
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		nbt.put(NBT_KEY, this.key.asNBT());
@@ -77,7 +77,7 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		this.key = WorldKey.fromNBT(nbt.getCompound(NBT_KEY));
@@ -119,21 +119,21 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 		return getBlockState().getBlock() instanceof DungeonKeyChestBlock.Large;
 	}
 	
-	public Vector3d getCenterOffset() {
+	public Vec3 getCenterOffset() {
 		final VoxelShape shape;
 		if (isLarge()) {
-			shape = ((DungeonKeyChestBlock.Large) this.getBlockState().getBlock()).getWholeShape(getBlockState(), level, worldPosition, ISelectionContext.empty());
+			shape = ((DungeonKeyChestBlock.Large) this.getBlockState().getBlock()).getWholeShape(getBlockState(), level, worldPosition, CollisionContext.empty());
 		} else {
 			shape = this.getBlockState().getShape(level, worldPosition);
 		}
-		return new Vector3d(
+		return new Vec3(
 				(shape.max(Axis.X) - shape.min(Axis.X)) / 2 + shape.min(Axis.X),
 				shape.max(Axis.Y),
 				(shape.max(Axis.Z) - shape.min(Axis.Z)) / 2 + shape.min(Axis.Z)
 				);
 	}
 	
-	public void open(PlayerEntity player) {
+	public void open(Player player) {
 		if (this.level.isClientSide() || this.isTriggered()) {
 			return;
 		}
@@ -141,7 +141,7 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 		this.setTriggered(true);
 		AutoDungeons.GetWorldKeys().addKey(getWorldKey());
 		this.level.blockEvent(worldPosition, getBlockState().getBlock(), 0, 0);
-		level.playSound(null, worldPosition, SoundEvents.CHEST_OPEN, SoundCategory.BLOCKS, .5f, .8f);
+		level.playSound(null, worldPosition, SoundEvents.CHEST_OPEN, SoundSource.BLOCKS, .5f, .8f);
 		
 		NostrumMagicaSounds fanfare = isLarge() ? NostrumMagicaSounds.AMBIENT_WOOSH2 : NostrumMagicaSounds.AMBIENT_WOOSH3;
 		fanfare.play(level, worldPosition);
@@ -156,7 +156,7 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 				final Random rand = level.random;
 				final VoxelShape shape;
 				if (large) {
-					shape = ((DungeonKeyChestBlock.Large) this.getBlockState().getBlock()).getWholeShape(getBlockState(), level, worldPosition, ISelectionContext.empty());
+					shape = ((DungeonKeyChestBlock.Large) this.getBlockState().getBlock()).getWholeShape(getBlockState(), level, worldPosition, CollisionContext.empty());
 				} else {
 					shape = this.getBlockState().getShape(level, worldPosition);
 				}
@@ -170,7 +170,7 @@ public class DungeonKeyChestTileEntity extends TileEntity implements IWorldKeyHo
 					NostrumParticles.GLOW_ORB.spawn(this.level, new SpawnParams(
 							1, x + xOffset, y, z + zOffset, 0,
 							40, 20,
-							new Vector3d(0, .05, 0), new Vector3d(.005, .045, .005)
+							new Vec3(0, .05, 0), new Vec3(.005, .045, .005)
 							).color(.5f, 1f, 1f, .25f));
 				}
 			}

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.IPositionHolderItem;
 import com.smanzana.nostrummagica.item.NostrumItems;
@@ -12,22 +12,22 @@ import com.smanzana.nostrummagica.util.ContainerUtil;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.ClickType;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.concurrent.TickDelayedTask;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.TickTask;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
@@ -45,19 +45,19 @@ public class SilverMirrorGui {
 	private static final int GUI_HOTBAR_INV_HOFFSET = 8;
 	private static final int GUI_HOTBAR_INV_VOFFSET = 151;
 	
-	public static class MirrorContainer extends Container {
+	public static class MirrorContainer extends AbstractContainerMenu {
 		
 		public static final String ID = "silver_mirror_container";
 		
 		protected @Nonnull ItemStack mirrorStack;
-		protected Inventory inventory;
+		protected SimpleContainer inventory;
 		protected final int mirrorPos;
 		protected final boolean isServer;
 		
-		public MirrorContainer(int windowId, PlayerInventory playerInv, @Nonnull ItemStack mirrorStack, int mirrorPos) {
+		public MirrorContainer(int windowId, Inventory playerInv, @Nonnull ItemStack mirrorStack, int mirrorPos) {
 			super(NostrumContainers.SilverMirror, windowId);
 			this.mirrorStack = mirrorStack;
-			this.inventory = new Inventory(1);
+			this.inventory = new SimpleContainer(1);
 			this.mirrorPos = mirrorPos;
 			this.isServer = !playerInv.player.level.isClientSide();
 
@@ -76,12 +76,12 @@ public class SilverMirrorGui {
 			
 			inventory.addListener((inv) -> {
 				if (isServer) {
-					playerInv.player.level.getServer().tell(new TickDelayedTask(playerInv.player.level.getServer().getTickCount(), MirrorContainer.this::onInventoryChange));
+					playerInv.player.level.getServer().tell(new TickTask(playerInv.player.level.getServer().getTickCount(), MirrorContainer.this::onInventoryChange));
 				}
 			});
 		}
 		
-		public static final MirrorContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+		public static final MirrorContainer FromNetwork(int windowId, Inventory playerInv, FriendlyByteBuf buffer) {
 			final int slot = buffer.readVarInt();
 			ItemStack stack = playerInv.getItem(slot);
 			if (stack.isEmpty() || !(stack.getItem() instanceof SilverMirrorItem)) {
@@ -114,13 +114,13 @@ public class SilverMirrorGui {
 		
 		protected boolean attemptSend(ItemStack stack) {
 			if (this.isServer) {
-				final RegistryKey<World> dimension = IPositionHolderItem.getDimension(this.mirrorStack);
+				final ResourceKey<Level> dimension = IPositionHolderItem.getDimension(this.mirrorStack);
 				final BlockPos pos = IPositionHolderItem.getBlockPosition(this.mirrorStack);
 				
 				if (dimension != null && pos != null) {
-					final World world = ServerLifecycleHooks.getCurrentServer().getLevel(dimension);
+					final Level world = ServerLifecycleHooks.getCurrentServer().getLevel(dimension);
 					if (world != null && NostrumMagica.isBlockLoaded(world, pos)) {
-						TileEntity te = world.getBlockEntity(pos);
+						BlockEntity te = world.getBlockEntity(pos);
 						if (te != null && te instanceof ParadoxMirrorTileEntity) {
 							((ParadoxMirrorTileEntity) te).receiveAndSpawnItem(stack, pos.offset(0, 2, 0));
 							return true;
@@ -136,10 +136,10 @@ public class SilverMirrorGui {
 		}
 		
 		@Override
-		public @Nonnull ItemStack quickMoveStack(PlayerEntity playerIn, int fromSlot) {
+		public @Nonnull ItemStack quickMoveStack(Player playerIn, int fromSlot) {
 			ItemStack prev = ItemStack.EMPTY;	
 			Slot slot = (Slot) this.slots.get(fromSlot);
-			IInventory inv = slot.container;
+			Container inv = slot.container;
 			
 			if (slot.hasItem()) {
 				ItemStack stack = slot.getItem();
@@ -193,18 +193,18 @@ public class SilverMirrorGui {
 		}
 		
 		@Override
-		public boolean stillValid(PlayerEntity playerIn) {
+		public boolean stillValid(Player playerIn) {
 			return true;
 		}
 		
 		@Override
-		public @Nonnull ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+		public @Nonnull ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
 			if (slotId == mirrorPos) {
 				return ItemStack.EMPTY; // don't touch the mirror slot
 			}
 			
 			ItemStack itemstack = ItemStack.EMPTY;
-			PlayerInventory inventoryplayer = player.inventory;
+			Inventory inventoryplayer = player.inventory;
 
 			if (clickTypeIn == ClickType.PICKUP && (dragType == 0 || dragType == 1)
 					&& slotId >= 0 && !inventoryplayer.getCarried().isEmpty()) {
@@ -299,7 +299,7 @@ public class SilverMirrorGui {
 		}
 		
 		@Override
-		public void removed(PlayerEntity playerIn) {
+		public void removed(Player playerIn) {
 			super.removed(playerIn);
 			this.clearContainer(playerIn, playerIn.level, inventory);
 		}
@@ -308,14 +308,14 @@ public class SilverMirrorGui {
 	@OnlyIn(Dist.CLIENT)
 	public static class MirrorGui extends AutoGuiContainer<MirrorContainer> {
 
-		public MirrorGui(MirrorContainer container, PlayerInventory playerInv, ITextComponent name) {
+		public MirrorGui(MirrorContainer container, Inventory playerInv, Component name) {
 			super(container, playerInv, name);
 			this.imageWidth = GUI_WIDTH;
 			this.imageHeight = GUI_HEIGHT;
 		}
 		
 		@Override
-		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+		protected void renderBg(PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
@@ -324,7 +324,7 @@ public class SilverMirrorGui {
 		}
 		
 		@Override
-		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			// no labels
 			//super.drawGuiContainerForegroundLayer(matrixStackIn, mouseX, mouseY);
 		}

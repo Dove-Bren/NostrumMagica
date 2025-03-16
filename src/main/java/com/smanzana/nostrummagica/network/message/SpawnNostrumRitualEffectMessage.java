@@ -11,14 +11,14 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.NetUtils;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Server is signalling that a ritual has been performed, and the effects should be shown.
@@ -30,7 +30,7 @@ public class SpawnNostrumRitualEffectMessage {
 
 	public static void handle(SpawnNostrumRitualEffectMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
-		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.instance.proxy.getPlayer();
 		if (!DimensionUtils.InDimension(player, message.dimension)) {
 			return;
 		}
@@ -44,7 +44,7 @@ public class SpawnNostrumRitualEffectMessage {
 		ClientPredefinedEffect.SpawnRitualEffect(message.pos, message.element, message.center, message.extras, message.reagents, message.output);
 	}
 
-	private final RegistryKey<World> dimension;
+	private final ResourceKey<Level> dimension;
 	private final BlockPos pos;
 	private final EMagicElement element;
 	private final List<ItemStack> reagents;
@@ -52,7 +52,7 @@ public class SpawnNostrumRitualEffectMessage {
 	private final @Nullable List<ItemStack> extras;
 	private final ItemStack output;
 	
-	public SpawnNostrumRitualEffectMessage(RegistryKey<World> dimension, BlockPos pos, EMagicElement element, List<ItemStack> reagents,
+	public SpawnNostrumRitualEffectMessage(ResourceKey<Level> dimension, BlockPos pos, EMagicElement element, List<ItemStack> reagents,
 			ItemStack center, @Nullable List<ItemStack> extras, ItemStack output) {
 		this.dimension = dimension;
 		this.pos = pos;
@@ -63,8 +63,8 @@ public class SpawnNostrumRitualEffectMessage {
 		this.output = output;
 	}
 
-	public static SpawnNostrumRitualEffectMessage decode(PacketBuffer buf) {
-		final RegistryKey<World> dimID;
+	public static SpawnNostrumRitualEffectMessage decode(FriendlyByteBuf buf) {
+		final ResourceKey<Level> dimID;
 		final BlockPos pos;
 		final EMagicElement element;
 		final List<ItemStack> reagents;
@@ -107,7 +107,7 @@ public class SpawnNostrumRitualEffectMessage {
 		return new SpawnNostrumRitualEffectMessage(dimID, pos, element, reagents, center, extras, output);
 	}
 
-	public static void encode(SpawnNostrumRitualEffectMessage msg, PacketBuffer buf) {
+	public static void encode(SpawnNostrumRitualEffectMessage msg, FriendlyByteBuf buf) {
 		NetUtils.packDimension(buf, msg.dimension);
 		buf.writeBlockPos(msg.pos);
 		buf.writeEnum(msg.element);

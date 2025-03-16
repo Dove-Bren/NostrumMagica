@@ -7,28 +7,28 @@ import com.smanzana.nostrummagica.block.ActiveHopperBlock;
 import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ChestTileEntity;
-import net.minecraft.tileentity.IHopper;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.EntityPredicates;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.Hopper;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISidedInventory, ITickableTileEntity {
+public class ActiveHopperTileEntity extends BlockEntity implements Hopper, WorldlyContainer, TickableBlockEntity {
 	
 	private static final String NBT_SLOT = "slot";
 	private static final String NBT_CUSTOMNAME = "custom_name";
@@ -43,7 +43,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		if (!slot.isEmpty()) {
@@ -60,7 +60,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		slot = (nbt.contains(NBT_SLOT) ? ItemStack.of(nbt.getCompound(NBT_SLOT)) : ItemStack.EMPTY); // nulls if empty
@@ -130,17 +130,17 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return true;
 	}
 
 	@Override
-	public void startOpen(PlayerEntity player) {
+	public void startOpen(Player player) {
 		;
 	}
 
 	@Override
-	public void stopOpen(PlayerEntity player) {
+	public void stopOpen(Player player) {
 		;
 	}
 
@@ -256,7 +256,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	private boolean pushItems() {
 		// Inventory we want to push into is in direction FACING
 		final Direction direction = ActiveHopperBlock.GetFacing(level.getBlockState(worldPosition));
-		@Nullable TileEntity te = level.getBlockEntity(worldPosition.relative(direction));
+		@Nullable BlockEntity te = level.getBlockEntity(worldPosition.relative(direction));
 		
 		if (te != null) {
 			if (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).isPresent()) {
@@ -264,12 +264,12 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 				return pushInto(handler, direction);
 			}
 			
-			if (te instanceof IInventory) {
+			if (te instanceof Container) {
 				
-				IInventory inv = (IInventory) te;
+				Container inv = (Container) te;
 				
 				// Special cast for stupid chests :P
-				if (te instanceof ChestTileEntity) {
+				if (te instanceof ChestBlockEntity) {
 					BlockState state = level.getBlockState(worldPosition.relative(direction));
 					if (state != null && state.getBlock() instanceof ChestBlock) {
 						inv = ChestBlock.getContainer((ChestBlock) state.getBlock(), state, level, worldPosition.relative(direction), true);
@@ -280,20 +280,20 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 			}
 		}
 		
-		final AxisAlignedBB captureBox = getCaptureBB(false);
-		for (Entity e : level.getEntities((Entity) null, captureBox, EntityPredicates.CONTAINER_ENTITY_SELECTOR)) {
+		final AABB captureBox = getCaptureBB(false);
+		for (Entity e : level.getEntities((Entity) null, captureBox, EntitySelector.CONTAINER_ENTITY_SELECTOR)) {
 			// Vanilla uses a random entity in the list. We'll just use the first.
-			return pushInto((IInventory) e, direction);
+			return pushInto((Container) e, direction);
 		}
 		
 		return false;
 	}
 	
-	private boolean pushInto(IInventory inventory, Direction direction) {
+	private boolean pushInto(Container inventory, Direction direction) {
 		ItemStack copyToInsert = slot.copy();
 		copyToInsert.setCount(1);
-		if (inventory instanceof ISidedInventory) {
-			ISidedInventory sided = (ISidedInventory) inventory;
+		if (inventory instanceof WorldlyContainer) {
+			WorldlyContainer sided = (WorldlyContainer) inventory;
 			for (int insertIndex : sided.getSlotsForFace(direction.getOpposite())) {
 				if (!sided.canPlaceItemThroughFace(insertIndex, copyToInsert, direction.getOpposite())) {
 					continue;
@@ -351,7 +351,7 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 	private boolean pullItems() {
 		// We want to pull from opposite(FACING)
 		final Direction direction = ActiveHopperBlock.GetFacing(level.getBlockState(worldPosition)).getOpposite();
-		@Nullable TileEntity te = level.getBlockEntity(worldPosition.relative(direction));
+		@Nullable BlockEntity te = level.getBlockEntity(worldPosition.relative(direction));
 		
 		if (te != null) {
 			if (te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction).isPresent()) {
@@ -359,12 +359,12 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 				return pullFrom(handler, direction);
 			}
 			
-			if (te instanceof IInventory) {
+			if (te instanceof Container) {
 				
-				IInventory inv = (IInventory) te;
+				Container inv = (Container) te;
 				
 				// Special cast for stupid chests :P
-				if (te instanceof ChestTileEntity) {
+				if (te instanceof ChestBlockEntity) {
 					BlockState state = level.getBlockState(worldPosition.relative(direction));
 					if (state != null && state.getBlock() instanceof ChestBlock) {
 						inv = ChestBlock.getContainer((ChestBlock) state.getBlock(), state, level, worldPosition.relative(direction), true);
@@ -374,18 +374,18 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 			}
 		}
 		
-		final AxisAlignedBB captureBox = getCaptureBB(true);
-		for (Entity e : level.getEntities((Entity) null, captureBox, EntityPredicates.CONTAINER_ENTITY_SELECTOR)) {
+		final AABB captureBox = getCaptureBB(true);
+		for (Entity e : level.getEntities((Entity) null, captureBox, EntitySelector.CONTAINER_ENTITY_SELECTOR)) {
 			// Vanilla uses a random entity in the list. We'll just use the first.
-			return pullFrom((IInventory) e, direction);
+			return pullFrom((Container) e, direction);
 		}
 		
 		return false;
 	}
 	
-	private boolean pullFrom(IInventory inventory, Direction direction) {
-		if (inventory instanceof ISidedInventory) {
-			ISidedInventory sided = (ISidedInventory) inventory;
+	private boolean pullFrom(Container inventory, Direction direction) {
+		if (inventory instanceof WorldlyContainer) {
+			WorldlyContainer sided = (WorldlyContainer) inventory;
 			for (int i : sided.getSlotsForFace(direction)) {
 				@Nonnull ItemStack inSlot = sided.getItem(i);
 				if (inSlot.isEmpty()) {
@@ -460,16 +460,16 @@ public class ActiveHopperTileEntity extends TileEntity implements IHopper, ISide
 		return false;
 	}
 	
-	private AxisAlignedBB getCaptureBB(boolean forPull) {
+	private AABB getCaptureBB(boolean forPull) {
 		final Direction direction = ActiveHopperBlock.GetFacing(level.getBlockState(worldPosition));
 		
 		if (direction == Direction.DOWN) {
 			// Down has different collision so do a custom box
-			return new AxisAlignedBB(0, 0, 0, 1, 1, 1).move(worldPosition).expandTowards(0, 1, 0);
+			return new AABB(0, 0, 0, 1, 1, 1).move(worldPosition).expandTowards(0, 1, 0);
 		}
 		
 		final BlockPos spot = forPull ? worldPosition.relative(direction.getOpposite()) : worldPosition.relative(direction);
-		return new AxisAlignedBB(0, 0, 0, 1, 1, 1).move(spot);
+		return new AABB(0, 0, 0, 1, 1, 1).move(spot);
 	}
 	
 	@Override

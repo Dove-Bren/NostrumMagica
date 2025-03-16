@@ -13,45 +13,45 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.item.NostrumItems;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.entity.MobType;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class DragonArmor extends Item {
 
 	public static enum DragonEquipmentSlot {
-		HELM(EquipmentSlotType.HEAD),
-		BODY(EquipmentSlotType.CHEST),
-		WINGS(EquipmentSlotType.LEGS),
-		CREST(EquipmentSlotType.FEET);
+		HELM(EquipmentSlot.HEAD),
+		BODY(EquipmentSlot.CHEST),
+		WINGS(EquipmentSlot.LEGS),
+		CREST(EquipmentSlot.FEET);
 		
-		private final EquipmentSlotType mirrorSlot;
+		private final EquipmentSlot mirrorSlot;
 		
-		private DragonEquipmentSlot(EquipmentSlotType mirrorSlot) {
+		private DragonEquipmentSlot(EquipmentSlot mirrorSlot) {
 			this.mirrorSlot = mirrorSlot;
 		}
 		
-		public EquipmentSlotType getMirrorSlot() {
+		public EquipmentSlot getMirrorSlot() {
 			return mirrorSlot;
 		}
 		
-		public static final @Nullable DragonEquipmentSlot FindForSlot(EquipmentSlotType vanillaSlot) {
+		public static final @Nullable DragonEquipmentSlot FindForSlot(EquipmentSlot vanillaSlot) {
 			for (DragonEquipmentSlot slot : DragonEquipmentSlot.values()) {
 				if (slot.mirrorSlot == vanillaSlot) {
 					return slot;
@@ -315,7 +315,7 @@ public class DragonArmor extends Item {
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlotType equipmentSlot, ItemStack stack) {
+	public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot equipmentSlot, ItemStack stack) {
 		final @Nullable DragonEquipmentSlot dragonSlot = DragonEquipmentSlot.FindForSlot(equipmentSlot);
 		if (dragonSlot != null) {
 			return getAttributeModifiers(dragonSlot, stack);
@@ -326,19 +326,19 @@ public class DragonArmor extends Item {
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		// Disable vanilla's so we can do our own
 		if (!stack.hasTag() || !stack.getTag().contains("HideFlags", 99)) {
-			CompoundNBT tag = stack.getTag();
+			CompoundTag tag = stack.getTag();
 			if (tag == null) {
-				tag = new CompoundNBT();
+				tag = new CompoundTag();
 			}
 			
 			tag.putInt("HideFlags", 2);
 			stack.setTag(tag);
 		}
 		
-		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.instance.proxy.getPlayer();
 		
 		// Copied from vanilla's ItemStack
 		for (DragonEquipmentSlot dragonSlot : DragonEquipmentSlot.values())
@@ -347,8 +347,8 @@ public class DragonArmor extends Item {
 
 			if (!multimap.isEmpty())
 			{
-				tooltip.add(new StringTextComponent(""));
-				tooltip.add(new TranslationTextComponent("item.nostrummagica.modifiers.dragonslot." + dragonSlot.getName()));
+				tooltip.add(new TextComponent(""));
+				tooltip.add(new TranslatableComponent("item.nostrummagica.modifiers.dragonslot." + dragonSlot.getName()));
 
 				for (Entry<Attribute, AttributeModifier> entry : multimap.entries())
 				{
@@ -359,7 +359,7 @@ public class DragonArmor extends Item {
 					if (attributemodifier.getId() == Item.BASE_ATTACK_DAMAGE_UUID)
 					{
 						d0 = d0 + player.getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue();
-						d0 = d0 + (double)EnchantmentHelper.getDamageBonus(stack, CreatureAttribute.UNDEFINED);
+						d0 = d0 + (double)EnchantmentHelper.getDamageBonus(stack, MobType.UNDEFINED);
 						flag = true;
 					}
 					else if (attributemodifier.getId() == Item.BASE_ATTACK_SPEED_UUID)
@@ -381,16 +381,16 @@ public class DragonArmor extends Item {
 					
 					if (flag)
 					{
-						tooltip.add((new StringTextComponent(" ")).append(new TranslationTextComponent("attribute.modifier.equals." + attributemodifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), new TranslationTextComponent("attribute.name." + entry.getKey().getDescriptionId()))).withStyle(TextFormatting.DARK_GREEN));
+						tooltip.add((new TextComponent(" ")).append(new TranslatableComponent("attribute.modifier.equals." + attributemodifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), new TranslatableComponent("attribute.name." + entry.getKey().getDescriptionId()))).withStyle(ChatFormatting.DARK_GREEN));
 					}
 					else if (d0 > 0.0D)
 					{
-						tooltip.add((new TranslationTextComponent("attribute.modifier.plus." + attributemodifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), new TranslationTextComponent(entry.getKey().getDescriptionId()))).withStyle(TextFormatting.BLUE));
+						tooltip.add((new TranslatableComponent("attribute.modifier.plus." + attributemodifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), new TranslatableComponent(entry.getKey().getDescriptionId()))).withStyle(ChatFormatting.BLUE));
 					}
 					else if (d0 < 0.0D)
 					{
 						d1 = d1 * -1.0D;
-						tooltip.add((new TranslationTextComponent("attribute.modifier.take." + attributemodifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), new TranslationTextComponent(entry.getKey().getDescriptionId()))).withStyle(TextFormatting.RED));
+						tooltip.add((new TranslatableComponent("attribute.modifier.take." + attributemodifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), new TranslatableComponent(entry.getKey().getDescriptionId()))).withStyle(ChatFormatting.RED));
 					}
 				}
 			}

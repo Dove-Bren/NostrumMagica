@@ -1,27 +1,27 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.block.dungeon.LockedDoorBlock;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.tile.DungeonDoorTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import com.mojang.math.Vector3f;
 
 public class TileEntityDungeonDoorRenderer extends TileEntityLockedDoorRenderer<DungeonDoorTileEntity> {
 
-	public TileEntityDungeonDoorRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
+	public TileEntityDungeonDoorRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
 		super(rendererDispatcherIn);
 	}
 	
-	protected void renderLock(DungeonDoorTileEntity tileEntityIn, double ticks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
-		final MutableBoundingBox bounds = tileEntityIn.getDoorBounds();
+	protected void renderLock(DungeonDoorTileEntity tileEntityIn, double ticks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
+		final BoundingBox bounds = tileEntityIn.getDoorBounds();
 		final float yDiff = bounds.y1 + 1 - bounds.y0;
 		
 		final float width = .75f;
@@ -43,7 +43,7 @@ public class TileEntityDungeonDoorRenderer extends TileEntityLockedDoorRenderer<
 		final float green = ((float) ((colorRGB >> 8) & 0xFF) / 255f);
 		final float blue = ((float) ((colorRGB >> 0) & 0xFF) / 255f);
 		
-		IVertexBuilder buffer = bufferIn.getBuffer(NostrumRenderTypes.LOCKEDCHEST_LOCK);
+		VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.LOCKEDCHEST_LOCK);
 		
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(0, yDiff/2, -.3f);

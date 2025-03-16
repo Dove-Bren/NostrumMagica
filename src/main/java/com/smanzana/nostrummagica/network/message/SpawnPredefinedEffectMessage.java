@@ -10,13 +10,13 @@ import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.Predefin
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.NetUtils;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Server is signalling that a ritual has been performed, and the effects should be shown.
@@ -28,29 +28,29 @@ public class SpawnPredefinedEffectMessage {
 
 	public static void handle(SpawnPredefinedEffectMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
-		PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.instance.proxy.getPlayer();
 		if (!DimensionUtils.InDimension(player, message.dimension)) {
 			return;
 		}
 		
 		Entity ent = player.level.getEntity(message.entityID);
-		Vector3d offset = (ent != null ? Vector3d.ZERO : message.position);
+		Vec3 offset = (ent != null ? Vec3.ZERO : message.position);
 		
 		if (offset == null) {
-			offset = Vector3d.ZERO;
+			offset = Vec3.ZERO;
 		}
 		
 		ClientPredefinedEffect.Spawn(offset, message.type, message.duration, ent);
 	}
 
 	protected final PredefinedEffect type;
-	protected final RegistryKey<World> dimension;
+	protected final ResourceKey<Level> dimension;
 	protected final int duration;
 	
-	protected final @Nullable Vector3d position;
+	protected final @Nullable Vec3 position;
 	protected final int entityID;
 	
-	public SpawnPredefinedEffectMessage(PredefinedEffect type, int duration, RegistryKey<World> dimension, Vector3d position) {
+	public SpawnPredefinedEffectMessage(PredefinedEffect type, int duration, ResourceKey<Level> dimension, Vec3 position) {
 		this.type = type;
 		this.duration = duration;
 		this.dimension = dimension;
@@ -58,7 +58,7 @@ public class SpawnPredefinedEffectMessage {
 		this.entityID = 0;
 	}
 	
-	public SpawnPredefinedEffectMessage(PredefinedEffect type, int duration, RegistryKey<World> dimension, int entityID) {
+	public SpawnPredefinedEffectMessage(PredefinedEffect type, int duration, ResourceKey<Level> dimension, int entityID) {
 		this.type = type;
 		this.duration = duration;
 		this.dimension = dimension;
@@ -66,9 +66,9 @@ public class SpawnPredefinedEffectMessage {
 		this.position = null;
 	}
 
-	public static SpawnPredefinedEffectMessage decode(PacketBuffer buf) {
+	public static SpawnPredefinedEffectMessage decode(FriendlyByteBuf buf) {
 		final PredefinedEffect type;
-		final RegistryKey<World> dimension;
+		final ResourceKey<Level> dimension;
 		final int duration;
 		
 		//final @Nullable Vector3d position;
@@ -79,13 +79,13 @@ public class SpawnPredefinedEffectMessage {
 		dimension = NetUtils.unpackDimension(buf);
 		
 		if (buf.readBoolean()) {
-			return new SpawnPredefinedEffectMessage(type, duration, dimension, new Vector3d(buf.readDouble(), buf.readDouble(), buf.readDouble()));
+			return new SpawnPredefinedEffectMessage(type, duration, dimension, new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()));
 		} else {
 			return new SpawnPredefinedEffectMessage(type, duration, dimension, buf.readVarInt());
 		}
 	}
 
-	public static void encode(SpawnPredefinedEffectMessage msg, PacketBuffer buf) {
+	public static void encode(SpawnPredefinedEffectMessage msg, FriendlyByteBuf buf) {
 		buf.writeEnum(msg.type);
 		buf.writeVarInt(msg.duration);
 		NetUtils.packDimension(buf, msg.dimension);

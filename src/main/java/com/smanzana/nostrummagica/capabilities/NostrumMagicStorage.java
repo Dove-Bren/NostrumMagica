@@ -17,18 +17,18 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.NetUtils;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.IntNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -85,8 +85,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	private static final String NBT_TRANSMUTE_KNOWLEDGE = "transmute_knowledge";
 	
 	@Override
-	public INBT writeNBT(Capability<INostrumMagic> capability, INostrumMagic instance, Direction side) {
-		CompoundNBT nbt = new CompoundNBT();
+	public Tag writeNBT(Capability<INostrumMagic> capability, INostrumMagic instance, Direction side) {
+		CompoundTag nbt = new CompoundTag();
 		
 		nbt.putString(NBT_TIER, instance.getTier().name().toLowerCase());
 		nbt.putInt(NBT_LEVEL, instance.getLevel());
@@ -96,10 +96,10 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		nbt.putInt(NBT_MANA, instance.getMana());
 		nbt.putInt(NBT_RESERVED_MANA, instance.getReservedMana());
 		
-		nbt.put(NBT_ELEMENTAL_SKILLPOINTS, NetUtils.ToNBT(instance.getElementalSkillPointsMap(), IntNBT::valueOf));
-		nbt.put(NBT_ELEMENTAL_XP, NetUtils.ToNBT(instance.getElementalXPMap(), IntNBT::valueOf));
+		nbt.put(NBT_ELEMENTAL_SKILLPOINTS, NetUtils.ToNBT(instance.getElementalSkillPointsMap(), IntTag::valueOf));
+		nbt.put(NBT_ELEMENTAL_XP, NetUtils.ToNBT(instance.getElementalXPMap(), IntTag::valueOf));
 		
-		CompoundNBT compound = new CompoundNBT();
+		CompoundTag compound = new CompoundTag();
 		{
 			Map<String, Integer> map = instance.serializeLoreLevels();
 			for (String key : map.keySet()) {
@@ -108,13 +108,13 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		nbt.put(NBT_LORELEVELS, compound);
 		
-		ListNBT list = new ListNBT();
+		ListTag list = new ListTag();
 		for (String crc : instance.serializeSpellHistory()) {
-			list.add(StringNBT.valueOf(crc));
+			list.add(StringTag.valueOf(crc));
 		}
 		nbt.put(NBT_SPELLCRCS, list);
 		
-		compound = new CompoundNBT();
+		compound = new CompoundTag();
 		{
 			Map<EMagicElement, EElementalMastery> map = instance.serializeElementMastery();
 			for (EMagicElement key : map.keySet()) {
@@ -123,7 +123,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		nbt.put(NBT_MASTERED_ELEMENTS, compound);
 		
-		compound = new CompoundNBT();
+		compound = new CompoundTag();
 		{
 			Map<EMagicElement, Boolean> map = instance.serializeElementTrials();
 			for (EMagicElement key : map.keySet()) {
@@ -132,13 +132,13 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		nbt.put(NBT_ELEMENT_TRIALS, compound);
 		
-		list = new ListNBT();
+		list = new ListTag();
 		{
 			Map<UUID, Float> map = instance.getManaModifiers();
 			for (UUID id : map.keySet()) {
 				if (id == null) continue;
 				
-				compound = new CompoundNBT();
+				compound = new CompoundTag();
 				compound.putUUID(NBT_MOD_INTERNAL_ID, id);
 				compound.putFloat(NBT_MOD_INTERNAL_VALUE, map.get(id));
 				list.add(compound);
@@ -146,13 +146,13 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		nbt.put(NBT_MOD_MANA, list);
 		
-		list = new ListNBT();
+		list = new ListTag();
 		{
 			Map<UUID, Float> map = instance.getManaCostModifiers();
 			for (UUID id : map.keySet()) {
 				if (id == null) continue;
 				
-				compound = new CompoundNBT();
+				compound = new CompoundTag();
 				compound.putUUID(NBT_MOD_INTERNAL_ID, id);
 				compound.putFloat(NBT_MOD_INTERNAL_VALUE, map.get(id));
 				list.add(compound);
@@ -160,13 +160,13 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		nbt.put(NBT_MOD_MANA_COST, list);
 		
-		list = new ListNBT();
+		list = new ListTag();
 		{
 			Map<UUID, Float> map = instance.getManaRegenModifiers();
 			for (UUID id : map.keySet()) {
 				if (id == null) continue;
 				
-				compound = new CompoundNBT();
+				compound = new CompoundTag();
 				compound.putUUID(NBT_MOD_INTERNAL_ID, id);
 				compound.putFloat(NBT_MOD_INTERNAL_VALUE, map.get(id));
 				list.add(compound);
@@ -174,13 +174,13 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		nbt.put(NBT_MOD_MANA_REGEN, list);
 		
-		list = new ListNBT();
+		list = new ListTag();
 		{
 			Map<UUID, Integer> map = instance.getManaBonusModifiers();
 			for (UUID id : map.keySet()) {
 				if (id == null) continue;
 				
-				compound = new CompoundNBT();
+				compound = new CompoundTag();
 				compound.putUUID(NBT_MOD_INTERNAL_ID, id);
 				compound.putInt(NBT_MOD_INTERNAL_VALUE, map.get(id));
 				list.add(compound);
@@ -188,14 +188,14 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		nbt.put(NBT_MOD_MANA_BONUS, list);
 		
-		list = new ListNBT();
+		list = new ListTag();
 		for (SpellShape shape : instance.getShapes()) {
 			String key = shape.getShapeKey();
-			list.add(StringNBT.valueOf(key));
+			list.add(StringTag.valueOf(key));
 		}
 		nbt.put(NBT_SHAPES, list);
 		
-		compound = new CompoundNBT();
+		compound = new CompoundTag();
 		{
 			Map<EAlteration, Boolean> map = instance.serializeAlterations();
 			for (EAlteration key : map.keySet()) {
@@ -206,7 +206,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		BlockPos markPos = instance.getMarkLocation();
 		if (markPos != null) {
-			CompoundNBT posTag = new CompoundNBT();
+			CompoundTag posTag = new CompoundTag();
 			posTag.putInt("x", markPos.getX());
 			posTag.putInt("y", markPos.getY());
 			posTag.putInt("z", markPos.getZ());
@@ -219,45 +219,45 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		List<String> stringList = instance.getCurrentQuests();
 		if (stringList != null && !stringList.isEmpty()) {
-			ListNBT tagList = new ListNBT();
+			ListTag tagList = new ListTag();
 			for (String quest : stringList) {
-				tagList.add(StringNBT.valueOf(quest));
+				tagList.add(StringTag.valueOf(quest));
 			}
 			nbt.put(NBT_QUESTS_CURRENT, tagList);
 		}
 		
 		stringList = instance.getCompletedQuests();
 		if (stringList != null && !stringList.isEmpty()) {
-			ListNBT tagList = new ListNBT();
+			ListTag tagList = new ListTag();
 			for (String quest : stringList) {
-				tagList.add(StringNBT.valueOf(quest));
+				tagList.add(StringTag.valueOf(quest));
 			}
 			nbt.put(NBT_QUESTS_COMPLETED, tagList);
 		}
 		
 		stringList = instance.getCompletedResearches();
 		if (stringList != null && !stringList.isEmpty()) {
-			ListNBT tagList = new ListNBT();
+			ListTag tagList = new ListTag();
 			for (String research : stringList) {
-				tagList.add(StringNBT.valueOf(research));
+				tagList.add(StringTag.valueOf(research));
 			}
 			nbt.put(NBT_RESEARCHES, tagList);
 		}
 		
 		Collection<Skill> skills = instance.getSkills();
 		if (skills != null && !skills.isEmpty()) {
-			ListNBT tagList = new ListNBT();
+			ListTag tagList = new ListTag();
 			for (Skill skill : skills) {
-				tagList.add(StringNBT.valueOf(skill.getKey().toString()));
+				tagList.add(StringTag.valueOf(skill.getKey().toString()));
 			}
 			nbt.put(NBT_SKILLS, tagList);
 		}
 		
-		compound = new CompoundNBT();;
+		compound = new CompoundTag();;
 		Map<EMagicElement, Map<EAlteration, Boolean>> knowledge = instance.getSpellKnowledge();
 		if (knowledge != null && !knowledge.isEmpty())
 		for (EMagicElement elem : knowledge.keySet()) {
-			CompoundNBT subtag = new CompoundNBT();
+			CompoundTag subtag = new CompoundTag();
 			Map<EAlteration, Boolean> map = knowledge.get(elem);
 			if (map == null || map.isEmpty())
 				continue;
@@ -273,23 +273,23 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		if (instance.getSorceryPortalPos() != null) {
 			nbt.putString(NBT_SORCERYPORTAL_DIM, instance.getSorceryPortalDimension().getRegistryName().toString());
-			nbt.put(NBT_SORCERYPORTAL_POS, NBTUtil.writeBlockPos(instance.getSorceryPortalPos()));
+			nbt.put(NBT_SORCERYPORTAL_POS, NbtUtils.writeBlockPos(instance.getSorceryPortalPos()));
 		}
 		
 		final VanillaRespawnInfo respawnInfo = instance.getSavedRespawnInfo();
 		if (respawnInfo != null) {
 			nbt.putString(NBT_SAVEDRESPAWN_DIM, respawnInfo.dimension.location().toString());
-			nbt.put(NBT_SAVEDRESPAWN_POS, NBTUtil.writeBlockPos(respawnInfo.pos));
+			nbt.put(NBT_SAVEDRESPAWN_POS, NbtUtils.writeBlockPos(respawnInfo.pos));
 			nbt.putFloat(NBT_SAVEDRESPAWN_YAW, respawnInfo.yaw);
 			nbt.putBoolean(NBT_SAVEDRESPAWN_FORCE, respawnInfo.forced);
 		}
 		
-		list = new ListNBT();
+		list = new ListTag();
 		for (Entry<TransmuteKnowledge, Boolean> entry : instance.getTransmuteKnowledge().entrySet()) {
 			if (entry.getValue() == null || !entry.getValue()) {
 				continue;
 			}
-			CompoundNBT subtag = entry.getKey().toNBT();
+			CompoundTag subtag = entry.getKey().toNBT();
 			list.add(subtag);
 		}
 		nbt.put(NBT_TRANSMUTE_KNOWLEDGE, list);
@@ -298,8 +298,8 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 	}
 
 	@Override
-	public void readNBT(Capability<INostrumMagic> capability, INostrumMagic instance, Direction side, INBT nbt) {
-		CompoundNBT tag = (CompoundNBT) nbt;
+	public void readNBT(Capability<INostrumMagic> capability, INostrumMagic instance, Direction side, Tag nbt) {
+		CompoundTag tag = (CompoundTag) nbt;
 		EMagicTier tier = EMagicTier.LOCKED;
 		try {
 			tier = EMagicTier.valueOf(tag.getString(NBT_TIER).toUpperCase());
@@ -317,22 +317,22 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			);
 		
 		Map<EMagicElement, Integer> elementalSkillPoints = new EnumMap<>(EMagicElement.class);
-		NetUtils.FromNBT(elementalSkillPoints, EMagicElement.class, tag.getCompound(NBT_ELEMENTAL_SKILLPOINTS), (p) -> ((IntNBT) p).getAsInt());
+		NetUtils.FromNBT(elementalSkillPoints, EMagicElement.class, tag.getCompound(NBT_ELEMENTAL_SKILLPOINTS), (p) -> ((IntTag) p).getAsInt());
 		instance.setElementalSkillPointMap(elementalSkillPoints);
 		
 		Map<EMagicElement, Integer> elementalXP = new EnumMap<>(EMagicElement.class);
-		NetUtils.FromNBT(elementalXP, EMagicElement.class, tag.getCompound(NBT_ELEMENTAL_XP), (p) -> ((IntNBT) p).getAsInt());
+		NetUtils.FromNBT(elementalXP, EMagicElement.class, tag.getCompound(NBT_ELEMENTAL_XP), (p) -> ((IntTag) p).getAsInt());
 		instance.setElementalXPMap(elementalXP);
 			
 		// LORE
-		CompoundNBT compound = tag.getCompound(NBT_LORELEVELS);
+		CompoundTag compound = tag.getCompound(NBT_LORELEVELS);
 		for (String key : compound.getAllKeys()) {
 			Integer level = compound.getInt(key);
 			instance.deserializeLore(key, level);
 		}
 		
 		// SPELLS
-		ListNBT list = tag.getList(NBT_SPELLCRCS, NBT.TAG_STRING);
+		ListTag list = tag.getList(NBT_SPELLCRCS, NBT.TAG_STRING);
 		for (int i = 0; i < list.size(); i++) {
 			instance.deserializeSpells(list.getString(i));
 		}
@@ -373,14 +373,14 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		// Mark Location
 		if (tag.contains(NBT_MARK_POS, NBT.TAG_COMPOUND)) {
-			CompoundNBT posTag = tag.getCompound(NBT_MARK_POS);
+			CompoundTag posTag = tag.getCompound(NBT_MARK_POS);
 			BlockPos location = new BlockPos(
 					posTag.getInt("x"),
 					posTag.getInt("y"),
 					posTag.getInt("z")
 					);
 			String dimension = tag.getString(NBT_MARK_DIMENSION);
-			RegistryKey<World> dimKey = RegistryKey.create(Registry.DIMENSION_REGISTRY, ResourceLocation.tryParse(dimension));
+			ResourceKey<Level> dimKey = ResourceKey.create(Registry.DIMENSION_REGISTRY, ResourceLocation.tryParse(dimension));
 			
 			instance.setMarkLocation(dimKey, location);
 		}
@@ -391,14 +391,14 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		// Quests
 		if (tag.contains(NBT_QUESTS_CURRENT, NBT.TAG_LIST)) {
-			ListNBT tagList = tag.getList(NBT_QUESTS_CURRENT, NBT.TAG_STRING);
+			ListTag tagList = tag.getList(NBT_QUESTS_CURRENT, NBT.TAG_STRING);
 			for (int i = 0; i < tagList.size(); i++) {
 				String quest = tagList.getString(i);
 				instance.addQuest(quest);
 			}
 		}
 		if (tag.contains(NBT_QUESTS_COMPLETED, NBT.TAG_LIST)) {
-			ListNBT tagList = tag.getList(NBT_QUESTS_COMPLETED, NBT.TAG_STRING);
+			ListTag tagList = tag.getList(NBT_QUESTS_COMPLETED, NBT.TAG_STRING);
 			for (int i = 0; i < tagList.size(); i++) {
 				String quest = tagList.getString(i);
 				instance.addQuest(quest);
@@ -407,7 +407,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		
 		if (tag.contains(NBT_RESEARCHES, NBT.TAG_LIST)) {
-			ListNBT tagList = tag.getList(NBT_RESEARCHES, NBT.TAG_STRING);
+			ListTag tagList = tag.getList(NBT_RESEARCHES, NBT.TAG_STRING);
 			for (int i = 0; i < tagList.size(); i++) {
 				String research = tagList.getString(i);
 				instance.completeResearch(research);
@@ -415,7 +415,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		
 		if (tag.contains(NBT_SKILLS, NBT.TAG_LIST)) {
-			ListNBT tagList = tag.getList(NBT_SKILLS, NBT.TAG_STRING);
+			ListTag tagList = tag.getList(NBT_SKILLS, NBT.TAG_STRING);
 			for (int i = 0; i < tagList.size(); i++) {
 				String raw = tagList.getString(i);
 				ResourceLocation loc = new ResourceLocation(raw);
@@ -430,7 +430,7 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 			for (String key : compound.getAllKeys()) {
 				try {
 					EMagicElement elem = EMagicElement.valueOf(key);
-					CompoundNBT subtag = compound.getCompound(key);
+					CompoundTag subtag = compound.getCompound(key);
 					for (String altKey : subtag.getAllKeys()) {
 						EAlteration alt;
 						if (altKey.equalsIgnoreCase("none"))
@@ -449,15 +449,15 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		
 		if (tag.contains(NBT_SORCERYPORTAL_POS)) {
 			String dimName = tag.getString(NBT_SORCERYPORTAL_DIM);
-			RegistryKey<World> dim = RegistryKey.create(Registry.DIMENSION_REGISTRY, ResourceLocation.tryParse(dimName));
+			ResourceKey<Level> dim = ResourceKey.create(Registry.DIMENSION_REGISTRY, ResourceLocation.tryParse(dimName));
 			instance.setSorceryPortalLocation(
 					dim,
-					NBTUtil.readBlockPos(tag.getCompound(NBT_SORCERYPORTAL_POS))); // Warning: can break if save used across game versions
+					NbtUtils.readBlockPos(tag.getCompound(NBT_SORCERYPORTAL_POS))); // Warning: can break if save used across game versions
 		}
 		
 		if (tag.contains(NBT_SAVEDRESPAWN_DIM)) {
-			final RegistryKey<World> dim = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(tag.getString(NBT_SAVEDRESPAWN_DIM)));
-			final BlockPos pos = NBTUtil.readBlockPos(tag.getCompound(NBT_SAVEDRESPAWN_POS));
+			final ResourceKey<Level> dim = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(tag.getString(NBT_SAVEDRESPAWN_DIM)));
+			final BlockPos pos = NbtUtils.readBlockPos(tag.getCompound(NBT_SAVEDRESPAWN_POS));
 			final float yaw = tag.getFloat(NBT_SAVEDRESPAWN_YAW);
 			final boolean forced = tag.getBoolean(NBT_SAVEDRESPAWN_FORCE);
 			instance.setSavedRespawnInfo(new VanillaRespawnInfo(dim, pos, yaw, forced));
@@ -472,10 +472,10 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		Map<UUID, Float> modManaRegen = new HashMap<>();
 		
 		if (tag.contains(NBT_MOD_MANA, NBT.TAG_LIST)) {
-			ListNBT tagList = tag.getList(NBT_MOD_MANA, NBT.TAG_COMPOUND);
+			ListTag tagList = tag.getList(NBT_MOD_MANA, NBT.TAG_COMPOUND);
 			
 			for (int i = 0; i < tagList.size(); i++) {
-				CompoundNBT subtag = tagList.getCompound(i);
+				CompoundTag subtag = tagList.getCompound(i);
 				UUID id = subtag.getUUID(NBT_MOD_INTERNAL_ID);
 				float val = subtag.getFloat(NBT_MOD_INTERNAL_VALUE);
 				if (id != null) {
@@ -485,10 +485,10 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		
 		if (tag.contains(NBT_MOD_MANA_BONUS, NBT.TAG_LIST)) {
-			ListNBT tagList = tag.getList(NBT_MOD_MANA_BONUS, NBT.TAG_COMPOUND);
+			ListTag tagList = tag.getList(NBT_MOD_MANA_BONUS, NBT.TAG_COMPOUND);
 			
 			for (int i = 0; i < tagList.size(); i++) {
-				CompoundNBT subtag = tagList.getCompound(i);
+				CompoundTag subtag = tagList.getCompound(i);
 				UUID id = subtag.getUUID(NBT_MOD_INTERNAL_ID);
 				int val = subtag.getInt(NBT_MOD_INTERNAL_VALUE);
 				if (id != null) {
@@ -498,10 +498,10 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		
 		if (tag.contains(NBT_MOD_MANA_COST, NBT.TAG_LIST)) {
-			ListNBT tagList = tag.getList(NBT_MOD_MANA_COST, NBT.TAG_COMPOUND);
+			ListTag tagList = tag.getList(NBT_MOD_MANA_COST, NBT.TAG_COMPOUND);
 			
 			for (int i = 0; i < tagList.size(); i++) {
-				CompoundNBT subtag = tagList.getCompound(i);
+				CompoundTag subtag = tagList.getCompound(i);
 				UUID id = subtag.getUUID(NBT_MOD_INTERNAL_ID);
 				float val = subtag.getFloat(NBT_MOD_INTERNAL_VALUE);
 				if (id != null) {
@@ -511,10 +511,10 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		}
 		
 		if (tag.contains(NBT_MOD_MANA_REGEN, NBT.TAG_LIST)) {
-			ListNBT tagList = tag.getList(NBT_MOD_MANA_REGEN, NBT.TAG_COMPOUND);
+			ListTag tagList = tag.getList(NBT_MOD_MANA_REGEN, NBT.TAG_COMPOUND);
 			
 			for (int i = 0; i < tagList.size(); i++) {
-				CompoundNBT subtag = tagList.getCompound(i);
+				CompoundTag subtag = tagList.getCompound(i);
 				UUID id = subtag.getUUID(NBT_MOD_INTERNAL_ID);
 				float val = subtag.getFloat(NBT_MOD_INTERNAL_VALUE);
 				if (id != null) {
@@ -526,10 +526,10 @@ public class NostrumMagicStorage implements IStorage<INostrumMagic> {
 		instance.setModifierMaps(modMana, modManaFlat, modManaCost, modManaRegen);
 		
 		if (tag.contains(NBT_TRANSMUTE_KNOWLEDGE, NBT.TAG_LIST)) {
-			ListNBT tagList = tag.getList(NBT_TRANSMUTE_KNOWLEDGE, NBT.TAG_COMPOUND);
+			ListTag tagList = tag.getList(NBT_TRANSMUTE_KNOWLEDGE, NBT.TAG_COMPOUND);
 			
 			for (int i = 0; i < tagList.size(); i++) {
-				CompoundNBT subtag = tagList.getCompound(i);
+				CompoundTag subtag = tagList.getCompound(i);
 				TransmuteKnowledge knowledge = TransmuteKnowledge.fromNBT(subtag);
 				instance.giveTransmuteKnowledge(knowledge.key, knowledge.level);
 			}

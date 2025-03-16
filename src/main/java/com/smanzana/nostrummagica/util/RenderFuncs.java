@@ -4,39 +4,38 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Function;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.util.Curves.ICurve3d;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldVertexBufferUploader;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix3f;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Quaternion;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.EmptyModelData;
@@ -53,16 +52,16 @@ public final class RenderFuncs {
 		return RenderRandom(new Random());
 	}
 	
-	public static void RenderModelWithColorNoBatch(MatrixStack stack, IBakedModel model, int color, int combinedLight, int combinedOverlay) {
-		Tessellator tessellator = Tessellator.getInstance();
+	public static void RenderModelWithColorNoBatch(PoseStack stack, BakedModel model, int color, int combinedLight, int combinedOverlay) {
+		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder buffer = tessellator.getBuilder();
-		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK); // quads hardcode this internally. If not, would need to convert when rendering quad?
+		buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.BLOCK); // quads hardcode this internally. If not, would need to convert when rendering quad?
 		RenderModelWithColor(stack, buffer, model, color, combinedLight, combinedOverlay);
 		buffer.end();
-		WorldVertexBufferUploader.end(buffer);
+		BufferUploader.end(buffer);
 	}
 	
-	public static void RenderModelWithColor(MatrixStack stack, IVertexBuilder buffer, IBakedModel model, int color, int combinedLight, int combinedOverlay) {
+	public static void RenderModelWithColor(PoseStack stack, VertexConsumer buffer, BakedModel model, int color, int combinedLight, int combinedOverlay) {
 		final float colors[] = ColorUtil.ARGBToColor(color);
 		RenderModel(stack, buffer, model, combinedLight, combinedOverlay, colors[0], colors[1], colors[2], colors[3]);
 	}
@@ -70,40 +69,40 @@ public final class RenderFuncs {
 	private static final Random RenderModelRandom = new Random();
 	public static final int BrightPackedLight = 15728880;
 	
-	public static void RenderModel(MatrixStack stack, IVertexBuilder buffer, IBakedModel model, int combinedLight, int combinedOverlay, float red, float green, float blue, float alpha) {
+	public static void RenderModel(PoseStack stack, VertexConsumer buffer, BakedModel model, int combinedLight, int combinedOverlay, float red, float green, float blue, float alpha) {
 		RenderModel(stack.last(), buffer, model, combinedLight, combinedOverlay, red, green, blue, alpha);
 	}
 	
-	public static void RenderModel(MatrixStack.Entry stackLast, IVertexBuilder buffer, IBakedModel model, int combinedLight, int combinedOverlay, float red, float green, float blue, float alpha) {
+	public static void RenderModel(PoseStack.Pose stackLast, VertexConsumer buffer, BakedModel model, int combinedLight, int combinedOverlay, float red, float green, float blue, float alpha) {
 		
 		for(Direction side : Direction.values()) {
 			List<BakedQuad> quads = model.getQuads(null, side, RenderRandom(RenderModelRandom), EmptyModelData.INSTANCE);
 			if(!quads.isEmpty()) 
 				for(BakedQuad quad : quads) {
-					buffer.addVertexData(stackLast, quad, red, green, blue, alpha, combinedLight, combinedOverlay, true);
+					buffer.putBulkData(stackLast, quad, red, green, blue, alpha, combinedLight, combinedOverlay, true);
 //					LightUtil.renderQuadColor(buffer, quad, color);
 				}
 		}
 		List<BakedQuad> quads = model.getQuads(null, null, RenderRandom(RenderModelRandom), EmptyModelData.INSTANCE);
 		if(!quads.isEmpty()) {
 			for(BakedQuad quad : quads) 
-				buffer.addVertexData(stackLast, quad, red, green, blue, alpha, combinedLight, combinedOverlay, true);
+				buffer.putBulkData(stackLast, quad, red, green, blue, alpha, combinedLight, combinedOverlay, true);
 				//LightUtil.renderQuadColor(buffer, quad, color);
 		}
 
 	}
 	
-	public static void RenderBlockState(BlockState state, MatrixStack stack, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
+	public static void RenderBlockState(BlockState state, PoseStack stack, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		// Could get model and turn around and call RenderModel() on it
-		 Minecraft.getInstance().getBlockRenderer().renderBlock(state, stack, bufferIn, combinedLightIn, combinedOverlayIn, EmptyModelData.INSTANCE);
+		 Minecraft.getInstance().getBlockRenderer().renderSingleBlock(state, stack, bufferIn, combinedLightIn, combinedOverlayIn, EmptyModelData.INSTANCE);
 	}
 
-	public static void RenderWorldItem(ItemStack stack, MatrixStack matrix) {
+	public static void RenderWorldItem(ItemStack stack, PoseStack matrix) {
 		// light and overlay constants taken from ItemRenderer and GameRenderer
 		final int combinedLight = BrightPackedLight;
 		final int combinedOverlay = OverlayTexture.NO_OVERLAY;
 		
-		IRenderTypeBuffer.Impl typebuffer = Minecraft.getInstance().renderBuffers().bufferSource();
+		MultiBufferSource.BufferSource typebuffer = Minecraft.getInstance().renderBuffers().bufferSource();
 		RenderWorldItem(stack, matrix, typebuffer, combinedLight, combinedOverlay);
 		typebuffer.endBatch();
 	}
@@ -114,71 +113,74 @@ public final class RenderFuncs {
 	 * @param world
 	 * @param stack
 	 */
-	public static void RenderWorldItem(ItemStack stack, MatrixStack matrix, IRenderTypeBuffer typeBuffer, int combinedLight) {
+	public static void RenderWorldItem(ItemStack stack, PoseStack matrix, MultiBufferSource typeBuffer, int combinedLight) {
 		RenderWorldItem(stack, matrix, typeBuffer, combinedLight, OverlayTexture.NO_OVERLAY);
 	}
 	
-	public static void RenderWorldItem(ItemStack stack, MatrixStack matrix, IRenderTypeBuffer typeBuffer, int combinedLight, int combinedOverlay) {
+	public static void RenderWorldItem(ItemStack stack, PoseStack matrix, MultiBufferSource typeBuffer, int combinedLight, int combinedOverlay) {
 		Minecraft.getInstance().getItemRenderer()
-			.renderStatic(stack, TransformType.GROUND, combinedLight, combinedOverlay, matrix, typeBuffer);
+			.renderStatic(stack, TransformType.GROUND, combinedLight, combinedOverlay, matrix, typeBuffer, 0);
 	}
 	
-	public static void RenderGUIItem(ItemStack stack, MatrixStack matrixStackIn) {
+	public static void RenderGUIItem(ItemStack stack, PoseStack matrixStackIn) {
 		final Minecraft mc = Minecraft.getInstance();
-		RenderSystem.pushMatrix();
-		RenderSystem.multMatrix(matrixStackIn.last().pose());
+		final PoseStack actualStack = RenderSystem.getModelViewStack();
+		actualStack.pushPose();
+		actualStack.mulPoseMatrix(matrixStackIn.last().pose());
+		//RenderSystem.pushMatrix();
+		//RenderSystem.multMatrix(matrixStackIn.last().pose());
 		mc.getItemRenderer().renderGuiItem(stack, 0, 0);
-		RenderSystem.popMatrix();
+		actualStack.popPose();
+		//RenderSystem.popMatrix();
 	}
 	
-	public static void RenderGUIItem(ItemStack stack, MatrixStack matrixStackIn, int x, int y, int z) {
+	public static void RenderGUIItem(ItemStack stack, PoseStack matrixStackIn, int x, int y, int z) {
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(x, y, z);
 		RenderGUIItem(stack, matrixStackIn);
 		matrixStackIn.popPose();
 	}
 	
-	public static void RenderGUIItem(ItemStack stack, MatrixStack matrixStackIn, int x, int y) {
+	public static void RenderGUIItem(ItemStack stack, PoseStack matrixStackIn, int x, int y) {
 		RenderGUIItem(stack, matrixStackIn, x, y, 0);
 	}
 	
 	// can use blit here: blit(x, y, 0, u, v, width, height, texWidth, texHeight)
-	public static void drawModalRectWithCustomSizedTextureImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
+	public static void drawModalRectWithCustomSizedTextureImmediate(PoseStack matrixStackIn, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight) {
 		Screen.blit(matrixStackIn, x, y, u, v, width, height, textureWidth, textureHeight);
 	}
 	
-	public static void drawModalRectWithCustomSizedTextureImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight, float red, float green, float blue, float alpha) {
+	public static void drawModalRectWithCustomSizedTextureImmediate(PoseStack matrixStackIn, int x, int y, float u, float v, int width, int height, int textureWidth, int textureHeight, float red, float green, float blue, float alpha) {
 		// hack for now
-		RenderSystem.color4f(red, green, blue, alpha);
+		RenderSystem.setShaderColor(red, green, blue, alpha);
 		drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, u, v, width, height, textureWidth, textureHeight);
-		RenderSystem.color4f(1f, 1f, 1f, 1f);
+		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 	}
 	
 	// Different from the above in that this includes scaling on what's drawn
-	public static void drawScaledCustomSizeModalRectImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight) {
+	public static void drawScaledCustomSizeModalRectImmediate(PoseStack matrixStackIn, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight) {
 		drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, u, v, uWidth, vHeight, width, height, tileWidth, tileHeight, 1f, 1f, 1f, 1f);
 	}
 	
-	public static void drawScaledCustomSizeModalRectImmediate(MatrixStack matrixStackIn, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, float red, float green, float blue, float alpha) {
-		Tessellator tessellator = Tessellator.getInstance();
+	public static void drawScaledCustomSizeModalRectImmediate(PoseStack matrixStackIn, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, float red, float green, float blue, float alpha) {
+		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuilder();
-		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR_TEX);
+		bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
 		
 		drawScaledCustomSizeModalRect(matrixStackIn, bufferbuilder, x, y, u, v, uWidth, vHeight, width, height, tileWidth, tileHeight,
 				red, green, blue, alpha);
 
 		bufferbuilder.end();
-		RenderSystem.enableAlphaTest();
-		WorldVertexBufferUploader.end(bufferbuilder);
+		BufferUploader.end(bufferbuilder);
 	}
 	
-	public static void drawScaledCustomSizeModalRect(MatrixStack matrixStackIn, IVertexBuilder buffer, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, float red, float green, float blue, float alpha) {
+	public static void drawScaledCustomSizeModalRect(PoseStack matrixStackIn, VertexConsumer buffer, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, float red, float green, float blue, float alpha) {
 		final int combinedLight = BrightPackedLight;
 		final int combinedOverlay = OverlayTexture.NO_OVERLAY;
 		drawScaledCustomSizeModalRect(matrixStackIn, buffer, x, y, u, v, uWidth, vHeight, width, height, tileWidth, tileHeight, combinedLight, combinedOverlay, red, green, blue, alpha);
 	}
 	
-	public static void drawScaledCustomSizeModalRect(MatrixStack matrixStackIn, IVertexBuilder buffer, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public static void drawScaledCustomSizeModalRect(PoseStack matrixStackIn, VertexConsumer buffer, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		final float f = 1.0F / tileWidth;
 		final float f1 = 1.0F / tileHeight;
 		final Matrix4f transform = matrixStackIn.last().pose();
@@ -190,26 +192,25 @@ public final class RenderFuncs {
 		buffer.vertex(transform, x, y, 0.0f).color(red, green, blue, alpha).uv((u * f), (v * f1)).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, 0, 0, 1).endVertex();
 	}
 	
-	public static void drawRect(MatrixStack stack, int minX, int minY, int maxX, int maxY, int colorARGB) {
-		AbstractGui.fill(stack, minX, minY, maxX, maxY, colorARGB);
+	public static void drawRect(PoseStack stack, int minX, int minY, int maxX, int maxY, int colorARGB) {
+		GuiComponent.fill(stack, minX, minY, maxX, maxY, colorARGB);
 	}
 	
-	public static void drawGradientRect(MatrixStack stack, int minX, int minY, int maxX, int maxY, int colorTopLeft, int colorTopRight, int colorBottomLeft, int colorBottomRight) {
+	public static void drawGradientRect(PoseStack stack, int minX, int minY, int maxX, int maxY, int colorTopLeft, int colorTopRight, int colorBottomLeft, int colorBottomRight) {
 		final Matrix4f transform = stack.last().pose();
 		final float[] colorTR = ColorUtil.ARGBToColor(colorTopRight);
 		final float[] colorTL = ColorUtil.ARGBToColor(colorTopLeft);
 		final float[] colorBL = ColorUtil.ARGBToColor(colorBottomLeft);
 		final float[] colorBR = ColorUtil.ARGBToColor(colorBottomRight);
 		
-		Tessellator tessellator = Tessellator.getInstance();
+		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuilder();
-		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+		bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
 		RenderSystem.disableTexture();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.disableAlphaTest();
-		RenderSystem.shadeModel(GL11.GL_SMOOTH);
+		//RenderSystem.shadeModel(GL11.GL_SMOOTH);
 		{
 			bufferbuilder.vertex(transform, minX, minY, 0).color(colorTL[0], colorTL[1], colorTL[2], colorTL[3]).endVertex();
 			bufferbuilder.vertex(transform, minX, maxY, 0).color(colorBL[0], colorBL[1], colorBL[2], colorBL[3]).endVertex();
@@ -218,14 +219,13 @@ public final class RenderFuncs {
 		}
 
 		bufferbuilder.end();
-		WorldVertexBufferUploader.end(bufferbuilder);
+		BufferUploader.end(bufferbuilder);
 		RenderSystem.disableBlend();
-		RenderSystem.enableAlphaTest();
 		RenderSystem.enableTexture();
-		RenderSystem.shadeModel(GL11.GL_FLAT);
+		//RenderSystem.shadeModel(GL11.GL_FLAT);
 	}
 
-	public static final void renderSpaceQuad(MatrixStack stack, IVertexBuilder buffer,
+	public static final void renderSpaceQuad(PoseStack stack, VertexConsumer buffer,
 			float radius,
 			int combinedLightmapIn, int combinedOverlayIn, float red, float green, float blue, float alpha
 			) {
@@ -254,7 +254,7 @@ public final class RenderFuncs {
 		buffer.vertex(transform, avector3f[3].x(), avector3f[3].y(), avector3f[3].z()).color(red, green, blue, alpha).uv(uMin, vMax).overlayCoords(combinedOverlayIn).uv2(combinedLightmapIn).normal(normal, 0, 0, 1).endVertex();
 	}
 	
-	public static final void renderSpaceQuadFacingCamera(MatrixStack stack, IVertexBuilder buffer, ActiveRenderInfo renderInfo,
+	public static final void renderSpaceQuadFacingCamera(PoseStack stack, VertexConsumer buffer, Camera renderInfo,
 			float radius,
 			int lightmap, int overlay,
 			float red, float green, float blue, float alpha) {
@@ -272,11 +272,11 @@ public final class RenderFuncs {
 	}
 
 	// Note: renders in ENTITY vertex formate
-	public static final void drawUnitCube(MatrixStack stack, IVertexBuilder buffer, int packedLightIn, int combinedOverlayIn, float red, float green, float blue, float alpha) {
+	public static final void drawUnitCube(PoseStack stack, VertexConsumer buffer, int packedLightIn, int combinedOverlayIn, float red, float green, float blue, float alpha) {
 		drawUnitCube(stack, buffer, 0, 1, 0, 1, packedLightIn, combinedOverlayIn, red, green, blue, alpha);
 	}
 	
-	public static final void drawUnitCube(MatrixStack stack, IVertexBuilder buffer, float minU, float maxU, float minV, float maxV, int packedLightIn, int combinedOverlayIn,
+	public static final void drawUnitCube(PoseStack stack, VertexConsumer buffer, float minU, float maxU, float minV, float maxV, int packedLightIn, int combinedOverlayIn,
 			float red, float green, float blue, float alpha) {
 		
 		final float mind = -.5f;
@@ -326,7 +326,7 @@ public final class RenderFuncs {
 	}
 	
 	// Assumes render type is LINES
-	public static final void drawUnitCubeOutline(MatrixStack stack, IVertexBuilder buffer, int packedLightIn, int combinedOverlayIn,
+	public static final void drawUnitCubeOutline(PoseStack stack, VertexConsumer buffer, int packedLightIn, int combinedOverlayIn,
 			float red, float green, float blue, float alpha) {
 		
 		// REally tex makes no sense, but will provide it anyways.
@@ -400,7 +400,7 @@ public final class RenderFuncs {
 	 * @param blue
 	 * @param alpha
 	 */
-	public static final void drawEllipse(float horizontalRadius, float verticalRadius, int points, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, float red, float green, float blue, float alpha) {
+	public static final void drawEllipse(float horizontalRadius, float verticalRadius, int points, PoseStack matrixStackIn, VertexConsumer buffer, int packedLightIn, float red, float green, float blue, float alpha) {
 		drawEllipse(horizontalRadius, verticalRadius, points, 0f, matrixStackIn, buffer, packedLightIn, red, green, blue, alpha);
 	}
 	
@@ -417,7 +417,7 @@ public final class RenderFuncs {
 	 * @param blue
 	 * @param alpha
 	 */
-	public static final void drawEllipse(float horizontalRadius, float verticalRadius, int points, float rotationPercent, MatrixStack matrixStackIn, IVertexBuilder buffer, int packedLightIn, float red, float green, float blue, float alpha) {
+	public static final void drawEllipse(float horizontalRadius, float verticalRadius, int points, float rotationPercent, PoseStack matrixStackIn, VertexConsumer buffer, int packedLightIn, float red, float green, float blue, float alpha) {
 		
 		final double angleOffset = rotationPercent * Math.PI;
 		final Matrix4f transform = matrixStackIn.last().pose();
@@ -444,7 +444,7 @@ public final class RenderFuncs {
 		}
 	}
 	
-	public static final void drawOrb(MatrixStack matrixStackIn, IVertexBuilder buffer, int combinedLightIn, int combinedOverlayIn, float red, float green, float blue, float alpha,
+	public static final void drawOrb(PoseStack matrixStackIn, VertexConsumer buffer, int combinedLightIn, int combinedOverlayIn, float red, float green, float blue, float alpha,
 			int rows, int columns, float xRadius, float yRadius, float zRadius) {
 		final Matrix4f transform = matrixStackIn.last().pose();
 		final Matrix3f normal = matrixStackIn.last().normal();
@@ -491,7 +491,7 @@ public final class RenderFuncs {
 		}
 	}
 	
-	public static final void renderLine(MatrixStack matrixStackIn, IVertexBuilder buffer, Vector3d start, Vector3d end,
+	public static final void renderLine(PoseStack matrixStackIn, VertexConsumer buffer, Vec3 start, Vec3 end,
 			//float u1, float v1, float u2, float v2,
 			int combinedOverlayIn, int combinedLightIn,
 			float red, float green, float blue, float alpha) {
@@ -500,13 +500,13 @@ public final class RenderFuncs {
 				red, green, blue, alpha);
 	}
 	
-	public static final void renderLine(MatrixStack matrixStackIn, IVertexBuilder buffer, Vector3d start, Vector3d end,
+	public static final void renderLine(PoseStack matrixStackIn, VertexConsumer buffer, Vec3 start, Vec3 end,
 			//float u1, float v1, float u2, float v2,
 			float width,
 			int combinedOverlayIn, int combinedLightIn,
 			float red, float green, float blue, float alpha) {
 		
-		final Vector3d diff = end.subtract(start);
+		final Vec3 diff = end.subtract(start);
 		
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(start.x(), start.y(), start.z());
@@ -519,11 +519,11 @@ public final class RenderFuncs {
 		matrixStackIn.popPose();
 	}
 	
-	public static final void renderCurve(MatrixStack matrixStackIn, IVertexBuilder buffer, Vector3d start, ICurve3d curve, int segments,
+	public static final void renderCurve(PoseStack matrixStackIn, VertexConsumer buffer, Vec3 start, ICurve3d curve, int segments,
 			//float u1, float v1, float u2, float v2,
 			int combinedOverlayIn, int combinedLightIn,
 			float red, float green, float blue, float alpha) {
-		Vector3d last = curve.getPosition(0f);
+		Vec3 last = curve.getPosition(0f);
 
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(start.x(), start.y(), start.z());
@@ -531,7 +531,7 @@ public final class RenderFuncs {
 		final Matrix3f normal = matrixStackIn.last().normal();
 		for (int i = 1; i <= segments; i++) {
 			final float nextProg = ((float) i / (float) segments);
-			Vector3d next = curve.getPosition(nextProg);
+			Vec3 next = curve.getPosition(nextProg);
 			
 			buffer.vertex(transform, (float) last.x(), (float) last.y(), (float) last.z()).color(red, green, blue, alpha).uv(0, 0).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
 			buffer.vertex(transform, (float) next.x(), (float) next.y(), (float) next.z()).color(red, green, blue, alpha).uv(1, 1).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
@@ -541,34 +541,34 @@ public final class RenderFuncs {
 		matrixStackIn.popPose();
 	}
 	
-	public static final void renderHorizontalRibbon(MatrixStack matrixStackIn, IVertexBuilder buffer, Vector3d start, ICurve3d curve, int segments,
+	public static final void renderHorizontalRibbon(PoseStack matrixStackIn, VertexConsumer buffer, Vec3 start, ICurve3d curve, int segments,
 			float width, float texOffsetProg,
 			int combinedOverlayIn, int combinedLightIn,
 			float red, float green, float blue, float alpha) {
 		
-		Function<Vector3d, Vector3d> widthMapper = (segmentDiff) -> segmentDiff.multiply(1, 0, 1).normalize().scale(width/2).yRot(-90f);
+		Function<Vec3, Vec3> widthMapper = (segmentDiff) -> segmentDiff.multiply(1, 0, 1).normalize().scale(width/2).yRot(-90f);
 		
 		renderRibbon(matrixStackIn, buffer, start, curve, segments, widthMapper, texOffsetProg,
 				combinedOverlayIn, combinedLightIn, red, green, blue, alpha);
 	}
 	
-	public static final void renderVerticalRibbon(MatrixStack matrixStackIn, IVertexBuilder buffer, Vector3d start, ICurve3d curve, int segments,
+	public static final void renderVerticalRibbon(PoseStack matrixStackIn, VertexConsumer buffer, Vec3 start, ICurve3d curve, int segments,
 			float width, float texOffsetProg,
 			int combinedOverlayIn, int combinedLightIn,
 			float red, float green, float blue, float alpha) {
 		
-		Function<Vector3d, Vector3d> widthMapper = (segmentDiff) -> new Vector3d(0, width/2, 0);
+		Function<Vec3, Vec3> widthMapper = (segmentDiff) -> new Vec3(0, width/2, 0);
 		
 		renderRibbon(matrixStackIn, buffer, start, curve, segments, widthMapper, texOffsetProg,
 				combinedOverlayIn, combinedLightIn, red, green, blue, alpha);
 	}
 	
-	public static final void renderRibbon(MatrixStack matrixStackIn, IVertexBuilder buffer, Vector3d start, ICurve3d curve, int segments,
-			Function<Vector3d, Vector3d> widthSupplier, float texOffsetProg,
+	public static final void renderRibbon(PoseStack matrixStackIn, VertexConsumer buffer, Vec3 start, ICurve3d curve, int segments,
+			Function<Vec3, Vec3> widthSupplier, float texOffsetProg,
 			int combinedOverlayIn, int combinedLightIn,
 			float red, float green, float blue, float alpha) {
 		
-		Vector3d last = curve.getPosition(0f);
+		Vec3 last = curve.getPosition(0f);
 		//float lastV = lowV; 
 
 		matrixStackIn.pushPose();
@@ -577,9 +577,9 @@ public final class RenderFuncs {
 		final Matrix3f normal = matrixStackIn.last().normal();
 		for (int i = 1; i <= segments; i++) {
 			final float nextProg = ((float) i / (float) segments);
-			final Vector3d next = curve.getPosition(nextProg);
-			final Vector3d segmentDiff = next.subtract(last);
-			final Vector3d widthOffset = widthSupplier.apply(segmentDiff);
+			final Vec3 next = curve.getPosition(nextProg);
+			final Vec3 segmentDiff = next.subtract(last);
+			final Vec3 widthOffset = widthSupplier.apply(segmentDiff);
 			//final float nextV = lastV == lowV ? highV : lowV;
 			
 			buffer.vertex(transform, (float) (last.x() - widthOffset.x()), (float) (last.y() - widthOffset.y()), (float) (last.z() - widthOffset.z())).color(red, green, blue, alpha).uv(0, 1 + texOffsetProg).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
@@ -594,13 +594,13 @@ public final class RenderFuncs {
 		matrixStackIn.popPose();
 	}
 	
-	public static final void drawNameplate(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, Entity entityIn, String info, FontRenderer fonter, int packedLightIn, float yOffsetExtra, ActiveRenderInfo renderInfo) {
+	public static final void drawNameplate(PoseStack matrixStackIn, MultiBufferSource bufferIn, Entity entityIn, String info, Font fonter, int packedLightIn, float yOffsetExtra, Camera renderInfo) {
 		final float offsetY = yOffsetExtra + (entityIn == null ? 0 : (entityIn.getBbHeight() + 0.5f));
 		final boolean discrete = entityIn == null ? false : entityIn.isDiscrete();
 		drawNameplate(matrixStackIn, bufferIn, info, fonter, packedLightIn, offsetY, discrete, renderInfo);
 	}
 	
-	public static final void drawNameplate(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, String info, FontRenderer fonter, int packedLightIn, float yOffset, boolean discrete, ActiveRenderInfo renderInfo) {
+	public static final void drawNameplate(PoseStack matrixStackIn, MultiBufferSource bufferIn, String info, Font fonter, int packedLightIn, float yOffset, boolean discrete, Camera renderInfo) {
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(0.0D, yOffset, 0.0D);
 		matrixStackIn.mulPose(renderInfo.rotation());
@@ -608,7 +608,7 @@ public final class RenderFuncs {
 		matrixStackIn.popPose();
 	}
 	
-	public static final void drawNameplate(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, String info, FontRenderer fontrenderer, int packedLightIn, boolean discrete) {
+	public static final void drawNameplate(PoseStack matrixStackIn, MultiBufferSource bufferIn, String info, Font fontrenderer, int packedLightIn, boolean discrete) {
 		matrixStackIn.pushPose();
         matrixStackIn.scale(-0.025F, -0.025F, 0.025F);
 		
@@ -624,7 +624,7 @@ public final class RenderFuncs {
 		matrixStackIn.popPose();
 	}
 
-	public static int drawSplitString(MatrixStack matrixStackIn, FontRenderer fonter, String str, int x, int y, int width, int infoColor) {
+	public static int drawSplitString(PoseStack matrixStackIn, Font fonter, String str, int x, int y, int width, int infoColor) {
 		int offset = 0;
 		int lineWidth = fonter.width(str);
 		while (lineWidth > width) {
@@ -670,40 +670,40 @@ public final class RenderFuncs {
 	}
 	
 	// Copies of Vanilla's blit but with color support
-	public static final void blit(MatrixStack matrixStack, int x, int y, int blitOffset, int width, int height, TextureAtlasSprite sprite, float red, float green, float blue, float alpha) {
+	public static final void blit(PoseStack matrixStack, int x, int y, int blitOffset, int width, int height, TextureAtlasSprite sprite, float red, float green, float blue, float alpha) {
 		innerBlit(matrixStack.last().pose(), x, x + width, y, y + height, blitOffset, sprite.getU0(), sprite.getU1(), sprite.getV0(), sprite.getV1(), red, green, blue, alpha);
 	}
 
-	public static final void blit(MatrixStack matrixStack, int x, int y, int uOffset, int vOffset, int uWidth, int vHeight, float red, float green, float blue, float alpha) {
+	public static final void blit(PoseStack matrixStack, int x, int y, int uOffset, int vOffset, int uWidth, int vHeight, float red, float green, float blue, float alpha) {
 		blit(matrixStack, x, y, 0, (float)uOffset, (float)vOffset, uWidth, vHeight, 256, 256, red, green, blue, alpha);
 	}
 
-	public static final void blit(MatrixStack matrixStack, int x, int y, int blitOffset, float uOffset, float vOffset, int uWidth, int vHeight, int textureHeight, int textureWidth, float red, float green, float blue, float alpha) {
+	public static final void blit(PoseStack matrixStack, int x, int y, int blitOffset, float uOffset, float vOffset, int uWidth, int vHeight, int textureHeight, int textureWidth, float red, float green, float blue, float alpha) {
 		innerBlit(matrixStack, x, x + uWidth, y, y + vHeight, blitOffset, uWidth, vHeight, uOffset, vOffset, textureWidth, textureHeight, red, green, blue, alpha);
 	}
 
-	public static final void blit(MatrixStack matrixStack, int x, int y, int width, int height, float uOffset, float vOffset, int uWidth, int vHeight, int textureWidth, int textureHeight, float red, float green, float blue, float alpha) {
+	public static final void blit(PoseStack matrixStack, int x, int y, int width, int height, float uOffset, float vOffset, int uWidth, int vHeight, int textureWidth, int textureHeight, float red, float green, float blue, float alpha) {
 		innerBlit(matrixStack, x, x + width, y, y + height, 0, uWidth, vHeight, uOffset, vOffset, textureWidth, textureHeight, red, green, blue, alpha);
 	}
 
-	public static final void blit(MatrixStack matrixStack, int x, int y, float uOffset, float vOffset, int width, int height, int textureWidth, int textureHeight, float red, float green, float blue, float alpha) {
+	public static final void blit(PoseStack matrixStack, int x, int y, float uOffset, float vOffset, int width, int height, int textureWidth, int textureHeight, float red, float green, float blue, float alpha) {
 		blit(matrixStack, x, y, width, height, uOffset, vOffset, width, height, textureWidth, textureHeight, red, green, blue, alpha);
 	}
 
-	private static final void innerBlit(MatrixStack matrixStack, int x1, int x2, int y1, int y2, int blitOffset, int uWidth, int vHeight, float uOffset, float vOffset, int textureWidth, int textureHeight, float red, float green, float blue, float alpha) {
+	private static final void innerBlit(PoseStack matrixStack, int x1, int x2, int y1, int y2, int blitOffset, int uWidth, int vHeight, float uOffset, float vOffset, int textureWidth, int textureHeight, float red, float green, float blue, float alpha) {
 		innerBlit(matrixStack.last().pose(), x1, x2, y1, y2, blitOffset, (uOffset + 0.0F) / (float)textureWidth, (uOffset + (float)uWidth) / (float)textureWidth, (vOffset + 0.0F) / (float)textureHeight, (vOffset + (float)vHeight) / (float)textureHeight, red, green, blue, alpha);
 	}
 
 	private static final void innerBlit(Matrix4f matrix, int x1, int x2, int y1, int y2, int blitOffset, float minU, float maxU, float minV, float maxV, float red, float green, float blue, float alpha) {
-		BufferBuilder bufferbuilder = Tessellator.getInstance().getBuilder();
-		bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR_TEX);
+		BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
+		bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
 		bufferbuilder.vertex(matrix, (float)x1, (float)y2, (float)blitOffset).color(red, green, blue, alpha).uv(minU, maxV).endVertex();
 		bufferbuilder.vertex(matrix, (float)x2, (float)y2, (float)blitOffset).color(red, green, blue, alpha).uv(maxU, maxV).endVertex();
 		bufferbuilder.vertex(matrix, (float)x2, (float)y1, (float)blitOffset).color(red, green, blue, alpha).uv(maxU, minV).endVertex();
 		bufferbuilder.vertex(matrix, (float)x1, (float)y1, (float)blitOffset).color(red, green, blue, alpha).uv(minU, minV).endVertex();
 		bufferbuilder.end();
-		RenderSystem.enableAlphaTest();
-		WorldVertexBufferUploader.end(bufferbuilder);
+		//RenderSystem.enableAlphaTest();
+		BufferUploader.end(bufferbuilder);
 	}
 	
 	// Should be somewhere else?
@@ -712,8 +712,8 @@ public final class RenderFuncs {
 		return new ModelResourceLocation(loc, "");
 	}
 
-	public static final MatrixStack makeNewMatrixStack(ActiveRenderInfo renderInfo) {
-		MatrixStack stack = new MatrixStack();
+	public static final PoseStack makeNewMatrixStack(Camera renderInfo) {
+		PoseStack stack = new PoseStack();
 		
 		// World renderer doesn't start with an identity stack; it applies some rotations based on
 		// the camera. These are copied out of GameRenderer#RenderWorld right before calling "this.mc.worldRenderer.updateCameraAndRender"
@@ -725,7 +725,7 @@ public final class RenderFuncs {
 		return stack;
 	}
 
-	public static void renderDiamond(MatrixStack matrixStackIn, IVertexBuilder bufferIn, float width, float height, int packedLightIn,
+	public static void renderDiamond(PoseStack matrixStackIn, VertexConsumer bufferIn, float width, float height, int packedLightIn,
 			int packedOverlayIn, float red, float green, float blue, float alpha) {
 		final Matrix4f transform = matrixStackIn.last().pose();
 		final Matrix3f normal = matrixStackIn.last().normal();

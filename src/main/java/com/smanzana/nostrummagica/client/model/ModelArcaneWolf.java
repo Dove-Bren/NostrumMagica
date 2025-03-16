@@ -1,32 +1,32 @@
 package com.smanzana.nostrummagica.client.model;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 
-import net.minecraft.client.renderer.entity.model.WolfModel;
-import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.model.WolfModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.util.Mth;
 
 public class ModelArcaneWolf extends WolfModel<ArcaneWolfEntity> {
 	
 	// Want to use WolfModel's, which used to be public :(
-	protected ModelRenderer head;
-	protected ModelRenderer body;
-	protected ModelRenderer legBackRight;
-	protected ModelRenderer legBackLeft;
-	protected ModelRenderer legFrontRight;
-	protected ModelRenderer legFrontLeft;
-	protected ModelRenderer tail;
-	protected ModelRenderer mane;
+	protected ModelPart head;
+	protected ModelPart body;
+	protected ModelPart legBackRight;
+	protected ModelPart legBackLeft;
+	protected ModelPart legFrontRight;
+	protected ModelPart legFrontLeft;
+	protected ModelPart tail;
+	protected ModelPart mane;
 	
-	protected ModelRenderer headSnootBridge;
+	protected ModelPart headSnootBridge;
 	
 	public ModelArcaneWolf(int color) {
 		//super(); Don't bother creating parent model
 		
-		this.head = new ModelRenderer(this, 0, 0);
+		this.head = new ModelPart(this, 0, 0);
 		this.head.addBox(-2.0F, -3.0F, -2.0F, 6, 6, 4, 0.0F);
 		this.head.setPos(-1.0F, 13.5F, -7.0F);
 		this.head.texOffs(16, 14).addBox(-1.999F, -4.5F, 0.0F, 2, 2, 1, 0.0F); // Ear
@@ -37,7 +37,7 @@ public class ModelArcaneWolf extends WolfModel<ArcaneWolfEntity> {
 		this.head.texOffs(42, 13).addBox(-2.5F, -1.5F, -1.5F, 1, 4, 3, 0.0F); // Right face floof // TODO texture
 		this.head.texOffs(42, 13).addBox(3.5F, -1.5F, -1.5F, 1, 4, 3, 0.0F); // Left face floof // TODO texture
 		//this.head.setTextureOffset(18, 14).addBox(0.5F, -1.0F, -4.0F, 1, 2, 2, 0.0F); // SnootBridge
-		headSnootBridge = new ModelRenderer(this, 23, 14);
+		headSnootBridge = new ModelPart(this, 23, 14);
 //		headSnootBridge.offsetX = 0;
 //		headSnootBridge.offsetY = .016F;
 //		headSnootBridge.offsetZ = -.075F;
@@ -45,28 +45,28 @@ public class ModelArcaneWolf extends WolfModel<ArcaneWolfEntity> {
 		headSnootBridge.addBox(0, 0, 0, 1, 1, 2, 0.0F); // SnootBridge
 		headSnootBridge.xRot = 10f;
 		head.addChild(headSnootBridge);
-		this.body = new ModelRenderer(this, 18, 14);
+		this.body = new ModelPart(this, 18, 14);
 		this.body.addBox(-3.0F, -2.0F, -3.0F, 6, 9, 6, 0.0F);
 		this.body.setPos(0.0F, 14.0F, 2.0F);
 		this.body.texOffs(21, 0).addBox(-3.5F, 1.5F, -3.5F, 7, 5, 7, 0.0F); // Butt floof // TODO texture
 		
 		
-		mane = new ModelRenderer(this, 21, 0);
+		mane = new ModelPart(this, 21, 0);
 		mane.addBox(-3.0F, -3.0F, -3.0F, 8, 6, 7, 0.0F);
 		mane.setPos(-1.0F, 14.0F, 2.0F);
-		this.legBackRight = new ModelRenderer(this, 0, 18);
+		this.legBackRight = new ModelPart(this, 0, 18);
 		this.legBackRight.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
 		this.legBackRight.setPos(-2.5F, 16.0F, 7.0F);
-		this.legBackLeft = new ModelRenderer(this, 0, 18);
+		this.legBackLeft = new ModelPart(this, 0, 18);
 		this.legBackLeft.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
 		this.legBackLeft.setPos(0.5F, 16.0F, 7.0F);
-		this.legFrontRight = new ModelRenderer(this, 0, 18);
+		this.legFrontRight = new ModelPart(this, 0, 18);
 		this.legFrontRight.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
 		this.legFrontRight.setPos(-2.5F, 16.0F, -4.0F);
-		this.legFrontLeft = new ModelRenderer(this, 0, 18);
+		this.legFrontLeft = new ModelPart(this, 0, 18);
 		this.legFrontLeft.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
 		this.legFrontLeft.setPos(0.5F, 16.0F, -4.0F);
-		tail = new ModelRenderer(this, 9, 18);
+		tail = new ModelPart(this, 9, 18);
 		tail.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
 		tail.setPos(-1.0F, 12.0F, 8.0F);
 	}
@@ -75,11 +75,11 @@ public class ModelArcaneWolf extends WolfModel<ArcaneWolfEntity> {
 		this(-1);
 	}
 	
-	protected Iterable<ModelRenderer> headParts() {
+	protected Iterable<ModelPart> headParts() {
 		return ImmutableList.of(this.head);
 	}
 
-	protected Iterable<ModelRenderer> bodyParts() {
+	protected Iterable<ModelPart> bodyParts() {
 		return ImmutableList.of(this.body, this.legBackRight, this.legBackLeft, this.legFrontRight, this.legFrontLeft, this.tail, this.mane);
 	}
 	
@@ -116,7 +116,7 @@ public class ModelArcaneWolf extends WolfModel<ArcaneWolfEntity> {
 //	}
 	
 	@Override
-	public void renderToBuffer(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
+	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		matrixStackIn.pushPose();
 		matrixStackIn.scale(1.25f, 1.25f, 1.25f);
 		matrixStackIn.translate(0, (-8f) / 24f, 0);
@@ -141,7 +141,7 @@ public class ModelArcaneWolf extends WolfModel<ArcaneWolfEntity> {
 		if (entityIn.isAngry() /*isAngry()*/) {
 			this.tail.yRot = 0.0F;
 		} else {
-			this.tail.yRot = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+			this.tail.yRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
 		}
 
 		if (entityIn.isInSittingPose()) {
@@ -169,10 +169,10 @@ public class ModelArcaneWolf extends WolfModel<ArcaneWolfEntity> {
 			this.legBackLeft.setPos(0.5F, 16.0F, 7.0F);
 			this.legFrontRight.setPos(-2.5F, 16.0F, -4.0F);
 			this.legFrontLeft.setPos(0.5F, 16.0F, -4.0F);
-			this.legBackRight.xRot = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
-			this.legBackLeft.xRot = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
-			this.legFrontRight.xRot = MathHelper.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
-			this.legFrontLeft.xRot = MathHelper.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+			this.legBackRight.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+			this.legBackLeft.xRot = Mth.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
+			this.legFrontRight.xRot = Mth.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
+			this.legFrontLeft.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
 		}
 
 		this.head.zRot = entityIn.getHeadRollAngle(partialTick) + entityIn.getBodyRollAngle(partialTick, 0.0F);

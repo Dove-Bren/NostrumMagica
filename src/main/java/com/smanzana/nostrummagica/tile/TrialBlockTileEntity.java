@@ -14,26 +14,26 @@ import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.trial.CombatTrial;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.server.level.ServerLevel;
 
-public class TrialBlockTileEntity extends TileEntity implements ITickableTileEntity {
+public class TrialBlockTileEntity extends BlockEntity implements TickableBlockEntity {
 	
 	private static final String NBT_ELEMENT = "element";
 	
 	private @Nullable CombatTrial activeTrial;
-	private @Nullable PlayerEntity activeTrialPlayer;
+	private @Nullable Player activeTrialPlayer;
 	private EMagicElement element;
 	private float scale;
 	
@@ -75,7 +75,7 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
 		
 		nbt.put(NBT_ELEMENT, this.getElement().toNBT());
@@ -84,17 +84,17 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		this.element = EMagicElement.FromNBT(nbt.get(NBT_ELEMENT));
 	}
 	
-	protected CombatTrial findTrial(EMagicElement element, @Nullable PlayerEntity starter) {
-		return CombatTrial.CreateForElement(element, (ServerWorld) this.level, this.worldPosition, starter);
+	protected CombatTrial findTrial(EMagicElement element, @Nullable Player starter) {
+		return CombatTrial.CreateForElement(element, (ServerLevel) this.level, this.worldPosition, starter);
 	}
 	
-	public void startTrial(@Nullable PlayerEntity starter) {
+	public void startTrial(@Nullable Player starter) {
 		if (!level.isClientSide()) {
 			this.startTrial(findTrial(this.getElement(), starter), starter);
 		}
@@ -104,7 +104,7 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 		return activeTrial != null;
 	}
 	
-	protected void onTrialEnd(CombatTrial trial, PlayerEntity player, boolean success) {
+	protected void onTrialEnd(CombatTrial trial, Player player, boolean success) {
 		if (success) {
 			playSuccessEffects(player);
 			awardTrialRewards(player);
@@ -113,29 +113,29 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 		}
 	}
 	
-	protected void playFailEffects(PlayerEntity player) {
+	protected void playFailEffects(Player player) {
 		NostrumMagicaSounds.CAST_FAIL.play((Entity) player);
 	}
 	
-	protected void playSuccessEffects(PlayerEntity player) {
+	protected void playSuccessEffects(Player player) {
 		NostrumMagicaSounds.LEVELUP.play((Entity) player);
 		// Message done in attr
 		//player.sendMessage(new TranslationTextComponent("info.element.mastery" + mastery.intValue(), new Object[] {this.element.getName()}));
 		TrialBlock.DoEffect(worldPosition, player, this.getElement().getColor());
 	}
 	
-	protected void playStartEffects(PlayerEntity player) {
-		level.playSound(null, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), SoundEvents.WITHER_SPAWN, SoundCategory.BLOCKS, 1f, 2f);
+	protected void playStartEffects(Player player) {
+		level.playSound(null, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), SoundEvents.WITHER_SPAWN, SoundSource.BLOCKS, 1f, 2f);
 		
 		NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
 				100,
 				worldPosition.getX() + .5, worldPosition.getY() + 1.25, worldPosition.getZ() + .5, .1,
 				60, 10,
-				new Vector3d(0, .1, 0), new Vector3d(.1, .1, .1)
+				new Vec3(0, .1, 0), new Vec3(.1, .1, .1)
 				).gravity(.05f).color(this.getElement().getColor()));
 	}
 	
-	protected void awardTrialRewards(PlayerEntity player) {
+	protected void awardTrialRewards(Player player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return;
@@ -158,13 +158,13 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 		
 		attr.endTrial(this.getElement());
 		attr.setElementalMastery(this.getElement(), newMastery);
-		NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
+		NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
 	}
 	
 	protected void stopTrial(boolean success) {
 		if (isTrialActive()) {
 			CombatTrial stoppedTrial = activeTrial;
-			PlayerEntity stoppedPlayer = activeTrialPlayer;
+			Player stoppedPlayer = activeTrialPlayer;
 			activeTrial = null;
 			activeTrialPlayer = null;
 			trialTicks = 0;
@@ -179,7 +179,7 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 		playStartEffects(activeTrialPlayer);
 	}
 	
-	protected void startTrial(CombatTrial trial, PlayerEntity player) {
+	protected void startTrial(CombatTrial trial, Player player) {
 		if (!isTrialActive()) {
 			this.activeTrial = trial;
 			this.activeTrialPlayer = player;
@@ -195,7 +195,7 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	protected void spawnStartupWarning() {
-		((ServerWorld) level).addFreshEntity(
+		((ServerLevel) level).addFreshEntity(
 				(new TameLightning(NostrumEntityTypes.tameLightning, level, worldPosition.getX() + 0.5, worldPosition.getY() + 1, worldPosition.getZ() + 0.5))
 				);
 	}
@@ -209,7 +209,7 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 				(60 - this.trialTicks) / 10,
 				worldPosition.getX() + .5, worldPosition.getY() + 1.25, worldPosition.getZ() + .5, 5,
 				40, 10,
-				new Vector3d(worldPosition.getX() + .5, worldPosition.getY() + 1.25, worldPosition.getZ() + .5)
+				new Vec3(worldPosition.getX() + .5, worldPosition.getY() + 1.25, worldPosition.getZ() + .5)
 				).color(this.getElement().getColor()));
 	}
 	
@@ -244,17 +244,17 @@ public class TrialBlockTileEntity extends TileEntity implements ITickableTileEnt
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, 3, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
 	}
 
 	@Override
-	public CompoundNBT getUpdateTag() {
-		return this.save(new CompoundNBT());
+	public CompoundTag getUpdateTag() {
+		return this.save(new CompoundTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
 		handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}

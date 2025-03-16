@@ -15,12 +15,12 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.sounds.SoundEvents;
 
-import net.minecraft.entity.ai.goal.Goal.Flag;
+import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 public class ArcaneWolfEldrichGoal extends Goal {
 
@@ -105,7 +105,7 @@ public class ArcaneWolfEldrichGoal extends Goal {
 		// to that. Then, each tick, maybe do damage or update effect.
 		// Effect is actually going to be 'predefined' client effect to avoid spamming packets.
 		float base = 20 * 5;
-		EffectInstance boostEffect = wolf.getEffect(NostrumEffects.magicBoost);
+		MobEffectInstance boostEffect = wolf.getEffect(NostrumEffects.magicBoost);
 		if (boostEffect != null) {
 			base *= Math.pow(1.5, boostEffect.getAmplifier() + 1);
 		}

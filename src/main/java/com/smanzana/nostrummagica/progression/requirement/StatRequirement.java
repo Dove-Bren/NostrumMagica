@@ -7,10 +7,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStats;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 
 public class StatRequirement implements IRequirement{
 
@@ -23,7 +23,7 @@ public class StatRequirement implements IRequirement{
 	}
 
 	@Override
-	public boolean matches(PlayerEntity player) {
+	public boolean matches(Player player) {
 		final PlayerStats stats = NostrumMagica.instance.getPlayerStats().get(player);
 		return stats.getStat(stat) >= amount;
 	}
@@ -34,11 +34,11 @@ public class StatRequirement implements IRequirement{
 	}
 	
 	@Override
-	public List<ITextComponent> getDescription(PlayerEntity player) {
+	public List<Component> getDescription(Player player) {
 		final PlayerStats stats = NostrumMagica.instance.getPlayerStats().get(player);
 		//final String amtString = String.format("%.2f / %.2f ", stats.getStat(stat), amount);
 		final String amtString = String.format("%.0f / %.0f ", stats.getStat(stat), amount);
-		return Lists.newArrayList(new StringTextComponent(amtString).append( 
-				stat.getName().withStyle(TextFormatting.BLUE)));
+		return Lists.newArrayList(new TextComponent(amtString).append( 
+				stat.getName().withStyle(ChatFormatting.BLUE)));
 	}
 }

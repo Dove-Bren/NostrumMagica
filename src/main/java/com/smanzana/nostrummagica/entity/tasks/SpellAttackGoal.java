@@ -7,14 +7,14 @@ import javax.annotation.Nullable;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.spell.Spell;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.player.Player;
 
-import net.minecraft.entity.ai.goal.Goal.Flag;
+import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
-public class SpellAttackGoal<T extends MobEntity> extends Goal {
+public class SpellAttackGoal<T extends Mob> extends Goal {
 	
 	
 	protected T entity;
@@ -65,8 +65,8 @@ public class SpellAttackGoal<T extends MobEntity> extends Goal {
 			return false;
 		}
 		
-		if (needsTarget && entity.getTarget() instanceof PlayerEntity) {
-			PlayerEntity player = (PlayerEntity) entity.getTarget();
+		if (needsTarget && entity.getTarget() instanceof Player) {
+			Player player = (Player) entity.getTarget();
 			if (player.isCreative() || player.isSpectator()) {
 				return false;
 			}

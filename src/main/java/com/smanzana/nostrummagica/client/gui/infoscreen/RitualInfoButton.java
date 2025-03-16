@@ -5,17 +5,17 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class RitualInfoButton extends InfoButton {
 
@@ -32,7 +32,7 @@ public class RitualInfoButton extends InfoButton {
 	}
 
 	@Override
-	public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		float tint = 1f;
 		if (mouseX >= this.x 
 			&& mouseY >= this.y 
@@ -62,11 +62,11 @@ public class RitualInfoButton extends InfoButton {
 		}
 	}
 	
-	private List<ITextComponent> desc = new ArrayList<>(1);
+	private List<Component> desc = new ArrayList<>(1);
 	@Override
-	public List<ITextComponent> getDescription() {
+	public List<Component> getDescription() {
 		if (desc.isEmpty())
-			desc.add(new TranslationTextComponent("ritual." + ritual.getTitleKey() + ".name", new Object[0]));
+			desc.add(new TranslatableComponent("ritual." + ritual.getTitleKey() + ".name", new Object[0]));
 		
 		return desc;
 	}

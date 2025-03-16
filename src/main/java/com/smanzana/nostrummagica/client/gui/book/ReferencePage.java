@@ -5,8 +5,8 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.entity.player.Player;
 
 public class ReferencePage extends TableOfContentsPage {
 	
@@ -19,7 +19,7 @@ public class ReferencePage extends TableOfContentsPage {
 	
 	protected boolean onElementClick(BookScreen parent, int index, int button) {
 		if (index < references.length) {
-			PlayerEntity player = (PlayerEntity) NostrumMagica.instance.proxy.getPlayer();
+			Player player = (Player) NostrumMagica.instance.proxy.getPlayer();
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr == null)
 				return false;

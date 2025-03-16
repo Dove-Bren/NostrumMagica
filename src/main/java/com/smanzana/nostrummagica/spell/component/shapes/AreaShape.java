@@ -13,10 +13,10 @@ import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
 /**
  * Abstract trigger that waits for entities to be in an area and then applies the spell to them.
@@ -32,8 +32,8 @@ public abstract class AreaShape extends SpellShape implements ISelectableShape {
 		private static final int NUM_TICKS = (20 * 20) / TICK_RATE; // 20 seconds
 		private static final int GROUND_TICK_CYCLES = (20 * 4) / TICK_RATE;
 
-		protected final World world;
-		protected final Vector3d pos;
+		protected final Level world;
+		protected final Vec3 pos;
 		protected final int tickRate;
 		protected final int duration;
 		private final boolean continuous;
@@ -46,7 +46,7 @@ public abstract class AreaShape extends SpellShape implements ISelectableShape {
 		private boolean dead;
 		private Map<LivingEntity, Integer> affected; // maps to time last effect visited
 		
-		public AreaShapeInstance(ISpellState state, World world, Vector3d pos, int tickRate, int duration, float radiusHint, boolean continuous, boolean affectsEnts, boolean affectsGround, SpellCharacteristics characteristics) {
+		public AreaShapeInstance(ISpellState state, Level world, Vec3 pos, int tickRate, int duration, float radiusHint, boolean continuous, boolean affectsEnts, boolean affectsGround, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.pos = pos;
@@ -63,7 +63,7 @@ public abstract class AreaShape extends SpellShape implements ISelectableShape {
 		}
 		
 		protected abstract boolean isInArea(LivingEntity entity);
-		protected abstract boolean isInArea(World world, BlockPos pos);
+		protected abstract boolean isInArea(Level world, BlockPos pos);
 		
 		@Override
 		public void spawn(LivingEntity caster) {
@@ -86,7 +86,7 @@ public abstract class AreaShape extends SpellShape implements ISelectableShape {
 				
 				if (affectsGround && aliveCycles % GROUND_TICK_CYCLES == 0) {
 					// check all blocks in -radius,-radius,-radius <-> radius,radius,radius
-					BlockPos.Mutable cursor = new BlockPos.Mutable();
+					BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 					List<SpellLocation> list = Lists.newArrayList();
 					for (int i = -(int)radiusHint; i <= radiusHint; i++)
 					for (int j = -(int)radiusHint; j <= radiusHint; j++)

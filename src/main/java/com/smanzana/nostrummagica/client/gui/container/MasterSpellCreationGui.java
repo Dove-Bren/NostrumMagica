@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
@@ -30,21 +30,21 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.ClickType;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -98,7 +98,7 @@ public class MasterSpellCreationGui {
 	
 	private static final int MANA_VOFFSET = 99;
 	
-	public static class SpellCreationContainer extends Container {
+	public static class SpellCreationContainer extends AbstractContainerMenu {
 		
 		public static final String ID = "spell_creation";
 		
@@ -108,17 +108,17 @@ public class MasterSpellCreationGui {
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
 		protected final SpellTableTileEntity inventory;
-		protected final PlayerEntity player;
+		protected final Player player;
 		protected boolean isValid; // has an acceptable scroll
 		protected boolean spellValid; // grammer checks out
-		protected List<ITextComponent> spellErrorStrings; // Updated on validate(); what's wrong?
-		protected List<ITextComponent> reagentStrings; // Updated on validate; what reagents will be used. Only filled if successful
+		protected List<Component> spellErrorStrings; // Updated on validate(); what's wrong?
+		protected List<Component> reagentStrings; // Updated on validate; what reagents will be used. Only filled if successful
 		protected String name;
 		protected int iconIndex; // -1 indicates none has been selected yet
 		protected int lastManaCost;
 		protected int lastWeight;
 		
-		public SpellCreationContainer(int windowId, PlayerEntity crafter, PlayerInventory playerInv, SpellTableTileEntity tableInventory) {
+		public SpellCreationContainer(int windowId, Player crafter, Inventory playerInv, SpellTableTileEntity tableInventory) {
 			super(NostrumContainers.SpellCreationMaster, windowId);
 			this.inventory = tableInventory;
 			this.player = crafter;
@@ -143,7 +143,7 @@ public class MasterSpellCreationGui {
 				}
 				
 				@Override
-				public ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
+				public ItemStack onTake(Player playerIn, ItemStack stack) {
 					validate();
 					
 					return super.onTake(playerIn, stack);
@@ -184,7 +184,7 @@ public class MasterSpellCreationGui {
 					}
 					
 					@Override
-					public @Nonnull ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
+					public @Nonnull ItemStack onTake(Player playerIn, ItemStack stack) {
 						validate();
 						
 						return super.onTake(playerIn, stack);
@@ -214,7 +214,7 @@ public class MasterSpellCreationGui {
 			
 		}
 		
-		public static final SpellCreationContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buffer) {
+		public static final SpellCreationContainer FromNetwork(int windowId, Inventory playerInv, FriendlyByteBuf buffer) {
 			return new SpellCreationContainer(windowId, playerInv.player, playerInv, ContainerUtil.GetPackedTE(buffer));
 		}
 		
@@ -224,7 +224,7 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		public boolean stillValid(PlayerEntity playerIn) {
+		public boolean stillValid(Player playerIn) {
 			return true;
 		}
 		
@@ -237,7 +237,7 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, PlayerEntity player) {
+		public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
 			ItemStack ret = super.clicked(slotId, dragType, clickTypeIn, player);
 			
 			isValid = false;
@@ -249,7 +249,7 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		public ItemStack quickMoveStack(PlayerEntity playerIn, int fromSlot) {
+		public ItemStack quickMoveStack(Player playerIn, int fromSlot) {
 			Slot slot = (Slot) this.slots.get(fromSlot);
 			
 			if (slot != null && slot.hasItem()) {
@@ -389,8 +389,8 @@ public class MasterSpellCreationGui {
 			return spell;
 		}
 		
-		public static Spell craftSpell(String name, int iconIdx, SpellTableTileEntity inventory, PlayerEntity crafter,
-				List<ITextComponent> spellErrorStrings, List<ITextComponent> reagentStrings,
+		public static Spell craftSpell(String name, int iconIdx, SpellTableTileEntity inventory, Player crafter,
+				List<Component> spellErrorStrings, List<Component> reagentStrings,
 				boolean deductReagents) {
 			boolean fail = false;
 			//INostrumMagic attr = NostrumMagica.getMagicWrapper(crafter);
@@ -399,17 +399,17 @@ public class MasterSpellCreationGui {
 			reagentStrings.clear();
 			
 			if (locked) {
-				spellErrorStrings.add(new StringTextComponent("The runes on the board don't respond to your hands"));
+				spellErrorStrings.add(new TextComponent("The runes on the board don't respond to your hands"));
 				return null;
 			}
 			
 			if (name.trim().isEmpty()) {
-				spellErrorStrings.add(new StringTextComponent("Must have a name"));
+				spellErrorStrings.add(new TextComponent("Must have a name"));
 				fail = true;
 			}
 			
 			if (iconIdx < 0) {
-				spellErrorStrings.add(new StringTextComponent("Must have a spell icon selected"));
+				spellErrorStrings.add(new TextComponent("Must have a spell icon selected"));
 				fail = true;
 			}
 
@@ -418,7 +418,7 @@ public class MasterSpellCreationGui {
 			if (!SpellCrafting.CheckForValidRunes(context, inventory, 1, inventory.getReagentSlotIndex()-1, rawSpellErrors)) {
 				// Dump raw errors into output strings and return
 				for (String error : rawSpellErrors) {
-					spellErrorStrings.add(new StringTextComponent(error));
+					spellErrorStrings.add(new TextComponent(error));
 				}
 				return null;
 			}
@@ -433,7 +433,7 @@ public class MasterSpellCreationGui {
 			if (spell == null) {
 				// Dump raw errors into output strings and return
 				for (String error : rawSpellErrors) {
-					spellErrorStrings.add(new StringTextComponent(error));
+					spellErrorStrings.add(new TextComponent(error));
 				}
 				return null;
 			}
@@ -449,10 +449,10 @@ public class MasterSpellCreationGui {
 				
 				int left = takeReagent(inventory, type, count, false);
 				if (left != 0) {
-					spellErrorStrings.add(new StringTextComponent("Need " + left + " more " + type.prettyName()));
+					spellErrorStrings.add(new TextComponent("Need " + left + " more " + type.prettyName()));
 					fail = true;
 				} else {
-					reagentStrings.add(new StringTextComponent(count + " " + type.prettyName()));
+					reagentStrings.add(new TextComponent(count + " " + type.prettyName()));
 				}
 				
 			}
@@ -473,7 +473,7 @@ public class MasterSpellCreationGui {
 					int left = takeReagent(inventory, type, count, true);
 					if (left != 0) {
 						System.out.println("Couldn't take all " + type.name());
-						spellErrorStrings.add(new StringTextComponent("Need " + left + " more " + type.prettyName()));
+						spellErrorStrings.add(new TextComponent("Need " + left + " more " + type.prettyName()));
 						return null;
 					}
 					
@@ -528,7 +528,7 @@ public class MasterSpellCreationGui {
 			private SpellGui gui;
 			
 			public SpellIconButton(int x, int y, int val, SpellGui gui) {
-				super(x, y, ICON_BUTTON_LENGTH, ICON_BUTTON_LENGTH, StringTextComponent.EMPTY, (b) -> {
+				super(x, y, ICON_BUTTON_LENGTH, ICON_BUTTON_LENGTH, TextComponent.EMPTY, (b) -> {
 					gui.iconButtonClicked(b);
 				});
 				this.value = val;
@@ -538,7 +538,7 @@ public class MasterSpellCreationGui {
 			}
 			
 			@Override
-			public void render(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
 				float tint = 1f;
 				mc.getTextureManager().bind(TEXT);
@@ -564,16 +564,16 @@ public class MasterSpellCreationGui {
 
 		private SpellCreationContainer container;
 		private List<SpellIconButton> buttons;
-		private TextFieldWidget nameField;
-		private Rectangle2d iconArea;
+		private EditBox nameField;
+		private Rect2i iconArea;
 		
-		public SpellGui(SpellCreationContainer container, PlayerInventory playerInv, ITextComponent name) {
+		public SpellGui(SpellCreationContainer container, Inventory playerInv, Component name) {
 			super(container, playerInv, name);
 			this.container = container;
 			this.imageWidth = GUI_WIDTH;
 			this.imageHeight = GUI_HEIGHT;
 			final Minecraft mc = Minecraft.getInstance();
-			this.nameField = new TextFieldWidget(mc.font, 0, 0, NAME_WIDTH, NAME_HEIGHT, new StringTextComponent(container.name));
+			this.nameField = new EditBox(mc.font, 0, 0, NAME_WIDTH, NAME_HEIGHT, new TextComponent(container.name));
 			this.nameField.setMaxLength(NAME_MAX);
 			this.nameField.setResponder((s) -> {
 				container.name = s;
@@ -602,7 +602,7 @@ public class MasterSpellCreationGui {
 			final int perRow = spaceWidth / ICON_BUTTON_LENGTH;
 			extraMargin += (spaceWidth % ICON_BUTTON_LENGTH) / 2; // Center by adding remainder / 2
 			
-			iconArea = new Rectangle2d(extraMargin, verticalMargin, horizontalMargin - extraMargin, ((SpellIcon.numIcons / perRow) + 1) * ICON_BUTTON_LENGTH);
+			iconArea = new Rect2i(extraMargin, verticalMargin, horizontalMargin - extraMargin, ((SpellIcon.numIcons / perRow) + 1) * ICON_BUTTON_LENGTH);
 			for (int i = 0; i < SpellIcon.numIcons; i++) {
 				SpellIconButton button = new SpellIconButton(
 						extraMargin + (i % perRow) * ICON_BUTTON_LENGTH,
@@ -621,7 +621,7 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+		protected void renderBg(PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
@@ -658,7 +658,7 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			
 			if (container.isValid) {
 				int horizontalMargin = (width - imageWidth) / 2;
@@ -767,7 +767,7 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		public List<Rectangle2d> getGuiExtraAreas() {
+		public List<Rect2i> getGuiExtraAreas() {
 			return Lists.newArrayList(iconArea);
 		}
 	}
@@ -782,7 +782,7 @@ public class MasterSpellCreationGui {
 		private RuneSlot next;
 		private SpellCreationContainer container;
 		
-		public RuneSlot(SpellCreationContainer container, RuneSlot prev, IInventory inventoryIn, int index, int x, int y) {
+		public RuneSlot(SpellCreationContainer container, RuneSlot prev, Container inventoryIn, int index, int x, int y) {
 			super(inventoryIn, index, x, y);
 			this.prev = prev;
 			this.container = container;
@@ -835,7 +835,7 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		public @Nonnull ItemStack onTake(PlayerEntity playerIn, ItemStack stack) {
+		public @Nonnull ItemStack onTake(Player playerIn, ItemStack stack) {
 			// This is called AFTER things have been changed or swapped
 			// Which means we just look to see if we have an item.
 			// If not, take item from next

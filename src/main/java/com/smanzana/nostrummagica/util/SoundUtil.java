@@ -1,11 +1,11 @@
 package com.smanzana.nostrummagica.util;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.ISound;
+import net.minecraft.client.resources.sounds.SoundInstance;
 
 public class SoundUtil {
 
-	public static final void stopSound(ISound sound) {
+	public static final void stopSound(SoundInstance sound) {
 		Minecraft.getInstance().getSoundManager().stop(sound);
 		
 		// TODO is this still real?

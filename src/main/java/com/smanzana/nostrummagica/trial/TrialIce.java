@@ -4,13 +4,13 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.MinecraftForge;
@@ -26,7 +26,7 @@ public class TrialIce extends WorldTrial {
 
 	@SubscribeEvent
 	public void onDeath(LivingDeathEvent e) {
-		if (e.getEntityLiving() instanceof PlayerEntity) {
+		if (e.getEntityLiving() instanceof Player) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(e.getEntityLiving());
 			if (attr == null || !attr.isUnlocked())
 				return;
@@ -37,15 +37,15 @@ public class TrialIce extends WorldTrial {
 			if (e.getSource() != DamageSource.DROWN)
 				return;
 			
-			Vector3d pos = e.getEntityLiving().position();
+			Vec3 pos = e.getEntityLiving().position();
 			Biome biome = e.getEntityLiving().level.getBiome(
 					new BlockPos(pos.x, pos.y, pos.z));
-			RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName());
+			ResourceKey<Biome> biomeKey = ResourceKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName());
 			
 			if (!BiomeDictionary.hasType(biomeKey, Type.COLD))
 				return;
 			
-			this.complete((PlayerEntity) e.getEntityLiving());
+			this.complete((Player) e.getEntityLiving());
 		}
 	}
 	

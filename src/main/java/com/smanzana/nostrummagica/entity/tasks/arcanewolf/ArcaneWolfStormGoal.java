@@ -9,13 +9,13 @@ import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.ArcaneWolfElementalTyp
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.TameLightning;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.monster.CreeperEntity;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.server.level.ServerLevel;
 
-import net.minecraft.entity.ai.goal.Goal.Flag;
+import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 public class ArcaneWolfStormGoal extends Goal {
 
@@ -45,7 +45,7 @@ public class ArcaneWolfStormGoal extends Goal {
 				&& wolf.tickCount >= cooldownTicks
 				&& wolf.getMana() >= manaCost
 				&& wolf.getElementalType() == ArcaneWolfElementalType.STORM
-				&& !(wolf.getTarget() instanceof CreeperEntity);
+				&& !(wolf.getTarget() instanceof Creeper);
 	}
 	
 	@Override
@@ -80,7 +80,7 @@ public class ArcaneWolfStormGoal extends Goal {
 	
 	protected void blastEntity(ArcaneWolfEntity wolf, LivingEntity target) {
 		for (int i = 0; i < 2; i++) {
-			((ServerWorld) target.level).addFreshEntity(
+			((ServerLevel) target.level).addFreshEntity(
 					(new TameLightning(NostrumEntityTypes.tameLightning, target.level,
 							target.getX() + (wolf.getRandom().nextFloat()-.5f),
 							target.getY(),

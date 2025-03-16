@@ -2,19 +2,19 @@ package com.smanzana.nostrummagica.spell;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceContext.BlockMode;
-import net.minecraft.util.math.RayTraceContext.FluidMode;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.ClipContext.Block;
+import net.minecraft.world.level.ClipContext.Fluid;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 
 public class SpellTeleportation {
 	
-	private static final boolean isPassable(World world, BlockPos pos) {
+	private static final boolean isPassable(Level world, BlockPos pos) {
 		if (world.isEmptyBlock(pos))
 			return true;
 		
@@ -30,13 +30,13 @@ public class SpellTeleportation {
 		return false;
 	}
 	
-	protected static final @Nullable Vector3d BlinkNoPassthrough(Entity entity, Vector3d source, Vector3d idealDestination) {
-		Vector3d dest = null;
-		RayTraceResult mop = entity.level.clip(new RayTraceContext(source, idealDestination, BlockMode.COLLIDER, FluidMode.NONE, entity));
+	protected static final @Nullable Vec3 BlinkNoPassthrough(Entity entity, Vec3 source, Vec3 idealDestination) {
+		Vec3 dest = null;
+		HitResult mop = entity.level.clip(new ClipContext(source, idealDestination, Block.COLLIDER, Fluid.NONE, entity));
 		if (mop != null && mop.getLocation().distanceTo(source) > 0.5) {
 			// We got one
 			BlockPos pos;
-			if (mop.getType() == RayTraceResult.Type.BLOCK) {
+			if (mop.getType() == HitResult.Type.BLOCK) {
 				SpellLocation hitLoc = new SpellLocation(entity.level, mop);
 				pos = hitLoc.hitBlockPos;
 			} else {
@@ -49,17 +49,17 @@ public class SpellTeleportation {
 			}
 			
 			if (isPassable(entity.level, pos) && isPassable(entity.level, pos.offset(0, 1, 0))) {
-				dest = Vector3d.atCenterOf(pos);
+				dest = Vec3.atCenterOf(pos);
 			}
 		}
 		return dest;
 	}
 	
-	protected static final @Nullable Vector3d BlinkPassthrough(Entity entity, Vector3d source, Vector3d idealDestination) {
+	protected static final @Nullable Vec3 BlinkPassthrough(Entity entity, Vec3 source, Vec3 idealDestination) {
 		int i = 4; // Attempt raytrace from (20% * i * pathlength)
-		Vector3d dest = null;
-		Vector3d translation = idealDestination.subtract(source);
-		Vector3d from;
+		Vec3 dest = null;
+		Vec3 translation = idealDestination.subtract(source);
+		Vec3 from;
 		double curDist;
 		while (i >= 0) {
 			if (i == 0) {
@@ -67,7 +67,7 @@ public class SpellTeleportation {
 				from = source;
 			} else {
 				curDist = (.2 * i);
-				from = new Vector3d(translation.x * curDist,
+				from = new Vec3(translation.x * curDist,
 						translation.y * curDist,
 						translation.z * curDist);
 				from = source.add(from);
@@ -84,10 +84,10 @@ public class SpellTeleportation {
 		return dest;
 	}
 
-	public static final @Nullable Vector3d Blink(Entity entity, Vector3d source, Vector3d direction, double dist, boolean passthrough) {
-		Vector3d dest;
+	public static final @Nullable Vec3 Blink(Entity entity, Vec3 source, Vec3 direction, double dist, boolean passthrough) {
+		Vec3 dest;
 		BlockPos bpos;
-		Vector3d translation = new Vector3d(direction.x * dist,
+		Vec3 translation = new Vec3(direction.x * dist,
 				direction.y * dist,
 				direction.z * dist);
 		

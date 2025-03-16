@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.spell;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.EntityDamageSource;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class MagicDamageSource extends EntityDamageSource {
 	
@@ -22,17 +22,17 @@ public class MagicDamageSource extends EntityDamageSource {
 	}
 	
 	@Override
-	public ITextComponent getLocalizedDeathMessage(LivingEntity entityLivingBaseIn) {
+	public Component getLocalizedDeathMessage(LivingEntity entityLivingBaseIn) {
 		final String untranslated;
-		final ITextComponent extraName;
+		final Component extraName;
 		if (this.entity != null) {
 			untranslated = "death.attack.magic.attacker." + element.name();
 			extraName = this.entity.getDisplayName();
 		} else {
 			untranslated = "death.attack.magic." + element.name();
-			extraName = StringTextComponent.EMPTY;
+			extraName = TextComponent.EMPTY;
 		}
-        return new TranslationTextComponent(untranslated, entityLivingBaseIn.getDisplayName(), extraName);
+        return new TranslatableComponent(untranslated, entityLivingBaseIn.getDisplayName(), extraName);
     }
 
 	public EMagicElement getElement() {

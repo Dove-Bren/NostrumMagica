@@ -24,20 +24,20 @@ import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTier;
-import net.minecraft.item.SwordItem;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -52,7 +52,7 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 	private static final String NBT_CHARGES = "charges";
 	
 	public MageBlade() {
-		super(ItemTier.DIAMOND, 3, -2.0F, NostrumItems.PropEquipment());
+		super(Tiers.DIAMOND, 3, -2.0F, NostrumItems.PropEquipment());
 	}
 	
 	public @Nullable EMagicElement getElement(ItemStack stack) {
@@ -74,9 +74,9 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 			return;
 		}
 		
-		CompoundNBT tag = stack.getTag();
+		CompoundTag tag = stack.getTag();
 		if (tag == null) {
-			tag = new CompoundNBT();
+			tag = new CompoundTag();
 		}
 		
 		if (element == null) {
@@ -103,9 +103,9 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 			return;
 		}
 		
-		CompoundNBT tag = stack.getTag();
+		CompoundTag tag = stack.getTag();
 		if (tag == null) {
-			tag = new CompoundNBT();
+			tag = new CompoundTag();
 		}
 		
 		if (charges <= 0) {
@@ -118,10 +118,10 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot equipmentSlot) {
 		Multimap<Attribute, AttributeModifier> multimap = super.getDefaultAttributeModifiers(equipmentSlot);//HashMultimap.<String, AttributeModifier>create();
 
-		if (equipmentSlot == EquipmentSlotType.MAINHAND || equipmentSlot == EquipmentSlotType.OFFHAND) {
+		if (equipmentSlot == EquipmentSlot.MAINHAND || equipmentSlot == EquipmentSlot.OFFHAND) {
 			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 			builder.putAll(multimap);
 			builder.put(NostrumAttributes.magicPotency, new AttributeModifier(MAGEBLADE_POTENCY_UUID, "Potency modifier", 10, AttributeModifier.Operation.ADDITION));
@@ -171,22 +171,22 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 		// We provide -10% reagent cost, +20% potency
 		summary.addReagentCost(-.1f);
 		//summary.addEfficiency(.2f);
-		ItemStacks.damageItem(stack, caster, caster.getItemInHand(Hand.MAIN_HAND) == stack ? Hand.MAIN_HAND : Hand.OFF_HAND, 1);
+		ItemStacks.damageItem(stack, caster, caster.getItemInHand(InteractionHand.MAIN_HAND) == stack ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND, 1);
 	}
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		//tooltip.add("Magic Potency Bonus: 20%");
-		tooltip.add(new StringTextComponent("Reagent Cost Discount: 10%"));
+		tooltip.add(new TextComponent("Reagent Cost Discount: 10%"));
 	}
 	
 	protected void doEffect(LivingEntity entity, EMagicElement element) {
 		NostrumParticles.GLOW_ORB.spawn(entity.level, new SpawnParams(
 				3,
 				entity.getX(), entity.getY() + entity.getBbHeight(), entity.getZ(), 1, 30, 5,
-				new Vector3d(0, -0.05, 0), null
+				new Vec3(0, -0.05, 0), null
 				).color(0x80000000 | (0x00FFFFFF & element.getColor())));
 		NostrumMagicaSounds.DAMAGE_FIRE.play(entity);
 	}
@@ -241,7 +241,7 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static final float ModelElement(ItemStack stack, @Nullable World worldIn, @Nullable LivingEntity entityIn) {
+	public static final float ModelElement(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn) {
 		final EMagicElement elem = ((MageBlade) stack.getItem()).getElement(stack);
 		if (elem == null) {
 			return 0;

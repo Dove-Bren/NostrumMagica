@@ -9,9 +9,9 @@ import com.smanzana.nostrummagica.entity.dragon.DragonGambit;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.spell.Spell;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
 
 // Extend with some way to get gambits and spells, silly!
 public abstract class DragonGambittedSpellAttackGoal<T extends DragonEntity & ITameDragon> extends Goal {

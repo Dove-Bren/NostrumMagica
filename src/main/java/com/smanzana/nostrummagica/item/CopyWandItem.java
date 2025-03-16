@@ -10,19 +10,19 @@ import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.autodungeons.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -33,7 +33,7 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 	
 	private @Nullable Blueprint blueprint;
 	
-	private @Nullable World selectWorld;
+	private @Nullable Level selectWorld;
 	private @Nullable BlockPos select1;
 	private @Nullable BlockPos select2;
 	
@@ -43,37 +43,37 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
-		tooltip.add(new StringTextComponent("For Creative Singleplayer Use"));
+		tooltip.add(new TextComponent("For Creative Singleplayer Use"));
 		if (Screen.hasShiftDown()) {
-			tooltip.add(new StringTextComponent("Select bounds to copy with right-click."));
-			tooltip.add(new StringTextComponent("Shift-right-click to capture or spawn."));
+			tooltip.add(new TextComponent("Select bounds to copy with right-click."));
+			tooltip.add(new TextComponent("Shift-right-click to capture or spawn."));
 		}
 	}
 	
 	@Override
-	public ActionResultType useOn(ItemUseContext context) {
-		final World world = context.getLevel();
+	public InteractionResult useOn(UseOnContext context) {
+		final Level world = context.getLevel();
 		final BlockPos pos = context.getClickedPos();
-		final PlayerEntity player = context.getPlayer();
+		final Player player = context.getPlayer();
 		
 		if (world.isClientSide)
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		
 		if (FMLEnvironment.dist == Dist.DEDICATED_SERVER) {
-			player.sendMessage(new StringTextComponent("This item only works in single player"), Util.NIL_UUID);
-			return ActionResultType.FAIL;
+			player.sendMessage(new TextComponent("This item only works in single player"), Util.NIL_UUID);
+			return InteractionResult.FAIL;
 		}
 		
 		if (pos == null)
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		
 		if (player == null || !player.isCreative()) {
 			if (player != null) {
-				player.sendMessage(new StringTextComponent("You must be in creative to use this item"), Util.NIL_UUID);
+				player.sendMessage(new TextComponent("You must be in creative to use this item"), Util.NIL_UUID);
 			}
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
 		// Handle selection and spawning based on shift
@@ -113,41 +113,41 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 			blueprint = null;
 		}
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override
-	public boolean hasBlueprint(PlayerEntity player, ItemStack stack) {
+	public boolean hasBlueprint(Player player, ItemStack stack) {
 		return this.blueprint != null;
 	}
 
 	@Override
-	public boolean shouldDisplayBlueprint(PlayerEntity player, ItemStack stack, BlockPos pos) {
+	public boolean shouldDisplayBlueprint(Player player, ItemStack stack, BlockPos pos) {
 		return player.isShiftKeyDown() && player.isCreative();
 	}
 
 	@Override
-	public IBlueprint getBlueprint(PlayerEntity player, ItemStack stack, BlockPos pos) {
+	public IBlueprint getBlueprint(Player player, ItemStack stack, BlockPos pos) {
 		return blueprint;
 	}
 
 	@Override
-	public boolean shouldRenderSelection(PlayerEntity player, ItemStack stack) {
+	public boolean shouldRenderSelection(Player player, ItemStack stack) {
 		return player.isCreative() && select1 != null && DimensionUtils.SameDimension(selectWorld, player.level);
 	}
 
 	@Override
-	public BlockPos getAnchor(PlayerEntity player, ItemStack stack) {
+	public BlockPos getAnchor(Player player, ItemStack stack) {
 		return select1;
 	}
 
 	@Override
-	public BlockPos getBoundingPos(PlayerEntity player, ItemStack stack) {
+	public BlockPos getBoundingPos(Player player, ItemStack stack) {
 		return select2;
 	}
 
 	@Override
-	public boolean isSelectionValid(PlayerEntity player, ItemStack selectionStack) {
+	public boolean isSelectionValid(Player player, ItemStack selectionStack) {
 		final int size = Math.abs(select1.getX() - select2.getX())
 				* Math.abs(select1.getY() - select2.getY())
 				* Math.abs(select1.getZ() - select1.getZ());

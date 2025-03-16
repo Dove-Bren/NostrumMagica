@@ -32,14 +32,14 @@ import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 
 /**
  * Default implementation of the INostrumMagic interface
@@ -133,10 +133,10 @@ public class NostrumMagic implements INostrumMagic {
 	private List<String> completedResearch;
 	private Set<Skill> skills;
 	private BlockPos markLocation;
-	private RegistryKey<World> markDimension;
+	private ResourceKey<Level> markDimension;
 	private boolean enhancedTeleport;
 	private Map<EMagicElement, Map<EAlteration, Boolean>> spellKnowledge;
-	private RegistryKey<World> sorceryPortalDim;
+	private ResourceKey<Level> sorceryPortalDim;
 	private BlockPos sorceryPortalPos;
 	private @Nullable VanillaRespawnInfo savedRespawnInfo;
 	private Map<TransmuteKnowledge, Boolean> transmuteKnowledge;
@@ -156,7 +156,7 @@ public class NostrumMagic implements INostrumMagic {
 		completedQuests = new ArrayList<>();
 		completedResearch = new ArrayList<>();
 		familiars = new ArrayList<>();
-		sorceryPortalDim = World.OVERWORLD;
+		sorceryPortalDim = Level.OVERWORLD;
 		sorceryPortalPos = null;
 		savedRespawnInfo = null;
 		enhancedTeleport = false;
@@ -210,8 +210,8 @@ public class NostrumMagic implements INostrumMagic {
 		}
 		this.tier = tier;
 		
-		if (this.entity != null && this.entity instanceof ServerPlayerEntity) {
-			TierCriteriaTrigger.Instance.trigger((ServerPlayerEntity) this.entity, tier);
+		if (this.entity != null && this.entity instanceof ServerPlayer) {
+			TierCriteriaTrigger.Instance.trigger((ServerPlayer) this.entity, tier);
 		}
 	}
 	
@@ -337,8 +337,8 @@ public class NostrumMagic implements INostrumMagic {
 		final int startingMana = this.mana;
 		this.mana = Math.max(0, Math.min(this.mana + mana, this.getMaxMana()));
 		if (startingMana > this.mana) {
-			if (entity != null && entity instanceof PlayerEntity) {
-				PlayerStatTracker.Update((PlayerEntity) entity, (stats) -> stats.addStat(PlayerStat.ManaSpentTotal, startingMana - this.mana));
+			if (entity != null && entity instanceof Player) {
+				PlayerStatTracker.Update((Player) entity, (stats) -> stats.addStat(PlayerStat.ManaSpentTotal, startingMana - this.mana));
 			}
 		}
 	}
@@ -366,8 +366,8 @@ public class NostrumMagic implements INostrumMagic {
 	public void addReservedMana(int reserved) {
 		// Bound between 0 and max mana
 		this.reservedMana = Math.max(0, Math.min(this.getMaxMana(), this.reservedMana + reserved));
-		if (mana < 0 && entity != null && entity instanceof PlayerEntity) {
-			PlayerStatTracker.Update((PlayerEntity) entity, (stats) -> stats.takeMax(PlayerStat.MaxReservedMana, this.reservedMana));
+		if (mana < 0 && entity != null && entity instanceof Player) {
+			PlayerStatTracker.Update((Player) entity, (stats) -> stats.takeMax(PlayerStat.MaxReservedMana, this.reservedMana));
 		}
 	}
 
@@ -456,10 +456,10 @@ public class NostrumMagic implements INostrumMagic {
 //			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
 //		}
 		
-		if (entity != null && entity instanceof PlayerEntity && !entity.level.isClientSide) {
+		if (entity != null && entity instanceof Player && !entity.level.isClientSide) {
 			NetworkHandler.sendTo(
 					new LoreMessage(tagged, this),
-					(ServerPlayerEntity) entity);
+					(ServerPlayer) entity);
 			
 		}
 	}
@@ -477,10 +477,10 @@ public class NostrumMagic implements INostrumMagic {
 //			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
 //		}
 		
-		if (entity != null && entity instanceof PlayerEntity && !entity.level.isClientSide) {
+		if (entity != null && entity instanceof Player && !entity.level.isClientSide) {
 			NetworkHandler.sendTo(
 					new LoreMessage(tagged, this),
-					(ServerPlayerEntity) entity);
+					(ServerPlayer) entity);
 			
 		}
 		
@@ -523,9 +523,9 @@ public class NostrumMagic implements INostrumMagic {
 		
 		if (mastery != EElementalMastery.UNKNOWN) {
 			if (this.entity != null && !this.entity.level.isClientSide
-					&& this.entity instanceof PlayerEntity) {
-				PlayerEntity player = (PlayerEntity) this.entity;
-				player.sendMessage(new TranslationTextComponent("info.element_mastery." + mastery.getTranslationKey(), element.getName()), Util.NIL_UUID);
+					&& this.entity instanceof Player) {
+				Player player = (Player) this.entity;
+				player.sendMessage(new TranslatableComponent("info.element_mastery." + mastery.getTranslationKey(), element.getName()), Util.NIL_UUID);
 			}
 		}
 		
@@ -673,12 +673,12 @@ public class NostrumMagic implements INostrumMagic {
 	}
 	
 	@Override
-	public RegistryKey<World> getMarkDimension() {
+	public ResourceKey<Level> getMarkDimension() {
 		return markDimension;
 	}
 	
 	@Override
-	public void setMarkLocation(RegistryKey<World> dimension, BlockPos pos) {
+	public void setMarkLocation(ResourceKey<Level> dimension, BlockPos pos) {
 		this.markDimension = dimension;
 		this.markLocation = pos;
 	}
@@ -829,8 +829,8 @@ public class NostrumMagic implements INostrumMagic {
 		}
 		
 		Boolean old = map.put(alteration, true);
-		if ((old == null || !old) && entity != null && entity instanceof PlayerEntity) {
-			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) entity);
+		if ((old == null || !old) && entity != null && entity instanceof Player) {
+			NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) entity);
 		}
 	}
 	
@@ -840,7 +840,7 @@ public class NostrumMagic implements INostrumMagic {
 	}
 	
 	@Override
-	public RegistryKey<World> getSorceryPortalDimension() {
+	public ResourceKey<Level> getSorceryPortalDimension() {
 		return this.sorceryPortalDim;
 	}
 	
@@ -855,7 +855,7 @@ public class NostrumMagic implements INostrumMagic {
 	}
 	
 	@Override
-	public void setSorceryPortalLocation(RegistryKey<World> dimension, BlockPos pos) {
+	public void setSorceryPortalLocation(ResourceKey<Level> dimension, BlockPos pos) {
 		this.sorceryPortalDim = dimension;
 		this.sorceryPortalPos = pos;
 	}
@@ -881,7 +881,7 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public void refresh(ServerPlayerEntity player) {
+	public void refresh(ServerPlayer player) {
 //		// Capture current mana to avoid having to always regen bonus
 //		final int startingMana = this.getMana();
 //		

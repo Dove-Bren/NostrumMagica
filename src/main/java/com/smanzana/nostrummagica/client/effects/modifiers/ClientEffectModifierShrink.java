@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.effects.modifiers;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.client.effects.ClientEffect.ClientEffectRenderDetail;
 
 import net.minecraftforge.api.distmarker.Dist;
@@ -30,7 +30,7 @@ public class ClientEffectModifierShrink implements ClientEffectModifier {
 	}
 	
 	@Override
-	public void apply(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
+	public void apply(PoseStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		if (progress > this.plateau) {
 			// Stage 1
 			final float frac = Math.min(1f, (progress - plateau) / (1f - plateau));
@@ -46,7 +46,7 @@ public class ClientEffectModifierShrink implements ClientEffectModifier {
 	}
 
 	@Override
-	public void earlyApply(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
+	public void earlyApply(PoseStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {
 		;
 	}
 

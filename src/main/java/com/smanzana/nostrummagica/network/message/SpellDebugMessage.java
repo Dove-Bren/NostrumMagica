@@ -6,13 +6,13 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * A spell was cast and the server has generated the debug information
@@ -36,17 +36,17 @@ public class SpellDebugMessage {
 	@CapabilityInject(INostrumMagic.class)
 	public static Capability<INostrumMagic> CAPABILITY = null;
 	
-	private final ITextComponent comp;
+	private final Component comp;
 	
-	public SpellDebugMessage(ITextComponent comp) {
+	public SpellDebugMessage(Component comp) {
 		this.comp = comp;
 	}
 
-	public static SpellDebugMessage decode(PacketBuffer buf) {
+	public static SpellDebugMessage decode(FriendlyByteBuf buf) {
 		return new SpellDebugMessage(buf.readComponent());
 	}
 
-	public static void encode(SpellDebugMessage msg, PacketBuffer buf) {
+	public static void encode(SpellDebugMessage msg, FriendlyByteBuf buf) {
 		buf.writeComponent(msg.comp);
 	}
 

@@ -1,12 +1,12 @@
 package com.smanzana.nostrummagica.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.OreBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorldReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.OreBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelReader;
 import net.minecraftforge.common.ToolType;
 
 public class ManiOreBlock extends OreBlock {
@@ -42,7 +42,7 @@ public class ManiOreBlock extends OreBlock {
 //	}
 	
 	@Override
-	public int getExpDrop(BlockState state, IWorldReader world, BlockPos pos, int fortune, int silktouch) {
+	public int getExpDrop(BlockState state, LevelReader world, BlockPos pos, int fortune, int silktouch) {
 		return silktouch == 0 ? RANDOM.nextInt(3) : 0;
 	}
 }

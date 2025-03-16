@@ -11,22 +11,22 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -43,7 +43,7 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 	private static final String NBT_Y = "y";
 	private static final String NBT_Z = "z";
 
-	private static Map<RegistryKey<World>, String> DimensionNames = new HashMap<>();
+	private static Map<ResourceKey<Level>, String> DimensionNames = new HashMap<>();
 
 	public PositionCrystal() {
 		super(NostrumItems.PropUnstackable());
@@ -51,8 +51,8 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 	
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-		RegistryKey<World> dim = getDimension(stack);
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+		ResourceKey<Level> dim = getDimension(stack);
 		BlockPos pos = getBlockPosition(stack);
 		
 		if (pos == null)
@@ -62,15 +62,15 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 		if (dimName == null)
 			dimName = "An Unknown Dimension";
 		
-		tooltip.add(new StringTextComponent("<" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ">").withStyle(TextFormatting.GREEN));
-		tooltip.add(new StringTextComponent(dimName).withStyle(TextFormatting.DARK_GREEN));
+		tooltip.add(new TextComponent("<" + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + ">").withStyle(ChatFormatting.GREEN));
+		tooltip.add(new TextComponent(dimName).withStyle(ChatFormatting.DARK_GREEN));
 	}
 	
 	public static BlockPos getBlockPosition(ItemStack stack) {
 		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return null;
 		
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null)
 			return null;
 		
@@ -91,27 +91,27 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 	 * @param stack
 	 * @return
 	 */
-	public static RegistryKey<World> getDimension(ItemStack stack) {
+	public static ResourceKey<Level> getDimension(ItemStack stack) {
 		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
-			return World.OVERWORLD;
+			return Level.OVERWORLD;
 		
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null)
-			return World.OVERWORLD;
+			return Level.OVERWORLD;
 		
 		return DimensionUtils.GetDimKey(nbt.getString(NBT_DIMENSION));
 	}
 	
-	public static void setPosition(ItemStack stack, RegistryKey<World> dimension, BlockPos pos) {
+	public static void setPosition(ItemStack stack, ResourceKey<Level> dimension, BlockPos pos) {
 		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return;
 		
 		if (pos == null)
 			return;
 		
-		CompoundNBT tag;
+		CompoundTag tag;
 		if (!stack.hasTag())
-			tag = new CompoundNBT();
+			tag = new CompoundTag();
 		else
 			tag = stack.getTag();
 		
@@ -127,7 +127,7 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 		if (stack.isEmpty() || !(stack.getItem() instanceof PositionCrystal))
 			return;
 		
-		CompoundNBT tag;
+		CompoundTag tag;
 		if (!stack.hasTag())
 			return;
 		
@@ -141,32 +141,32 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 	}
 	
 	@Override
-	public ActionResultType useOn(ItemUseContext context) {
-		final World worldIn = context.getLevel();
+	public InteractionResult useOn(UseOnContext context) {
+		final Level worldIn = context.getLevel();
 		final BlockPos pos = context.getClickedPos();
-		final PlayerEntity playerIn = context.getPlayer();
+		final Player playerIn = context.getPlayer();
 		final @Nonnull ItemStack stack = context.getItemInHand();
 		
 		if (worldIn.isClientSide)
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		
 		if (pos == null)
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		
 		setPosition(stack, DimensionUtils.GetDimension(playerIn), pos);
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getItemInHand(hand);
 		
 		if (playerIn.isShiftKeyDown()) {
 			clearPosition(itemStackIn);
-			return new ActionResult<ItemStack>(ActionResultType.SUCCESS, itemStackIn);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
 		}
 		
-		return new ActionResult<ItemStack>(ActionResultType.PASS, itemStackIn);
+		return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStackIn);
 	}
 
 	@Override
@@ -190,7 +190,7 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static String getDimensionName(RegistryKey<World> dim) {
+	public static String getDimensionName(ResourceKey<Level> dim) {
 		if (DimensionNames.containsKey(dim)) {
 			return DimensionNames.get(dim);
 		}
@@ -221,7 +221,7 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 	}
 
 	@Override
-	public boolean shouldRenderSelection(PlayerEntity player, ItemStack stack) {
+	public boolean shouldRenderSelection(Player player, ItemStack stack) {
 		return player.isCreative() && player.isShiftKeyDown()
 				&& !player.getMainHandItem().isEmpty() && player.getMainHandItem().getItem() instanceof PositionCrystal
 				&& !player.getOffhandItem().isEmpty() && player.getOffhandItem().getItem() instanceof PositionCrystal
@@ -233,17 +233,17 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 	}
 
 	@Override
-	public BlockPos getAnchor(PlayerEntity player, ItemStack stack) {
+	public BlockPos getAnchor(Player player, ItemStack stack) {
 		return getBlockPosition(player.getMainHandItem());
 	}
 
 	@Override
-	public BlockPos getBoundingPos(PlayerEntity player, ItemStack stack) {
+	public BlockPos getBoundingPos(Player player, ItemStack stack) {
 		return getBlockPosition(player.getOffhandItem());
 	}
 
 	@Override
-	public boolean isSelectionValid(PlayerEntity player, ItemStack selectionStack) {
+	public boolean isSelectionValid(Player player, ItemStack selectionStack) {
 		return true;
 	}
 }

@@ -8,12 +8,12 @@ import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Client has cast a spell
@@ -27,7 +27,7 @@ public class ClientCastMessage {
 		// cast it if they can
 		ctx.get().setPacketHandled(true);
 		
-		final ServerPlayerEntity sp = ctx.get().getSender();
+		final ServerPlayer sp = ctx.get().getSender();
 		
 		// What spell?
 		Spell spell = NostrumMagica.instance.getSpellRegistry().lookup(
@@ -91,11 +91,11 @@ public class ClientCastMessage {
 		this.tomeId = tomeID;
 	}
 
-	public static ClientCastMessage decode(PacketBuffer buf) {
+	public static ClientCastMessage decode(FriendlyByteBuf buf) {
 		return new ClientCastMessage(buf.readInt(), buf.readBoolean(), buf.readInt());
 	}
 
-		public static void encode(ClientCastMessage msg, PacketBuffer buf) {
+		public static void encode(ClientCastMessage msg, FriendlyByteBuf buf) {
 		buf.writeInt(msg.id);
 		buf.writeBoolean(msg.isScroll);
 		buf.writeInt(msg.tomeId);

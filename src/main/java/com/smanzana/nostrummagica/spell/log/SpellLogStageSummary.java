@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 
 /**
  * Each shape in a spell can trigger multiple times, each time creating a spell log 'stage' with the same idx.

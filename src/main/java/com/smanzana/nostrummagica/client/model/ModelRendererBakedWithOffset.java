@@ -1,9 +1,9 @@
 package com.smanzana.nostrummagica.client.model;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.renderer.model.Model;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.model.Model;
+import net.minecraft.resources.ResourceLocation;
 
 public class ModelRendererBakedWithOffset extends ModelRendererBaked {
 	
@@ -61,7 +61,7 @@ public class ModelRendererBakedWithOffset extends ModelRendererBaked {
 
 	// Made public with AT :)
 	@Override
-	public void translateAndRotate(MatrixStack matrixStackIn) {
+	public void translateAndRotate(PoseStack matrixStackIn) {
 		// Apply offset
 		matrixStackIn.translate(offsetX, offsetY, offsetZ);
 		super.translateAndRotate(matrixStackIn);

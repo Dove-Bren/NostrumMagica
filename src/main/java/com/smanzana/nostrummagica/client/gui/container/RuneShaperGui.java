@@ -6,7 +6,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.widget.FixedWidget;
 import com.smanzana.nostrummagica.item.SpellRune;
@@ -23,21 +23,21 @@ import com.smanzana.nostrummagica.util.ContainerUtil.NoisySlot;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.gui.widget.button.AbstractButton;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -54,22 +54,22 @@ public class RuneShaperGui {
 	private static final int POS_SLOT_INGREDIENT_HOFFSET = 156;
 	private static final int POS_SLOT_INGREDIENT_VOFFSET = 111;
 	
-	public static class RuneShaperContainer extends Container {
+	public static class RuneShaperContainer extends AbstractContainerMenu {
 		
 		public static final String ID = "rune_shaper";
 		
 		// Actual container variables as well as a couple for keeping track
 		// of crafting state
 		protected final RuneShaperTileEntity shaper;
-		protected final Inventory modItemInventory;
+		protected final SimpleContainer modItemInventory;
 		protected final SimpleInventoryContainerlet extraInv;
 		
 		private final HideableSlot ingredientSlot;
 		
-		public RuneShaperContainer(int windowId, PlayerEntity player, IInventory playerInv, RuneShaperTileEntity tableInventory, BlockPos pos, @Nullable IInventory extraInventory) {
+		public RuneShaperContainer(int windowId, Player player, Container playerInv, RuneShaperTileEntity tableInventory, BlockPos pos, @Nullable Container extraInventory) {
 			super(NostrumContainers.RuneShaper, windowId);
 			this.shaper = tableInventory;
-			this.modItemInventory = new Inventory(1);
+			this.modItemInventory = new SimpleContainer(1);
 			
 			// Rune slot
 			this.addSlot(new NoisySlot(shaper, 0, POS_SLOT_INPUT_HOFFSET, POS_SLOT_INPUT_VOFFSET, this::runeChanged));
@@ -89,13 +89,13 @@ public class RuneShaperGui {
 			
 			if (extraInventory != null) {
 				final int height = 88;
-				this.extraInv = new SimpleInventoryContainerlet(this::addSlot, extraInventory, HideableSlot::new, GUI_WIDTH, GUI_HEIGHT	- height, 100, height, new StringTextComponent("Chest"));
+				this.extraInv = new SimpleInventoryContainerlet(this::addSlot, extraInventory, HideableSlot::new, GUI_WIDTH, GUI_HEIGHT	- height, 100, height, new TextComponent("Chest"));
 			} else {
 				this.extraInv = null;
 			}
 		}
 		
-		public static final RuneShaperContainer FromNetwork(int windowId, PlayerInventory playerInv, PacketBuffer buf) {
+		public static final RuneShaperContainer FromNetwork(int windowId, Inventory playerInv, FriendlyByteBuf buf) {
 			RuneShaperTileEntity te = ContainerUtil.GetPackedTE(buf);
 			return new RuneShaperContainer(windowId, playerInv.player, playerInv, te, buf.readBlockPos(), te.getExtraInventory());
 		}
@@ -110,7 +110,7 @@ public class RuneShaperGui {
 		}
 		
 		@Override
-		public @Nonnull ItemStack quickMoveStack(PlayerEntity playerIn, int fromSlot) {
+		public @Nonnull ItemStack quickMoveStack(Player playerIn, int fromSlot) {
 			Slot slot = (Slot) this.slots.get(fromSlot);
 			
 			if (slot != null && slot.hasItem()) {
@@ -170,12 +170,12 @@ public class RuneShaperGui {
 		}
 		
 		@Override
-		public boolean stillValid(PlayerEntity playerIn) {
+		public boolean stillValid(Player playerIn) {
 			return true;
 		}
 		
 		@Override
-		public void removed(PlayerEntity playerIn) {
+		public void removed(Player playerIn) {
 			super.removed(playerIn);
 			this.clearContainer(playerIn, playerIn.level, this.modItemInventory);
 		}
@@ -259,7 +259,7 @@ public class RuneShaperGui {
 			private final RuneShaperGuiContainer gui;
 			
 			public SubmitButton(RuneShaperGuiContainer gui, int x, int y, int width, int height) {
-				super(x, y, width, height, StringTextComponent.EMPTY);
+				super(x, y, width, height, TextComponent.EMPTY);
 				this.gui = gui;
 			}
 
@@ -280,7 +280,7 @@ public class RuneShaperGui {
 			}
 			
 			@Override
-			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final int u;
 				final int v;
 				final int uw;
@@ -313,7 +313,7 @@ public class RuneShaperGui {
 			private final RuneShaperGuiContainer gui;
 			
 			public IngredientSlotWidget(RuneShaperGuiContainer gui, int x, int y, int width, int height) {
-				super(x, y, width, height, StringTextComponent.EMPTY);
+				super(x, y, width, height, TextComponent.EMPTY);
 				this.gui = gui;
 			}
 			
@@ -327,7 +327,7 @@ public class RuneShaperGui {
 			}
 			
 			@Override
-			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				if (!gui.container.ingredientSlot.isActive()) {
 					return;
 				}
@@ -363,7 +363,7 @@ public class RuneShaperGui {
 			private final RuneShaperGuiContainer gui;
 			private final SpellShapeProperty<?> property;
 			
-			public PropertyWidget(RuneShaperGuiContainer gui, SpellShapeProperty<?> property, ITextComponent label, int x, int y, int width, int height) {
+			public PropertyWidget(RuneShaperGuiContainer gui, SpellShapeProperty<?> property, Component label, int x, int y, int width, int height) {
 				super(x, y, width, height, label);
 				this.gui = gui;
 				this.property = property;
@@ -379,7 +379,7 @@ public class RuneShaperGui {
 			}
 			
 			@Override
-			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				int color = 0xFFFFFFFF;
 				if (isSelected()) {
 					color -= 0x004F4F4F;
@@ -410,7 +410,7 @@ public class RuneShaperGui {
 			private final RuneShaperGuiContainer gui;
 			private final int valueIdx;
 			
-			public PropertyValueWidget(RuneShaperGuiContainer gui, int valueIdx, ITextComponent label, int x, int y, int width, int height) {
+			public PropertyValueWidget(RuneShaperGuiContainer gui, int valueIdx, Component label, int x, int y, int width, int height) {
 				super(x, y, width, height, label);
 				this.gui = gui;
 				this.valueIdx = valueIdx;
@@ -426,7 +426,7 @@ public class RuneShaperGui {
 			}
 			
 			@Override
-			public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final int u;
 				final int v;
 				final int uw;
@@ -526,17 +526,17 @@ public class RuneShaperGui {
 
 		private final RuneShaperContainer container;
 		
-		protected final List<Rectangle2d> extraAreas;
+		protected final List<Rect2i> extraAreas;
 		protected @Nullable SimpleInventoryWidget extraInventoryWidget;
 		protected SubmitButton submitButton;
 		
 		private final List<SpellShapeProperty<?>> properties;
 		private @Nullable SpellShapeProperty<?> selectedProperty = null;
 		private int propertyValueIdx = -1;
-		private @Nullable ITextComponent description = null;
+		private @Nullable Component description = null;
 		private ItemStack lastViewedRune = ItemStack.EMPTY;
 		
-		public RuneShaperGuiContainer(RuneShaperContainer container, PlayerInventory playerInv, ITextComponent name) {
+		public RuneShaperGuiContainer(RuneShaperContainer container, Inventory playerInv, Component name) {
 			super(container, playerInv, name);
 			this.container = container;
 			this.imageWidth = GUI_WIDTH;
@@ -553,7 +553,7 @@ public class RuneShaperGui {
 				this.extraInventoryWidget = new SimpleInventoryWidget(this, container.extraInv);
 				this.extraInventoryWidget.setColor(0xFF221F23);
 				// this.addButton(extraInventoryWidget); done later so it can be repeated
-				extraAreas.add(new Rectangle2d(this.getGuiLeft() + container.extraInv.x, this.getGuiTop() + this.container.extraInv.y, this.container.extraInv.width, this.container.extraInv.height));
+				extraAreas.add(new Rect2i(this.getGuiLeft() + container.extraInv.x, this.getGuiTop() + this.container.extraInv.y, this.container.extraInv.width, this.container.extraInv.height));
 			}
 			
 			submitButton = new SubmitButton(this, this.getGuiLeft() + POS_SUBMIT_HOFFSET, this.getGuiTop() + POS_SUBMIT_VOFFSET, POS_SUBMIT_WIDTH, POS_SUBMIT_HEIGHT);
@@ -589,7 +589,7 @@ public class RuneShaperGui {
 			
 			// Add value widgets for configuring the selected property
 			if (shape != null && this.selectedProperty != null) {
-				final ITextComponent[] values = getValuesForProperty(shape, this.selectedProperty);
+				final Component[] values = getValuesForProperty(shape, this.selectedProperty);
 				final int width = POS_VALUE_WIDTH;
 				final int height = POS_VALUE_HEIGHT;
 				final int margin = 20;
@@ -618,9 +618,9 @@ public class RuneShaperGui {
 			return new PropertyWidget(this, property, getPropertyName(shape, property), x, y, w, h);
 		}
 		
-		protected <T> ITextComponent[] getValuesForProperty(SpellShape shape, SpellShapeProperty<T> property) {
+		protected <T> Component[] getValuesForProperty(SpellShape shape, SpellShapeProperty<T> property) {
 			T[] values = property.getPossibleValues();
-			ITextComponent[] ret = new ITextComponent[values.length];
+			Component[] ret = new Component[values.length];
 			
 			for (int i = 0; i < values.length; i++) {
 				ret[i] = property.getDisplayValue(shape, values[i]);
@@ -628,12 +628,12 @@ public class RuneShaperGui {
 			return ret;
 		}
 		
-		protected <T> ITextComponent getPropertyName(SpellShape shape, SpellShapeProperty<T> property) {
+		protected <T> Component getPropertyName(SpellShape shape, SpellShapeProperty<T> property) {
 			return property.getDisplayName(shape);
 		}
 		
 		@Override
-		protected void renderBg(MatrixStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+		protected void renderBg(PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
@@ -656,7 +656,7 @@ public class RuneShaperGui {
 		}
 		
 		@Override
-		protected void renderLabels(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+		protected void renderLabels(PoseStack matrixStackIn, int mouseX, int mouseY) {
 			
 		}
 		
@@ -741,7 +741,7 @@ public class RuneShaperGui {
 		}
 
 		@Override
-		public List<Rectangle2d> getGuiExtraAreas() {
+		public List<Rect2i> getGuiExtraAreas() {
 			return extraAreas;
 		}
 	}

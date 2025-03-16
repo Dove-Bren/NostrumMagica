@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Entity might have a special interaction with the SoulDagger.

@@ -4,34 +4,34 @@ import java.awt.Color;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.autodungeons.util.ColorUtil;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelRendererBakedWithOffset;
 import com.smanzana.nostrummagica.item.armor.KoidHelmet;
 
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.renderer.Atlases;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.PlayerRenderer;
-import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.entity.model.PlayerModel;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.resources.ResourceLocation;
 
-public class LayerKoidHelm extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> {
+public class LayerKoidHelm extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
 	
 	private static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "entity/koid");
 	
 	protected ModelRendererBakedWithOffset model;
 
-	protected static final IVertexBuilder GetBuffer(IRenderTypeBuffer typeBuffer, @Nullable RenderType type) {
+	protected static final VertexConsumer GetBuffer(MultiBufferSource typeBuffer, @Nullable RenderType type) {
 		if (type == null) {
-			type = Atlases.translucentCullBlockSheet();
+			type = Sheets.translucentCullBlockSheet();
 		}
 		
 		return typeBuffer.getBuffer(type);
@@ -43,7 +43,7 @@ public class LayerKoidHelm extends LayerRenderer<AbstractClientPlayerEntity, Pla
 	}
 	
 	@Override
-	public void render(MatrixStack stack, IRenderTypeBuffer typeBuffer, int packedLight, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void render(PoseStack stack, MultiBufferSource typeBuffer, int packedLight, AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
 		if (ShouldRender(player)) {
 			final float period = 20 * 60;
 			final float time = player.tickCount + partialTicks;
@@ -63,7 +63,7 @@ public class LayerKoidHelm extends LayerRenderer<AbstractClientPlayerEntity, Pla
 	}
 	
 	public static boolean ShouldRender(LivingEntity player) {
-		if (player.hasItemInSlot(EquipmentSlotType.HEAD) && player.getItemBySlot(EquipmentSlotType.HEAD).getItem() instanceof KoidHelmet) {
+		if (player.hasItemInSlot(EquipmentSlot.HEAD) && player.getItemBySlot(EquipmentSlot.HEAD).getItem() instanceof KoidHelmet) {
 			return true;
 		}
 		

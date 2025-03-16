@@ -2,20 +2,20 @@ package com.smanzana.nostrummagica.tile;
 
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock.MimicBlockData;
 
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 /**
  * Hacky specialization that notices when it's not mimicking anything (air) and ticks to try and find something
  * @author Skyler
  *
  */
-public class DelayLoadedMimicBlockTileEntity extends MimicBlockTileEntity implements ITickableTileEntity {
+public class DelayLoadedMimicBlockTileEntity extends MimicBlockTileEntity implements TickableBlockEntity {
 	
 	protected boolean loading;
 	protected int loadingTicks;
 	
-	protected DelayLoadedMimicBlockTileEntity(TileEntityType<? extends DelayLoadedMimicBlockTileEntity> type) {
+	protected DelayLoadedMimicBlockTileEntity(BlockEntityType<? extends DelayLoadedMimicBlockTileEntity> type) {
 		super(type);
 		this.loading = true;
 	}

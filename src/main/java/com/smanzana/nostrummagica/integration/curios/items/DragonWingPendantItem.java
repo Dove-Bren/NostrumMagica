@@ -6,11 +6,11 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.IDragonWingRenderItem;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants.NBT;
@@ -36,12 +36,12 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 		}
 
 		final LivingEntity ent = event.getEntityLiving();
-		if (!(ent instanceof PlayerEntity)) {
+		if (!(ent instanceof Player)) {
 			return;
 		}
 		
-		PlayerEntity player = (PlayerEntity) ent;
-		IInventory inv = NostrumMagica.instance.curios.getCurios(player);
+		Player player = (Player) ent;
+		Container inv = NostrumMagica.instance.curios.getCurios(player);
 		if (inv != null) {
 			for (int i = 0; i < inv.getContainerSize(); i++) {
 				ItemStack stack = inv.getItem(i);
@@ -63,12 +63,12 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 		}
 
 		final LivingEntity ent = event.getEntityLiving();
-		if (!(ent instanceof PlayerEntity)) {
+		if (!(ent instanceof Player)) {
 			return;
 		}
 		
-		PlayerEntity player = (PlayerEntity) ent;
-		IInventory inv = NostrumMagica.instance.curios.getCurios(player);
+		Player player = (Player) ent;
+		Container inv = NostrumMagica.instance.curios.getCurios(player);
 		if (inv != null) {
 			for (int i = 0; i < inv.getContainerSize(); i++) {
 				ItemStack stack = inv.getItem(i);
@@ -84,12 +84,12 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public boolean shouldRenderDragonWings(ItemStack stack, PlayerEntity player) {
+	public boolean shouldRenderDragonWings(ItemStack stack, Player player) {
 		return true;
 	}
 	
 	@Override
-	public int getDragonWingColor(ItemStack stack, PlayerEntity player) {
+	public int getDragonWingColor(ItemStack stack, Player player) {
 		if (stack.isEmpty()) {
 			return 0xFFFFFFFF;
 		}
@@ -141,9 +141,9 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 			return;
 		}
 		
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		
 		nbt.putString("element", element.name());

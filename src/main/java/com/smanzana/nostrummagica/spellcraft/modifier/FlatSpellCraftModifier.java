@@ -11,15 +11,15 @@ import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellIngredient;
 import com.smanzana.nostrummagica.spellcraft.SpellIngredientBuilder;
 
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class FlatSpellCraftModifier implements ISpellCraftModifier {
 	
-	protected static final TextFormatting STYLE_GOOD = TextFormatting.DARK_GREEN;
-	protected static final TextFormatting STYLE_BAD = TextFormatting.RED;
-	protected static final TextFormatting STYLE_OVERRIDE = TextFormatting.DARK_PURPLE;
+	protected static final ChatFormatting STYLE_GOOD = ChatFormatting.DARK_GREEN;
+	protected static final ChatFormatting STYLE_BAD = ChatFormatting.RED;
+	protected static final ChatFormatting STYLE_OVERRIDE = ChatFormatting.DARK_PURPLE;
 	
 	protected final int weightModifier;
 	protected final float manaRateModifier;
@@ -86,35 +86,35 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 	}
 
 	@Override
-	public List<ITextComponent> getDetails(List<ITextComponent> lines) {
+	public List<Component> getDetails(List<Component> lines) {
 		if (weightModifier != 0) {
-			lines.add(new TranslationTextComponent("spellcraftmod.weight", (weightModifier < 0 ? "" : "+"), weightModifier)
+			lines.add(new TranslatableComponent("spellcraftmod.weight", (weightModifier < 0 ? "" : "+"), weightModifier)
 					.withStyle(weightModifier < 0 ? STYLE_GOOD : STYLE_BAD));
 		}
 		if (manaRateModifier != 0) {
 			final int manaPerc = (int) (manaRateModifier * 100);
-			lines.add(new TranslationTextComponent("spellcraftmod.mana", (manaRateModifier < 0 ? "" : "+"), manaPerc)
+			lines.add(new TranslatableComponent("spellcraftmod.mana", (manaRateModifier < 0 ? "" : "+"), manaPerc)
 					.withStyle(manaRateModifier < 0 ? STYLE_GOOD : STYLE_BAD));
 		}
 		if (efficiencyModifier != 0) {
 			final int effPerc = (int) (efficiencyModifier * 100);
-			lines.add(new TranslationTextComponent("spellcraftmod.efficiency", (efficiencyModifier < 0 ? "" : "+"), effPerc)
+			lines.add(new TranslatableComponent("spellcraftmod.efficiency", (efficiencyModifier < 0 ? "" : "+"), effPerc)
 					.withStyle(elementCountModifier > 0 ? STYLE_GOOD : STYLE_BAD));
 		}
 		if (elementCountModifier != 0) {
-			lines.add(new TranslationTextComponent("spellcraftmod.elementcount", (elementCountModifier < 0 ? "" : "+"), elementCountModifier)
+			lines.add(new TranslatableComponent("spellcraftmod.elementcount", (elementCountModifier < 0 ? "" : "+"), elementCountModifier)
 					.withStyle(elementCountModifier > 0 ? STYLE_GOOD : STYLE_BAD));
 		}
 		if (elementOverride != null) {
-			lines.add(new TranslationTextComponent("spellcraftmod.override.element", elementOverride.getName())
+			lines.add(new TranslatableComponent("spellcraftmod.override.element", elementOverride.getName())
 					.withStyle(STYLE_OVERRIDE));
 		}
 		if (alterationOverride != null) {
-			lines.add(new TranslationTextComponent("spellcraftmod.override.alteration", alterationOverride.getName())
+			lines.add(new TranslatableComponent("spellcraftmod.override.alteration", alterationOverride.getName())
 					.withStyle(STYLE_OVERRIDE));
 		}
 		if (shapeOverride != null) {
-			lines.add(new TranslationTextComponent("spellcraftmod.override.shape", shapeOverride.getDisplayName())
+			lines.add(new TranslatableComponent("spellcraftmod.override.shape", shapeOverride.getDisplayName())
 					.withStyle(STYLE_OVERRIDE));
 		}
 		

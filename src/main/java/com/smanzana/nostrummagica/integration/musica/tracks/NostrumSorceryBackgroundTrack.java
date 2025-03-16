@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.player.LocalPlayer;
 
 //@Optional.Interface(iface="com.smanzana.musica.IMusicTrack", modid="musica")
 public class NostrumSorceryBackgroundTrack implements IMusicTrack {
@@ -30,17 +30,17 @@ public class NostrumSorceryBackgroundTrack implements IMusicTrack {
 	}
 
 	@Override
-	public boolean shouldPlay(ClientPlayerEntity player) {
+	public boolean shouldPlay(LocalPlayer player) {
 		return player != null && DimensionUtils.IsSorceryDim(DimensionUtils.GetDimension(player));
 	}
 	
 	@Override
-	public boolean shouldLoop(ClientPlayerEntity player) {
+	public boolean shouldLoop(LocalPlayer player) {
 		return shouldPlay(player);
 	}
 
 	@Override
-	public MusicSound getSound(ClientPlayerEntity player) {
+	public MusicSound getSound(LocalPlayer player) {
 		switch (introStep) {
 		case 0:
 			introStep++;
@@ -60,7 +60,7 @@ public class NostrumSorceryBackgroundTrack implements IMusicTrack {
 	}
 	
 	@Override
-	public void onStop(ClientPlayerEntity player) {
+	public void onStop(LocalPlayer player) {
 		this.introStep = 0;
 	}
 

@@ -4,13 +4,13 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.server.level.ServerLevel;
 
-public class SingleSpawnerTileEntity extends TileEntity implements ITickableTileEntity {
+public class SingleSpawnerTileEntity extends BlockEntity implements TickableBlockEntity {
 	
 	protected int ticksExisted;
 	
@@ -18,14 +18,14 @@ public class SingleSpawnerTileEntity extends TileEntity implements ITickableTile
 		this(NostrumTileEntities.SingleSpawnerTileEntityType);
 	}
 	
-	protected SingleSpawnerTileEntity(TileEntityType<?> type) {
+	protected SingleSpawnerTileEntity(BlockEntityType<?> type) {
 		super(type);
 		ticksExisted = 0;
 	}
 	
 	// Only call on server
 	protected void majorTick(BlockState state) {
-		NostrumBlocks.singleSpawner.tick(state, (ServerWorld) level, worldPosition, NostrumMagica.rand);
+		NostrumBlocks.singleSpawner.tick(state, (ServerLevel) level, worldPosition, NostrumMagica.rand);
 	}
 	
 	@Override

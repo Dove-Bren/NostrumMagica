@@ -6,25 +6,25 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
 
-public class MimicBlockTileEntity extends TileEntity {
+public class MimicBlockTileEntity extends BlockEntity {
 	
 	protected final MimicBlock.MimicBlockData data;
 	
-	protected MimicBlockTileEntity(TileEntityType<? extends MimicBlockTileEntity> type) {
+	protected MimicBlockTileEntity(BlockEntityType<? extends MimicBlockTileEntity> type) {
 		super(type);
 		this.data = new MimicBlock.MimicBlockData();
 	}
@@ -42,23 +42,23 @@ public class MimicBlockTileEntity extends TileEntity {
 	}
 	
 	@Override
-	public CompoundNBT getUpdateTag() {
-		CompoundNBT tag = super.getUpdateTag();
+	public CompoundTag getUpdateTag() {
+		CompoundTag tag = super.getUpdateTag();
 		
 		if (this.getData().mimicState != null) {
-			tag.put("nested_state", NBTUtil.writeBlockState(this.getData().mimicState));
+			tag.put("nested_state", NbtUtils.writeBlockState(this.getData().mimicState));
 		}
 		
 		return tag;
 	}
 	
 	@Override
-	public SUpdateTileEntityPacket getUpdatePacket() {
-		return new SUpdateTileEntityPacket(this.worldPosition, -1, this.getUpdateTag());
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return new ClientboundBlockEntityDataPacket(this.worldPosition, -1, this.getUpdateTag());
 	}
 	
 	@Override
-	public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		this.handleUpdateTag(this.getBlockState(), pkt.getTag());
 	}
 	
@@ -67,13 +67,13 @@ public class MimicBlockTileEntity extends TileEntity {
 	}
 	
 	@Override
-	public void handleUpdateTag(BlockState state, CompoundNBT tag) {
+	public void handleUpdateTag(BlockState state, CompoundTag tag) {
 		super.handleUpdateTag(state, tag);
 		
 		final BlockState newState;
 		
 		if (tag.contains("nested_state")) {
-			newState = NBTUtil.readBlockState(tag.getCompound("nested_state"));
+			newState = NbtUtils.readBlockState(tag.getCompound("nested_state"));
 		} else {
 			// Server told us something's changed (or we just loaded)
 			newState = refreshState();
@@ -111,8 +111,8 @@ public class MimicBlockTileEntity extends TileEntity {
 				// like anything's changed.
 				//world.notifyBlockUpdate(getPos(), this.getBlockState(), this.getBlockState(), 11); // On client, rerenders. Server flushes data.
 				
-				SUpdateTileEntityPacket supdatetileentitypacket = this.getUpdatePacket();
-				for (ServerPlayerEntity player : ((ServerWorld) level).players()) {
+				ClientboundBlockEntityDataPacket supdatetileentitypacket = this.getUpdatePacket();
+				for (ServerPlayer player : ((ServerLevel) level).players()) {
 					if (supdatetileentitypacket != null) {
 						player.connection.send(supdatetileentitypacket);
 					}

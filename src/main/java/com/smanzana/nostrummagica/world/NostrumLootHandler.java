@@ -2,10 +2,10 @@ package com.smanzana.nostrummagica.world;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.loot.LootPool;
-import net.minecraft.loot.RandomValueRange;
-import net.minecraft.loot.TableLootEntry;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.RandomValueBounds;
+import net.minecraft.world.level.storage.loot.entries.LootTableReference;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -61,9 +61,9 @@ public final class NostrumLootHandler {
 
 	private LootPool getInjectPool(String entryName) {
 		return LootPool.lootPool()
-				.add(TableLootEntry.lootTableReference(new ResourceLocation(NostrumMagica.MODID, "inject/" + entryName))
+				.add(LootTableReference.lootTableReference(new ResourceLocation(NostrumMagica.MODID, "inject/" + entryName))
 						.setWeight(1))
-				.setRolls(new RandomValueRange(1))
+				.setRolls(new RandomValueBounds(1))
 				.bonusRolls(0, 1)
 				.name("nostrum_inject_pool")
 		.build();

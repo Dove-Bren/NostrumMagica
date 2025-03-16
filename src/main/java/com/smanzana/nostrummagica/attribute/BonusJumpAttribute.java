@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.attribute;
 
-import net.minecraft.entity.ai.attributes.RangedAttribute;
+import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 
 public class BonusJumpAttribute extends RangedAttribute {
 	

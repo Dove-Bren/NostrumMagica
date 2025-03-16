@@ -12,25 +12,25 @@ import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.PointOfView;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Rarity;
-import net.minecraft.item.UseAction;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.client.CameraType;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.Util;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -80,7 +80,7 @@ public class DragonSoulItem extends PetSoulItem {
 	}
 
 	@Override
-	protected void beforePetRespawn(LivingEntity pet, World world, Vector3d pos, ItemStack stack) {
+	protected void beforePetRespawn(LivingEntity pet, Level world, Vec3 pos, ItemStack stack) {
 		// Dragons spawn at 50% health and 0% mana
 		if (pet instanceof TameRedDragonEntity) { // TODO new base class lol
 			TameRedDragonEntity dragon = ((TameRedDragonEntity) pet);
@@ -95,38 +95,38 @@ public class DragonSoulItem extends PetSoulItem {
 	}
 	
 	@Override
-	public ActionResultType interactLivingEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+	public InteractionResult interactLivingEntity(ItemStack stack, Player playerIn, LivingEntity target, InteractionHand hand) {
 		if (!playerIn.isCreative()) {
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		}
 		
 		if (playerIn.level.isClientSide) {
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
 		if (target instanceof TameRedDragonEntity) {
 			ItemStack newStack = MakeSoulItem((TameRedDragonEntity) target);
 			target.spawnAtLocation(newStack, 1);
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
-		return ActionResultType.PASS;
+		return InteractionResult.PASS;
 	}
 	
 	@Override
-	public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand hand) {
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		final ItemStack held = playerIn.getItemInHand(hand);
 		if (getMana(held) >= getMaxMana(held)) {
-			return new ActionResult<ItemStack>(ActionResultType.PASS, held);
+			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, held);
 		}
 		
 		playerIn.startUsingItem(hand);
-		return new ActionResult<ItemStack>(ActionResultType.SUCCESS, held);
+		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, held);
 	}
 	
 	@Override
-	public UseAction getUseAnimation(ItemStack stack) {
-		return UseAction.BOW;
+	public UseAnim getUseAnimation(ItemStack stack) {
+		return UseAnim.BOW;
 	}
 	
 	@Override
@@ -135,7 +135,7 @@ public class DragonSoulItem extends PetSoulItem {
 	}
 	
 	@Override
-	public ItemStack finishUsingItem(ItemStack stack, World worldIn, LivingEntity entityLiving) {
+	public ItemStack finishUsingItem(ItemStack stack, Level worldIn, LivingEntity entityLiving) {
 		if (worldIn.isClientSide) {
 			return stack;
 		}
@@ -158,14 +158,14 @@ public class DragonSoulItem extends PetSoulItem {
 		if (player.level.isClientSide) {
 			// On client, spawn particles
 			if (NostrumMagica.rand.nextBoolean()) {
-				Vector3d offset;
+				Vec3 offset;
 				final float rotation;
 				final Minecraft mc = Minecraft.getInstance();
-				if (player == NostrumMagica.instance.proxy.getPlayer() && mc.options.getCameraType() == PointOfView.FIRST_PERSON) {
-					offset = new Vector3d(-.1, player.getEyeHeight() -.05, .2);
+				if (player == NostrumMagica.instance.proxy.getPlayer() && mc.options.getCameraType() == CameraType.FIRST_PERSON) {
+					offset = new Vec3(-.1, player.getEyeHeight() -.05, .2);
 					rotation = -player.yRot % 360f;
 				} else {
-					offset = new Vector3d(-.375, player.getEyeHeight() -.05, .825);
+					offset = new Vec3(-.375, player.getEyeHeight() -.05, .825);
 					if (player == NostrumMagica.instance.proxy.getPlayer()) {
 						rotation = -player.yBodyRot % 360f;
 					} else {
@@ -187,15 +187,15 @@ public class DragonSoulItem extends PetSoulItem {
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
 		String name = getPetName(stack);
 		if (name == null || name.isEmpty()) {
 			name = "Unknown Pet";
 		}
-		tooltip.add(new StringTextComponent(name).withStyle(TextFormatting.DARK_RED));
-		tooltip.add(new StringTextComponent(getMana(stack) + " / " + getMaxMana(stack)).withStyle(TextFormatting.BLUE));
+		tooltip.add(new TextComponent(name).withStyle(ChatFormatting.DARK_RED));
+		tooltip.add(new TextComponent(getMana(stack) + " / " + getMaxMana(stack)).withStyle(ChatFormatting.BLUE));
 	}
 	
 	@Override
@@ -205,7 +205,7 @@ public class DragonSoulItem extends PetSoulItem {
 			if (NostrumMagica.rand.nextBoolean()) {
 				NostrumParticles.GLOW_ORB.spawn(entityItem.level, new SpawnParams(
 						1, entityItem.getX(), entityItem.getY() + .5, entityItem.getZ(), .25, 30, 10,
-						new Vector3d(0, .05, 0), new Vector3d(.025, 0, .025)
+						new Vec3(0, .05, 0), new Vec3(.025, 0, .025)
 						).color(.3f, .6f, 0f, 0f));
 			}
 		}
@@ -214,9 +214,9 @@ public class DragonSoulItem extends PetSoulItem {
 	}
 	
 	public int getMana(ItemStack stack) {
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 			stack.setTag(nbt);
 		}
 		
@@ -226,9 +226,9 @@ public class DragonSoulItem extends PetSoulItem {
 	public void setMana(ItemStack stack, int mana) {
 		mana = Math.min(mana, getMaxMana(stack));
 		
-		CompoundNBT nbt = stack.getTag();
+		CompoundTag nbt = stack.getTag();
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 			stack.setTag(nbt);
 		}
 		
@@ -277,9 +277,9 @@ public class DragonSoulItem extends PetSoulItem {
 	}
 
 	@Override
-	public boolean canSpawnEntity(World world, LivingEntity spawner, Vector3d pos, ItemStack stack) {
+	public boolean canSpawnEntity(Level world, LivingEntity spawner, Vec3 pos, ItemStack stack) {
 		if (this.getMana(stack) < this.getMaxMana(stack)) {
-			spawner.sendMessage(new TranslationTextComponent("info.respawn_soulbound_dragon.fail.mana", new Object[0]), Util.NIL_UUID);
+			spawner.sendMessage(new TranslatableComponent("info.respawn_soulbound_dragon.fail.mana", new Object[0]), Util.NIL_UUID);
 			return false;
 		}
 		

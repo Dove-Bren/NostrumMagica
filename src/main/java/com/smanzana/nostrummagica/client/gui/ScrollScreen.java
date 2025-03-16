@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.SpellPlate;
 import com.smanzana.nostrummagica.item.SpellScroll;
@@ -15,10 +15,10 @@ import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.TextComponent;
 
 public class ScrollScreen extends Screen {
 
@@ -40,7 +40,7 @@ public class ScrollScreen extends Screen {
 	}
 	
 	public ScrollScreen(Spell spellIn) {
-		super(new StringTextComponent("SpellScroll Info Screen"));
+		super(new TextComponent("SpellScroll Info Screen"));
 		this.spell = spellIn;
 		this.components = new LinkedList<>();
 		
@@ -72,7 +72,7 @@ public class ScrollScreen extends Screen {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, int parWidth, int parHeight, float p_73863_3_) {
+	public void render(PoseStack matrixStackIn, int parWidth, int parHeight, float p_73863_3_) {
 		
 		final int leftOffset = (this.width - TEXT_BACK_WIDTH) / 2; //distance from left
 		final int topOffset = (this.height - TEXT_BACK_HEIGHT) / 2;

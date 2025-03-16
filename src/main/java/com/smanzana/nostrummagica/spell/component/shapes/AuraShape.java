@@ -26,15 +26,15 @@ import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Entities;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.Lazy;
 
 /**
@@ -52,7 +52,7 @@ public class AuraShape extends AreaShape {
 
 		private final LivingEntity origin;
 		private final float radius;
-		private final World world;
+		private final Level world;
 		private final boolean includeAllies;
 		private final SpellCharacteristics characteristics;
 		
@@ -104,7 +104,7 @@ public class AuraShape extends AreaShape {
 						origin.getZ(),
 						.1,
 						30, 0, // lifetime + jitter
-						Vector3d.ZERO, (new Vector3d(.2, .2, .2)).scale(radius / 4)
+						Vec3.ZERO, (new Vec3(.2, .2, .2)).scale(radius / 4)
 						).color(characteristics.element.getColor())
 						);
 				NostrumParticles.LIGHTNING_STATIC.spawn(world, new SpawnParams(
@@ -114,7 +114,7 @@ public class AuraShape extends AreaShape {
 						origin.getZ(),
 						radius,
 						20, 0, // lifetime + jitter
-						new Vector3d(0, -.025, 0), new Vector3d(0, .05, 0)
+						new Vec3(0, -.025, 0), new Vec3(0, .05, 0)
 						).color(characteristics.element.getColor()));
 			}
 		}
@@ -140,7 +140,7 @@ public class AuraShape extends AreaShape {
 				}
 				
 				// Check all entities in the world
-				for (LivingEntity e : Entities.GetEntities((ServerWorld) world, (e) -> {return canAffect(e) && isInArea(e);})) {
+				for (LivingEntity e : Entities.GetEntities((ServerLevel) world, (e) -> {return canAffect(e) && isInArea(e);})) {
 					if (visitEntity(e)) {
 						TriggerData data = new TriggerData(
 								Lists.newArrayList(e),
@@ -261,7 +261,7 @@ public class AuraShape extends AreaShape {
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
+	public boolean shouldTrace(Player player, SpellShapeProperties params) {
 		return false;
 	}
 	
@@ -290,7 +290,7 @@ public class AuraShape extends AreaShape {
 		final float range = this.getRadius(getDefaultProperties());
 		builder.add(new SpellShapePreviewComponent.Disk(location.hitPosition.add(0, .5, 0), range));
 		
-		List<LivingEntity> ents = location.world.getEntities(state.getSelf(), VoxelShapes.block().bounds().move(location.hitPosition).inflate(range + 1), (ent) -> 
+		List<LivingEntity> ents = location.world.getEntities(state.getSelf(), Shapes.block().bounds().move(location.hitPosition).inflate(range + 1), (ent) -> 
 			ent instanceof LivingEntity && location.hitPosition.distanceTo(ent.position()) <= range
 		).stream().map(ent -> (LivingEntity) ent).collect(Collectors.toList());
 		if (ents != null && !ents.isEmpty()) {

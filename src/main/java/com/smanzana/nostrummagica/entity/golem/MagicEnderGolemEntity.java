@@ -8,12 +8,12 @@ import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.potion.Effects;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.level.Level;
 
 public class MagicEnderGolemEntity extends MagicGolemEntity {
 	
@@ -49,7 +49,7 @@ public class MagicEnderGolemEntity extends MagicGolemEntity {
 		}
 	}
 
-	public MagicEnderGolemEntity(EntityType<MagicEnderGolemEntity> type, World worldIn) {
+	public MagicEnderGolemEntity(EntityType<MagicEnderGolemEntity> type, Level worldIn) {
 		super(type, worldIn, EMagicElement.ENDER, false, true, true);
 	}
 
@@ -92,10 +92,10 @@ public class MagicEnderGolemEntity extends MagicGolemEntity {
 
 	@Override
 	public boolean shouldDoBuff(LivingEntity target) {
-		return target.getEffect(Effects.INVISIBILITY) == null;
+		return target.getEffect(MobEffects.INVISIBILITY) == null;
 	}
 
-	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
+	public static final AttributeSupplier.Builder BuildAttributes() {
 		return MagicGolemEntity.BuildBaseAttributes()
 	        .add(Attributes.MOVEMENT_SPEED, 0.30D)
 	

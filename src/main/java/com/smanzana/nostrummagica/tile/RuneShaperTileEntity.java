@@ -6,16 +6,16 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.SpellRune;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class RuneShaperTileEntity extends TileEntity implements IInventory {
+public class RuneShaperTileEntity extends BlockEntity implements Container {
 
 	private static final String NBT_INV = "runeshaperinv";
 	
@@ -96,16 +96,16 @@ public class RuneShaperTileEntity extends TileEntity implements IInventory {
 	}
 
 	@Override
-	public boolean stillValid(PlayerEntity player) {
+	public boolean stillValid(Player player) {
 		return true;
 	}
 
 	@Override
-	public void startOpen(PlayerEntity player) {
+	public void startOpen(Player player) {
 	}
 
 	@Override
-	public void stopOpen(PlayerEntity player) {
+	public void stopOpen(Player player) {
 	}
 
 	@Override
@@ -131,33 +131,33 @@ public class RuneShaperTileEntity extends TileEntity implements IInventory {
 	
 	
 	@Override
-	public CompoundNBT save(CompoundNBT nbt) {
+	public CompoundTag save(CompoundTag nbt) {
 		nbt = super.save(nbt);
-		CompoundNBT compound = new CompoundNBT();
+		CompoundTag compound = new CompoundTag();
 		
 		for (int i = 0; i < getContainerSize(); i++) {
 			if (getItem(i).isEmpty())
 				continue;
 			
-			CompoundNBT tag = new CompoundNBT();
+			CompoundTag tag = new CompoundTag();
 			compound.put(i + "", getItem(i).save(tag));
 		}
 		
 		if (nbt == null)
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		
 		nbt.put(NBT_INV, compound);
 		return nbt;
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundNBT nbt) {
+	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_INV, NBT.TAG_COMPOUND))
 			return;
 		this.clearContent();
-		CompoundNBT items = nbt.getCompound(NBT_INV);
+		CompoundTag items = nbt.getCompound(NBT_INV);
 		for (String key : items.getAllKeys()) {
 			int id;
 			try {
@@ -182,9 +182,9 @@ public class RuneShaperTileEntity extends TileEntity implements IInventory {
 		return true;
 	}
 
-	public IInventory getExtraInventory() {
+	public Container getExtraInventory() {
 		for (BlockPos checkPos : new BlockPos[] {worldPosition.above(), worldPosition.north(), worldPosition.east(), worldPosition.south(), worldPosition.west(), worldPosition.below(), worldPosition.above().north(), worldPosition.above().south(), worldPosition.above().east(), worldPosition.above().west(), worldPosition.north().east(), worldPosition.north().west(), worldPosition.south().east(), worldPosition.south().west()}) {
-			@Nullable TileEntity te = level.getBlockEntity(checkPos);
+			@Nullable BlockEntity te = level.getBlockEntity(checkPos);
 			if (te != null && te instanceof RuneLibraryTileEntity) {
 				return ((RuneLibraryTileEntity) te).getInventory();
 			}

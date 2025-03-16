@@ -2,14 +2,14 @@ package com.smanzana.nostrummagica.client.gui.infoscreen;
 
 import java.util.List;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.IForegroundRenderable;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.button.AbstractButton;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public abstract class InfoButton extends AbstractButton implements IForegroundRenderable {
@@ -19,16 +19,16 @@ public abstract class InfoButton extends AbstractButton implements IForegroundRe
 	protected final InfoScreen screen;
 	
 	public InfoButton(InfoScreen screen, int x, int y) {
-		super(x, y, BUTTON_WIDTH, BUTTON_WIDTH, StringTextComponent.EMPTY);
+		super(x, y, BUTTON_WIDTH, BUTTON_WIDTH, TextComponent.EMPTY);
 		this.screen = screen;
 	}
 
 	public abstract IInfoSubScreen getScreen(INostrumMagic attr);
 	
-	public abstract List<ITextComponent> getDescription();
+	public abstract List<Component> getDescription();
 	
 	@Override
-	public void renderForeground(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	public void renderForeground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		if (mouseX >= this.x && mouseY > this.y
 			&& mouseX <= this.x + this.width
 			&& mouseY <= this.y + this.height) {

@@ -9,29 +9,29 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.Registry;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import net.minecraft.particles.IParticleData.IDeserializer;
+import net.minecraft.core.particles.ParticleOptions.Deserializer;
 
-public class NostrumParticleData implements IParticleData {
+public class NostrumParticleData implements ParticleOptions {
 	
-	public static final IDeserializer<NostrumParticleData> DESERIALIZER = new IDeserializer<NostrumParticleData>() {
+	public static final Deserializer<NostrumParticleData> DESERIALIZER = new Deserializer<NostrumParticleData>() {
 
 		@Override
 		public NostrumParticleData fromCommand(ParticleType<NostrumParticleData> particleTypeIn, StringReader reader)
 				throws CommandSyntaxException {
-			return new NostrumParticleData(particleTypeIn, new SpawnParams(1, 0, 0, 0, .5, 20, 0, new Vector3d(0, 1, 0), Vector3d.ZERO));
+			return new NostrumParticleData(particleTypeIn, new SpawnParams(1, 0, 0, 0, .5, 20, 0, new Vec3(0, 1, 0), Vec3.ZERO));
 		}
 
 		@Override
-		public NostrumParticleData fromNetwork(ParticleType<NostrumParticleData> particleTypeIn, PacketBuffer buffer) {
+		public NostrumParticleData fromNetwork(ParticleType<NostrumParticleData> particleTypeIn, FriendlyByteBuf buffer) {
 			SpawnParams params = SpawnParams.FromNBT(buffer.readNbt());
 			return new NostrumParticleData(particleTypeIn, params);
 		}
@@ -70,7 +70,7 @@ public class NostrumParticleData implements IParticleData {
 	// This compliments serializer's read method.
 	// It does NOT work with toNBT() and fromNBT().
 	@Override
-	public void writeToNetwork(PacketBuffer buffer) {
+	public void writeToNetwork(FriendlyByteBuf buffer) {
 		buffer.writeNbt(params.toNBT(null));
 	}
 
@@ -81,9 +81,9 @@ public class NostrumParticleData implements IParticleData {
 	}
 	
 	// NBT interface for ease-of-use. Not to be used with write/read vanilla particle system
-	public CompoundNBT toNBT(@Nullable CompoundNBT nbt) {
+	public CompoundTag toNBT(@Nullable CompoundTag nbt) {
 		if (nbt == null) {
-			nbt = new CompoundNBT();
+			nbt = new CompoundTag();
 		}
 		
 		nbt.putString("particleType", this.getType().getRegistryName().toString());
@@ -94,7 +94,7 @@ public class NostrumParticleData implements IParticleData {
 	
 	// NBT interface for ease-of-use. Not to be used with write/read vanilla particle system
 	@SuppressWarnings("unchecked")
-	public static @Nullable NostrumParticleData fromNBT(CompoundNBT nbt) {
+	public static @Nullable NostrumParticleData fromNBT(CompoundTag nbt) {
 		String typeName = nbt.getString("particleType");
 		ParticleType<?> type = ForgeRegistries.PARTICLE_TYPES.getValue(ResourceLocation.tryParse(typeName));
 		ParticleType<NostrumParticleData> particleType;

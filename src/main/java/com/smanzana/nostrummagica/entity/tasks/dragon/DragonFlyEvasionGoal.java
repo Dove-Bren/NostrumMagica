@@ -6,11 +6,11 @@ import java.util.Random;
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.FlyingDragonEntity;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.core.BlockPos;
 
-import net.minecraft.entity.ai.goal.Goal.Flag;
+import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 public class DragonFlyEvasionGoal extends Goal {
 	
@@ -86,7 +86,7 @@ public class DragonFlyEvasionGoal extends Goal {
         // Find y
         double y;
         {
-        	BlockPos.Mutable pos = new BlockPos.Mutable().set(this.dragon.blockPosition());
+        	BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos().set(this.dragon.blockPosition());
         	
         	// First, find the ground
     		while(pos.getY() > 0) {

@@ -12,8 +12,8 @@ import com.smanzana.nostrummagica.progression.requirement.IRequirement;
 import com.smanzana.nostrummagica.progression.reward.IReward;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Base class for Nostrum quests.
@@ -170,7 +170,7 @@ public class NostrumQuest {
 		return this.offsetY;
 	}
 	
-	public void grantReward(PlayerEntity player) {
+	public void grantReward(Player player) {
 		reward.award(player);
 	}
 	
@@ -179,7 +179,7 @@ public class NostrumQuest {
 	 * This distributes reward and updates the player's quest state.
 	 * @param player
 	 */
-	public void completeQuest(PlayerEntity player) {
+	public void completeQuest(Player player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return;
@@ -192,10 +192,10 @@ public class NostrumQuest {
 		if (!player.level.isClientSide)
 			NostrumMagicaSounds.SUCCESS_QUEST.play(player.level, player.getX(), player.getY(), player.getZ());
 		else
-			NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) player);
+			NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
 	}
 	
-	public void startQuest(PlayerEntity player) {
+	public void startQuest(Player player) {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return;

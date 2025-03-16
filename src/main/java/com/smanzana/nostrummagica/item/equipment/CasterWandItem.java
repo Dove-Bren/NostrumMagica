@@ -29,25 +29,25 @@ import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
-import net.minecraft.client.renderer.color.IItemColor;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTier;
-import net.minecraft.item.Rarity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.Hand;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -63,22 +63,22 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	private static final String NBT_SPELL = "spell";
 	
 	public CasterWandItem() {
-		super(ItemTier.WOOD, 2, -2.4F, NostrumItems.PropEquipment().rarity(Rarity.UNCOMMON).durability(300));
+		super(Tiers.WOOD, 2, -2.4F, NostrumItems.PropEquipment().rarity(Rarity.UNCOMMON).durability(300));
 		MinecraftForge.EVENT_BUS.addListener(CasterWandItem::onSpellCast);
 	}
 	
 	@Override
-	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlotType equipmentSlot) {
+	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot equipmentSlot) {
 		Multimap<Attribute, AttributeModifier> multimap = HashMultimap.<Attribute, AttributeModifier>create();
 		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
 		builder.putAll(multimap);
 
-		if (equipmentSlot == EquipmentSlotType.MAINHAND) {
+		if (equipmentSlot == EquipmentSlot.MAINHAND) {
             builder.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 4, AttributeModifier.Operation.ADDITION));
             builder.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", -2.4000000953674316D, AttributeModifier.Operation.ADDITION));
 		}
 		
-		if (equipmentSlot == EquipmentSlotType.MAINHAND || equipmentSlot == EquipmentSlotType.OFFHAND) {
+		if (equipmentSlot == EquipmentSlot.MAINHAND || equipmentSlot == EquipmentSlot.OFFHAND) {
 			builder.put(NostrumAttributes.magicPotency, new AttributeModifier(WAND_POTENCY_UUID, "Potency modifier", 20, AttributeModifier.Operation.ADDITION));
 		}
 
@@ -122,22 +122,22 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		final @Nullable Spell spell = getSpell(stack);
 		if (spell != null) {
-			tooltip.add(new TranslationTextComponent("info.caster_wand.spell", spell.getName()).withStyle(TextFormatting.GOLD));
+			tooltip.add(new TranslatableComponent("info.caster_wand.spell", spell.getName()).withStyle(ChatFormatting.GOLD));
 		} else {
-			tooltip.add(new TranslationTextComponent("info.caster_wand.nospell"));
+			tooltip.add(new TranslatableComponent("info.caster_wand.nospell"));
 		}
 		
-		tooltip.add(StringTextComponent.EMPTY);
-		tooltip.add(new TranslationTextComponent("info.caster_wand.desc").withStyle(TextFormatting.GRAY));
-		tooltip.add(new StringTextComponent(" -2 Spell Weight").withStyle(TextFormatting.DARK_GREEN));
+		tooltip.add(TextComponent.EMPTY);
+		tooltip.add(new TranslatableComponent("info.caster_wand.desc").withStyle(ChatFormatting.GRAY));
+		tooltip.add(new TextComponent(" -2 Spell Weight").withStyle(ChatFormatting.DARK_GREEN));
 	}
 	
 	protected void setSpell(ItemStack wand, @Nullable Spell spell) {
-		CompoundNBT tag = wand.getOrCreateTag();
+		CompoundTag tag = wand.getOrCreateTag();
 		if (spell == null) {
 			tag.remove(NBT_SPELL);
 		} else {
@@ -155,7 +155,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	@Override
 	public @Nullable Spell getSpell(ItemStack wand) {
 		if (wand.hasTag()) {
-			CompoundNBT tag = wand.getTag();
+			CompoundTag tag = wand.getTag();
 			if (tag.contains(NBT_SPELL, NBT.TAG_INT)) {
 				final int id = tag.getInt(NBT_SPELL);
 				return NostrumMagica.instance.getSpellRegistry().lookup(id);
@@ -185,7 +185,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 		return false;
 	}
 	
-	public static final class CasterWandColor implements IItemColor {
+	public static final class CasterWandColor implements ItemColor {
 		@Override
 		public int getColor(ItemStack stack, int layer) {
 			if (layer == 1) {
@@ -203,7 +203,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	}
 
 	@Override
-	public boolean shouldTrace(World world, PlayerEntity player, ItemStack stack) {
+	public boolean shouldTrace(Level world, Player player, ItemStack stack) {
 		@Nullable Spell spell = this.getSpell(stack);
 		if (spell == null) {
 			return false;
@@ -213,7 +213,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	}
 	
 	@Override
-	public double getTraceRange(World world, PlayerEntity player, ItemStack stack) {
+	public double getTraceRange(Level world, Player player, ItemStack stack) {
 		@Nullable Spell spell = this.getSpell(stack);
 		if (spell == null) {
 			return 0;
@@ -223,7 +223,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	}
 	
 	@Override
-	protected boolean canCharge(World worldIn, PlayerEntity playerIn, Hand hand, ItemStack stack) {
+	protected boolean canCharge(Level worldIn, Player playerIn, InteractionHand hand, ItemStack stack) {
 		@Nullable Spell spell = this.getSpell(stack);
 		return spell != null;
 	}
@@ -239,7 +239,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	}
 
 	@Override
-	protected void fireChargedWeapon(World worldIn, LivingEntity playerIn, Hand hand, ItemStack stack) {
+	protected void fireChargedWeapon(Level worldIn, LivingEntity playerIn, InteractionHand hand, ItemStack stack) {
 		@Nullable Spell spell = this.getSpell(stack);
 		if (spell != null) {
 			if (worldIn.isClientSide()) {
@@ -275,9 +275,9 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 
 	@Override
 	public void onFinishCastFromTool(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
-		if (caster instanceof PlayerEntity) {
-			NostrumMagica.instance.proxy.sendMana((PlayerEntity) caster);
-			((PlayerEntity) caster).getCooldowns().addCooldown(stack.getItem(), 20);
+		if (caster instanceof Player) {
+			NostrumMagica.instance.proxy.sendMana((Player) caster);
+			((Player) caster).getCooldowns().addCooldown(stack.getItem(), 20);
 		}
 	}
 	
@@ -286,10 +286,10 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 		// Notice and respond any time any spell is cast.
 		// Note that our spell caster handler will have put in a smaller one already, so this will replace it.
 		final SpellCastResult result = event.getCastResult();
-		if (result.succeeded && result.caster != null && result.caster instanceof PlayerEntity && NostrumMagica.getMagicWrapper(result.caster) != null && !result.caster.isDeadOrDying()) {
+		if (result.succeeded && result.caster != null && result.caster instanceof Player && NostrumMagica.getMagicWrapper(result.caster) != null && !result.caster.isDeadOrDying()) {
 			if (!NostrumMagica.getMagicWrapper(result.caster).hasSkill(NostrumSkills.Spellcasting_ToolCooldown)) {
 				final int cooldownTicks = SpellCasting.CalculateSpellCooldown(result);
-				((PlayerEntity) result.caster).getCooldowns().addCooldown(NostrumItems.casterWand, cooldownTicks);
+				((Player) result.caster).getCooldowns().addCooldown(NostrumItems.casterWand, cooldownTicks);
 			}
 		}
 	}

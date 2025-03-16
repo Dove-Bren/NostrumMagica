@@ -2,10 +2,10 @@ package com.smanzana.nostrummagica.spell.component;
 
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.IntNBT;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponent;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.BaseComponent;
 
 public class IntSpellShapeProperty extends SpellShapeProperty<Integer> {
 
@@ -28,13 +28,13 @@ public class IntSpellShapeProperty extends SpellShapeProperty<Integer> {
 	}
 
 	@Override
-	public Integer readValue(INBT tag) {
-		return tag instanceof IntNBT ? ((IntNBT) tag).getAsInt() : getDefault();
+	public Integer readValue(Tag tag) {
+		return tag instanceof IntTag ? ((IntTag) tag).getAsInt() : getDefault();
 	}
 
 	@Override
-	public INBT writeValue(Integer value) {
-		return IntNBT.valueOf(value);
+	public Tag writeValue(Integer value) {
+		return IntTag.valueOf(value);
 	}
 
 	@Override
@@ -52,8 +52,8 @@ public class IntSpellShapeProperty extends SpellShapeProperty<Integer> {
 	}
 
 	@Override
-	public TextComponent getDisplayValue(SpellShape shape, Integer value) {
-		return new StringTextComponent("" + value); 
+	public BaseComponent getDisplayValue(SpellShape shape, Integer value) {
+		return new TextComponent("" + value); 
 	}
 
 	@Override

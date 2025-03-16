@@ -1,22 +1,22 @@
 package com.smanzana.nostrummagica.spell.log;
 
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
 
 public abstract class SpellLogModifier {
 
-	protected final ITextComponent label;
+	protected final Component label;
 	protected final ESpellLogModifierType type;
 	private final float modifier;
 	
-	public SpellLogModifier(ESpellLogModifierType type, ITextComponent label, float modifier) {
+	public SpellLogModifier(ESpellLogModifierType type, Component label, float modifier) {
 		this.type = type;
 		this.label = label;
 		this.modifier = modifier;
 	}
 	
-	public abstract ITextComponent getDescription();
+	public abstract Component getDescription();
 	
 	public float getModifier() {
 		return modifier;
@@ -28,65 +28,65 @@ public abstract class SpellLogModifier {
 	
 	protected static abstract class Percentage extends SpellLogModifier {
 		
-		private final ITextComponent description;
+		private final Component description;
 
-		public Percentage(ESpellLogModifierType type, ITextComponent label, float modifier, TextFormatting negColor, TextFormatting posColor) {
+		public Percentage(ESpellLogModifierType type, Component label, float modifier, ChatFormatting negColor, ChatFormatting posColor) {
 			super(type, label, modifier);
 			
-			description = label.copy().append(new StringTextComponent(": ")).append(
-					new StringTextComponent(String.format("%+.0f%%", modifier * 100f)).withStyle(modifier <= 0 ? negColor : posColor)
+			description = label.copy().append(new TextComponent(": ")).append(
+					new TextComponent(String.format("%+.0f%%", modifier * 100f)).withStyle(modifier <= 0 ? negColor : posColor)
 				);
 		}
 
 		@Override
-		public ITextComponent getDescription() {
+		public Component getDescription() {
 			return description;
 		}
 	}
 	
 	protected static class BonusScale extends Percentage {
-		public BonusScale(ITextComponent label, float modifier) {
-			super(ESpellLogModifierType.BONUS_SCALE, label, modifier, TextFormatting.RED, TextFormatting.GREEN);
+		public BonusScale(Component label, float modifier) {
+			super(ESpellLogModifierType.BONUS_SCALE, label, modifier, ChatFormatting.RED, ChatFormatting.GREEN);
 		}
 	}
 	
 	protected static class ResistScale extends Percentage {
-		public ResistScale(ITextComponent label, float modifier) {
-			super(ESpellLogModifierType.RESIST_SCALE, label, modifier, TextFormatting.DARK_RED, TextFormatting.DARK_BLUE);
+		public ResistScale(Component label, float modifier) {
+			super(ESpellLogModifierType.RESIST_SCALE, label, modifier, ChatFormatting.DARK_RED, ChatFormatting.DARK_BLUE);
 		}
 	}
 	
 	protected static abstract class Flat extends SpellLogModifier {
 		
-		private final ITextComponent description;
+		private final Component description;
 
-		public Flat(ESpellLogModifierType type, ITextComponent label, float modifier, TextFormatting negColor, TextFormatting posColor) {
+		public Flat(ESpellLogModifierType type, Component label, float modifier, ChatFormatting negColor, ChatFormatting posColor) {
 			super(type, label, modifier);
 			
-			description = label.copy().append(new StringTextComponent(": ")).append(
-					new StringTextComponent(String.format("%+.1f", modifier)).withStyle(modifier <= 0 ? negColor : posColor)
+			description = label.copy().append(new TextComponent(": ")).append(
+					new TextComponent(String.format("%+.1f", modifier)).withStyle(modifier <= 0 ? negColor : posColor)
 				);
 		}
 
 		@Override
-		public ITextComponent getDescription() {
+		public Component getDescription() {
 			return description;
 		}
 	}
 	
 	protected static class BaseFlat extends Flat {
-		public BaseFlat(ITextComponent label, float modifier) {
-			super(ESpellLogModifierType.BASE_FLAT, label, modifier, TextFormatting.YELLOW, TextFormatting.GOLD);
+		public BaseFlat(Component label, float modifier) {
+			super(ESpellLogModifierType.BASE_FLAT, label, modifier, ChatFormatting.YELLOW, ChatFormatting.GOLD);
 		}
 	}
 	
 	protected static class FinalFlat extends Flat {
-		public FinalFlat(ITextComponent label, float modifier) {
-			super(ESpellLogModifierType.FINAL_FLAT, label, modifier, TextFormatting.RED, TextFormatting.BLUE);
+		public FinalFlat(Component label, float modifier) {
+			super(ESpellLogModifierType.FINAL_FLAT, label, modifier, ChatFormatting.RED, ChatFormatting.BLUE);
 		}
 	}
 	
-	public static final SpellLogModifier Make(ITextComponent label, float modifier, ESpellLogModifierType type) {
+	public static final SpellLogModifier Make(Component label, float modifier, ESpellLogModifierType type) {
 		switch (type) {
 		case BASE_FLAT:
 			return new BaseFlat(label, modifier);

@@ -6,24 +6,24 @@ import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockDisplayReader;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -50,12 +50,12 @@ public class TogglePlatformBlock extends Block implements ITriggeredBlock {
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		super.createBlockStateDefinition(builder);
 		builder.add(ON);
 	}
 	
-	public void setEnabled(World world, BlockPos pos, BlockState state, boolean enabled) {
+	public void setEnabled(Level world, BlockPos pos, BlockState state, boolean enabled) {
 		world.setBlock(pos, state.setValue(ON, enabled), 3);
 	}
 	
@@ -72,55 +72,55 @@ public class TogglePlatformBlock extends Block implements ITriggeredBlock {
 	}
 	
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
-		if (!isEnabled(state) && context != ISelectionContext.empty()) {
-			if (context.getEntity() == null || !(context.getEntity() instanceof PlayerEntity) || !((PlayerEntity) context.getEntity()).isCreative()) {
-				return VoxelShapes.empty();
+		if (!isEnabled(state) && context != CollisionContext.empty()) {
+			if (context.getEntity() == null || !(context.getEntity() instanceof Player) || !((Player) context.getEntity()).isCreative()) {
+				return Shapes.empty();
 			}
 		}
 		
-		return VoxelShapes.block();
+		return Shapes.block();
 	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public VoxelShape getCollisionShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+	public VoxelShape getCollisionShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		if (!isEnabled(state)) {
-			return VoxelShapes.empty();
+			return Shapes.empty();
 		}
 		
 		return super.getCollisionShape(state, worldIn, pos, context);
 	}
 	
 	@Override
-	public boolean propagatesSkylightDown(BlockState state, IBlockReader reader, BlockPos pos) {
+	public boolean propagatesSkylightDown(BlockState state, BlockGetter reader, BlockPos pos) {
 		return true;
 	}
 	
 	// GetHowMuchLightGoesThrough?? Not sure.
 	@Override
 	@OnlyIn(Dist.CLIENT)
-	public float getShadeBrightness(BlockState state, IBlockReader worldIn, BlockPos pos) {
+	public float getShadeBrightness(BlockState state, BlockGetter worldIn, BlockPos pos) {
 		return 1.0F;
 	}
 	
-	protected void toggle(World world, BlockPos pos, BlockState state) {
+	protected void toggle(Level world, BlockPos pos, BlockState state) {
 		setEnabled(world, pos, state, !isEnabled(state));
 	}
 	
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (!playerIn.isCreative()) {
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		}
 		
-		if (hand != Hand.MAIN_HAND) {
-			return ActionResultType.PASS;
+		if (hand != InteractionHand.MAIN_HAND) {
+			return InteractionResult.PASS;
 		}
 		
 		if (worldIn.isClientSide) {
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
 		
 		if (playerIn.isShiftKeyDown()) {
@@ -131,34 +131,34 @@ public class TogglePlatformBlock extends Block implements ITriggeredBlock {
 			toggle(worldIn, pos, state);
 		}
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 	
-	protected void triggerInternal(World world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
+	protected void triggerInternal(Level world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
 		toggle(world, blockPos, state);
 	}
 
 	@Override
-	public void trigger(World world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
+	public void trigger(Level world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
 		if (!world.isClientSide()) {
 			WorldUtil.WalkConnectedBlocks(world, blockPos, new IBlockWalker() {
 				@Override
-				public boolean canVisit(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos,
+				public boolean canVisit(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
 						BlockState state, int distance) {
 					return state.getBlock() == TogglePlatformBlock.this && !pos.equals(triggerPos);
 				}
 
 				@Override
-				public boolean walk(IBlockReader world, BlockPos startPos, BlockState startState, BlockPos pos,
+				public boolean walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
 						BlockState state, int distance, int walkCount) {
-					((TogglePlatformBlock) state.getBlock()).triggerInternal((World) world, pos, state, triggerPos);
+					((TogglePlatformBlock) state.getBlock()).triggerInternal((Level) world, pos, state, triggerPos);
 					return false;
 				}
 			}, 256);
 		}
 	}
 	
-	public static final int MakePlatformColor(BlockState state, IBlockDisplayReader world, BlockPos pos, int tintIndex) {
+	public static final int MakePlatformColor(BlockState state, BlockAndTintGetter world, BlockPos pos, int tintIndex) {
 		return Color.HSBtoRGB((float) ((double)(System.currentTimeMillis() % 6000L) / 6000.0), 1f, 1f);
 	}
 }

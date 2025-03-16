@@ -8,23 +8,23 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.audio.SoundHandler;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.AbstractButton;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextProperties;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -91,7 +91,7 @@ public class BookScreen extends Screen {
 	}
 	
 	public BookScreen(String screenKey, List<IBookPage> pages, boolean tableOfContents) {
-		super(new StringTextComponent("NostrumBookScreen"));
+		super(new TextComponent("NostrumBookScreen"));
 		this.pages = pages;
 		this.currentPage = 0;
 		this.maxPage = (pages.size() - 1) / 2;
@@ -159,7 +159,7 @@ public class BookScreen extends Screen {
 	}
 	
 	@Override
-	public void render(MatrixStack matrixStackIn, int parWidth, int parHeight, float p_73863_3_) {
+	public void render(PoseStack matrixStackIn, int parWidth, int parHeight, float p_73863_3_) {
 
 		RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 		Minecraft.getInstance().getTextureManager().bind(background);
@@ -225,17 +225,17 @@ public class BookScreen extends Screen {
 	}
 	
 	@Override
-	protected void renderTooltip(MatrixStack matrixStackIn, ItemStack item, int x, int y) {
+	protected void renderTooltip(PoseStack matrixStackIn, ItemStack item, int x, int y) {
 		//GlStateManager.pushLightingAttributes();
 		super.renderTooltip(matrixStackIn, item, x, y);
 		//GlStateManager.popAttributes();
 		//GlStateManager.enableBlend();
 	}
 	
-	public void renderTooltipLines(MatrixStack matrixStackIn, List<String> lines, int x, int y) {
-		List<ITextProperties> text = new ArrayList<>(lines.size());
+	public void renderTooltipLines(PoseStack matrixStackIn, List<String> lines, int x, int y) {
+		List<FormattedText> text = new ArrayList<>(lines.size());
 		for (String raw : lines) {
-			text.add(ITextProperties.of(raw));
+			text.add(FormattedText.of(raw));
 		}
 		this.renderWrappedToolTip(matrixStackIn, text, x, y, font);
 	}
@@ -302,7 +302,7 @@ public class BookScreen extends Screen {
         private final BookScreen screen;
 
         public NextPageButton(BookScreen screen, int parPosX, int parPosY, boolean parIsNextButton) {
-            super(parPosX, parPosY, 23, 13, StringTextComponent.EMPTY);
+            super(parPosX, parPosY, 23, 13, TextComponent.EMPTY);
             isNextButton = parIsNextButton;
             this.screen = screen;
         }
@@ -311,7 +311,7 @@ public class BookScreen extends Screen {
          * Draws this button to the screen.
          */
         @Override
-        public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
+        public void render(PoseStack matrixStackIn, int parX, int parY, float partialTicks) {
         	if (visible) {
                 boolean isButtonPressed = (parX >= x 
 
@@ -353,7 +353,7 @@ public class BookScreen extends Screen {
 		 private final BookScreen screen;
 		
 		public HomeButton(BookScreen screen, int parPosX, int parPosY) {
-            super(parPosX, parPosY, 23, 13, StringTextComponent.EMPTY);
+            super(parPosX, parPosY, 23, 13, TextComponent.EMPTY);
             this.screen = screen;
 		}
 
@@ -361,7 +361,7 @@ public class BookScreen extends Screen {
 		 *Draws this button to the screen.
 		 */
         @Override
-        public void render(MatrixStack matrixStackIn, int parX, int parY, float partialTicks) {
+        public void render(PoseStack matrixStackIn, int parX, int parY, float partialTicks) {
         	if (visible) {
         		boolean isButtonPressed = (parX >= x 
         				&& parY >= y 
@@ -383,8 +383,8 @@ public class BookScreen extends Screen {
             }
         }
         
-        public void playPressSound(SoundHandler soundHandlerIn) {
-        	soundHandlerIn.play(SimpleSound.forUI(NostrumMagicaSounds.UI_TICK.getEvent(), 1.0F));
+        public void playPressSound(SoundManager soundHandlerIn) {
+        	soundHandlerIn.play(SimpleSoundInstance.forUI(NostrumMagicaSounds.UI_TICK.getEvent(), 1.0F));
         }
 
 		@Override
@@ -401,7 +401,7 @@ public class BookScreen extends Screen {
 	 */
 	public static void makePagesFrom(List<IBookPage> pages, String input) {
 		Minecraft mc = Minecraft.getInstance();
-		FontRenderer fonter = mc.font;
+		Font fonter = mc.font;
 		final int maxLines = (PAGE_HEIGHT / (LinedTextPage.LINE_HEIGHT_EXTRA + fonter.lineHeight)) - 1;
 		String lines[];
 		int count;

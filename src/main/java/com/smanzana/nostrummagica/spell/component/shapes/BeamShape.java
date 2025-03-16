@@ -17,13 +17,13 @@ import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.Lazy;
 
 /**
@@ -80,10 +80,10 @@ public class BeamShape extends InstantShape {
 	protected TriggerData getTargetData(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		final boolean hitsAir = hitsAir(params);
 		// Cast from eyes
-		final Vector3d start = location.shooterPosition;
-		final Vector3d dir = RayTrace.directionFromAngles(pitch, yaw);
-		final Vector3d end = start.add(dir.normalize().scale(BEAM_RANGE));
-		Collection<RayTraceResult> traces = RayTrace.allInPath(location.world, state.getSelf(), start, end, new RayTrace.OtherLiving(state.getCaster()), hitsAir);
+		final Vec3 start = location.shooterPosition;
+		final Vec3 dir = RayTrace.directionFromAngles(pitch, yaw);
+		final Vec3 end = start.add(dir.normalize().scale(BEAM_RANGE));
+		Collection<HitResult> traces = RayTrace.allInPath(location.world, state.getSelf(), start, end, new RayTrace.OtherLiving(state.getCaster()), hitsAir);
 		List<LivingEntity> targs = null;
 		List<SpellLocation> blocks = null;
 		
@@ -91,14 +91,14 @@ public class BeamShape extends InstantShape {
 			targs = new LinkedList<>();
 			blocks = new LinkedList<>();
 			
-			for (RayTraceResult trace : traces) {
+			for (HitResult trace : traces) {
 				if (trace == null)
 					continue;
 				
-				if (trace.getType() == RayTraceResult.Type.MISS)
+				if (trace.getType() == HitResult.Type.MISS)
 					continue;
 				
-				if (trace.getType() == RayTraceResult.Type.ENTITY) {
+				if (trace.getType() == HitResult.Type.ENTITY) {
 					if (RayTrace.livingFromRaytrace(trace) != null) {
 						targs.add(RayTrace.livingFromRaytrace(trace));
 					}
@@ -132,12 +132,12 @@ public class BeamShape extends InstantShape {
 	}
 
 	@Override
-	public boolean shouldTrace(PlayerEntity player, SpellShapeProperties params) {
+	public boolean shouldTrace(Player player, SpellShapeProperties params) {
 		return true;
 	}
 	
 	@Override
-	public double getTraceRange(PlayerEntity player, SpellShapeProperties params) {
+	public double getTraceRange(Player player, SpellShapeProperties params) {
 		return BEAM_RANGE;
 	}
 
@@ -153,10 +153,10 @@ public class BeamShape extends InstantShape {
 	
 	@Override
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
-		final Vector3d from = location.shooterPosition;
-		final Vector3d dir = RayTrace.directionFromAngles(pitch, yaw);
-		final Vector3d maxDist = from.add(dir.normalize().scale(BEAM_RANGE));
-		builder.add(new SpellShapePreviewComponent.AoELine(from.add(0, -.25, 0).add(Vector3d.directionFromRotation(pitch, yaw+90).scale(.1f)), maxDist, 3f));
+		final Vec3 from = location.shooterPosition;
+		final Vec3 dir = RayTrace.directionFromAngles(pitch, yaw);
+		final Vec3 maxDist = from.add(dir.normalize().scale(BEAM_RANGE));
+		builder.add(new SpellShapePreviewComponent.AoELine(from.add(0, -.25, 0).add(Vec3.directionFromRotation(pitch, yaw+90).scale(.1f)), maxDist, 3f));
 		return super.addToPreview(builder, state, entity, location, pitch, yaw, properties, characteristics);
 	}
 

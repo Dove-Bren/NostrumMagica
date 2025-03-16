@@ -11,17 +11,17 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.tile.ShrineTileEntity;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public abstract class ShrineTriggerEntity<E extends ShrineTileEntity<?>> extends TileProxyTriggerEntity<E> {
 	
 	protected static final String ID_BASE = "entity_shrine_ent_";
 	
-	protected ShrineTriggerEntity(EntityType<? extends ShrineTriggerEntity<E>> type, World worldIn) {
+	protected ShrineTriggerEntity(EntityType<? extends ShrineTriggerEntity<E>> type, Level worldIn) {
 		super(type, worldIn);
 	}
 	
@@ -37,11 +37,11 @@ public abstract class ShrineTriggerEntity<E extends ShrineTileEntity<?>> extends
 
 	@Override
 	protected boolean canBeHitBy(LivingEntity attacker) {
-		return attacker instanceof PlayerEntity && !isInvisibleTo((PlayerEntity) attacker);
+		return attacker instanceof Player && !isInvisibleTo((Player) attacker);
 	}
 	
 	@Override
-	public boolean isInvisibleTo(PlayerEntity player) {
+	public boolean isInvisibleTo(Player player) {
 		if (this.getLinkedTileEntity() == null) {
 			return true;
 		}
@@ -67,7 +67,7 @@ public abstract class ShrineTriggerEntity<E extends ShrineTileEntity<?>> extends
 	public static class Element extends ShrineTriggerEntity<ShrineTileEntity.Element> {
 		public static final String ID = ID_BASE + "element";
 		
-		public Element(EntityType<? extends ShrineTriggerEntity<ShrineTileEntity.Element>> type, World worldIn) {
+		public Element(EntityType<? extends ShrineTriggerEntity<ShrineTileEntity.Element>> type, Level worldIn) {
 			super(type, worldIn);
 		}
 		
@@ -82,7 +82,7 @@ public abstract class ShrineTriggerEntity<E extends ShrineTileEntity<?>> extends
 	public static class Shape extends ShrineTriggerEntity<ShrineTileEntity.Shape> {
 		public static final String ID = ID_BASE + "shape";
 		
-		public Shape(EntityType<? extends ShrineTriggerEntity<ShrineTileEntity.Shape>> type, World worldIn) {
+		public Shape(EntityType<? extends ShrineTriggerEntity<ShrineTileEntity.Shape>> type, Level worldIn) {
 			super(type, worldIn);
 		}
 		
@@ -101,7 +101,7 @@ public abstract class ShrineTriggerEntity<E extends ShrineTileEntity<?>> extends
 	public static class Alteration extends ShrineTriggerEntity<ShrineTileEntity.Alteration> {
 		public static final String ID = ID_BASE + "alteration";
 		
-		public Alteration(EntityType<? extends ShrineTriggerEntity<ShrineTileEntity.Alteration>> type, World worldIn) {
+		public Alteration(EntityType<? extends ShrineTriggerEntity<ShrineTileEntity.Alteration>> type, Level worldIn) {
 			super(type, worldIn);
 		}
 		
@@ -116,7 +116,7 @@ public abstract class ShrineTriggerEntity<E extends ShrineTileEntity<?>> extends
 	public static class Tier extends ShrineTriggerEntity<ShrineTileEntity.Tier> {
 		public static final String ID = ID_BASE + "tier";
 		
-		public Tier(EntityType<? extends ShrineTriggerEntity<ShrineTileEntity.Tier>> type, World worldIn) {
+		public Tier(EntityType<? extends ShrineTriggerEntity<ShrineTileEntity.Tier>> type, Level worldIn) {
 			super(type, worldIn);
 		}
 		

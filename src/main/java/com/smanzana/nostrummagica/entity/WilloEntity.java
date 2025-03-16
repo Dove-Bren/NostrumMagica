@@ -38,55 +38,55 @@ import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.SpellUtils;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntitySize;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MoverType;
-import net.minecraft.entity.Pose;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.controller.MovementController;
-import net.minecraft.entity.ai.goal.Goal;
-import net.minecraft.entity.ai.goal.HurtByTargetGoal;
-import net.minecraft.entity.ai.goal.LookAtGoal;
-import net.minecraft.entity.ai.goal.LookRandomlyGoal;
-import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
-import net.minecraft.entity.monster.MonsterEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.MoveControl;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.Registry;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElementalEntity {
+public class WilloEntity extends Monster implements ILoreSupplier, IElementalEntity {
 	
 	public static enum WilloStatus {
 		NEUTRAL,
@@ -97,12 +97,12 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 	public static final String ID = "entity_willo";
 	
 	protected static final double MAX_WISP_DISTANCE_SQ = 144;
-	protected static final DataParameter<EMagicElement> ELEMENT = EntityDataManager.<EMagicElement>defineId(WilloEntity.class, MagicElementDataSerializer.instance);
-	protected static final DataParameter<WilloStatus> STATUS = EntityDataManager.<WilloStatus>defineId(WilloEntity.class, WilloStatusSerializer.instance);
+	protected static final EntityDataAccessor<EMagicElement> ELEMENT = SynchedEntityData.<EMagicElement>defineId(WilloEntity.class, MagicElementDataSerializer.instance);
+	protected static final EntityDataAccessor<WilloStatus> STATUS = SynchedEntityData.<WilloStatus>defineId(WilloEntity.class, WilloStatusSerializer.instance);
 	
 	private int idleCooldown;
 	
-	public WilloEntity(EntityType<? extends WilloEntity> type, World worldIn) {
+	public WilloEntity(EntityType<? extends WilloEntity> type, Level worldIn) {
 		super(type, worldIn);
 		this.setNoGravity(true);
 		this.moveControl = new WispMoveHelper(this);
@@ -138,16 +138,16 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 			}
 		});
 		this.goalSelector.addGoal(priority++, new AIRandomFly(this));
-		this.goalSelector.addGoal(priority++, new LookAtGoal(this, PlayerEntity.class, 60f));
-		this.goalSelector.addGoal(priority++, new LookRandomlyGoal(this));
+		this.goalSelector.addGoal(priority++, new LookAtPlayerGoal(this, Player.class, 60f));
+		this.goalSelector.addGoal(priority++, new RandomLookAroundGoal(this));
 		
 		priority = 1;
 		this.targetSelector.addGoal(priority++, new HurtByTargetGoal(this).setAlertOthers(WilloEntity.class));
-		this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<PlayerEntity>(this, PlayerEntity.class, 10, true, false, null));
+		this.targetSelector.addGoal(priority++, new NearestAttackableTargetGoal<Player>(this, Player.class, 10, true, false, null));
 	}
 	
-	public static final AttributeModifierMap.MutableAttribute BuildAttributes() {
-		return MonsterEntity.createMonsterAttributes()
+	public static final AttributeSupplier.Builder BuildAttributes() {
+		return Monster.createMonsterAttributes()
 			.add(Attributes.MOVEMENT_SPEED, 0.2D)
 			.add(Attributes.MAX_HEALTH, 10.0D)
 			.add(Attributes.ARMOR, 4.0D)
@@ -178,7 +178,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 		return 1F;
 	}
 
-	protected float getStandingEyeHeight(Pose pose, EntitySize size)
+	protected float getStandingEyeHeight(Pose pose, EntityDimensions size)
 	{
 		return this.getBbHeight() * 0.5F;
 	}
@@ -195,11 +195,11 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 		return flag;
 	}
 
-	public ActionResultType /*processInteract*/ mobInteract(PlayerEntity player, Hand hand, @Nonnull ItemStack stack) {
-		return ActionResultType.PASS;
+	public InteractionResult /*processInteract*/ mobInteract(Player player, InteractionHand hand, @Nonnull ItemStack stack) {
+		return InteractionResult.PASS;
 	}
 
-	public boolean canBeLeashed(PlayerEntity player) {
+	public boolean canBeLeashed(Player player) {
 		return false;
 	}
 	
@@ -249,7 +249,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 			
 			EMagicElement element = this.getElement();
 			int color = element.getColor();
-			Vector3d offset = this.calculateViewVector(0f, this.yHeadRot).yRot(random.nextBoolean() ? 90f : -90f).scale(.5)
+			Vec3 offset = this.calculateViewVector(0f, this.yHeadRot).yRot(random.nextBoolean() ? 90f : -90f).scale(.5)
 					.scale(random.nextFloat() * 3 + 1f);
 			NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
 					1,
@@ -258,7 +258,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 					getZ() + offset.z,
 					0, 40, 0,
 					//offset.scale(rand.nextFloat() * .2f),
-					new Vector3d(0, -.05, 0),
+					new Vec3(0, -.05, 0),
 					null
 					).color(color));
 		}
@@ -331,7 +331,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 	}
 	
 	@Override
-	public void readAdditionalSaveData(CompoundNBT compound) {
+	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 		if (compound.contains("element", NBT.TAG_STRING)) {
 			try {
@@ -350,7 +350,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 	}
 	
 	@Override
-	public void addAdditionalSaveData(CompoundNBT compound) {
+	public void addAdditionalSaveData(CompoundTag compound) {
 		super.addAdditionalSaveData(compound);
 		
 		compound.putString("element", this.getElement().name());
@@ -444,7 +444,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 		}
 	}
 	
-	private void playEffect(IParticleData particle) {
+	private void playEffect(ParticleOptions particle) {
 		
 		for (int i = 0; i < 15; ++i) {
 			double d0 = this.random.nextGaussian() * 0.02D;
@@ -469,7 +469,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 	}
 	
 	// Adapted from the wisp move helper
-	static protected class WispMoveHelper extends MovementController {
+	static protected class WispMoveHelper extends MoveControl {
 		private final WilloEntity parentEntity;
 		private int courseChangeCooldown;
 
@@ -480,13 +480,13 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 
 		@Override
 		public void tick() {
-			if (this.operation == MovementController.Action.MOVE_TO) {
+			if (this.operation == MoveControl.Operation.MOVE_TO) {
 				double d0 = this.getWantedX() - this.parentEntity.getX();
 				double d1 = this.getWantedY() - this.parentEntity.getY();
 				double d2 = this.getWantedZ() - this.parentEntity.getZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 
-				d3 = (double)MathHelper.sqrt(d3);
+				d3 = (double)Mth.sqrt(d3);
 				
 //				if (Math.abs(d3) < .5) {
 //					this.parentEntity.getMotion().x = 0;
@@ -512,8 +512,8 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 //				}
 				
 				if (Math.abs(d3) < .5) {
-					this.parentEntity.setDeltaMovement(Vector3d.ZERO);
-					this.operation = MovementController.Action.WAIT;
+					this.parentEntity.setDeltaMovement(Vec3.ZERO);
+					this.operation = MoveControl.Operation.WAIT;
 					return;
 				} else if (this.isNotColliding(this.getWantedX(), this.getWantedY(), this.getWantedZ(), d3)) {
 					float basespeed = (float) this.parentEntity.getAttribute(Attributes.MOVEMENT_SPEED).getValue();
@@ -524,11 +524,11 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 							(d2 / d3) * basespeed  * speedModifier
 							);
 					
-					float f9 = (float)(MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
+					float f9 = (float)(Mth.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
 					this.mob.yRot = this.rotlerp(this.mob.yRot, f9, 90.0F);
 				} else if (courseChangeCooldown-- <= 0) {
 					courseChangeCooldown = this.parentEntity.getRandom().nextInt(5) + 10;
-					this.operation = MovementController.Action.WAIT;
+					this.operation = MoveControl.Operation.WAIT;
 				}
 			}
 		}
@@ -540,7 +540,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 			double d0 = (x - this.parentEntity.getX()) / p_179926_7_;
 			double d1 = (y - this.parentEntity.getY()) / p_179926_7_;
 			double d2 = (z - this.parentEntity.getZ()) / p_179926_7_;
-			AxisAlignedBB axisalignedbb = this.parentEntity.getBoundingBox();
+			AABB axisalignedbb = this.parentEntity.getBoundingBox();
 
 			for (int i = 1; (double)i < p_179926_7_; ++i) {
 				axisalignedbb = axisalignedbb.move(d0, d1, d2);
@@ -556,7 +556,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 	
 	// Copied from EntityFlying class
 		@Override
-		public void travel(Vector3d how) {
+		public void travel(Vec3 how) {
 			if (this.isInWater()) {
 				this.moveRelative(0.02F, how);
 				this.move(MoverType.SELF, this.getDeltaMovement());
@@ -570,7 +570,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 
 				if (this.onGround) {
 					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
-					BlockPos underPos = new BlockPos(MathHelper.floor(this.getX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getZ()));
+					BlockPos underPos = new BlockPos(Mth.floor(this.getX()), Mth.floor(this.getBoundingBox().minY) - 1, Mth.floor(this.getZ()));
 					BlockState underState = this.level.getBlockState(underPos);
 					f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
 				}
@@ -581,7 +581,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 
 				if (this.onGround) {
 					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
-					BlockPos underPos = new BlockPos(MathHelper.floor(this.getX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getZ()));
+					BlockPos underPos = new BlockPos(Mth.floor(this.getX()), Mth.floor(this.getBoundingBox().minY) - 1, Mth.floor(this.getZ()));
 					BlockState underState = this.level.getBlockState(underPos);
 					f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
 				}
@@ -593,7 +593,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 			this.animationSpeedOld = this.animationSpeed;
 			double d1 = this.getX() - this.xo;
 			double d0 = this.getZ() - this.zo;
-			float f2 = MathHelper.sqrt(d1 * d1 + d0 * d0) * 4.0F;
+			float f2 = Mth.sqrt(d1 * d1 + d0 * d0) * 4.0F;
 
 			if (f2 > 1.0F) {
 				f2 = 1.0F;
@@ -612,13 +612,13 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 	}
 	
 	@Override
-	public boolean checkSpawnRules(IWorld world, SpawnReason spawnReason) {
+	public boolean checkSpawnRules(LevelAccessor world, MobSpawnType spawnReason) {
 		if (!super.checkSpawnRules(world, spawnReason)) { // checks light level
 			return false;
 		}
 		
 		// Want to use dimension key but not available with IWorldReadyer
-		RegistryKey<Biome> biomeKey = RegistryKey.create(Registry.BIOME_REGISTRY, world.getBiome(this.blockPosition()).getRegistryName());
+		ResourceKey<Biome> biomeKey = ResourceKey.create(Registry.BIOME_REGISTRY, world.getBiome(this.blockPosition()).getRegistryName());
 		
 //		if (!DimensionUtils.IsOverworld(world) && !DimensionUtils.IsNether(world)) {
 //			return false;
@@ -648,7 +648,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 				return false;
 			}
 			
-			MovementController MovementController = this.parentEntity.getMoveControl();
+			MoveControl MovementController = this.parentEntity.getMoveControl();
 
 			if (!MovementController.hasWanted()) {
 				return true;
@@ -674,7 +674,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 		 */
 		public void start() {
 			Random random = this.parentEntity.getRandom();
-			final Vector3d center = (parentEntity.getTarget() == null ? parentEntity.position() : parentEntity.getTarget().position());
+			final Vec3 center = (parentEntity.getTarget() == null ? parentEntity.position() : parentEntity.getTarget().position());
 			final float range = (parentEntity.getTarget() == null ? 16f : 8f);
 			double d0 = center.x + (double)((random.nextFloat() * 2.0F - 1.0F) * range);
 			double d1 = center.y + (double)((random.nextFloat() * 2.0F - 1.0F) * range);
@@ -682,7 +682,7 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 			
 			// Adjust to above ground
 			double height = random.nextInt(4) + 2;
-			BlockPos.Mutable cursor = new BlockPos.Mutable();
+			BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
 			cursor.set(d0, d1, d2);
 			
 			while (cursor.getY() > 0 && parentEntity.level.isEmptyBlock(cursor)) {
@@ -987,13 +987,13 @@ public class WilloEntity extends MonsterEntity implements ILoreSupplier, IElemen
 	
 	@Override
 	@Nullable
-	public ILivingEntityData finalizeSpawn(IServerWorld world, DifficultyInstance difficulty, SpawnReason reason, @Nullable ILivingEntityData livingdata, @Nullable CompoundNBT dataTag) {
+	public SpawnGroupData finalizeSpawn(ServerLevelAccessor world, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData livingdata, @Nullable CompoundTag dataTag) {
 		final EMagicElement elem = EMagicElement.values()[NostrumMagica.rand.nextInt(EMagicElement.values().length)];
 		setElement(elem);
 		return super.finalizeSpawn(world, difficulty, reason, livingdata, dataTag);
 	}
 	
-	public static boolean canSpawnExtraCheck(EntityType<WilloEntity> type, IServerWorld world, SpawnReason reason, BlockPos pos, Random rand) {
+	public static boolean canSpawnExtraCheck(EntityType<WilloEntity> type, ServerLevelAccessor world, MobSpawnType reason, BlockPos pos, Random rand) {
 		// Do extra checks in the nether, which has a smaller pool of spawns and so weight 1 is bigger than intended
 		
 		if (DimensionUtils.IsNether(world.getLevel())) {

@@ -7,10 +7,10 @@ import java.util.function.Consumer;
 import com.smanzana.nostrummagica.client.gui.container.SimpleInventoryWidget.IHiddenSlotFactory;
 import com.smanzana.nostrummagica.util.Rectangle;
 
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 public class SimpleInventoryContainerlet {
 	
@@ -29,16 +29,16 @@ public class SimpleInventoryContainerlet {
 	protected final int y;
 	protected final int width;
 	protected final int height;
-	protected final ITextComponent title;
+	protected final Component title;
 	protected final Rectangle invBounds;
 	protected final List<HideableSlot> slots;
 	protected final int spilloverRows;
 	
-	public SimpleInventoryContainerlet(Consumer<Slot> container, IInventory inventory, IHiddenSlotFactory factory, int x, int y, int width, int height) {
-		this(container, inventory, factory, x, y, width, height, StringTextComponent.EMPTY);
+	public SimpleInventoryContainerlet(Consumer<Slot> container, Container inventory, IHiddenSlotFactory factory, int x, int y, int width, int height) {
+		this(container, inventory, factory, x, y, width, height, TextComponent.EMPTY);
 	}
 	
-	public SimpleInventoryContainerlet(Consumer<Slot> container, IInventory inventory, IHiddenSlotFactory factory, int x, int y, int width, int height, ITextComponent title) {
+	public SimpleInventoryContainerlet(Consumer<Slot> container, Container inventory, IHiddenSlotFactory factory, int x, int y, int width, int height, Component title) {
 		this.x = x;
 		this.y = y;
 		this.width = width;

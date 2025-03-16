@@ -3,20 +3,20 @@ package com.smanzana.nostrummagica.block.dungeon;
 import com.smanzana.nostrummagica.item.WorldKeyItem;
 import com.smanzana.nostrummagica.tile.LockedDoorTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 
 public class LockedDoorBlock extends MagicDoorBlock {
 
@@ -30,7 +30,7 @@ public class LockedDoorBlock extends MagicDoorBlock {
 	}
 	
 	@Override
-	protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		super.createBlockStateDefinition(builder);
 		builder.add(UNLOCKABLE);
 	}
@@ -41,7 +41,7 @@ public class LockedDoorBlock extends MagicDoorBlock {
 	}
 	
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
 		if (!this.isMaster(state))
 			return null;
 		
@@ -49,7 +49,7 @@ public class LockedDoorBlock extends MagicDoorBlock {
 	}
 	
 	@Override
-	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity playerIn, Hand hand, BlockRayTraceResult hit) {
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (!worldIn.isClientSide()) {
 			BlockPos master = this.getMasterPos(worldIn, state, pos);
 			if (master != null) {
@@ -61,13 +61,13 @@ public class LockedDoorBlock extends MagicDoorBlock {
 					door.setColor(dye.getDyeColor());
 				} else if (playerIn.isCreative() && !heldItem.isEmpty() && heldItem.getItem() instanceof WorldKeyItem) {
 					; // Do nothing and let item take care of it
-					return ActionResultType.PASS;
+					return InteractionResult.PASS;
 				} else {
 					door.attemptUnlock(playerIn);
 				}
 			}
 		}
 		
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 }

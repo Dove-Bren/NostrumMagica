@@ -1,13 +1,13 @@
 package com.smanzana.nostrummagica.client.effects;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -17,7 +17,7 @@ public class ClientEffectHellBurn extends ClientEffect {
 	protected final Entity entity;
 	
 	public ClientEffectHellBurn(Entity entity, int duration) {
-		super(Vector3d.ZERO, null, duration);
+		super(Vec3.ZERO, null, duration);
 		this.entity = entity;
 	}
 	
@@ -33,7 +33,7 @@ public class ClientEffectHellBurn extends ClientEffect {
 	
 	protected void spawnFireEffect() {
 		final double angleRad = Math.PI * 2 * NostrumMagica.rand.nextFloat();
-		final Vector3d offset = new Vector3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
+		final Vec3 offset = new Vec3(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
 		entity.level.addParticle(ParticleTypes.FLAME,
 				entity.getX() + offset.x,
 				entity.getY() + entity.getBbHeight() + offset.y,
@@ -46,7 +46,7 @@ public class ClientEffectHellBurn extends ClientEffect {
 	
 	protected void spawnPoisonEffect() {
 		final double angleRad = Math.PI * 2 * NostrumMagica.rand.nextFloat();
-		final Vector3d offset = new Vector3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
+		final Vec3 offset = new Vec3(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
 		entity.level.addParticle(ParticleTypes.CRIT,
 				entity.getX() + offset.x,
 				entity.getY() + entity.getBbHeight() + offset.y,
@@ -57,7 +57,7 @@ public class ClientEffectHellBurn extends ClientEffect {
 	
 	protected void spawnMagmaEffect() {
 		final double angleRad = Math.PI * 2 * NostrumMagica.rand.nextFloat();
-		final Vector3d dir = new Vector3d(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
+		final Vec3 dir = new Vec3(Math.cos(angleRad) * .5, .25, Math.sin(angleRad) * .5);
 		entity.level.addParticle(ParticleTypes.LAVA,
 				entity.getX(),
 				entity.getY() + entity.getBbHeight() - .1,
@@ -69,7 +69,7 @@ public class ClientEffectHellBurn extends ClientEffect {
 	}
 	
 	@Override
-	protected void drawForm(MatrixStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
 		if (!this.modifiers.isEmpty())
 			for (ClientEffectModifier mod : modifiers) {
 				mod.apply(matrixStackIn, detail, progress, partialTicks);

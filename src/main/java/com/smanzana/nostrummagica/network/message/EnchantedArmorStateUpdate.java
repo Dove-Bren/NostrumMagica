@@ -6,9 +6,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
  * Sent from a client to server, or from a server to a bunch of clients. Updates state information about
@@ -58,7 +58,7 @@ public class EnchantedArmorStateUpdate {
 		this.entityID = entityID;
 	}
 
-	public static EnchantedArmorStateUpdate decode(PacketBuffer buf) {
+	public static EnchantedArmorStateUpdate decode(FriendlyByteBuf buf) {
 		return new EnchantedArmorStateUpdate(
 				buf.readEnum(ArmorState.class),
 				buf.readBoolean(),
@@ -66,7 +66,7 @@ public class EnchantedArmorStateUpdate {
 				);
 	}
 
-	public static void encode(EnchantedArmorStateUpdate msg, PacketBuffer buf) {
+	public static void encode(EnchantedArmorStateUpdate msg, FriendlyByteBuf buf) {
 		buf.writeEnum(msg.state);
 		buf.writeBoolean(msg.data);
 		buf.writeVarInt(msg.entityID);

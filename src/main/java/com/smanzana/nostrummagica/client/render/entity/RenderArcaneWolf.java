@@ -1,21 +1,21 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelArcaneWolf;
 import com.smanzana.nostrummagica.client.render.layer.LayerArcaneWolfRunes;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 public class RenderArcaneWolf extends MobRenderer<ArcaneWolfEntity, ModelArcaneWolf> {
 
 	private static final ResourceLocation ARCANE_WOLF_TEXTURE_BASE = new ResourceLocation(NostrumMagica.MODID, "textures/entity/arcane_wolf/base.png");
 	
-	public RenderArcaneWolf(EntityRendererManager renderManagerIn, float shadowSizeIn) {
+	public RenderArcaneWolf(EntityRenderDispatcher renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelArcaneWolf(), shadowSizeIn);
 		this.addLayer(new LayerArcaneWolfRunes(this));
 	}
@@ -32,7 +32,7 @@ public class RenderArcaneWolf extends MobRenderer<ArcaneWolfEntity, ModelArcaneW
 	}
 	
 	@Override
-	public void render(ArcaneWolfEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+	public void render(ArcaneWolfEntity entity, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		if (entity.isWet()) {
 			//float f = entity.getBrightness() * entity.getShadingWhileWet(partialTicks);
 			float f = entity.getWetShade(partialTicks);

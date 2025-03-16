@@ -6,50 +6,50 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 public class LabeledWidget extends MoveableObscurableWidget {
 	
 	public static interface ILabel {
-		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color);
+		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color);
 	}
 	
 	public static interface IValue {
-		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color, Rectangle2d labelArea);
+		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color, Rect2i labelArea);
 	}
 	
 	protected final Screen parent;
 	protected final ILabel label;
 	protected final IValue value;
 	
-	protected @Nullable List<ITextComponent> tooltip;
+	protected @Nullable List<Component> tooltip;
 	protected int colorLabel = 0xFFAAAAAA;
 	protected int colorValue = 0xFFE4E5D5;
 	protected float scale = 1f;
 	
 	public LabeledWidget(Screen parent, ILabel label, IValue value, int x, int y, int width, int height) {
-		super(x, y, width, height, StringTextComponent.EMPTY);
+		super(x, y, width, height, TextComponent.EMPTY);
 		this.parent = parent;
 		this.label = label;
 		this.value = value;
 	}
 	
-	public LabeledWidget tooltip(List<ITextComponent> tooltip) {
+	public LabeledWidget tooltip(List<Component> tooltip) {
 		this.tooltip = tooltip;
 		return this;
 	}
 	
-	public LabeledWidget tooltip(ITextComponent tooltip) {
+	public LabeledWidget tooltip(Component tooltip) {
 		return tooltip(Lists.newArrayList(tooltip));
 	}
 	
@@ -68,21 +68,21 @@ public class LabeledWidget extends MoveableObscurableWidget {
 		return this;
 	}
 	
-	protected Rectangle2d renderLabel(MatrixStack matrixStackIn, int x, int y, float partialTicks) {
+	protected Rect2i renderLabel(PoseStack matrixStackIn, int x, int y, float partialTicks) {
 		return this.label.render(matrixStackIn, x, y, partialTicks, this.colorLabel);
 	}
 	
-	protected Rectangle2d renderValue(MatrixStack matrixStackIn, int x, int y, float partialTicks, Rectangle2d labelArea) {
+	protected Rect2i renderValue(PoseStack matrixStackIn, int x, int y, float partialTicks, Rect2i labelArea) {
 		return this.value.render(matrixStackIn, x, y, partialTicks, this.colorValue, labelArea);
 	}
 	
 	@Override
-	public void renderButton(MatrixStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+	public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(this.x, this.y, 0);
 		matrixStackIn.scale(scale, scale, 1f);
-		final Rectangle2d labelArea = renderLabel(matrixStackIn, 0, 0, partialTicks);
-		final Rectangle2d valueArea = renderValue(matrixStackIn, labelArea.getWidth(), 0, partialTicks, labelArea);
+		final Rect2i labelArea = renderLabel(matrixStackIn, 0, 0, partialTicks);
+		final Rect2i valueArea = renderValue(matrixStackIn, labelArea.getWidth(), 0, partialTicks, labelArea);
 		matrixStackIn.popPose();
 		
 		// Recalc hover to be actual rendered text length. value can change so have to keep redoing this...
@@ -92,7 +92,7 @@ public class LabeledWidget extends MoveableObscurableWidget {
 	}
 	
 	@Override
-	public void renderToolTip(MatrixStack matrixStackIn, int mouseX, int mouseY) {
+	public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
 		if (this.isHovered() && this.tooltip != null) {
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 100);
@@ -103,27 +103,27 @@ public class LabeledWidget extends MoveableObscurableWidget {
 	
 	public static class TextLabel implements ILabel {
 		
-		private final ITextComponent label;
+		private final Component label;
 		
-		public TextLabel(ITextComponent label) {
+		public TextLabel(Component label) {
 			this.label = label;
 		}
 		
 		@Override
-		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color) {
+		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
 			final Minecraft mc = Minecraft.getInstance();
-			final FontRenderer font = mc.font;
+			final Font font = mc.font;
 			final int len = font.width(label);
 			
 			font.drawShadow(matrixStackIn, label, 0, 0, color);
 			
-			return new Rectangle2d(x, y, len, font.lineHeight);
+			return new Rect2i(x, y, len, font.lineHeight);
 		}
 	}
 	
 	public static class StringLabel extends TextLabel {
 		public StringLabel(String label) {
-			super(new StringTextComponent(label));
+			super(new TextComponent(label));
 		}
 	}
 	
@@ -140,10 +140,10 @@ public class LabeledWidget extends MoveableObscurableWidget {
 		}
 		
 		@Override
-		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color) {
+		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
 			final float[] colors = ColorUtil.ARGBToColor(color);
 			this.icon.render(Minecraft.getInstance(), matrixStackIn, x, y, width, height, colors[0], colors[1], colors[2], colors[3]);
-			return new Rectangle2d(x, y, width, height);
+			return new Rect2i(x, y, width, height);
 		}
 	}
 	
@@ -160,10 +160,10 @@ public class LabeledWidget extends MoveableObscurableWidget {
 		}
 		
 		@Override
-		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color) {
+		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
 			final float[] colors = ColorUtil.ARGBToColor(color);
 			this.icon.draw(matrixStackIn, x, y, width, height, colors[0], colors[1], colors[2], colors[3]);
-			return new Rectangle2d(x, y, width, height);
+			return new Rect2i(x, y, width, height);
 		}
 	}
 	
@@ -176,9 +176,9 @@ public class LabeledWidget extends MoveableObscurableWidget {
 		}
 		
 		@Override
-		public Rectangle2d render(MatrixStack matrixStackIn, int x, int y, float partialTicks, int color, Rectangle2d labelArea) {
+		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color, Rect2i labelArea) {
 			final Minecraft mc = Minecraft.getInstance();
-			final FontRenderer font = mc.font;
+			final Font font = mc.font;
 			final String value = valueGetter.get();
 			final int len = font.width(value);
 			
@@ -188,7 +188,7 @@ public class LabeledWidget extends MoveableObscurableWidget {
 			
 			font.draw(matrixStackIn, value, x, yAdjust, color);
 			
-			return new Rectangle2d(x, yAdjust, len, font.lineHeight);
+			return new Rect2i(x, yAdjust, len, font.lineHeight);
 		}
 	}
 }
