@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.item.equipment;
 
-import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -23,32 +22,32 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentCategory;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.DiggerItem;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
+import net.minecraftforge.common.TierSortingRegistry;
+import net.minecraftforge.common.ToolAction;
+import net.minecraftforge.common.ToolActions;
 
 public class AspectedEarthWeapon extends DiggerItem implements ILoreTagged, ISpellEquipment {
 
@@ -56,10 +55,29 @@ public class AspectedEarthWeapon extends DiggerItem implements ILoreTagged, ISpe
 	
 	private static final float AttackDamage = 3.0f;
 	private static final float AttackSpeed = -1.8f;
-	private static final int HarvestLevel = 3;
 	
 	public AspectedEarthWeapon() {
-		super(AttackDamage, AttackSpeed, Tiers.DIAMOND, new HashSet<>(), NostrumItems.PropEquipment().durability(1440).addToolType(ToolType.PICKAXE, HarvestLevel).addToolType(ToolType.SHOVEL, HarvestLevel));
+		super(AttackDamage, AttackSpeed, Tiers.DIAMOND, BlockTags.MINEABLE_WITH_PICKAXE, NostrumItems.PropEquipment().durability(1440));
+	}
+	
+	protected final boolean toolMatches(ItemStack stack, BlockState state) {
+		return state.is(BlockTags.MINEABLE_WITH_PICKAXE) || state.is(BlockTags.MINEABLE_WITH_SHOVEL);
+	}
+	
+	@Override
+	public boolean canPerformAction(ItemStack stack, ToolAction toolAction) {
+		// Only allow axe mining; Don't strip with special axe
+		return ToolActions.DEFAULT_PICKAXE_ACTIONS.contains(toolAction)
+				|| ToolActions.DEFAULT_SHOVEL_ACTIONS.contains(toolAction);
+	}
+	
+	@Override
+	public float getDestroySpeed(ItemStack stack, BlockState state) {
+		// Simulate pick and shovel
+		if (toolMatches(stack, state)) {
+			return this.speed;
+		}
+		return 1.0f;
 	}
 	
 	@Override
@@ -94,26 +112,14 @@ public class AspectedEarthWeapon extends DiggerItem implements ILoreTagged, ISpe
 	 * Check whether this Item can harvest the given Block
 	 */
 	@Override
-	public boolean isCorrectToolForDrops(BlockState blockIn) {
-		Block block = blockIn.getBlock();
-		final int harvestLevel = this.getHarvestLevel(ItemStack.EMPTY, blockIn.getHarvestTool(), null, blockIn);
-		if (harvestLevel != -1) {
-			return blockIn.getHarvestLevel() <= harvestLevel;
+	public boolean isCorrectToolForDrops(ItemStack stack, BlockState blockIn) {
+		if (toolMatches(stack, blockIn)) {
+			return TierSortingRegistry.isCorrectTierForDrops(getTier(), blockIn);
 		}
 		
-		// Copied from pickaxe and shovel
-		Material material = blockIn.getMaterial();
-		return material == Material.STONE || material == Material.METAL || material == Material.HEAVY_METAL
-				|| block == Blocks.SNOW || block == Blocks.SNOW_BLOCK;
+		return false;
 	}
 
-	@Override
-	public float getDestroySpeed(ItemStack stack, BlockState state) {
-		// Copied from pickaxe
-		Material material = state.getMaterial();
-		return material != Material.METAL && material != Material.HEAVY_METAL && material != Material.STONE ? super.getDestroySpeed(stack, state) : this.speed;
-	}
-	
 	@Override
 	public String getLoreKey() {
 		return "sword_earth";

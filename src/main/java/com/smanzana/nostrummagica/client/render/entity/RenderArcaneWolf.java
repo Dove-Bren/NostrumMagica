@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.client.render.layer.LayerArcaneWolfRunes;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
@@ -15,7 +15,7 @@ public class RenderArcaneWolf extends MobRenderer<ArcaneWolfEntity, ModelArcaneW
 
 	private static final ResourceLocation ARCANE_WOLF_TEXTURE_BASE = new ResourceLocation(NostrumMagica.MODID, "textures/entity/arcane_wolf/base.png");
 	
-	public RenderArcaneWolf(EntityRenderDispatcher renderManagerIn, float shadowSizeIn) {
+	public RenderArcaneWolf(EntityRendererProvider.Context renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelArcaneWolf(), shadowSizeIn);
 		this.addLayer(new LayerArcaneWolfRunes(this));
 	}

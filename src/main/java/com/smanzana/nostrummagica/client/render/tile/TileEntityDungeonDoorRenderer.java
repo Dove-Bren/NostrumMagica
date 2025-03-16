@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.block.dungeon.LockedDoorBlock;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.tile.DungeonDoorTileEntity;
@@ -9,20 +10,19 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import com.mojang.math.Vector3f;
 
 public class TileEntityDungeonDoorRenderer extends TileEntityLockedDoorRenderer<DungeonDoorTileEntity> {
 
-	public TileEntityDungeonDoorRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
-		super(rendererDispatcherIn);
+	public TileEntityDungeonDoorRenderer(BlockEntityRendererProvider.Context context) {
+		super(context);
 	}
 	
 	protected void renderLock(DungeonDoorTileEntity tileEntityIn, double ticks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		final BoundingBox bounds = tileEntityIn.getDoorBounds();
-		final float yDiff = bounds.y1 + 1 - bounds.y0;
+		final float yDiff = bounds.maxY() + 1 - bounds.minY();
 		
 		final float width = .75f;
 		final float height = .75f;
@@ -38,7 +38,7 @@ public class TileEntityDungeonDoorRenderer extends TileEntityLockedDoorRenderer<
 			glow = .5f + (.15f * (float) Math.sin(glowProg * 2 * Math.PI));
 		}
 		
-		final int colorRGB = tileEntityIn.getColor().getColorValue();
+		final int colorRGB = tileEntityIn.getColor().getTextColor();
 		final float red = ((float) ((colorRGB >> 16) & 0xFF) / 255f);
 		final float green = ((float) ((colorRGB >> 8) & 0xFF) / 255f);
 		final float blue = ((float) ((colorRGB >> 0) & 0xFF) / 255f);

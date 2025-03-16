@@ -9,7 +9,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public abstract class FlyingDragonEntity extends DragonEntity {
 
@@ -131,7 +131,7 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 
-        if (compound.contains(DRAGON_SERIAL_FLYING_TOK, NBT.TAG_ANY_NUMERIC)) {
+        if (compound.contains(DRAGON_SERIAL_FLYING_TOK, Tag.TAG_ANY_NUMERIC)) {
         	int i = compound.getByte(DRAGON_SERIAL_FLYING_TOK);
         	FlyState state = FlyState.values()[i];
         	if (state == FlyState.LANDING) {

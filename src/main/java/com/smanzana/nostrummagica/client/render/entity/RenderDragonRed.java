@@ -11,21 +11,21 @@ import com.smanzana.nostrummagica.item.armor.DragonArmor;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
 
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 public class RenderDragonRed<T extends RedDragonBaseEntity> extends MobRenderer<T, ModelDragonRed<T>> {
 
 	protected final ModelDragonRed<T> dragonModel;
 	
-	public RenderDragonRed(EntityRenderDispatcher renderManagerIn, float shadowSizeIn) {
+	public RenderDragonRed(EntityRendererProvider.Context renderManagerIn, float shadowSizeIn) {
 		this(renderManagerIn, new ModelDragonRed<>(), shadowSizeIn);
 	}
 	
-	protected RenderDragonRed(EntityRenderDispatcher renderManagerIn, ModelDragonRed<T> modelBase, float shadowSizeIn) {
+	protected RenderDragonRed(EntityRendererProvider.Context renderManagerIn, ModelDragonRed<T> modelBase, float shadowSizeIn) {
 		super(renderManagerIn, modelBase, shadowSizeIn);
 		this.dragonModel = modelBase;
 	}

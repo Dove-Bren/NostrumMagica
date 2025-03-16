@@ -45,7 +45,7 @@ import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class ReagentBag extends Item implements ILoreTagged {
 
@@ -160,7 +160,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 				return ItemStack.EMPTY;
 			
 			CompoundTag items = bag.getTag().getCompound(NBT_ITEMS);
-			if (items.contains(pos + "", NBT.TAG_COMPOUND))
+			if (items.contains(pos + "", Tag.TAG_COMPOUND))
 				return ItemStack.of(items.getCompound(pos + ""));
 			else
 				return ItemStack.EMPTY;
@@ -220,7 +220,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
-		int pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, hand);
+		int pos = Inventories.getPlayerHandSlotIndex(playerIn.getInventory(), hand);
 		NostrumMagica.instance.proxy.openContainer(playerIn, ReagentBagGui.BagContainer.Make(pos));
 		
 		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, playerIn.getItemInHand(hand));

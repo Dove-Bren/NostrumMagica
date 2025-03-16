@@ -35,7 +35,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.TicketType;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 public class ObeliskTileEntity extends BlockEntity implements TickableBlockEntity {
@@ -203,11 +203,11 @@ public class ObeliskTileEntity extends BlockEntity implements TickableBlockEntit
 	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
-		if (nbt == null || !nbt.contains(NBT_MASTER, NBT.TAG_BYTE))
+		if (nbt == null || !nbt.contains(NBT_MASTER, Tag.TAG_BYTE))
 			return;
 
 		this.master = nbt.getBoolean(NBT_MASTER);
-		ListTag list = nbt.getList(NBT_TARGETS, NBT.TAG_COMPOUND);
+		ListTag list = nbt.getList(NBT_TARGETS, Tag.TAG_COMPOUND);
 		if (list != null && list.size() > 0) {
 			this.targets = new ArrayList<>(list.size());
 			for (int i = 0; i < list.size(); i++) {

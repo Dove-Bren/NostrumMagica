@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.dungeon.LockedDoorBlock;
@@ -14,50 +16,47 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import com.mojang.math.Matrix4f;
 import net.minecraft.world.phys.Vec3;
-import com.mojang.math.Vector3f;
 
-public class TileEntityLockedDoorRenderer<E extends LockedDoorTileEntity> extends BlockEntityRenderer<E> {
+public class TileEntityLockedDoorRenderer<E extends LockedDoorTileEntity> extends BlockEntityRendererBase<E> {
 
 	public static final ResourceLocation TEX_GEM_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/gui/brass.png");
 	public static final ResourceLocation TEX_PLATE_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/block/ceramic_generic.png");
 	
-	public TileEntityLockedDoorRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
-		super(rendererDispatcherIn);
+	public TileEntityLockedDoorRenderer(BlockEntityRendererProvider.Context context) {
+		super(context);
 	}
 	
 	protected void renderChains(E tileEntityIn, double ticks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		final BoundingBox bounds = tileEntityIn.getDoorBounds();
 		final float length = (float) Math.sqrt(
-				Math.pow(bounds.x1 + 1 - bounds.x0, 2)
-				+ Math.pow(bounds.y1 + 1 - bounds.y0, 2)
-				+ Math.pow(bounds.z1 + 1 - bounds.z0, 2)
+				Math.pow(bounds.maxX() + 1 - bounds.minX(), 2)
+				+ Math.pow(bounds.maxY() + 1 - bounds.minY(), 2)
+				+ Math.pow(bounds.maxZ() + 1 - bounds.minZ(), 2)
 				);
 		final float chainWidth = .25f;
 		final float zOffset = -(chainWidth/2f);
 		final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.LOCKEDCHEST_CHAIN);
-		final float yDiff = bounds.y1 + 1 - bounds.y0;
+		final float yDiff = bounds.maxY() + 1 - bounds.minY();
 		final float hDiff;
 		switch (tileEntityIn.getFace()) {
 		case NORTH:
 		default:
-			hDiff = bounds.x1 + 1 - bounds.x0;
+			hDiff = bounds.maxX() + 1 - bounds.minX();
 			break;
 		case EAST:
-			hDiff = bounds.z1 + 1 - bounds.z0;
+			hDiff = bounds.maxZ() + 1 - bounds.minZ();
 			break;
 		case SOUTH:
-			hDiff = bounds.x1 + 1 - bounds.x0;
+			hDiff = bounds.maxX() + 1 - bounds.minX();
 			break;
 		case WEST:
-			hDiff = bounds.z1 + 1 - bounds.z0;
+			hDiff = bounds.maxZ() + 1 - bounds.minZ();
 			break;
 		}
 		
@@ -124,7 +123,7 @@ public class TileEntityLockedDoorRenderer<E extends LockedDoorTileEntity> extend
 	
 	protected void renderLock(E tileEntityIn, double ticks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		final BoundingBox bounds = tileEntityIn.getDoorBounds();
-		final float yDiff = bounds.y1 + 1 - bounds.y0;
+		final float yDiff = bounds.maxY() + 1 - bounds.minY();
 		
 		final float width = .75f;
 		final float height = .75f;
@@ -140,7 +139,7 @@ public class TileEntityLockedDoorRenderer<E extends LockedDoorTileEntity> extend
 			glow = .5f + (.15f * (float) Math.sin(glowProg * 2 * Math.PI));
 		}
 		
-		final int colorRGB = tileEntityIn.getColor().getColorValue();
+		final int colorRGB = tileEntityIn.getColor().getTextColor();
 		final float red = ((float) ((colorRGB >> 16) & 0xFF) / 255f);
 		final float green = ((float) ((colorRGB >> 8) & 0xFF) / 255f);
 		final float blue = ((float) ((colorRGB >> 0) & 0xFF) / 255f);
@@ -176,9 +175,9 @@ public class TileEntityLockedDoorRenderer<E extends LockedDoorTileEntity> extend
 			BlockPos pos = tileEntityIn.getBlockPos();
 			BoundingBox bounds = tileEntityIn.getDoorBounds();
 			Vec3 centerPos = new Vec3(
-					bounds.x0 + (float) (bounds.x1 + 1 - bounds.x0) / 2,
-					bounds.y0,
-					bounds.z0 + (float) (bounds.z1 + 1 - bounds.z0) / 2
+					bounds.minX() + (float) (bounds.maxX() + 1 - bounds.minX()) / 2,
+					bounds.minY(),
+					bounds.minZ() + (float) (bounds.maxZ() + 1 - bounds.minZ()) / 2
 					);
 			matrixStackIn.translate(centerPos.x() - pos.getX(), centerPos.y() - pos.getY(), centerPos.z() - pos.getZ());
 		}
@@ -217,7 +216,7 @@ public class TileEntityLockedDoorRenderer<E extends LockedDoorTileEntity> extend
 			matrixStackIn.translate(0, 1, drawZ);
 			matrixStackIn.scale(-VANILLA_FONT_SCALE * 2, -VANILLA_FONT_SCALE * 2, VANILLA_FONT_SCALE * 2);
 			
-			Font fonter = this.renderer.font;
+			Font fonter = context.getBlockEntityRenderDispatcher().font;
 			fonter.drawInBatch(lockStr, fonter.width(lockStr) / -2, 0, color, false, matrixStackIn.last().pose(), bufferIn, false, 0x0, combinedLightIn);
 			matrixStackIn.popPose();
 		}

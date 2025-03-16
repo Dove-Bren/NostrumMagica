@@ -50,7 +50,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 /**
  * Magic mirror that links to another and transports items!
@@ -278,7 +278,7 @@ public class ParadoxMirrorBlock extends Block implements ILoreTagged {
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, BlockGetter worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-		if (stack.isEmpty() || !stack.hasTag() || !stack.getTag().contains(NBT_LINKED_POS, NBT.TAG_COMPOUND))
+		if (stack.isEmpty() || !stack.hasTag() || !stack.getTag().contains(NBT_LINKED_POS, Tag.TAG_COMPOUND))
 			return;
 		
 		BlockPos pos = NbtUtils.readBlockPos(stack.getTag().getCompound(NBT_LINKED_POS));

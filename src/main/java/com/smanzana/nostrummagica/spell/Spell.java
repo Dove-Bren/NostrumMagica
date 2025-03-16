@@ -1124,7 +1124,7 @@ public class Spell {
 	}
 	
 	/**
-	 * Deserializes a spell from NBT.
+	 * Deserializes a spell from Tag.
 	 * Does not register it in the registry
 	 * @param nbt
 	 * @param id

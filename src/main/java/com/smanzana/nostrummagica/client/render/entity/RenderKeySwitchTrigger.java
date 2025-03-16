@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Vector3f;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBillboard;
@@ -13,13 +14,12 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Vector3f;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 public class RenderKeySwitchTrigger extends LivingEntityRenderer<KeySwitchTriggerEntity, ModelKeySwitchTrigger> {
 
@@ -28,7 +28,7 @@ public class RenderKeySwitchTrigger extends LivingEntityRenderer<KeySwitchTrigge
 
 	protected ModelBillboard iconModel;
 	
-	public RenderKeySwitchTrigger(EntityRenderDispatcher renderManagerIn) {
+	public RenderKeySwitchTrigger(EntityRendererProvider.Context renderManagerIn) {
 		super(renderManagerIn, new ModelKeySwitchTrigger(), .1f);
 		iconModel = new ModelBillboard();
 		iconModel.setRadius(.25f);

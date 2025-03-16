@@ -23,7 +23,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class SpellPlate extends Item implements ILoreTagged {
 
@@ -219,7 +219,7 @@ public class SpellPlate extends Item implements ILoreTagged {
 			return null;
 		
 		List<SpellTomeEnhancementWrapper> enhancements = new LinkedList<>();
-		ListTag list = stack.getTag().getList(NBT_ENHANCEMENTS, NBT.TAG_COMPOUND);
+		ListTag list = stack.getTag().getList(NBT_ENHANCEMENTS, Tag.TAG_COMPOUND);
 		if (list == null || list.isEmpty())
 			return enhancements;
 		

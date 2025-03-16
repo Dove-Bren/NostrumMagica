@@ -13,15 +13,15 @@ import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.Snowball;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.Snowball;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -106,7 +106,7 @@ public class ElementalIceArmor extends ElementalArmor {
 							entity.addEffect(new MobEffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * 1), 0));
 						}
 					}
-					event.getSource().getDirectEntity().remove();
+					event.getSource().getDirectEntity().discard();
 					event.setCanceled(true);
 					
 					NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(

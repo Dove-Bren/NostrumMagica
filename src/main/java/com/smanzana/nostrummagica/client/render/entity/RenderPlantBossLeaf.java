@@ -1,16 +1,16 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelPlantBossLeaf;
 import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Vector3f;
 
 public class RenderPlantBossLeaf extends EntityRenderer<PlantBossEntity.PlantBossLeafLimb> {
 
@@ -18,7 +18,7 @@ public class RenderPlantBossLeaf extends EntityRenderer<PlantBossEntity.PlantBos
 	
 	protected ModelPlantBossLeaf mainModel;
 	
-	public RenderPlantBossLeaf(EntityRenderDispatcher renderManagerIn) {
+	public RenderPlantBossLeaf(EntityRendererProvider.Context renderManagerIn) {
 		super(renderManagerIn);
 		
 		mainModel = new ModelPlantBossLeaf();

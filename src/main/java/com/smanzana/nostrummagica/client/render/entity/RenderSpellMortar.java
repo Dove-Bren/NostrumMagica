@@ -2,6 +2,9 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.entity.SpellMortarEntity;
@@ -9,12 +12,9 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
 
 public class RenderSpellMortar extends EntityRenderer<SpellMortarEntity> {
 	
@@ -22,7 +22,7 @@ public class RenderSpellMortar extends EntityRenderer<SpellMortarEntity> {
 	
 	private final float scale;
 
-	public RenderSpellMortar(EntityRenderDispatcher renderManager, float scale) {
+	public RenderSpellMortar(EntityRendererProvider.Context renderManager, float scale) {
 		super(renderManager);
 		this.scale = scale;
 	}

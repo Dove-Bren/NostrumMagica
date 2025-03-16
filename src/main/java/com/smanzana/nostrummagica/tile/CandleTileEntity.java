@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class CandleTileEntity extends BlockEntity implements TickableBlockEntity, IReagentProviderTile {
 	
@@ -64,7 +64,7 @@ public class CandleTileEntity extends BlockEntity implements TickableBlockEntity
 	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
-		if (nbt == null || !nbt.contains(NBT_TYPE, NBT.TAG_STRING))
+		if (nbt == null || !nbt.contains(NBT_TYPE, Tag.TAG_STRING))
 			return;
 		
 		this.type = parseType(nbt.getString(NBT_TYPE));

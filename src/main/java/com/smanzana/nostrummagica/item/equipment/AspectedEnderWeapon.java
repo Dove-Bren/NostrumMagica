@@ -149,7 +149,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	
 	protected Vec3 getCastPosition(LivingEntity caster) {
 		HitResult result = RayTrace.raytrace(caster.level, caster, caster.position().add(0, caster.getEyeHeight(), 0),
-				caster.xRot, caster.yRot, MAX_BALL_DIST, (ent) -> {
+				caster.getXRot(), caster.getYRot(), MAX_BALL_DIST, (ent) -> {
 					return false; // Don't want entities
 				});
 		
@@ -169,7 +169,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	
 	protected @Nullable EnderRodBallEntity findNearestBall(LivingEntity caster) {
 		ServerLevel world = (ServerLevel) caster.level;
-		List<Entity> balls = world.getEntities(NostrumEntityTypes.enderRodBall, (e) -> {
+		List<? extends EnderRodBallEntity> balls = world.getEntities(NostrumEntityTypes.enderRodBall, (e) -> {
 			return e != null
 					&& e instanceof EnderRodBallEntity
 					&& caster.equals(((EnderRodBallEntity) e).getOwner());
@@ -229,7 +229,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 			}
 		}
 		
-		ball.remove();
+		ball.discard();
 	}
 	
 	protected void teleportEntity(LivingEntity caster, LivingEntity entity, Vec3 pos) {

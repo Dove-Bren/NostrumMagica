@@ -51,8 +51,8 @@ public class SeekingGem extends Item implements ILoreTagged {
 				? chestFilterIn
 				: IS_DUNGEONCHEST; 
 		
-		final BlockPos min = new BlockPos(bounds.x0, bounds.y0, bounds.z0);
-		final BlockPos max = new BlockPos(bounds.x1, bounds.y1, bounds.z1);
+		final BlockPos min = new BlockPos(bounds.minX(), bounds.minY(), bounds.minZ());
+		final BlockPos max = new BlockPos(bounds.maxX(), bounds.maxY(), bounds.maxZ());
 		List<BlockPos> matches = new ArrayList<>();
 		WorldUtil.ScanBlocks(world, min, max, (worldIn, pos) -> {
 			BlockState state = world.getBlockState(pos);

@@ -2,22 +2,21 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.tile.TrialBlockTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Vector3f;
 
-public class TileEntityTrialRenderer extends BlockEntityRenderer<TrialBlockTileEntity> {
+public class TileEntityTrialRenderer extends BlockEntityRendererBase<TrialBlockTileEntity> {
 
-	public TileEntityTrialRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
+	public TileEntityTrialRenderer(BlockEntityRendererProvider.Context rendererDispatcherIn) {
 		super(rendererDispatcherIn);
 	}
 	

@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements IOrientedTileEntity {
 	
@@ -160,7 +160,7 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 			this.unlinkedEntID = nbt.getUUID(NBT_ENTITY_ID);
 		}
 		
-		if (nbt.contains(NBT_TRIGGER_OFFSET, NBT.TAG_LONG)) {
+		if (nbt.contains(NBT_TRIGGER_OFFSET, Tag.TAG_LONG)) {
 			// Legacy!
 			this.triggerOffset = WorldUtil.blockPosFromLong1_12_2(nbt.getLong(NBT_TRIGGER_OFFSET));
 		} else if (nbt.contains(NBT_TRIGGER_OFFSET)) {

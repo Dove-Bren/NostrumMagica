@@ -52,7 +52,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOverlay, ISpellCastingTool, ISpellContainerItem {
 	
@@ -251,7 +251,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (nbt == null)
 			nbt = new CompoundTag();
 		
-		ListTag tags = nbt.getList(NBT_SPELLS, NBT.TAG_INT);
+		ListTag tags = nbt.getList(NBT_SPELLS, Tag.TAG_INT);
 		
 		if (tags == null)
 			tags = new ListTag();
@@ -271,7 +271,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (nbt == null)
 			nbt = new CompoundTag();
 		
-		ListTag tags = nbt.getList(NBT_SPELLS, NBT.TAG_INT);
+		ListTag tags = nbt.getList(NBT_SPELLS, Tag.TAG_INT);
 		boolean found = false;
 		
 		if (tags == null)
@@ -338,7 +338,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (nbt == null)
 			return null;
 		
-		ListTag tags = nbt.getList(NBT_SPELLS, NBT.TAG_INT);
+		ListTag tags = nbt.getList(NBT_SPELLS, Tag.TAG_INT);
 		
 		if (tags == null || tags.size() == 0)
 			return null;
@@ -374,7 +374,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 			return makeDefaultPage(itemStack);
 		
 		CompoundTag nbt = itemStack.getTag();
-		ListTag pages = nbt.getList(NBT_PAGE_LIST, NBT.TAG_INT_ARRAY);
+		ListTag pages = nbt.getList(NBT_PAGE_LIST, Tag.TAG_INT_ARRAY);
 		
 		if (pages == null || pages.size() == 0 || pages.size() <= pageIdx) {
 			return makeDefaultPage(itemStack);
@@ -398,7 +398,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		}
 		
 		CompoundTag nbt = itemStack.getOrCreateTag();
-		ListTag pages = (nbt.contains(NBT_PAGE_LIST, NBT.TAG_LIST)) ? nbt.getList(NBT_PAGE_LIST, NBT.TAG_INT_ARRAY) : new ListTag();
+		ListTag pages = (nbt.contains(NBT_PAGE_LIST, Tag.TAG_LIST)) ? nbt.getList(NBT_PAGE_LIST, Tag.TAG_INT_ARRAY) : new ListTag();
 		
 		// Possibly catch up on any pages that aren't in the list yet. Could just go up to pageIdx, but might as well take the time to fill them out all.
 		final int pageCount = getPageCount(itemStack);
@@ -870,8 +870,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	private static List<SpellTomeEnhancementWrapper> readEnhancements(CompoundTag nbt) {
 		List<SpellTomeEnhancementWrapper> list = new LinkedList<>();
 		
-		if (nbt != null && nbt.contains(NBT_ENHANCEMENTS, NBT.TAG_LIST)) {
-			ListTag tags = nbt.getList(NBT_ENHANCEMENTS, NBT.TAG_COMPOUND);
+		if (nbt != null && nbt.contains(NBT_ENHANCEMENTS, Tag.TAG_LIST)) {
+			ListTag tags = nbt.getList(NBT_ENHANCEMENTS, Tag.TAG_COMPOUND);
 			for (int i = 0; i < tags.size(); i++) {
 				CompoundTag tag = tags.getCompound(i);
 				String key = tag.getString(NBT_ENHANCEMENT_KEY);

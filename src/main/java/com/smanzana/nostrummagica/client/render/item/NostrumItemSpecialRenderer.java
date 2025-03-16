@@ -11,24 +11,25 @@ import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.world.item.ItemStack;
 
-@OnlyIn(Dist.CLIENT)
-public class SpellPatternTomeRenderer extends BlockEntityWithoutLevelRenderer {
+public class NostrumItemSpecialRenderer extends BlockEntityWithoutLevelRenderer {
 	
-	public static final SpellPatternTomeRenderer INSTANCE = new SpellPatternTomeRenderer();
+	public static final NostrumItemSpecialRenderer INSTANCE = new NostrumItemSpecialRenderer();
 
 	public static final ResourceLocation BASE_MODEL = NostrumMagica.Loc("item/" + SpellPatternTome.ID + "_base");
+	
+	private NostrumItemSpecialRenderer() {
+		super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
+	}
 	
 	protected BakedModel getBaseModel(ItemStack stack, ItemTransforms.TransformType transform) {
 		return Minecraft.getInstance().getModelManager().getModel(BASE_MODEL);

@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.item.armor;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -15,17 +16,18 @@ import com.smanzana.nostrummagica.loretag.Lore;
 
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.IItemRenderProperties;
 
 public class MageArmor extends ArmorItem implements ILoreTagged {
 	
@@ -154,19 +156,23 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 
 	private static ModelWitchHat<?> model;
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	@OnlyIn(Dist.CLIENT)
-	public <A extends HumanoidModel<?>> A getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlot armorSlot, A _default) {
-		if (armorSlot == EquipmentSlot.HEAD && this.slot == armorSlot) {
-			if (model == null) {
-				model = new ModelWitchHat<>(0f);
+	public void initializeClient(Consumer<IItemRenderProperties> props) {
+		super.initializeClient(props);
+		props.accept(new IItemRenderProperties() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public <A extends HumanoidModel<?>> A getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlot armorSlot, A _default) {
+				if (armorSlot == EquipmentSlot.HEAD && MageArmor.this.slot == armorSlot) {
+					if (model == null) {
+						model = new ModelWitchHat<>(0f);
+					}
+					return (A) model;
+				}
+				return _default;
 			}
-			return (A) model;
-		}
-		return _default;
+		});
 	}
 	
-	//
 
 }

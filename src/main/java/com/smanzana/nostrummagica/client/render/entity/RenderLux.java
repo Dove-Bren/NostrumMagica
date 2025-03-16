@@ -6,13 +6,13 @@ import com.smanzana.nostrummagica.client.model.ModelLux;
 import com.smanzana.nostrummagica.entity.LuxEntity;
 
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
 public class RenderLux extends MobRenderer<LuxEntity, ModelLux> {
 
-	public RenderLux(EntityRenderDispatcher renderManagerIn, float scale) {
+	public RenderLux(EntityRendererProvider.Context renderManagerIn, float scale) {
 		super(renderManagerIn, new ModelLux(), .33f);
 	}
 	

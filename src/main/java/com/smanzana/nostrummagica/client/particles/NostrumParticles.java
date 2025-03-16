@@ -16,7 +16,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -351,7 +351,7 @@ public enum NostrumParticles {
 			final int lifetimeJitter = tag.getInt(NBT_LIFETIME_JITTER);
 			
 			final SpawnParams params;
-			if (tag.contains(NBT_VELOCITY, NBT.TAG_COMPOUND)) {
+			if (tag.contains(NBT_VELOCITY, Tag.TAG_COMPOUND)) {
 				CompoundTag subtag = tag.getCompound(NBT_VELOCITY);
 				final double velocityX = subtag.getDouble("x");
 				final double velocityY = subtag.getDouble("y");
@@ -373,7 +373,7 @@ public enum NostrumParticles {
 						new Vec3(velocityX, velocityY, velocityZ),
 						velocityJitter
 						);
-			} else if (tag.contains(NBT_TARGET_POS, NBT.TAG_COMPOUND)) {
+			} else if (tag.contains(NBT_TARGET_POS, Tag.TAG_COMPOUND)) {
 				CompoundTag subtag = tag.getCompound(NBT_TARGET_POS);
 				final double targetX = subtag.getDouble("x");
 				final double targetY = subtag.getDouble("y");
@@ -384,7 +384,7 @@ public enum NostrumParticles {
 						lifetime, lifetimeJitter,
 						new Vec3(targetX, targetY, targetZ)
 						);
-			} else if (tag.contains(NBT_TARGET_ENT_ID, NBT.TAG_INT)) {
+			} else if (tag.contains(NBT_TARGET_ENT_ID, Tag.TAG_INT)) {
 				final int ID = tag.getInt(NBT_TARGET_ENT_ID);
 				params = new SpawnParams(
 						count,
@@ -402,18 +402,18 @@ public enum NostrumParticles {
 			}
 			
 			// Extra optional data
-			if (tag.contains("color", NBT.TAG_INT)) {
+			if (tag.contains("color", Tag.TAG_INT)) {
 				params.color(tag.getInt("color"));
 			}
-			if (tag.contains(NBT_DIE_ON_TARGET, NBT.TAG_BYTE)) {
+			if (tag.contains(NBT_DIE_ON_TARGET, Tag.TAG_BYTE)) {
 				params.dieOnTarget(tag.getBoolean(NBT_DIE_ON_TARGET));
 			}
 			
-			if (tag.contains(NBT_GRAVITY_STRENGTH, NBT.TAG_FLOAT)) {
+			if (tag.contains(NBT_GRAVITY_STRENGTH, Tag.TAG_FLOAT)) {
 				params.gravity(tag.getFloat(NBT_GRAVITY_STRENGTH));
 			}
 			
-			if (tag.contains(NBT_TARGET_BEHAVIOR, NBT.TAG_INT)) {
+			if (tag.contains(NBT_TARGET_BEHAVIOR, Tag.TAG_INT)) {
 				final int ord = tag.getInt(NBT_TARGET_BEHAVIOR);
 				if (ord < TargetBehavior.values().length) {
 					params.targetBehavior = TargetBehavior.values()[ord];

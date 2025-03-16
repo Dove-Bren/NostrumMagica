@@ -2,6 +2,9 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelRenderShiv;
 import com.smanzana.nostrummagica.client.model.ModelWillo;
@@ -11,12 +14,9 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
 
 public class RenderWillo extends MobRenderer<WilloEntity, ModelRenderShiv<WilloEntity>> {
 
@@ -24,7 +24,7 @@ public class RenderWillo extends MobRenderer<WilloEntity, ModelRenderShiv<WilloE
 	
 	private ModelWillo mainModel;
 	
-	public RenderWillo(EntityRenderDispatcher renderManagerIn, float scale) {
+	public RenderWillo(EntityRendererProvider.Context renderManagerIn, float scale) {
 		super(renderManagerIn, new ModelRenderShiv<WilloEntity>(RenderType::entityCutoutNoCull), .33f);
 		mainModel = new ModelWillo();
 	}

@@ -179,7 +179,7 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellEquipme
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static final float ModelActivated(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn) {
+	public static final float ModelActivated(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn, int entID) {
 		return entityIn != null && hasFreeCast(stack)
 				? 1.0F : 0.0F;
 	}

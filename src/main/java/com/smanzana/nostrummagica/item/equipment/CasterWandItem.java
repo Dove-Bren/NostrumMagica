@@ -51,7 +51,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, ISpellContainerItem, IRaytraceOverlay, ISpellCastingTool {
@@ -156,7 +156,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	public @Nullable Spell getSpell(ItemStack wand) {
 		if (wand.hasTag()) {
 			CompoundTag tag = wand.getTag();
-			if (tag.contains(NBT_SPELL, NBT.TAG_INT)) {
+			if (tag.contains(NBT_SPELL, Tag.TAG_INT)) {
 				final int id = tag.getInt(NBT_SPELL);
 				return NostrumMagica.instance.getSpellRegistry().lookup(id);
 			}

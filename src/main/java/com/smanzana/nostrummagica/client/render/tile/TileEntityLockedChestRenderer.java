@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
@@ -10,24 +12,21 @@ import com.smanzana.nostrummagica.item.WorldKeyItem;
 import com.smanzana.nostrummagica.tile.LockedChestTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import net.minecraft.world.item.ItemStack;
 
-public class TileEntityLockedChestRenderer extends BlockEntityRenderer<LockedChestTileEntity> {
+public class TileEntityLockedChestRenderer extends BlockEntityRendererBase<LockedChestTileEntity> {
 	
 	public static final ResourceLocation TEXT_LOCK_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/models/block/lock_plate.png");
 	public static final ResourceLocation TEXT_CHAINLINK_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/models/block/chain_link.png");
 
-	public TileEntityLockedChestRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
-		super(rendererDispatcherIn);
+	public TileEntityLockedChestRenderer(BlockEntityRendererProvider.Context context) {
+		super(context);
 	}
 	
 	protected void renderLock(LockedChestTileEntity te, double ticks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
@@ -45,7 +44,7 @@ public class TileEntityLockedChestRenderer extends BlockEntityRenderer<LockedChe
 			glow = .5f + (.15f * (float) Math.sin(glowProg * 2 * Math.PI));
 		}
 		
-		final int colorRGB = te.getColor().getColorValue();
+		final int colorRGB = te.getColor().getTextColor();
 		final float red = ((float) ((colorRGB >> 16) & 0xFF) / 255f);
 		final float green = ((float) ((colorRGB >> 8) & 0xFF) / 255f);
 		final float blue = ((float) ((colorRGB >> 0) & 0xFF) / 255f);

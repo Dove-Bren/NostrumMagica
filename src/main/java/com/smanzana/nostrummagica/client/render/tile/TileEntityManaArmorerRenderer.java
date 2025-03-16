@@ -2,24 +2,23 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.tile.ManaArmorerTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
-import com.mojang.math.Vector3f;
+import net.minecraft.world.level.block.state.BlockState;
 
-public class TileEntityManaArmorerRenderer extends BlockEntityRenderer<ManaArmorerTileEntity> {
+public class TileEntityManaArmorerRenderer extends BlockEntityRendererBase<ManaArmorerTileEntity> {
 
-	public TileEntityManaArmorerRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
-		super(rendererDispatcherIn);
+	public TileEntityManaArmorerRenderer(BlockEntityRendererProvider.Context context) {
+		super(context);
 	}
 	
 	@Override

@@ -1,19 +1,18 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.item.ItemStack;
-import com.mojang.math.Vector3f;
 
-public class TileEntityAltarRenderer extends BlockEntityRenderer<AltarTileEntity> {
+public class TileEntityAltarRenderer extends BlockEntityRendererBase<AltarTileEntity> {
 
-	public TileEntityAltarRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
-		super(rendererDispatcherIn);
+	public TileEntityAltarRenderer(BlockEntityRendererProvider.Context context) {
+		super(context);
 	}
 	
 	@Override

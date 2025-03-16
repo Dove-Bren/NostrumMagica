@@ -62,7 +62,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerBossEvent;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEntity, IElementalEntity, ILoreSupplier {
 
@@ -417,7 +417,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 
-		if (compound.contains(DRAGON_SERIAL_PHASE_TOK, NBT.TAG_ANY_NUMERIC)) {
+		if (compound.contains(DRAGON_SERIAL_PHASE_TOK, Tag.TAG_ANY_NUMERIC)) {
         	int i = compound.getByte(DRAGON_SERIAL_PHASE_TOK);
             this.setPhase(DragonPhase.values()[i]);
         }

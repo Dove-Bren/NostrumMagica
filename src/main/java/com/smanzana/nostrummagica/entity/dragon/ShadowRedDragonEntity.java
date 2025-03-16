@@ -23,7 +23,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreSupplier {
 	
@@ -170,7 +170,7 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreS
 	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 
-		if (compound.contains(DRAGON_SERIAL_HASTARGET_TOK, NBT.TAG_ANY_NUMERIC)) {
+		if (compound.contains(DRAGON_SERIAL_HASTARGET_TOK, Tag.TAG_ANY_NUMERIC)) {
         	this.entityData.set(HASTARGET, compound.getBoolean(DRAGON_SERIAL_HASTARGET_TOK));
         }
 	}

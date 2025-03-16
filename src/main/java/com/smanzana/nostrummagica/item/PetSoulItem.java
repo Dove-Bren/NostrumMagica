@@ -120,7 +120,7 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 		if (rawEnt == null) {
 			return null;
 		} else if (!(rawEnt instanceof LivingEntity)) {
-			rawEnt.remove();
+			rawEnt.discard();
 			return null;
 		}
 		
@@ -129,7 +129,7 @@ public abstract class PetSoulItem extends Item implements ILoreTagged {
 		// Check for other copies of the entity in the world, and remove them if so
 		Entity staleEnt = Entities.FindEntity(world, ent.getUUID());
 		if (staleEnt != null) {
-			staleEnt.remove();
+			staleEnt.discard();
 		}
 		
 		// Fix entity so it can respawn

@@ -36,9 +36,9 @@ public class NostrumChunkLoader {
 //	public void ticketsLoaded(List<Ticket> tickets, World world) {
 //		for (Ticket ticket : tickets) {
 //			CompoundNBT nbt = ticket.getModData();
-//			if (nbt.contains(NBT_TICKET_BASE, NBT.TAG_BYTE)
+//			if (nbt.contains(NBT_TICKET_BASE, Tag.TAG_BYTE)
 //					&& nbt.getBoolean(NBT_TICKET_BASE)
-//					&& nbt.contains(NBT_TICKET_REGKEY, NBT.TAG_STRING))
+//					&& nbt.contains(NBT_TICKET_REGKEY, Tag.TAG_STRING))
 //				this.tickets.put(nbt.getString(NBT_TICKET_REGKEY), ticket);
 //		}
 //	}

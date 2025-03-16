@@ -4,11 +4,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.client.model.ModelShadowDragonRed;
 import com.smanzana.nostrummagica.entity.dragon.ShadowRedDragonEntity;
 
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 public class RenderShadowDragonRed extends RenderDragonRed<ShadowRedDragonEntity> {
 
-	public RenderShadowDragonRed(EntityRenderDispatcher renderManagerIn, float shadowSizeIn) {
+	public RenderShadowDragonRed(EntityRendererProvider.Context renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelShadowDragonRed(), shadowSizeIn);
 	}
 	

@@ -10,7 +10,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -69,7 +69,7 @@ public class BonusJumpCapability implements IBonusJumpCapability {
 			BonusJumpCapability instance = (BonusJumpCapability) instanceIn;
 			
 			instance.resetCount();
-			if (nbtIn.getId() == NBT.TAG_COMPOUND) {
+			if (nbtIn.getId() == Tag.TAG_COMPOUND) {
 				instance.jumpCount = ((CompoundTag) nbtIn).getInt(NBT_COUNT);
 			}
 		}

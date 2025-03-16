@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelGolem;
 import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
 
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
@@ -15,7 +15,7 @@ public class RenderGolem<T extends MagicGolemEntity> extends MobRenderer<T, Mode
 
 	private Map<String, ResourceLocation> texCache;
 	
-	public RenderGolem(EntityRenderDispatcher renderManagerIn, ModelGolem<T> modelBaseIn, float shadowSizeIn) {
+	public RenderGolem(EntityRendererProvider.Context renderManagerIn, ModelGolem<T> modelBaseIn, float shadowSizeIn) {
 		super(renderManagerIn, modelBaseIn, shadowSizeIn);
 		texCache = new HashMap<>();
 	}

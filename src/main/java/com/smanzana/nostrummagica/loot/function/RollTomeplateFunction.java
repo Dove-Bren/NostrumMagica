@@ -7,13 +7,12 @@ import com.google.gson.JsonSyntaxException;
 import com.smanzana.nostrummagica.item.SpellPlate;
 import com.smanzana.nostrummagica.loot.NostrumLoot;
 
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.storage.loot.Serializer;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.util.GsonHelper;
 
 public class RollTomeplateFunction extends LootItemConditionalFunction {
 	

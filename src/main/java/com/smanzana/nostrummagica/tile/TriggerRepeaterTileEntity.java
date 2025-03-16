@@ -24,7 +24,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedTileEntity {
 	
@@ -91,7 +91,7 @@ public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedT
 	public void load(BlockState state, CompoundTag compound) {
 		super.load(state, compound);
 		
-		ListTag list = compound.getList(NBT_OFFSET_LIST, NBT.TAG_COMPOUND);
+		ListTag list = compound.getList(NBT_OFFSET_LIST, Tag.TAG_COMPOUND);
 		offsets.clear();
 		for (int i = 0; i < list.size(); i++) {
 			offsets.add(NbtUtils.readBlockPos(list.getCompound(i)));

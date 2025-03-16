@@ -10,20 +10,20 @@ import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Blocks;
 
 public class RenderCursedGlassTrigger extends RenderSwitchTrigger {
 	
 	private /*final*/ ModelCursedGlass model;
 	
-	public RenderCursedGlassTrigger(EntityRenderDispatcher renderManagerIn) {
+	public RenderCursedGlassTrigger(EntityRendererProvider.Context renderManagerIn) {
 		super(renderManagerIn);
 		this.model = new ModelCursedGlass();
 	}

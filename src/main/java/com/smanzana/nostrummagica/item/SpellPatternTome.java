@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.item;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -8,30 +9,32 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.client.render.item.SpellPatternTomeRenderer;
+import com.smanzana.nostrummagica.client.render.item.NostrumItemSpecialRenderer;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.Util;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.IItemRenderProperties;
 
 public class SpellPatternTome extends Item implements ILoreTagged {
 
@@ -39,7 +42,19 @@ public class SpellPatternTome extends Item implements ILoreTagged {
 	private static final String NBT_PATTERN = "pattern";
 	
 	public SpellPatternTome(Item.Properties properties) {
-		super(properties.setISTER(() -> SpellPatternTomeRenderer::new));
+		super(properties);
+	}
+	
+	@Override
+	public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+		super.initializeClient(consumer);
+		
+		consumer.accept(new IItemRenderProperties() {
+			@Override
+			public BlockEntityWithoutLevelRenderer getItemStackRenderer()  {
+				return NostrumItemSpecialRenderer.INSTANCE;
+			}
+		});
 	}
 	
 	protected void setPatternID(ItemStack stack, ResourceLocation ID) {

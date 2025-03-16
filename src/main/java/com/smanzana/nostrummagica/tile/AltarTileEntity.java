@@ -15,7 +15,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.Direction;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class AltarTileEntity extends BlockEntity implements WorldlyContainer, IAetherInfusableTileEntity {
 	
@@ -73,7 +73,7 @@ public class AltarTileEntity extends BlockEntity implements WorldlyContainer, IA
 		if (nbt == null)
 			return;
 			
-		if (!nbt.contains(NBT_ITEM, NBT.TAG_COMPOUND)) {
+		if (!nbt.contains(NBT_ITEM, Tag.TAG_COMPOUND)) {
 			stack = ItemStack.EMPTY;
 		} else {
 			CompoundTag tag = nbt.getCompound(NBT_ITEM);

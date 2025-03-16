@@ -14,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class LoreTableTileEntity extends BlockEntity implements TickableBlockEntity {
 
@@ -119,12 +119,12 @@ public class LoreTableTileEntity extends BlockEntity implements TickableBlockEnt
 			return;
 		
 		this.progress = nbt.getFloat("progress");
-		if (nbt.contains("item", NBT.TAG_COMPOUND))
+		if (nbt.contains("item", Tag.TAG_COMPOUND))
 			this.item = ItemStack.of(nbt.getCompound("item"));
 		else
 			this.item = ItemStack.EMPTY;
 		
-		if (nbt.contains("lore", NBT.TAG_STRING))
+		if (nbt.contains("lore", Tag.TAG_STRING))
 			this.lorekey = nbt.getString("lore");
 			
 		

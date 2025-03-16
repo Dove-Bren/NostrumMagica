@@ -24,7 +24,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class BasicSpellTableTileEntity extends BlockEntity implements ISpellCraftingInventory, ISpellCraftingTileEntity {
 
@@ -179,7 +179,7 @@ public class BasicSpellTableTileEntity extends BlockEntity implements ISpellCraf
 	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
-		if (nbt == null || !nbt.contains(NBT_INV, NBT.TAG_COMPOUND))
+		if (nbt == null || !nbt.contains(NBT_INV, Tag.TAG_COMPOUND))
 			return;
 		
 		CompoundTag items = nbt.getCompound(NBT_INV);

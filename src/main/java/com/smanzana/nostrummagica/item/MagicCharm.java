@@ -16,31 +16,31 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.LightningBolt;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ServerLevelData;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -175,9 +175,8 @@ public class MagicCharm extends Item implements ILoreTagged {
 				continue;
 			
 			float hardness = state.getDestroySpeed(world, pos);
-			int harvestLevel = state.getBlock().getHarvestLevel(state);
 			
-			if (hardness > 10 || harvestLevel > 1 || hardness < 0)
+			if (hardness > 10 || hardness < 0)
 				continue;
 			
 			List<ItemStack> drops = Block.getDrops(state, world, pos, world.getBlockEntity(pos));
@@ -332,7 +331,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 					player.getX() + 5,
 					player.getY() + 10,
 					player.getZ() + 5);
-			List<Entity> entities = world.getEntitiesOfClass(LivingEntity.class, bb);
+			List<LivingEntity> entities = world.getEntitiesOfClass(LivingEntity.class, bb);
 			if (entities != null && !entities.isEmpty())
 				for (Entity e : entities) {
 					LightningBolt bolt = new LightningBolt(EntityType.LIGHTNING_BOLT, world);

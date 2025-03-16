@@ -9,19 +9,18 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 
-public class TileEntityDungeonKeyChestRenderer extends BlockEntityRenderer<DungeonKeyChestTileEntity> {
+public class TileEntityDungeonKeyChestRenderer extends BlockEntityRendererBase<DungeonKeyChestTileEntity> {
 
 	public static final ResourceLocation ICON_COPPER_KEY = new ResourceLocation(NostrumMagica.MODID, "textures/models/copper_key.png");
 	public static final ResourceLocation ICON_SILVER_KEY = new ResourceLocation(NostrumMagica.MODID, "textures/models/silver_key.png");
 	private static final ResourceLocation ICON_GLOW = new ResourceLocation(NostrumMagica.MODID, "textures/effects/glow_orb.png");
 	
-	public TileEntityDungeonKeyChestRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
-		super(rendererDispatcherIn);
+	public TileEntityDungeonKeyChestRenderer(BlockEntityRendererProvider.Context context) {
+		super(context);
 	}
 	
 	@Override
@@ -56,9 +55,9 @@ public class TileEntityDungeonKeyChestRenderer extends BlockEntityRenderer<Dunge
 				matrixStackIn.pushPose();
 				matrixStackIn.translate(xOffset, yOffset, zOffset);
 				VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.GetBlendedEntity(ICON_GLOW));
-				RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, this.renderer.camera, radius * glowMult, combinedLightIn, combinedOverlayIn, 1f, 1f, .5f, 1f);
+				RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, context.getBlockEntityRenderDispatcher().camera, radius * glowMult, combinedLightIn, combinedOverlayIn, 1f, 1f, .5f, 1f);
 				buffer = bufferIn.getBuffer(RenderType.entityCutout(icon));
-				RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, this.renderer.camera, radius, combinedLightIn, combinedOverlayIn, 1f, 1f, 1f, 1f);
+				RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, context.getBlockEntityRenderDispatcher().camera, radius, combinedLightIn, combinedOverlayIn, 1f, 1f, 1f, 1f);
 				matrixStackIn.popPose();
 			}
 		}

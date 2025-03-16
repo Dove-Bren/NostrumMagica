@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBaked;
 import com.smanzana.nostrummagica.client.model.ModelRenderShiv;
@@ -9,11 +10,10 @@ import com.smanzana.nostrummagica.entity.KoidEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Vector3f;
 
 public class RenderKoid extends MobRenderer<KoidEntity, ModelRenderShiv<KoidEntity>> {
 	
@@ -21,7 +21,7 @@ public class RenderKoid extends MobRenderer<KoidEntity, ModelRenderShiv<KoidEnti
 	
 	protected ModelBaked<KoidEntity> modelBase;
 
-	public RenderKoid(EntityRenderDispatcher renderManagerIn, float shadowSizeIn) {
+	public RenderKoid(EntityRendererProvider.Context renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelRenderShiv<>(), shadowSizeIn);
 		this.modelBase = new ModelBaked<>(MODEL);
 	}

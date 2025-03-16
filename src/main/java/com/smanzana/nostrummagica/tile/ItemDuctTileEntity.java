@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -175,7 +175,7 @@ public class ItemDuctTileEntity extends BlockEntity implements /* IInventory, */
 		super.load(state, nbt);
 		
 		itemQueue.clear();
-		ListTag list = nbt.getList(NBT_SORTED, NBT.TAG_COMPOUND);
+		ListTag list = nbt.getList(NBT_SORTED, Tag.TAG_COMPOUND);
 		for (int i = 0; i < list.size(); i++) {
 			CompoundTag tag = list.getCompound(i);
 			itemQueue.add(ItemEntry.fromNBT(tag));

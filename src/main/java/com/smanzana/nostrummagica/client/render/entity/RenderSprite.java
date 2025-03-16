@@ -1,19 +1,19 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.client.model.ModelSpriteCore;
 import com.smanzana.nostrummagica.entity.SpriteEntity;
 
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Vector3f;
 
 public class RenderSprite extends MobRenderer<SpriteEntity, ModelSpriteCore> {
 
-	public RenderSprite(EntityRenderDispatcher renderManagerIn, float shadowSizeIn) {
+	public RenderSprite(EntityRendererProvider.Context renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelSpriteCore(), shadowSizeIn);
 	}
 

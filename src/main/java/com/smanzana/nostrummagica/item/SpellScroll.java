@@ -19,24 +19,24 @@ import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, ISpellContainerItem {
@@ -79,7 +79,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		
 		CompoundTag nbt = itemStackIn.getTag();
 		
-		if (!nbt.contains(NBT_SPELL, NBT.TAG_INT))
+		if (!nbt.contains(NBT_SPELL, Tag.TAG_INT))
 			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStackIn);
 		
 		Spell spell = GetSpell(itemStackIn);
@@ -94,7 +94,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 			
 			// Set cooldown directly even though event handler will have already set it.
 			// Using a scroll has more cooldown than noticing other spells being cast.
-			playerIn.getCooldowns().addCooldown(this.getItem(), SpellCasting.CalculateSpellCooldown(spell, playerIn, result.summary) * 2);
+			playerIn.getCooldowns().addCooldown(this, SpellCasting.CalculateSpellCooldown(spell, playerIn, result.summary) * 2);
 			
 			NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) playerIn);
 		}
@@ -156,7 +156,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 			return 1;
 		
 		CompoundTag nbt = itemStack.getTag();		
-		if (nbt == null || !nbt.contains(NBT_DURABILITY, NBT.TAG_INT))
+		if (nbt == null || !nbt.contains(NBT_DURABILITY, Tag.TAG_INT))
 			return 15; // old default
 		
 		return Math.max(1, nbt.getInt(NBT_DURABILITY));

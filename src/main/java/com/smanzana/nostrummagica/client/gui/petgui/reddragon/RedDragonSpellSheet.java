@@ -30,7 +30,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
@@ -605,7 +605,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	
 	// Server has sent information about all gambits
 	private void receiveAllGambits(CompoundTag nbt) {
-		ListTag list = nbt.getList("gambits", NBT.TAG_STRING);
+		ListTag list = nbt.getList("gambits", Tag.TAG_STRING);
 		if (list != null) {
 			for (int i = 0; i < dragonInv.getContainerSize() && i < list.size(); i++) {
 				String name = list.getString(i);

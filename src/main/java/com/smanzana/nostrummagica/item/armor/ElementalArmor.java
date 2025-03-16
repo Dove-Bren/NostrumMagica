@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -50,61 +51,62 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Projectiles;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.world.level.block.BambooSaplingBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.CropBlock;
-import net.minecraft.world.level.block.BonemealableBlock;
-import net.minecraft.world.level.block.SaplingBlock;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.EquipmentSlot.Type;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BambooSaplingBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.SaplingBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.network.chat.Component;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.IItemRenderProperties;
 import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fmlclient.registry.ClientRegistry;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
 public class ElementalArmor extends ArmorItem
@@ -1053,18 +1055,23 @@ public class ElementalArmor extends ArmorItem
 
 		return NostrumMagica.MODID + ":textures/models/armor/magic_armor_" + element.name().toLowerCase() + ".png";
 	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	
 	@Override
-	@OnlyIn(Dist.CLIENT)
-	public HumanoidModel getArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot,
-			HumanoidModel defaultModel) {
-		final int setCount = getSetPieces(entity);
-		final int index = (setCount - 1) + (type == Type.MASTER ? 1 : 0); // Boost 1 if ultimate armor
-		ModelEnchantedArmorBase<LivingEntity> model = armorModels.get(index % armorModels.size());
-		model.setVisibleFrom(slot);
+	public void initializeClient(Consumer<IItemRenderProperties> props) {
+		super.initializeClient(props);
+		props.accept(new IItemRenderProperties() {
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@Override
+			public HumanoidModel getArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot,
+					HumanoidModel defaultModel) {
+				final int setCount = getSetPieces(entity);
+				final int index = (setCount - 1) + (type == Type.MASTER ? 1 : 0); // Boost 1 if ultimate armor
+				ModelEnchantedArmorBase<LivingEntity> model = armorModels.get(index % armorModels.size());
+				model.setVisibleFrom(slot);
 
-		return model;
+				return model;
+			}
+		});
 	}
 
 	public static int GetSetCount(LivingEntity entity, EMagicElement element, Type type) {
@@ -1270,7 +1277,7 @@ public class ElementalArmor extends ArmorItem
 
 	public static final boolean EntityHasEnchantedArmor(LivingEntity entity) {
 		for (EquipmentSlot slot : EquipmentSlot.values()) {
-			if (slot.getType() != Type.ARMOR) {
+			if (slot.getType() != EquipmentSlot.Type.ARMOR) {
 				continue;
 			}
 
@@ -1286,12 +1293,9 @@ public class ElementalArmor extends ArmorItem
 	// Updates all entities' current set bonuses (or lack there-of) from enchanted
 	// armor
 	public static void ServerWorldTick(ServerLevel world) {
-		world.getEntities().forEach((ent) -> {
-			if (ent instanceof LivingEntity) {
-				LivingEntity living = (LivingEntity) ent;
-				if (living.isFallFlying() && living.isShiftKeyDown() && living instanceof ServerPlayer) {
-					((ServerPlayer) living).stopFallFlying();
-				}
+		world.getEntities().get(EntityTypeTest.forClass(LivingEntity.class), (living) -> {
+			if (living.isFallFlying() && living.isShiftKeyDown() && living instanceof ServerPlayer) {
+				((ServerPlayer) living).stopFallFlying();
 			}
 		});
 	}
@@ -1566,7 +1570,7 @@ public class ElementalArmor extends ArmorItem
 		boolean hasJump = true;
 		
 		// Start flying (this logic is meant to match the elytra check)
-		if (!flying && hasJump && !player.isOnGround() && !player.abilities.flying && player.isFallFlying()) {
+		if (!flying && hasJump && !player.isOnGround() && !player.getAbilities().flying && player.isFallFlying()) {
 			// Does this armor support flying?
 			if (HasElytra(player)) {
 				SetArmorFlying(player, true);
@@ -1577,7 +1581,7 @@ public class ElementalArmor extends ArmorItem
 		
 		// Mana jump
 		final double MANA_JUMP_AMT = flying ? .6 : .4;
-		if (hasJump && flying && !player.isOnGround() && !lastTickGround && !player.abilities.flying
+		if (hasJump && flying && !player.isOnGround() && !lastTickGround && !player.getAbilities().flying
 				&& player.getDeltaMovement().y < MANA_JUMP_AMT) {
 			// Does this armor have mana jump?
 			if (HasManaJump(player)) {
@@ -1653,7 +1657,7 @@ public class ElementalArmor extends ArmorItem
 		}
 
 		// Dragon flying
-		if (flying && !player.isOnGround() && !player.abilities.flying && player.input.up) {
+		if (flying && !player.isOnGround() && !player.getAbilities().flying && player.input.up) {
 			// Does this armor have dragon flying?
 			if (HasDragonFlight(player)) {
 				// Check if magnitude of flying is low and if so, boost it with magic
@@ -1675,7 +1679,7 @@ public class ElementalArmor extends ArmorItem
 
 					// We take mana depending on how 'up' we're being propeled
 					final float vertScale = (dx == 0 && dy == 0 && dz == 0 ? 0f : (float) (dy / (dx + dy + dz)));
-					final boolean deduct = vertScale == 0f ? false : (random.nextFloat() < vertScale * 3);
+					final boolean deduct = vertScale == 0f ? false : (NostrumMagica.rand.nextFloat() < vertScale * 3);
 					if (deduct) {
 						consumeDragonFlight(player);
 						NetworkHandler
@@ -1686,7 +1690,7 @@ public class ElementalArmor extends ArmorItem
 		}
 
 		// Double-press abilities
-		if (!flying && !player.abilities.flying) {
+		if (!flying && !player.getAbilities().flying) {
 			// just for testing
 			if (doubleBack) {
 				if (HasWindTornado(player)) {
@@ -1939,15 +1943,15 @@ public class ElementalArmor extends ArmorItem
 					continue;
 				}
 				if (growable.isValidBonemealTarget(world, cursor, state, false)
-						&& growable.isBonemealSuccess(world, random, cursor, state)) {
+						&& growable.isBonemealSuccess(world, NostrumMagica.rand, cursor, state)) {
 					// Only grow 1/4th the time
-					if (random.nextBoolean() && random.nextBoolean()) {
-						growable.performBonemeal((ServerLevel) world, random, cursor, state);
+					if (NostrumMagica.rand.nextBoolean() && NostrumMagica.rand.nextBoolean()) {
+						growable.performBonemeal((ServerLevel) world, NostrumMagica.rand, cursor, state);
 					}
 
 					((ServerLevel) world).sendParticles(ParticleTypes.HAPPY_VILLAGER,
-							cursor.getX() + .5 + (-.5 + random.nextDouble()), cursor.getY() + .5,
-							cursor.getZ() + .5 + (-.5 + random.nextDouble()), 2, .2, .2, .2, 0);
+							cursor.getX() + .5 + (-.5 + NostrumMagica.rand.nextDouble()), cursor.getY() + .5,
+							cursor.getZ() + .5 + (-.5 + NostrumMagica.rand.nextDouble()), 2, .2, .2, .2, 0);
 					return cursor.immutable();
 				}
 			}

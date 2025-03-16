@@ -84,7 +84,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class WilloEntity extends Monster implements ILoreSupplier, IElementalEntity {
 	
@@ -333,14 +333,14 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 	@Override
 	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
-		if (compound.contains("element", NBT.TAG_STRING)) {
+		if (compound.contains("element", Tag.TAG_STRING)) {
 			try {
 				this.entityData.set(ELEMENT, EMagicElement.valueOf(compound.getString("element").toUpperCase()));
 			} catch (Exception e) {
 				this.entityData.set(ELEMENT, EMagicElement.ICE);
 			}
 		}
-//		if (compound.contains("status", NBT.TAG_STRING)) {
+//		if (compound.contains("status", Tag.TAG_STRING)) {
 //			try {
 //				this.dataManager.set(STATUS, WilloStatus.valueOf(compound.getString("status").toUpperCase()));
 //			} catch (Exception e) {

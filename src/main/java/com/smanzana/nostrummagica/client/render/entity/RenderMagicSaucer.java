@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBaked;
 import com.smanzana.nostrummagica.entity.CyclerSpellSaucerEntity;
@@ -10,11 +11,10 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Vector3f;
 
 public class RenderMagicSaucer<T extends SpellSaucerEntity> extends EntityRenderer<T> {
 	
@@ -22,7 +22,7 @@ public class RenderMagicSaucer<T extends SpellSaucerEntity> extends EntityRender
 	
 	private ModelBaked<T> mainModel;
 
-	public RenderMagicSaucer(EntityRenderDispatcher renderManagerIn) {
+	public RenderMagicSaucer(EntityRendererProvider.Context renderManagerIn) {
 		super(renderManagerIn);
 		mainModel = new ModelBaked<>(RenderType::entityTranslucent, MODEL);
 	}
@@ -54,7 +54,7 @@ public class RenderMagicSaucer<T extends SpellSaucerEntity> extends EntityRender
 		matrixStackIn.pushPose();
 		if (!(entityIn instanceof CyclerSpellSaucerEntity)) {
 			//matrixStackIn.rotate(Vector3f.XP.rotationDegrees(-90.0F - entityLiving.rotationPitch));
-			matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(entityIn.xRot));
+			matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(entityIn.getXRot()));
 		}
 		
 		matrixStackIn.scale(.5f, .5f, .5f);

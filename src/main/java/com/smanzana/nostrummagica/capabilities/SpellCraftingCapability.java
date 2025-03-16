@@ -16,7 +16,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.Capability.IStorage;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class SpellCraftingCapability implements ISpellCrafting {
 	
@@ -79,10 +79,10 @@ public class SpellCraftingCapability implements ISpellCrafting {
 			SpellCraftingCapability instance = (SpellCraftingCapability) instanceIn;
 			instance.clearAll();
 			
-			if (nbtIn.getId() == NBT.TAG_COMPOUND) {
+			if (nbtIn.getId() == Tag.TAG_COMPOUND) {
 				CompoundTag nbt = (CompoundTag) nbtIn;
 				
-				ListTag patternList = nbt.getList(NBT_PATTERNS, NBT.TAG_STRING);
+				ListTag patternList = nbt.getList(NBT_PATTERNS, Tag.TAG_STRING);
 				for (int i = 0; i < patternList.size(); i++) {
 					ResourceLocation key = new ResourceLocation(patternList.getString(i));
 					@Nullable SpellCraftPattern pattern = SpellCraftPattern.Get(key);

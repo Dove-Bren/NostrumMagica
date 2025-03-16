@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelHookShot;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
@@ -11,13 +13,11 @@ import com.smanzana.nostrummagica.util.Projectiles;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Matrix4f;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
-import com.mojang.math.Vector3f;
 
 public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 	
@@ -26,7 +26,7 @@ public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 
 	private ModelHookShot model;
 	
-	public RenderHookShot(EntityRenderDispatcher renderManagerIn) {
+	public RenderHookShot(EntityRendererProvider.Context renderManagerIn) {
 		super(renderManagerIn);
 		
 		this.model = new ModelHookShot();
@@ -100,7 +100,7 @@ public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 		
 		// First, render chain
 		if (shooter != null) {
-			Vec3 offset = Projectiles.getVectorForRotation(shooter.xRot - 90f, shooter.yHeadRot + 90f).scale(.1);
+			Vec3 offset = Projectiles.getVectorForRotation(shooter.getXRot() - 90f, shooter.yHeadRot + 90f).scale(.1);
 			final Vec3 diff = shooter.getEyePosition(partialTicks).add(offset).subtract(entity.getEyePosition(partialTicks));
 			final float totalLength = (float) diff.distanceTo(new Vec3(0,0,0));
 			final float segments = totalLength / texLen;

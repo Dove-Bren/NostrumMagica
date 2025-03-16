@@ -141,23 +141,23 @@ import com.smanzana.nostrummagica.world.gen.NostrumFeatures;
 import com.smanzana.nostrummagica.world.gen.NostrumStructures;
 
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -2174,7 +2174,7 @@ public class ModInit {
 //		gen.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.plantbossDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
 	}
 	
-	public static final void onTagsUpdated(TagsUpdatedEvent.CustomTagTypes event) {
+	public static final void onTagsUpdated(TagsUpdatedEvent event) {
 		NostrumMagica.logger.info("Got custom tag reload notification");
 		RitualRegistry.instance().reloadRituals();
 	}

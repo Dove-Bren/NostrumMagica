@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -116,7 +116,7 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 			return null;
 		}
 		
-		if (stack.getTag() == null || !stack.getTag().contains("element", NBT.TAG_STRING)) {
+		if (stack.getTag() == null || !stack.getTag().contains("element", Tag.TAG_STRING)) {
 			return null;
 		}
 		

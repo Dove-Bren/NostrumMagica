@@ -18,7 +18,7 @@ import net.minecraftforge.registries.ObjectHolder;
 public class AetheriaProxy {
 	
 	// Handles to these Aetheria items if they're loaded.
-	// Here because they used to be NostrumMagica items and could be referenced in NBT.
+	// Here because they used to be NostrumMagica items and could be referenced in Tag.
 	@ObjectHolder("nostrumaetheria:shield_ring_small") public static @Nullable Item ringShieldSmall; // Requires Aether
 	@ObjectHolder("nostrumaetheria:shield_ring_large") public static @Nullable Item ringShieldLarge; // Requires Aether
 	@ObjectHolder("nostrumaetheria:elude_cloak") public static @Nullable Item eludeCape; // Requires Aether

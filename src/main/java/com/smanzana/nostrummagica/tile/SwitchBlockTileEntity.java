@@ -18,7 +18,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTriggerEntity> implements IOrientedTileEntity {
 	
@@ -107,7 +107,7 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 			}
 		}
 		
-		if (nbt.contains(NBT_OFFSET, NBT.TAG_LONG)) {
+		if (nbt.contains(NBT_OFFSET, Tag.TAG_LONG)) {
 			this.triggerOffset = WorldUtil.blockPosFromLong1_12_2(nbt.getLong(NBT_OFFSET));
 		} else {
 			this.triggerOffset = NbtUtils.readBlockPos(nbt.getCompound(NBT_OFFSET));

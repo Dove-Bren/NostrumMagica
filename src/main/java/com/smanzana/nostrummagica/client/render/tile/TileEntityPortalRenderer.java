@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PortalBlock.NostrumPortalTileEntityBase;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
@@ -10,18 +11,16 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
-import com.mojang.math.Vector3f;
 
-public class TileEntityPortalRenderer extends BlockEntityRenderer<NostrumPortalTileEntityBase> {
+public class TileEntityPortalRenderer extends BlockEntityRendererBase<NostrumPortalTileEntityBase> {
 
 	public static final ResourceLocation TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/block/portal.png");
 	
-	public TileEntityPortalRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
-		super(rendererDispatcherIn);
+	public TileEntityPortalRenderer(BlockEntityRendererProvider.Context context) {
+		super(context);
 	}
 	
 	@Override
@@ -31,7 +30,7 @@ public class TileEntityPortalRenderer extends BlockEntityRenderer<NostrumPortalT
 		// Want to rotate to camera but only around Y. Before th is was a atan between z and x..
 		// I THINK now it's using the active render info's look vector and chopping out the Y, and then
 		// doing the same thing.
-		final Camera renderInfo = this.renderer.camera;
+		final Camera renderInfo = this.context.getBlockEntityRenderDispatcher().camera;
 		Vec3 posOffset = Vec3.atCenterOf(tileEntityIn.getBlockPos()).subtract(renderInfo.getPosition());
 		float rotY = (float) (Math.atan2(posOffset.z(), posOffset.x()) / (2 * Math.PI));
 		rotY *= -360f;

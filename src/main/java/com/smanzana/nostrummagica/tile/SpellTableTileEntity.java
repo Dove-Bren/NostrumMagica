@@ -22,7 +22,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class SpellTableTileEntity extends BlockEntity implements ISpellCraftingInventory, ISpellCraftingTileEntity {
 
@@ -192,7 +192,7 @@ public class SpellTableTileEntity extends BlockEntity implements ISpellCraftingI
 	public void load(BlockState state, CompoundTag nbt) {
 		super.load(state, nbt);
 		
-		if (nbt == null || !nbt.contains(NBT_INV, NBT.TAG_COMPOUND))
+		if (nbt == null || !nbt.contains(NBT_INV, Tag.TAG_COMPOUND))
 			return;
 		
 		CompoundTag items = nbt.getCompound(NBT_INV);

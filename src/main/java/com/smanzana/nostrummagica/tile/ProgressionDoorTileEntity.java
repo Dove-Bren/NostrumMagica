@@ -22,7 +22,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class ProgressionDoorTileEntity extends BlockEntity {
 	
@@ -141,7 +141,7 @@ public class ProgressionDoorTileEntity extends BlockEntity {
 		this.requiredTier = EMagicTier.FromNBT(compound.get(NBT_TIER));
 		this.requiredComponents.clear();
 		
-		ListTag list = compound.getList(NBT_COMPS, NBT.TAG_STRING);
+		ListTag list = compound.getList(NBT_COMPS, Tag.TAG_STRING);
 		int count = list.size();
 		for (int i = 0; i < count; i++) {
 			this.requiredComponents.add(SpellComponentWrapper.fromKeyString(list.getString(i)));

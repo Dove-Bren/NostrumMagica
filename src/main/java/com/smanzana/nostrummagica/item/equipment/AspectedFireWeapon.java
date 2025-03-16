@@ -137,7 +137,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 	protected @Nullable LivingEntity getCastTarget(LivingEntity caster) {
 		// We have a target?
 		HitResult result = RayTrace.raytraceApprox(caster.level, caster, caster.position().add(0, caster.getEyeHeight(), 0),
-				caster.xRot, caster.yRot, CAST_RANGE, (ent) -> {
+				caster.getXRot(), caster.getYRot(), CAST_RANGE, (ent) -> {
 					return ent != null
 							&& ent != caster
 							&& ent instanceof LivingEntity

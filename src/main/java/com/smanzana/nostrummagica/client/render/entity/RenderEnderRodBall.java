@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelBaked;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
@@ -10,11 +11,10 @@ import com.smanzana.nostrummagica.entity.EnderRodBallEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Vector3f;
 
 public class RenderEnderRodBall extends EntityRenderer<EnderRodBallEntity> {
 	
@@ -22,7 +22,7 @@ public class RenderEnderRodBall extends EntityRenderer<EnderRodBallEntity> {
 	
 	protected ModelBaked<EnderRodBallEntity> ballOrb;
 
-	public RenderEnderRodBall(EntityRenderDispatcher renderManagerIn) {
+	public RenderEnderRodBall(EntityRendererProvider.Context renderManagerIn) {
 		super(renderManagerIn);
 		this.ballOrb = new ModelBaked<>(NostrumRenderTypes::GetBlendedEntity, BALL_MODEL);
 	}

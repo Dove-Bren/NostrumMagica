@@ -2,6 +2,9 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.MagicTierIcon;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
@@ -11,12 +14,9 @@ import com.smanzana.nostrummagica.entity.ShrineTriggerEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
 
 public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> extends EntityRenderer<E> {
 
@@ -25,7 +25,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 	private static final ResourceLocation TEX_BUBBLE_DAM2 = NostrumMagica.Loc("textures/block/shrine_bubble_2.png");
 	private static final ResourceLocation TEX_BUBBLE_DAM3 = NostrumMagica.Loc("textures/block/shrine_bubble_3.png");
 	
-	public RenderShrineTrigger(EntityRenderDispatcher renderManagerIn) {
+	public RenderShrineTrigger(EntityRendererProvider.Context renderManagerIn) {
 		super(renderManagerIn);
 	}
 
@@ -100,7 +100,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 	}
 	
 	protected static abstract class SpellComponentRender<E extends ShrineTriggerEntity<?>> extends RenderShrineTrigger<E> {
-		public SpellComponentRender(EntityRenderDispatcher renderManagerIn) {
+		public SpellComponentRender(EntityRendererProvider.Context renderManagerIn) {
 			super(renderManagerIn);
 		}
 		
@@ -118,7 +118,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 	
 	public static class Element extends SpellComponentRender<ShrineTriggerEntity.Element> {
 		
-		public Element(EntityRenderDispatcher renderManagerIn) {
+		public Element(EntityRendererProvider.Context renderManagerIn) {
 			super(renderManagerIn);
 		}
 		
@@ -131,7 +131,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 	
 	public static class Shape extends SpellComponentRender<ShrineTriggerEntity.Shape> {
 		
-		public Shape(EntityRenderDispatcher renderManagerIn) {
+		public Shape(EntityRendererProvider.Context renderManagerIn) {
 			super(renderManagerIn);
 		}
 		
@@ -144,7 +144,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 	
 	public static class Alteration extends SpellComponentRender<ShrineTriggerEntity.Alteration> {
 		
-		public Alteration(EntityRenderDispatcher renderManagerIn) {
+		public Alteration(EntityRendererProvider.Context renderManagerIn) {
 			super(renderManagerIn);
 		}
 		
@@ -157,7 +157,7 @@ public abstract class RenderShrineTrigger<E extends ShrineTriggerEntity<?>> exte
 	
 	public static class Tier extends RenderShrineTrigger<ShrineTriggerEntity.Tier> {
 		
-		public Tier(EntityRenderDispatcher renderManagerIn) {
+		public Tier(EntityRendererProvider.Context renderManagerIn) {
 			super(renderManagerIn);
 		}
 		

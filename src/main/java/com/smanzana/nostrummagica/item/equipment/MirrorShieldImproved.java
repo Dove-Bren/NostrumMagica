@@ -92,7 +92,7 @@ public class MirrorShieldImproved extends MirrorShield {
 			} else {
 				if (!entity.getOffhandItem().isEmpty() && entity.getOffhandItem().getItem() instanceof MirrorShieldImproved) {
 					// If holding mirror shield in offhand but not actively blocking, have chance of charging
-					if (!getBlockCharged(entity.getOffhandItem()) && random.nextFloat() < CHARGE_CHANCE)
+					if (!getBlockCharged(entity.getOffhandItem()) && NostrumMagica.rand.nextFloat() < CHARGE_CHANCE)
 						markBlockCharged(entity.getOffhandItem(), true);
 				}
 			}
@@ -146,7 +146,7 @@ public class MirrorShieldImproved extends MirrorShield {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static final float ModelCharged(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn) {
+	public static final float ModelCharged(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn, int entID) {
 		return getBlockCharged(stack) ? 1.0F : 0.0F;
 	}
 

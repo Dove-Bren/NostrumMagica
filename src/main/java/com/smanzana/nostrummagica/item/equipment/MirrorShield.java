@@ -162,7 +162,7 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 //	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static final float ModelBlocking(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn) {
+	public static final float ModelBlocking(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn, int entID) {
 		// Copied from vanilla
 		return entityIn != null && entityIn.isUsingItem() && entityIn.getUseItem() == stack ? 1.0F : 0.0F;
 	}

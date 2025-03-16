@@ -30,7 +30,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBlockEntity, IAetherInfusableTileEntity {
 	
@@ -93,7 +93,7 @@ public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBloc
 		if (nbt == null)
 			return;
 			
-		if (nbt.contains(NBT_LINKED_POS, NBT.TAG_LONG)) {
+		if (nbt.contains(NBT_LINKED_POS, Tag.TAG_LONG)) {
 			// Legacy!
 			linkedPosition = WorldUtil.blockPosFromLong1_12_2(nbt.getLong(NBT_LINKED_POS));
 		} else if (nbt.contains(NBT_LINKED_POS)) {

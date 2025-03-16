@@ -73,7 +73,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class LuxEntity extends Animal implements ILoreSupplier/*, ITameableEntity*/ {
 	
@@ -411,19 +411,19 @@ public class LuxEntity extends Animal implements ILoreSupplier/*, ITameableEntit
 	@Override
 	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
-		if (compound.contains("home", NBT.TAG_LONG)) {
+		if (compound.contains("home", Tag.TAG_LONG)) {
 			setHome(BlockPos.of(compound.getLong("home"))); // Warning: can break if save used across game versions
 		} else {
 			setHome(null);
 		}
 		
-//		if (compound.contains("owner", NBT.TAG_COMPOUND)) {
+//		if (compound.contains("owner", Tag.TAG_COMPOUND)) {
 //			setOwner(compound.getUniqueId("owner"));
 //		} else {
 //			setOwner((UUID)null);
 //		}
 		
-		if (compound.contains("pollinated_item", NBT.TAG_COMPOUND)) {
+		if (compound.contains("pollinated_item", Tag.TAG_COMPOUND)) {
 			setPollinatedItem(ItemStack.of(compound.getCompound("pollinated_item")));
 		} else {
 			setPollinatedItem(ItemStack.EMPTY);

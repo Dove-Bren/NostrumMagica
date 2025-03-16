@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.tile.CandleTileEntity;
@@ -8,18 +9,15 @@ import com.smanzana.nostrummagica.util.NonNullEnumMap;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.item.ItemStack;
-import com.mojang.math.Vector3f;
 
-public class TileEntityCandleRenderer extends BlockEntityRenderer<CandleTileEntity> {
+public class TileEntityCandleRenderer extends BlockEntityRendererBase<CandleTileEntity> {
 
 	private NonNullEnumMap<ReagentType, ItemStack> itemCache;
 	
-	public TileEntityCandleRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
-		super(rendererDispatcherIn);
-		
+	public TileEntityCandleRenderer(BlockEntityRendererProvider.Context context) {
+		super(context);
 		itemCache = new NonNullEnumMap<>(ReagentType.class, ItemStack.EMPTY);
 		for (ReagentType type : ReagentType.values()) {
 			itemCache.put(type, ReagentItem.CreateStack(type, 1));

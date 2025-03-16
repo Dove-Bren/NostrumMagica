@@ -33,7 +33,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public abstract class DragonEntity extends Monster {
 	
@@ -229,7 +229,7 @@ public abstract class DragonEntity extends Monster {
 		public void readFromNBT(CompoundTag nbt) {
 			this.clearContent();
 			
-			ListTag list = nbt.getList(NBT_LIST, NBT.TAG_COMPOUND);
+			ListTag list = nbt.getList(NBT_LIST, Tag.TAG_COMPOUND);
 			for (int i = 0; i < list.size(); i++) {
 				CompoundTag wrapper = list.getCompound(i);
 				try {

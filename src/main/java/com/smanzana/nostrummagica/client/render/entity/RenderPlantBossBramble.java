@@ -1,16 +1,16 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelPlantBossBramble;
 import com.smanzana.nostrummagica.entity.plantboss.PlantBossBrambleEntity;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Vector3f;
 
 public class RenderPlantBossBramble extends EntityRenderer<PlantBossBrambleEntity> {
 
@@ -18,7 +18,7 @@ public class RenderPlantBossBramble extends EntityRenderer<PlantBossBrambleEntit
 	
 	protected ModelPlantBossBramble mainModel;
 	
-	public RenderPlantBossBramble(EntityRenderDispatcher renderManagerIn) {
+	public RenderPlantBossBramble(EntityRendererProvider.Context renderManagerIn) {
 		super(renderManagerIn);
 		
 		mainModel = new ModelPlantBossBramble();
@@ -37,7 +37,7 @@ public class RenderPlantBossBramble extends EntityRenderer<PlantBossBrambleEntit
 		
 		//this.mainModel = new ModelPlantBossBramble();
 		matrixStackIn.pushPose();
-		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(180f - entityIn.yRot));
+		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(180f - entityIn.getYRot()));
 		matrixStackIn.scale(-1, -1, 1);
 		matrixStackIn.scale(scale, 1, 1);
 		matrixStackIn.translate(0, -1.5f, 0);

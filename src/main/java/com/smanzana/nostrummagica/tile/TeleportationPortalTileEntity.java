@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTileEntityBase  {
 
@@ -87,7 +87,7 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	public void load(BlockState state, CompoundTag compound) {
 		super.load(state, compound);
 		
-		if (compound.contains(NBT_TARGET_LEGACY, NBT.TAG_LONG)) {
+		if (compound.contains(NBT_TARGET_LEGACY, Tag.TAG_LONG)) {
 			// Legacy!
 			target = new Location(WorldUtil.blockPosFromLong1_12_2(compound.getLong(NBT_TARGET_LEGACY)), Level.OVERWORLD);
 		} else if (compound.contains(NBT_TARGET_LEGACY)) {

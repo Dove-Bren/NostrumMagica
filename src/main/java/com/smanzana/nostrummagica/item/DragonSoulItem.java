@@ -163,13 +163,13 @@ public class DragonSoulItem extends PetSoulItem {
 				final Minecraft mc = Minecraft.getInstance();
 				if (player == NostrumMagica.instance.proxy.getPlayer() && mc.options.getCameraType() == CameraType.FIRST_PERSON) {
 					offset = new Vec3(-.1, player.getEyeHeight() -.05, .2);
-					rotation = -player.yRot % 360f;
+					rotation = -player.getYRot() % 360f;
 				} else {
 					offset = new Vec3(-.375, player.getEyeHeight() -.05, .825);
 					if (player == NostrumMagica.instance.proxy.getPlayer()) {
 						rotation = -player.yBodyRot % 360f;
 					} else {
-						rotation = -player.yRot % 360f;
+						rotation = -player.getYRot() % 360f;
 					}
 				}
 				

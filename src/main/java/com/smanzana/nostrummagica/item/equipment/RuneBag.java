@@ -13,19 +13,19 @@ import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.Inventories.ItemStackArrayWrapper;
 import com.smanzana.nostrummagica.util.Inventories.IterableInventoryWrapper;
 
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class RuneBag extends Item implements ILoreTagged {
 
@@ -81,7 +81,7 @@ public class RuneBag extends Item implements ILoreTagged {
 				return ItemStack.EMPTY;
 			
 			CompoundTag items = bag.getTag().getCompound(NBT_ITEMS);
-			if (items.contains(pos + "", NBT.TAG_COMPOUND))
+			if (items.contains(pos + "", Tag.TAG_COMPOUND))
 				return ItemStack.of(items.getCompound(pos + ""));
 			else
 				return ItemStack.EMPTY;
@@ -141,11 +141,11 @@ public class RuneBag extends Item implements ILoreTagged {
 	
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
-		int pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, InteractionHand.MAIN_HAND);
+		int pos = Inventories.getPlayerHandSlotIndex(playerIn.getInventory(), InteractionHand.MAIN_HAND);
 		ItemStack inHand = playerIn.getMainHandItem();
 		if (inHand.isEmpty()) {
 			inHand = playerIn.getOffhandItem();
-			pos = Inventories.getPlayerHandSlotIndex(playerIn.inventory, InteractionHand.OFF_HAND);
+			pos = Inventories.getPlayerHandSlotIndex(playerIn.getInventory(), InteractionHand.OFF_HAND);
 		}
 		NostrumMagica.instance.proxy.openContainer(playerIn, RuneBagGui.BagContainer.Make(pos));
 		

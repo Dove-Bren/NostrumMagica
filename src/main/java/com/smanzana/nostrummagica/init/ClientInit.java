@@ -66,7 +66,7 @@ import com.smanzana.nostrummagica.client.render.entity.RenderSwitchTrigger;
 import com.smanzana.nostrummagica.client.render.entity.RenderTameDragonRed;
 import com.smanzana.nostrummagica.client.render.entity.RenderWillo;
 import com.smanzana.nostrummagica.client.render.entity.RenderWisp;
-import com.smanzana.nostrummagica.client.render.item.SpellPatternTomeRenderer;
+import com.smanzana.nostrummagica.client.render.item.NostrumItemSpecialRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityAltarRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityCandleRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityDungeonDoorRenderer;
@@ -115,34 +115,35 @@ import com.smanzana.nostrummagica.util.Curves;
 import com.smanzana.nostrummagica.util.Curves.ICurve3d;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleEngine;
-import net.minecraft.client.renderer.block.BlockModelShaper;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
-import net.minecraft.client.renderer.entity.AreaEffectCloudRenderer;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.entity.LightningBoltRenderer;
+import net.minecraft.client.renderer.entity.NoopRenderer;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ColorHandlerEvent;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
@@ -151,8 +152,6 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
@@ -167,22 +166,6 @@ public class ClientInit {
 
 	@SubscribeEvent
 	public static void clientSetup(FMLClientSetupEvent event) {
-		//ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.SymbolTileEntityType, TileEntitySymbolRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.TrialBlockEntityType, TileEntityTrialRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.CandleTileEntityType, TileEntityCandleRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.AltarTileEntityType, TileEntityAltarRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.NostrumObeliskEntityType, TileEntityObeliskRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.TeleportationPortalTileEntityType, TileEntityPortalRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.ObeliskPortalTileEntityType, TileEntityPortalRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.SorceryPortalTileEntityType, TileEntityPortalRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.TemporaryPortalTileEntityType, TileEntityPortalRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.ProgressionDoorTileEntityType, TileEntityProgressionDoorRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.ManaArmorerTileEntityType, TileEntityManaArmorerRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.LockedChestEntityType, TileEntityLockedChestRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.LockedDoorType, TileEntityLockedDoorRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.DungeonKeyChestTileEntityType, TileEntityDungeonKeyChestRenderer::new);
-		ClientRegistry.bindTileEntityRenderer(NostrumTileEntities.DungeonDoorTileEntityType, TileEntityDungeonDoorRenderer::new);
-		
 		MenuScreens.register(NostrumContainers.ActiveHopper, ActiveHopperGui.ActiveHopperGuiContainer::new);
 		MenuScreens.register(NostrumContainers.LoreTable, LoreTableGui.LoreTableGuiContainer::new);
 		MenuScreens.register(NostrumContainers.ModificationTable, ModificationTableGui.ModificationGui::new);
@@ -208,7 +191,7 @@ public class ClientInit {
 		MinecraftForge.EVENT_BUS.addListener(QuickMoveBagButton::OnContainerScreenShow);
 		
 		registerBlockRenderLayer();
-		registerEntityRenderers();
+		//registerEntityRenderers();
 		
 		event.enqueueWork(ClientInit::registerItemModelProperties);
 		
@@ -262,7 +245,7 @@ public class ClientInit {
 			ModelLoader.addSpecialModel(loc);
 		}
 		
-		ModelLoader.addSpecialModel(SpellPatternTomeRenderer.BASE_MODEL);
+		ModelLoader.addSpecialModel(NostrumItemSpecialRenderer.BASE_MODEL);
 	}
 	
 	@SubscribeEvent
@@ -305,47 +288,67 @@ public class ClientInit {
 		event.getBlockColors().register(TogglePlatformBlock::MakePlatformColor, NostrumBlocks.togglePlatform);
 	}
 	
-	private static final void registerEntityRenderers() {
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.spellProjectile, (manager) -> new RenderSpellProjectile(manager, 1f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.spellBullet, (manager) -> new RenderSpellBullet(manager, 1f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.golemEarth, (manager) -> new RenderGolem<MagicEarthGolemEntity>(manager, new ModelGolem<>(), .8f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.golemFire, (manager) -> new RenderGolem<MagicFireGolemEntity>(manager, new ModelGolem<>(), .8f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.golemIce, (manager) -> new RenderGolem<MagicIceGolemEntity>(manager, new ModelGolem<>(), .8f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.golemLightning, (manager) -> new RenderGolem<MagicLightningGolemEntity>(manager, new ModelGolem<>(), .8f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.golemEnder, (manager) -> new RenderGolem<MagicEnderGolemEntity>(manager, new ModelGolem<>(), .8f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.golemPhysical, (manager) -> new RenderGolem<MagicPhysicalGolemEntity>(manager, new ModelGolem<>(), .8f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.golemWind, (manager) -> new RenderGolem<MagicWindGolemEntity>(manager, new ModelGolem<>(), .8f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.koid, (manager) -> new RenderKoid(manager, .3f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.dragonRed, (manager) ->  new RenderDragonRed<RedDragonEntity>(manager, 5));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.dragonRedBodyPart, (manager) -> new RenderDragonRedPart(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.tameDragonRed, (manager) -> new RenderTameDragonRed(manager, 2));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.shadowDragonRed, (manager) -> new RenderShadowDragonRed(manager, 2));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.sprite, (manager) -> new RenderSprite(manager, .7f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.dragonEgg, (manager) -> new RenderDragonEgg(manager, .45f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.chakramSpellSaucer, (manager) -> new RenderMagicSaucer<ChakramSpellSaucerEntity>(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.cyclerSpellSaucer, (manager) -> new RenderMagicSaucer<CyclerSpellSaucerEntity>(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.switchTrigger, (manager) -> new RenderSwitchTrigger(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.keySwitchTrigger, (manager) -> new RenderKeySwitchTrigger(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.tameLightning, (manager) -> new LightningBoltRenderer(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.hookShot, (manager) -> new RenderHookShot(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.wisp, (manager) -> new RenderWisp(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.lux, (manager) -> new RenderLux(manager, 1f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.willo, (manager) -> new RenderWillo(manager, 1f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.arcaneWolf, (manager) -> new RenderArcaneWolf(manager, 1f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.plantBoss, (manager) -> new RenderPlantBoss(manager, 1f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.plantBossLeaf, (manager) -> new RenderPlantBossLeaf(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.spellMortar, (manager) -> new RenderSpellMortar(manager, 1f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.plantBossBramble, (manager) -> new RenderPlantBossBramble(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.plantBossBody, (manager) -> new RenderPlantBossBody(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.enderRodBall, (manager) -> new RenderEnderRodBall(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.areaEffect, (manager) -> new AreaEffectCloudRenderer(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.spellBubble, (manager) -> new RenderSpellBubble(manager, 1f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.elementShrine, (manager) -> new RenderShrineTrigger.Element(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.shapeShrine, (manager) -> new RenderShrineTrigger.Shape(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.alterationShrine, (manager) -> new RenderShrineTrigger.Alteration(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.tierShrine, (manager) -> new RenderShrineTrigger.Tier(manager));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.magicDamageProjectile, (manager) -> new RenderMagicProjectile(manager, .5f));
-		RenderingRegistry.registerEntityRenderingHandler(NostrumEntityTypes.cursedGlassTrigger, (manager) -> new RenderCursedGlassTrigger(manager));
+	@SubscribeEvent
+	public static final void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+		event.registerEntityRenderer(NostrumEntityTypes.spellProjectile, (manager) -> new RenderSpellProjectile(manager, 1f));
+		event.registerEntityRenderer(NostrumEntityTypes.spellBullet, (manager) -> new RenderSpellBullet(manager, 1f));
+		event.registerEntityRenderer(NostrumEntityTypes.golemEarth, (manager) -> new RenderGolem<MagicEarthGolemEntity>(manager, new ModelGolem<>(), .8f));
+		event.registerEntityRenderer(NostrumEntityTypes.golemFire, (manager) -> new RenderGolem<MagicFireGolemEntity>(manager, new ModelGolem<>(), .8f));
+		event.registerEntityRenderer(NostrumEntityTypes.golemIce, (manager) -> new RenderGolem<MagicIceGolemEntity>(manager, new ModelGolem<>(), .8f));
+		event.registerEntityRenderer(NostrumEntityTypes.golemLightning, (manager) -> new RenderGolem<MagicLightningGolemEntity>(manager, new ModelGolem<>(), .8f));
+		event.registerEntityRenderer(NostrumEntityTypes.golemEnder, (manager) -> new RenderGolem<MagicEnderGolemEntity>(manager, new ModelGolem<>(), .8f));
+		event.registerEntityRenderer(NostrumEntityTypes.golemPhysical, (manager) -> new RenderGolem<MagicPhysicalGolemEntity>(manager, new ModelGolem<>(), .8f));
+		event.registerEntityRenderer(NostrumEntityTypes.golemWind, (manager) -> new RenderGolem<MagicWindGolemEntity>(manager, new ModelGolem<>(), .8f));
+		event.registerEntityRenderer(NostrumEntityTypes.koid, (manager) -> new RenderKoid(manager, .3f));
+		event.registerEntityRenderer(NostrumEntityTypes.dragonRed, (manager) ->  new RenderDragonRed<RedDragonEntity>(manager, 5));
+		event.registerEntityRenderer(NostrumEntityTypes.dragonRedBodyPart, (manager) -> new RenderDragonRedPart(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.tameDragonRed, (manager) -> new RenderTameDragonRed(manager, 2));
+		event.registerEntityRenderer(NostrumEntityTypes.shadowDragonRed, (manager) -> new RenderShadowDragonRed(manager, 2));
+		event.registerEntityRenderer(NostrumEntityTypes.sprite, (manager) -> new RenderSprite(manager, .7f));
+		event.registerEntityRenderer(NostrumEntityTypes.dragonEgg, (manager) -> new RenderDragonEgg(manager, .45f));
+		event.registerEntityRenderer(NostrumEntityTypes.chakramSpellSaucer, (manager) -> new RenderMagicSaucer<ChakramSpellSaucerEntity>(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.cyclerSpellSaucer, (manager) -> new RenderMagicSaucer<CyclerSpellSaucerEntity>(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.switchTrigger, (manager) -> new RenderSwitchTrigger(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.keySwitchTrigger, (manager) -> new RenderKeySwitchTrigger(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.tameLightning, (manager) -> new LightningBoltRenderer(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.hookShot, (manager) -> new RenderHookShot(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.wisp, (manager) -> new RenderWisp(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.lux, (manager) -> new RenderLux(manager, 1f));
+		event.registerEntityRenderer(NostrumEntityTypes.willo, (manager) -> new RenderWillo(manager, 1f));
+		event.registerEntityRenderer(NostrumEntityTypes.arcaneWolf, (manager) -> new RenderArcaneWolf(manager, 1f));
+		event.registerEntityRenderer(NostrumEntityTypes.plantBoss, (manager) -> new RenderPlantBoss(manager, 1f));
+		event.registerEntityRenderer(NostrumEntityTypes.plantBossLeaf, (manager) -> new RenderPlantBossLeaf(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.spellMortar, (manager) -> new RenderSpellMortar(manager, 1f));
+		event.registerEntityRenderer(NostrumEntityTypes.plantBossBramble, (manager) -> new RenderPlantBossBramble(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.plantBossBody, (manager) -> new RenderPlantBossBody(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.enderRodBall, (manager) -> new RenderEnderRodBall(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.areaEffect, NoopRenderer::new);//new AreaEffectCloudRenderer(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.spellBubble, (manager) -> new RenderSpellBubble(manager, 1f));
+		event.registerEntityRenderer(NostrumEntityTypes.elementShrine, (manager) -> new RenderShrineTrigger.Element(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.shapeShrine, (manager) -> new RenderShrineTrigger.Shape(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.alterationShrine, (manager) -> new RenderShrineTrigger.Alteration(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.tierShrine, (manager) -> new RenderShrineTrigger.Tier(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.magicDamageProjectile, (manager) -> new RenderMagicProjectile(manager, .5f));
+		event.registerEntityRenderer(NostrumEntityTypes.cursedGlassTrigger, (manager) -> new RenderCursedGlassTrigger(manager));
+	}
+	
+	@SubscribeEvent
+	public static final void registerTileEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+		//event.registerBlockEntityRenderer(NostrumTileEntities.SymbolTileEntityType, TileEntitySymbolRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.TrialBlockEntityType, TileEntityTrialRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.CandleTileEntityType, TileEntityCandleRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.AltarTileEntityType, TileEntityAltarRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.NostrumObeliskEntityType, TileEntityObeliskRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.TeleportationPortalTileEntityType, TileEntityPortalRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.ObeliskPortalTileEntityType, TileEntityPortalRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.SorceryPortalTileEntityType, TileEntityPortalRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.TemporaryPortalTileEntityType, TileEntityPortalRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.ProgressionDoorTileEntityType, TileEntityProgressionDoorRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.ManaArmorerTileEntityType, TileEntityManaArmorerRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.LockedChestEntityType, TileEntityLockedChestRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.LockedDoorType, TileEntityLockedDoorRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.DungeonKeyChestTileEntityType, TileEntityDungeonKeyChestRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.DungeonDoorTileEntityType, TileEntityDungeonDoorRenderer::new);
 	}
 	
 	@SubscribeEvent
@@ -675,7 +678,7 @@ public class ClientInit {
 		IEffectRenderer.RegisterRenderer(effect, new EffectGemRenderer(effect));
 	}
 	
-	public static final SpellPatternTomeRenderer makeSpellPatternTomeRenderer() {
-		return SpellPatternTomeRenderer.INSTANCE;
+	public static final NostrumItemSpecialRenderer makeSpellPatternTomeRenderer() {
+		return NostrumItemSpecialRenderer.INSTANCE;
 	}
 }

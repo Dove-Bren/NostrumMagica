@@ -1,28 +1,27 @@
 package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.util.ModelUtils;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Vector3f;
+import net.minecraft.world.level.block.state.BlockState;
 
-public class TileEntityObeliskRenderer extends BlockEntityRenderer<ObeliskTileEntity> {
+public class TileEntityObeliskRenderer extends BlockEntityRendererBase<ObeliskTileEntity> {
 
 	protected static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "block/orb_crystal");
 	protected BakedModel model;
 	
-	public TileEntityObeliskRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
-		super(rendererDispatcherIn);
+	public TileEntityObeliskRenderer(BlockEntityRendererProvider.Context context) {
+		super(context);
 	}
 	
 	protected void initModel() {

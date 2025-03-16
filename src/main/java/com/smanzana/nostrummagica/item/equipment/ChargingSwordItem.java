@@ -110,7 +110,7 @@ public abstract class ChargingSwordItem extends SwordItem {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static final float ModelCharge(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn) {
+	public static final float ModelCharge(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn, int entID) {
 		if (entityIn == null) {
 			return 0.0F;
 		} else {
@@ -119,7 +119,7 @@ public abstract class ChargingSwordItem extends SwordItem {
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public static final float ModelCharging(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn) {
+	public static final float ModelCharging(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn, int entID) {
 		return entityIn != null && entityIn.isUsingItem() && entityIn.getUseItem() == stack ? 1.0F : 0.0F;
 	}
 	

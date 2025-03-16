@@ -8,14 +8,12 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.util.Inventories;
 
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-
-import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SilverMirrorItem extends HandheldMirrorItem implements ILoreTagged {
 
@@ -61,7 +59,7 @@ public class SilverMirrorItem extends HandheldMirrorItem implements ILoreTagged 
 
 	@Override
 	protected void handleOpen(Player player, InteractionHand hand, ItemStack stack) {
-		int pos = Inventories.getPlayerHandSlotIndex(player.inventory, hand);
+		int pos = Inventories.getPlayerHandSlotIndex(player.getInventory(), hand);
 		NostrumMagica.instance.proxy.openContainer(player, SilverMirrorGui.MirrorContainer.Make(pos));
 	}
 

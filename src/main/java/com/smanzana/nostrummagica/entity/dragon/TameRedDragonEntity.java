@@ -98,7 +98,7 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import com.smanzana.nostrummagica.pet.IPetWithSoul.SoulBoundLore;
@@ -756,14 +756,14 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 	}
 
 	/**
-	 * (abstract) Protected helper method to read subclass entity data from NBT.
+	 * (abstract) Protected helper method to read subclass entity data from Tag.
 	 */
 	@Override
 	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 		UUID id;
 
-		if (compound.contains(NBT_OWNER_ID, NBT.TAG_STRING)) {
+		if (compound.contains(NBT_OWNER_ID, Tag.TAG_STRING)) {
 			id = UUID.fromString(compound.getString(NBT_OWNER_ID));
 		}
 		else {
@@ -819,7 +819,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		
 		// Read inventory
 		{
-			ListTag list = compound.getList(NBT_INVENTORY, NBT.TAG_COMPOUND);
+			ListTag list = compound.getList(NBT_INVENTORY, Tag.TAG_COMPOUND);
 			this.inventory = new SimpleContainer(DRAGON_INV_SIZE);
 			
 			for (int i = 0; i < DRAGON_INV_SIZE; i++) {
@@ -842,7 +842,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		if (canCast) {
 			this.spellInventory = RedDragonSpellInventory.fromNBT(compound.getCompound(NBT_SPELL_INVENTORY));
 			
-//			ListNBT list = compound.getList(NBT_SPELL_INVENTORY, NBT.TAG_COMPOUND);
+//			ListNBT list = compound.getList(NBT_SPELL_INVENTORY, Tag.TAG_COMPOUND);
 //			if (list != null) {
 //				
 //				for (int i = 0; i < spellInventory.getSizeInventory(); i++) {
@@ -2121,7 +2121,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 			
 			// Item inventory
 			{
-				ListTag list = nbt.getList(NBT_ITEMS, NBT.TAG_COMPOUND);
+				ListTag list = nbt.getList(NBT_ITEMS, Tag.TAG_COMPOUND);
 				if (list != null) {
 					for (int i = 0; i < inv.getContainerSize(); i++) {
 						CompoundTag tag = list.getCompound(i);
@@ -2136,7 +2136,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 			
 			// Gambits
 			{
-				ListTag list = nbt.getList(NBT_GAMBITS, NBT.TAG_STRING);
+				ListTag list = nbt.getList(NBT_GAMBITS, Tag.TAG_STRING);
 				if (list != null) {
 					for (int i = 0; i < inv.getContainerSize(); i++) {
 						String name = list.getString(i);

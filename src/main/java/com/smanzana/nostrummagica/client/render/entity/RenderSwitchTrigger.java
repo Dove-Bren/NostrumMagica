@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelRepeatSwitchTrigger;
 import com.smanzana.nostrummagica.client.model.ModelSwitchTrigger;
@@ -15,12 +16,11 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Vector3f;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 
 public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 
@@ -31,7 +31,7 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 	private ModelSwitchTrigger modelTimed;
 	private ModelSwitchTrigger modelRepeatable;
 	
-	public RenderSwitchTrigger(EntityRenderDispatcher renderManagerIn) {
+	public RenderSwitchTrigger(EntityRendererProvider.Context renderManagerIn) {
 		super(renderManagerIn);
 		this.modelOneTime = new ModelSwitchTrigger();
 		this.modelTimed = new ModelTimedSwitchTrigger();

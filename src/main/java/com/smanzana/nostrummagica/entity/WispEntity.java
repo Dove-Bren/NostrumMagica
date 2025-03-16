@@ -77,7 +77,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchantableEntity, IElementalEntity {
 	
@@ -321,7 +321,7 @@ public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchant
 	@Override
 	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
-		if (compound.contains("home", NBT.TAG_LONG)) {
+		if (compound.contains("home", Tag.TAG_LONG)) {
 			setHome(BlockPos.of(compound.getLong("home"))); // Warning: can break if save used across game versions
 		}
 	}

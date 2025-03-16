@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.util.NetUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.FloatTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class PlayerStats {
 
@@ -69,7 +69,7 @@ public class PlayerStats {
 		PlayerStats stats = new PlayerStats();
 		
 		CompoundTag tag;
-		if (nbt.contains("nostrum_stats", NBT.TAG_COMPOUND)) {
+		if (nbt.contains("nostrum_stats", Tag.TAG_COMPOUND)) {
 			tag = nbt.getCompound("nostrum_stats");
 		} else {
 			tag = nbt;

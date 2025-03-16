@@ -30,7 +30,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTileEntity, TickableBlockEntity {
 	
@@ -109,7 +109,7 @@ public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTile
 		super.load(state, compound);
 		
 		teleOffset = null;
-		if (compound.contains(NBT_OFFSET, NBT.TAG_LONG)) {
+		if (compound.contains(NBT_OFFSET, Tag.TAG_LONG)) {
 			// Legacy format! Probably dungeon spawning
 			teleOffset = WorldUtil.blockPosFromLong1_12_2(compound.getLong(NBT_OFFSET));
 		} else {

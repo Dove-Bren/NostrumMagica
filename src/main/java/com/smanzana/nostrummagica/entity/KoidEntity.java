@@ -45,7 +45,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraft.nbt.Tag;
 
 public class KoidEntity extends Monster implements ILoreSupplier, IElementalEntity {
 	
@@ -247,7 +247,7 @@ public class KoidEntity extends Monster implements ILoreSupplier, IElementalEnti
 	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
 
-        if (compound.contains("KoidType", NBT.TAG_ANY_NUMERIC)) {
+        if (compound.contains("KoidType", Tag.TAG_ANY_NUMERIC)) {
         	int i = compound.getByte("KoidType");
             this.setElement(EMagicElement.values()[i]);
         }

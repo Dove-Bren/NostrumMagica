@@ -12,9 +12,9 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
 
 public class RenderWisp extends EntityRenderer<WispEntity> {
@@ -23,7 +23,7 @@ public class RenderWisp extends EntityRenderer<WispEntity> {
 
 	protected ModelBaked<WispEntity> orbModel;
 	
-	public RenderWisp(EntityRenderDispatcher renderManagerIn) {
+	public RenderWisp(EntityRendererProvider.Context renderManagerIn) {
 		super(renderManagerIn);
 		orbModel = new ModelBaked<>(NostrumRenderTypes::GetBlendedEntity, MODEL);
 	}

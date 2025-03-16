@@ -2,6 +2,9 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -15,21 +18,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import net.minecraft.resources.ResourceLocation;
 
-public class TileEntityProgressionDoorRenderer extends BlockEntityRenderer<ProgressionDoorTileEntity> {
+public class TileEntityProgressionDoorRenderer extends BlockEntityRendererBase<ProgressionDoorTileEntity> {
 
 	public static final ResourceLocation TEX_GEM_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/gui/brass.png");
 	public static final ResourceLocation TEX_PLATE_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/block/ceramic_generic.png");
-	
-	public TileEntityProgressionDoorRenderer(BlockEntityRenderDispatcher rendererDispatcherIn) {
-		super(rendererDispatcherIn);
+
+	public TileEntityProgressionDoorRenderer(BlockEntityRendererProvider.Context context) {
+		super(context);
 	}
 	
 	@Override
@@ -190,7 +189,7 @@ public class TileEntityProgressionDoorRenderer extends BlockEntityRenderer<Progr
 			matrixStackIn.translate(0, 1.25, drawZ);
 			matrixStackIn.scale(-VANILLA_FONT_SCALE * 2, -VANILLA_FONT_SCALE * 2, VANILLA_FONT_SCALE * 2);
 			
-			Font fonter = this.renderer.font;
+			Font fonter = this.context.getBlockEntityRenderDispatcher().font;
 			fonter.drawInBatch(val, fonter.width(val) / -2, 0, color, false, matrixStackIn.last().pose(), bufferIn, false, 0x0, combinedLightIn);
 			matrixStackIn.popPose();
 		}

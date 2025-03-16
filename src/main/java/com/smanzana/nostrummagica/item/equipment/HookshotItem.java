@@ -18,25 +18,25 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.Projectiles;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.IronBarsBlock;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.Util;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.Util;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.IronBarsBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
@@ -156,7 +156,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 						playerIn.sendMessage(new TranslatableComponent("info.hookshot.bad_dim"), Util.NIL_UUID);
 					} else {
 						HookShotEntity hook = new HookShotEntity(NostrumEntityTypes.hookShot, worldIn, playerIn, getMaxDistance(itemStackIn), 
-								Projectiles.getVectorForRotation(playerIn.xRot, playerIn.yRot).scale(getVelocity(itemStackIn)),
+								Projectiles.getVectorForRotation(playerIn.getXRot(), playerIn.getYRot()).scale(getVelocity(itemStackIn)),
 								this.type);
 						worldIn.addFreshEntity(hook);
 						SetHook(itemStackIn, hook);
@@ -236,7 +236,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 		}
 		HookShotEntity hook = GetHookEntity(world, stack);
 		if (hook != null) {
-			hook.remove();
+			hook.discard();
 		}
 		
 		SetHook(stack, null);
@@ -426,7 +426,7 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 	}
 	
 	@OnlyIn(Dist.CLIENT)
-	public static final float ModelExtended(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn) {
+	public static final float ModelExtended(ItemStack stack, @Nullable Level worldIn, @Nullable LivingEntity entityIn, int entID) {
 		return entityIn != null
 				&& (IsExtended(stack)
 				&& (entityIn.getItemInHand(InteractionHand.MAIN_HAND) == stack || entityIn.getItemInHand(InteractionHand.OFF_HAND) == stack))
