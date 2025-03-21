@@ -4,7 +4,10 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
-public interface ISpellCrafting {
+import net.minecraft.nbt.CompoundTag;
+import net.minecraftforge.common.util.INBTSerializable;
+
+public interface ISpellCrafting extends INBTSerializable<CompoundTag> {
 	
 	public List<SpellCraftPattern> getKnownPatterns();
 	

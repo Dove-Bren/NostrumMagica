@@ -20,6 +20,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -44,7 +45,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * @author Skyler
  *
  */
-public class ObeliskBlock extends Block {
+public class ObeliskBlock extends Block implements EntityBlock {
 
 	private static final BooleanProperty MASTER = BooleanProperty.create("master");
 	private static final BooleanProperty TILE = BooleanProperty.create("tile");
@@ -195,12 +196,7 @@ public class ObeliskBlock extends Block {
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
-	}
-	
-	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		if (state.getValue(TILE))
 			return new ObeliskTileEntity(state.getValue(MASTER));
 		

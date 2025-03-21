@@ -7,10 +7,11 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -20,14 +21,18 @@ import net.minecraft.world.phys.Vec3;
  */
 public class ManaArmor implements IManaArmor {
 	
+	private static final String NBT_HAS_ARMOR = "has_armor";
+	private static final String NBT_MANA_COST = "mana_cost";
+	
 	private boolean hasArmor;
 	private int manaCost;
 	
-	private LivingEntity entity;
+	private final LivingEntity entity;
 	
-	public ManaArmor() {
+	public ManaArmor(LivingEntity entity) {
 		hasArmor = false;
 		manaCost = 0;
+		this.entity = entity;
 	}
 
 	@Override
@@ -67,11 +72,6 @@ public class ManaArmor implements IManaArmor {
 		this.deserialize(cap.hasArmor(), cap.getManaCost());
 	}
 	
-	@Override
-	public void provideEntity(LivingEntity entity) {
-		this.entity = entity;
-	}
-
 	@Override
 	public boolean canHandle(Entity hurtEntity, DamageSource source, float amount) {
 		// I want to filter out things that damage creative players, but not all mods are good about that...
@@ -161,5 +161,21 @@ public class ManaArmor implements IManaArmor {
 		} else {
 			return 25; 
 		}
+	}
+
+	@Override
+	public CompoundTag serializeNBT() {
+		CompoundTag nbt = new CompoundTag();
+		
+		nbt.putBoolean(NBT_HAS_ARMOR, hasArmor());
+		nbt.putInt(NBT_MANA_COST, getManaCost());
+		
+		return nbt;
+	}
+
+	@Override
+	public void deserializeNBT(CompoundTag tag) {
+		deserialize(tag.getBoolean(NBT_HAS_ARMOR),
+			tag.getInt(NBT_MANA_COST));
 	}
 }

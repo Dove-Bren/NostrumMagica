@@ -9,16 +9,14 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 
 public class SpellCraftingCapability implements ISpellCrafting {
+	
+	private static final String NBT_PATTERNS = "patterns";
 	
 	protected List<SpellCraftPattern> patterns;
 	
@@ -50,50 +48,32 @@ public class SpellCraftingCapability implements ISpellCrafting {
 		this.patterns.clear();
 	}
 	
-	public static class Serializer implements IStorage<ISpellCrafting> {
+	@Override
+	public CompoundTag serializeNBT() {
+		CompoundTag nbt = new CompoundTag();
 		
-		public static final Serializer INSTANCE = new Serializer();
-		
-		private static final String NBT_PATTERNS = "patterns";
-		
-		protected Serializer() {
-			
+		ListTag list = new ListTag();
+		for (SpellCraftPattern pattern : getKnownPatterns()) {
+			list.add(StringTag.valueOf(pattern.getRegistryName().toString()));
 		}
-	
-		@Override
-		public Tag writeNBT(Capability<ISpellCrafting> capability, ISpellCrafting instanceIn, Direction side) {
-			SpellCraftingCapability instance = (SpellCraftingCapability) instanceIn;
-			CompoundTag nbt = new CompoundTag();
-			
-			ListTag list = new ListTag();
-			for (SpellCraftPattern pattern : instance.getKnownPatterns()) {
-				list.add(StringTag.valueOf(pattern.getRegistryName().toString()));
-			}
-			nbt.put(NBT_PATTERNS, list);
-			
-			return nbt;
-		}
+		nbt.put(NBT_PATTERNS, list);
+		
+		return nbt;
+	}
 
-		@Override
-		public void readNBT(Capability<ISpellCrafting> capability, ISpellCrafting instanceIn, Direction side, Tag nbtIn) {
-			SpellCraftingCapability instance = (SpellCraftingCapability) instanceIn;
-			instance.clearAll();
-			
-			if (nbtIn.getId() == Tag.TAG_COMPOUND) {
-				CompoundTag nbt = (CompoundTag) nbtIn;
-				
-				ListTag patternList = nbt.getList(NBT_PATTERNS, Tag.TAG_STRING);
-				for (int i = 0; i < patternList.size(); i++) {
-					ResourceLocation key = new ResourceLocation(patternList.getString(i));
-					@Nullable SpellCraftPattern pattern = SpellCraftPattern.Get(key);
-					if (pattern != null) {
-						instance.patterns.add(pattern);
-					} else {
-						NostrumMagica.logger.error("Encountered pattern in SpellCraftingCapability that is unknown: " + key);
-					}
-				}
+	@Override
+	public void deserializeNBT(CompoundTag nbt) {
+		clearAll();
+		
+		ListTag patternList = nbt.getList(NBT_PATTERNS, Tag.TAG_STRING);
+		for (int i = 0; i < patternList.size(); i++) {
+			ResourceLocation key = new ResourceLocation(patternList.getString(i));
+			@Nullable SpellCraftPattern pattern = SpellCraftPattern.Get(key);
+			if (pattern != null) {
+				patterns.add(pattern);
+			} else {
+				NostrumMagica.logger.error("Encountered pattern in SpellCraftingCapability that is unknown: " + key);
 			}
 		}
 	}
-
 }

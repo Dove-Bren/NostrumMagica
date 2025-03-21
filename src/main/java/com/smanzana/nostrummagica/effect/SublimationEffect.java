@@ -13,13 +13,13 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffectCategory;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -58,7 +58,7 @@ public class SublimationEffect extends MobEffect {
 		// Look for nearby spread-enablers
 		boolean spread = false;
 		Entity spreadingEnt = null;
-		List<Entity> nearbyEnts = target.getCommandSenderWorld().getEntities(target, target.getEntity().getBoundingBox().inflate(10), e -> true);
+		List<Entity> nearbyEnts = target.getCommandSenderWorld().getEntities(target, target.getBoundingBox().inflate(10), e -> true);
 		for (Entity ent : nearbyEnts) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(ent);
 			if (attr != null && attr.hasSkill(NostrumSkills.Fire_Corrupt) && NostrumMagica.rand.nextBoolean()) {

@@ -58,12 +58,7 @@ public class DungeonLauncherBlock extends DirectionalBlock implements ITriggered
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
-	}
-	
-	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new DungeonLauncherTileEntity();
 	}
 	

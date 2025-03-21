@@ -7,17 +7,16 @@ import com.smanzana.nostrummagica.tile.TeleportationPortalTileEntity;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Location;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
 
 /**
  * Portal that takes players to different spots in the same dimension
@@ -41,12 +40,7 @@ public class TeleportationPortalBlock extends PortalBlock  {
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
-	}
-	
-	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		if (isMaster(state)) {
 			return new TeleportationPortalTileEntity();
 		}
@@ -94,7 +88,7 @@ public class TeleportationPortalBlock extends PortalBlock  {
 						
 						
 							if (entityIn instanceof ServerPlayer) {
-								((ServerPlayer) entityIn).connection.teleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), entityIn.yRot, entityIn.xRot);
+								((ServerPlayer) entityIn).connection.teleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), entityIn.getYRot(), entityIn.getXRot());
 							} else {
 								entityIn.teleportTo(event.getTargetX(), event.getTargetY(), event.getTargetZ());
 							}

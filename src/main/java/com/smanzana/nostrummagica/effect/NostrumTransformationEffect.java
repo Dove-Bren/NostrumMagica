@@ -1,10 +1,17 @@
 package com.smanzana.nostrummagica.effect;
 
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffectCategory;
+import java.util.function.Consumer;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.client.EffectRenderer;
 
 /**
  * Way to mark entities for later transformation.
@@ -32,8 +39,24 @@ public class NostrumTransformationEffect extends MobEffect {
     }
 	
 	@Override
-	public boolean shouldRender(MobEffectInstance effect) {
-		return false;
+	public void initializeClient(Consumer<EffectRenderer> consumer) {
+		super.initializeClient(consumer);
+		consumer.accept(new EffectRenderer() {
+
+			@Override
+			public void renderInventoryEffect(MobEffectInstance effect, EffectRenderingInventoryScreen<?> gui,
+					PoseStack mStack, int x, int y, float z) {
+			}
+
+			@Override
+			public void renderHUDEffect(MobEffectInstance effect, GuiComponent gui, PoseStack mStack, int x, int y,
+					float z, float alpha) {
+			}
+			
+			@Override
+			public boolean shouldRender(MobEffectInstance effect) {
+				return false;
+			}
+		});
 	}
-	
 }

@@ -103,12 +103,7 @@ public abstract class DungeonKeyChestBlock extends HorizontalDirectionalBlock im
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
-	}
-	
-	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new DungeonKeyChestTileEntity();
 	}
 	

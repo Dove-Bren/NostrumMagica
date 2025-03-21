@@ -9,8 +9,6 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
@@ -50,9 +48,6 @@ public class ManaMessage {
 	}
 		
 
-	@CapabilityInject(INostrumMagic.class)
-	public static Capability<INostrumMagic> CAPABILITY = null;
-	
 	private final UUID uuid;
 	private final int mana;
 	

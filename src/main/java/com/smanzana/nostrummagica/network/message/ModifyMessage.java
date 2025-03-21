@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.network.message;
 import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.tile.ModificationTableTileEntity;
 
 import net.minecraft.core.BlockPos;
@@ -11,8 +10,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
@@ -44,9 +41,6 @@ public class ModifyMessage {
 		});
 	}
 
-	@CapabilityInject(INostrumMagic.class)
-	public static Capability<INostrumMagic> CAPABILITY = null;
-	
 	private final BlockPos pos;
 	private final boolean bool;
 	private final float flt;

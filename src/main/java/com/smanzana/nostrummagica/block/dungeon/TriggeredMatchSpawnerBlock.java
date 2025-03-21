@@ -3,11 +3,10 @@ package com.smanzana.nostrummagica.block.dungeon;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.tile.TriggeredMatchSpawnerTileEntity;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * A match spawner, but doesn't start until triggered
@@ -23,7 +22,7 @@ public class TriggeredMatchSpawnerBlock extends MatchSpawnerBlock implements ITr
 	}
 	
 	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new TriggeredMatchSpawnerTileEntity();
 	}
 

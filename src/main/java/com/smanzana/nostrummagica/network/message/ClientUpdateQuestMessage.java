@@ -10,8 +10,6 @@ import com.smanzana.nostrummagica.progression.quest.NostrumQuest;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
@@ -39,9 +37,6 @@ public class ClientUpdateQuestMessage {
 		});
 	}
 
-	@CapabilityInject(INostrumMagic.class)
-	public static Capability<INostrumMagic> CAPABILITY = null;
-	
 	private final NostrumQuest quest;
 	
 	public ClientUpdateQuestMessage(NostrumQuest quest) {

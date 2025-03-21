@@ -112,7 +112,7 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 	
 	@Override
 	protected void beforeDestroyingBlock(LevelAccessor worldIn, BlockPos pos, BlockState state) {
-		BlockEntity tileentity = state.hasTileEntity() ? worldIn.getBlockEntity(pos) : null;
+		BlockEntity tileentity = state.hasBlockEntity() ? worldIn.getBlockEntity(pos) : null;
 		Block.dropResources(state, worldIn, pos, tileentity);
 	}
 	

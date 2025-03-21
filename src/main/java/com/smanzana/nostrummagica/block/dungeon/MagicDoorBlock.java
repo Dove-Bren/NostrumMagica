@@ -409,6 +409,6 @@ public abstract class MagicDoorBlock extends HorizontalDirectionalBlock {
 		BlockPos bottomLeft = new BlockPos(leftTopPos.getX(), bottomPos.getY(), leftTopPos.getZ());
 		BlockPos topRight = new BlockPos(rightTopPos.getX(), maxY, rightTopPos.getZ());
 		
-		return new BoundingBox(bottomLeft, topRight); // constructor takes care of min/maxing x and z
+		return BoundingBox.fromCorners(bottomLeft, topRight); // constructor takes care of min/maxing x and z
 	}
 }

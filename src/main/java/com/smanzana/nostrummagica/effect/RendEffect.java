@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.effect;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
@@ -8,19 +7,15 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -35,18 +30,6 @@ public class RendEffect extends MobEffect {
 	public RendEffect() {
 		super(MobEffectCategory.HARMFUL, 0xFFC7B5BE);
 		this.addAttributeModifier(Attributes.ARMOR, MOD_UUID, -2D, AttributeModifier.Operation.ADDITION);
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	@Override
-    public void renderInventoryEffect(MobEffectInstance effect, EffectRenderingInventoryScreen<?> gui, PoseStack matrixStackIn, int x, int y, float z) {
-		;
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	@Override
-    public void renderHUDEffect(MobEffectInstance effect, GuiComponent gui, PoseStack matrixStackIn, int x, int y, float z, float alpha) {
-		;
 	}
 	
 	@SubscribeEvent(priority = EventPriority.HIGH)
@@ -64,7 +47,7 @@ public class RendEffect extends MobEffect {
 					if (attr != null && attr.hasSkill(NostrumSkills.Physical_Corrupt) && NostrumMagica.rand.nextInt(4) == 0) {
 						
 						// Spread
-						for (Entity ent : target.getCommandSenderWorld().getEntities(target, target.getEntity().getBoundingBox().inflate(10), (ent) -> ent instanceof LivingEntity && (NostrumMagica.IsSameTeam((LivingEntity) ent, target) || (ent instanceof Monster && target instanceof Monster)))) {
+						for (Entity ent : target.getCommandSenderWorld().getEntities(target, target.getBoundingBox().inflate(10), (ent) -> ent instanceof LivingEntity && (NostrumMagica.IsSameTeam((LivingEntity) ent, target) || (ent instanceof Monster && target instanceof Monster)))) {
 							((LivingEntity) ent).addEffect(new MobEffectInstance(NostrumEffects.rend, effect.getDuration(), effect.getAmplifier()));
 							
 							NostrumParticles.FILLED_ORB.spawn(target.level, new SpawnParams(

@@ -14,6 +14,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.RenderShape;
@@ -38,7 +39,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * @author Skyler
  *
  */
-public class ActiveHopperBlock extends Block {
+public class ActiveHopperBlock extends BaseEntityBlock {
 	
 	public static final DirectionProperty FACING = DirectionProperty.create("facing", (facing) -> {
 		return facing != null && facing != Direction.UP;
@@ -99,12 +100,7 @@ public class ActiveHopperBlock extends Block {
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
-	}
-	
-	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new ActiveHopperTileEntity();
 	}
 	

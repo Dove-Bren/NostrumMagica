@@ -9,25 +9,26 @@ import com.smanzana.nostrummagica.item.SpellRune.ElementSpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.ShapeSpellRune;
 import com.smanzana.nostrummagica.tile.ShrineTileEntity;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
+public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends BaseEntityBlock {
 	
 	public static final String ID_ELEMENT = "element_shrine";
 	public static final String ID_ALTERATION = "alteration_shrine";
@@ -94,12 +95,7 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 		}
 		
 		@Override
-		public boolean hasTileEntity(BlockState state) {
-			return true;
-		}
-		
-		@Override
-		public ShrineTileEntity.Element createTileEntity(BlockState state, BlockGetter world) {
+		public ShrineTileEntity.Element newBlockEntity(BlockPos pos, BlockState state) {
 			ShrineTileEntity.Element ent = new ShrineTileEntity.Element();
 			return ent;
 		}
@@ -127,12 +123,7 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 		}
 		
 		@Override
-		public boolean hasTileEntity(BlockState state) {
-			return true;
-		}
-		
-		@Override
-		public ShrineTileEntity.Shape createTileEntity(BlockState state, BlockGetter world) {
+		public ShrineTileEntity.Shape newBlockEntity(BlockPos pos, BlockState state) {
 			ShrineTileEntity.Shape ent = new ShrineTileEntity.Shape();
 			return ent;
 		}
@@ -160,12 +151,7 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 		}
 		
 		@Override
-		public boolean hasTileEntity(BlockState state) {
-			return true;
-		}
-		
-		@Override
-		public ShrineTileEntity.Alteration createTileEntity(BlockState state, BlockGetter world) {
+		public ShrineTileEntity.Alteration newBlockEntity(BlockPos pos, BlockState state) {
 			ShrineTileEntity.Alteration ent = new ShrineTileEntity.Alteration();
 			return ent;
 		}
@@ -193,12 +179,7 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends Block {
 		}
 		
 		@Override
-		public boolean hasTileEntity(BlockState state) {
-			return true;
-		}
-		
-		@Override
-		public ShrineTileEntity.Tier createTileEntity(BlockState state, BlockGetter world) {
+		public ShrineTileEntity.Tier newBlockEntity(BlockPos pos, BlockState state) {
 			ShrineTileEntity.Tier ent = new ShrineTileEntity.Tier();
 			return ent;
 		}

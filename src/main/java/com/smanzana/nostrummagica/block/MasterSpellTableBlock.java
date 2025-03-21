@@ -19,6 +19,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -31,7 +32,7 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
 
 @SuppressWarnings("deprecation")
-public class MasterSpellTableBlock extends HorizontalDirectionalBlock {
+public class MasterSpellTableBlock extends HorizontalDirectionalBlock implements EntityBlock {
 	
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	private static final BooleanProperty MASTER = BooleanProperty.create("master");
@@ -127,12 +128,7 @@ public class MasterSpellTableBlock extends HorizontalDirectionalBlock {
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
-	}
-	
-	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		if (state.getValue(MASTER))
 			return new SpellTableTileEntity();
 		

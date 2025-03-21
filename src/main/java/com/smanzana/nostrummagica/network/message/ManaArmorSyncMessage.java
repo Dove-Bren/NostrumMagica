@@ -7,13 +7,11 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
+import com.smanzana.nostrummagica.capabilities.ManaArmor;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
@@ -37,9 +35,6 @@ public class ManaArmorSyncMessage {
 		});
 	}
 	
-	@CapabilityInject(IManaArmor.class)
-	public static Capability<IManaArmor> CAPABILITY = null;
-	
 	private final int entID;
 	private final IManaArmor stats;
 	
@@ -53,9 +48,9 @@ public class ManaArmorSyncMessage {
 	}
 
 	public static ManaArmorSyncMessage decode(FriendlyByteBuf buf) {
-		IManaArmor stats = CAPABILITY.getDefaultInstance();
+		ManaArmor stats = new ManaArmor(null);
 		final int entID = buf.readVarInt();
-		CAPABILITY.getStorage().readNBT(CAPABILITY, stats, null, buf.readNbt());
+		stats.deserializeNBT(buf.readNbt());
 		
 		return new ManaArmorSyncMessage(
 				entID,
@@ -65,7 +60,7 @@ public class ManaArmorSyncMessage {
 
 	public static void encode(ManaArmorSyncMessage msg, FriendlyByteBuf buf) {
 		buf.writeVarInt(msg.entID);
-		buf.writeNbt((CompoundTag) CAPABILITY.getStorage().writeNBT(CAPABILITY, msg.stats, null));
+		buf.writeNbt(msg.stats.serializeNBT());
 	}
 
 }

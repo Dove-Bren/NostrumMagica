@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity.SwitchTriggerType;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
@@ -37,7 +38,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Skyler
  *
  */
-public class SwitchBlock extends Block {
+public class SwitchBlock extends Block implements EntityBlock {
 	
 	protected static final VoxelShape SWITCH_BLOCK_AABB = Block.box(0.0D, 0.0D, 0.0D, 16D, 3.2D, 16D);
 
@@ -79,12 +80,7 @@ public class SwitchBlock extends Block {
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
-	}
-	
-	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new SwitchBlockTileEntity();
 	}
 	

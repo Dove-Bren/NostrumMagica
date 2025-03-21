@@ -18,14 +18,15 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.util.INBTSerializable;
 
-public interface INostrumMagic {
+public interface INostrumMagic extends INBTSerializable<CompoundTag> {
 	
 	public static class TransmuteKnowledge {
 		public final String key;
@@ -195,7 +196,6 @@ public interface INostrumMagic {
 	
 	// Copy fields out of
 	public void copy(INostrumMagic cap);
-	public void provideEntity(LivingEntity entity);
 	
 	// Quests
 	public List<String> getCompletedQuests();

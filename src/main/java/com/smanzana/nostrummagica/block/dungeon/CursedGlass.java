@@ -27,6 +27,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.level.BlockGetter;
@@ -94,7 +95,10 @@ public class CursedGlass extends SwitchBlock {
 		}
 		
 		// If creative, still be full cube even when broken
-		if (context.getEntity() != null && context.getEntity() instanceof Player && ((Player) context.getEntity()).isCreative()) {
+		if (context instanceof EntityCollisionContext
+				&& ((EntityCollisionContext) context).getEntity().isPresent()
+				&& ((EntityCollisionContext)context).getEntity().get() instanceof Player
+				&& ((Player) ((EntityCollisionContext)context).getEntity().get()).isCreative()) {
 			return Shapes.block();
 		}
 		
@@ -122,12 +126,7 @@ public class CursedGlass extends SwitchBlock {
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return !isDummy(state);
-	}
-	
-	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return isDummy(state) ? null : new CursedGlassTileEntity();
 	}
 	

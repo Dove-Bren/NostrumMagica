@@ -3,15 +3,12 @@ package com.smanzana.nostrummagica.network.message;
 import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
@@ -33,9 +30,6 @@ public class SpellDebugMessage {
 		});
 	}
 
-	@CapabilityInject(INostrumMagic.class)
-	public static Capability<INostrumMagic> CAPABILITY = null;
-	
 	private final Component comp;
 	
 	public SpellDebugMessage(Component comp) {

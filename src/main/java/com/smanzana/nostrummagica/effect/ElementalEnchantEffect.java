@@ -2,19 +2,13 @@ package com.smanzana.nostrummagica.effect;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffectCategory;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ElementalEnchantEffect extends MobEffect {
 
@@ -72,18 +66,6 @@ public class ElementalEnchantEffect extends MobEffect {
 			this.addAttributeModifier(NostrumAttributes.GetReduceAttribute(this.element), GetModID(this.element), 1D, AttributeModifier.Operation.ADDITION);
 			this.addAttributeModifier(NostrumAttributes.GetReduceAttribute(this.element.getOpposite()), GetModID(this.element), -1D, AttributeModifier.Operation.ADDITION);
 		}
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	@Override
-    public void renderInventoryEffect(MobEffectInstance effect, EffectRenderingInventoryScreen<?> gui, PoseStack matrixStackIn, int x, int y, float z) {
-		;
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	@Override
-    public void renderHUDEffect(MobEffectInstance effect, GuiComponent gui, PoseStack matrixStackIn, int x, int y, float z, float alpha) {
-		;
 	}
 	
 	public static ElementalEnchantEffect GetForElement(EMagicElement element) {

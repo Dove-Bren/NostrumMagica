@@ -1,17 +1,10 @@
 package com.smanzana.nostrummagica.effect;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectCategory;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 
 public class MagicBoostEffect extends MobEffect {
 
@@ -26,17 +19,5 @@ public class MagicBoostEffect extends MobEffect {
 	
 	public boolean isDurationEffectTick(int duration, int amp) {
 		return false; // No tick effects
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	@Override
-    public void renderInventoryEffect(MobEffectInstance effect, EffectRenderingInventoryScreen<?> gui, PoseStack matrixStackIn, int x, int y, float z) {
-		PotionIcon.MAGICBOOST.draw(matrixStackIn, gui.getMinecraft(), x + 6, y + 7);
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	@Override
-    public void renderHUDEffect(MobEffectInstance effect, GuiComponent gui, PoseStack matrixStackIn, int x, int y, float z, float alpha) {
-		PotionIcon.MAGICBOOST.draw(matrixStackIn, Minecraft.getInstance(), x + 3, y + 3);
 	}
 }

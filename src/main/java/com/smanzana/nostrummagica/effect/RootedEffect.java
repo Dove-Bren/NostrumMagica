@@ -2,23 +2,16 @@ package com.smanzana.nostrummagica.effect;
 
 import java.awt.Color;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.AttributeMap;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class RootedEffect extends MobEffect {
 
@@ -69,17 +62,4 @@ public class RootedEffect extends MobEffect {
 		NostrumMagica.magicEffectProxy.remove(SpecialEffect.ROOTED, entityLivingBaseIn);
 		super.removeAttributeModifiers(entityLivingBaseIn, attributeMapIn, amplifier);
     }
-	
-	@OnlyIn(Dist.CLIENT)
-	@Override
-    public void renderInventoryEffect(MobEffectInstance effect, EffectRenderingInventoryScreen<?> gui, PoseStack matrixStackIn, int x, int y, float z) {
-		PotionIcon.ROOTED.draw(matrixStackIn, gui.getMinecraft(), x + 6, y + 7);
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	@Override
-    public void renderHUDEffect(MobEffectInstance effect, GuiComponent gui, PoseStack matrixStackIn, int x, int y, float z, float alpha) {
-		PotionIcon.ROOTED.draw(matrixStackIn, Minecraft.getInstance(), x + 3, y + 3);
-	}
-	
 }

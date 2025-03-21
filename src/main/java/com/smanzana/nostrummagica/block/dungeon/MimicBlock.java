@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.MimicBlockTileEntity;
 
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
@@ -45,7 +46,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.ModelProperty;
 
 @SuppressWarnings("deprecation")
-public abstract class MimicBlock extends Block implements EntityBlock {
+public abstract class MimicBlock extends BaseEntityBlock implements EntityBlock {
 	
 	public static class MimicBlockData {
 		public BlockState mimicState;
@@ -69,18 +70,8 @@ public abstract class MimicBlock extends Block implements EntityBlock {
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
-	}
-	
-	@Override
-	public BlockEntity newBlockEntity(BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new MimicBlockTileEntity();
-	}
-	
-	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
-		return newBlockEntity(world);
 	}
 	
 //	@Override

@@ -36,12 +36,7 @@ public class LockedDoorBlock extends MagicDoorBlock {
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return this.isMaster(state);
-	}
-	
-	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		if (!this.isMaster(state))
 			return null;
 		

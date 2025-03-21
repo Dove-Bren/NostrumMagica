@@ -8,13 +8,12 @@ import java.util.Set;
 import com.smanzana.nostrummagica.tile.TemporaryPortalTileEntity;
 import com.smanzana.nostrummagica.util.Location;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
 
 /**
  * Teleportation Portal with a finite lifetime
@@ -34,12 +33,7 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
-	}
-	
-	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		if (isMaster(state)) {
 			return new TemporaryPortalTileEntity();
 		}

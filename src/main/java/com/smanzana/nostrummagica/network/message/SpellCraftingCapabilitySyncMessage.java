@@ -7,13 +7,11 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
+import com.smanzana.nostrummagica.capabilities.SpellCraftingCapability;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
@@ -37,9 +35,6 @@ public class SpellCraftingCapabilitySyncMessage {
 		});
 	}
 	
-	@CapabilityInject(ISpellCrafting.class)
-	public static Capability<ISpellCrafting> CAPABILITY = null;
-	
 	private final int entID;
 	private final ISpellCrafting stats;
 	
@@ -53,9 +48,9 @@ public class SpellCraftingCapabilitySyncMessage {
 	}
 
 	public static SpellCraftingCapabilitySyncMessage decode(FriendlyByteBuf buf) {
-		ISpellCrafting stats = CAPABILITY.getDefaultInstance();
+		ISpellCrafting stats = new SpellCraftingCapability();
 		final int entID = buf.readVarInt();
-		CAPABILITY.getStorage().readNBT(CAPABILITY, stats, null, buf.readNbt());
+		stats.deserializeNBT(buf.readNbt());
 		
 		return new SpellCraftingCapabilitySyncMessage(
 				entID,
@@ -65,7 +60,7 @@ public class SpellCraftingCapabilitySyncMessage {
 
 	public static void encode(SpellCraftingCapabilitySyncMessage msg, FriendlyByteBuf buf) {
 		buf.writeVarInt(msg.entID);
-		buf.writeNbt((CompoundTag) CAPABILITY.getStorage().writeNBT(CAPABILITY, msg.stats, null));
+		buf.writeNbt(msg.stats.serializeNBT());
 	}
 
 }

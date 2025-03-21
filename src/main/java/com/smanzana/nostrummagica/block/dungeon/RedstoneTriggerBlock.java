@@ -58,12 +58,7 @@ public class RedstoneTriggerBlock extends TriggerRepeaterBlock {
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
-	}
-	
-	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter reader) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new TriggerRepeaterTileEntity();
 	}
 

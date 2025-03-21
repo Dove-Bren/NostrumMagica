@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,14 +32,23 @@ import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
+import com.smanzana.nostrummagica.util.NetUtils;
 
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 /**
@@ -141,9 +151,9 @@ public class NostrumMagic implements INostrumMagic {
 	private @Nullable VanillaRespawnInfo savedRespawnInfo;
 	private Map<TransmuteKnowledge, Boolean> transmuteKnowledge;
 	
-	private LivingEntity entity;
+	private final LivingEntity entity;
 	
-	public NostrumMagic() {
+	public NostrumMagic(LivingEntity entity) {
 		tier = EMagicTier.LOCKED;
 		//familiars = new ArrayList<>();
 		loreLevels = new HashMap<>();
@@ -169,6 +179,8 @@ public class NostrumMagic implements INostrumMagic {
 		modManaFlat = new HashMap<>();
 		modManaCost = new HashMap<>();
 		modManaRegen = new HashMap<>();
+		
+		this.entity = entity;
 	}
 
 	@Override
@@ -663,11 +675,6 @@ public class NostrumMagic implements INostrumMagic {
 	}
 	
 	@Override
-	public void provideEntity(LivingEntity entity) {
-		this.entity = entity;
-	}
-
-	@Override
 	public BlockPos getMarkLocation() {
 		return markLocation;
 	}
@@ -788,7 +795,7 @@ public class NostrumMagic implements INostrumMagic {
 			return;
 		
 		for (LivingEntity entity : familiars) {
-			entity.remove();
+			entity.discard();
 		}
 		
 		familiars.clear();
@@ -1036,6 +1043,506 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public void setElementalXPMap(Map<EMagicElement, Integer> map) {
 		this.elementalXP = map;
+	}
+	
+	private static final String NBT_TIER = "tier";
+	private static final String NBT_LEVEL = "level";
+	private static final String NBT_XP = "xp";
+	private static final String NBT_SKILLPOINTS = "skillpoints";
+	private static final String NBT_ELEMENTAL_SKILLPOINTS = "elemental_skillpoints";
+	private static final String NBT_ELEMENTAL_XP = "elemental_xp";
+	private static final String NBT_RESEARCHPOINTS = "researchpoints";
+	private static final String NBT_MANA = "mana";
+	private static final String NBT_RESERVED_MANA = "reserved_mana";
+	
+	private static final String NBT_MOD_MANA = "mod_mana";
+	private static final String NBT_MOD_MANA_COST = "mod_mana_cost";
+	private static final String NBT_MOD_MANA_REGEN = "mod_mana_regen";
+	private static final String NBT_MOD_MANA_BONUS = "mod_mana_bonus";
+	private static final String NBT_MOD_INTERNAL_ID = "id";
+	private static final String NBT_MOD_INTERNAL_VALUE = "value";
+	
+	private static final String NBT_SKILLS = "skills";
+	
+	//private static final String NBT_FAMILIARS = "familiars";
+	
+	private static final String NBT_LORELEVELS = "lore";
+	private static final String NBT_SPELLCRCS = "spellcrcs"; // spells we've done's CRCs
+	private static final String NBT_MASTERED_ELEMENTS = "mastered_elements";
+	private static final String NBT_ELEMENT_TRIALS = "element_trials";
+	private static final String NBT_SHAPES = "shapes"; // list of shape keys
+	private static final String NBT_ALTERATIONS = "alterations";
+	
+	private static final String NBT_MARK_DIMENSION = "mark_dim";
+	private static final String NBT_MARK_POS = "mark_pos";
+	private static final String NBT_ENHANCED_TELEPORT = "enhanced_teleport";
+	
+	private static final String NBT_QUESTS_COMPLETED = "quests_completed";
+	private static final String NBT_QUESTS_CURRENT = "quests_current";
+	
+	private static final String NBT_RESEARCHES = "research_completed";
+	
+	private static final String NBT_SPELLKNOWLEDGE = "spell_knowledge";
+	
+	private static final String NBT_SORCERYPORTAL_DIM = "sorcery_portal_dim";
+	private static final String NBT_SORCERYPORTAL_POS = "sorcery_portal_pos";
+	
+	private static final String NBT_SAVEDRESPAWN_DIM = "saved_respawn_dim";
+	private static final String NBT_SAVEDRESPAWN_POS = "saved_respawn_pos";
+	private static final String NBT_SAVEDRESPAWN_YAW = "saved_respawn_yaw";
+	private static final String NBT_SAVEDRESPAWN_FORCE = "saved_respawn_force";
+	
+	private static final String NBT_TRANSMUTE_KNOWLEDGE = "transmute_knowledge";
+
+	@Override
+	public CompoundTag serializeNBT() {
+		CompoundTag nbt = new CompoundTag();
+		
+		nbt.putString(NBT_TIER, getTier().name().toLowerCase());
+		nbt.putInt(NBT_LEVEL, getLevel());
+		nbt.putFloat(NBT_XP, getXP());
+		nbt.putInt(NBT_SKILLPOINTS, getSkillPoints());
+		nbt.putInt(NBT_RESEARCHPOINTS, getResearchPoints());
+		nbt.putInt(NBT_MANA, getMana());
+		nbt.putInt(NBT_RESERVED_MANA, getReservedMana());
+		
+		nbt.put(NBT_ELEMENTAL_SKILLPOINTS, NetUtils.ToNBT(getElementalSkillPointsMap(), IntTag::valueOf));
+		nbt.put(NBT_ELEMENTAL_XP, NetUtils.ToNBT(getElementalXPMap(), IntTag::valueOf));
+		
+		CompoundTag compound = new CompoundTag();
+		{
+			Map<String, Integer> map = serializeLoreLevels();
+			for (String key : map.keySet()) {
+				compound.putInt(key, map.get(key));
+			}
+		}
+		nbt.put(NBT_LORELEVELS, compound);
+		
+		ListTag list = new ListTag();
+		for (String crc : serializeSpellHistory()) {
+			list.add(StringTag.valueOf(crc));
+		}
+		nbt.put(NBT_SPELLCRCS, list);
+		
+		compound = new CompoundTag();
+		{
+			Map<EMagicElement, EElementalMastery> map = serializeElementMastery();
+			for (EMagicElement key : map.keySet()) {
+				compound.put(key.name(), map.get(key).toNBT());
+			}
+		}
+		nbt.put(NBT_MASTERED_ELEMENTS, compound);
+		
+		compound = new CompoundTag();
+		{
+			Map<EMagicElement, Boolean> map = serializeElementTrials();
+			for (EMagicElement key : map.keySet()) {
+				compound.putBoolean(key.name(), map.get(key));
+			}
+		}
+		nbt.put(NBT_ELEMENT_TRIALS, compound);
+		
+		list = new ListTag();
+		{
+			Map<UUID, Float> map = getManaModifiers();
+			for (UUID id : map.keySet()) {
+				if (id == null) continue;
+				
+				compound = new CompoundTag();
+				compound.putUUID(NBT_MOD_INTERNAL_ID, id);
+				compound.putFloat(NBT_MOD_INTERNAL_VALUE, map.get(id));
+				list.add(compound);
+			}
+		}
+		nbt.put(NBT_MOD_MANA, list);
+		
+		list = new ListTag();
+		{
+			Map<UUID, Float> map = getManaCostModifiers();
+			for (UUID id : map.keySet()) {
+				if (id == null) continue;
+				
+				compound = new CompoundTag();
+				compound.putUUID(NBT_MOD_INTERNAL_ID, id);
+				compound.putFloat(NBT_MOD_INTERNAL_VALUE, map.get(id));
+				list.add(compound);
+			}
+		}
+		nbt.put(NBT_MOD_MANA_COST, list);
+		
+		list = new ListTag();
+		{
+			Map<UUID, Float> map = getManaRegenModifiers();
+			for (UUID id : map.keySet()) {
+				if (id == null) continue;
+				
+				compound = new CompoundTag();
+				compound.putUUID(NBT_MOD_INTERNAL_ID, id);
+				compound.putFloat(NBT_MOD_INTERNAL_VALUE, map.get(id));
+				list.add(compound);
+			}
+		}
+		nbt.put(NBT_MOD_MANA_REGEN, list);
+		
+		list = new ListTag();
+		{
+			Map<UUID, Integer> map = getManaBonusModifiers();
+			for (UUID id : map.keySet()) {
+				if (id == null) continue;
+				
+				compound = new CompoundTag();
+				compound.putUUID(NBT_MOD_INTERNAL_ID, id);
+				compound.putInt(NBT_MOD_INTERNAL_VALUE, map.get(id));
+				list.add(compound);
+			}
+		}
+		nbt.put(NBT_MOD_MANA_BONUS, list);
+		
+		list = new ListTag();
+		for (SpellShape shape : getShapes()) {
+			String key = shape.getShapeKey();
+			list.add(StringTag.valueOf(key));
+		}
+		nbt.put(NBT_SHAPES, list);
+		
+		compound = new CompoundTag();
+		{
+			Map<EAlteration, Boolean> map = serializeAlterations();
+			for (EAlteration key : map.keySet()) {
+				compound.putBoolean(key.name(), map.get(key));
+			}
+		}
+		nbt.put(NBT_ALTERATIONS, compound);
+		
+		BlockPos markPos = getMarkLocation();
+		if (markPos != null) {
+			CompoundTag posTag = new CompoundTag();
+			posTag.putInt("x", markPos.getX());
+			posTag.putInt("y", markPos.getY());
+			posTag.putInt("z", markPos.getZ());
+			nbt.putString(NBT_MARK_DIMENSION, getMarkDimension().location().toString());
+			nbt.put(NBT_MARK_POS, posTag);
+		}
+		if (hasEnhancedTeleport()) {
+			nbt.putBoolean(NBT_ENHANCED_TELEPORT, true);
+		}
+		
+		List<String> stringList = getCurrentQuests();
+		if (stringList != null && !stringList.isEmpty()) {
+			ListTag tagList = new ListTag();
+			for (String quest : stringList) {
+				tagList.add(StringTag.valueOf(quest));
+			}
+			nbt.put(NBT_QUESTS_CURRENT, tagList);
+		}
+		
+		stringList = getCompletedQuests();
+		if (stringList != null && !stringList.isEmpty()) {
+			ListTag tagList = new ListTag();
+			for (String quest : stringList) {
+				tagList.add(StringTag.valueOf(quest));
+			}
+			nbt.put(NBT_QUESTS_COMPLETED, tagList);
+		}
+		
+		stringList = getCompletedResearches();
+		if (stringList != null && !stringList.isEmpty()) {
+			ListTag tagList = new ListTag();
+			for (String research : stringList) {
+				tagList.add(StringTag.valueOf(research));
+			}
+			nbt.put(NBT_RESEARCHES, tagList);
+		}
+		
+		Collection<Skill> skills = getSkills();
+		if (skills != null && !skills.isEmpty()) {
+			ListTag tagList = new ListTag();
+			for (Skill skill : skills) {
+				tagList.add(StringTag.valueOf(skill.getKey().toString()));
+			}
+			nbt.put(NBT_SKILLS, tagList);
+		}
+		
+		compound = new CompoundTag();;
+		Map<EMagicElement, Map<EAlteration, Boolean>> knowledge = getSpellKnowledge();
+		if (knowledge != null && !knowledge.isEmpty())
+		for (EMagicElement elem : knowledge.keySet()) {
+			CompoundTag subtag = new CompoundTag();
+			Map<EAlteration, Boolean> map = knowledge.get(elem);
+			if (map == null || map.isEmpty())
+				continue;
+			for (EAlteration alt : map.keySet()) {
+				Boolean bool = map.get(alt);
+				if (bool != null && bool) {
+					subtag.putBoolean(alt == null ? "none" : alt.name(), true);
+				}
+			}
+			compound.put(elem.name(), subtag);
+		}
+		nbt.put(NBT_SPELLKNOWLEDGE, compound);
+		
+		if (getSorceryPortalPos() != null) {
+			nbt.putString(NBT_SORCERYPORTAL_DIM, getSorceryPortalDimension().getRegistryName().toString());
+			nbt.put(NBT_SORCERYPORTAL_POS, NbtUtils.writeBlockPos(getSorceryPortalPos()));
+		}
+		
+		final VanillaRespawnInfo respawnInfo = getSavedRespawnInfo();
+		if (respawnInfo != null) {
+			nbt.putString(NBT_SAVEDRESPAWN_DIM, respawnInfo.dimension.location().toString());
+			nbt.put(NBT_SAVEDRESPAWN_POS, NbtUtils.writeBlockPos(respawnInfo.pos));
+			nbt.putFloat(NBT_SAVEDRESPAWN_YAW, respawnInfo.yaw);
+			nbt.putBoolean(NBT_SAVEDRESPAWN_FORCE, respawnInfo.forced);
+		}
+		
+		list = new ListTag();
+		for (Entry<TransmuteKnowledge, Boolean> entry : getTransmuteKnowledge().entrySet()) {
+			if (entry.getValue() == null || !entry.getValue()) {
+				continue;
+			}
+			CompoundTag subtag = entry.getKey().toNBT();
+			list.add(subtag);
+		}
+		nbt.put(NBT_TRANSMUTE_KNOWLEDGE, list);
+		
+		return nbt;
+	}
+
+	@Override
+	public void deserializeNBT(CompoundTag tag) {
+		EMagicTier tier = EMagicTier.LOCKED;
+		try {
+			tier = EMagicTier.valueOf(tag.getString(NBT_TIER).toUpperCase());
+		} catch (Exception e) {
+			tier = EMagicTier.LOCKED;
+		}
+		deserialize(
+			tier,
+			tag.getInt(NBT_LEVEL),
+			tag.getFloat(NBT_XP),
+			tag.getInt(NBT_SKILLPOINTS),
+			tag.getInt(NBT_RESEARCHPOINTS),
+			tag.getInt(NBT_MANA),
+			tag.getInt(NBT_RESERVED_MANA)
+			);
+		
+		Map<EMagicElement, Integer> elementalSkillPoints = new EnumMap<>(EMagicElement.class);
+		NetUtils.FromNBT(elementalSkillPoints, EMagicElement.class, tag.getCompound(NBT_ELEMENTAL_SKILLPOINTS), (p) -> ((IntTag) p).getAsInt());
+		setElementalSkillPointMap(elementalSkillPoints);
+		
+		Map<EMagicElement, Integer> elementalXP = new EnumMap<>(EMagicElement.class);
+		NetUtils.FromNBT(elementalXP, EMagicElement.class, tag.getCompound(NBT_ELEMENTAL_XP), (p) -> ((IntTag) p).getAsInt());
+		setElementalXPMap(elementalXP);
+			
+		// LORE
+		CompoundTag compound = tag.getCompound(NBT_LORELEVELS);
+		for (String key : compound.getAllKeys()) {
+			Integer level = compound.getInt(key);
+			deserializeLore(key, level);
+		}
+		
+		// SPELLS
+		ListTag list = tag.getList(NBT_SPELLCRCS, Tag.TAG_STRING);
+		for (int i = 0; i < list.size(); i++) {
+			deserializeSpells(list.getString(i));
+		}
+		
+		// ELEMENTS
+		compound = tag.getCompound(NBT_MASTERED_ELEMENTS);
+		for (String key : compound.getAllKeys()) {
+			EMagicElement elem = EMagicElement.valueOf(key);
+			setElementalMastery(elem, EElementalMastery.fromNBT(compound.get(key)));
+		}
+		
+		compound = tag.getCompound(NBT_ELEMENT_TRIALS);
+		for (String key : compound.getAllKeys()) {
+			boolean val = compound.getBoolean(key);
+			if (val) {
+				EMagicElement elem = EMagicElement.valueOf(key);
+				startTrial(elem);
+			}
+		}
+		
+		// SHAPES
+		list = tag.getList(NBT_SHAPES, Tag.TAG_STRING);
+		for (int i = 0; i < list.size(); i++) {
+			SpellShape shape = SpellShape.get(list.getString(i));
+			addShape(shape);
+		}
+		
+		// ALTERATIONS
+
+		compound = tag.getCompound(NBT_ALTERATIONS);
+		for (String key : compound.getAllKeys()) {
+			boolean val = compound.getBoolean(key);
+			if (val) {
+				EAlteration elem = EAlteration.valueOf(key);
+				unlockAlteration(elem);
+			}
+		}
+		
+		// Mark Location
+		if (tag.contains(NBT_MARK_POS, Tag.TAG_COMPOUND)) {
+			CompoundTag posTag = tag.getCompound(NBT_MARK_POS);
+			BlockPos location = new BlockPos(
+					posTag.getInt("x"),
+					posTag.getInt("y"),
+					posTag.getInt("z")
+					);
+			String dimension = tag.getString(NBT_MARK_DIMENSION);
+			ResourceKey<Level> dimKey = ResourceKey.create(Registry.DIMENSION_REGISTRY, ResourceLocation.tryParse(dimension));
+			
+			setMarkLocation(dimKey, location);
+		}
+		
+		if (tag.contains(NBT_ENHANCED_TELEPORT) && tag.getBoolean(NBT_ENHANCED_TELEPORT)) {
+			unlockEnhancedTeleport();
+		}
+		
+		// Quests
+		if (tag.contains(NBT_QUESTS_CURRENT, Tag.TAG_LIST)) {
+			ListTag tagList = tag.getList(NBT_QUESTS_CURRENT, Tag.TAG_STRING);
+			for (int i = 0; i < tagList.size(); i++) {
+				String quest = tagList.getString(i);
+				addQuest(quest);
+			}
+		}
+		if (tag.contains(NBT_QUESTS_COMPLETED, Tag.TAG_LIST)) {
+			ListTag tagList = tag.getList(NBT_QUESTS_COMPLETED, Tag.TAG_STRING);
+			for (int i = 0; i < tagList.size(); i++) {
+				String quest = tagList.getString(i);
+				addQuest(quest);
+				completeQuest(quest);
+			}
+		}
+		
+		if (tag.contains(NBT_RESEARCHES, Tag.TAG_LIST)) {
+			ListTag tagList = tag.getList(NBT_RESEARCHES, Tag.TAG_STRING);
+			for (int i = 0; i < tagList.size(); i++) {
+				String research = tagList.getString(i);
+				completeResearch(research);
+			}
+		}
+		
+		if (tag.contains(NBT_SKILLS, Tag.TAG_LIST)) {
+			ListTag tagList = tag.getList(NBT_SKILLS, Tag.TAG_STRING);
+			for (int i = 0; i < tagList.size(); i++) {
+				String raw = tagList.getString(i);
+				ResourceLocation loc = new ResourceLocation(raw);
+				if (Skill.lookup(loc) != null) {
+					addSkill(Skill.lookup(loc));
+				}
+			}
+		}
+		
+		if (tag.contains(NBT_SPELLKNOWLEDGE, Tag.TAG_COMPOUND)) {
+			compound = tag.getCompound(NBT_SPELLKNOWLEDGE);
+			for (String key : compound.getAllKeys()) {
+				try {
+					EMagicElement elem = EMagicElement.valueOf(key);
+					CompoundTag subtag = compound.getCompound(key);
+					for (String altKey : subtag.getAllKeys()) {
+						EAlteration alt;
+						if (altKey.equalsIgnoreCase("none"))
+							alt = null;
+						else
+							alt = EAlteration.valueOf(altKey);
+						if (subtag.getBoolean(altKey)) {
+							setKnowledge(elem, alt);
+						}
+					}
+				} catch (Exception e) {
+					continue;
+				}
+			}
+		}
+		
+		if (tag.contains(NBT_SORCERYPORTAL_POS)) {
+			String dimName = tag.getString(NBT_SORCERYPORTAL_DIM);
+			ResourceKey<Level> dim = ResourceKey.create(Registry.DIMENSION_REGISTRY, ResourceLocation.tryParse(dimName));
+			setSorceryPortalLocation(
+					dim,
+					NbtUtils.readBlockPos(tag.getCompound(NBT_SORCERYPORTAL_POS))); // Warning: can break if save used across game versions
+		}
+		
+		if (tag.contains(NBT_SAVEDRESPAWN_DIM)) {
+			final ResourceKey<Level> dim = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(tag.getString(NBT_SAVEDRESPAWN_DIM)));
+			final BlockPos pos = NbtUtils.readBlockPos(tag.getCompound(NBT_SAVEDRESPAWN_POS));
+			final float yaw = tag.getFloat(NBT_SAVEDRESPAWN_YAW);
+			final boolean forced = tag.getBoolean(NBT_SAVEDRESPAWN_FORCE);
+			setSavedRespawnInfo(new VanillaRespawnInfo(dim, pos, yaw, forced));
+		} else {
+			setSavedRespawnInfo(null);
+		}
+		
+		// Modifiers
+		Map<UUID, Float> modMana = new HashMap<>();
+		Map<UUID, Integer> modManaFlat = new HashMap<>();
+		Map<UUID, Float> modManaCost = new HashMap<>();
+		Map<UUID, Float> modManaRegen = new HashMap<>();
+		
+		if (tag.contains(NBT_MOD_MANA, Tag.TAG_LIST)) {
+			ListTag tagList = tag.getList(NBT_MOD_MANA, Tag.TAG_COMPOUND);
+			
+			for (int i = 0; i < tagList.size(); i++) {
+				CompoundTag subtag = tagList.getCompound(i);
+				UUID id = subtag.getUUID(NBT_MOD_INTERNAL_ID);
+				float val = subtag.getFloat(NBT_MOD_INTERNAL_VALUE);
+				if (id != null) {
+					modMana.put(id, val);
+				}
+			}
+		}
+		
+		if (tag.contains(NBT_MOD_MANA_BONUS, Tag.TAG_LIST)) {
+			ListTag tagList = tag.getList(NBT_MOD_MANA_BONUS, Tag.TAG_COMPOUND);
+			
+			for (int i = 0; i < tagList.size(); i++) {
+				CompoundTag subtag = tagList.getCompound(i);
+				UUID id = subtag.getUUID(NBT_MOD_INTERNAL_ID);
+				int val = subtag.getInt(NBT_MOD_INTERNAL_VALUE);
+				if (id != null) {
+					modManaFlat.put(id, val);
+				}
+			}
+		}
+		
+		if (tag.contains(NBT_MOD_MANA_COST, Tag.TAG_LIST)) {
+			ListTag tagList = tag.getList(NBT_MOD_MANA_COST, Tag.TAG_COMPOUND);
+			
+			for (int i = 0; i < tagList.size(); i++) {
+				CompoundTag subtag = tagList.getCompound(i);
+				UUID id = subtag.getUUID(NBT_MOD_INTERNAL_ID);
+				float val = subtag.getFloat(NBT_MOD_INTERNAL_VALUE);
+				if (id != null) {
+					modManaCost.put(id, val);
+				}
+			}
+		}
+		
+		if (tag.contains(NBT_MOD_MANA_REGEN, Tag.TAG_LIST)) {
+			ListTag tagList = tag.getList(NBT_MOD_MANA_REGEN, Tag.TAG_COMPOUND);
+			
+			for (int i = 0; i < tagList.size(); i++) {
+				CompoundTag subtag = tagList.getCompound(i);
+				UUID id = subtag.getUUID(NBT_MOD_INTERNAL_ID);
+				float val = subtag.getFloat(NBT_MOD_INTERNAL_VALUE);
+				if (id != null) {
+					modManaRegen.put(id, val);
+				}
+			}
+		}
+		
+		setModifierMaps(modMana, modManaFlat, modManaCost, modManaRegen);
+		
+		if (tag.contains(NBT_TRANSMUTE_KNOWLEDGE, Tag.TAG_LIST)) {
+			ListTag tagList = tag.getList(NBT_TRANSMUTE_KNOWLEDGE, Tag.TAG_COMPOUND);
+			
+			for (int i = 0; i < tagList.size(); i++) {
+				CompoundTag subtag = tagList.getCompound(i);
+				TransmuteKnowledge knowledge = TransmuteKnowledge.fromNBT(subtag);
+				giveTransmuteKnowledge(knowledge.key, knowledge.level);
+			}
+		}
 	}
 	
 }

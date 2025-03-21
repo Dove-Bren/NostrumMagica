@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
@@ -13,7 +14,6 @@ import io.netty.handler.codec.DecoderException;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.HoverEvent;
@@ -23,8 +23,6 @@ import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
@@ -58,9 +56,6 @@ public class LoreMessage {
 		});
 	}
 	
-	@CapabilityInject(INostrumMagic.class)
-	public static Capability<INostrumMagic> CAPABILITY = null;
-	
 	private final ILoreTagged lore;
 	private final INostrumMagic stats;
 	
@@ -70,8 +65,8 @@ public class LoreMessage {
 	}
 
 	public static LoreMessage decode(FriendlyByteBuf buf) {
-		INostrumMagic stats = CAPABILITY.getDefaultInstance();
-		CAPABILITY.getStorage().readNBT(CAPABILITY, stats, null, buf.readNbt());
+		NostrumMagic stats = new NostrumMagic(null);
+		stats.deserializeNBT(buf.readNbt());
 		
 		final String loreID = buf.readUtf(32767);
 		ILoreTagged lore = LoreRegistry.instance().lookup(loreID);
@@ -83,7 +78,7 @@ public class LoreMessage {
 	}
 
 	public static void encode(LoreMessage msg, FriendlyByteBuf buf) {
-		buf.writeNbt((CompoundTag) CAPABILITY.getStorage().writeNBT(CAPABILITY, msg.stats, null));
+		buf.writeNbt(msg.stats.serializeNBT());
 		buf.writeUtf(msg.lore.getLoreKey());
 	}
 

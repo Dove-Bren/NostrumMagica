@@ -2,16 +2,10 @@ package com.smanzana.nostrummagica.effect;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectCategory;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 /**
  * Effect consumed by a spell effect of the right type.
@@ -33,18 +27,6 @@ public class ElementalSpellBoostEffect extends MobEffect {
 	public ElementalSpellBoostEffect(EMagicElement element) {
 		super(MobEffectCategory.HARMFUL, element.getColor());
 		this.element = element;
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	@Override
-    public void renderInventoryEffect(MobEffectInstance effect, EffectRenderingInventoryScreen<?> gui, PoseStack matrixStackIn, int x, int y, float z) {
-		;
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	@Override
-    public void renderHUDEffect(MobEffectInstance effect, GuiComponent gui, PoseStack matrixStackIn, int x, int y, float z, float alpha) {
-		;
 	}
 	
 	public static ElementalSpellBoostEffect GetForElement(EMagicElement element) {

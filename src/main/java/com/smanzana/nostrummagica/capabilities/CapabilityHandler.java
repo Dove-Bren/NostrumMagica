@@ -2,20 +2,28 @@ package com.smanzana.nostrummagica.capabilities;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class CapabilityHandler {
 
-	public static final ResourceLocation CAPABILITY_MAGIC_LOC = new ResourceLocation(NostrumMagica.MODID, "magicattrib");
-	public static final ResourceLocation CAPABILITY_MANARMOR_LOC = new ResourceLocation(NostrumMagica.MODID, "manaarmorattrib");
-	public static final ResourceLocation CAPABILITY_SPELLCRAFTING_LOC = NostrumMagica.Loc("spellcrafting");
-	public static final ResourceLocation CAPABILITY_BONUSJUMP_LOC = NostrumMagica.Loc("bonusjump");
+	private static final ResourceLocation CAPABILITY_MAGIC_LOC = new ResourceLocation(NostrumMagica.MODID, "magicattrib");
+	private static final ResourceLocation CAPABILITY_MANARMOR_LOC = new ResourceLocation(NostrumMagica.MODID, "manaarmorattrib");
+	private static final ResourceLocation CAPABILITY_SPELLCRAFTING_LOC = NostrumMagica.Loc("spellcrafting");
+	private static final ResourceLocation CAPABILITY_BONUSJUMP_LOC = NostrumMagica.Loc("bonusjump");
+	
+	public static final Capability<INostrumMagic> CAPABILITY_MAGIC = CapabilityManager.get(new CapabilityToken<>(){});
+	public static final Capability<IManaArmor> CAPABILITY_MANAARMOR = CapabilityManager.get(new CapabilityToken<>(){});
+	public static final Capability<ISpellCrafting> CAPABILITY_SPELLCRAFTING = CapabilityManager.get(new CapabilityToken<>(){});
+	public static final Capability<IBonusJumpCapability> CAPABILITY_BONUSJUMP = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	public CapabilityHandler() {
 		MinecraftForge.EVENT_BUS.register(this);
@@ -27,10 +35,11 @@ public class CapabilityHandler {
 		//if player. Or not. Should get config going. For now, if it's a player make it?
 		//also need to catch death, etc
 		if (event.getObject() instanceof Player) {
-			event.addCapability(CAPABILITY_MAGIC_LOC, new NostrumMagicAttributeProvider(event.getObject()));
-			event.addCapability(CAPABILITY_MANARMOR_LOC, new ManaArmorAttributeProvider(event.getObject()));
-			event.addCapability(CAPABILITY_SPELLCRAFTING_LOC, new SpellCraftingCapabilityProvider());
-			event.addCapability(CAPABILITY_BONUSJUMP_LOC, new BonusJumpCapabilityProvider());
+			Player player = (Player) event.getObject();
+			event.addCapability(CAPABILITY_MAGIC_LOC, new AutoCapabilityProvider<>(CAPABILITY_MAGIC, new NostrumMagic(player)));
+			event.addCapability(CAPABILITY_MANARMOR_LOC, new AutoCapabilityProvider<>(CAPABILITY_MANAARMOR, new ManaArmor(player)));
+			event.addCapability(CAPABILITY_SPELLCRAFTING_LOC, new AutoCapabilityProvider<>(CAPABILITY_SPELLCRAFTING, new SpellCraftingCapability()));
+			event.addCapability(CAPABILITY_BONUSJUMP_LOC, new AutoCapabilityProvider<>(CAPABILITY_BONUSJUMP, new BonusJumpCapability()));
 		}
 	}
 	
@@ -38,19 +47,19 @@ public class CapabilityHandler {
 	public void onClone(PlayerEvent.Clone event) {
 		//if (event.isWasDeath()) {
 			INostrumMagic cap = NostrumMagica.getMagicWrapper(event.getOriginal());
-			event.getPlayer().getCapability(NostrumMagicAttributeProvider.CAPABILITY, null).orElse(null)
+			event.getPlayer().getCapability(CAPABILITY_MAGIC, null).orElse(null)
 				.copy(cap);
 			
 			IManaArmor armor = NostrumMagica.getManaArmor(event.getOriginal());
-			event.getPlayer().getCapability(ManaArmorAttributeProvider.CAPABILITY, null).orElse(null)
+			event.getPlayer().getCapability(CAPABILITY_MANAARMOR, null).orElse(null)
 				.copy(armor);
 			
 			ISpellCrafting crafting = NostrumMagica.getSpellCrafting(event.getOriginal());
-			event.getPlayer().getCapability(SpellCraftingCapabilityProvider.CAPABILITY, null).orElse(null)
+			event.getPlayer().getCapability(CAPABILITY_SPELLCRAFTING, null).orElse(null)
 				.copy(crafting);
 			
 			IBonusJumpCapability jump = NostrumMagica.getBonusJump(event.getOriginal());
-			event.getPlayer().getCapability(BonusJumpCapabilityProvider.CAPABILITY, null).orElse(null)
+			event.getPlayer().getCapability(CAPABILITY_BONUSJUMP, null).orElse(null)
 				.copy(jump);
 		//}
 		//if (!event.getEntityPlayer().world.isRemote)

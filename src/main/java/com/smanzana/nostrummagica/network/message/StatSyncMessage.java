@@ -4,12 +4,11 @@ import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 /**
@@ -25,16 +24,13 @@ public class StatSyncMessage {
 		NostrumMagica.logger.info("Recieved Nostrum Magica sync message from server");
 		
 		Minecraft.getInstance().submit(() -> {
-			INostrumMagic override = CAPABILITY.getDefaultInstance();
-			CAPABILITY.getStorage().readNBT(CAPABILITY, override, null, message.tag);
+			INostrumMagic override = new NostrumMagic(null);
+			override.deserializeNBT(message.tag);
 			NostrumMagica.instance.proxy.receiveStatOverrides(override);
 		});
 		
 		ctx.get().setPacketHandled(true);
 	}
-	
-	@CapabilityInject(INostrumMagic.class)
-	public static Capability<INostrumMagic> CAPABILITY = null;
 	
 	protected CompoundTag tag;
 	
@@ -43,7 +39,7 @@ public class StatSyncMessage {
 	}
 	
 	public StatSyncMessage(INostrumMagic stats) {
-		tag = (CompoundTag) CAPABILITY.getStorage().writeNBT(CAPABILITY, stats, null);
+		tag = stats.serializeNBT();
 	}
 
 	public static StatSyncMessage decode(FriendlyByteBuf buf) {

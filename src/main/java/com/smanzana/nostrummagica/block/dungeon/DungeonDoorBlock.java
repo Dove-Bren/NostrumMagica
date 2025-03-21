@@ -40,7 +40,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 	}
 	
 	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		if (!this.isMaster(state))
 			return null;
 		

@@ -1,10 +1,11 @@
 package com.smanzana.nostrummagica.capabilities;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraftforge.common.util.INBTSerializable;
 
-public interface IManaArmor {
+public interface IManaArmor extends INBTSerializable<CompoundTag> {
 
 	// Armor present or not
 	public boolean hasArmor();
@@ -42,5 +43,4 @@ public interface IManaArmor {
 	
 	// Copy fields out of an existing armor capability
 	public void copy(IManaArmor cap);
-	public void provideEntity(LivingEntity entity);
 }

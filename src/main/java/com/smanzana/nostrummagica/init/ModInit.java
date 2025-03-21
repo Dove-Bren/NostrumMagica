@@ -9,18 +9,12 @@ import com.smanzana.autodungeons.command.CommandSpawnDungeon;
 import com.smanzana.autodungeons.command.CommandWriteRoom;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.capabilities.BonusJumpCapability;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.IBonusJumpCapability;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
-import com.smanzana.nostrummagica.capabilities.ManaArmor;
-import com.smanzana.nostrummagica.capabilities.ManaArmorStorage;
-import com.smanzana.nostrummagica.capabilities.NostrumMagic;
-import com.smanzana.nostrummagica.capabilities.NostrumMagicStorage;
-import com.smanzana.nostrummagica.capabilities.SpellCraftingCapability;
 import com.smanzana.nostrummagica.command.CommandAllPatterns;
 import com.smanzana.nostrummagica.command.CommandAllQuests;
 import com.smanzana.nostrummagica.command.CommandAllResearch;
@@ -160,7 +154,7 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -252,12 +246,6 @@ public class ModInit {
 	private static final void init() {
     	LoreRegistry.instance();
     	TameRedDragonEntity.init();
-    	
-    	CapabilityManager.INSTANCE.register(INostrumMagic.class, new NostrumMagicStorage(), NostrumMagic::new);
-		CapabilityManager.INSTANCE.register(IManaArmor.class, new ManaArmorStorage(), ManaArmor::new);
-		CapabilityManager.INSTANCE.register(ISpellCrafting.class, SpellCraftingCapability.Serializer.INSTANCE, SpellCraftingCapability::new);
-		CapabilityManager.INSTANCE.register(IBonusJumpCapability.class, BonusJumpCapability.Serializer.INSTANCE, BonusJumpCapability::new);
-		new CapabilityHandler();
 	}
 	
 	private static final void postinit() {
@@ -2188,5 +2176,14 @@ public class ModInit {
 		CriteriaTriggers.register(CastSpellCriteriaTrigger.Instance);
 		CriteriaTriggers.register(CraftSpellCriteriaTrigger.Instance);
 		CriteriaTriggers.register(RitualCriteriaTrigger.Instance);
+	}
+	
+	@SubscribeEvent
+	public static final void registerCapabilities(RegisterCapabilitiesEvent event) {
+		event.register(INostrumMagic.class);
+		event.register(IManaArmor.class);
+		event.register(ISpellCrafting.class);
+		event.register(IBonusJumpCapability.class);
+		new CapabilityHandler();
 	}
 }

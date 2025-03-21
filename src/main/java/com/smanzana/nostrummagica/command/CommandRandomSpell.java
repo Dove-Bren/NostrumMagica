@@ -55,7 +55,7 @@ public class CommandRandomSpell {
 		
 		final Spell spell = CreateRandomSpell(name, null, cost, weight);
 		ItemStack stack = SpellScroll.create(spell);
-		player.inventory.add(stack);
+		player.getInventory().add(stack);
 		
 		return 0;
 	}

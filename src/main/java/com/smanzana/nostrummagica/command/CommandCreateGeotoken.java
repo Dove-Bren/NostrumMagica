@@ -26,7 +26,7 @@ public class CommandCreateGeotoken  {
 		
 		ItemStack stack = new ItemStack(NostrumItems.positionToken);
 		PositionToken.setPosition(stack, player.getCommandSenderWorld().dimension(), player.blockPosition());
-		player.inventory.add(stack);
+		player.getInventory().add(stack);
 		
 		return 0;
 	}

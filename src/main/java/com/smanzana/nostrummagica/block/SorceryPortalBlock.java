@@ -7,23 +7,21 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
 import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 
 /**
  * Portal that takes players to and from the Sorcery dimension
  * @author Skyler
  *
  */
-@SuppressWarnings("deprecation")
 public class SorceryPortalBlock extends PortalBlock implements EntityBlock  {
 	
 	public static final String ID = "sorcery_portal";
@@ -37,12 +35,7 @@ public class SorceryPortalBlock extends PortalBlock implements EntityBlock  {
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return isMaster(state);
-	}
-	
-	@Override
-	public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		if (isMaster(state)) {
 			return new SorceryPortalTileEntity();
 		}
@@ -102,10 +95,4 @@ public class SorceryPortalBlock extends PortalBlock implements EntityBlock  {
 		return entityIn instanceof Player;
 	}
 
-	@Override
-	public BlockEntity newBlockEntity(BlockGetter worldIn) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 }
