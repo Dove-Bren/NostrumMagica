@@ -9,18 +9,18 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.util.Entities;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
 public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity implements IMultiPartEntityPart<T> {
 	
@@ -82,7 +82,7 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 						// Parent claims we're not theirs.
 						NostrumMagica.logger.warn("MultiPartEntity part failed to attach. Removing " + this);
 						parentCache = null;
-						this.remove();
+						this.discard();
 					}
 				}
 			}
@@ -155,13 +155,13 @@ public class MultiPartEntityPart<T extends IMultiPartEntity> extends Entity impl
 		
 		if (this.getParent() == null) {
 			if (++orphanTicks > 10) {
-				this.remove();
+				this.discard();
 			}
 		} else {
 			orphanTicks = 0;
 			Entity parent = (Entity) this.getParent();
 			if (!parent.isAlive()) {
-				this.remove();
+				this.discard();
 			}
 		}
 	}

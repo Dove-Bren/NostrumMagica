@@ -424,7 +424,7 @@ public class PlayerListener {
 				double dist = Math.abs(ent.position().subtract(entry.getValue().position).length());
 				if (dist <= entry.getValue().proximity) {
 					if (entry.getKey().onEvent(Event.PROXIMITY, ent, null))
-						it.remove();
+						it.discard();
 				}
 					
 			}
@@ -444,7 +444,7 @@ public class PlayerListener {
 				for (BlockPos p : blockListCopy) {
 					if (p.equals(entpos))
 						if (entry.getKey().onEvent(Event.POSITION, ent, null)) {
-							it2.remove();
+							it2.discard();
 							break;
 						}
 				}	
@@ -467,11 +467,11 @@ public class PlayerListener {
 				if (entry.getValue().higher) {
 					if (level >= thresh)
 						if (entry.getKey().onEvent(Event.FOOD, ent, null))
-							it.remove();
+							it.discard();
 				} else {
 					if (level <= thresh)
 						if (entry.getKey().onEvent(Event.FOOD, ent, null))
-							it.remove();
+							it.discard();
 				}
 			}
 		}
@@ -496,11 +496,11 @@ public class PlayerListener {
 				if (entry.getValue().higher) {
 					if (level >= thresh)
 						if (entry.getKey().onEvent(Event.MANA, ent, null))
-							it.remove();
+							it.discard();
 				} else {
 					if (level <= thresh)
 						if (entry.getKey().onEvent(Event.MANA, ent, null))
-							it.remove();
+							it.discard();
 				}
 			}
 		}
@@ -531,11 +531,11 @@ public class PlayerListener {
 			if (entry.getValue().higher) {
 				if (level >= thresh)
 					if (entry.getKey().onEvent(Event.HEALTH, ent, null))
-						it.remove();
+						it.discard();
 			} else {
 				if (level <= thresh)
 					if (entry.getKey().onEvent(Event.HEALTH, ent, null))
-						it.remove();
+						it.discard();
 			}
 		}
 	}
@@ -723,7 +723,7 @@ public class PlayerListener {
 					}
 					
 					if (entry.getKey().onEvent(Event.DAMAGED, source, null))
-						it.remove();
+						it.discard();
 				}
 			}
 		}
@@ -1042,7 +1042,7 @@ public class PlayerListener {
 					info.delay--;
 					if (info.delay == 0) {
 						if (entry.getKey().onEvent(Event.TIME, null, null)) {
-							it.remove();
+							it.discard();
 							continue;
 						} else {
 							info.startTick = tickCount;
@@ -1055,7 +1055,7 @@ public class PlayerListener {
 					int diff = tickCount - info.startTick;
 					if (diff % (info.interval == 0 ? 1 : info.interval) == 0)
 						if (entry.getKey().onEvent(Event.TIME, null, null))
-							it.remove();
+							it.discard();
 				}
 			}
 			
@@ -1334,7 +1334,7 @@ public class PlayerListener {
 			
 			if (info.entity == null || info.entity.equals(entity)) {
 				if (entry.getKey().onEvent(Event.MAGIC_EFFECT, entity, new SpellActionListenerData(entity, caster, summary)))
-					it.remove();
+					it.discard();
 			}
 		}
 	}
@@ -1378,7 +1378,7 @@ public class PlayerListener {
 		while (it.hasNext()) {
 			Entry<Entity, Vec3> entry = it.next();
 			if (entry.getKey() == null || !entry.getKey().isAlive()) {
-				it.remove();
+				it.discard();
 			} else {
 				Vec3 last = entry.getValue();
 				Vec3 cur = entry.getKey().position();

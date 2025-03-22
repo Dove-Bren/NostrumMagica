@@ -14,6 +14,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.ToolActions;
 
 public abstract class RedDragonBaseEntity extends FlyingDragonEntity {
 
@@ -122,7 +123,7 @@ public abstract class RedDragonBaseEntity extends FlyingDragonEntity {
 		{
 			if (i > 0)
 			{
-				target.knockback((float)i * 0.5F, (double)Mth.sin(this.yRot * 0.017453292F), (double)(-Mth.cos(this.yRot * 0.017453292F)));
+				target.knockback((float)i * 0.5F, (double)Mth.sin(this.getYRot() * 0.017453292F), (double)(-Mth.cos(this.getYRot() * 0.017453292F)));
 				this.setDeltaMovement(this.getDeltaMovement().multiply(.6, 1, .6));
 			}
 
@@ -131,7 +132,7 @@ public abstract class RedDragonBaseEntity extends FlyingDragonEntity {
 				Player entityplayer = (Player)target;
 				ItemStack itemstack1 = entityplayer.isUsingItem() ? entityplayer.getUseItem() : ItemStack.EMPTY;
 
-				if (!itemstack1.isEmpty() && itemstack1.isShield(entityplayer))
+				if (!itemstack1.isEmpty() && itemstack1.canPerformAction(ToolActions.SHIELD_BLOCK))
 				{
 					float f1 = 0.5F;
 

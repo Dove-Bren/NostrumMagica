@@ -6,11 +6,9 @@ import java.util.Random;
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.FlyingDragonEntity;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.core.BlockPos;
-
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 public class DragonFlyEvasionGoal extends Goal {
 	

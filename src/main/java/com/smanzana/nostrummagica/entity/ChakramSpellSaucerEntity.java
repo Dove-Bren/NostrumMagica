@@ -1,11 +1,11 @@
 package com.smanzana.nostrummagica.entity;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public class ChakramSpellSaucerEntity extends SpellSaucerEntity {
 	
@@ -68,7 +68,7 @@ public class ChakramSpellSaucerEntity extends SpellSaucerEntity {
 			
 			if (origin == null) {
 				// We got loaded...
-				this.remove();
+				this.discard();
 				return;
 			}
 			
@@ -105,14 +105,14 @@ public class ChakramSpellSaucerEntity extends SpellSaucerEntity {
 ////				// Can't avoid a SQR; tracking motion would require SQR, too to get path length
 ////				if (this.getPositionVec().squareDistanceTo(origin) > maxDistance) {
 ////					trigger.onFizzle(this.getPosition());
-////					this.remove();
+////					this.discard();
 ////				}
 //			
 //			// Check for motion boundaries
 //			if (this.returning) {
 //				if (Math.abs(this.getPositionVec().distanceTo(this.origin)) <= 0.5) {
 //					if (++trips >= maxTrips) {
-//						this.remove();
+//						this.discard();
 //					} else {
 //						returning = false;
 //						// Capture motion to get boomerang-effect

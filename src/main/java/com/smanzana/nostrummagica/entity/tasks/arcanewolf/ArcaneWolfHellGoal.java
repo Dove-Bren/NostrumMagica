@@ -15,13 +15,11 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.sounds.SoundEvents;
-
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 public class ArcaneWolfHellGoal extends Goal {
 

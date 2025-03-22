@@ -10,10 +10,10 @@ import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.ArcaneWolfElementalTyp
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.petcommand.api.PetFuncs;
 
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.phys.Vec3;
 
 public class ArcaneWolfMysticGoal extends Goal {

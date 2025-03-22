@@ -55,7 +55,23 @@ import com.smanzana.petcommand.api.pet.PetInfo;
 import com.smanzana.petcommand.api.pet.PetInfo.PetAction;
 import com.smanzana.petcommand.api.pet.PetInfo.SecondaryFlavor;
 
-import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.Util;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -63,53 +79,34 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.BegGoal;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.LeapAtTargetGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
-import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.ai.goal.SitWhenOrderedToGoal;
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
-import net.minecraft.world.entity.ai.goal.SitWhenOrderedToGoal;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.AbstractSkeleton;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.AbstractSkeleton;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.scores.Team;
-import net.minecraft.tags.FluidTags;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.Util;
-import net.minecraft.util.Mth;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.scores.Team;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import com.smanzana.nostrummagica.pet.IPetWithSoul.SoulBoundLore;
 
 public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPet, IPetWithSoul, IStabbableEntity, IMagicEntity {
 	
@@ -796,11 +793,11 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		
 		if (this.isVehicle() && this.canBeControlledByRider()) {
 			LivingEntity entitylivingbase = (LivingEntity)this.getControllingPassenger();
-			this.yRot = entitylivingbase.yRot;
-			this.yRotO = this.yRot;
-			this.xRot = entitylivingbase.xRot * 0.5F;
-			this.setRot(this.yRot, this.xRot);
-			this.yBodyRot = this.yRot;
+			this.setYRot(entitylivingbase.getYRot());
+			this.yRotO = this.getYRot();
+			this.setXRot(entitylivingbase.getXRot() * 0.5F);
+			this.setRot(this.getYRot(), this.getXRot());
+			this.yBodyRot = this.getYRot();
 			this.yHeadRot = this.yBodyRot;
 			double strafe = entitylivingbase.xxa * 0.45F;
 			double forward = entitylivingbase.zza * .7f;
@@ -834,7 +831,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 			this.animationSpeedOld = this.animationSpeed;
 			double d1 = this.getX() - this.xo;
 			double d0 = this.getZ() - this.zo;
-			float f2 = Mth.sqrt(d1 * d1 + d0 * d0) * 4.0F;
+			float f2 = (float) (Math.sqrt(d1 * d1 + d0 * d0) * 4.0F);
 
 			if (f2 > 1.0F) {
 				f2 = 1.0F;
@@ -1404,9 +1401,9 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 	}
 	
 	@Override
-	public boolean causeFallDamage(float distance, float damageMulti) {
+	public boolean causeFallDamage(float distance, float damageMulti, DamageSource source) {
 		this.jumpCount = 0;
-		return super.causeFallDamage(Math.max(0, distance-this.getFallReduction()), damageMulti);
+		return super.causeFallDamage(Math.max(0, distance-this.getFallReduction()), damageMulti, source);
 	}
 	
 	public void addAdditionalSaveData(CompoundTag compound) {
@@ -2060,7 +2057,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		newWolf.setPos(wolf.getX(), wolf.getY(), wolf.getZ());
 		newWolf.tame(player);
 		newWolf.setHealth(5f);
-		wolf.remove();
+		wolf.discard();
 		wolf.level.addFreshEntity(newWolf);
 		return newWolf;
 	}

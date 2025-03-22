@@ -63,7 +63,7 @@ public abstract class DragonGambittedSpellAttackGoal<T extends DragonEntity & IT
 			return false;
 		}
 		
-		if (!dragon.getSensing().canSee(currentTarget)){
+		if (!dragon.getSensing().hasLineOfSight(currentTarget)){
 			return false;
 		}
 		

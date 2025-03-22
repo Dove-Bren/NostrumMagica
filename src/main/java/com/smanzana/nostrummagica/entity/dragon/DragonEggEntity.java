@@ -77,12 +77,12 @@ public class DragonEggEntity extends Mob implements ILoreSupplier {
 	
 	
 	@Override
-	public void knockback(float strenght, double xRatio, double zRatio) {
+	public void knockback(double strength, double xRatio, double zRatio) {
 		return; // Do not get knocked around
 	}
 	
 	@Override
-	public boolean causeFallDamage(float distance, float damageMultiplier) {
+	public boolean causeFallDamage(float distance, float damageMultiplier, DamageSource source) {
 		return this.hurt(DamageSource.FALL, 9999f);
 	}
 	
@@ -237,7 +237,7 @@ public class DragonEggEntity extends Mob implements ILoreSupplier {
 			}
 		}
 		
-		this.remove();
+		this.discard();
 	}
 	
 	@Override

@@ -5,9 +5,9 @@ import java.util.Random;
 
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.core.BlockPos;
 
 public class DragonFlyRandomGoal extends Goal {
 

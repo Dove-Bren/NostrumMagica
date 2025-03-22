@@ -28,7 +28,7 @@ public class KeySwitchTriggerEntity extends TileProxyTriggerEntity<KeySwitchBloc
 						4, this.getX(), getY() + 1.25, getZ(), 1.25,
 						20, 0,
 						this.position().add(0, 1, 0)
-						).gravity(-.025f).color(keyEnt.getColor().getColorValue() | 0xAA000000));
+						).gravity(-.025f).color(keyEnt.getColor().getTextColor() | 0xAA000000));
 			}
 		}
 	}

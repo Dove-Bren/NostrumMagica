@@ -5,16 +5,16 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.tile.EntityProxiedTileEntity;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?>> extends Mob {
 	
@@ -41,7 +41,7 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 	}
 	
 	@Override
-	public void knockback(float strenght, double xRatio, double zRatio) {
+	public void knockback(double strenght, double xRatio, double zRatio) {
 		return; // Do not get knocked around
 	}
 	
@@ -132,7 +132,7 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 				
 				// Should be on top of a shrine block
 				if (getLinkedTileEntity() == null) {
-					this.remove();
+					this.discard();
 				}
 			}
 		}

@@ -29,18 +29,32 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.BushBlock;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.entity.AgableMob;
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MoverType;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
@@ -51,29 +65,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.BushBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraft.nbt.Tag;
 
 public class LuxEntity extends Animal implements ILoreSupplier/*, ITameableEntity*/ {
 	
@@ -163,13 +163,7 @@ public class LuxEntity extends Animal implements ILoreSupplier/*, ITameableEntit
 		this.goalSelector.addGoal(priority++, new AIRoostTask(this, true));
 		
 		// If player nearby with a flower, be tempted!
-		this.goalSelector.addGoal(priority++, new GenericTemptGoal(this, 1.1D, false, Ingredient.EMPTY) {
-			@Override
-			protected boolean shouldFollowItem(ItemStack stack) {
-				return !stack.isEmpty()
-						&& (NostrumTags.Items.ReagentCrystabloom.contains(stack.getItem()) || NostrumTags.Items.ReagentBlackPearl.contains(stack.getItem()));
-			}
-			
+		this.goalSelector.addGoal(priority++, new GenericTemptGoal(this, 1.1D, false, Ingredient.of(NostrumTags.Items.LuxTemptItem)) {
 			@Override
 			public void moveToclosestPlayer(PathfinderMob tempted, Player player) {
 				if (tempted.distanceToSqr(player) < 6.25D) {
@@ -452,11 +446,6 @@ public class LuxEntity extends Animal implements ILoreSupplier/*, ITameableEntit
 	}
 	
 	@Override
-	public boolean causeFallDamage(float distance, float damageMulti) {
-		return false; // No fall damage
-	}
-	
-	@Override
 	protected void checkFallDamage(double y, boolean onGround, BlockState stae, BlockPos pos) {
 		
 	}
@@ -512,7 +501,7 @@ public class LuxEntity extends Animal implements ILoreSupplier/*, ITameableEntit
 				double d2 = this.getWantedZ() - this.parentEntity.getZ();
 				double d3 = d0 * d0 + d1 * d1 + d2 * d2;
 
-				d3 = (double)Mth.sqrt(d3);
+				d3 = (double)Math.sqrt(d3);
 				
 				if (Math.abs(d3) < .1) {
 					this.parentEntity.setDeltaMovement(Vec3.ZERO);
@@ -530,7 +519,7 @@ public class LuxEntity extends Animal implements ILoreSupplier/*, ITameableEntit
 							);
 					
 					float f9 = (float)(Mth.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
-					this.mob.yRot = this.rotlerp(this.mob.yRot, f9, 90.0F);
+					this.mob.setYRot(this.rotlerp(this.mob.getYRot(), f9, 90.0F));
 				}
 			}
 		}
@@ -554,7 +543,7 @@ public class LuxEntity extends Animal implements ILoreSupplier/*, ITameableEntit
 					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
 					BlockPos underPos = new BlockPos(Mth.floor(this.getX()), Mth.floor(this.getBoundingBox().minY) - 1, Mth.floor(this.getZ()));
 					BlockState underState = this.level.getBlockState(underPos);
-					f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
+					f = underState.getFriction(this.level, underPos, this) * 0.91F;
 				}
 
 				float f1 = 0.16277136F / (f * f * f);
@@ -565,24 +554,14 @@ public class LuxEntity extends Animal implements ILoreSupplier/*, ITameableEntit
 					//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
 					BlockPos underPos = new BlockPos(Mth.floor(this.getX()), Mth.floor(this.getBoundingBox().minY) - 1, Mth.floor(this.getZ()));
 					BlockState underState = this.level.getBlockState(underPos);
-					f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
+					f = underState.getFriction(this.level, underPos, this) * 0.91F;
 				}
 
 				this.move(MoverType.SELF, this.getDeltaMovement());
 				this.setDeltaMovement(this.getDeltaMovement().scale(f));
 			}
 
-			this.animationSpeedOld = this.animationSpeed;
-			double d1 = this.getX() - this.xo;
-			double d0 = this.getZ() - this.zo;
-			float f2 = Mth.sqrt(d1 * d1 + d0 * d0) * 4.0F;
-
-			if (f2 > 1.0F) {
-				f2 = 1.0F;
-			}
-
-			this.animationSpeed += (f2 - this.animationSpeed) * 0.4F;
-			this.animationPosition += this.animationSpeed;
+			this.calculateEntityAnimation(this, false);
 		}
 
 	/**
@@ -1163,7 +1142,7 @@ public class LuxEntity extends Animal implements ILoreSupplier/*, ITameableEntit
 			BlockState state = level.getBlockState(cursor);
 			if (
 				state == null
-				|| state.getBlock().isAir(state, level, cursor)
+				|| state.isAir()
 				|| !state.isSolidRender(level, cursor)
 				|| state.getMaterial() == Material.LEAVES
 				) {
@@ -1227,7 +1206,7 @@ public class LuxEntity extends Animal implements ILoreSupplier/*, ITameableEntit
 	}
 
 	@Override
-	public AgableMob /*createChild*/ getBreedOffspring(ServerLevel world, AgableMob ageable) {
+	public AgeableMob getBreedOffspring(ServerLevel world, AgeableMob ageable) {
 		return null;
 	}
 

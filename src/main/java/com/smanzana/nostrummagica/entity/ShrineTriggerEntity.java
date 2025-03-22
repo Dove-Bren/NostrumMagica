@@ -11,10 +11,10 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.tile.ShrineTileEntity;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
 public abstract class ShrineTriggerEntity<E extends ShrineTileEntity<?>> extends TileProxyTriggerEntity<E> {

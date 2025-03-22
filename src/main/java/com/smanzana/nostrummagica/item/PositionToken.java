@@ -188,7 +188,7 @@ public class PositionToken extends PositionCrystal {
 //								pos.getY(),
 //								pos.getZ()
 //								);
-//						entityItem.remove();
+//						entityItem.discard();
 //						return true;
 //					}
 //				}

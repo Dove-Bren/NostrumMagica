@@ -9,13 +9,11 @@ import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.ArcaneWolfElementalTyp
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.TameLightning;
 
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.server.level.ServerLevel;
-
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 public class ArcaneWolfStormGoal extends Goal {
 

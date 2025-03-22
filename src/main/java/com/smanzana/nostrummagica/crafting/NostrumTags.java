@@ -107,6 +107,8 @@ public class NostrumTags {
 		private static final String TAG_SILVER_INGOT = "ingots/silver";
 		
 		private static final String TAG_TRANSMUTABLE_ITEM = "transmutable/item";
+
+		private static final String TAG_LUX_TEMPT_ITEM = "lux_tempt_items";
 		
 		public static final Tag.Named<Item> RuneAny = tag(TAG_RUNE);
 		
@@ -201,6 +203,8 @@ public class NostrumTags {
 		public static final Tag.Named<Item> SilverIngot = forgeTag(TAG_SILVER_INGOT);
 		
 		public static final Tag.Named<Item> TransmutableItem = tagOptional(TAG_TRANSMUTABLE_ITEM);
+		
+		public static final Tag.Named<Item> LuxTemptItem = tagOptional(TAG_LUX_TEMPT_ITEM);
 		
 		private static Tag.Named<Item> tag(String path) {
 			return ItemTags.bind(new ResourceLocation(NostrumMagica.MODID, path).toString());

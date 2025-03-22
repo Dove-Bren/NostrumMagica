@@ -2,14 +2,14 @@ package com.smanzana.nostrummagica.entity;
 
 import com.smanzana.nostrummagica.spell.component.shapes.MortarShape.MortarShapeInstance;
 
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.Level;
 
 public class SpellMortarEntity extends SpellProjectileEntity {
 	
@@ -45,7 +45,7 @@ public class SpellMortarEntity extends SpellProjectileEntity {
 		if (!level.isClientSide) {
 			if (origin == null) {
 				// We got loaded...
-				this.remove();
+				this.discard();
 				return;
 			}
 			
@@ -86,14 +86,14 @@ public class SpellMortarEntity extends SpellProjectileEntity {
 //				state.onEntityCollision(world, pos, this);
 //			}
 //			
-//			this.remove();
+//			this.discard();
 //		} else if (result.getType() == RayTraceResult.Type.ENTITY) {
 //			final Entity entityHit = RayTrace.entFromRaytrace(result);
 //			if (filter == null || filter.apply(entityHit)) {
 //				if ((entityHit != this.getOwner() && !this.getOwner().isRidingOrBeingRiddenBy(entityHit))
 //						|| this.ticksExisted > 20) {
 //					trigger.onProjectileHit(entityHit);
-//					this.remove();
+//					this.discard();
 //				}
 //			}
 //		}

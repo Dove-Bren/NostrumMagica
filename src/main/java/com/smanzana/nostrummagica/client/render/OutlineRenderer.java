@@ -71,7 +71,7 @@ public class OutlineRenderer {
 		while (it.hasNext()) {
 			Entity ent = it.next();
 			if (ent == null || !ent.isAlive()) {
-				it.remove();
+				it.discard();
 			}
 		}
 	}

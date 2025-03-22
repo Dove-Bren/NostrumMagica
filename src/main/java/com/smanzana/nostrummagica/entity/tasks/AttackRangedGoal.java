@@ -4,14 +4,12 @@ import java.util.EnumSet;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.world.entity.monster.RangedAttackMob;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.item.BowItem;
-import net.minecraft.world.InteractionHand;
-
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 public class AttackRangedGoal<T extends Mob> extends Goal
 {
@@ -135,7 +133,7 @@ public class AttackRangedGoal<T extends Mob> extends Goal
 
 		if (entitylivingbase != null) {
 			double d0 = this.entity.distanceToSqr(entitylivingbase.getX(), entitylivingbase.getBoundingBox().minY, entitylivingbase.getZ());
-			boolean flag = this.entity.getSensing().canSee(entitylivingbase);
+			boolean flag = this.entity.getSensing().hasLineOfSight(entitylivingbase);
 			boolean flag1 = this.seeTime > 0;
 
 			if (flag != flag1) {

@@ -4,11 +4,9 @@ import java.util.EnumSet;
 
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.core.BlockPos;
-
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 public class DragonLandGoal extends Goal {
 
@@ -64,8 +62,8 @@ public class DragonLandGoal extends Goal {
 		}
 		
 		double y = pos.getY();
-		double x = (Math.cos(dragon.yRot) * 10.0);
-		double z = (Math.sin(dragon.yRot) * 10.0);
+		double x = (Math.cos(dragon.getYRot()) * 10.0);
+		double z = (Math.sin(dragon.getYRot()) * 10.0);
 		x += pos.getX();
 		z += pos.getZ();
 		

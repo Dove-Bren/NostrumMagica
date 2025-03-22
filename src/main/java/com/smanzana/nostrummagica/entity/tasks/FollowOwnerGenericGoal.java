@@ -6,19 +6,17 @@ import com.google.common.base.Predicate;
 import com.smanzana.petcommand.api.ai.IFollowOwnerGoal;
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 
 public class FollowOwnerGenericGoal<T extends PathfinderMob & ITameableEntity> extends Goal implements IFollowOwnerGoal {
 	
@@ -125,7 +123,7 @@ public class FollowOwnerGenericGoal<T extends PathfinderMob & ITameableEntity> e
 				pos2.set(i + l, k, j + i1);
 				pos3.set(i + l, k + 1, j + i1);
 				if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && theWorld.getBlockState(new BlockPos(pos1)).isValidSpawn(theWorld, pos1, teleportingEntity.getType()) && IsEmptyBlock(theWorld, pos2) && IsEmptyBlock(theWorld, pos3)) {
-					teleportingEntity.moveTo((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), teleportingEntity.yRot, teleportingEntity.xRot);
+					teleportingEntity.moveTo((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), teleportingEntity.getYRot(), teleportingEntity.getXRot());
 					if (teleportingEntity instanceof Mob) {
 						((Mob) teleportingEntity).getNavigation().stop();
 					}

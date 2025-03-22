@@ -5,10 +5,10 @@ import java.util.Random;
 
 import com.google.common.base.Predicate;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 
 public class StayHomeGoal<T extends PathfinderMob> extends Goal {

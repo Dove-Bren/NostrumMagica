@@ -447,7 +447,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 					this.getX() + (Math.cos(rotRad) * offset.x) + (Math.sin(rotRad) * offset.z),
 					this.getY() + offset.y,
 					this.getZ() + (Math.sin(rotRad) * offset.x) + (Math.cos(rotRad) * offset.z),
-					this.yRot, this.xRot);
+					this.getYRot(), this.getXRot());
 			part.tick();
 		}
 	}
@@ -504,7 +504,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	protected void customServerAiStep() {
 		super.customServerAiStep();
 		
-		this.bossInfo.setPercent(this.getHealth() / this.getMaxHealth());
+		this.bossInfo.setProgress(this.getHealth() / this.getMaxHealth());
 	}
 	
 	public void startSeenByPlayer(ServerPlayer player) {

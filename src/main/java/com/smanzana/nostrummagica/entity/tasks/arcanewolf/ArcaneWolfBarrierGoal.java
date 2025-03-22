@@ -12,9 +12,9 @@ import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.petcommand.api.PetFuncs;
 
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.effect.MobEffectInstance;
 
 public class ArcaneWolfBarrierGoal extends Goal {
 

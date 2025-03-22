@@ -318,7 +318,7 @@ public abstract class PortalBlock extends Block implements IPortalBlock, EntityB
 			}
 			
 			if (charge == null || charge == 0) {
-				it.remove();
+				it.discard();
 			} else {
 				ServerEntityTeleportCharge.put(ent, charge);
 			}

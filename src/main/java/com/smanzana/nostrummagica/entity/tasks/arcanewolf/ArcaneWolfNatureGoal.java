@@ -9,9 +9,9 @@ import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.ArcaneWolfElementalType;
 import com.smanzana.petcommand.api.PetFuncs;
 
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.effect.MobEffectInstance;
 
 public class ArcaneWolfNatureGoal extends Goal {
 

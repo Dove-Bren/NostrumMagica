@@ -10,20 +10,20 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
 /**
  * A projectile that does magic damage when it impacts an entity.
@@ -126,7 +126,7 @@ public class MagicDamageProjectileEntity extends AbstractHurtingProjectile {
 			boolean canImpact = this.canImpact(entityHit);
 			if (canImpact && entityHit instanceof LivingEntity) {
 				this.damageEntity((LivingEntity) entityHit);
-				this.remove();
+				this.discard();
 			}
 		}
 	}
@@ -135,7 +135,7 @@ public class MagicDamageProjectileEntity extends AbstractHurtingProjectile {
 	protected void onHitBlock(BlockHitResult result) {
 		if (!level.isClientSide()) {
 			NostrumMagicaSounds.CAST_FAIL.play(this);
-			this.remove();
+			this.discard();
 		}
 	}
 	

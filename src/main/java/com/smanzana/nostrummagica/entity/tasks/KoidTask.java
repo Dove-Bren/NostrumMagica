@@ -16,12 +16,10 @@ import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 public class KoidTask extends Goal {
 	
@@ -408,7 +406,7 @@ public class KoidTask extends Goal {
 			
 			if (!done && !inMelee && hasRange && inRange && rangeCooldown <= 0) {
 				// Can we do a ranged attack?
-				if (koid.canSee(target)) {
+				if (koid.hasLineOfSight(target)) {
 					Spell spell = this.getRanged();
 					spell.cast(koid, 1.0f);
 					rangeCooldown = 20 * 3 * (1 + KoidTask.rand.nextInt(3));
@@ -458,7 +456,7 @@ public class KoidTask extends Goal {
 			success = true;
 			double dist = koid.distanceToSqr(target.getX(), target.getBoundingBox().minY, target.getZ());
 
-            if (dist <= RANGE_SQR - 64.0 && koid.canSee(target))
+            if (dist <= RANGE_SQR - 64.0 && koid.hasLineOfSight(target))
             {
             	koid.getNavigation().stop();
             	++this.strafeTime;
@@ -608,7 +606,7 @@ public class KoidTask extends Goal {
 	}
 	
 	private static Vec2f getPitchYaw(LivingEntity entity){
-		Vec2f vec2f = new Vec2f(entity.xRot, entity.yRot);
+		Vec2f vec2f = new Vec2f(entity.getXRot(), entity.getYRot());
 		return vec2f;
 	}
 

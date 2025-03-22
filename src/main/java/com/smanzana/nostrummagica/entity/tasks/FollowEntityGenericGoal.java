@@ -2,18 +2,16 @@ package com.smanzana.nostrummagica.entity.tasks;
 
 import java.util.EnumSet;
 
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 
 public class FollowEntityGenericGoal<T extends Mob> extends Goal {
 	
@@ -127,7 +125,7 @@ public class FollowEntityGenericGoal<T extends Mob> extends Goal {
 								for (int i1 = 0; i1 <= 4; ++i1) {
 									pos1.set(i + l, k - 1, j + i1);
 									if ((l < 1 || i1 < 1 || l > 3 || i1 > 3) && canTeleportToBlock(pos1)) {
-										this.entity.moveTo((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), this.entity.yRot, this.entity.xRot);
+										this.entity.moveTo((double)((float)(i + l) + 0.5F), (double)k, (double)((float)(j + i1) + 0.5F), this.entity.getYRot(), this.entity.getXRot());
 										this.petPathfinder.stop();
 										return;
 									}

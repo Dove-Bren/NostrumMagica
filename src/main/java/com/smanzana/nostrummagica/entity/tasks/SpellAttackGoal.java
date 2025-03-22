@@ -12,8 +12,6 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
-
 public class SpellAttackGoal<T extends Mob> extends Goal {
 	
 	
@@ -61,7 +59,7 @@ public class SpellAttackGoal<T extends Mob> extends Goal {
 		if (needsTarget && (entity.getTarget() == null || !entity.getTarget().isAlive()))
 			return false;
 		
-		if (needsTarget && !entity.getSensing().canSee(entity.getTarget())){
+		if (needsTarget && !entity.getSensing().hasLineOfSight(entity.getTarget())){
 			return false;
 		}
 		

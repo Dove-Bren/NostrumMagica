@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.entity;
 
 
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 
 public class CursedGlassTriggerEntity extends SwitchTriggerEntity {

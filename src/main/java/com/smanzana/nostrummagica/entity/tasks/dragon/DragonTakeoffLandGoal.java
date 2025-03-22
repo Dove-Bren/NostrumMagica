@@ -7,8 +7,6 @@ import com.smanzana.nostrummagica.entity.dragon.FlyingDragonEntity;
 
 import net.minecraft.world.entity.ai.goal.Goal;
 
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
-
 public class DragonTakeoffLandGoal extends Goal {
 	
 	private FlyingDragonEntity dragon;

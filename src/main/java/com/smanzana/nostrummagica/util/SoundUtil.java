@@ -22,7 +22,7 @@ public class SoundUtil {
 //			while (it.hasNext()) {
 //				Entry<String, ISound> entry = it.next();
 //				if (entry.get().equals(sound)) {
-//					it.remove();
+//					it.discard();
 //				}
 //			}
 //		} catch (Exception e) {

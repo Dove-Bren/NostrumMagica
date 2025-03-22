@@ -37,47 +37,47 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.SpellUtils;
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.animal.AbstractGolem;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.Difficulty;
-import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraft.nbt.Tag;
 
 public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchantableEntity, IElementalEntity {
 	
@@ -342,11 +342,6 @@ public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchant
 	}
 	
 	@Override
-	public boolean causeFallDamage(float distance, float damageMulti) {
-		return false; // No fall damage
-	}
-	
-	@Override
 	protected void checkFallDamage(double y, boolean onGround, BlockState stae, BlockPos pos) {
 		
 	}
@@ -471,7 +466,7 @@ public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchant
 
 				if (this.courseChangeCooldown-- <= 0) {
 					this.courseChangeCooldown += this.parentEntity.getRandom().nextInt(5) + 2;
-					d3 = (double)Mth.sqrt(d3);
+					d3 = (double)Math.sqrt(d3);
 
 					if (this.isNotColliding(this.getWantedX(), this.getWantedY(), this.getWantedZ(), d3)) {
 						this.parentEntity.setDeltaMovement(this.parentEntity.getDeltaMovement().add(
@@ -525,7 +520,7 @@ public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchant
 				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
 				BlockPos underPos = new BlockPos(Mth.floor(this.getX()), Mth.floor(this.getBoundingBox().minY) - 1, Mth.floor(this.getZ()));
 				BlockState underState = this.level.getBlockState(underPos);
-				f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
+				f = underState.getFriction(this.level, underPos, this) * 0.91F;
 			}
 
 			float f1 = 0.16277136F / (f * f * f);
@@ -536,24 +531,14 @@ public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchant
 				//f = this.world.getBlockState(new BlockPos(MathHelper.floor(this.getPosX()), MathHelper.floor(this.getBoundingBox().minY) - 1, MathHelper.floor(this.getPosZ()))).getBlock().slipperiness * 0.91F;
 				BlockPos underPos = new BlockPos(Mth.floor(this.getX()), Mth.floor(this.getBoundingBox().minY) - 1, Mth.floor(this.getZ()));
 				BlockState underState = this.level.getBlockState(underPos);
-				f = underState.getBlock().getSlipperiness(underState, this.level, underPos, this) * 0.91F;
+				f = underState.getFriction(this.level, underPos, this) * 0.91F;
 			}
 
 			this.move(MoverType.SELF, this.getDeltaMovement());
 			this.setDeltaMovement(this.getDeltaMovement().scale(f));
 		}
 
-		this.animationSpeedOld = this.animationSpeed;
-		double d1 = this.getX() - this.xo;
-		double d0 = this.getZ() - this.zo;
-		float f2 = Mth.sqrt(d1 * d1 + d0 * d0) * 4.0F;
-
-		if (f2 > 1.0F) {
-			f2 = 1.0F;
-		}
-
-		this.animationSpeed += (f2 - this.animationSpeed) * 0.4F;
-		this.animationPosition += this.animationSpeed;
+		this.calculateEntityAnimation(this, false);
 	}
 
 	/**
@@ -924,7 +909,7 @@ public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchant
 				ent.setCustomNameVisible(this.isCustomNameVisible());
 			}
 			level.addFreshEntity(ent);
-			this.remove();
+			this.discard();
 			return true;
 		}
 		

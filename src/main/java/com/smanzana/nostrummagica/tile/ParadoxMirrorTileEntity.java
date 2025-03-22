@@ -205,7 +205,7 @@ public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBloc
 		while (it.hasNext()) {
 			ItemEntity ent = it.next();
 			if (ent == null || !ent.isAlive() || ent.distanceToSqr(worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5) > 4) {
-				it.remove();
+				it.discard();
 			}
 		}
 	}

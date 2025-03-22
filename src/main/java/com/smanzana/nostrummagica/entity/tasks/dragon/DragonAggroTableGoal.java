@@ -16,7 +16,7 @@ public class DragonAggroTableGoal<E extends DragonEntity, T extends LivingEntity
 		this.checkSight = checkSight;
 		this.dragon = dragon;
 		aggroTable = new AggroTable<>((ent) -> {
-			return !DragonAggroTableGoal.this.checkSight || DragonAggroTableGoal.this.dragon.getSensing().canSee(ent);
+			return !DragonAggroTableGoal.this.checkSight || DragonAggroTableGoal.this.dragon.getSensing().hasLineOfSight(ent);
 		});
 	}
 

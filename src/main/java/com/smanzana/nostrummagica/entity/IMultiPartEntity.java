@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.entity;
 
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 
 public interface IMultiPartEntity {

@@ -10,8 +10,6 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
-
 public class GolemTask extends Goal {
 
 	private static final Random rand = new Random();
@@ -210,7 +208,7 @@ public class GolemTask extends Goal {
 			
 			if (!done && !inMelee && range && inRange && rangeCooldown <= 0) {
 				// Can we do a ranged attack?
-				if (golem.canSee(target)) {
+				if (golem.hasLineOfSight(target)) {
 					golem.doRangeTask(target);
 					rangeCooldown = 20 * 3 * (1 + GolemTask.rand.nextInt(3));
 					done = true;
@@ -254,7 +252,7 @@ public class GolemTask extends Goal {
 			success = true;
 			double dist = golem.distanceToSqr(target.getX(), target.getBoundingBox().minY, target.getZ());
 
-            if (dist <= RANGE_SQR - 25.0 && golem.canSee(target))
+            if (dist <= RANGE_SQR - 25.0 && golem.hasLineOfSight(target))
             {
             	golem.getNavigation().stop();
                 ++this.strafeTime;

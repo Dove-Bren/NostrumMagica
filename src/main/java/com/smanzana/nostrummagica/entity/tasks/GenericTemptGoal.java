@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.entity.tasks;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.TemptGoal;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 
 // Slightly extending to make it a little easier to just customize some things
@@ -16,12 +15,8 @@ public class GenericTemptGoal extends TemptGoal {
 	}
 
 	public GenericTemptGoal(PathfinderMob creatureIn, double speedIn, boolean scaredByPlayerMovementIn, Ingredient temptItemIn) {
-		super(creatureIn, speedIn, scaredByPlayerMovementIn, temptItemIn);
+		super(creatureIn, speedIn, temptItemIn, scaredByPlayerMovementIn);
 		this.speed = speedIn;
-	}
-
-	protected boolean shouldFollowItem(ItemStack stack) {
-		return super.shouldFollowItem(stack);
 	}
 
 	protected void moveToclosestPlayer(PathfinderMob tempted, Player player) {

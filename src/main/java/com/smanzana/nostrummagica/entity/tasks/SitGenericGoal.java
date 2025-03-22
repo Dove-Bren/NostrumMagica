@@ -4,11 +4,9 @@ import java.util.EnumSet;
 
 import com.smanzana.petcommand.api.entity.ITameableEntity;
 
-import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
-
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
 
 public class SitGenericGoal<T extends PathfinderMob & ITameableEntity> extends Goal {
 	

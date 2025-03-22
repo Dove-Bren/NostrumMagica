@@ -262,7 +262,7 @@ public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTile
 				UUID key = it.next();
 				final Integer charge = EntityChargeMap.get(key);
 				if (charge == null || (charge == 1 || charge == -1)) {
-					it.remove();
+					it.discard();
 				} else {
 					EntityChargeMap.put(key, charge + (charge > 0 ? -1 : 1));
 				}

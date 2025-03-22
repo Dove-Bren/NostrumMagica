@@ -3,10 +3,10 @@ package com.smanzana.nostrummagica.entity.tasks.dragon;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.entity.dragon.RedDragonBaseEntity;
 
-import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.phys.AABB;
 
 public class DragonNearestAttackableTargetGoal<T extends LivingEntity> extends NearestAttackableTargetGoal<T> {

@@ -6,16 +6,16 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
 
 public class SpellBubbleEntity extends SpellProjectileEntity {
 	
@@ -135,7 +135,7 @@ public class SpellBubbleEntity extends SpellProjectileEntity {
 		
 		if (!level.isClientSide() && this.tickCount >= lifetime) {
 			this.onProjectileDeath();
-			this.remove();
+			this.discard();
 		}
 	}
 

@@ -174,7 +174,7 @@ public abstract class FlyingDragonEntity extends DragonEntity {
 			this.navigation = new DragonEntity.PathNavigatorDragonFlier(this, level);
 			this.setFlyingAI();
 		}
-		this.push(Math.cos(this.yRot) * .2, 0.5, Math.sin(this.yRot) * .2);
+		this.push(Math.cos(this.getYRot()) * .2, 0.5, Math.sin(this.getYRot()) * .2);
 		this.setNoGravity(true);
 		
 	}

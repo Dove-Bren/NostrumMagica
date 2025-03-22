@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.entity.dragon.FlyingDragonEntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 public class DragonMeleeAttackGoal extends MeleeAttackGoal {
 	

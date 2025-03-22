@@ -14,27 +14,27 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
 public class HookShotEntity extends Entity {
 	
@@ -230,7 +230,7 @@ public class HookShotEntity extends Entity {
 		}
 		else
 		{
-			this.remove();
+			this.discard();
 		}
 	}
 	
@@ -239,7 +239,7 @@ public class HookShotEntity extends Entity {
 		Entity attachedEntity = this.getHookedEntity();
 		if (attachedEntity != null) {
 			if (!attachedEntity.isAlive()) {
-				remove();
+				discard();
 				return;
 			}
 		}
@@ -248,7 +248,7 @@ public class HookShotEntity extends Entity {
 			final double dist = caster.distanceToSqr(this);
 			if (dist < 8) {
 				if (this.getHookshotType() != HookshotType.CLAW || caster.isShiftKeyDown()) {
-					this.remove();
+					this.discard();
 					return;
 				}
 			}
@@ -259,17 +259,17 @@ public class HookShotEntity extends Entity {
 		if (this.isFetch()) {
 			// Bring the hooked entity (and ourselves) back to the shooter
 			if (attachedEntity == null) {
-				this.remove();
+				this.discard();
 				return;
 			}
 			
 			if (caster == null) {
-				this.remove();
+				this.discard();
 				return;
 			}
 			
 			if (attachedEntity.isShiftKeyDown()) {
-				this.remove();
+				this.discard();
 				return;
 			}
 			
@@ -293,7 +293,7 @@ public class HookShotEntity extends Entity {
 			
 			if (attachedEntity != null) {
 				if (!attachedEntity.isAlive()) {
-					this.remove();
+					this.discard();
 					return;
 				}
 				this.teleportTo(attachedEntity.getX(), attachedEntity.getY() + (attachedEntity.getBbHeight() / 2), attachedEntity.getZ());
@@ -301,7 +301,7 @@ public class HookShotEntity extends Entity {
 			
 			if (caster != null) {
 				if ((tickCount - tickHooked) > 6 && caster.isOnGround()) {
-					this.remove();
+					this.discard();
 					return;
 				}
 				
@@ -334,7 +334,7 @@ public class HookShotEntity extends Entity {
 				
 				// Make sure caster still exists
 				if (caster != null && !caster.isAlive()) {
-					this.remove();
+					this.discard();
 					return;
 				}
 				
@@ -342,7 +342,7 @@ public class HookShotEntity extends Entity {
 				if (caster != null) {
 					final double dist = caster.distanceToSqr(this);
 					if (dist > (maxLength*maxLength)) {
-						this.remove();
+						this.discard();
 					}
 				}
 				
@@ -400,7 +400,7 @@ public class HookShotEntity extends Entity {
 			// Make sure type of hookshot supports material
 			BlockState state = level.getBlockState(RayTrace.blockPosFromResult(result));
 			if (wantsFetch || state == null || !HookshotItem.CanBeHooked(getHookshotType(), state)) {
-				this.remove();
+				this.discard();
 				return;
 			}
 			

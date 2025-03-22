@@ -65,7 +65,7 @@ public class AggroTable<T extends LivingEntity> {
 	public synchronized void addDamage(T attacker, float damage) {
 		Float val = damageTable.get(attacker);
 		if (val == null) {
-			val = new Float(0.0f);
+			val = Float.valueOf(0.0f);
 		}
 		
 		float real = val.floatValue();

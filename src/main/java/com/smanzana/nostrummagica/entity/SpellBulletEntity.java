@@ -11,28 +11,28 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.SeekingBulletShape.SeekingBulletShapeInstance;
 import com.smanzana.nostrummagica.util.RayTrace;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.entity.projectile.ShulkerBullet;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.util.Mth;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.Difficulty;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
 // Like shulker bullets but have spells in them
 public class SpellBulletEntity extends ShulkerBullet {
@@ -89,7 +89,7 @@ public class SpellBulletEntity extends ShulkerBullet {
 			double d0 = (double)blockpos.getX() + 0.5D;
 			double d1 = (double)blockpos.getY() + 0.5D;
 			double d2 = (double)blockpos.getZ() + 0.5D;
-			this.moveTo(d0, d1, d2, this.yRot, this.xRot);
+			this.moveTo(d0, d1, d2, this.getYRot(), this.getXRot());
 			this.target = target;
 			this.direction = Direction.UP;
 			this.selectNextMoveDirection(axis);
@@ -104,7 +104,7 @@ public class SpellBulletEntity extends ShulkerBullet {
 		
 		// shulker shells move them to center of block. We want shooter pos + eye height
 		if (shooter != null) {
-			this.moveTo(shooter.getX(), shooter.getY() + shooter.getEyeHeight(), shooter.getZ(), this.yRot, this.xRot);
+			this.moveTo(shooter.getX(), shooter.getY() + shooter.getEyeHeight(), shooter.getZ(), this.getYRot(), this.getXRot());
 		}
 		
 		this.setElement(self.getElement());
@@ -138,7 +138,7 @@ public class SpellBulletEntity extends ShulkerBullet {
 		} else {
 			trigger.onProjectileHit(entityHit);
 		}
-		this.remove();
+		this.discard();
 	}
 	
 	@Override
@@ -146,7 +146,7 @@ public class SpellBulletEntity extends ShulkerBullet {
 		if (!this.level.isClientSide) {
 			trigger.onProjectileHit(this.blockPosition());
 		}
-		this.remove();
+		this.discard();
 		return true;
 	}
 	
@@ -246,7 +246,7 @@ public class SpellBulletEntity extends ShulkerBullet {
 		double deltaX = targetX - this.getX();
 		double deltaY = targetY - this.getY();
 		double deltaZ = targetZ - this.getZ();
-		double dist = (double)Mth.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+		double dist = (double)Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
 
 		if (dist == 0.0D)
 		{
@@ -270,7 +270,7 @@ public class SpellBulletEntity extends ShulkerBullet {
 	 */
 	public void tick() {
 		if (!this.level.isClientSide && this.level.getDifficulty() == Difficulty.PEACEFUL) {
-			this.remove();
+			this.discard();
 		} else {
 			//super.tick();
 			this.baseTick();

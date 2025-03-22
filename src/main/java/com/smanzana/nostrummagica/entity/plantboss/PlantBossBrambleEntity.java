@@ -4,24 +4,24 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.core.Direction;
-import net.minecraft.world.damagesource.EntityDamageSource;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
 public class PlantBossBrambleEntity extends Entity {
 	
@@ -170,7 +170,7 @@ public class PlantBossBrambleEntity extends Entity {
 			entity.removeEffect(NostrumEffects.rooted);
 			entity.doHurtTarget(this);
 			entity.hurt(new BrambleDamageSource(this.plant), 6f);
-			entity.knockback(1f, (double)Mth.sin(this.yRot * 0.017453292F), (double)(-Mth.cos(this.yRot * 0.017453292F)));
+			entity.knockback(1f, (double)Mth.sin(this.getYRot() * 0.017453292F), (double)(-Mth.cos(this.getYRot() * 0.017453292F)));
 		}
 	}
 	
@@ -182,11 +182,13 @@ public class PlantBossBrambleEntity extends Entity {
 			this.setRot(this.getFacing().toYRot(), 0f);
 		}
 		
+		checkBoundingBox();
+		
 		if (!level.isClientSide) {
 			// Move if given a direction
 			if (this.getFacing() != null) {
 				if (startPos.distSqr(this.getX(), this.getY(), this.getZ(), true) > this.distance * this.distance) {
-					this.remove();
+					this.discard();
 				}
 				
 				Vec3 motion = Vec3.atLowerCornerOf(this.getFacing().getNormal())
@@ -212,21 +214,21 @@ public class PlantBossBrambleEntity extends Entity {
 		final float w = turned ? this.getBrambleDepth() : this.getBrambleWidth();
 		final float h = this.getBrambleHeight();
 		final float d = turned ? this.getBrambleWidth() : this.getBrambleDepth();
-		this.entityBBOverride = new AABB(
+		this.setBoundingBox(new AABB(
 				this.getX() - (w/2f),
 				this.getY(),
 				this.getZ() - (d/2f),
 				this.getX() + (w/2f),
 				this.getY() + h,
 				this.getZ() + (d/2f)
-				);
+				)); // TODO this is different. Used to set override variable and force that to return when getting bounding box, which is now final.
 	}
 	
-	@Override
-	public AABB getBoundingBox() {
-		checkBoundingBox();
-		return this.entityBBOverride;
-	}
+//	@Override
+//	public AABB getBoundingBox() {
+//		checkBoundingBox();
+//		return this.entityBBOverride;
+//	}
 
 	@Override
 	public Packet<?> getAddEntityPacket() {

@@ -51,7 +51,7 @@ public class DragonSummonShadowAttackGoal<T extends DragonEntity> extends Goal {
 		
 		boolean found = false;
 		for (LivingEntity targ : this.pool) {
-			if (dragon.getSensing().canSee(targ)) {
+			if (dragon.getSensing().hasLineOfSight(targ)) {
 				found = true;
 				break;
 			}

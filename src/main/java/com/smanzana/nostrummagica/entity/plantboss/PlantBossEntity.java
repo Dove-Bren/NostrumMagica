@@ -37,8 +37,17 @@ import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.SpellUtils;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Plane;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerBossEvent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.BossEvent;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
@@ -48,22 +57,12 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Direction.Plane;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.BossEvent;
 import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerBossEvent;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEntity {
 	
@@ -239,13 +238,13 @@ public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEnt
 		super(type, worldIn);
         this.noCulling = true;
         this.xpReward = 1250;
-        this.pushthrough = 1f;
+        //this.pushthrough = 1f; TODO not sure what the replacement for this is. Used to be "entityCollisionReduction"
 		
         this.parts = new MultiPartEntityPart[NumberOfLeaves + 1];
 		this.limbs = new PlantBossLeafLimb[NumberOfLeaves];
         
 		this.aggroTable = new AggroTable<>((ent) -> {
-			return PlantBossEntity.this.getSensing().canSee(ent);
+			return PlantBossEntity.this.getSensing().hasLineOfSight(ent);
 		});
 		
 		this.stateTasks = new EnumMap<>(BattleState.class);
@@ -492,7 +491,7 @@ public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEnt
 				spawnLimbs();
 			}
 			
-			getBody().moveTo(getX(), getY(), getZ(), yRot, xRot);
+			getBody().moveTo(getX(), getY(), getZ(), getYRot(), getXRot());
 			positionLeaves(limbs);
 			this.tickStateMachine();
 		}
@@ -573,7 +572,7 @@ public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEnt
 	protected void customServerAiStep() {
 		super.customServerAiStep();
 		
-		this.bossInfo.setPercent(this.getHealth() / this.getMaxHealth());
+		this.bossInfo.setProgress(this.getHealth() / this.getMaxHealth());
 	}
 	
 	@Override
@@ -806,7 +805,7 @@ public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEnt
 			List<Entity> ents = this.level.getEntities(this, searchBox, (e) -> {
 				return (e instanceof LivingEntity)
 						&& (!(e instanceof Player) || !((Player) e).isCreative())
-						&& (this.canSee(e));
+						&& (this.hasLineOfSight(e));
 				});
 			
 			if (ents.isEmpty()) {
@@ -824,7 +823,7 @@ public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEnt
 	}
 	
 	protected boolean isStillTargetable(@Nonnull LivingEntity target) {
-		return this.getSensing().canSee(target);
+		return this.getSensing().hasLineOfSight(target);
 	}
 	
 	protected void setCasting(@Nullable Spell spell) {
@@ -1111,7 +1110,7 @@ public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEnt
 		}
 		
 		private void setPitch(float pitch) {
-			this.xRot = pitch;
+			this.setXRot(pitch);
 			this.effectivePitch = pitch;
 			
 			final double pitchDiffForTopRad = 0.152680255;
@@ -1125,27 +1124,29 @@ public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEnt
 		
 		private float widthCache = 0;
 		private float heightCache = 0;
-		@Override
-		public AABB getBoundingBox() {
-			if (this.getBbWidth() != widthCache || this.getBbHeight() != heightCache) {
-				this.widthCache = getBbWidth();
-				this.heightCache = getBbHeight();
-				
-				// change BB to match pitch...
-				AABB bb = this.getBoundingBox();
-				final double centerZ = (bb.minZ + bb.maxZ) / 2;
-				this.setBoundingBox(new AABB(
-						bb.minX, bb.minY, centerZ - 2,
-						bb.maxX, bb.maxY, centerZ + 2
-						));
-			}
-			
-			return super.getBoundingBox();
-		}
+//		@Override
+//		public AABB getBoundingBox() {
+//			return super.getBoundingBox();
+//		}
 		
 		@Override
 		public void tick() {
 			super.tick();
+			
+			{
+				if (this.getBbWidth() != widthCache || this.getBbHeight() != heightCache) {
+					this.widthCache = getBbWidth();
+					this.heightCache = getBbHeight();
+					
+					// change BB to match pitch...
+					AABB bb = this.getBoundingBox();
+					final double centerZ = (bb.minZ + bb.maxZ) / 2;
+					this.setBoundingBox(new AABB(
+							bb.minX, bb.minY, centerZ - 2,
+							bb.maxX, bb.maxY, centerZ + 2
+							));
+				}
+			}
 			
 			if (this.level != null && level.isClientSide) {
 				if (this.plant == null) {
@@ -1403,11 +1404,11 @@ public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEnt
 						double d2 = (pillar.getZ() + .5) - parent.getZ();
 						double d1 = (pillar.getY() + 1) - (parent.getY() + parent.getEyeHeight());
 						
-						double d3 = (double)Mth.sqrt(d0 * d0 + d2 * d2);
-						float f = (float)(Mth.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
-						float f1 = (float)(-(Mth.atan2(d1, d3) * (180D / Math.PI)));
-						parent.xRot = f1;
-						parent.yRot = f;
+						double d3 = (double)Math.sqrt(d0 * d0 + d2 * d2);
+						float f = (float)(Math.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
+						float f1 = (float)(-(Math.atan2(d1, d3) * (180D / Math.PI)));
+						parent.setXRot(f1);
+						parent.setYRot(f);
 					}
 					
 					doSpellCast(null, spell, -1);
@@ -1537,7 +1538,7 @@ public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEnt
 		public void startTask() {
 			super.startTask();
 			
-			this.startingYaw = (parent.yRot + parent.random.nextFloat() * 360f) % 360f;
+			this.startingYaw = (parent.getYRot() + parent.random.nextFloat() * 360f) % 360f;
 			parent.curlLeaves(10, false); // want to be true but need to lower and raise leaves
 		}
 		

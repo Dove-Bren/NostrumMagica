@@ -92,7 +92,7 @@ public class AltarRitualLayout implements IRitualLayout {
 			while (it.hasNext()) {
 				final ItemStack remaining = it.next();
 				if (req.test(remaining)) {
-					it.remove();
+					it.discard();
 					found = true;
 					break;
 				}
@@ -322,7 +322,7 @@ public class AltarRitualLayout implements IRitualLayout {
 				// Sort of special case for first item
 				if (((AltarTileEntity) te).getItem().isEmpty()) {
 					((AltarTileEntity) te).setItem(it.next());
-					it.remove();
+					it.discard();
 				}
 				
 				VisitTier3Extras(world, center, (w, pos) -> {
@@ -331,7 +331,7 @@ public class AltarRitualLayout implements IRitualLayout {
 						if (posTE != null && posTE instanceof AltarTileEntity) {
 							if (((AltarTileEntity) posTE).getItem().isEmpty()) {
 								((AltarTileEntity) posTE).setItem(it.next());
-								it.remove();
+								it.discard();
 							}
 						}
 					}

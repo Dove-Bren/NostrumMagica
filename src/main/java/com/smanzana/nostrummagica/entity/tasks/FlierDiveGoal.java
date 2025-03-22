@@ -4,8 +4,8 @@ import java.util.EnumSet;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 /**
@@ -53,7 +53,7 @@ public class FlierDiveGoal<T extends Mob> extends Goal
 			return false;
 		}
 		
-		if (requiresSight && !entity.getSensing().canSee(target)) {
+		if (requiresSight && !entity.getSensing().hasLineOfSight(target)) {
 			return false;
 		}
 		

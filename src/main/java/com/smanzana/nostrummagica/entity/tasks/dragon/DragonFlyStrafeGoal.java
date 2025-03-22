@@ -7,8 +7,6 @@ import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 
-import net.minecraft.world.entity.ai.goal.Goal.Flag;
-
 public class DragonFlyStrafeGoal<T extends DragonEntity> extends Goal {
 
 	protected final T dragon;
@@ -51,7 +49,7 @@ public class DragonFlyStrafeGoal<T extends DragonEntity> extends Goal {
         if (entitylivingbase != null)
         {
             double d0 = this.dragon.distanceToSqr(entitylivingbase.getX(), entitylivingbase.getBoundingBox().minY, entitylivingbase.getZ());
-            boolean flag = this.dragon.getSensing().canSee(entitylivingbase);
+            boolean flag = this.dragon.getSensing().hasLineOfSight(entitylivingbase);
             boolean flag1 = this.seeTime > 0;
 
             if (flag != flag1)
