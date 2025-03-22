@@ -80,7 +80,7 @@ public class AltarBlock extends BaseEntityBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new AltarTileEntity();
+		return new AltarTileEntity(pos, state);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -98,14 +98,6 @@ public class AltarBlock extends BaseEntityBlock {
 	        world.removeBlockEntity(pos);
 		}
 		super.onRemove(state, world, pos, newState, isMoving);
-	}
-	
-	@SuppressWarnings("deprecation")
-	@Override
-	public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int eventID, int eventParam) {
-		super.triggerEvent(state, worldIn, pos, eventID, eventParam);
-		BlockEntity tileentity = worldIn.getBlockEntity(pos);
-        return tileentity == null ? false : tileentity.triggerEvent(eventID, eventParam);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -146,7 +138,7 @@ public class AltarBlock extends BaseEntityBlock {
 				
 				altar.setItem(stack.split(1));
 				if (stack.getCount() <= 0) {
-					first.remove();
+					first.discard();
 				}
 			}
 		}
@@ -182,7 +174,7 @@ public class AltarBlock extends BaseEntityBlock {
 			// Has an item
 			if (heldItem.isEmpty()) {
 				final ItemStack altarItem = altar.getItem();
-				if (!playerIn.inventory.add(altarItem)) {
+				if (!playerIn.getInventory().add(altarItem)) {
 					worldIn.addFreshEntity(
 							new ItemEntity(worldIn,
 									pos.getX() + .5, pos.getY() + 1.2, pos.getZ() + .5,

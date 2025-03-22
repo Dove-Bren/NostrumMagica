@@ -37,7 +37,7 @@ public class SorceryPortalBlock extends PortalBlock implements EntityBlock  {
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		if (isMaster(state)) {
-			return new SorceryPortalTileEntity();
+			return new SorceryPortalTileEntity(pos, state);
 		}
 		
 		return null;

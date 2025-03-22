@@ -9,25 +9,25 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.fluid.PoisonWaterFluid;
+import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.IBlockLoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.LiquidBlock;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.material.FlowingFluid;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.pathfinder.PathComputationType;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.pathfinder.PathComputationType;
 
 public class PoisonWaterBlock extends LiquidBlock {
 
@@ -50,7 +50,7 @@ public class PoisonWaterBlock extends LiquidBlock {
 	}
 	
 	@Override
-	public Fluid takeLiquid(LevelAccessor worldIn, BlockPos pos, BlockState state) {
+	public ItemStack pickupBlock(LevelAccessor worldIn, BlockPos pos, BlockState state) {
 		// want to do this but we don't know the player
 //		final boolean allowed;
 //		if (this.unbreakable) {
@@ -63,9 +63,9 @@ public class PoisonWaterBlock extends LiquidBlock {
 		final boolean allowed = !this.unbreakable;
 		
 		if (allowed) {
-			return this.getFluid();
+			return new ItemStack(NostrumItems.poisonWaterBucket);
 		} else {
-			return Fluids.EMPTY;
+			return ItemStack.EMPTY; //return new ItemStack(NostrumItems.poisonWaterBucket)
 		}
 	}
 	

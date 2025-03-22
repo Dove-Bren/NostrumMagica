@@ -191,7 +191,7 @@ public class ItemDuctBlock extends PipeBlock implements SimpleWaterloggedBlock, 
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new ItemDuctTileEntity();
+		return new ItemDuctTileEntity(pos, state);
 	}
 	
 	@Override

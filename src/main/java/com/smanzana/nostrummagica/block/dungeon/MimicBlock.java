@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
@@ -9,40 +10,39 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.MimicBlockTileEntity;
 
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.TerrainParticle;
-import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.TerrainParticle;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
-import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.util.Mth;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.IBlockRenderProperties;
 import net.minecraftforge.client.model.data.ModelProperty;
 
 @SuppressWarnings("deprecation")
@@ -71,7 +71,7 @@ public abstract class MimicBlock extends BaseEntityBlock implements EntityBlock 
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new MimicBlockTileEntity();
+		return new MimicBlockTileEntity(pos, state);
 	}
 	
 //	@Override
@@ -168,8 +168,8 @@ public abstract class MimicBlock extends BaseEntityBlock implements EntityBlock 
 //    }
 
     @Override
-    public int getLightValue(BlockState state, BlockGetter world, BlockPos pos) {
-        int result = getValue(state, world, pos, BlockState::getLightValue, () -> super.getLightValue(state, world, pos));
+    public int getLightEmission(BlockState state, BlockGetter world, BlockPos pos) {
+        int result = getValue(state, world, pos, BlockState::getLightEmission, () -> super.getLightEmission(state, world, pos));
         // Copied from secret rooms mod, b ut it's SO SLOW because getting the stacktrace on a thread is not fast. Kills performance!
 //        //This is needed so we can control AO. Try to remove this asap
 //        if ("net.minecraft.client.renderer.BlockModelRenderer".equals(Thread.currentThread().getStackTrace()[3].getClassName())) {
@@ -206,86 +206,87 @@ public abstract class MimicBlock extends BaseEntityBlock implements EntityBlock 
     //ParticleManager#addBlockHitEffects
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public boolean addHitEffects(BlockState state, Level world, HitResult target, ParticleEngine manager) {
-        if(target instanceof BlockHitResult) {
-            BlockPos pos = ((BlockHitResult) target).getBlockPos();
-            Optional<BlockState> mirrorState = getMirrorState(state, world, pos);
-            if(mirrorState.isPresent()) {
-                BlockState blockstate = mirrorState.get();
-                Direction side = ((BlockHitResult) target).getDirection();
-                if (blockstate.getRenderShape() != RenderShape.INVISIBLE) {
-                    int x = pos.getX();
-                    int y = pos.getY();
-                    int z = pos.getZ();
-                    AABB bb = blockstate.getShape(world, pos).bounds();
-                    double xPos = x + world.random.nextDouble() * (bb.maxX - bb.minX - 0.2F) + 0.1F + bb.minX;
-                    double yPos = y + world.random.nextDouble() * (bb.maxY - bb.minY - 0.2F) + 0.1F + bb.minY;
-                    double zPos = z + world.random.nextDouble() * (bb.maxZ - bb.minZ - 0.2F) + 0.1F + bb.minZ;
+    public void initializeClient(Consumer<IBlockRenderProperties> consumer) {
+    	consumer.accept(new IBlockRenderProperties() {
+    		@Override
+    	    public boolean addHitEffects(BlockState state, Level world, HitResult target, ParticleEngine manager) {
+    	        if(target instanceof BlockHitResult) {
+    	            BlockPos pos = ((BlockHitResult) target).getBlockPos();
+    	            Optional<BlockState> mirrorState = getMirrorState(state, world, pos);
+    	            if(mirrorState.isPresent()) {
+    	                BlockState blockstate = mirrorState.get();
+    	                Direction side = ((BlockHitResult) target).getDirection();
+    	                if (blockstate.getRenderShape() != RenderShape.INVISIBLE) {
+    	                    int x = pos.getX();
+    	                    int y = pos.getY();
+    	                    int z = pos.getZ();
+    	                    AABB bb = blockstate.getShape(world, pos).bounds();
+    	                    double xPos = x + world.random.nextDouble() * (bb.maxX - bb.minX - 0.2F) + 0.1F + bb.minX;
+    	                    double yPos = y + world.random.nextDouble() * (bb.maxY - bb.minY - 0.2F) + 0.1F + bb.minY;
+    	                    double zPos = z + world.random.nextDouble() * (bb.maxZ - bb.minZ - 0.2F) + 0.1F + bb.minZ;
 
-                    switch (side) {
-                        case UP: yPos = y + bb.maxY + 0.1F; break;
-                        case DOWN: yPos = y + bb.minY - 0.1F; break;
-                        case NORTH: zPos = z + bb.minZ - 0.1F; break;
-                        case SOUTH: zPos = z + bb.maxZ + 0.1F; break;
-                        case WEST: xPos = x + bb.minX - 0.1F; break;
-                        case EAST: xPos = x + bb.maxX + 0.1F; break;
-                    }
+    	                    switch (side) {
+    	                        case UP: yPos = y + bb.maxY + 0.1F; break;
+    	                        case DOWN: yPos = y + bb.minY - 0.1F; break;
+    	                        case NORTH: zPos = z + bb.minZ - 0.1F; break;
+    	                        case SOUTH: zPos = z + bb.maxZ + 0.1F; break;
+    	                        case WEST: xPos = x + bb.minX - 0.1F; break;
+    	                        case EAST: xPos = x + bb.maxX + 0.1F; break;
+    	                    }
 
-                    final Minecraft mc = Minecraft.getInstance();
-                    mc.particleEngine.add(
-                            new TerrainParticle((ClientLevel) world, xPos, yPos, zPos, 0.0D, 0.0D, 0.0D, blockstate)
-                                    .init(pos)
-                                    .setPower(0.2F)
-                                    .scale(0.6F)
-                    );
-                }
-            }
-        }
-        return true;
-    }
+    	                    final Minecraft mc = Minecraft.getInstance();
+    	                    mc.particleEngine.add(
+    	                            new TerrainParticle((ClientLevel) world, xPos, yPos, zPos, 0.0D, 0.0D, 0.0D, blockstate)
+    	                                    .setPower(0.2F)
+    	                                    .scale(0.6F)
+    	                    );
+    	                }
+    	            }
+    	        }
+    	        return true;
+    	    }
 
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public boolean addDestroyEffects(BlockState stateIn, Level world, BlockPos pos, ParticleEngine manager) {
-        Optional<BlockState> mirrorState = getMirrorState(stateIn, world, pos);
-        if (mirrorState.isPresent()) {
-            if(mirrorState.get().isAir(world, pos)) {
-                return false;
-            }
-            BlockState state = mirrorState.get();
-            VoxelShape voxelshape = state.getShape(world, pos);
-            voxelshape.forAllBoxes((x1, y1, z1, x2, y2, z2) -> {
-                double xDelta = Math.min(1.0D, x2 - x1);
-                double yDelta = Math.min(1.0D, y2 - y1);
-                double zDelta = Math.min(1.0D, z2 - z1);
-                int xAmount = Math.max(2, Mth.ceil( xDelta / 0.25D));
-                int yAmount = Math.max(2, Mth.ceil( yDelta / 0.25D));
-                int zAmount = Math.max(2, Mth.ceil( zDelta / 0.25D));
+    	    @Override
+    	    public boolean addDestroyEffects(BlockState stateIn, Level world, BlockPos pos, ParticleEngine manager) {
+    	        Optional<BlockState> mirrorState = getMirrorState(stateIn, world, pos);
+    	        if (mirrorState.isPresent()) {
+    	            if(mirrorState.get().isAir()) {
+    	                return false;
+    	            }
+    	            BlockState state = mirrorState.get();
+    	            VoxelShape voxelshape = state.getShape(world, pos);
+    	            voxelshape.forAllBoxes((x1, y1, z1, x2, y2, z2) -> {
+    	                double xDelta = Math.min(1.0D, x2 - x1);
+    	                double yDelta = Math.min(1.0D, y2 - y1);
+    	                double zDelta = Math.min(1.0D, z2 - z1);
+    	                int xAmount = Math.max(2, Mth.ceil( xDelta / 0.25D));
+    	                int yAmount = Math.max(2, Mth.ceil( yDelta / 0.25D));
+    	                int zAmount = Math.max(2, Mth.ceil( zDelta / 0.25D));
 
-                for(int x = 0; x < xAmount; ++x) {
-                    for(int y = 0; y < yAmount; ++y) {
-                        for(int z = 0; z < zAmount; ++z) {
-                            double dx = (x + 0.5D) / xAmount;
-                            double dy = (y + 0.5D) / yAmount;
-                            double dz = (z + 0.5D) / zAmount;
-                            double xPos = dx * xDelta + x1;
-                            double yPos = dy * yDelta + y1;
-                            double zPos = dz * zDelta + z1;
-                            
-                            final Minecraft mc = Minecraft.getInstance();
-                            mc.particleEngine.add(
-                                    new TerrainParticle((ClientLevel) world,
-                                            pos.getX() + xPos,pos.getY() + yPos, pos.getZ() + zPos,
-                                            dx - 0.5D, dy - 0.5D,dz - 0.5D, state)
-                                            .init(pos)
-                            );
-                        }
-                    }
-                }
-            });
-        }
-        return true;
+    	                for(int x = 0; x < xAmount; ++x) {
+    	                    for(int y = 0; y < yAmount; ++y) {
+    	                        for(int z = 0; z < zAmount; ++z) {
+    	                            double dx = (x + 0.5D) / xAmount;
+    	                            double dy = (y + 0.5D) / yAmount;
+    	                            double dz = (z + 0.5D) / zAmount;
+    	                            double xPos = dx * xDelta + x1;
+    	                            double yPos = dy * yDelta + y1;
+    	                            double zPos = dz * zDelta + z1;
+    	                            
+    	                            final Minecraft mc = Minecraft.getInstance();
+    	                            mc.particleEngine.add(
+    	                                    new TerrainParticle((ClientLevel) world,
+    	                                            pos.getX() + xPos,pos.getY() + yPos, pos.getZ() + zPos,
+    	                                            dx - 0.5D, dy - 0.5D,dz - 0.5D, state)
+    	                            );
+    	                        }
+    	                    }
+    	                }
+    	            });
+    	        }
+    	        return true;
+    	    }
+    	});
     }
 
     @Override

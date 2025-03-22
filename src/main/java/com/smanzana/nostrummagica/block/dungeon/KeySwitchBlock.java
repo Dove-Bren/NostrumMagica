@@ -31,7 +31,7 @@ public class KeySwitchBlock extends SwitchBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new KeySwitchBlockTileEntity();
+		return new KeySwitchBlockTileEntity(pos, state);
 	}
 	
 	@Override

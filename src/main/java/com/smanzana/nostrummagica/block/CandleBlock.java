@@ -201,14 +201,6 @@ public class CandleBlock extends BaseEntityBlock {
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
-	@Override
-	public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
-		super.triggerEvent(state, worldIn, pos, id, param);
-        BlockEntity tileentity = worldIn.getBlockEntity(pos);
-        return tileentity == null ? false : tileentity.triggerEvent(id, param);
-	}
-	
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
@@ -265,7 +257,7 @@ public class CandleBlock extends BaseEntityBlock {
 						}
 						
 						if (stack.getCount() <= 0) {
-							item.remove();
+							item.discard();
 						}
 						
 						break;
@@ -352,8 +344,8 @@ public class CandleBlock extends BaseEntityBlock {
 		}
 		
 		if (candle == null) {
-			candle = new CandleTileEntity(type);
-			world.setBlockEntity(pos, candle);
+			candle = new CandleTileEntity(type, pos, state);
+			world.setBlockEntity(candle);
 		}
 		
 		candle.setReagentType(type);

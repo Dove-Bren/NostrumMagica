@@ -96,7 +96,7 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends BaseEnt
 		
 		@Override
 		public ShrineTileEntity.Element newBlockEntity(BlockPos pos, BlockState state) {
-			ShrineTileEntity.Element ent = new ShrineTileEntity.Element();
+			ShrineTileEntity.Element ent = new ShrineTileEntity.Element(pos, state);
 			return ent;
 		}
 
@@ -124,7 +124,7 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends BaseEnt
 		
 		@Override
 		public ShrineTileEntity.Shape newBlockEntity(BlockPos pos, BlockState state) {
-			ShrineTileEntity.Shape ent = new ShrineTileEntity.Shape();
+			ShrineTileEntity.Shape ent = new ShrineTileEntity.Shape(pos, state);
 			return ent;
 		}
 
@@ -152,7 +152,7 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends BaseEnt
 		
 		@Override
 		public ShrineTileEntity.Alteration newBlockEntity(BlockPos pos, BlockState state) {
-			ShrineTileEntity.Alteration ent = new ShrineTileEntity.Alteration();
+			ShrineTileEntity.Alteration ent = new ShrineTileEntity.Alteration(pos, state);
 			return ent;
 		}
 
@@ -180,7 +180,7 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends BaseEnt
 		
 		@Override
 		public ShrineTileEntity.Tier newBlockEntity(BlockPos pos, BlockState state) {
-			ShrineTileEntity.Tier ent = new ShrineTileEntity.Tier();
+			ShrineTileEntity.Tier ent = new ShrineTileEntity.Tier(pos, state);
 			return ent;
 		}
 

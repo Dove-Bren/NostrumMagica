@@ -32,14 +32,9 @@ public class ObeliskPortal extends TeleportationPortalBlock {
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
-	}
-	
-	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		if (isMaster(state)) {
-			return new ObeliskPortalTileEntity();
+			return new ObeliskPortalTileEntity(pos, state);
 		}
 		
 		return null;

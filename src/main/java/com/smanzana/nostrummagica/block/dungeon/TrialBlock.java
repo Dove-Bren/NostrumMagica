@@ -59,7 +59,7 @@ public class TrialBlock extends BaseEntityBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new TrialBlockTileEntity();
+		return new TrialBlockTileEntity(pos, state);
 	}
 	
 	@Override

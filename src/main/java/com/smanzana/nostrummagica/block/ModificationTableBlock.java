@@ -48,7 +48,7 @@ public class ModificationTableBlock extends BaseEntityBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new ModificationTableTileEntity();
+		return new ModificationTableTileEntity(pos, state);
 	}
 	
 	@Override

@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.block.dungeon;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.item.PositionCrystal;
@@ -16,6 +18,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -29,6 +32,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
@@ -66,8 +70,9 @@ public class TriggerRepeaterBlock extends BaseEntityBlock implements ITriggeredB
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
-		if (context != CollisionContext.empty()) {
-			if (context.getEntity() != null && context.getEntity() instanceof Player && ((Player) context.getEntity()).isCreative()) {
+		if (context != CollisionContext.empty() && context instanceof EntityCollisionContext) {
+			final @Nullable Entity entity = ((EntityCollisionContext) context).getEntity().orElse(null);
+			if (entity != null && entity instanceof Player && ((Player) entity).isCreative()) {
 				return Shapes.block();
 			}
 		}
@@ -89,7 +94,7 @@ public class TriggerRepeaterBlock extends BaseEntityBlock implements ITriggeredB
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new TriggerRepeaterTileEntity();
+		return new TriggerRepeaterTileEntity(pos, state);
 	}
 
 	@Override

@@ -127,7 +127,7 @@ public class CursedGlass extends SwitchBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return isDummy(state) ? null : new CursedGlassTileEntity();
+		return isDummy(state) ? null : new CursedGlassTileEntity(pos, state);
 	}
 	
 	@Override

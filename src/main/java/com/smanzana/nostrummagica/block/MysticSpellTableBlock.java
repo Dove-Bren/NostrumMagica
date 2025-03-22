@@ -31,7 +31,7 @@ public class MysticSpellTableBlock extends BasicSpellTableBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new MysticSpellTableTileEntity();
+		return new MysticSpellTableTileEntity(pos, state);
 	}
 	
 	@Override

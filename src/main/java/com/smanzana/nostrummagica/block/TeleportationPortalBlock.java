@@ -42,7 +42,7 @@ public class TeleportationPortalBlock extends PortalBlock  {
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		if (isMaster(state)) {
-			return new TeleportationPortalTileEntity();
+			return new TeleportationPortalTileEntity(pos, state);
 		}
 		
 		return null;

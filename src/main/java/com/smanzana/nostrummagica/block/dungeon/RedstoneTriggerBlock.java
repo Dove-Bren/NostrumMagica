@@ -59,7 +59,7 @@ public class RedstoneTriggerBlock extends TriggerRepeaterBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new TriggerRepeaterTileEntity();
+		return new TriggerRepeaterTileEntity(pos, state);
 	}
 
 	@Override

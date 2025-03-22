@@ -101,7 +101,7 @@ public class ActiveHopperBlock extends BaseEntityBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new ActiveHopperTileEntity();
+		return new ActiveHopperTileEntity(pos, state);
 	}
 	
 	@Override

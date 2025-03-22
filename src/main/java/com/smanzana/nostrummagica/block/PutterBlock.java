@@ -58,7 +58,7 @@ public class PutterBlock extends BaseEntityBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new PutterBlockTileEntity();
+		return new PutterBlockTileEntity(pos, state);
 	}
 	
 	@Override

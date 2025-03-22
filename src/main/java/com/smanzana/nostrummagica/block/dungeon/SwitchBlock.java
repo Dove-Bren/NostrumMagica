@@ -81,7 +81,7 @@ public class SwitchBlock extends Block implements EntityBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new SwitchBlockTileEntity();
+		return new SwitchBlockTileEntity(pos, state);
 	}
 	
 	@Override

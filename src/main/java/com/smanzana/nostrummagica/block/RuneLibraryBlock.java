@@ -132,7 +132,7 @@ public class RuneLibraryBlock extends BaseEntityBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new RuneLibraryTileEntity();
+		return new RuneLibraryTileEntity(pos, state);
 	}
 	
 	@Override

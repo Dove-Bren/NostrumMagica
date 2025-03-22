@@ -35,7 +35,7 @@ public class ProgressionDoorBlock extends MagicDoorBlock implements EntityBlock 
 		if (!this.isMaster(state))
 			return null;
 		
-		return new ProgressionDoorTileEntity();
+		return new ProgressionDoorTileEntity(pos, state);
 	}
 	
 	@Override

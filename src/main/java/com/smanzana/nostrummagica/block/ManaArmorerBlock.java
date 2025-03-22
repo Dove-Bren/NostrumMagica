@@ -73,7 +73,7 @@ public class ManaArmorerBlock extends BaseEntityBlock {
 //	}
 	
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new ManaArmorerTileEntity();
+		return new ManaArmorerTileEntity(pos, state);
 	}
 	
 //	@Override

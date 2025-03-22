@@ -1,33 +1,36 @@
 package com.smanzana.nostrummagica.block;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.fluid.MysticWaterFluid;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.BucketPickup;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.pathfinder.PathComputationType;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BucketPickup;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -71,12 +74,12 @@ public class MysticWaterBlock extends Block implements BucketPickup {
 	}
 	
 	@Override
-	public Fluid takeLiquid(LevelAccessor worldIn, BlockPos pos, BlockState state) {
+	public ItemStack pickupBlock(LevelAccessor worldIn, BlockPos pos, BlockState state) {
 		// Let the player pick it up regardless of level
 		worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 11);
-		return this.getFluid();
+		return ItemStack.EMPTY;
 	}
-	
+
 	@Override
 	public boolean canBeReplaced(BlockState state, BlockPlaceContext useContext) {
 		return true;
@@ -135,5 +138,10 @@ public class MysticWaterBlock extends Block implements BucketPickup {
 	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
 		worldIn.getLiquidTicks().scheduleTick(currentPos, stateIn.getFluidState().getType(), this.getFluid().getTickDelay(worldIn));
 		return stateIn;
+	}
+
+	@Override
+	public Optional<SoundEvent> getPickupSound() {
+		return Fluids.WATER.getPickupSound();
 	}
 }

@@ -197,7 +197,7 @@ public class TeleportRuneBlock extends BaseEntityBlock  {
 
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new TeleportRuneTileEntity();
+		return new TeleportRuneTileEntity(pos, state);
 	}
 	
 	@Override

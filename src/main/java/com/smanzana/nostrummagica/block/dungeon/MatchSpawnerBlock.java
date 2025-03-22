@@ -66,13 +66,8 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 	}
 	
 	@Override
-	public boolean hasTileEntity(BlockState state) {
-		return true;
-	}
-	
-	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new MatchSpawnerTileEntity();
+		return new MatchSpawnerTileEntity(pos, state);
 	}
 	
 	@Override

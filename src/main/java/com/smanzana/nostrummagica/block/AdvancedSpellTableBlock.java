@@ -32,7 +32,7 @@ public class AdvancedSpellTableBlock extends BasicSpellTableBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new AdvancedSpellTableTileEntity();
+		return new AdvancedSpellTableTileEntity(pos, state);
 	}
 	
 	@Override

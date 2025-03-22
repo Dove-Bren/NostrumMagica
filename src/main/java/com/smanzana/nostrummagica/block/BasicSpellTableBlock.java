@@ -64,7 +64,7 @@ public class BasicSpellTableBlock extends BaseEntityBlock implements ILoreTagged
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new BasicSpellTableTileEntity();
+		return new BasicSpellTableTileEntity(pos, state);
 	}
 	
 	@Override

@@ -63,6 +63,7 @@ public class ObeliskBlock extends Block implements EntityBlock {
 				.strength(2f, 10f)
 				.sound(SoundType.STONE)
 				.noDrops()
+				.lightLevel(ObeliskBlock::getLightValue)
 				);
 		
 		this.registerDefaultState(this.stateDefinition.any()
@@ -75,8 +76,7 @@ public class ObeliskBlock extends Block implements EntityBlock {
         return false;
     }
 	
-	@Override
-	public int getLightValue(BlockState state, BlockGetter world, BlockPos pos) {
+	protected static int getLightValue(BlockState state) {
 		if (state == null)
 			return 0;
 		if (!state.getValue(TILE))
@@ -198,7 +198,7 @@ public class ObeliskBlock extends Block implements EntityBlock {
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		if (state.getValue(TILE))
-			return new ObeliskTileEntity(state.getValue(MASTER));
+			return new ObeliskTileEntity(pos, state, state.getValue(MASTER));
 		
 		return null;
 	}
@@ -279,7 +279,7 @@ public class ObeliskBlock extends Block implements EntityBlock {
 			world.setBlockAndUpdate(center.offset(-offset, 0, i), Blocks.OBSIDIAN.defaultBlockState());
 		}
 		world.setBlockAndUpdate(center, NostrumBlocks.obelisk.getMasterState());
-		world.setBlockEntity(center, new ObeliskTileEntity(true));
+		world.setBlockEntity(new ObeliskTileEntity(center, NostrumBlocks.obelisk.getMasterState(), true));
 		
 		((ObeliskTileEntity) world.getBlockEntity(center)).init();
 		
@@ -299,8 +299,9 @@ public class ObeliskBlock extends Block implements EntityBlock {
 		for (int i = 0; i < TILE_HEIGHT; i++) {
 			BlockPos pos = center.offset(0, i, 0);
 			if (i == TILE_OFFSETY - 1) {
-				world.setBlockAndUpdate(pos, NostrumBlocks.obelisk.getTileState());
-				world.setBlockEntity(pos, new ObeliskTileEntity(corner));
+				final BlockState state = NostrumBlocks.obelisk.getTileState();
+				world.setBlockAndUpdate(pos, state);
+				world.setBlockEntity(new ObeliskTileEntity(pos, state, corner));
 			} else {
 				world.setBlockAndUpdate(pos, NostrumBlocks.obelisk.defaultBlockState());
 			}

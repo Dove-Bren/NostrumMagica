@@ -162,7 +162,7 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new SingleSpawnerTileEntity();
+		return new SingleSpawnerTileEntity(pos, state);
 	}
 	
 //	@Override

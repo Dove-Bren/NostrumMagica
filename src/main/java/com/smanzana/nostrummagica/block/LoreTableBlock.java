@@ -50,7 +50,7 @@ public class LoreTableBlock extends BaseEntityBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new LoreTableTileEntity();
+		return new LoreTableTileEntity(pos, state);
 	}
 	
 	@Override

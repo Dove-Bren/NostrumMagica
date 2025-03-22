@@ -35,15 +35,15 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		if (isMaster(state)) {
-			return new TemporaryPortalTileEntity();
+			return new TemporaryPortalTileEntity(pos, state);
 		}
 		
 		return null;
 	}
 	
-	protected static void spawnPortal(Level worldIn, BlockPos portalMaster, Location target, int duration) {
-		TemporaryPortalTileEntity te = new TemporaryPortalTileEntity(target, worldIn.getGameTime() + duration);
-		worldIn.setBlockEntity(portalMaster, te);
+	protected static void spawnPortal(Level worldIn, BlockPos portalMaster, BlockState portalState, Location target, int duration) {
+		TemporaryPortalTileEntity te = new TemporaryPortalTileEntity(portalMaster, portalState, target, worldIn.getGameTime() + duration);
+		worldIn.setBlockEntity(te);
 	}
 	
 	public static void spawn(Level world, BlockPos at, Location target, int duration) {
@@ -51,7 +51,7 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 		world.setBlockAndUpdate(at, state);
 		NostrumBlocks.temporaryTeleportationPortal.createPaired(world, at);
 		
-		spawnPortal(world, at, target, duration);
+		spawnPortal(world, at, state, target, duration);
 	}
 	
 	public static BlockPos spawnNearby(Level world, BlockPos center, double radius, boolean centerValid, Location target, int duration) {

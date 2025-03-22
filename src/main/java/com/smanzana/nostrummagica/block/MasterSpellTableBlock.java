@@ -130,7 +130,7 @@ public class MasterSpellTableBlock extends HorizontalDirectionalBlock implements
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		if (state.getValue(MASTER))
-			return new SpellTableTileEntity();
+			return new SpellTableTileEntity(pos, state);
 		
 		return null;
 	}

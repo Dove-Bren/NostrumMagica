@@ -23,7 +23,7 @@ public class TriggeredMatchSpawnerBlock extends MatchSpawnerBlock implements ITr
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new TriggeredMatchSpawnerTileEntity();
+		return new TriggeredMatchSpawnerTileEntity(pos, state);
 	}
 
 	@Override

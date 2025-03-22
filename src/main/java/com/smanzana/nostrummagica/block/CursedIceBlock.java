@@ -109,7 +109,8 @@ public class CursedIceBlock extends HalfTransparentBlock {
 		}
     }
 	
-	public void stepOn(Level worldIn, BlockPos pos, Entity entityIn) {
+	@Override
+	public void stepOn(Level worldIn, BlockPos pos, BlockState state, Entity entityIn) {
 		
 		if (!worldIn.isClientSide) {
 			int amp = 0;
@@ -123,7 +124,7 @@ public class CursedIceBlock extends HalfTransparentBlock {
 			}
 		}
 		
-		super.stepOn(worldIn, pos, entityIn);
+		super.stepOn(worldIn, pos, state, entityIn);
     }
 
 }

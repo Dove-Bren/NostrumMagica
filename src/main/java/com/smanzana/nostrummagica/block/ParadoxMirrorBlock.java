@@ -193,7 +193,7 @@ public class ParadoxMirrorBlock extends BaseEntityBlock implements ILoreTagged {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new ParadoxMirrorTileEntity();
+		return new ParadoxMirrorTileEntity(pos, state);
 	}
 	
 	@Override
