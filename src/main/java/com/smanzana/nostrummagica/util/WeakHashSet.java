@@ -82,7 +82,7 @@ public class WeakHashSet<T> implements Set<T> {
 		while (it.hasNext()) {
 			T elem = it.next();
 			if (!c.contains(elem)) {
-				it.discard();
+				it.remove();
 				modified = true;
 			}
 		}

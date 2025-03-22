@@ -206,7 +206,7 @@ public abstract class CombatTrialStaged extends CombatTrial {
 			while (it.hasNext()) {
 				Mob ent = it.next();
 				if (ent == null || !ent.isAlive()) {
-					it.discard();
+					it.remove();
 				}
 			}
 			
