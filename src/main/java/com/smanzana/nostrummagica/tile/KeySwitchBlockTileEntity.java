@@ -12,18 +12,19 @@ import com.smanzana.nostrummagica.entity.KeySwitchTriggerEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.Util;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchTriggerEntity> implements IWorldKeyHolder, IUniqueBlueprintTileEntity {
 	
@@ -31,15 +32,15 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	private DyeColor color;
 	private boolean triggered;
 	
-	public KeySwitchBlockTileEntity() {
-		super(NostrumTileEntities.KeySwitchTileEntityType);
+	public KeySwitchBlockTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.KeySwitchTileEntityType, pos, state);
 		key = new WorldKey();
 		color = DyeColor.RED;
 		triggered = false;
 	}
 	
-	public KeySwitchBlockTileEntity(WorldKey key) {
-		this();
+	public KeySwitchBlockTileEntity(WorldKey key, BlockPos pos, BlockState state) {
+		this(pos, state);
 		this.key = key;
 	}
 	
@@ -59,8 +60,8 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		this.key = WorldKey.fromNBT(nbt.getCompound(NBT_KEY));
 		try {
@@ -133,7 +134,7 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 				30, worldPosition.getX() + .5, worldPosition.getY() + 1.5, worldPosition.getZ() + .5, 0,
 				50, 10,
 				Vec3.ZERO, new Vec3(.075, .05, .075)
-				).gravity(-.1f).color(this.getColor().getColorValue() | 0xAA000000));
+				).gravity(-.1f).color(this.getColor().getTextColor() | 0xAA000000));
 	}
 	
 	@Override

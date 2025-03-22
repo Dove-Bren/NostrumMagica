@@ -6,15 +6,16 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
@@ -24,13 +25,13 @@ public class MimicBlockTileEntity extends BlockEntity {
 	
 	protected final MimicBlock.MimicBlockData data;
 	
-	protected MimicBlockTileEntity(BlockEntityType<? extends MimicBlockTileEntity> type) {
-		super(type);
+	protected MimicBlockTileEntity(BlockEntityType<? extends MimicBlockTileEntity> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 		this.data = new MimicBlock.MimicBlockData();
 	}
 	
-	public MimicBlockTileEntity() {
-		this(NostrumTileEntities.MimicBlockTileEntityType);
+	public MimicBlockTileEntity(BlockPos pos, BlockState state) {
+		this(NostrumTileEntities.MimicBlockTileEntityType, pos, state);
 	}
 
 	public MimicBlock.MimicBlockData getData() {
@@ -59,7 +60,7 @@ public class MimicBlockTileEntity extends BlockEntity {
 	
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-		this.handleUpdateTag(this.getBlockState(), pkt.getTag());
+		this.handleUpdateTag(pkt.getTag());
 	}
 	
 	protected @Nonnull BlockState refreshState() {
@@ -67,8 +68,8 @@ public class MimicBlockTileEntity extends BlockEntity {
 	}
 	
 	@Override
-	public void handleUpdateTag(BlockState state, CompoundTag tag) {
-		super.handleUpdateTag(state, tag);
+	public void handleUpdateTag(CompoundTag tag) {
+		super.handleUpdateTag(tag);
 		
 		final BlockState newState;
 		

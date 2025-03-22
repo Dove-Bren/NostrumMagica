@@ -5,10 +5,13 @@ import java.util.UUID;
 import com.smanzana.autodungeons.AutoDungeons;
 import com.smanzana.nostrummagica.block.dungeon.DungeonDoorBlock;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+
 public class DungeonDoorTileEntity extends LockedDoorTileEntity {
 
-	public DungeonDoorTileEntity() {
-		super(NostrumTileEntities.DungeonDoorTileEntityType);
+	public DungeonDoorTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.DungeonDoorTileEntityType, pos, state);
 	}
 	
 	@Override

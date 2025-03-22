@@ -10,19 +10,19 @@ import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.nbt.Tag;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class ProgressionDoorTileEntity extends BlockEntity {
 	
@@ -30,8 +30,8 @@ public class ProgressionDoorTileEntity extends BlockEntity {
 	private int requiredLevel;
 	private EMagicTier requiredTier;
 	
-	public ProgressionDoorTileEntity() {
-		super(NostrumTileEntities.ProgressionDoorTileEntityType);
+	public ProgressionDoorTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.ProgressionDoorTileEntityType, pos, state);
 		
 		requiredComponents = new HashSet<>();
 		requiredLevel = 0;
@@ -134,8 +134,8 @@ public class ProgressionDoorTileEntity extends BlockEntity {
 	private static final String NBT_COMPS = "required_componenets";
 	
 	@Override
-	public void load(BlockState state, CompoundTag compound) {
-		super.load(state, compound);
+	public void load(CompoundTag compound) {
+		super.load(compound);
 		
 		this.requiredLevel = compound.getInt(NBT_LEVEL);
 		this.requiredTier = EMagicTier.FromNBT(compound.get(NBT_TIER));
@@ -181,7 +181,7 @@ public class ProgressionDoorTileEntity extends BlockEntity {
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getTag());
+		handleUpdateTag(pkt.getTag());
 	}
 	
 	protected void dirty() {

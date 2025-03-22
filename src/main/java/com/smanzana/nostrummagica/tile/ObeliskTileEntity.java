@@ -17,26 +17,25 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.world.NostrumChunkLoader;
 
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.TicketType;
-import net.minecraft.nbt.Tag;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraftforge.fmllegacy.server.ServerLifecycleHooks;
 
 public class ObeliskTileEntity extends BlockEntity implements TickableBlockEntity {
 	
@@ -151,8 +150,8 @@ public class ObeliskTileEntity extends BlockEntity implements TickableBlockEntit
 	
 	private boolean isDestructing;
 	
-	public ObeliskTileEntity() {
-		super(NostrumTileEntities.NostrumObeliskEntityType); //, 0, 2000);
+	public ObeliskTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.NostrumObeliskEntityType, pos, state); //, 0, 2000);
 		master = false;
 		isDestructing = false;
 		targets = new LinkedList<>();
@@ -162,13 +161,13 @@ public class ObeliskTileEntity extends BlockEntity implements TickableBlockEntit
 		//this.compWrapper.configureInOut(true, false);
 	}
 	
-	public ObeliskTileEntity(boolean master) {
-		this();
+	public ObeliskTileEntity(BlockPos pos, BlockState state, boolean master) {
+		this(pos, state);
 		this.master = master;
 	}
 	
-	public ObeliskTileEntity(Corner corner) {
-		this(false);
+	public ObeliskTileEntity(BlockPos pos, BlockState state, Corner corner) {
+		this(pos, state, false);
 		this.corner = corner;
 	}
 	
@@ -200,8 +199,8 @@ public class ObeliskTileEntity extends BlockEntity implements TickableBlockEntit
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_MASTER, Tag.TAG_BYTE))
 			return;
@@ -469,7 +468,7 @@ public class ObeliskTileEntity extends BlockEntity implements TickableBlockEntit
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getTag());
+		handleUpdateTag(pkt.getTag());
 	}
 	
 	// Registers this TE as a chunk loader. Gets a ticket and forces the chunk.

@@ -12,13 +12,14 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.SpellEffectEvent.SpellEffectEndEvent;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -32,8 +33,8 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	protected float lastDamage;
 	protected @Nullable LivingEntity lastAttacker;
 	
-	protected CursedGlassTileEntity(BlockEntityType<? extends CursedGlassTileEntity> tileType) {
-		super(tileType);
+	protected CursedGlassTileEntity(BlockEntityType<? extends CursedGlassTileEntity> tileType, BlockPos pos, BlockState state) {
+		super(tileType, pos, state);
 		requiredDamage = 4f;
 		lastDamageTicks = -1;
 		lastDamage = 0f;
@@ -42,8 +43,8 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
-	public CursedGlassTileEntity() {
-		this(NostrumTileEntities.CursedGlassType);
+	public CursedGlassTileEntity(BlockPos pos, BlockState state) {
+		this(NostrumTileEntities.CursedGlassType, pos, state);
 	}
 	
 	private static final String NBT_REQUIRED_DAMAGE = "required_damage";
@@ -64,8 +65,8 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		this.requiredDamage = nbt.getFloat(NBT_REQUIRED_DAMAGE);
 		if (nbt.contains(NBT_REQUIRED_ELEMENT)) {

@@ -18,18 +18,17 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.sounds.SoundSource;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public class ManaArmorerTileEntity extends BlockEntity implements TickableBlockEntity {
@@ -49,16 +48,11 @@ public class ManaArmorerTileEntity extends BlockEntity implements TickableBlockE
 	protected int ticksExisted;
 	protected float rotationProg;
 	
-	public ManaArmorerTileEntity() {
-		super(NostrumTileEntities.ManaArmorerTileEntityType);
+	public ManaArmorerTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.ManaArmorerTileEntityType, pos, state);
 		this.activeCrystals = new ArrayList<>(MAX_CRYSTALS);
 		this.ticksExisted = 0;
 		this.rotationProg = 0;
-	}
-	
-	@Override
-	public double getViewDistance() {
-		return super.getViewDistance();
 	}
 	
 	public boolean isActive() {
@@ -413,8 +407,8 @@ public class ManaArmorerTileEntity extends BlockEntity implements TickableBlockE
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null)
 			return;
@@ -444,7 +438,7 @@ public class ManaArmorerTileEntity extends BlockEntity implements TickableBlockE
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getTag());
+		handleUpdateTag(pkt.getTag());
 	}
 	
 	private void dirty() {

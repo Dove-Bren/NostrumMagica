@@ -6,14 +6,14 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.SpellRune;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.Container;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class RuneShaperTileEntity extends BlockEntity implements Container {
 
@@ -26,8 +26,8 @@ public class RuneShaperTileEntity extends BlockEntity implements Container {
 	
 	private @Nonnull ItemStack slots[];
 	
-	public RuneShaperTileEntity() {
-		super(NostrumTileEntities.RuneShaperEntityType);
+	public RuneShaperTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.RuneShaperEntityType, pos, state);
 		slots = new ItemStack[getContainerSize()];
 		for (int i = 0; i < slots.length; i++) {
 			slots[i] = ItemStack.EMPTY;
@@ -151,8 +151,8 @@ public class RuneShaperTileEntity extends BlockEntity implements Container {
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_INV, Tag.TAG_COMPOUND))
 			return;

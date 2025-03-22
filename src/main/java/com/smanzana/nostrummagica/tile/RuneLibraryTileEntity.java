@@ -4,13 +4,14 @@ import com.smanzana.nostrummagica.block.RuneLibraryBlock;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.util.Inventories;
 
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -22,8 +23,8 @@ public class RuneLibraryTileEntity extends BlockEntity {
 	
 	private final SimpleContainer inventory;
 	
-	public RuneLibraryTileEntity() {
-		super(NostrumTileEntities.RuneLibraryType);
+	public RuneLibraryTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.RuneLibraryType, pos, state);
 		this.inventory = new SimpleContainer(27) {
 			@Override
 			public boolean canPlaceItem(int index, ItemStack stack) {
@@ -81,8 +82,8 @@ public class RuneLibraryTileEntity extends BlockEntity {
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null)
 			return;

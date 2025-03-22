@@ -3,14 +3,16 @@ package com.smanzana.nostrummagica.tile;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PortalBlock;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class SorceryPortalTileEntity extends PortalBlock.NostrumPortalTileEntityBase  {
 	
-	public SorceryPortalTileEntity() {
-		super(NostrumTileEntities.SorceryPortalTileEntityType);
+	public SorceryPortalTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.SorceryPortalTileEntityType, pos, state);
 	}
 
 	@OnlyIn(Dist.CLIENT)

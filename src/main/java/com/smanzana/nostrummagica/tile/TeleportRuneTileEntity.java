@@ -15,22 +15,21 @@ import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.nbt.Tag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.Shapes;
 
 public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTileEntity, TickableBlockEntity {
 	
@@ -42,8 +41,8 @@ public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTile
 	
 	private BlockPos teleOffset = null;
 	
-	public TeleportRuneTileEntity() {
-		super(NostrumTileEntities.TeleportRuneTileEntityType);
+	public TeleportRuneTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.TeleportRuneTileEntityType, pos, state);
 	}
 	
 	/**
@@ -92,9 +91,10 @@ public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTile
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getTag());
+		handleUpdateTag(pkt.getTag());
 	}
 	
+	@Override
 	public CompoundTag save(CompoundTag compound) {
 		super.save(compound);
 		
@@ -105,8 +105,9 @@ public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTile
 		return compound;
 	}
 	
-	public void load(BlockState state, CompoundTag compound) {
-		super.load(state, compound);
+	@Override
+	public void load(CompoundTag compound) {
+		super.load(compound);
 		
 		teleOffset = null;
 		if (compound.contains(NBT_OFFSET, Tag.TAG_LONG)) {

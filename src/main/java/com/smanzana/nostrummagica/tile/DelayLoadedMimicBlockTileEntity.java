@@ -2,8 +2,9 @@ package com.smanzana.nostrummagica.tile;
 
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock.MimicBlockData;
 
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Hacky specialization that notices when it's not mimicking anything (air) and ticks to try and find something
@@ -15,17 +16,16 @@ public class DelayLoadedMimicBlockTileEntity extends MimicBlockTileEntity implem
 	protected boolean loading;
 	protected int loadingTicks;
 	
-	protected DelayLoadedMimicBlockTileEntity(BlockEntityType<? extends DelayLoadedMimicBlockTileEntity> type) {
-		super(type);
+	protected DelayLoadedMimicBlockTileEntity(BlockEntityType<? extends DelayLoadedMimicBlockTileEntity> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 		this.loading = true;
 	}
 	
-	public DelayLoadedMimicBlockTileEntity() {
-		this(NostrumTileEntities.DelayedMimicBlockTileEntityType);
+	public DelayLoadedMimicBlockTileEntity(BlockPos pos, BlockState state) {
+		this(NostrumTileEntities.DelayedMimicBlockTileEntityType, pos, state);
 		this.loading = true;
 	}
 	
-	@SuppressWarnings("deprecation")
 	protected boolean successfullyLoaded() {
 		MimicBlockData data = this.getData();
 		return data != null && data.mimicState != null && !data.mimicState.isAir();

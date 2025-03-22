@@ -8,15 +8,15 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PutterBlock;
 import com.smanzana.nostrummagica.util.Inventories;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -32,8 +32,8 @@ public class PutterBlockTileEntity extends BlockEntity implements TickableBlockE
 	private ItemEntity itemEntCache = null;
 	private int ticksExisted;
 	
-	public PutterBlockTileEntity() {
-		super(NostrumTileEntities.PutterBlockTileEntityType);
+	public PutterBlockTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.PutterBlockTileEntityType, pos, state);
 		final PutterBlockTileEntity putter = this;
 		this.inventory = new SimpleContainer(9) {
 			@Override
@@ -57,8 +57,8 @@ public class PutterBlockTileEntity extends BlockEntity implements TickableBlockE
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null)
 			return;
@@ -183,7 +183,7 @@ public class PutterBlockTileEntity extends BlockEntity implements TickableBlockE
 		newItem.setDeltaMovement(oldItem.getDeltaMovement());
 		newItem.lifespan = oldItem.lifespan;
 		oldItem.level.addFreshEntity(newItem);
-		oldItem.remove();
+		oldItem.discard();
 		return newItem;
 	}
 	

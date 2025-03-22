@@ -6,16 +6,17 @@ import com.smanzana.nostrumaetheria.api.blocks.IAetherInfusableTileEntity;
 import com.smanzana.nostrumaetheria.api.blocks.IAetherInfuserTileEntity;
 import com.smanzana.nostrumaetheria.api.item.IAetherInfuserLens;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.WorldlyContainer;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class AltarTileEntity extends BlockEntity implements WorldlyContainer, IAetherInfusableTileEntity {
 	
@@ -24,8 +25,8 @@ public class AltarTileEntity extends BlockEntity implements WorldlyContainer, IA
 	// Transient display variables
 	private boolean hideItem;
 	
-	public AltarTileEntity() {
-		super(NostrumTileEntities.AltarTileEntityType);
+	public AltarTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.AltarTileEntityType, pos, state);
 	}
 	
 	public @Nonnull ItemStack getItem() {
@@ -67,8 +68,8 @@ public class AltarTileEntity extends BlockEntity implements WorldlyContainer, IA
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null)
 			return;
@@ -94,7 +95,7 @@ public class AltarTileEntity extends BlockEntity implements WorldlyContainer, IA
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getTag());
+		handleUpdateTag(pkt.getTag());
 	}
 	
 	private void dirty() {

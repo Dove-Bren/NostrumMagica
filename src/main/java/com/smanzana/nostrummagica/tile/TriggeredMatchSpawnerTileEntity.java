@@ -1,7 +1,8 @@
 package com.smanzana.nostrummagica.tile;
 
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
 	
@@ -9,8 +10,8 @@ public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
 	
 	protected boolean triggered;
 	
-	public TriggeredMatchSpawnerTileEntity() {
-		super(NostrumTileEntities.TriggeredMatchSpawnerTileEntityType);
+	public TriggeredMatchSpawnerTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.TriggeredMatchSpawnerTileEntityType, pos, state);
 	}
 	
 	public boolean isTriggered() {
@@ -37,8 +38,8 @@ public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		this.triggered = nbt.getBoolean(NBT_TRIGGERED);
 	}

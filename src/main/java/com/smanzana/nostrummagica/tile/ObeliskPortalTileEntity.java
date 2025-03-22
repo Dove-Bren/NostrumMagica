@@ -6,15 +6,17 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PortalBlock;
 import com.smanzana.nostrummagica.util.Location;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class ObeliskPortalTileEntity extends TeleportationPortalTileEntity {
 	
-	public ObeliskPortalTileEntity() {
-		super(NostrumTileEntities.ObeliskPortalTileEntityType);
+	public ObeliskPortalTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.ObeliskPortalTileEntityType, pos, state);
 	}
 	
 	@Override

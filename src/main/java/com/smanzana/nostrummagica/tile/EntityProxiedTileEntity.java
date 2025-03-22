@@ -4,24 +4,24 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.entity.TileProxyTriggerEntity;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.Level;
 
 public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?>> extends BlockEntity implements TickableBlockEntity {
 
 	private E triggerEntity;
 	
-	protected EntityProxiedTileEntity(BlockEntityType<? extends EntityProxiedTileEntity<E>> type) {
-		super(type);
+	protected EntityProxiedTileEntity(BlockEntityType<? extends EntityProxiedTileEntity<E>> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 	}
 	
 	@Override
@@ -37,7 +37,7 @@ public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getTag());
+		handleUpdateTag(pkt.getTag());
 	}
 	
 	protected void dirty() {
@@ -74,7 +74,7 @@ public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?
 					|| triggerEntity.distanceToSqr(worldPosition.getX() + offset.x(), worldPosition.getY() + offset.y(), worldPosition.getZ() + offset.z()) > 1.5) {
 				// Entity is dead OR is too far away
 				if (triggerEntity != null && !triggerEntity.isAlive()) {
-					triggerEntity.remove();
+					triggerEntity.discard();
 				}
 				
 				triggerEntity = makeTriggerEntity(this.getLevel(), worldPosition.getX() + offset.x(), worldPosition.getY() + offset.y(), worldPosition.getZ() + offset.z());
@@ -82,7 +82,7 @@ public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?
 			}
 		} else {
 			if (this.triggerEntity != null) {
-				this.triggerEntity.remove();
+				this.triggerEntity.discard();
 				this.triggerEntity = null;
 			}
 		}
@@ -96,7 +96,7 @@ public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 	}
 }

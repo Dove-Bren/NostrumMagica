@@ -7,17 +7,18 @@ import com.smanzana.nostrummagica.block.PortalBlock;
 import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraft.nbt.Tag;
 
 public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTileEntityBase  {
 
@@ -26,21 +27,21 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	
 	private Location target;
 	
-	protected TeleportationPortalTileEntity(BlockEntityType<?> type) {
-		super(type);
+	protected TeleportationPortalTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 	}
 	
-	public TeleportationPortalTileEntity() {
-		this(NostrumTileEntities.TeleportationPortalTileEntityType);
+	public TeleportationPortalTileEntity(BlockPos pos, BlockState state) {
+		this(NostrumTileEntities.TeleportationPortalTileEntityType, pos, state);
 	}
 	
-	protected TeleportationPortalTileEntity(BlockEntityType<?> type, Location target) {
-		this(type);
+	protected TeleportationPortalTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, Location target) {
+		this(type, pos, state);
 		this.setTarget(target);
 	}
 	
-	public TeleportationPortalTileEntity(Location target) {
-		this(NostrumTileEntities.TeleportationPortalTileEntityType, target);
+	public TeleportationPortalTileEntity(BlockPos pos, BlockState state, Location target) {
+		this(NostrumTileEntities.TeleportationPortalTileEntityType, pos, state, target);
 	}
 	
 	public @Nullable Location getTarget() {
@@ -84,8 +85,8 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag compound) {
-		super.load(state, compound);
+	public void load(CompoundTag compound) {
+		super.load(compound);
 		
 		if (compound.contains(NBT_TARGET_LEGACY, Tag.TAG_LONG)) {
 			// Legacy!
@@ -124,7 +125,7 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getTag());
+		handleUpdateTag(pkt.getTag());
 	}
 	
 }

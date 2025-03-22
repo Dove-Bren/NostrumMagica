@@ -4,10 +4,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PortalBlock;
 import com.smanzana.nostrummagica.util.Location;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -15,12 +15,12 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 
 	private long endticks;
 	
-	public TemporaryPortalTileEntity() {
-		super(NostrumTileEntities.TemporaryPortalTileEntityType);
+	public TemporaryPortalTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.TemporaryPortalTileEntityType, pos, state);
 	}
 	
-	public TemporaryPortalTileEntity(Location target, long endticks) {
-		super(NostrumTileEntities.TemporaryPortalTileEntityType, target);
+	public TemporaryPortalTileEntity(BlockPos pos, BlockState state, Location target, long endticks) {
+		super(NostrumTileEntities.TemporaryPortalTileEntityType, pos, state, target);
 		this.endticks = endticks;
 		this.setChanged();
 	}
@@ -75,8 +75,8 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag compound) {
-		super.load(state, compound);
+	public void load(CompoundTag compound) {
+		super.load(compound);
 		
 		endticks = compound.getLong("EXPIRE");
 	}

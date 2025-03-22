@@ -344,8 +344,8 @@ public abstract class PortalBlock extends Block implements IPortalBlock, EntityB
 	
 	public static abstract class NostrumPortalTileEntityBase extends BlockEntity {
 		
-		public NostrumPortalTileEntityBase(BlockEntityType<?> tileEntityTypeIn) {
-			super(tileEntityTypeIn);
+		public NostrumPortalTileEntityBase(BlockEntityType<?> tileEntityTypeIn, BlockPos pos, BlockState state) {
+			super(tileEntityTypeIn, pos, state);
 		}
 
 		/**

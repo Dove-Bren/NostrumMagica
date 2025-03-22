@@ -4,22 +4,22 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SingleSpawnerTileEntity extends BlockEntity implements TickableBlockEntity {
 	
 	protected int ticksExisted;
 	
-	public SingleSpawnerTileEntity() {
-		this(NostrumTileEntities.SingleSpawnerTileEntityType);
+	public SingleSpawnerTileEntity(BlockPos pos, BlockState state) {
+		this(NostrumTileEntities.SingleSpawnerTileEntityType, pos, state);
 	}
 	
-	protected SingleSpawnerTileEntity(BlockEntityType<?> type) {
-		super(type);
+	protected SingleSpawnerTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 		ticksExisted = 0;
 	}
 	

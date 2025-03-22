@@ -14,30 +14,29 @@ import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.Inventories;
 
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ArrowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TippedArrowItem;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
 
 public class DungeonLauncherTileEntity extends BlockEntity implements TickableBlockEntity {
 
@@ -49,8 +48,8 @@ public class DungeonLauncherTileEntity extends BlockEntity implements TickableBl
 	private int cooldownTicks;
 	private int ticksExisted;
 	
-	public DungeonLauncherTileEntity() {
-		super(NostrumTileEntities.DungeonLauncherTileType);
+	public DungeonLauncherTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.DungeonLauncherTileType, pos, state);
 		this.inventory = new SimpleContainer(9) {
 			@Override
 			public void setChanged() {
@@ -265,8 +264,8 @@ public class DungeonLauncherTileEntity extends BlockEntity implements TickableBl
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null)
 			return;

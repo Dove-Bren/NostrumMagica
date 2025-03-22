@@ -5,15 +5,14 @@ import java.util.Random;
 import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class CandleTileEntity extends BlockEntity implements TickableBlockEntity, IReagentProviderTile {
 	
@@ -22,13 +21,13 @@ public class CandleTileEntity extends BlockEntity implements TickableBlockEntity
 	private ReagentType type;
 	private int lifeTicks;
 	
-	public CandleTileEntity(ReagentType type) {
-		this();
+	public CandleTileEntity(ReagentType type, BlockPos pos, BlockState state) {
+		this(pos, state);
 		this.type = type;
 	}
 	
-	public CandleTileEntity() {
-		super(NostrumTileEntities.CandleTileEntityType);
+	public CandleTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.CandleTileEntityType, pos, state);
 		this.lifeTicks = (20 * 15) + CandleTileEntity.rand.nextInt(20*30);
 	}
 	
@@ -61,8 +60,8 @@ public class CandleTileEntity extends BlockEntity implements TickableBlockEntity
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_TYPE, Tag.TAG_STRING))
 			return;
@@ -83,7 +82,7 @@ public class CandleTileEntity extends BlockEntity implements TickableBlockEntity
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getTag());
+		handleUpdateTag(pkt.getTag());
 	}
 	
 	private void dirty() {

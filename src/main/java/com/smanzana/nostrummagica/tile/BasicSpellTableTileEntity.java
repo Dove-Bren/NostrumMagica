@@ -15,16 +15,16 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class BasicSpellTableTileEntity extends BlockEntity implements ISpellCraftingInventory, ISpellCraftingTileEntity {
 
@@ -38,12 +38,12 @@ public class BasicSpellTableTileEntity extends BlockEntity implements ISpellCraf
 	
 	private @Nonnull ItemStack slots[];
 	
-	public BasicSpellTableTileEntity() {
-		this(NostrumTileEntities.BasicSpellTableType);
+	public BasicSpellTableTileEntity(BlockPos pos, BlockState state) {
+		this(NostrumTileEntities.BasicSpellTableType, pos, state);
 	}
 	
-	protected BasicSpellTableTileEntity(BlockEntityType<? extends BasicSpellTableTileEntity> type) {
-		super(type);
+	protected BasicSpellTableTileEntity(BlockEntityType<? extends BasicSpellTableTileEntity> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 		slots = new ItemStack[getContainerSize()];
 		for (int i = 0; i < slots.length; i++)
 			slots[i] = ItemStack.EMPTY;
@@ -176,8 +176,8 @@ public class BasicSpellTableTileEntity extends BlockEntity implements ISpellCraf
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null || !nbt.contains(NBT_INV, Tag.TAG_COMPOUND))
 			return;

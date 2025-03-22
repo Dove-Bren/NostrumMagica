@@ -14,17 +14,17 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements IOrientedTileEntity {
 	
@@ -36,12 +36,12 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	
 	private UUID unlinkedEntID;
 	
-	protected MatchSpawnerTileEntity(BlockEntityType<? extends MatchSpawnerTileEntity> type) {
-		super(type);
+	protected MatchSpawnerTileEntity(BlockEntityType<? extends MatchSpawnerTileEntity> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 	}
 	
-	public MatchSpawnerTileEntity() {
-		this(NostrumTileEntities.MatchSpawnerTileEntityType);
+	public MatchSpawnerTileEntity(BlockPos pos, BlockState state) {
+		this(NostrumTileEntities.MatchSpawnerTileEntityType, pos, state);
 	}
 	
 	public void setTriggerOffset(BlockPos offset) {
@@ -153,8 +153,8 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt.hasUUID(NBT_ENTITY_ID)) {
 			this.unlinkedEntID = nbt.getUUID(NBT_ENTITY_ID);

@@ -7,23 +7,22 @@ import com.smanzana.nostrummagica.block.ActiveHopperBlock;
 import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.ChestBlock;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.Hopper;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -38,8 +37,8 @@ public class ActiveHopperTileEntity extends BlockEntity implements Hopper, World
 	private @Nullable String customName;
 	private int transferCooldown = -1;
 	
-	public ActiveHopperTileEntity() {
-		super(NostrumTileEntities.ActiveHopperTileEntityType);
+	public ActiveHopperTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.ActiveHopperTileEntityType, pos, state);
 	}
 	
 	@Override
@@ -60,8 +59,8 @@ public class ActiveHopperTileEntity extends BlockEntity implements Hopper, World
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		slot = (nbt.contains(NBT_SLOT) ? ItemStack.of(nbt.getCompound(NBT_SLOT)) : ItemStack.EMPTY); // nulls if empty
 		customName = (nbt.contains(NBT_CUSTOMNAME) ? nbt.getString(NBT_CUSTOMNAME) : null);

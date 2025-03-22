@@ -14,19 +14,19 @@ import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.trial.CombatTrial;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class TrialBlockTileEntity extends BlockEntity implements TickableBlockEntity {
 	
@@ -40,8 +40,8 @@ public class TrialBlockTileEntity extends BlockEntity implements TickableBlockEn
 	// Tracks ticks after a trial is started, used for delaying startup and effects
 	private int trialTicks;
 	
-	public TrialBlockTileEntity() {
-		super(NostrumTileEntities.TrialBlockEntityType);
+	public TrialBlockTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.TrialBlockEntityType, pos, state);
 		setScale(1f);
 		
 		activeTrial = null;
@@ -56,11 +56,6 @@ public class TrialBlockTileEntity extends BlockEntity implements TickableBlockEn
 	
 	protected void setScale(float scale) {
 		this.scale = scale;
-	}
-	
-	@Override
-	public double getViewDistance() {
-		return super.getViewDistance();
 	}
 	
 	public void setElement(EMagicElement element) {
@@ -84,8 +79,8 @@ public class TrialBlockTileEntity extends BlockEntity implements TickableBlockEn
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		this.element = EMagicElement.FromNBT(nbt.get(NBT_ELEMENT));
 	}
@@ -256,7 +251,7 @@ public class TrialBlockTileEntity extends BlockEntity implements TickableBlockEn
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getTag());
+		handleUpdateTag(pkt.getTag());
 	}
 	
 	protected void dirty() {

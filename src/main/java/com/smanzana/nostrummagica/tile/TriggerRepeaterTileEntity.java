@@ -11,20 +11,20 @@ import com.smanzana.autodungeons.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.Direction;
-import net.minecraft.Util;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedTileEntity {
 	
@@ -32,13 +32,13 @@ public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedT
 	
 	private List<BlockPos> offsets;
 	
-	protected TriggerRepeaterTileEntity(BlockEntityType<? extends TriggerRepeaterTileEntity> type) {
-		super(type);
+	protected TriggerRepeaterTileEntity(BlockEntityType<? extends TriggerRepeaterTileEntity> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 		offsets = new ArrayList<>();
 	}
 	
-	public TriggerRepeaterTileEntity() {
-		this(NostrumTileEntities.TriggerRepeaterTileEntityType);
+	public TriggerRepeaterTileEntity(BlockPos pos, BlockState state) {
+		this(NostrumTileEntities.TriggerRepeaterTileEntityType, pos, state);
 	}
 	
 	// Calculates the offset to the given pos and saves it
@@ -73,9 +73,10 @@ public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedT
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getTag());
+		handleUpdateTag(pkt.getTag());
 	}
 	
+	@Override
 	public CompoundTag save(CompoundTag compound) {
 		super.save(compound);
 		
@@ -88,8 +89,9 @@ public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedT
 		return compound;
 	}
 	
-	public void load(BlockState state, CompoundTag compound) {
-		super.load(state, compound);
+	@Override
+	public void load(CompoundTag compound) {
+		super.load(compound);
 		
 		ListTag list = compound.getList(NBT_OFFSET_LIST, Tag.TAG_COMPOUND);
 		offsets.clear();

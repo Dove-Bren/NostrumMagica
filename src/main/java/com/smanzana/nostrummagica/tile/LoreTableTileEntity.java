@@ -8,13 +8,13 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class LoreTableTileEntity extends BlockEntity implements TickableBlockEntity {
 
@@ -23,8 +23,8 @@ public class LoreTableTileEntity extends BlockEntity implements TickableBlockEnt
 	private String lorekey;
 	private int ticksExisted;
 	
-	public LoreTableTileEntity() {
-		super(NostrumTileEntities.LoreTableEntityType);
+	public LoreTableTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.LoreTableEntityType, pos, state);
 		progress = 0f;
 		lorekey = null;
 		item = ItemStack.EMPTY;
@@ -112,8 +112,8 @@ public class LoreTableTileEntity extends BlockEntity implements TickableBlockEnt
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null)
 			return;

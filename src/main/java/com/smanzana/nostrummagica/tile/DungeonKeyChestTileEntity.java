@@ -10,18 +10,19 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction.Axis;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction.Axis;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.phys.Vec3;
 
 public class DungeonKeyChestTileEntity extends BlockEntity implements IWorldKeyHolder {
 	
@@ -31,14 +32,14 @@ public class DungeonKeyChestTileEntity extends BlockEntity implements IWorldKeyH
 	// Ticks when opened, for client animation
 	private long openTicks = -1;
 	
-	public DungeonKeyChestTileEntity() {
-		super(NostrumTileEntities.DungeonKeyChestTileEntityType);
+	public DungeonKeyChestTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.DungeonKeyChestTileEntityType, pos, state);
 		key = new WorldKey();
 		triggered = false;
 	}
 	
-	public DungeonKeyChestTileEntity(WorldKey key) {
-		this();
+	public DungeonKeyChestTileEntity(WorldKey key, BlockPos pos, BlockState state) {
+		this(pos, state);
 		this.key = key;
 	}
 	
@@ -55,7 +56,7 @@ public class DungeonKeyChestTileEntity extends BlockEntity implements IWorldKeyH
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getTag());
+		handleUpdateTag(pkt.getTag());
 	}
 	
 	protected void dirty() {
@@ -77,8 +78,8 @@ public class DungeonKeyChestTileEntity extends BlockEntity implements IWorldKeyH
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		this.key = WorldKey.fromNBT(nbt.getCompound(NBT_KEY));
 		this.triggered = nbt.getBoolean(NBT_TRIGGERED);

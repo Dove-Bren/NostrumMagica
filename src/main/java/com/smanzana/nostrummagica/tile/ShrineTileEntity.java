@@ -5,28 +5,28 @@ import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.ShrineTriggerEntity;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends EntityProxiedTileEntity<E> {
 
@@ -35,8 +35,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 	
 	private int hitCount;
 	
-	protected ShrineTileEntity(BlockEntityType<? extends ShrineTileEntity<E>> type) {
-		super(type);
+	protected ShrineTileEntity(BlockEntityType<? extends ShrineTileEntity<E>> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 		hitCount = 0;
 	}
 	
@@ -99,8 +99,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		this.hitCount = nbt.getInt(NBT_HITS);
 	}
@@ -124,8 +124,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		
 		private EMagicElement element;
 		
-		public Element() {
-			super(NostrumTileEntities.ElementShrineTileType);
+		public Element(BlockPos pos, BlockState state) {
+			super(NostrumTileEntities.ElementShrineTileType, pos, state);
 			this.element = EMagicElement.PHYSICAL;
 		}
 		
@@ -148,8 +148,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public void load(BlockState state, CompoundTag nbt) {
-			super.load(state, nbt);
+		public void load(CompoundTag nbt) {
+			super.load(nbt);
 			
 			if (nbt.contains(NBT_ELEMENT)) {
 				this.element = EMagicElement.FromNBT(nbt.get(NBT_ELEMENT));
@@ -200,8 +200,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		
 		private EAlteration alteration;
 		
-		public Alteration() {
-			super(NostrumTileEntities.AlterationShrineTileType);
+		public Alteration(BlockPos pos, BlockState state) {
+			super(NostrumTileEntities.AlterationShrineTileType, pos, state);
 			this.alteration = EAlteration.INFLICT;
 		}
 		
@@ -224,8 +224,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public void load(BlockState state, CompoundTag nbt) {
-			super.load(state, nbt);
+		public void load(CompoundTag nbt) {
+			super.load(nbt);
 			
 			if (nbt.contains(NBT_ALTERATION)) {
 				this.alteration = EAlteration.FromNBT(nbt.get(NBT_ALTERATION));
@@ -272,8 +272,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		
 		private SpellShape shape;
 		
-		public Shape() {
-			super(NostrumTileEntities.ShapeShrineTileType);
+		public Shape(BlockPos pos, BlockState state) {
+			super(NostrumTileEntities.ShapeShrineTileType, pos, state);
 			this.shape = null;
 		}
 		
@@ -301,8 +301,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public void load(BlockState state, CompoundTag nbt) {
-			super.load(state, nbt);
+		public void load(CompoundTag nbt) {
+			super.load(nbt);
 			
 			if (nbt.contains(NBT_SHAPE)) {
 				this.shape = SpellShape.get(nbt.getString(NBT_SHAPE));
@@ -349,8 +349,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		
 		private EMagicTier tier;
 		
-		public Tier() {
-			super(NostrumTileEntities.TierShrineTileType);
+		public Tier(BlockPos pos, BlockState state) {
+			super(NostrumTileEntities.TierShrineTileType, pos, state);
 			this.tier = EMagicTier.LOCKED;
 		}
 		
@@ -373,8 +373,8 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public void load(BlockState state, CompoundTag nbt) {
-			super.load(state, nbt);
+		public void load(CompoundTag nbt) {
+			super.load(nbt);
 			this.tier = EMagicTier.FromNBT(nbt.get(NBT_TIER));
 		}
 

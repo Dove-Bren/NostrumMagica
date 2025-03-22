@@ -9,16 +9,16 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTriggerEntity> implements IOrientedTileEntity {
 	
@@ -41,8 +41,8 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	private long triggerWorldTicks;
 	private long cooldownTicks;
 	
-	protected SwitchBlockTileEntity(BlockEntityType<? extends SwitchBlockTileEntity> tileType) {
-		super(tileType);
+	protected SwitchBlockTileEntity(BlockEntityType<? extends SwitchBlockTileEntity> tileType, BlockPos pos, BlockState state) {
+		super(tileType, pos, state);
 		hitType = SwitchHitType.ANY;
 		triggerType = SwitchTriggerType.ONE_TIME;
 		triggerOffset = new BlockPos(0, -2, 0);
@@ -50,19 +50,19 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 		cooldownTicks = 0;
 	}
 	
-	public SwitchBlockTileEntity() {
-		this(NostrumTileEntities.SwitchBlockTileEntityType);
+	public SwitchBlockTileEntity(BlockPos pos, BlockState state) {
+		this(NostrumTileEntities.SwitchBlockTileEntityType, pos, state);
 	}
 	
-	public SwitchBlockTileEntity(SwitchBlockTileEntity.SwitchHitType type, BlockPos pos) {
-		this();
+	public SwitchBlockTileEntity( BlockPos blockEntPos, BlockState state, SwitchBlockTileEntity.SwitchHitType type,BlockPos pos) {
+		this(blockEntPos, state);
 		
 		this.hitType = type;
 		this.triggerOffset = pos;
 	}
 	
-	public SwitchBlockTileEntity(SwitchBlockTileEntity.SwitchHitType hitType, SwitchBlockTileEntity.SwitchTriggerType triggerType, BlockPos pos) {
-		this();
+	public SwitchBlockTileEntity( BlockPos blockEntPos, BlockState state, SwitchBlockTileEntity.SwitchHitType hitType, SwitchBlockTileEntity.SwitchTriggerType triggerType, BlockPos pos) {
+		this(blockEntPos, state);
 		
 		this.hitType = hitType;
 		this.triggerType = triggerType;
@@ -88,8 +88,8 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		int ord = nbt.getInt(NBT_HIT_TYPE);
 		for (SwitchBlockTileEntity.SwitchHitType type : SwitchHitType.values()) {

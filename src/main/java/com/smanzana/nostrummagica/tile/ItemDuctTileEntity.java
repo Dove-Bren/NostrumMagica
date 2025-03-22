@@ -12,20 +12,20 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.ChestBlock;
-import net.minecraft.world.Container;
-import net.minecraft.world.WorldlyContainer;
-import net.minecraft.world.Containers;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -143,8 +143,8 @@ public class ItemDuctTileEntity extends BlockEntity implements /* IInventory, */
 	private final LazyOptional<ItemDuctTileEntity.SidedItemHandler> handlerWest;
 	private final LazyOptional<ItemDuctTileEntity.SidedItemHandler> handlerEast;
 	
-	public ItemDuctTileEntity() {
-		super(NostrumTileEntities.ItemDuctTileEntityType);
+	public ItemDuctTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.ItemDuctTileEntityType, pos, state);
 		itemQueue = new LinkedList<>();
 		ticks = 0;
 		handlerDown = LazyOptional.of(() -> new SidedItemHandler(this, Direction.DOWN));
@@ -171,8 +171,8 @@ public class ItemDuctTileEntity extends BlockEntity implements /* IInventory, */
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		itemQueue.clear();
 		ListTag list = nbt.getList(NBT_SORTED, Tag.TAG_COMPOUND);

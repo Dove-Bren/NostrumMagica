@@ -11,21 +11,20 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.Direction;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.network.chat.TranslatableComponent;
 
 public class LockedDoorTileEntity extends BlockEntity implements TickableBlockEntity, IWorldKeyHolder, IUniqueBlueprintTileEntity {
 
@@ -36,14 +35,14 @@ public class LockedDoorTileEntity extends BlockEntity implements TickableBlockEn
 	private DyeColor color;
 	private int ticksExisted;
 	
-	protected LockedDoorTileEntity(BlockEntityType<? extends LockedDoorTileEntity> type) {
-		super(type);
+	protected LockedDoorTileEntity(BlockEntityType<? extends LockedDoorTileEntity> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
 		lockKey = new WorldKey();
 		color = DyeColor.GRAY;
 	}
 	
-	public LockedDoorTileEntity() {
-		this(NostrumTileEntities.LockedDoorType);
+	public LockedDoorTileEntity(BlockPos pos, BlockState state) {
+		this(NostrumTileEntities.LockedDoorType, pos, state);
 	}
 	
 	private void dirty() {
@@ -62,8 +61,8 @@ public class LockedDoorTileEntity extends BlockEntity implements TickableBlockEn
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null)
 			return;
@@ -89,7 +88,7 @@ public class LockedDoorTileEntity extends BlockEntity implements TickableBlockEn
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getTag());
+		handleUpdateTag(pkt.getTag());
 	}
 	
 	protected void checkBlockState() {

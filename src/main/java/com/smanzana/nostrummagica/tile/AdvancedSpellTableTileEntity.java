@@ -7,10 +7,11 @@ import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class AdvancedSpellTableTileEntity extends BasicSpellTableTileEntity {
 
@@ -22,8 +23,8 @@ public class AdvancedSpellTableTileEntity extends BasicSpellTableTileEntity {
 	
 	private @Nonnull ItemStack slots[];
 	
-	public AdvancedSpellTableTileEntity() {
-		super(NostrumTileEntities.AdvancedSpellTableType);
+	public AdvancedSpellTableTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.AdvancedSpellTableType, pos, state);
 	}
 	
 	@Override
@@ -62,8 +63,8 @@ public class AdvancedSpellTableTileEntity extends BasicSpellTableTileEntity {
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 	}
 	
 	@Override

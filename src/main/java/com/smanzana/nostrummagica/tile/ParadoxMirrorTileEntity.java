@@ -17,20 +17,19 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.nbt.Tag;
 
 public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBlockEntity, IAetherInfusableTileEntity {
 	
@@ -43,8 +42,8 @@ public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBloc
 	// Transient display variables
 	private int cooldownTicks;
 	
-	public ParadoxMirrorTileEntity() {
-		super(NostrumTileEntities.ParadoxMirrorTileEntityType);
+	public ParadoxMirrorTileEntity(BlockPos pos, BlockState state) {
+		super(NostrumTileEntities.ParadoxMirrorTileEntityType, pos, state);
 		cooldownTicks = 0;
 		receivedEntities = new ArrayList<>();
 	}
@@ -87,8 +86,8 @@ public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBloc
 	}
 	
 	@Override
-	public void load(BlockState state, CompoundTag nbt) {
-		super.load(state, nbt);
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
 		
 		if (nbt == null)
 			return;
@@ -116,7 +115,7 @@ public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBloc
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(this.getBlockState(), pkt.getTag());
+		handleUpdateTag(pkt.getTag());
 	}
 	
 	private void dirty() {
@@ -195,7 +194,7 @@ public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBloc
 		
 		// Have item, cooldown is good, and are linked! Consume and send!
 		@Nonnull ItemStack stack = entity.getItem();
-		entity.remove();
+		entity.discard();
 		
 		remoteTile.receiveAndSpawnItem(stack, this.getBlockPos());
 		return true;
