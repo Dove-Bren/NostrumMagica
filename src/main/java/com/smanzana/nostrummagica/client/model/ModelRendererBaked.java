@@ -83,7 +83,7 @@ public class ModelRendererBaked extends ModelPart {
 //	@OnlyIn(Dist.CLIENT)
 //    private void renderForCapture(IBakedModel model, BufferBuilder buffer, int color) {
 //		Random rand = new Random();
-//		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
+//		buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormats.ITEM);
 //		GlStateManager.pushMatrix();
 //		GlStateManager.rotatef(180, 1, 0, 0);
 //		
@@ -119,7 +119,7 @@ public class ModelRendererBaked extends ModelPart {
 ////
 ////			Tessellator tessellator = Tessellator.getInstance();
 ////			BufferBuilder buffer = tessellator.getBuffer();
-////			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
+////			buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormats.ITEM);
 ////
 ////			GlStateManager.rotatef(180, 0, 0, 1);
 ////			GlStateManager.translatef((float)-x, (float)-y, (float)z);
@@ -191,7 +191,7 @@ public class ModelRendererBaked extends ModelPart {
 //		
 //		//GlStateManager.rotatef(180, 1, 0, 0); // .OBJ's tend to have flipped Zs I suppose
 //		
-//		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
+//		buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormats.ITEM);
 //		
 //		if (this.preRender(buffer, scale)) {
 //			renderInternal(scale, compiledList);

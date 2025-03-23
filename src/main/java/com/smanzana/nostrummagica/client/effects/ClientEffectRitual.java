@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
@@ -17,12 +18,10 @@ import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.platform.Lighting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
-import com.mojang.math.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -119,7 +118,7 @@ public class ClientEffectRitual extends ClientEffect {
 //		GlStateManager.enableAlphaTest();
 //		GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-		Lighting.turnBackOn();
+		//Lighting.turnBackOn();
 		
 		RenderFuncs.RenderWorldItem(stack, matrixStackIn);
 		
@@ -154,7 +153,7 @@ public class ClientEffectRitual extends ClientEffect {
 //			GlStateManager.disableLighting();
 //			GlStateManager.enableAlphaTest();
 //			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-			Lighting.turnBackOn();
+			//Lighting.turnBackOn();
 			
 			RenderFuncs.RenderWorldItem(reagent, matrixStackIn);
 			

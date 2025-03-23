@@ -1,11 +1,12 @@
 package com.smanzana.nostrummagica.client.effects;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 
@@ -58,7 +59,7 @@ public class ClientEffectMajorSphere extends ClientEffect {
 //			GlStateManager.enableTexture();
 //			GlStateManager.color4f(0f, 0f, 0f, 0f);
 //			GlStateManager.color4f(1f, 1f, 1f, 1f);
-			Minecraft.getInstance().getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
+			RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
 			final int light = ClientEffectForm.InferLightmap(matrixStackIn, mc);
 			
 			// outside

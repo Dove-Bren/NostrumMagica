@@ -98,12 +98,12 @@ public class ClientEffect {
 	protected void setupRenderState() {
 		RenderSystem.enableBlend();
 		RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		RenderSystem.disableLighting();
+		//RenderSystem.disableLighting();
 	}
 	
 	protected void teardownRenderState() {
 		RenderSystem.disableBlend();
-		RenderSystem.defaultAlphaFunc();
+		//RenderSystem.defaultAlphaFunc();
 		RenderSystem.depthMask(true);
 		RenderSystem.depthFunc(GL11.GL_LEQUAL); // ???
 		

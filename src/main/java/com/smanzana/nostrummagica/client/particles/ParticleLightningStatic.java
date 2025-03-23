@@ -1,21 +1,19 @@
 package com.smanzana.nostrummagica.client.particles;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
 public class ParticleLightningStatic extends BatchRenderParticle {
@@ -49,7 +47,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 		bCol = blue;
 		alpha = 0f;
 		this.maxAlpha = alpha;
-		lifetime = lifetime;
+		this.lifetime = lifetime;
 		
 		type = NostrumMagica.rand.nextInt(2);
 	}
@@ -125,15 +123,15 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 		RenderSystem.enableDepthTest();
 		RenderSystem.enableBlend();
 		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		RenderSystem.alphaFunc(GL11.GL_GREATER, 0);
-		RenderSystem.disableLighting();
+		//RenderSystem.alphaFunc(GL11.GL_GREATER, 0);
+		//RenderSystem.disableLighting();
 		// Texture set up by batch renderer but would need to be here if this were a real particlerendertype
 		
 	}
 	
 	@Override
 	public void teardownBatchedRender() {
-		RenderSystem.alphaFunc(GL11.GL_GREATER, 0.1F); // idk where this was copied from
+		//RenderSystem.alphaFunc(GL11.GL_GREATER, 0.1F); // idk where this was copied from
 		RenderSystem.disableBlend();
 		RenderSystem.depthMask(true);
 	}

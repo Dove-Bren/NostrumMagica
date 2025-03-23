@@ -48,7 +48,7 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 		}
 		
 		int unused; // make this be a passed in thing! Not all are objs!
-		mc.getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
+		RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
 		
 		final int light = ClientEffectForm.InferLightmap(matrixStackIn, mc);
 		RenderSystem.disableCull();

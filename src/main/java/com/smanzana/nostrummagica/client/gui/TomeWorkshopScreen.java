@@ -114,7 +114,7 @@ public class TomeWorkshopScreen extends Screen {
 
 	public TomeWorkshopScreen(Player player) {
 		super(new TextComponent("Tome Workshop"));
-		this.playerInv = player.inventory;
+		this.playerInv = player.getInventory();
 		this.spellSlotWidgets = new ArrayList<>();
 		this.spellLibraryWidgets = new ArrayList<>();
 		this.inventoryWidgets = new ArrayList<>();

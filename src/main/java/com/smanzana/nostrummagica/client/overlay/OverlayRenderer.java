@@ -11,14 +11,19 @@ import java.util.WeakHashMap;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.lwjgl.opengl.GL11;
-
 import com.google.common.base.Predicate;
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.IPrintableAttribute;
 import com.smanzana.nostrummagica.block.ModificationTableBlock;
@@ -40,7 +45,6 @@ import com.smanzana.nostrummagica.client.render.layer.LayerDragonFlightWings;
 import com.smanzana.nostrummagica.client.render.layer.LayerKoidHelm;
 import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
 import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.inventory.EquipmentSetRegistry;
 import com.smanzana.nostrummagica.item.IRaytraceOverlay;
@@ -62,52 +66,46 @@ import com.smanzana.nostrummagica.spell.component.Transmutation;
 import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.world.level.block.state.BlockState;
-import com.mojang.blaze3d.platform.Window;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.CameraType;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.BufferUploader;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.client.model.EntityModel;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.CameraType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.tags.FluidTags;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult.Type;
-import com.mojang.math.Matrix4f;
 import net.minecraft.world.phys.Vec3;
-import com.mojang.math.Vector3f;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
-import net.minecraftforge.client.event.DrawHighlightEvent;
+import net.minecraftforge.client.event.DrawSelectionEvent;
 import net.minecraftforge.client.event.RenderBlockOverlayEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.IIngameOverlay;
+import net.minecraftforge.client.gui.OverlayRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -133,6 +131,18 @@ public class OverlayRenderer extends GuiComponent {
 	private static final int GUI_CONTINGENCY_ICON_OFFSETY = 37;
 	private static final int GUI_CONTINGENCY_ICON_LENGTH = 18;
 	
+	protected IIngameOverlay hookshotOverlay;
+	protected IIngameOverlay cursedFireOverlay;
+	protected IIngameOverlay spellSlideOverlay;
+	protected IIngameOverlay reagentTrackerOverlay;
+	protected IIngameOverlay manaOrbOverlay;
+	protected IIngameOverlay manaBarOverlay;
+	protected IIngameOverlay armorOverlay;
+	protected IIngameOverlay shieldHeartOverlay;
+	protected IIngameOverlay traceOverlay;
+	protected IIngameOverlay contingencyOverlay;
+	protected IIngameOverlay mysticAirOverlay;
+	
 	private int wiggleIndex; // set to multiples of 12 for each wiggle
 	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
 	
@@ -152,214 +162,185 @@ public class OverlayRenderer extends GuiComponent {
 		HUDToggle = false;
 	}
 	
-	@SubscribeEvent
-	public void onRender(RenderGameOverlayEvent.Pre event) {
-		Minecraft mc = Minecraft.getInstance();
-		LocalPlayer player = mc.player;
-		Window window = event.getWindow();
+	public void registerLayers() {
+		hookshotOverlay = OverlayRegistry.registerOverlayBelow(ForgeIngameGui.CROSSHAIR_ELEMENT, "NostrumMagica::hookshotOverlay", this::renderHookshotOverlay);
+		cursedFireOverlay = OverlayRegistry.registerOverlayBottom("NostrumMagica::cursedFireOverlay", this::renderCursedFireOverlay);
+		spellSlideOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.EXPERIENCE_BAR_ELEMENT, "NostrumMagica::spellSlideOverlay", this::renderSpellSlide);
+		reagentTrackerOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.EXPERIENCE_BAR_ELEMENT, "NostrumMagica::reagentTrackerOverlay", this::renderReagentTracker);
+		manaOrbOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.EXPERIENCE_BAR_ELEMENT, "NostrumMagica::manaOrbOverlay", this::renderManaOrbOverlay);
+		manaBarOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.EXPERIENCE_BAR_ELEMENT, "NostrumMagica::manaBarOverlay", this::renderManaBarOverlay);
+		armorOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.ARMOR_LEVEL_ELEMENT, "NostrumMagica::armorOverlay", this::renderArmorOverlay);
+		shieldHeartOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.PLAYER_HEALTH_ELEMENT, "NostrumMagica::shieldHeartOverlay", this::renderShieldOverlay);
 		
-		if (event.getType() == ElementType.CROSSHAIRS) {
-			if (ModConfig.config.displayHookshotCrosshair()) {
-				ItemStack hookshot = player.getMainHandItem();
-				if (hookshot.isEmpty() || !(hookshot.getItem() instanceof HookshotItem)) {
-					hookshot = player.getOffhandItem();
-				}
-				
-				if (hookshot.isEmpty() || !(hookshot.getItem() instanceof HookshotItem)) {
-					return;
-				}
-				
-				HookshotType type = HookshotItem.GetType(hookshot);
-				HitResult result = RayTrace.raytrace(player.level, player, player.getEyePosition(event.getPartialTicks()),
-						player.xRot, player.yRot, (float) HookshotItem.GetMaxDistance(type),
-						new Predicate<Entity>() {
-
-							@Override
-							public boolean apply(Entity arg0) {
-								return arg0 != null && arg0 != player && HookshotItem.CanBeHooked(type, arg0);
-							}
-					
-				});
-				
-				if (result != null) {
-					boolean hit = false;
-					boolean entity = false;
-					if (result.getType() == Type.ENTITY) {
-						// Already filtered in raytrace predicate
-						hit = true;
-						entity = true;
-					} else if (result.getType() == Type.BLOCK) {
-						BlockState state = player.level.getBlockState(RayTrace.blockPosFromResult(result));
-						if (state != null && HookshotItem.CanBeHooked(type, state)) {
-							hit = true;
-						}
-					}
-					
-					if (hit) {
-						event.setCanceled(true);
-						renderHookshotCrosshair(event.getMatrixStack(), player, window, entity);
-					}
-				}
-				
-			}
-		} else if (event.getType() == ElementType.ALL) {
-			// Before everything.
-			if (player.getEffect(NostrumEffects.cursedFire) != null) {
-				renderCursedFireOverlay(event.getMatrixStack(), player, window);
+		traceOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.CROSSHAIR_ELEMENT, "NostrumMagica::traceOverlay", this::renderTraceOverlay);
+		contingencyOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.POTION_ICONS_ELEMENT, "NostrumMagica::contingencyOverlay", this::renderContingencyOverlay);
+		mysticAirOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.VIGNETTE_ELEMENT, "NostrumMagica::mysticAirOverlay", this::renderMysticAirOverlay);
+	}
+	
+	private void renderMysticAirOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
+		final Minecraft mc = Minecraft.getInstance();
+		final LocalPlayer player = mc.player;
+		if (player == null || player.level == null) {
+			return;
+		}
+		
+		final int h = (int) player.getEyeHeight();
+		BlockState inBlock = player.level.getBlockState(new BlockPos(player.getX(), player.getY() + h, player.getZ()));
+		if (inBlock.getBlock() instanceof DungeonAirBlock) {
+			// Render dungeon air overlay
+			{
+				final Matrix4f transform = matrixStackIn.last().pose();
+				Tesselator tessellator = Tesselator.getInstance();
+				BufferBuilder bufferbuilder = tessellator.getBuilder();
+				RenderSystem.enableBlend();
+				RenderSystem.disableTexture();
+				//GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+				RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+				final float depth = -91f;
+				bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+				bufferbuilder.vertex(transform, 0, height, depth).color(.3f, 0, .3f, .2f).endVertex();
+				bufferbuilder.vertex(transform, width, height, depth).color(.3f, 0, .3f, .2f).endVertex();
+				bufferbuilder.vertex(transform, width, 0, depth).color(.3f, 0, .3f, .2f).endVertex();
+				bufferbuilder.vertex(transform, 0, 0, depth).color(.3f, 0, .3f, .2f).endVertex();
+				bufferbuilder.end();
+				BufferUploader.end(bufferbuilder);
+				RenderSystem.enableTexture();
 			}
 		}
 	}
 	
-	@SubscribeEvent
-	public void onRender(RenderGameOverlayEvent.Post event) {
-		Minecraft mc = Minecraft.getInstance();
-		LocalPlayer player = mc.player;
-		Window window = event.getWindow();
-		PoseStack matrixStackIn = event.getMatrixStack();
+	private void renderContingencyOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
+		// TODO config option
+		{
+			final Minecraft mc = Minecraft.getInstance();
+			final LocalPlayer player = mc.player;
+			final int nowTicks = player.tickCount;
+			int offsetX = 0;
+			EffectData data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_DAMAGE);
+			if (data != null) {
+				if (data.getAmt() == 0) {
+					data.amt(player.tickCount);
+				}
+				float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
+				timer = 1f - timer;
+				renderContingencyShield(matrixStackIn, player, width, height, 0, offsetX, timer);
+				offsetX++;
+			}
+			data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_MANA);
+			if (data != null) {
+				if (data.getAmt() == 0) {
+					data.amt(player.tickCount);
+				}
+				float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
+				timer = 1f - timer;
+				renderContingencyShield(matrixStackIn, player, width, height, 1, offsetX, timer);
+				offsetX++;
+			}
+			data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_HEALTH);
+			if (data != null) {
+				if (data.getAmt() == 0) {
+					data.amt(player.tickCount);
+				}
+				float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
+				timer = 1f - timer;
+				renderContingencyShield(matrixStackIn, player, width, height, 2, offsetX, timer);
+				offsetX++;
+			}
+			data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_FOOD);
+			if (data != null) {
+				if (data.getAmt() == 0) {
+					data.amt(player.tickCount);
+				}
+				float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
+				timer = 1f - timer;
+				renderContingencyShield(matrixStackIn, player, width, height, 3, offsetX, timer);
+				offsetX++;
+			}
+		}
+	}
+	
+	private void renderTraceOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
+		final Minecraft mc = Minecraft.getInstance();
+		final LocalPlayer player = mc.player;
+		ItemStack held = player.getMainHandItem();
+		if (held.isEmpty() || !(held.getItem() instanceof IRaytraceOverlay) || !((IRaytraceOverlay) held.getItem()).shouldTrace(player.level, player, held)) {
+			held = player.getOffhandItem();
+			if (held.isEmpty() || !(held.getItem() instanceof IRaytraceOverlay) || !((IRaytraceOverlay) held.getItem()).shouldTrace(player.level, player, held)) {
+				held = ItemStack.EMPTY;
+			}
+		}
 		
-		if (event.getType() == ElementType.EXPERIENCE) {
+		if (!held.isEmpty()) {
+			final double range = ((IRaytraceOverlay) held.getItem()).getTraceRange(player.level, player, held);
+			HitResult result = RayTrace.raytraceApprox(player.level, player, player.getEyePosition(partialTicks),
+					player.getXRot(), player.getYRot(), (float) range,
+					new Predicate<Entity>() {
+
+						@Override
+						public boolean apply(Entity arg0) {
+							return arg0 != null && arg0 != player && arg0 instanceof LivingEntity;
+						}
+				
+			}, .5);
+			Entity highlightEnt = RayTrace.entFromRaytrace(result);
+			if (highlightEnt != null) {
+				renderCrosshairTargetOverlay(matrixStackIn, player, width, height);
+			}
+		}
+	}
+	
+	private void renderHookshotOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
+		OverlayRegistry.enableOverlay(ForgeIngameGui.CROSSHAIR_ELEMENT, true);
+		if (ModConfig.config.displayHookshotCrosshair()) {
+			final Minecraft mc = Minecraft.getInstance();
+			final LocalPlayer player = mc.player;
+			ItemStack hookshot = player.getMainHandItem();
+			if (hookshot.isEmpty() || !(hookshot.getItem() instanceof HookshotItem)) {
+				hookshot = player.getOffhandItem();
+			}
 			
-			// We do mana stuff in experience layer
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-			if (attr == null || !attr.isUnlocked()) {
+			if (hookshot.isEmpty() || !(hookshot.getItem() instanceof HookshotItem)) {
 				return;
 			}
 			
-			renderSpellSlide(matrixStackIn, player, window, attr);
-			renderReagentTracker(matrixStackIn, player, window, attr, mc.font);
+			HookshotType type = HookshotItem.GetType(hookshot);
+			HitResult result = RayTrace.raytrace(player.level, player, player.getEyePosition(partialTicks),
+					player.getXRot(), player.getYRot(), (float) HookshotItem.GetMaxDistance(type),
+					new Predicate<Entity>() {
+
+						@Override
+						public boolean apply(Entity arg0) {
+							return arg0 != null && arg0 != player && HookshotItem.CanBeHooked(type, arg0);
+						}
+				
+			});
 			
-			if (mc.player.isCreative()
-					|| mc.player.isSpectator()) {
-				return;
-			}
-			
-			// Orbs
-			if (ModConfig.config.displayManaOrbs()) {
-				renderManaOrbs(matrixStackIn, player, window, attr);
-			}
-			
-			// Mana bar
-			if (ModConfig.config.displayManaBar()) {
-				renderManaBar(matrixStackIn, player, window, attr);
-			}
-		} else if (event.getType() == ElementType.ARMOR) {
-			if (ModConfig.config.displayArmorOverlay()) {
-				renderArmorOverlay(matrixStackIn, player, window);
-			}
-		} else if (event.getType() == ElementType.FOOD) {
-			if (ModConfig.config.displayShieldHearts()) {
-				renderShieldOverlay(matrixStackIn, player, window);
-			}
-		} else if (event.getType() == ElementType.CROSSHAIRS) {
-			//if (ModConfig.config.displayShieldHearts())
-			{
-				ItemStack held = player.getMainHandItem();
-				if (held.isEmpty() || !(held.getItem() instanceof IRaytraceOverlay) || !((IRaytraceOverlay) held.getItem()).shouldTrace(player.level, player, held)) {
-					held = player.getOffhandItem();
-					if (held.isEmpty() || !(held.getItem() instanceof IRaytraceOverlay) || !((IRaytraceOverlay) held.getItem()).shouldTrace(player.level, player, held)) {
-						held = ItemStack.EMPTY;
+			if (result != null) {
+				boolean hit = false;
+				boolean entity = false;
+				if (result.getType() == Type.ENTITY) {
+					// Already filtered in raytrace predicate
+					hit = true;
+					entity = true;
+				} else if (result.getType() == Type.BLOCK) {
+					BlockState state = player.level.getBlockState(RayTrace.blockPosFromResult(result));
+					if (state != null && HookshotItem.CanBeHooked(type, state)) {
+						hit = true;
 					}
 				}
 				
-				if (!held.isEmpty()) {
-					final double range = ((IRaytraceOverlay) held.getItem()).getTraceRange(player.level, player, held);
-					HitResult result = RayTrace.raytraceApprox(player.level, player, player.getEyePosition(event.getPartialTicks()),
-							player.xRot, player.yRot, (float) range,
-							new Predicate<Entity>() {
-	
-								@Override
-								public boolean apply(Entity arg0) {
-									return arg0 != null && arg0 != player && arg0 instanceof LivingEntity;
-								}
-						
-					}, .5);
-					Entity highlightEnt = RayTrace.entFromRaytrace(result);
-					if (highlightEnt != null) {
-						renderCrosshairTargetOverlay(matrixStackIn, player, window);
-					}
+				if (hit) {
+					OverlayRegistry.enableOverlay(ForgeIngameGui.CROSSHAIR_ELEMENT, false);
+					renderHookshotCrosshair(matrixStackIn, player, width, height, entity);
 				}
-			}
-		} else if (event.getType() == ElementType.POTION_ICONS) {
-			// TODO config option
-			{
-				final int nowTicks = player.tickCount;
-				int offsetX = 0;
-				EffectData data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_DAMAGE);
-				if (data != null) {
-					if (data.getAmt() == 0) {
-						data.amt(player.tickCount);
-					}
-					float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
-					timer = 1f - timer;
-					renderContingencyShield(matrixStackIn, player, window, 0, offsetX, timer);
-					offsetX++;
-				}
-				data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_MANA);
-				if (data != null) {
-					if (data.getAmt() == 0) {
-						data.amt(player.tickCount);
-					}
-					float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
-					timer = 1f - timer;
-					renderContingencyShield(matrixStackIn, player, window, 1, offsetX, timer);
-					offsetX++;
-				}
-				data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_HEALTH);
-				if (data != null) {
-					if (data.getAmt() == 0) {
-						data.amt(player.tickCount);
-					}
-					float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
-					timer = 1f - timer;
-					renderContingencyShield(matrixStackIn, player, window, 2, offsetX, timer);
-					offsetX++;
-				}
-				data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.CONTINGENCY_FOOD);
-				if (data != null) {
-					if (data.getAmt() == 0) {
-						data.amt(player.tickCount);
-					}
-					float timer = (float) (nowTicks - (int) data.getAmt()) / (float) data.getCount();
-					timer = 1f - timer;
-					renderContingencyShield(matrixStackIn, player, window, 3, offsetX, timer);
-					offsetX++;
-				}
-			}
-		} else if (event.getType() == ElementType.VIGNETTE) {
-			if (player == null || player.level == null) {
-				return;
 			}
 			
-			final int h = (int) player.getEyeHeight();
-			BlockState inBlock = player.level.getBlockState(new BlockPos(player.getX(), player.getY() + h, player.getZ()));
-			if (inBlock.getBlock() instanceof DungeonAirBlock) {
-				// Render dungeon air overlay
-				{
-					final Matrix4f transform = matrixStackIn.last().pose();
-					Tesselator tessellator = Tesselator.getInstance();
-					BufferBuilder bufferbuilder = tessellator.getBuilder();
-					RenderSystem.enableBlend();
-					RenderSystem.disableTexture();
-					//GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-					RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-					final float depth = -91f;
-					bufferbuilder.begin(7, DefaultVertexFormat.POSITION_COLOR);
-					bufferbuilder.vertex(transform, 0, event.getWindow().getGuiScaledHeight(), depth).color(.3f, 0, .3f, .2f).endVertex();
-					bufferbuilder.vertex(transform, event.getWindow().getGuiScaledWidth(), event.getWindow().getGuiScaledHeight(), depth).color(.3f, 0, .3f, .2f).endVertex();
-					bufferbuilder.vertex(transform, event.getWindow().getGuiScaledWidth(), 0, depth).color(.3f, 0, .3f, .2f).endVertex();
-					bufferbuilder.vertex(transform, 0, 0, depth).color(.3f, 0, .3f, .2f).endVertex();
-					bufferbuilder.end();
-					BufferUploader.end(bufferbuilder);
-					RenderSystem.enableTexture();
-				}
-			}
 		}
 	}
 	
 	private void renderOrbsInternal(PoseStack matrixStackIn, int whole, int pieces, int x, int y, float red, float green, float blue, float alpha) {
 		int i = 0;
-		Minecraft mc = Minecraft.getInstance();
-		mc.getTextureManager().bind(GUI_ICONS);
+		RenderSystem.setShaderTexture(0, GUI_ICONS);
 		
 		for (; i < whole; i++) {
 			// Draw a single partle orb
@@ -382,169 +363,184 @@ public class OverlayRenderer extends GuiComponent {
 		}
 	}
 	
-	private void renderManaOrbs(PoseStack matrixStackIn, LocalPlayer player, Window window, INostrumMagic attr) {
-		int hudXAnchor = window.getGuiScaledWidth() / 2 + 89;
-		int hudYAnchor = window.getGuiScaledHeight() - 49;
+	private void renderManaOrbOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
+		final Minecraft mc = Minecraft.getInstance();
+		final LocalPlayer player = mc.player;
+		final INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
-		hudYAnchor -= ModConfig.config.getManaSphereOffset() * 10;
+		if (attr != null && attr.isUnlocked()
+				&& ModConfig.config.displayManaOrbs()
+				&& !player.isCreative()
+				&& !player.isSpectator()) {
 		
-		if (player.isEyeInFluid(FluidTags.WATER) || player.getAirSupply() < player.getMaxAirSupply()) {
-			hudYAnchor -= 10;
-		}
-		
-		int wiggleOffset = 0;
-		if (wiggleIndex > 0)
-			wiggleOffset = OverlayRenderer.wiggleOffsets[wiggleIndex-- % 12];
-		
-		int totalMana = 0;
-		int totalMaxMana = 0;
-		
-		// render background
-		renderOrbsInternal(matrixStackIn, 10, 0, hudXAnchor + wiggleOffset, hudYAnchor, .4f, .4f, .4f, .4f);
-
-		// Render dragon mana first, if available
-		Collection<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(player, 32, true);
-		
-		boolean hasDragon = false;
-		if (dragons != null && !dragons.isEmpty()) {
-			int dragonMana = 0;
-			int dragonMaxMana = 0;
+			int hudXAnchor = width / 2 + 89;
+			int hudYAnchor = height - 49;
 			
-			for (ITameDragon dragon : dragons) {
-				if (dragon.sharesMana(player)) {
-					totalMana += dragon.getMana();
-					totalMaxMana += dragon.getMaxMana();
+			hudYAnchor -= ModConfig.config.getManaSphereOffset() * 10;
+			
+			if (player.isEyeInFluid(FluidTags.WATER) || player.getAirSupply() < player.getMaxAirSupply()) {
+				hudYAnchor -= 10;
+			}
+			
+			int wiggleOffset = 0;
+			if (wiggleIndex > 0)
+				wiggleOffset = OverlayRenderer.wiggleOffsets[wiggleIndex-- % 12];
+			
+			int totalMana = 0;
+			int totalMaxMana = 0;
+			
+			// render background
+			renderOrbsInternal(matrixStackIn, 10, 0, hudXAnchor + wiggleOffset, hudYAnchor, .4f, .4f, .4f, .4f);
+	
+			// Render dragon mana first, if available
+			Collection<ITameDragon> dragons = NostrumMagica.getNearbyTamedDragons(player, 32, true);
+			
+			boolean hasDragon = false;
+			if (dragons != null && !dragons.isEmpty()) {
+				int dragonMana = 0;
+				int dragonMaxMana = 0;
+				
+				for (ITameDragon dragon : dragons) {
+					if (dragon.sharesMana(player)) {
+						totalMana += dragon.getMana();
+						totalMaxMana += dragon.getMaxMana();
+						
+						dragonMana += dragon.getMana();
+						dragonMaxMana += dragon.getMaxMana();
+					}
+				}
+				
+				// Make sure at least ONE is willing to share mana with us
+				if (dragonMaxMana > 0) {
+					hasDragon = true;
+					float ratio = (float) dragonMana / (float) dragonMaxMana;
+					int parts = Math.round(40 * ratio);
+					int whole = parts / 4;
+					int pieces = parts % 4;
 					
-					dragonMana += dragon.getMana();
-					dragonMaxMana += dragon.getMaxMana();
+					// If we just found a dragon, start anim
+					if (this.wingIndex == 0) {
+						startWingAnim(true);
+					}
+					
+					renderOrbsInternal(matrixStackIn, whole, pieces, hudXAnchor + wiggleOffset, hudYAnchor, 1f, .2f, .2f, 1f);
 				}
 			}
 			
-			// Make sure at least ONE is willing to share mana with us
-			if (dragonMaxMana > 0) {
-				hasDragon = true;
-				float ratio = (float) dragonMana / (float) dragonMaxMana;
+			// If no dragon is sharing mana and we're not playing wing animation, start the furl anim
+			if (!hasDragon && wingIndex == wingAnimDur) {
+				startWingAnim(false);
+			}
+			
+			if (wingIndex != 0) {
+				final int index = wingIndex;
+				if (wingIndex < wingAnimDur) {
+					wingIndex++;
+				}
+				
+				final float ratio = ((float) (20 - Math.abs(index)) / 20f);
+				final float rot = ratio * 120.0f;
+				
+				RenderSystem.setShaderTexture(0, GUI_ICONS);
+				
+				matrixStackIn.pushPose();
+				matrixStackIn.translate(0, 0, -.5f); // Behind
+				matrixStackIn.translate(hudXAnchor + wiggleOffset - 1, hudYAnchor + 3, 0);
+				
+				matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(rot));
+				matrixStackIn.translate(-1, -10, 0);
+				//blit(0, 0, GUI_WING_SIZE, GUI_WING_OFFSETY, GUI_WING_SIZE, GUI_WING_SIZE, red, green, blue, alpha); // -10, 10, 
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, GUI_WING_SIZE,
+						GUI_WING_OFFSETY, -GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f,
+						1f, 1f, 1f, 1f - ratio);
+				matrixStackIn.popPose();
+				
+				matrixStackIn.pushPose();
+				matrixStackIn.translate(0, 0, -.5f); // Behind
+				matrixStackIn.translate(hudXAnchor + wiggleOffset - 76, hudYAnchor + 3, 0);
+				
+				matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(-rot));
+				matrixStackIn.translate(-10, -10, 0);
+				//blit(0, 0, 0, offsetX, offsetY, width, height, texWidth, texHeight, red, green, blue, alpha); // -10, 10, 
+				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 0,
+						GUI_WING_OFFSETY, GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256,
+						1f, 1f, 1f, 1f - ratio);
+				matrixStackIn.popPose();
+				
+				
+			}
+			
+			// Render player mana on top
+			if (attr.getMaxMana() > 0)
+			{
+				int playerMana = attr.getMana();
+				int playerMaxMana = attr.getMaxMana();
+				float ratio = (float) playerMana / (float) playerMaxMana;
+				
+				
 				int parts = Math.round(40 * ratio);
 				int whole = parts / 4;
 				int pieces = parts % 4;
 				
-				// If we just found a dragon, start anim
-				if (this.wingIndex == 0) {
-					startWingAnim(true);
-				}
+				//0094FF
+				renderOrbsInternal(matrixStackIn, whole, pieces, hudXAnchor + wiggleOffset, hudYAnchor, 0f, .8f, 1f, 1f);
 				
-				renderOrbsInternal(matrixStackIn, whole, pieces, hudXAnchor + wiggleOffset, hudYAnchor, 1f, .2f, .2f, 1f);
+				totalMana += playerMana;
+				totalMaxMana += playerMaxMana;
+			}
+	
+			if (ModConfig.config.displayManaText()) {
+				int centerx = hudXAnchor - (5 * 8);
+				String str = totalMana + "/" + totalMaxMana;
+				int strWidth = mc.font.width(str);
+				mc.font.draw(matrixStackIn,
+						str, centerx - strWidth/2, hudYAnchor + 1, 0xFFFFFFFF);
 			}
 		}
-		
-		// If no dragon is sharing mana and we're not playing wing animation, start the furl anim
-		if (!hasDragon && wingIndex == wingAnimDur) {
-			startWingAnim(false);
-		}
-		
-		if (wingIndex != 0) {
-			final int index = wingIndex;
-			if (wingIndex < wingAnimDur) {
-				wingIndex++;
-			}
-			
-			final float ratio = ((float) (20 - Math.abs(index)) / 20f);
-			final float rot = ratio * 120.0f;
-			
-			Minecraft mc = Minecraft.getInstance();
-			mc.getTextureManager().bind(GUI_ICONS);
-			
-			matrixStackIn.pushPose();
-			matrixStackIn.translate(0, 0, -.5f); // Behind
-			matrixStackIn.translate(hudXAnchor + wiggleOffset - 1, hudYAnchor + 3, 0);
-			
-			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(rot));
-			matrixStackIn.translate(-1, -10, 0);
-			//blit(0, 0, GUI_WING_SIZE, GUI_WING_OFFSETY, GUI_WING_SIZE, GUI_WING_SIZE, red, green, blue, alpha); // -10, 10, 
-			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, GUI_WING_SIZE,
-					GUI_WING_OFFSETY, -GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256f,
-					1f, 1f, 1f, 1f - ratio);
-			matrixStackIn.popPose();
-			
-			matrixStackIn.pushPose();
-			matrixStackIn.translate(0, 0, -.5f); // Behind
-			matrixStackIn.translate(hudXAnchor + wiggleOffset - 76, hudYAnchor + 3, 0);
-			
-			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(-rot));
-			matrixStackIn.translate(-10, -10, 0);
-			//blit(0, 0, 0, offsetX, offsetY, width, height, texWidth, texHeight, red, green, blue, alpha); // -10, 10, 
-			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 0,
-					GUI_WING_OFFSETY, GUI_WING_SIZE, GUI_WING_SIZE, 10, 10, 256f, 256,
-					1f, 1f, 1f, 1f - ratio);
-			matrixStackIn.popPose();
-			
-			
-		}
-		
-		// Render player mana on top
-		if (attr.getMaxMana() > 0)
-		{
-			int playerMana = attr.getMana();
-			int playerMaxMana = attr.getMaxMana();
-			float ratio = (float) playerMana / (float) playerMaxMana;
-			
-			
-			int parts = Math.round(40 * ratio);
-			int whole = parts / 4;
-			int pieces = parts % 4;
-			
-			//0094FF
-			renderOrbsInternal(matrixStackIn, whole, pieces, hudXAnchor + wiggleOffset, hudYAnchor, 0f, .8f, 1f, 1f);
-			
-			totalMana += playerMana;
-			totalMaxMana += playerMaxMana;
-		}
-
-		if (ModConfig.config.displayManaText()) {
-			Minecraft mc = Minecraft.getInstance();
-			int centerx = hudXAnchor - (5 * 8);
-			String str = totalMana + "/" + totalMaxMana;
-			int width = mc.font.width(str);
-			mc.font.draw(matrixStackIn,
-					str, centerx - width/2, hudYAnchor + 1, 0xFFFFFFFF);
-		}
-		
 	}
 	
-	private void renderManaBar(PoseStack matrixStackIn, LocalPlayer player, Window window, INostrumMagic attr) {
-		Minecraft mc = Minecraft.getInstance();
-		int hudXAnchor = window.getGuiScaledWidth() - (10 + GUI_BAR_WIDTH);
-		int hudYAnchor = 10 + (GUI_BAR_HEIGHT);
-		int displayHeight = (int) ((float) GUI_BAR_HEIGHT * Math.max(0f, Math.min(1f, (float) attr.getMana() / (float) attr.getMaxMana())));
+	private void renderManaBarOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
+		final Minecraft mc = Minecraft.getInstance();
+		final LocalPlayer player = mc.player;
+		final INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
-		RenderSystem.enableBlend();
-		mc.getTextureManager().bind(GUI_ICONS);
-		this.blit(matrixStackIn, hudXAnchor, hudYAnchor - displayHeight, GUI_BAR_OFFSETX + GUI_BAR_WIDTH, (GUI_BAR_HEIGHT - displayHeight), GUI_BAR_WIDTH, displayHeight);
-		this.blit(matrixStackIn, hudXAnchor, hudYAnchor - GUI_BAR_HEIGHT, GUI_BAR_OFFSETX, 0, GUI_BAR_WIDTH, GUI_BAR_HEIGHT);
+		if (attr != null && attr.isUnlocked()
+				&& ModConfig.config.displayManaBar()
+				) {
 		
-		if (ModConfig.config.displayXPBar()) {
-			displayHeight = (int) ((float) GUI_BAR_HEIGHT * Math.min(1f, Math.max(0f, attr.getXP() / attr.getMaxXP())));
-			this.blit(matrixStackIn, hudXAnchor, hudYAnchor - displayHeight, GUI_BAR_OFFSETX + GUI_BAR_WIDTH + GUI_BAR_WIDTH, (GUI_BAR_HEIGHT - displayHeight), GUI_BAR_WIDTH, displayHeight);
-		}
-		RenderSystem.disableBlend();
-		
-		if (ModConfig.config.displayManaText()) {
-			Font fonter = mc.font;
-			int centerx = hudXAnchor + (int) (.5 * GUI_BAR_WIDTH);
-			String str = "" + attr.getMana();
-			int width = fonter.width(str);
-			fonter.draw(matrixStackIn, 
-					str, centerx - width/2, hudYAnchor - (int) (.66 * GUI_BAR_HEIGHT), 0xFFFFFFFF);
+			int hudXAnchor = width - (10 + GUI_BAR_WIDTH);
+			int hudYAnchor = 10 + (GUI_BAR_HEIGHT);
+			int displayHeight = (int) ((float) GUI_BAR_HEIGHT * Math.max(0f, Math.min(1f, (float) attr.getMana() / (float) attr.getMaxMana())));
 			
-			str = "-";
-			width = fonter.width(str);
-			fonter.draw(matrixStackIn, 
-					str, centerx - width/2, hudYAnchor - ((int) (.66 * GUI_BAR_HEIGHT) - fonter.lineHeight), 0xFFFFFFFF);
+			RenderSystem.enableBlend();
+			RenderSystem.setShaderTexture(0, GUI_ICONS);
+			this.blit(matrixStackIn, hudXAnchor, hudYAnchor - displayHeight, GUI_BAR_OFFSETX + GUI_BAR_WIDTH, (GUI_BAR_HEIGHT - displayHeight), GUI_BAR_WIDTH, displayHeight);
+			this.blit(matrixStackIn, hudXAnchor, hudYAnchor - GUI_BAR_HEIGHT, GUI_BAR_OFFSETX, 0, GUI_BAR_WIDTH, GUI_BAR_HEIGHT);
 			
-			str = "" + attr.getMaxMana();
-			width = fonter.width(str);
-			fonter.draw(matrixStackIn, 
-					str, centerx - width/2, hudYAnchor - ((int) (.66 * GUI_BAR_HEIGHT) - (2 * fonter.lineHeight)), 0xFFFFFFFF);
+			if (ModConfig.config.displayXPBar()) {
+				displayHeight = (int) ((float) GUI_BAR_HEIGHT * Math.min(1f, Math.max(0f, attr.getXP() / attr.getMaxXP())));
+				this.blit(matrixStackIn, hudXAnchor, hudYAnchor - displayHeight, GUI_BAR_OFFSETX + GUI_BAR_WIDTH + GUI_BAR_WIDTH, (GUI_BAR_HEIGHT - displayHeight), GUI_BAR_WIDTH, displayHeight);
+			}
+			RenderSystem.disableBlend();
+			
+			if (ModConfig.config.displayManaText()) {
+				Font fonter = mc.font;
+				int centerx = hudXAnchor + (int) (.5 * GUI_BAR_WIDTH);
+				String str = "" + attr.getMana();
+				int strWidth = fonter.width(str);
+				fonter.draw(matrixStackIn, 
+						str, centerx - strWidth/2, hudYAnchor - (int) (.66 * GUI_BAR_HEIGHT), 0xFFFFFFFF);
+				
+				str = "-";
+				strWidth = fonter.width(str);
+				fonter.draw(matrixStackIn, 
+						str, centerx - strWidth/2, hudYAnchor - ((int) (.66 * GUI_BAR_HEIGHT) - fonter.lineHeight), 0xFFFFFFFF);
+				
+				str = "" + attr.getMaxMana();
+				strWidth = fonter.width(str);
+				fonter.draw(matrixStackIn, 
+						str, centerx - strWidth/2, hudYAnchor - ((int) (.66 * GUI_BAR_HEIGHT) - (2 * fonter.lineHeight)), 0xFFFFFFFF);
+			}
 		}
 	}
 	
@@ -621,38 +617,41 @@ public class OverlayRenderer extends GuiComponent {
 		return binding;
 	}
 	
-	private void renderSpellSlide(PoseStack matrixStackIn, LocalPlayer player, Window window, INostrumMagic attr) {
-		// Bottom left spell slide
-		// Spell name
-		Minecraft mc = Minecraft.getInstance();
-		Spell[] current = NostrumMagica.getCurrentSpellLoadout(mc.player);
-		if (current != null && current.length != 0) {
-			final int slotSize = 16;
-			int slideHeight = slotSize + (4);
-			
-			final int slideWidthInSlots = Math.max(3, current.length);
-			final int slideWidth = slotSize * slideWidthInSlots;
-			
-			// XP bar
-			RenderFuncs.drawRect(matrixStackIn, 0, window.getGuiScaledHeight() - 4, slideWidth, window.getGuiScaledHeight(), 0xFF000000);
-			RenderFuncs.drawRect(matrixStackIn, 1, window.getGuiScaledHeight() - 3, slideWidth - 1, window.getGuiScaledHeight() - 1, 0xFF808080);
-			final int xpXOffset = Math.round((attr.getXP() / attr.getMaxXP()) * (slideWidth-2));
-			if (xpXOffset > 0) {
-				RenderFuncs.drawRect(matrixStackIn, 1, window.getGuiScaledHeight() - 3, 1 + xpXOffset, window.getGuiScaledHeight() - 1, 0xFFFFFF22);
-			}
-			
-			// Spells
-			final int xOffset = (slideWidthInSlots > current.length) ? ((slideWidthInSlots - current.length) * slotSize) / 2 : 0;
-			final int yOffset = window.getGuiScaledHeight() - slideHeight;
-			if (slideWidthInSlots > current.length) {
-				RenderFuncs.drawGradientRect(matrixStackIn, 0, yOffset + (slideHeight/4), slideWidth, window.getGuiScaledHeight() - 4,
-						0x00000000, 0x00000000, 0x80000000, 0x80000000);
-			}
-			for (int i = 0; i < current.length; i++) {
-				matrixStackIn.pushPose();
-				matrixStackIn.translate(xOffset + (i * slotSize), yOffset, 0);
-				renderSpellLoadoutSlot(matrixStackIn, current[i], getBindingForSlot(i), slotSize, slotSize);
-				matrixStackIn.popPose();
+	private void renderSpellSlide(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
+		final Minecraft mc = Minecraft.getInstance();
+		final INostrumMagic attr = NostrumMagica.getMagicWrapper(mc.player);
+		if (attr != null && attr.isUnlocked()) {
+			// Bottom left spell slide
+			// Spell name
+			Spell[] current = NostrumMagica.getCurrentSpellLoadout(mc.player);
+			if (current != null && current.length != 0) {
+				final int slotSize = 16;
+				int slideHeight = slotSize + (4);
+				
+				final int slideWidthInSlots = Math.max(3, current.length);
+				final int slideWidth = slotSize * slideWidthInSlots;
+				
+				// XP bar
+				RenderFuncs.drawRect(matrixStackIn, 0, height - 4, slideWidth, height, 0xFF000000);
+				RenderFuncs.drawRect(matrixStackIn, 1, height - 3, slideWidth - 1, height - 1, 0xFF808080);
+				final int xpXOffset = Math.round((attr.getXP() / attr.getMaxXP()) * (slideWidth-2));
+				if (xpXOffset > 0) {
+					RenderFuncs.drawRect(matrixStackIn, 1, height - 3, 1 + xpXOffset, height - 1, 0xFFFFFF22);
+				}
+				
+				// Spells
+				final int xOffset = (slideWidthInSlots > current.length) ? ((slideWidthInSlots - current.length) * slotSize) / 2 : 0;
+				final int yOffset = height - slideHeight;
+				if (slideWidthInSlots > current.length) {
+					RenderFuncs.drawGradientRect(matrixStackIn, 0, yOffset + (slideHeight/4), slideWidth, height - 4,
+							0x00000000, 0x00000000, 0x80000000, 0x80000000);
+				}
+				for (int i = 0; i < current.length; i++) {
+					matrixStackIn.pushPose();
+					matrixStackIn.translate(xOffset + (i * slotSize), yOffset, 0);
+					renderSpellLoadoutSlot(matrixStackIn, current[i], getBindingForSlot(i), slotSize, slotSize);
+					matrixStackIn.popPose();
+				}
 			}
 		}
 	}
@@ -726,7 +725,10 @@ public class OverlayRenderer extends GuiComponent {
 		return reagentStacks.get(type);
 	}
 	
-	private void renderReagentTracker(PoseStack matrixStackIn, LocalPlayer player, Window window, INostrumMagic attr, Font fonter) {
+	private void renderReagentTracker(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int guiWidth, int guiHeight) {
+		final Minecraft mc = Minecraft.getInstance();
+		final LocalPlayer player = mc.player;
+		
 		tickReagentCounts(player);
 		
 		final ReagentHUDMode mode = ModConfig.config.displayReagentMode();
@@ -772,25 +774,25 @@ public class OverlayRenderer extends GuiComponent {
 		if (offsetAuto) {
 			final int estimatedSpellSlideWidth = 16 * 5;
 			final int estimatedLeftTaken = estimatedSpellSlideWidth + 80 + width;
-			if (window.getGuiScaledWidth()/2 < estimatedLeftTaken) {
+			if (guiWidth/2 < estimatedLeftTaken) {
 				xOffset = 0;
-				yOffset = window.getGuiScaledHeight() - (height + 28);
+				yOffset = guiHeight - (height + 28);
 				hang = Direction.WEST;
 			} else {
 				xOffset = estimatedSpellSlideWidth + 10;
-				yOffset = window.getGuiScaledHeight() - height;
+				yOffset = guiHeight - height;
 				hang = Direction.SOUTH;
 			}
 		} else {
 			if (configX == -1) {
-				xOffset = window.getGuiScaledWidth() - width;
+				xOffset = guiWidth - width;
 			} else {
-				xOffset = configX > 0 ? configX : (window.getGuiScaledWidth() - configX);
+				xOffset = configX > 0 ? configX : (guiWidth - configX);
 			}
 			if (configY == -1) {
-				yOffset = window.getGuiScaledHeight() - height;
+				yOffset = guiHeight - height;
 			} else {
-				yOffset = configY > 0 ? configY : (window.getGuiScaledHeight() - configY);
+				yOffset = configY > 0 ? configY : (guiHeight - configY);
 			}
 			
 			hang = configX == -1 ? Direction.EAST
@@ -873,105 +875,113 @@ public class OverlayRenderer extends GuiComponent {
 			final int color = (lastReagentsUsed.contains(type) ? 0xFFFFFF40 : 0xFFFFFFFF);
 			
 			RenderFuncs.RenderGUIItem(getReagentStack(type), matrixStackIn, x, y, -30);
-			fonter.draw(matrixStackIn, lastReagentCounts.get(type) + "", x + 18, y + 5, color);
+			mc.font.draw(matrixStackIn, lastReagentCounts.get(type) + "", x + 18, y + 5, color);
 		}
 		matrixStackIn.popPose();
 		matrixStackIn.popPose();
 	}
 	
-	private void renderArmorOverlay(PoseStack matrixStackIn, LocalPlayer player, Window window) {
-		// Clone calc of left y offset, since it's not passed through
-		int left_height = 39;
-		AttributeInstance attrMaxHealth = player.getAttribute(Attributes.MAX_HEALTH);
-        float healthMax = (float)attrMaxHealth.getValue();
-        if (ModConfig.config.displayArmorOverlayOneLine()) {
-        	// Cap to 20 -- one full row
-        	healthMax = Math.min(20f, healthMax);
-        }
-        float absorb = Mth.ceil(player.getAbsorptionAmount());
-		int healthRows = Mth.ceil((healthMax + absorb) / 2.0F / 10.0F);
-        int rowHeight = Math.max(10 - (healthRows - 2), 3);
-
-        left_height += (healthRows * rowHeight);
-        if (rowHeight != 10) left_height += 10 - rowHeight;
-        int left = window.getGuiScaledWidth() / 2 - 91;
-        int top = window.getGuiScaledHeight() - left_height;
-		
-        matrixStackIn.pushPose();
-		RenderSystem.enableBlend();
-		
-		int level = player.getArmorValue();//ForgeHooks.getTotalArmorValue(player);
-		level -= 20;
-		
-		// Stretch the last 5 to 100% out to fill the whole bar
-		level = Math.min(20, level * 4);
-        for (int i = 0; i < level; i += 2)
-        {
-            RenderFuncs.blit(matrixStackIn, left, top, 34, 9, 9, 3, 0.1f, .2f, 1f, .8f);
-            left += 8;
-        }
-		
-		RenderSystem.disableBlend();
-		matrixStackIn.popPose();
-	}
+	private void renderArmorOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
+		if (ModConfig.config.displayArmorOverlay()) {
+			final Minecraft mc = Minecraft.getInstance();
+			final LocalPlayer player = mc.player;
+			
+			// Clone calc of left y offset, since it's not passed through
+			int left_height = 39;
+			AttributeInstance attrMaxHealth = player.getAttribute(Attributes.MAX_HEALTH);
+	        float healthMax = (float)attrMaxHealth.getValue();
+	        if (ModConfig.config.displayArmorOverlayOneLine()) {
+	        	// Cap to 20 -- one full row
+	        	healthMax = Math.min(20f, healthMax);
+	        }
+	        float absorb = Mth.ceil(player.getAbsorptionAmount());
+			int healthRows = Mth.ceil((healthMax + absorb) / 2.0F / 10.0F);
+	        int rowHeight = Math.max(10 - (healthRows - 2), 3);
 	
-	private void renderShieldOverlay(PoseStack matrixStackIn, LocalPlayer player, Window window) {
-		double physical = 0;
-		double magical = 0;
-		EffectData data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.SHIELD_PHYSICAL);
-		if (data != null) {
-			physical = data.getAmt();
-		}
-		data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.SHIELD_MAGIC);
-		if (data != null) {
-			magical = data.getAmt();
-		}
-		
-		// Clone calc of left y offset, since it's not passed through
-		int left_height = 39;
-        int left = window.getGuiScaledWidth() / 2 - 91;
-        int top = window.getGuiScaledHeight() - left_height;
-        int whole = (int) Math.ceil(physical) / 2;
-        boolean half = Math.ceil(physical) % 2 == 1;
-        
-        if (physical > 0 || magical > 0) {
-        	Minecraft mc = Minecraft.getInstance();
+	        left_height += (healthRows * rowHeight);
+	        if (rowHeight != 10) left_height += 10 - rowHeight;
+	        int left = width / 2 - 91;
+	        int top = height - left_height;
+			
 	        matrixStackIn.pushPose();
 			RenderSystem.enableBlend();
-			mc.getTextureManager().bind(GUI_ICONS);
 			
-	        for (int i = 0; i < whole; i++)
+			int level = player.getArmorValue();//ForgeHooks.getTotalArmorValue(player);
+			level -= 20;
+			
+			// Stretch the last 5 to 100% out to fill the whole bar
+			level = Math.min(20, level * 4);
+	        for (int i = 0; i < level; i += 2)
 	        {
-	            blit(matrixStackIn, left, top, GUI_SHIELD_PHYS_OFFSETX, GUI_SHIELD_OFFSETY, 9, 9);
+	            RenderFuncs.blit(matrixStackIn, left, top, 34, 9, 9, 3, 0.1f, .2f, 1f, .8f);
 	            left += 8;
 	        }
-	        
-	        if (half) {
-	        	blit(matrixStackIn, left, top, GUI_SHIELD_PHYS_OFFSETX + 9, GUI_SHIELD_OFFSETY, 5, 9);
-	        }
-	        
-	        // Repeat for magic
-	        whole = (int) Math.ceil(magical) / 2;
-	        half = Math.ceil(magical) % 2 == 1;
-	        left = window.getGuiScaledWidth() / 2 - 91;
-	        
-	        for (int i = 0; i < whole; i++)
-	        {
-	            blit(matrixStackIn, left, top, GUI_SHIELD_MAG_OFFSETX, GUI_SHIELD_OFFSETY, 9, 9);
-	            left += 8;
-	        }
-	        
-	        if (half) {
-	        	blit(matrixStackIn, left, top, GUI_SHIELD_MAG_OFFSETX, GUI_SHIELD_OFFSETY + 9, 5, 9);
-	        }
 			
-//	        GlStateManager.color4f(1f, 1f, 1f, 1f);
 			RenderSystem.disableBlend();
 			matrixStackIn.popPose();
-        }
+		}
 	}
 	
-	private void renderHookshotCrosshair(PoseStack matrixStackIn, LocalPlayer player, Window scaledResolution, boolean entity) {
+	private void renderShieldOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
+		if (ModConfig.config.displayShieldHearts()) {
+			final Minecraft mc = Minecraft.getInstance();
+			final LocalPlayer player = mc.player;
+			double physical = 0;
+			double magical = 0;
+			EffectData data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.SHIELD_PHYSICAL);
+			if (data != null) {
+				physical = data.getAmt();
+			}
+			data = NostrumMagica.magicEffectProxy.getData(player, SpecialEffect.SHIELD_MAGIC);
+			if (data != null) {
+				magical = data.getAmt();
+			}
+			
+			// Clone calc of left y offset, since it's not passed through
+			int left_height = 39;
+	        int left = width / 2 - 91;
+	        int top = height - left_height;
+	        int whole = (int) Math.ceil(physical) / 2;
+	        boolean half = Math.ceil(physical) % 2 == 1;
+	        
+	        if (physical > 0 || magical > 0) {
+		        matrixStackIn.pushPose();
+				RenderSystem.enableBlend();
+				RenderSystem.setShaderTexture(0, GUI_ICONS);
+				
+		        for (int i = 0; i < whole; i++)
+		        {
+		            blit(matrixStackIn, left, top, GUI_SHIELD_PHYS_OFFSETX, GUI_SHIELD_OFFSETY, 9, 9);
+		            left += 8;
+		        }
+		        
+		        if (half) {
+		        	blit(matrixStackIn, left, top, GUI_SHIELD_PHYS_OFFSETX + 9, GUI_SHIELD_OFFSETY, 5, 9);
+		        }
+		        
+		        // Repeat for magic
+		        whole = (int) Math.ceil(magical) / 2;
+		        half = Math.ceil(magical) % 2 == 1;
+		        left = width / 2 - 91;
+		        
+		        for (int i = 0; i < whole; i++)
+		        {
+		            blit(matrixStackIn, left, top, GUI_SHIELD_MAG_OFFSETX, GUI_SHIELD_OFFSETY, 9, 9);
+		            left += 8;
+		        }
+		        
+		        if (half) {
+		        	blit(matrixStackIn, left, top, GUI_SHIELD_MAG_OFFSETX, GUI_SHIELD_OFFSETY + 9, 5, 9);
+		        }
+				
+	//	        GlStateManager.color4f(1f, 1f, 1f, 1f);
+				RenderSystem.disableBlend();
+				matrixStackIn.popPose();
+	        }
+		}
+	}
+	
+	private void renderHookshotCrosshair(PoseStack matrixStackIn, LocalPlayer player, int width, int height, boolean entity) {
 		final float red;
 		final float green;
 		final float blue;
@@ -989,8 +999,7 @@ public class OverlayRenderer extends GuiComponent {
 			blue = .5f;
 			alpha = .7f;
 		}
-		Minecraft mc = Minecraft.getInstance();
-		mc.getTextureManager().bind(GUI_ICONS);
+		RenderSystem.setShaderTexture(0, GUI_ICONS);
 		
 		final int period = 30;
 		final float frac = (float) (player.level.getGameTime() % period) / period;
@@ -1007,7 +1016,7 @@ public class OverlayRenderer extends GuiComponent {
 		for (int i = 0; i < 3; i++) {
 			rot = rotOffset + (360.0f / 3) * i;
 			matrixStackIn.pushPose();
-			matrixStackIn.translate(scaledResolution.getGuiScaledWidth() / 2, scaledResolution.getGuiScaledHeight() / 2, 0);
+			matrixStackIn.translate(width / 2, height / 2, 0);
 			
 			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(rot));
 			matrixStackIn.translate(0, -radius, 0);
@@ -1030,14 +1039,13 @@ public class OverlayRenderer extends GuiComponent {
 		matrixStackIn.popPose();
 	}
 	
-	private void renderCrosshairTargetOverlay(PoseStack matrixStackIn, LocalPlayer player, Window scaledResolution) {
+	private void renderCrosshairTargetOverlay(PoseStack matrixStackIn, LocalPlayer player, int width, int height) {
 		matrixStackIn.pushPose();
 		RenderSystem.enableBlend();
 		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		Minecraft mc = Minecraft.getInstance();
-		mc.getTextureManager().bind(GUI_ICONS);
+		RenderSystem.setShaderTexture(0, GUI_ICONS);
 		
-		matrixStackIn.translate(scaledResolution.getGuiScaledWidth() / 2, scaledResolution.getGuiScaledHeight() / 2, 0);
+		matrixStackIn.translate(width / 2, height / 2, 0);
 		
 		matrixStackIn.translate(-GUI_TARGET_CROSSHAIR_WIDTH / 2, -(GUI_TARGET_CROSSHAIR_WIDTH / 2), 0);
 		
@@ -1051,10 +1059,9 @@ public class OverlayRenderer extends GuiComponent {
 		matrixStackIn.popPose();
 	}
 	
-	private void renderContingencyShield(PoseStack matrixStackIn, LocalPlayer player, Window scaledResolution, int typeOffset, int xoffset, float timer) {
-		Minecraft mc = Minecraft.getInstance();
-		final int left = (scaledResolution.getGuiScaledWidth() / 2 + 91) + 10 + (xoffset * GUI_CONTINGENCY_ICON_LENGTH);
-		final int top = scaledResolution.getGuiScaledHeight() - (2 + GUI_CONTINGENCY_ICON_LENGTH);
+	private void renderContingencyShield(PoseStack matrixStackIn, LocalPlayer player, int guiWidth, int guiHeight, int typeOffset, int xoffset, float timer) {
+		final int left = (guiWidth / 2 + 91) + 10 + (xoffset * GUI_CONTINGENCY_ICON_LENGTH);
+		final int top = guiHeight - (2 + GUI_CONTINGENCY_ICON_LENGTH);
 		final float borderScale = 1.07f;
 		final BufferBuilder buffer = Tesselator.getInstance().getBuilder();
 		final int width = GUI_CONTINGENCY_ICON_LENGTH; // for readability
@@ -1067,7 +1074,7 @@ public class OverlayRenderer extends GuiComponent {
 		matrixStackIn.pushPose();
 		RenderSystem.enableBlend();
 		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		mc.getTextureManager().bind(GUI_ICONS);
+		RenderSystem.setShaderTexture(0, GUI_ICONS);
 		
 		matrixStackIn.translate(left, top, 0);
 		
@@ -1076,7 +1083,7 @@ public class OverlayRenderer extends GuiComponent {
 		matrixStackIn.scale(borderScale, borderScale, borderScale);
 		{
 			final Matrix4f transform = matrixStackIn.last().pose();
-			buffer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR_TEX);
+			buffer.begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR_TEX);
 			
 			final float uMin = ((float) (GUI_CONTINGENCY_ICON_OFFSETX + (3 * GUI_CONTINGENCY_ICON_LENGTH))) / 256f;
 			final float uMax = ((float) (GUI_CONTINGENCY_ICON_OFFSETX + (4 * GUI_CONTINGENCY_ICON_LENGTH))) / 256f;
@@ -1132,12 +1139,11 @@ public class OverlayRenderer extends GuiComponent {
 		matrixStackIn.popPose();
 	}
 	
-	private void renderCursedFireOverlay(PoseStack matrixStackIn, Player player, Window window) {
+	private void renderCursedFireOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
 		final Minecraft mc = Minecraft.getInstance();
-		final float width = window.getGuiScaledWidth() / 2;
 		
 		matrixStackIn.pushPose();
-		matrixStackIn.translate(window.getGuiScaledWidth()*.2f, window.getGuiScaledHeight() * .95f, -500);
+		matrixStackIn.translate(width *.2f, height * .95f, -500);
 		
 		matrixStackIn.pushPose();
 		matrixStackIn.scale(width, width, 1);
@@ -1145,7 +1151,7 @@ public class OverlayRenderer extends GuiComponent {
 		matrixStackIn.popPose();
 		
 		matrixStackIn.pushPose();
-		matrixStackIn.translate(window.getGuiScaledWidth()*.6f, 0, 0);
+		matrixStackIn.translate(width*.6f, 0, 0);
 		matrixStackIn.scale(width, width, 1);
 		CursedFireEffectRenderer.renderFire(matrixStackIn, mc.renderBuffers().bufferSource(), CursedFireEffectRenderer.TEX_FIRE_1.sprite(), RenderFuncs.BrightPackedLight, 1f, 1f, 1f, 1f, 1f);
 		matrixStackIn.popPose();
@@ -1255,9 +1261,8 @@ public class OverlayRenderer extends GuiComponent {
 		RenderFuncs.RenderGUIItem(new ItemStack(NostrumItems.spellScroll), matrixStackIn);
 		
 		if (loreIsDeep != null) {
-			final Minecraft mc = Minecraft.getInstance();
 			final int u = (160 + (loreIsDeep ? 0 : 32));
-			mc.getTextureManager().bind(GUI_ICONS);
+			RenderSystem.setShaderTexture(0, GUI_ICONS);
 			
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 101); // items render z+100
@@ -1267,23 +1272,20 @@ public class OverlayRenderer extends GuiComponent {
 	}
 	
 	private void renderEnchantableIcon(PoseStack matrixStackIn) {
-		Minecraft mc = Minecraft.getInstance();
 		RenderSystem.enableBlend();
-		mc.getTextureManager().bind(GUI_ICONS);
+		RenderSystem.setShaderTexture(0, GUI_ICONS);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 6, 6, 192, 32, 32, 32, 12, 12, 256, 256);
 	}
 	
 	private void renderConfigurableIcon(PoseStack matrixStackIn) {
-		Minecraft mc = Minecraft.getInstance();
 		RenderSystem.enableBlend();
-		mc.getTextureManager().bind(GUI_ICONS);
+		RenderSystem.setShaderTexture(0, GUI_ICONS);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 8, 8, 160, 32, 32, 32, 8, 8, 256, 256);
 	}
 	
 	private void renderTransmutableIcon(PoseStack matrixStackIn) {
-		Minecraft mc = Minecraft.getInstance();
 		RenderSystem.enableBlend();
-		mc.getTextureManager().bind(GUI_ICONS);
+		RenderSystem.setShaderTexture(0, GUI_ICONS);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 8, 8, 224, 32, 32, 32, 8, 8, 256, 256);
 	}
 	
@@ -1357,22 +1359,6 @@ public class OverlayRenderer extends GuiComponent {
 		}
 	}
 		
-	
-	@SubscribeEvent
-	public void onTooltipRender(RenderTooltipEvent.PostText event) {
-//		ItemStack stack = event.getStack();
-//		if (stack.isEmpty() || !(stack.getItem() instanceof ILoreTagged)) {
-//			return;
-//		}
-//		
-//		INostrumMagic attr = NostrumMagica.getMagicWrapper(mc.player);
-//		if (attr == null || !attr.isUnlocked()) {
-//			return;
-//		}
-//		
-//		ILoreTagged tag = (ILoreTagged) stack.getItem();
-//		renderLoreIcon(attr.hasFullLore(tag));
-	}
 	
 	protected void renderRoots(PoseStack matrixStackIn, LivingEntity entity) {
 		if (entity.tickCount % 4 == 0) {
@@ -1482,7 +1468,7 @@ public class OverlayRenderer extends GuiComponent {
 	}
 	
 	@SubscribeEvent
-	public void onBlockHighlight(DrawHighlightEvent.HighlightBlock event) {
+	public void onBlockHighlight(DrawSelectionEvent.HighlightBlock event) {
 		if (event.isCanceled() || event.getTarget().getType() != HitResult.Type.BLOCK) {
 			return;
 		}

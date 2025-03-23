@@ -132,7 +132,7 @@ public class NostrumRenderTypes {
 				.setOutputState(ITEM_ENTITY_TARGET)
 				.setAlphaState(CUTOUT_ALPHA)
 			.createCompositeState(false);
-		HOOKSHOT_CHAIN = RenderType.create(Name("hookshot_chain"), DefaultVertexFormat.POSITION_TEX, GL11.GL_QUADS, 128, glState);
+		HOOKSHOT_CHAIN = RenderType.create(Name("hookshot_chain"), DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS, 128, glState);
 		
 		glState = RenderType.CompositeState.builder()
 				.setTextureState(new RenderStateShard.TextureStateShard(LayerManaArmor.TEXTURE_ARMOR, true, false))
@@ -143,7 +143,7 @@ public class NostrumRenderTypes {
 				.setTexturingState(MANAARMOR_GLINT)
 				// depth test?
 			.createCompositeState(false);
-		MANA_ARMOR = RenderType.create(Name("manaarmor"), DefaultVertexFormat.NEW_ENTITY, GL11.GL_QUADS, 128, glState);
+		MANA_ARMOR = RenderType.create(Name("manaarmor"), DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 128, glState);
 		
 		glState = RenderType.CompositeState.builder()
 				.setTextureState(new RenderStateShard.TextureStateShard(SpellShapeRenderer.TEXTURE_BLOCK, true, false))
@@ -154,7 +154,7 @@ public class NostrumRenderTypes {
 				.setTexturingState(SPELLSHAPE_TEXTURING)
 				// depth test?
 			.createCompositeState(false);
-		SPELLSHAPE_QUADS = RenderType.create(Name("spellshape"), DefaultVertexFormat.POSITION_COLOR_TEX, GL11.GL_QUADS, 128, glState);
+		SPELLSHAPE_QUADS = RenderType.create(Name("spellshape"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 128, glState);
 		
 		glState = RenderType.CompositeState.builder()
 				.setTextureState(new RenderStateShard.TextureStateShard(SpellShapeRenderer.TEXTURE_FLOW, true, false))
@@ -166,7 +166,7 @@ public class NostrumRenderTypes {
 				//.texturing(SPELLSHAPE_TEXTURING)
 				// depth test?
 			.createCompositeState(false);
-		SPELLSHAPE_ORB_CHAIN = RenderType.create(Name("spellshape_chain"), DefaultVertexFormat.POSITION_COLOR_TEX, GL11.GL_QUADS, 128, glState);
+		SPELLSHAPE_ORB_CHAIN = RenderType.create(Name("spellshape_chain"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 128, glState);
 		
 		glState = RenderType.CompositeState.builder()
 				//.texture(new RenderState.TextureState(SpellShapeRenderer.TEXTURE_FLOW, true, false))
@@ -235,7 +235,7 @@ public class NostrumRenderTypes {
 				.setLightmapState(LIGHTMAP_ENABLED)
 				.setCullState(NO_CULL)
 			.createCompositeState(false);
-		LOCKEDCHEST_LOCK = RenderType.create(Name("lockedchest_lock"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 32, glState);
+		LOCKEDCHEST_LOCK = RenderType.create(Name("lockedchest_lock"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.QUADS, 32, glState);
 		
 		glState = RenderType.CompositeState.builder()
 				.setTextureState(new RenderStateShard.TextureStateShard(TileEntityLockedChestRenderer.TEXT_CHAINLINK_LOC, false, true))
@@ -244,14 +244,14 @@ public class NostrumRenderTypes {
 				.setCullState(NO_CULL)
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
 			.createCompositeState(false);
-		LOCKEDCHEST_CHAIN = RenderType.create(Name("lockedchest_chain"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 64, glState);
+		LOCKEDCHEST_CHAIN = RenderType.create(Name("lockedchest_chain"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.QUADS, 64, glState);
 		
 		glState = RenderType.CompositeState.builder()
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
 				.setLightmapState(NO_LIGHTING)
 				.setDepthTestState(NO_DEPTH)
 			.createCompositeState(false);
-		WORLD_SELECT_HIGHLIGHT_CULL = RenderType.create(Name("WorldSelectCull"), DefaultVertexFormat.POSITION_COLOR, GL11.GL_QUADS, 16, glState);
+		WORLD_SELECT_HIGHLIGHT_CULL = RenderType.create(Name("WorldSelectCull"), DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 16, glState);
 		
 		glState = RenderType.CompositeState.builder()
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
@@ -259,7 +259,7 @@ public class NostrumRenderTypes {
 				.setDepthTestState(NO_DEPTH)
 				.setCullState(NO_CULL) // Previously only was no-cull if inside box
 			.createCompositeState(false);
-		WORLD_SELECT_HIGHLIGHT = RenderType.create(Name("WorldSelect"), DefaultVertexFormat.POSITION_COLOR, GL11.GL_QUADS, 16, glState);
+		WORLD_SELECT_HIGHLIGHT = RenderType.create(Name("WorldSelect"), DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 16, glState);
 	}
 	
 	public static final RenderType GetIconType(ResourceLocation texture) {
@@ -274,7 +274,7 @@ public class NostrumRenderTypes {
 				//.target(ITEM_ENTITY_TARGET)
 				//.writeMask(WRITE_TO_DEPTH_AND_COLOR)
 			.createCompositeState(false);
-		return RenderType.create(Name("flaticon"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, GL11.GL_QUADS, 32, glState);
+		return RenderType.create(Name("flaticon"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.QUADS, 32, glState);
 	}
 	
 	public static final RenderType GetBlendedEntity(ResourceLocation texture, boolean affectsOutline) {
@@ -307,7 +307,7 @@ public class NostrumRenderTypes {
 				.setOverlayState(OVERLAY_ENABLED)
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
 			.createCompositeState(affectsOutline);
-		return RenderType.create(Name("nostrum_blendedentity"), DefaultVertexFormat.NEW_ENTITY, GL11.GL_QUADS, 256, glState);
+		return RenderType.create(Name("nostrum_blendedentity"), DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, glState);
 	}
 	
 	public static final RenderType GetBlendedEntity(ResourceLocation texture) {

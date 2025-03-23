@@ -111,7 +111,7 @@ public class ClientEffectRenderer {
 				ClientEffect ef = it.next();
 				if (!ef.displayTick(mc, stack, event.getPartialTicks())) {
 					ef.onEnd();
-					it.discard();
+					it.remove();
 				}
 			}
 		}

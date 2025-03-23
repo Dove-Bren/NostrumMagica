@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.client.particles;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.annotation.Nullable;
 
 import com.mojang.serialization.Codec;
@@ -12,15 +14,15 @@ import com.smanzana.nostrummagica.util.NetUtils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.Level;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
+import net.minecraftforge.fmllegacy.network.PacketDistributor.TargetPoint;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum NostrumParticles {
@@ -54,11 +56,23 @@ public enum NostrumParticles {
 	public @Nullable INostrumParticleFactory<?> getFactory() {
 		if (factory == null) {
 			try {
-				factory = factoryClazz.newInstance();
+				factory = factoryClazz.getDeclaredConstructor().newInstance();
 			} catch (InstantiationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
