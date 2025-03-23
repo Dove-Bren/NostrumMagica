@@ -1,25 +1,27 @@
 package com.smanzana.nostrummagica.world.dimension;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryLookupCodec;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.CheckerboardColumnBiomeSource;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
-import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.levelgen.StructureSettings;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -91,7 +93,7 @@ public class EmptyChunkGen extends ChunkGenerator {
 //	}
 	
 	@Override
-	public int getBaseHeight(int x, int z, Types heightmapType) {
+	public int getBaseHeight(int x, int z, Types heightmapType, LevelHeightAccessor accessor) {
 		return 0;
 	}
 
@@ -107,13 +109,12 @@ public class EmptyChunkGen extends ChunkGenerator {
 	}
 
 	@Override
-	public void fillFromNoise(LevelAccessor p_230352_1_, StructureFeatureManager p_230352_2_, ChunkAccess p_230352_3_) { // Actual generator?
-		; // Do nothing
+	public CompletableFuture<ChunkAccess> fillFromNoise(Executor p_230352_1_, StructureFeatureManager p_230352_2_, ChunkAccess p_230352_3_) { // Actual generator?
+		return CompletableFuture.completedFuture(p_230352_3_); // Do nothing
 	}
 
 	@Override
-	public BlockGetter getBaseColumn(int p_230348_1_, int p_230348_2_) { // I'm not sure what this is? Reader for a single x/z column?
-		return new NoiseColumn(new BlockState[] {Blocks.AIR.defaultBlockState()});
+	public NoiseColumn getBaseColumn(int p_230348_1_, int p_230348_2_, LevelHeightAccessor height) { // I'm not sure what this is? Reader for a single x/z column?
+		return new NoiseColumn(0, new BlockState[] {Blocks.AIR.defaultBlockState()});
 	}
-	
 }

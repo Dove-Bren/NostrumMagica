@@ -9,6 +9,7 @@ import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.world.level.levelgen.feature.blockplacers.SimpleBlockPlacer;
 import net.minecraft.world.level.levelgen.feature.stateproviders.SimpleStateProvider;
 import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration;
+import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.data.worldgen.Features;
@@ -52,11 +53,11 @@ public class NostrumFeatures {
 		
 		CONFFEATURE_ORE_MANI = registerConfiguredFeature(NostrumMagica.Loc(ID_ORE_MANI), Feature.ORE.configured(
 				new OreConfiguration(OreConfiguration.Predicates.NATURAL_STONE, NostrumBlocks.maniOre.defaultBlockState(), 9))
-				.range(128).squared().count(15));
+				.rangeUniform(VerticalAnchor.bottom(), VerticalAnchor.aboveBottom(128)).squared().count(15));
 		
 		CONFFEATURE_ORE_ESSORE = registerConfiguredFeature(NostrumMagica.Loc(ID_ORE_ESSORE), Feature.ORE.configured(
 				new OreConfiguration(OreConfiguration.Predicates.NATURAL_STONE, NostrumBlocks.essenceOre.defaultBlockState(), 4))
-				.range(60).squared().count(8));
+				.rangeUniform(VerticalAnchor.bottom(), VerticalAnchor.aboveBottom(60)).squared().count(8));
 	}
 	
 	private static ConfiguredFeature<?, ?> registerConfiguredFeature(ResourceLocation id, ConfiguredFeature<?, ?> feature) {

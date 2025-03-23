@@ -3,11 +3,12 @@ package com.smanzana.nostrummagica.world.gen;
 import com.smanzana.autodungeons.world.gen.DungeonStructure;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
-import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 public abstract class NostrumDungeonStructures {
@@ -19,8 +20,8 @@ public abstract class NostrumDungeonStructures {
 		}
 		
 		@Override
-		protected boolean /*hasStartAt*/ isFeatureChunk(ChunkGenerator generator, BiomeSource biomeProvider, long seed, WorldgenRandom rand, int x, int z, Biome biome, ChunkPos pos, NoneFeatureConfiguration config) {
-			rand.setSeed((long)(x ^ z << 4) ^ seed);
+		protected boolean /*hasStartAt*/ isFeatureChunk(ChunkGenerator generator, BiomeSource biomeProvider, long seed, WorldgenRandom rand, ChunkPos pos, Biome biome, ChunkPos posCopy, NoneFeatureConfiguration config, LevelHeightAccessor height) {
+			rand.setSeed((long)(pos.x ^ pos.z << 4) ^ seed);
 			return rand.nextInt(2) < 1;
 		}
 	}
@@ -32,7 +33,7 @@ public abstract class NostrumDungeonStructures {
 		}
 		
 		@Override
-		protected boolean /*hasStartAt*/ isFeatureChunk(ChunkGenerator generator, BiomeSource biomeProvider, long seed, WorldgenRandom rand, int x, int z, Biome biome, ChunkPos pos, NoneFeatureConfiguration config) {
+		protected boolean /*hasStartAt*/ isFeatureChunk(ChunkGenerator generator, BiomeSource biomeProvider, long seed, WorldgenRandom rand, ChunkPos pos, Biome biome, ChunkPos posCopy, NoneFeatureConfiguration config, LevelHeightAccessor height) {
 			// Spawn a portal shrine somewhere in the 32x32 chunks around 0
 //			if (x == (int) ((seed & (0x1F << 14)) >> 14) - 16
 //					&& z == (int) ((seed & (0x1F << 43)) >> 43) - 16) {
@@ -52,8 +53,8 @@ public abstract class NostrumDungeonStructures {
 		}
 
 		@Override
-		protected boolean /*hasStartAt*/ isFeatureChunk(ChunkGenerator generator, BiomeSource biomeProvider, long seed, WorldgenRandom rand, int x, int z, Biome biome, ChunkPos pos, NoneFeatureConfiguration config) {
-			rand.setSeed((long)(x ^ z << 4) ^ seed);
+		protected boolean /*hasStartAt*/ isFeatureChunk(ChunkGenerator generator, BiomeSource biomeProvider, long seed, WorldgenRandom rand, ChunkPos pos, Biome biome, ChunkPos posCopy, NoneFeatureConfiguration config, LevelHeightAccessor height) {
+			rand.setSeed((long)(pos.x ^ pos.z << 4) ^ seed);
 			return rand.nextInt(2) < 1;
 		}
 	}

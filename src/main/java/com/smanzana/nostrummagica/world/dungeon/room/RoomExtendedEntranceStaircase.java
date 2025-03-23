@@ -191,7 +191,7 @@ public class RoomExtendedEntranceStaircase extends StaticRoom implements IStairc
 			if (bounds == null) {
 				bounds = super.getBounds(new BlueprintLocation(cursor, start.getFacing()));
 			} else {
-				bounds.expand(super.getBounds(new BlueprintLocation(cursor, start.getFacing())));
+				bounds.encapsulate(super.getBounds(new BlueprintLocation(cursor, start.getFacing())));
 			}
 		}
 		

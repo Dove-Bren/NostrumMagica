@@ -5,7 +5,6 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef.DungeonRoomRef;
@@ -14,31 +13,31 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.world.level.block.FireBlock;
-import net.minecraft.world.level.portal.PortalInfo;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.client.renderer.FogRenderer;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffects;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.portal.PortalInfo;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.WorldTickEvent;
 import net.minecraftforge.event.entity.EntityMobGriefingEvent;
-import net.minecraftforge.event.entity.living.EntityTeleportEvent;
+import net.minecraftforge.event.entity.EntityTeleportEvent;
 import net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
@@ -446,7 +445,6 @@ public class NostrumSorceryDimension {
 			MinecraftForge.EVENT_BUS.register(this);
 		}
 		
-		@SuppressWarnings("deprecation")
 		@SubscribeEvent
 		public void onFogDensityCheck(EntityViewRenderEvent.FogDensity event) {
 			final Entity entity = event.getInfo().getEntity();
@@ -474,10 +472,12 @@ public class NostrumSorceryDimension {
 					far = rangeMod;
 				}
 
-				RenderSystem.fogStart(near);
-				RenderSystem.fogEnd(far);
-				RenderSystem.fogMode(GlStateManager.FogMode.LINEAR);
-				RenderSystem.setupNvFogDistance();
+//				RenderSystem.fogStart(near);
+//				RenderSystem.fogEnd(far);
+//				RenderSystem.fogMode(GlStateManager.FogMode.LINEAR);
+//				RenderSystem.setupNvFogDistance();
+				RenderSystem.setShaderFogStart(near);
+				RenderSystem.setShaderFogEnd(far);
 				net.minecraftforge.client.ForgeHooksClient.onFogRender(event.getType(), event.getInfo(), (float) event.getRenderPartialTicks(), far);
 			} else {
 				event.setDensity(.03f);

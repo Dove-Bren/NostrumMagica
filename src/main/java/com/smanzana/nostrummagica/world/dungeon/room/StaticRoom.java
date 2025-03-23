@@ -408,7 +408,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 		BlueprintLocation corner1 = NostrumDungeon.asRotated(entry, new BlockPos(locMinX, locMinY, locMinZ), Direction.NORTH);
 		BlueprintLocation corner2 = NostrumDungeon.asRotated(entry, new BlockPos(locMaxX, locMaxY, locMaxZ), Direction.NORTH);
 		
-		return new BoundingBox(corner1.getPos(), corner2.getPos());
+		return BoundingBox.fromCorners(corner1.getPos(), corner2.getPos());
 	}
 	
 	public int getRoomWeight() {
