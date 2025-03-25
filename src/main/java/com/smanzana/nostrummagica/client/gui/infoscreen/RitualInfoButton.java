@@ -42,7 +42,7 @@ public class RitualInfoButton extends InfoButton {
 		}
 		
 		Minecraft mc = Minecraft.getInstance();
-		mc.getTextureManager().bind(InfoScreen.background);
+		RenderSystem.setShaderTexture(0, InfoScreen.background);
 		RenderSystem.enableBlend();
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, 0,
 				0, width,

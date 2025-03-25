@@ -7,10 +7,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spell.EAlteration;
@@ -23,11 +24,9 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
-import com.mojang.blaze3d.platform.Lighting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public abstract class PersonalSubScreen implements IInfoSubScreen {
 
@@ -175,8 +174,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			public void drawOverlay(PoseStack matrixStackIn, Minecraft mc, int offsetx, int offsety, int width, int height, int mouseX, int mouseY) {
 				if (mouseX >= offsetx + x && mouseX <= x + offsetx + this.width
 						&& mouseY >= offsety + y && mouseY <= y + offsety + this.height) {
-					GuiUtils.drawHoveringText(matrixStackIn, tooltip, mouseX, mouseY, width, height, 150, mc.font);
-					Lighting.turnOff();
+					mc.screen.renderTooltip(matrixStackIn, tooltip, Optional.empty(), mouseX, mouseY, mc.font);
 				}
 			}
 			
@@ -435,8 +433,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			mc.font.drawShadow(matrixStackIn, desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
 			
 			if (tooltipText != null) {
-				GuiUtils.drawHoveringText(matrixStackIn, Lists.newArrayList(tooltipText), mouseX, mouseY, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), 200, mc.font);
-				Lighting.turnOff();
+				mc.screen.renderTooltip(matrixStackIn, Lists.newArrayList(tooltipText), Optional.empty(), mouseX, mouseY, mc.font);
 			}
 		}
 
@@ -598,8 +595,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				final float ratio = .5f;
 				if (mouseX >= x && mouseY >= y
 						&& mouseX <= x + width && mouseY <= y + (int) (mc.font.lineHeight * ratio)) {
-					GuiUtils.drawHoveringText(matrixStackIn, Lists.newArrayList(new TextComponent(desc)), mouseX, mouseY, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), 200, mc.font);
-					Lighting.turnOff();
+					mc.screen.renderTooltip(matrixStackIn, Lists.newArrayList(new TextComponent(desc)), Optional.empty(), mouseX, mouseY, mc.font);
 				}
 			}
 			

@@ -188,9 +188,9 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		matrixStackIn.translate(x, y, 0);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.color4f(.7f, .71f, .7f, .4f);
+		RenderSystem.setShaderColor(.7f, .71f, .7f, .4f);
 		PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
-		RenderSystem.color4f(1f, 1f, 1f, 1f);
+		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 		RenderSystem.disableBlend();
 		matrixStackIn.popPose();
 	}
@@ -201,9 +201,9 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		matrixStackIn.translate(x, y, 0);
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
-		RenderSystem.color4f(.2f, .2f, .2f, .4f);
+		RenderSystem.setShaderColor(.2f, .2f, .2f, .4f);
 		PetGUIRenderHelper.DrawSingleSlot(matrixStackIn, cellWidth, cellWidth);
-		RenderSystem.color4f(1f, 1f, 1f, 1f);
+		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 		RenderSystem.disableBlend();
 		matrixStackIn.popPose();
 	}

@@ -47,7 +47,7 @@ public class QuickMoveBagButton extends AbstractButton {
 			color[1] *= .8f;
 			color[2] *= .8f;
 		}
-		Minecraft.getInstance().getTextureManager().bind(TEX);
+		RenderSystem.setShaderTexture(0, TEX);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, 0, 0, TEX_WIDTH, TEX_HEIGHT, width, height, TEX_WIDTH, TEX_HEIGHT, color[0], color[1], color[2], color[3]);
 	}
 

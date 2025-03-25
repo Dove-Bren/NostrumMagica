@@ -8,15 +8,20 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
-import org.lwjgl.opengl.GL11;
-
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.NostrumMagic;
@@ -34,26 +39,19 @@ import com.smanzana.nostrummagica.progression.research.NostrumResearch.Size;
 import com.smanzana.nostrummagica.util.Curves;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import net.minecraft.client.renderer.Rect2i;
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Matrix4f;
-import net.minecraft.world.phys.Vec2;
-import com.mojang.math.Vector3f;
+import net.minecraft.network.chat.BaseComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.BaseComponent;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraftforge.fml.client.gui.GuiUtils;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec2;
 
 public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 
@@ -197,7 +195,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	public void drawBackground(IMirrorScreen parent, PoseStack matrixStackIn, int width, int height, int mouseX, int mouseY, float partialTicks) {
 		float extra = .1f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
 		float inv = .1f - extra;
-		Minecraft.getInstance().getTextureManager().bind(RES_BACK);
+		RenderSystem.setShaderTexture(0, RES_BACK);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 0, 0, TEX_BACK_WIDTH, TEX_BACK_HEIGHT, width, height, TEX_BACK_WIDTH, TEX_BACK_HEIGHT,
 				.9f + extra, 1f, .8f + inv, 1f);
 	}
@@ -418,7 +416,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        		parent = new Vec2(parent.x - (-Math.signum(diff.x) * ((float) other.width / 2f)), parent.y);
 	        	}
 	        	
-	        	buf.begin(GL11.GL_LINES, DefaultVertexFormat.POSITION_COLOR);
+	        	buf.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR);
 		        buf.vertex(child.x, child.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
 		        buf.vertex(parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
 		        Tesselator.getInstance().end();
@@ -457,7 +455,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		        
 		        {
 		        	final Matrix4f transform = matrixStackIn.last().pose();
-			        buf.begin(GL11.GL_LINES, DefaultVertexFormat.POSITION_COLOR);
+			        buf.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR);
 			        buf.vertex(transform, child.x, child.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
 			        buf.vertex(transform, childTo.x, childTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
 			        buf.vertex(transform, parentTo.x, parentTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
@@ -491,7 +489,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		        matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(rotate));
 		        {
 		        	final Matrix4f transform = matrixStackIn.last().pose();
-			        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+			        buf.begin(VertexFormat.Mode.LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 			        for (int i = 0; i <= points; i++) {
 			        	float progress = (float) i / (float) points;
 			        	Vec2 point = Curves.alignedArc2D(progress, Vec2.ZERO, radius, flip);
@@ -515,7 +513,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        }
 	        RenderSystem.enableTexture();
 			RenderSystem.enableBlend();
-			Minecraft.getInstance().getTextureManager().bind(RES_ICONS);
+			RenderSystem.setShaderTexture(0, RES_ICONS);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, -(TEX_ARROW_WIDTH/2) - 1, -(TEX_ARROW_HEIGHT/2), TEX_ARROW_HOFFSET,
 					TEX_ARROW_VOFFSET, TEX_ARROW_WIDTH, TEX_ARROW_HEIGHT, 14, 7, TEX_UTILS_WIDTH,  TEX_UTILS_HEIGHT,
 					1f, 1f, 1f, alpha);
@@ -610,20 +608,20 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			
 			RenderSystem.enableTexture();
 			RenderSystem.enableBlend();
-			Minecraft.getInstance().getTextureManager().bind(RES_ICONS);
+			RenderSystem.setShaderTexture(0, RES_ICONS);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, textureX,
 					textureY, textureW, textureH, this.width, this.height, TEX_UTILS_WIDTH, TEX_UTILS_HEIGHT,
 					color[0], color[1], color[2], color[3]);
 			
 			// Now draw icon
-			Lighting.turnBackOn();
+			//Lighting.turnBackOn();
 			// RenderGuiItem moves 100 forward. Blocks render several z deep.
 			// Squish to 8 deep, and shift back
 			matrixStackIn.scale(1f, 1f, .4f);
 			matrixStackIn.translate(0, 0, -90);
 			RenderFuncs.RenderGUIItem(research.getIconItem(), matrixStackIn, x + (width - 16) / 2, y + (height - 16) / 2);
 			RenderSystem.enableDepthTest();
-			Lighting.turnOff();
+			//Lighting.turnOff();
 			
 			matrixStackIn.popPose();
 		}
@@ -636,7 +634,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		        matrixStackIn.pushPose();
 		        matrixStackIn.scale(fontScale, fontScale, 1f);
 		        matrixStackIn.translate((int) (mouseX / fontScale) - mouseX, (int) (mouseY / fontScale) - mouseY, 0);
-		        GuiUtils.drawHoveringText(matrixStackIn, tooltip, mouseX, mouseY, subscreen.width, subscreen.height, 400, font); // drawTooltip with array of text components
+		        mc.screen.renderTooltip(matrixStackIn, tooltip, Optional.empty(), mouseX, mouseY, font); // drawTooltip with array of text components
 				matrixStackIn.popPose();
 			}
 		}

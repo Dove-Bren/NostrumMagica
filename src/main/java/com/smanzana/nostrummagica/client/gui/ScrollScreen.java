@@ -85,8 +85,8 @@ public class ScrollScreen extends Screen {
 		final int listYOffset = 95;
 		final int listXOffset = 25;
 		
-		//RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-		Minecraft.getInstance().getTextureManager().bind(background);
+		//RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+		RenderSystem.setShaderTexture(0, background);
 		
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, leftOffset, topOffset, 0, 0, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_BACK_WIDTH, TEXT_BACK_HEIGHT, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
 				1f, 1f, 1f, 1f);

@@ -43,7 +43,7 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 		
 		@Override
 		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-			Minecraft.getInstance().getTextureManager().bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y, TEX_SLOT_HOFFSET, TEX_SLOT_VOFFSET, TEX_SLOT_WIDTH, TEX_SLOT_HEIGHT, this.width, this.height, TEX_WIDTH, TEX_HEIGHT);
 		}
 		
@@ -221,7 +221,7 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 	}
 	
 	protected void renderInventoryBackground(PoseStack matrixStackIn, int width, int height, float red, float green, float blue, float alpha) {
-		Minecraft.getInstance().getTextureManager().bind(TEXT);
+		RenderSystem.setShaderTexture(0, TEXT);
 		
 		// Note: hardcoding border size to be 4
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, TEX_BORDER_TL_HOFFSET, TEX_BORDER_TL_VOFFSET, TEX_BORDER_TL_WIDTH, TEX_BORDER_TL_HEIGHT, 4, 4, TEX_WIDTH, TEX_HEIGHT, red, green, blue, alpha);
@@ -238,7 +238,7 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 	}
 	
 	protected void renderInventoryOverlay(PoseStack matrixStackIn, int width, int height, Rect2i hollow, float red, float green, float blue, float alpha) {
-		Minecraft.getInstance().getTextureManager().bind(TEXT);
+		RenderSystem.setShaderTexture(0, TEXT);
 		
 //		final int innerOffset = 4;
 //		final int topY = hollow.getY() - 1;

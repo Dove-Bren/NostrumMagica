@@ -190,7 +190,7 @@ public class ObeliskScreen extends Screen {
 	public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 
 		//GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-		Minecraft.getInstance().getTextureManager().bind(background);
+		RenderSystem.setShaderTexture(0, background);
 		
 		double time = (float) ((double) System.currentTimeMillis() / 15000.0);
 		int panX = (int) (Math.sin(time) * TEXT_BACK_PAN);
@@ -222,13 +222,13 @@ public class ObeliskScreen extends Screen {
 			
 			int left = (this.width / 3) - 14;
 			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
-			Minecraft.getInstance().getTextureManager().bind(background);
+			RenderSystem.setShaderTexture(0, background);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, left, 0, 42 + (mouseover ? 14 : 0), 78, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
 					1f, 1f, 1f, 1f);
 		} else {
 			int left = 0;
 			boolean mouseover = (mouseX >= left && mouseX <= left + 14 && mouseY <= 14);
-			Minecraft.getInstance().getTextureManager().bind(background);
+			RenderSystem.setShaderTexture(0, background);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, left, 0, 42 + (mouseover ? 14 : 0), 64, 14, 14, 14, 14, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,
 					1f, 1f, 1f, 1f);
 		}

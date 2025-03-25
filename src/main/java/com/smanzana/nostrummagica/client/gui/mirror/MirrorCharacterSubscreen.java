@@ -18,6 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Player;
@@ -250,6 +251,11 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			matrixStackIn.scale(scale, scale, 1f);
 			font.draw(matrixStackIn, label, 0, 0, 0xFFAAAAAA);
 			matrixStackIn.popPose();
+		}
+
+		@Override
+		public void updateNarration(NarrationElementOutput p_169152_) {
+			this.defaultButtonNarrationText(p_169152_);
 		}
 	}
 	

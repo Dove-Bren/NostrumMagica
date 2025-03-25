@@ -610,7 +610,7 @@ public class ModificationTableGui {
 				if (visible) {
 					
 					float tint = 1f;
-					Minecraft.getInstance().getTextureManager().bind(TEXT);
+					RenderSystem.setShaderTexture(0, TEXT);
 					if (parX >= this.x && parY >= this.y
 							&& parX <= this.x + this.width
 							&& parY <= this.y + this.height) {
@@ -702,7 +702,7 @@ public class ModificationTableGui {
 						tint = .8f;
 					}
 					
-					Minecraft.getInstance().getTextureManager().bind(TEXT);
+					RenderSystem.setShaderTexture(0, TEXT);
 					int y = 0;
 					if (gui.container.isValid)
 						y += SUBMIT_HEIGHT;

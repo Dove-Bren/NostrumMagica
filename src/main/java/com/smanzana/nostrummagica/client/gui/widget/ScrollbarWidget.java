@@ -161,7 +161,7 @@ public class ScrollbarWidget extends AbstractWidget {
 	}
 	
 	protected void drawScrollbar(PoseStack matrixStackIn, int width, int height) {
-		Minecraft.getInstance().getTextureManager().bind(TEXT);
+		RenderSystem.setShaderTexture(0, TEXT);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, TEX_SCROLLBAR_HOFFSET, TEX_SCROLLBAR_VOFFSET, TEX_SCROLLBAR_WIDTH, TEX_SCROLLBAR_HEIGHT, width, height, TEX_WIDTH, TEX_HEIGHT);
 	}
 	

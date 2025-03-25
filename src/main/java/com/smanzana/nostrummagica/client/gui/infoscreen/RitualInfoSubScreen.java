@@ -8,8 +8,9 @@ import javax.annotation.Nonnull;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.block.CandleBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -19,18 +20,15 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.renderer.MultiBufferSource;
-import com.mojang.blaze3d.platform.Lighting;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import com.mojang.math.Vector3f;
-import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraft.world.level.block.state.BlockState;
 
 @SuppressWarnings("deprecation")
 public class RitualInfoSubScreen implements IInfoSubScreen {
@@ -86,7 +84,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		}
 		tilt = 30;
 		
-		RenderSystem.pushMatrix(); // Save actual render system matrix
+		RenderSystem.backupProjectionMatrix(); // Save actual render system matrix
 		RenderSystem.viewport((int) (x * mc.getWindow().getGuiScale()), 0, (int) (width * mc.getWindow().getGuiScale()), (int) (height * mc.getWindow().getGuiScale()));
 		RenderSystem.clear(GL11.GL_DEPTH_BUFFER_BIT, false);
         //GlStateManager.clearDepth(1.0D);
@@ -235,12 +233,13 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 //	    GL11.glLoadIdentity();
 		
 		RenderSystem.viewport(0, 0, mc.getWindow().getScreenWidth(), mc.getWindow().getScreenHeight());
-		RenderSystem.matrixMode(GL11.GL_PROJECTION);
-		RenderSystem.loadIdentity();
-		RenderSystem.ortho(0.0D, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), 0.0D, 1000.0D, ForgeHooksClient.getGuiFarPlane());
-		RenderSystem.matrixMode(GL11.GL_MODELVIEW);
-		RenderSystem.loadIdentity();
-		RenderSystem.popMatrix();
+		int unused; // review!
+//		RenderSystem.matrixMode(GL11.GL_PROJECTION);
+//		RenderSystem.loadIdentity();
+//		RenderSystem.ortho(0.0D, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), 0.0D, 1000.0D, ForgeHooksClient.getGuiFarPlane());
+//		RenderSystem.matrixMode(GL11.GL_MODELVIEW);
+//		RenderSystem.loadIdentity();
+		RenderSystem.restoreProjectionMatrix();
 		
 		matrixStackIn.popPose();
 		
@@ -273,16 +272,16 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		RenderSystem.enableDepthTest();
 		matrixStackIn.translate(x, y, z);
 		RenderSystem.enableCull();
-		RenderSystem.enableRescaleNormal();
-		Lighting.turnOff();
+		//RenderSystem.enableRescaleNormal();
+		//Lighting.turnOff();
 		RenderSystem.depthMask(true);
 		//mc.gameRenderer.disableLightmap(); // used to be mc.entityRenderer.... TODO
 		
-		RenderSystem.disableLighting();
+		//RenderSystem.disableLighting();
 		RenderSystem.enableTexture();
-		RenderSystem.enableAlphaTest();
+		//RenderSystem.enableAlphaTest();
 		//mc.getTextureManager().bindTexture(new ResourceLocation(NostrumMagica.MODID, "textures/block/ceramic_generic.png"));
-		mc.getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
+		RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
 		
 		MultiBufferSource.BufferSource typebuffer = Minecraft.getInstance().renderBuffers().bufferSource();
 		try {
@@ -291,7 +290,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 			
 		}
 		typebuffer.endBatch();
-		RenderSystem.disableRescaleNormal();
+		//RenderSystem.disableRescaleNormal();
 		
 		matrixStackIn.popPose();
 	}

@@ -1,10 +1,10 @@
 package com.smanzana.nostrummagica.client.gui.book;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.resources.ResourceLocation;
 
@@ -45,7 +45,7 @@ public class HSplitPage implements IClickableBookPage {
 		
 		//draw dividing line on bottom (if applicable)
 		if (drawSplit) {
-			Minecraft.getInstance().getTextureManager().bind(divide);
+			RenderSystem.setShaderTexture(0, divide);
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, xoffset,
 					yoffset + (subheight + (divideSize / 2)), 0, 0, width, divideSize, TEXT_WIDTH, TEXT_HEIGHT);
 		}

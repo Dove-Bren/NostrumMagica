@@ -43,7 +43,7 @@ public class SpellIcon {
 	public void render(Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, float red, float green, float blue, float alpha) {
 		matrixStackIn.pushPose();
 
-		Minecraft.getInstance().getTextureManager().bind(TEX);
+		RenderSystem.setShaderTexture(0, TEX);
 		
 		RenderSystem.enableBlend();
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, u, v, TEX_ICON_WIDTH, TEX_ICON_WIDTH, width, height, TEX_WIDTH, TEX_WIDTH,

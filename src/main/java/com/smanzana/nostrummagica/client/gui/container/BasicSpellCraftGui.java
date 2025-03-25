@@ -416,7 +416,7 @@ public class BasicSpellCraftGui {
 		}
 		
 		protected void drawRuneCellBackground(PoseStack matrixStackIn, int width, int height) {
-			Minecraft.getInstance().getTextureManager().bind(getBackgroundTexture());
+			RenderSystem.setShaderTexture(0, getBackgroundTexture());
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
 					TEX_RUNESLOT_HOFFSET, TEX_RUNESLOT_VOFFSET, TEX_RUNESLOT_WIDTH, TEX_RUNESLOT_HEIGHT,
 					width, height,
@@ -425,7 +425,7 @@ public class BasicSpellCraftGui {
 		}
 		
 		protected void drawRuneSpacerBackground(PoseStack matrixStackIn, int width, int height, boolean animate) {
-			Minecraft.getInstance().getTextureManager().bind(getBackgroundTexture());
+			RenderSystem.setShaderTexture(0, getBackgroundTexture());
 			
 			if (animate) {
 				final int frameTimeMS = 500;

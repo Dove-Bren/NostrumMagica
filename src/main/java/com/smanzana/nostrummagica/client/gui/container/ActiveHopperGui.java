@@ -138,7 +138,7 @@ public class ActiveHopperGui {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
-			Minecraft.getInstance().getTextureManager().bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 		}
 		

@@ -9,8 +9,8 @@ import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
@@ -19,15 +19,14 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 
 public class MirrorGui extends Screen implements IMirrorScreen {
 	
@@ -118,19 +117,20 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 	
 	protected void addMainWidgets() {
 		for (MajorTabButton tab : majorTabs) {
-			this.addButton(tab);
+			this.addWidget(tab);
 		}
 	}
 	
 	@Override
 	public void addWidget(AbstractWidget widget) {
-		this.addButton(widget);
+		this.addWidget(widget);
 	}
 
 	@Override
 	public void resetWidgets() {
-		this.buttons.clear();
-		this.children.clear();
+		this.clearWidgets();
+//		this.buttons.clear();
+//		this.children.clear();
 		
 		this.minorTabs.clear();
 		
@@ -145,7 +145,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 				POS_MINORTAB_WIDTH, POS_MINORTAB_HEIGHT
 				);
 		this.minorTabs.add(button);
-		this.addButton(button);
+		this.addWidget(button);
 		
 		// If this was first, act like it got clicked
 		if (minorTabs.size() == 1) {
@@ -219,7 +219,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 	}
 	
 	private void drawLockedScreenBackground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-		Minecraft.getInstance().getTextureManager().bind(RES_BACK_CLOUD);
+		RenderSystem.setShaderTexture(0, RES_BACK_CLOUD);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 0, 0, TEX_WIDTH, TEX_HEIGHT, guiWidth, guiHeight, TEX_WIDTH, TEX_HEIGHT);
 		
 		int y = 0;
@@ -303,7 +303,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 	}
 	
 	private void drawScreenBorder(PoseStack matrixStackIn, float partialTicks) {
-		Minecraft.getInstance().getTextureManager().bind(RES_BASE);
+		RenderSystem.setShaderTexture(0, RES_BASE);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 				TEX_FRAME_HOFFSET, TEX_FRAME_VOFFSET, TEX_FRAME_WIDTH, TEX_FRAME_HEIGHT,
 				guiWidth, guiHeight, TEX_WIDTH, TEX_HEIGHT);
@@ -383,7 +383,12 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		}
 		matrixStackIn.popPose();
 		
-		for (AbstractWidget widget : this.buttons) {
+		for (GuiEventListener child : this.children()) {
+			// Hacky 2
+			if (!(child instanceof AbstractWidget widget)) {
+				continue;
+			}
+			
 			// Hacky
 			if (widget instanceof MajorTabButton || widget instanceof MinorTabButton
 					|| (mouseX > guiLeft() && mouseX < guiLeft() + guiWidth && mouseY > guiTop() && mouseY < guiTop() + guiHeight)) {
@@ -551,7 +556,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 				matrixStackIn.pushPose();
 				matrixStackIn.translate(0, 0, 10); // Hackily make sure to render on top of children widgets and the screen mask
 				
-				Minecraft.getInstance().getTextureManager().bind(RES_BASE);
+				RenderSystem.setShaderTexture(0, RES_BASE);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 						textureX, textureY, TEX_MAJORTAB_WIDTH, TEX_MAJORTAB_HEIGHT, this.width, this.height, TEX_WIDTH, TEX_HEIGHT);
 				
@@ -612,7 +617,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(x, y, 10); // Hackily make su re to render on top of children widgets
 			
-			Minecraft.getInstance().getTextureManager().bind(RES_BASE);
+			RenderSystem.setShaderTexture(0, RES_BASE);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 					textureX, textureY, TEX_MINORTAB_WIDTH, TEX_MINORTAB_HEIGHT, this.width, this.height, TEX_WIDTH, TEX_HEIGHT);
 			
@@ -621,7 +626,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 			
 			// Draw new tab if there's something new
 			if (tab.hasNewEntry(gui, gui.subscreen)) {
-				Minecraft.getInstance().getTextureManager().bind(RES_BASE);
+				RenderSystem.setShaderTexture(0, RES_BASE);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 						TEX_MINORTAB_NEW_HOFFSET, TEX_MINORTAB_NEW_VOFFSET, TEX_MINORTAB_NEW_WIDTH, TEX_MINORTAB_NEW_HEIGHT,
 						this.width, this.height, TEX_WIDTH, TEX_HEIGHT);

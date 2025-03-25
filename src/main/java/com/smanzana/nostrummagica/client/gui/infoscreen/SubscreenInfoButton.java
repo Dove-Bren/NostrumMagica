@@ -43,7 +43,7 @@ public class SubscreenInfoButton extends InfoButton {
 			tint = .75f;
 		}
 		
-		Minecraft.getInstance().getTextureManager().bind(InfoScreen.background);
+		RenderSystem.setShaderTexture(0, InfoScreen.background);
 		RenderSystem.enableBlend();
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, 0,
 				0, width,

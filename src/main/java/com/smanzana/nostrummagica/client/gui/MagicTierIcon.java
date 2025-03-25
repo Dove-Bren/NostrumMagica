@@ -58,7 +58,7 @@ public class MagicTierIcon {
 		matrixStackIn.pushPose();
 
 		{
-			Minecraft.getInstance().getTextureManager().bind(this.getModelLocation());
+			RenderSystem.setShaderTexture(0, this.getModelLocation());
 			RenderSystem.enableBlend();
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, xOffset, yOffset, 0, 0, this.width, this.height, width, height, this.width, this.height,
 					red, green, blue, alpha);

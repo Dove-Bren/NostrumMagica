@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.infoscreen;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -8,9 +9,9 @@ import com.smanzana.nostrummagica.client.gui.IForegroundRenderable;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public abstract class InfoButton extends AbstractButton implements IForegroundRenderable {
 
@@ -35,12 +36,9 @@ public abstract class InfoButton extends AbstractButton implements IForegroundRe
 			Minecraft mc = Minecraft.getInstance();
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 500);
-			GuiUtils.drawHoveringText(matrixStackIn, getDescription(),
+			screen.renderTooltip(matrixStackIn, getDescription(), Optional.empty(),
 					mouseX,
 					mouseY,
-					mc.getWindow().getScreenWidth(),
-					mc.getWindow().getScreenHeight(),
-					100,
 					mc.font);
 			matrixStackIn.popPose();
 		}
@@ -49,5 +47,10 @@ public abstract class InfoButton extends AbstractButton implements IForegroundRe
 	@Override
 	public void onPress() {
 		screen.selectScreen(this);
+	}
+	
+	@Override
+	public void updateNarration(NarrationElementOutput p_169152_) {
+		this.defaultButtonNarrationText(p_169152_);
 	}
 }

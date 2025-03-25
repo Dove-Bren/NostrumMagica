@@ -210,7 +210,7 @@ public class LoreTableGui {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
-			Minecraft.getInstance().getTextureManager().bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			float progress = container.table.getProgress();
@@ -235,7 +235,7 @@ public class LoreTableGui {
 				u += ((time % 3000) / 1000) * SHINE_LENGTH;
 				float alpha = 1f - .5f * ((float) (time % 1000) / 1000f);
 				
-				Minecraft.getInstance().getTextureManager().bind(TEXT);
+				RenderSystem.setShaderTexture(0, TEXT);
 				
 				RenderSystem.enableBlend();
 				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(

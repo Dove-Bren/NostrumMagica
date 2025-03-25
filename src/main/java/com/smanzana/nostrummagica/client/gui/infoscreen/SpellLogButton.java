@@ -39,7 +39,7 @@ public class SpellLogButton extends InfoButton {
 			tint = .75f;
 		}
 		
-		mc.getTextureManager().bind(InfoScreen.background);
+		RenderSystem.setShaderTexture(0, InfoScreen.background);
 		RenderSystem.enableBlend();
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, 0,
 				0, width,

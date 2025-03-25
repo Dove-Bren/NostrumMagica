@@ -5,26 +5,28 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.components.AbstractButton;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -144,11 +146,11 @@ public class BookScreen extends Screen {
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - TEXT_HEIGHT) / 2;
 		backButton = new NextPageButton(this, leftOffset + 30, topOffset + PAGE_HEIGHT + 5, false);
-		this.buttons.add(backButton);
+		this.addWidget(backButton);
 		nextButton = new NextPageButton(this, leftOffset + TEXT_WIDTH - (35 + 23), topOffset + PAGE_HEIGHT + 5, true);
-		this.buttons.add(nextButton);
+		this.addWidget(nextButton);
 		homeButton = new HomeButton(this, leftOffset + 30 + 24, topOffset + PAGE_HEIGHT + 3);
-		this.buttons.add(homeButton);
+		this.addWidget(homeButton);
 	}
 	
 	@Override	
@@ -161,8 +163,8 @@ public class BookScreen extends Screen {
 	@Override
 	public void render(PoseStack matrixStackIn, int parWidth, int parHeight, float p_73863_3_) {
 
-		RenderSystem.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-		Minecraft.getInstance().getTextureManager().bind(background);
+		RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+		RenderSystem.setShaderTexture(0, background);
 		
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - TEXT_HEIGHT) / 2;
@@ -233,11 +235,11 @@ public class BookScreen extends Screen {
 	}
 	
 	public void renderTooltipLines(PoseStack matrixStackIn, List<String> lines, int x, int y) {
-		List<FormattedText> text = new ArrayList<>(lines.size());
+		List<Component> text = new ArrayList<>(lines.size());
 		for (String raw : lines) {
-			text.add(FormattedText.of(raw));
+			text.add(new TextComponent(raw));
 		}
-		this.renderWrappedToolTip(matrixStackIn, text, x, y, font);
+		this.renderTooltip(matrixStackIn, text, Optional.empty(), x, y, font);
 	}
 	
 //	@Override
@@ -321,8 +323,8 @@ public class BookScreen extends Screen {
 
                       && parY < y + height);
 
-                RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-                Minecraft.getInstance().getTextureManager().bind(background);
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                RenderSystem.setShaderTexture(0, background);
                 int textureX = 0;
                 int textureY = 223;
 
@@ -344,6 +346,11 @@ public class BookScreen extends Screen {
 		@Override
 		public void onPress() {
 			screen.changePage(this.isNextButton);
+		}
+
+		@Override
+		public void updateNarration(NarrationElementOutput p_169152_) {
+			this.defaultButtonNarrationText(p_169152_);
 		}
     }
 
@@ -368,8 +375,8 @@ public class BookScreen extends Screen {
                       && parX < x + width 
                       && parY < y + height);
 
-        		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                Minecraft.getInstance().getTextureManager().bind(background);
+        		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                RenderSystem.setShaderTexture(0, background);
                 int textureX = 48;
                 int textureY = 221;
 
@@ -390,6 +397,11 @@ public class BookScreen extends Screen {
 		@Override
 		public void onPress() {
 			screen.gotoHome();
+		}
+
+		@Override
+		public void updateNarration(NarrationElementOutput p_169152_) {
+			this.defaultButtonNarrationText(p_169152_);
 		}
     }
 	

@@ -3,30 +3,30 @@ package com.smanzana.nostrummagica.client.gui.book;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.ScrollScreen;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
-import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.ClientTomeDropSpellMessage;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
-import net.minecraftforge.fml.client.gui.GuiUtils;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public class SpellPreviewPage implements IClickableBookPage {
 
@@ -101,8 +101,7 @@ public class SpellPreviewPage implements IClickableBookPage {
 
 	@Override
 	public void overlay(BookScreen parent, PoseStack matrixStackIn, Font fonter, int mouseX, int mouseY, int trueX, int trueY) {
-		Minecraft mc = Minecraft.getInstance();
-		GuiUtils.drawHoveringText(matrixStackIn, tooltip, trueX, trueY, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), 200, fonter);
+		parent.renderTooltip(matrixStackIn, tooltip, Optional.empty(), trueX, trueY, fonter);
 	}
 
 	@Override

@@ -50,7 +50,7 @@ public class SpellCraftPatternAutoRenderer implements ISpellCraftPatternRenderer
 			int height, float red, float green, float blue, float alpha) {
 		ResourceLocation texture = getTexture(pattern.getRegistryName());
 		
-		Minecraft.getInstance().getTextureManager().bind(texture);
+		RenderSystem.setShaderTexture(0, texture);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 0, 0, 32, 32, width, height, 32, 32, red, green, blue, alpha);
 	}
 

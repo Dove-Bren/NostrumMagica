@@ -629,7 +629,7 @@ public class MysticSpellCraftGui {
 		}
 		
 		protected void drawRuneCellBackground(PoseStack matrixStackIn, int width, int height, boolean isModified) {
-			Minecraft.getInstance().getTextureManager().bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, 
 					TEX_RUNESLOT_HOFFSET, TEX_RUNESLOT_VOFFSET, TEX_RUNESLOT_WIDTH, TEX_RUNESLOT_HEIGHT,
 					width, height,
@@ -638,7 +638,7 @@ public class MysticSpellCraftGui {
 		}
 		
 		protected void drawRuneSpacerBackground(PoseStack matrixStackIn, int width, int height, boolean animate) {
-			Minecraft.getInstance().getTextureManager().bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			if (animate) {
 				final int frameTimeMS = 500;
 				final int animFrame = (int) (System.currentTimeMillis() % (frameTimeMS * TEX_RUNESPACER_ANIM_COUNT)) / frameTimeMS;

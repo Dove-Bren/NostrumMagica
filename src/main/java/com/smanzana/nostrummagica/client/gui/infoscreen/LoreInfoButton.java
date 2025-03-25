@@ -5,8 +5,8 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.loretag.IBlockLoreTagged;
@@ -15,16 +15,16 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.world.level.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import com.mojang.blaze3d.platform.Lighting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.block.Block;
 
 public class LoreInfoButton extends InfoButton {
 
@@ -55,7 +55,7 @@ public class LoreInfoButton extends InfoButton {
 			tint = .75f;
 		}
 		
-		mc.getTextureManager().bind(InfoScreen.background);
+		RenderSystem.setShaderTexture(0, InfoScreen.background);
 		RenderSystem.enableBlend();
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, this.x, this.y, 0,
 				0, width,
@@ -93,7 +93,6 @@ public class LoreInfoButton extends InfoButton {
 		} else if (iconEntity != null) {
 			int x = this.x + (width / 2);
 			int y = this.y + (width - 1);
-			Lighting.turnOff();
 			InventoryScreen.renderEntityInInventory(x, y,
 					(int) (width * .4), (float)(this.x) - mouseX, (float)(this.y) - mouseY, (LivingEntity)iconEntity);
 		}
@@ -106,5 +105,10 @@ public class LoreInfoButton extends InfoButton {
 			desc.add(new TextComponent(lore.getLoreDisplayName()));
 		
 		return desc;
+	}
+
+	@Override
+	public void updateNarration(NarrationElementOutput p_169152_) {
+		this.defaultButtonNarrationText(p_169152_);
 	}
 }

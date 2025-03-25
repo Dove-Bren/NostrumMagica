@@ -4,9 +4,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.lwjgl.opengl.GL11;
-
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.book.BookScreen;
@@ -14,12 +13,13 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.AbstractButton;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -153,9 +153,8 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 						&& parX < this.x + width 
 						&& parY < this.y + height);
 
-				Minecraft mc = Minecraft.getInstance();
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				mc.getTextureManager().bind(BookScreen.background);
+				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+				RenderSystem.setShaderTexture(0, BookScreen.background);
 				int textureX = 0;
 				int textureY = 223;
 
@@ -180,6 +179,11 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 			else
 				page = Math.max(0, page-1);
 		}
+
+		@Override
+		public void updateNarration(NarrationElementOutput p_169152_) {
+			this.defaultButtonNarrationText(p_169152_);
+		}
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -196,9 +200,8 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
                       && parX < this.x + width 
                       && parY < this.y + height);
 
-        		Minecraft mc = Minecraft.getInstance();
-        		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                mc.getTextureManager().bind(BookScreen.background);
+        		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        		RenderSystem.setShaderTexture(0, BookScreen.background);
                 int textureX = 48;
                 int textureY = 221;
 
@@ -219,6 +222,11 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 		@Override
 		public void onPress() {
 			page = 0;
+		}
+
+		@Override
+		public void updateNarration(NarrationElementOutput p_169152_) {
+			this.defaultButtonNarrationText(p_169152_);
 		}
     }
 

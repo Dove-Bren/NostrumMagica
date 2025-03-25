@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.client.gui.widget.FixedWidget;
 
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.TextComponent;
 
 public abstract class PanningMirrorSubscreen implements IMirrorSubscreen {
@@ -135,6 +136,11 @@ public abstract class PanningMirrorSubscreen implements IMirrorSubscreen {
 		@Override
 		public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			; // don't render anything
+		}
+
+		@Override
+		public void updateNarration(NarrationElementOutput p_169152_) {
+			super.defaultButtonNarrationText(p_169152_);
 		}
 	}
 

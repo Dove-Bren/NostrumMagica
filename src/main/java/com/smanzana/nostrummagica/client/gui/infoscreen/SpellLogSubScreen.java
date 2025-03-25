@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -28,13 +29,14 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 
 public class SpellLogSubScreen implements IInfoSubScreen {
 
@@ -264,7 +266,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 			final float tint = (this.isHovered() ? .8f : 1f) * (active ? .8f : 1f);
 			
-			Minecraft.getInstance().getTextureManager().bind(Texture.TEXT);
+			RenderSystem.setShaderTexture(0, Texture.TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 					Texture.SHAPE_ICON_HOFFSET, Texture.SHAPE_ICON_VOFFSET, Texture.SHAPE_ICON_WIDTH, Texture.SHAPE_ICON_HEIGHT,
 					width, height, Texture.WIDTH, Texture.HEIGHT,
@@ -294,6 +296,11 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		public void setActive(boolean active) {
 			this.active = active;
 		}
+
+		@Override
+		public void updateNarration(NarrationElementOutput p_169152_) {
+			this.defaultButtonNarrationText(p_169152_);
+		}
 	}
 	
 	private static class AffectedEntsLabel extends LabeledWidget.ComponentIconLabel {
@@ -304,7 +311,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		
 		@Override
 		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
-			Minecraft.getInstance().getTextureManager().bind(Texture.TEXT);
+			RenderSystem.setShaderTexture(0, Texture.TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 					Texture.AFFECT_ICON_HOFFSET, Texture.AFFECT_ICON_VOFFSET, Texture.AFFECT_ICON_WIDTH, Texture.AFFECT_ICON_HEIGHT,
 					this.width + 2, height + 2, Texture.WIDTH, Texture.HEIGHT);
@@ -321,7 +328,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		
 		@Override
 		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
-			Minecraft.getInstance().getTextureManager().bind(Texture.TEXT);
+			RenderSystem.setShaderTexture(0, Texture.TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 					Texture.AFFECT_ICON_HOFFSET, Texture.AFFECT_ICON_VOFFSET, Texture.AFFECT_ICON_WIDTH, Texture.AFFECT_ICON_HEIGHT,
 					this.width + 2, height + 2, Texture.WIDTH, Texture.HEIGHT);
@@ -342,7 +349,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		
 		@Override
 		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
-			Minecraft.getInstance().getTextureManager().bind(Texture.TEXT);
+			RenderSystem.setShaderTexture(0, Texture.TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 					Texture.DAMAGE_TOT_ICON_HOFFSET, Texture.DAMAGE_TOT_ICON_VOFFSET, Texture.DAMAGE_TOT_ICON_WIDTH, Texture.DAMAGE_TOT_ICON_HEIGHT,
 					this.width, height, Texture.WIDTH, Texture.HEIGHT);
@@ -366,7 +373,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		@Override
 		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
 			final float colors[] = ColorUtil.ARGBToColor(element.getColor()); // ignore color argument
-			Minecraft.getInstance().getTextureManager().bind(Texture.TEXT);
+			RenderSystem.setShaderTexture(0, Texture.TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 					Texture.DAMAGE_ICON_HOFFSET, Texture.DAMAGE_ICON_VOFFSET, Texture.DAMAGE_ICON_WIDTH, Texture.DAMAGE_ICON_HEIGHT,
 					this.width, height, Texture.WIDTH, Texture.HEIGHT,
@@ -388,7 +395,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		
 		@Override
 		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
-			Minecraft.getInstance().getTextureManager().bind(Texture.TEXT);
+			RenderSystem.setShaderTexture(0, Texture.TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 					Texture.HEAL_TOT_ICON_HOFFSET, Texture.HEAL_TOT_ICON_VOFFSET, Texture.HEAL_TOT_ICON_WIDTH, Texture.HEAL_TOT_ICON_HEIGHT,
 					this.width, height, Texture.WIDTH, Texture.HEIGHT);
@@ -413,7 +420,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
 			final float colors[] = ColorUtil.ARGBToColor(element.getColor()); // ignore color argument
 			
-			Minecraft.getInstance().getTextureManager().bind(Texture.TEXT);
+			RenderSystem.setShaderTexture(0, Texture.TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 					Texture.HEAL_ICON_HOFFSET, Texture.HEAL_ICON_VOFFSET, Texture.HEAL_ICON_WIDTH, Texture.HEAL_ICON_HEIGHT,
 					this.width, height, Texture.WIDTH, Texture.HEIGHT,

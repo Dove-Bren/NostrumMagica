@@ -4,11 +4,15 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Matrix4f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
@@ -20,28 +24,23 @@ import com.smanzana.nostrummagica.progression.quest.NostrumQuest;
 import com.smanzana.nostrummagica.progression.requirement.IRequirement;
 import com.smanzana.nostrummagica.progression.reward.AlterationReward;
 import com.smanzana.nostrummagica.progression.reward.AttributeReward;
-import com.smanzana.nostrummagica.progression.reward.IReward;
 import com.smanzana.nostrummagica.progression.reward.AttributeReward.AwardType;
+import com.smanzana.nostrummagica.progression.reward.IReward;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import net.minecraft.client.renderer.Rect2i;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Matrix4f;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.BaseComponent;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 	
@@ -119,7 +118,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 		float extra = .1f * (float) Math.sin((double) System.currentTimeMillis() / 1500.0);
 		float inv = .1f - extra;
 		
-		Minecraft.getInstance().getTextureManager().bind(RES_BACK);
+		RenderSystem.setShaderTexture(0, RES_BACK);
 		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 				0, 0, TEX_BACK_WIDTH, TEX_BACK_HEIGHT,
 				width, height, TEX_BACK_WIDTH, TEX_BACK_HEIGHT,
@@ -257,7 +256,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 			RenderSystem.lineWidth(3f);
 	        //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 //	        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
-	        buf.begin(GL11.GL_LINES, DefaultVertexFormat.POSITION_COLOR);
+	        buf.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR);
 	        buf.vertex(transform, x, y, 0).color(1f, 1f, 1f, .6f).endVertex();
 	        buf.vertex(transform, other.x, other.y, 0).color(1f, 1f, 1f, .6f).endVertex();
 	        Tesselator.getInstance().end();
@@ -327,7 +326,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 			}
 			
 			RenderSystem.enableBlend();
-			Minecraft.getInstance().getTextureManager().bind(RES_ICONS);
+			RenderSystem.setShaderTexture(0, RES_ICONS);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
 					u, v, uw, vh, this.width, this.height, TEX_ICON_WIDTH, TEX_ICON_HEIGHT,
 					color[0], color[1], color[2], color[3]);
@@ -349,7 +348,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 				matrixStackIn.pushPose();
 				matrixStackIn.scale(fontScale, fontScale, 1f);
 				matrixStackIn.translate((int) (mouseX / fontScale) - mouseX, (int) (mouseY / fontScale) - mouseY, 0);
-				GuiUtils.drawHoveringText(matrixStackIn, tooltip, mouseX, mouseY, subscreen.width, subscreen.height, 400, font);
+				mc.screen.renderTooltip(matrixStackIn, tooltip, Optional.empty(), mouseX, mouseY, font);
 				matrixStackIn.popPose();
 			}
 		}

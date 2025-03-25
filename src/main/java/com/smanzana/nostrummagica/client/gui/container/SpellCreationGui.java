@@ -1098,7 +1098,7 @@ public class SpellCreationGui {
 			}
 			
 			protected void renderBackground(PoseStack matrixStackIn) {
-				Minecraft.getInstance().getTextureManager().bind(TEXT_UTILS);
+				RenderSystem.setShaderTexture(0, TEXT_UTILS);
 				
 				// Note: hardcoding border size to be 4
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, TEX_INFPANEL_BORDER_TL_HOFFSET, TEX_INFPANEL_BORDER_TL_VOFFSET, TEX_INFPANEL_BORDER_TL_WIDTH, TEX_INFPANEL_BORDER_TL_HEIGHT, 4, 4, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT, red, green, blue, alpha);
@@ -1223,7 +1223,7 @@ public class SpellCreationGui {
 		}
 		
 		protected void drawElementalBoost(PoseStack matrixStackIn, int width, int height, EMagicElement element) {
-			Minecraft.getInstance().getTextureManager().bind(TEXT_UTILS);
+			RenderSystem.setShaderTexture(0, TEXT_UTILS);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 					TEX_BOOST_HOFFSET, TEX_BOOST_VOFFSET, TEX_BOOST_WIDTH, TEX_BOOST_HEIGHT,
 					width/2, height, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT);
@@ -1233,7 +1233,7 @@ public class SpellCreationGui {
 		}
 		
 		protected void drawElementalPenalty(PoseStack matrixStackIn, int width, int height, EMagicElement element) {
-			Minecraft.getInstance().getTextureManager().bind(TEXT_UTILS);
+			RenderSystem.setShaderTexture(0, TEXT_UTILS);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 					TEX_PENALTY_HOFFSET, TEX_PENALTY_VOFFSET, TEX_PENALTY_WIDTH, TEX_PENALTY_HEIGHT,
 					width/2, height, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT);
