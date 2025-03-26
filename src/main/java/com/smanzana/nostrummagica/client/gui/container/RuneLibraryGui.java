@@ -2,23 +2,24 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.RuneLibraryTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
+import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.nostrummagica.util.RenderFuncs;
-import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -92,7 +93,7 @@ public class RuneLibraryGui {
 				Container to;
 				
 				if (slot.container == library.getInventory()) {
-					to = playerIn.inventory;
+					to = playerIn.getInventory();
 				} else {
 					to = library.getInventory();
 				}
@@ -148,7 +149,7 @@ public class RuneLibraryGui {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
-			mc.getTextureManager().bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 		}
 		

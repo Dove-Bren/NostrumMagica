@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
@@ -25,20 +26,20 @@ import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.Tags;
@@ -134,10 +135,10 @@ public class ModificationTableGui {
 				}
 				
 				@Override
-				public ItemStack onTake(Player playerIn, ItemStack stack) {
+				public void onTake(Player playerIn, ItemStack stack) {
 					validate();
 					floatIndex = 0;
-					return super.onTake(playerIn, stack);
+					super.onTake(playerIn, stack);
 				}
 			});
 			
@@ -180,7 +181,7 @@ public class ModificationTableGui {
 				
 				if (slot.container == this.inventory) {
 					// Trying to take our items
-					if (playerIn.inventory.add(cur)) {
+					if (playerIn.getInventory().add(cur)) {
 						slot.set(ItemStack.EMPTY);
 						slot.onTake(playerIn, cur);
 					}
@@ -358,7 +359,7 @@ public class ModificationTableGui {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
-			mc.getTextureManager().bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
@@ -553,8 +554,7 @@ public class ModificationTableGui {
 		}
 			
 		protected void refreshButtons() {
-			this.buttons.clear();
-			this.children.clear();
+			this.clearWidgets();
 			
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
@@ -563,8 +563,8 @@ public class ModificationTableGui {
 			
 			if (!container.inventory.getMainSlot().isEmpty()) {
 				if (container.hasBool) {
-					this.addButton(new ToggleButton(x, y, false, this));
-					this.addButton(new ToggleButton(x + 15, y, true, this));
+					this.addWidget(new ToggleButton(x, y, false, this));
+					this.addWidget(new ToggleButton(x + 15, y, true, this));
 					
 					y += 25;
 				}
@@ -581,13 +581,13 @@ public class ModificationTableGui {
 						for (int i = 0; i < SpellIcon.numIcons; i++) {
 							FloatButton button = new FloatButton(x + ((i % numHorizontal) * 16), y + ((i / numHorizontal) * 16), i, i, this);
 							
-							this.addButton(button);
+							this.addWidget(button);
 						}
 					}
 				}
 			}
 			
-			this.addButton(submitButton);
+			this.addWidget(submitButton);
 		}
 		
 		private static class ToggleButton extends Button {
@@ -656,7 +656,7 @@ public class ModificationTableGui {
 					if (gui.container.scrollMode) {
 						// In scroll mode, we show the icon they can select
 						float tint = 1f;
-						mc.getTextureManager().bind(TEXT);
+						RenderSystem.setShaderTexture(0, TEXT);
 						if (parX >= this.x && parY >= this.y
 								&& parX <= this.x + this.width
 								&& parY <= this.y + this.height) {
@@ -748,9 +748,9 @@ public class ModificationTableGui {
 		}
 		
 		@Override
-		public ItemStack onTake(Player playerIn, ItemStack stack) {
+		public void onTake(Player playerIn, ItemStack stack) {
 			container.validate();
-			return super.onTake(playerIn, stack);
+			super.onTake(playerIn, stack);
 		}
 		
 		@Override

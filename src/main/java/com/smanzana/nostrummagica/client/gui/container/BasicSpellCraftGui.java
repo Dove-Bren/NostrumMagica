@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
@@ -20,24 +21,24 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.tile.BasicSpellTableTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
-import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Vec3i;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 
 public class BasicSpellCraftGui {
 	
@@ -248,7 +249,7 @@ public class BasicSpellCraftGui {
 				return s.codePoints().allMatch(SpellGui::isValidChar);
 			});
 			this.nameField.setValue(getMenu().getName());
-			this.addButton(this.nameField);
+			this.addWidget(this.nameField);
 			
 			
 			// Spell icon buttons
@@ -268,14 +269,14 @@ public class BasicSpellCraftGui {
 						i,
 						this);
 				
-				this.addButton(button);
+				this.addWidget(button);
 			}
 			
 			// Info panel
 			if (NostrumMagica.getMagicWrapper(getMenu().player).hasSkill(NostrumSkills.Spellcraft_Infopanel)) {
 				infoPanelWidget = new InfoPanel(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT);
 				infoPanelWidget.setContent(this::renderSpellPanel);
-				this.addButton(infoPanelWidget);
+				this.addWidget(infoPanelWidget);
 				extraAreas.add(new Rect2i(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT));
 				{
 					// Weight status
@@ -286,16 +287,16 @@ public class BasicSpellCraftGui {
 			}
 			
 			// Status icon
-			this.addButton(new SpellStatusIcon(this, horizontalMargin + POS_STATUS_HOFFSET, verticalMargin + POS_STATUS_VOFFSET, POS_STATUS_WIDTH, POS_STATUS_HEIGHT));
+			this.addWidget(new SpellStatusIcon(this, horizontalMargin + POS_STATUS_HOFFSET, verticalMargin + POS_STATUS_VOFFSET, POS_STATUS_WIDTH, POS_STATUS_HEIGHT));
 			
 			// Submit button
-			this.addButton(new SubmitButton(this, horizontalMargin + POS_SUBMIT_HOFFSET, verticalMargin + POS_SUBMIT_VOFFSET, POS_SUBMIT_WIDTH, POS_SUBMIT_HEIGHT));
+			this.addWidget(new SubmitButton(this, horizontalMargin + POS_SUBMIT_HOFFSET, verticalMargin + POS_SUBMIT_VOFFSET, POS_SUBMIT_WIDTH, POS_SUBMIT_HEIGHT));
 			
 			// Extra inventory
 			if (this.getMenu().extraInventory != null) {
 				final SimpleInventoryContainerlet extraContainer = this.getMenu().extraInventory;
 				this.extraInventoryWidget = new SimpleInventoryWidget(this, extraContainer);
-				this.addButton(this.extraInventoryWidget);
+				this.addWidget(this.extraInventoryWidget);
 				extraAreas.add(new Rect2i(horizontalMargin + extraContainer.x, verticalMargin + this.getMenu().extraInventory.y, this.getMenu().extraInventory.width, this.getMenu().extraInventory.height));
 			}
 			
@@ -317,7 +318,7 @@ public class BasicSpellCraftGui {
 						});
 					}
 				});
-				this.addButton(partBarWidget);
+				this.addWidget(partBarWidget);
 			}
 
 			this.getMenu().validate();
@@ -383,7 +384,7 @@ public class BasicSpellCraftGui {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
-			mc.getTextureManager().bind(getBackgroundTexture());
+			RenderSystem.setShaderTexture(0, getBackgroundTexture());
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin, 0, 0, POS_CONTAINER_WIDTH, POS_CONTAINER_HEIGHT, TEX_WIDTH, TEX_HEIGHT);
 			
 			// Manually draw rune slots, since they're not baked onto the sheet

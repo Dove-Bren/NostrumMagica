@@ -2,25 +2,24 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.tile.LoreTableTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
-import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -104,9 +103,9 @@ public class LoreTableGui {
 					return false;
 				}
 				
-				public ItemStack onTake(Player playerIn, ItemStack stack) {
+				public void onTake(Player playerIn, ItemStack stack) {
 					table.onTakeItem(playerIn);
-					return super.onTake(playerIn, stack);
+					super.onTake(playerIn, stack);
 				}
 				
 			};
@@ -149,7 +148,7 @@ public class LoreTableGui {
 				
 				if (slot == this.inputSlot) {
 					// Trying to take our item
-					if (playerIn.inventory.add(cur)) {
+					if (playerIn.getInventory().add(cur)) {
 						inputSlot.set(ItemStack.EMPTY);
 						inputSlot.onTake(playerIn, cur);
 					} else {

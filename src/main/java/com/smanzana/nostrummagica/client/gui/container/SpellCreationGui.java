@@ -10,8 +10,8 @@ import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.ISpellCraftPatternRenderer;
@@ -42,26 +42,27 @@ import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.Container;
-import net.minecraft.world.inventory.ClickType;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -94,9 +95,9 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public ItemStack onTake(Player playerIn, ItemStack stack) {
+			public void onTake(Player playerIn, ItemStack stack) {
 				container.validate();
-				return super.onTake(playerIn, stack);
+				super.onTake(playerIn, stack);
 			}
 			
 			@Override
@@ -165,7 +166,7 @@ public class SpellCreationGui {
 			}
 			
 			@Override
-			public @Nonnull ItemStack onTake(Player playerIn, ItemStack stack) {
+			public @Nonnull void onTake(Player playerIn, ItemStack stack) {
 				// This is called AFTER things have been changed or swapped
 				// Which means we just look to see if we have an item.
 				// If not, take item from next
@@ -177,7 +178,7 @@ public class SpellCreationGui {
 
 				container.validate();
 				
-				return super.onTake(playerIn, stack);
+				super.onTake(playerIn, stack);
 			}
 			
 			@Override
@@ -253,10 +254,9 @@ public class SpellCreationGui {
 		}
 		
 		@Override
-		public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
+		public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
 			checkScroll();
-			ItemStack ret = super.clicked(slotId, dragType, clickTypeIn, player);
-			return ret;
+			super.clicked(slotId, dragType, clickTypeIn, player);
 		}
 		
 		@Override
@@ -269,7 +269,7 @@ public class SpellCreationGui {
 				if (slot.container == this.inventory) {
 					// Trying to take from the table
 					ItemStack dupe = cur.copy();
-					if (playerIn.inventory.add(dupe)) {
+					if (playerIn.getInventory().add(dupe)) {
 						slot.set(ItemStack.EMPTY);
 						slot.onTake(playerIn, dupe);
 					}
@@ -658,7 +658,7 @@ public class SpellCreationGui {
 			public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
 				float tint = 1f;
-				mc.getTextureManager().bind(TEXT_UTILS);
+				RenderSystem.setShaderTexture(0, TEXT_UTILS);
 				if (mouseX >= this.x && mouseY >= this.y
 						&& mouseX <= this.x + this.width
 						&& mouseY <= this.y + this.height) {
@@ -711,8 +711,7 @@ public class SpellCreationGui {
 			
 			@Override
 			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-				final Minecraft mc = Minecraft.getInstance();
-				mc.getTextureManager().bind(TEXT_UTILS);
+				RenderSystem.setShaderTexture(0, TEXT_UTILS);
 				final int u, v, wu, hv;
 				final float tint;
 				if (!gui.getMenu().hasProblems()) {
@@ -742,6 +741,11 @@ public class SpellCreationGui {
 					matrixStackIn.popPose();
 				}
 			}
+
+			@Override
+			public void updateNarration(NarrationElementOutput p_169152_) {
+				this.defaultButtonNarrationText(p_169152_);
+			}
 		}
 		
 		protected static class SpellStatusIcon extends AbstractWidget {
@@ -763,8 +767,7 @@ public class SpellCreationGui {
 			
 			@Override
 			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-				final Minecraft mc = Minecraft.getInstance();
-				mc.getTextureManager().bind(TEXT_UTILS);
+				RenderSystem.setShaderTexture(0, TEXT_UTILS);
 				final int u, v, wu, hv;
 				if (this.gui.getMenu().hasProblems()) {
 					u = TEXT_STATUS_BAD_HOFFSET;
@@ -790,6 +793,12 @@ public class SpellCreationGui {
 					matrixStackIn.popPose();
 				}
 			}
+
+			@Override
+			public void updateNarration(NarrationElementOutput p_169152_) {
+				// TODO Auto-generated method stub
+				
+			}
 		}
 		
 		protected static class WeightStatus extends AbstractWidget {
@@ -810,7 +819,6 @@ public class SpellCreationGui {
 			
 			@Override
 			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-				final Minecraft mc = Minecraft.getInstance();
 				final int weight = gui.getMenu().getCurrentWeight();
 				final int maxWeight = gui.getMenu().getMaxWeight();
 				
@@ -823,7 +831,7 @@ public class SpellCreationGui {
 				final int meterBarWidth = meterWidth - 2;
 				final int meterBarHeight = 6;
 				
-				mc.getTextureManager().bind(TEXT_UTILS);
+				RenderSystem.setShaderTexture(0, TEXT_UTILS);
 				
 				// Scale icon
 				final float[] scaleColor = ColorUtil.ARGBToColor(this.getScaleIconColor(weight, maxWeight));
@@ -848,7 +856,7 @@ public class SpellCreationGui {
 						meterXOffset + (meterWidth-meterBarWidth)/2 + meterPixels, y + (height + meterBarHeight)/2,
 						this.getMeterColor(weight, maxWeight));
 				
-				mc.getTextureManager().bind(TEXT_UTILS);
+				RenderSystem.setShaderTexture(0, TEXT_UTILS);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, meterXOffset, meterYOffset,
 						TEXT_GUAGE_HOFFSET, TEXT_GUAGE_VOFFSET, TEXT_GUAGE_WIDTH, TEXT_GUAGE_HEIGHT,
 						meterWidth, meterHeight, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT
@@ -877,6 +885,12 @@ public class SpellCreationGui {
 					return 0xFFFF0000;
 				}
 			}
+
+			@Override
+			public void updateNarration(NarrationElementOutput p_169152_) {
+				// TODO Auto-generated method stub
+				
+			}
 		}
 		
 		protected static class PatternIcon extends AbstractWidget {
@@ -901,10 +915,9 @@ public class SpellCreationGui {
 			
 			@Override
 			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-				final Minecraft mc = Minecraft.getInstance();
 				
 				// Background
-				mc.getTextureManager().bind(TEXT_UTILS);
+				RenderSystem.setShaderTexture(0, TEXT_UTILS);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y, 
 						TEX_PATTERN_HOFFSET, TEX_PATTERN_VOFFSET, TEX_PATTERN_WIDTH, TEX_PATTERN_HEIGHT,
 						width, height,
@@ -928,6 +941,12 @@ public class SpellCreationGui {
 						matrixStackIn.popPose();
 					}
 				}
+			}
+
+			@Override
+			public void updateNarration(NarrationElementOutput p_169152_) {
+				// TODO Auto-generated method stub
+				
 			}
 		}
 		
@@ -1006,6 +1025,12 @@ public class SpellCreationGui {
 			@Override
 			public boolean mouseClicked(double mouseX, double mouseY, int button) {
 				return false;
+			}
+
+			@Override
+			public void updateNarration(NarrationElementOutput p_169152_) {
+				// TODO Auto-generated method stub
+				
 			}
 		}
 		

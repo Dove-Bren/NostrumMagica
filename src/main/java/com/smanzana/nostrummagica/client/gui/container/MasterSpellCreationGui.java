@@ -8,17 +8,17 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.item.BlankScroll;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
+import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.item.SpellTome;
-import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpellCraftMessage;
 import com.smanzana.nostrummagica.spell.Spell;
@@ -26,25 +26,25 @@ import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.SpellCrafting;
 import com.smanzana.nostrummagica.tile.SpellTableTileEntity;
 import com.smanzana.nostrummagica.util.ContainerUtil;
-import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.Container;
-import net.minecraft.world.inventory.ClickType;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -143,10 +143,10 @@ public class MasterSpellCreationGui {
 				}
 				
 				@Override
-				public ItemStack onTake(Player playerIn, ItemStack stack) {
+				public void onTake(Player playerIn, ItemStack stack) {
 					validate();
 					
-					return super.onTake(playerIn, stack);
+					super.onTake(playerIn, stack);
 				}
 				
 				@Override
@@ -184,10 +184,10 @@ public class MasterSpellCreationGui {
 					}
 					
 					@Override
-					public @Nonnull ItemStack onTake(Player playerIn, ItemStack stack) {
+					public @Nonnull void onTake(Player playerIn, ItemStack stack) {
 						validate();
 						
-						return super.onTake(playerIn, stack);
+						super.onTake(playerIn, stack);
 					}
 				});
 			}
@@ -237,15 +237,13 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		public ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
-			ItemStack ret = super.clicked(slotId, dragType, clickTypeIn, player);
+		public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
+			super.clicked(slotId, dragType, clickTypeIn, player);
 			
 			isValid = false;
 			ItemStack stack = this.inventory.getItem(0);
 			if (!stack.isEmpty() && (stack.getItem() instanceof SpellTome || stack.getItem() instanceof BlankScroll))
 				isValid = true;
-			
-			return ret;
 		}
 		
 		@Override
@@ -258,7 +256,7 @@ public class MasterSpellCreationGui {
 				if (slot.container == this.inventory) {
 					// Trying to take from the table
 					ItemStack dupe = cur.copy();
-					if (playerIn.inventory.add(dupe)) {
+					if (playerIn.getInventory().add(dupe)) {
 						slot.set(ItemStack.EMPTY);
 						slot.onTake(playerIn, dupe);
 					}
@@ -541,7 +539,7 @@ public class MasterSpellCreationGui {
 			public void render(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final Minecraft mc = Minecraft.getInstance();
 				float tint = 1f;
-				mc.getTextureManager().bind(TEXT);
+				RenderSystem.setShaderTexture(0, TEXT);
 				if (mouseX >= this.x && mouseY >= this.y
 						&& mouseX <= this.x + this.width
 						&& mouseY <= this.y + this.height) {
@@ -585,7 +583,7 @@ public class MasterSpellCreationGui {
 			});
 			this.buttons = new ArrayList<>(SpellIcon.numIcons);
 			
-			this.addButton(nameField);
+			this.addWidget(nameField);
 		}
 		
 		@Override
@@ -612,10 +610,10 @@ public class MasterSpellCreationGui {
 						//int buttonId, int x, int y, int val, float actual, SpellCreationContainer container
 				
 				this.buttons.add(button);
-				this.addButton(button);
+				this.addWidget(button);
 			}
 			
-			this.addButton(nameField);
+			this.addWidget(nameField);
 			this.nameField.x = horizontalMargin + NAME_HOFFSET;
 			this.nameField.y = verticalMargin + NAME_VOFFSET;
 		}
@@ -625,7 +623,7 @@ public class MasterSpellCreationGui {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
-			mc.getTextureManager().bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 			
 			int x = (width - MESSAGE_WIDTH) / 2;
@@ -689,7 +687,7 @@ public class MasterSpellCreationGui {
 			if (!container.isValid) {
 				matrixStackIn.pushPose();
 				matrixStackIn.translate(0, 0, 500);
-				mc.getTextureManager().bind(TEXT);
+				RenderSystem.setShaderTexture(0, TEXT);
 				RenderSystem.enableBlend();
 				RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn,
 						(GUI_WIDTH - MESSAGE_WIDTH) / 2,
@@ -835,12 +833,11 @@ public class MasterSpellCreationGui {
 		}
 		
 		@Override
-		public @Nonnull ItemStack onTake(Player playerIn, ItemStack stack) {
+		public @Nonnull void onTake(Player playerIn, ItemStack stack) {
 			// This is called AFTER things have been changed or swapped
 			// Which means we just look to see if we have an item.
 			// If not, take item from next
 			if (!this.hasItem() && next != null && next.hasItem()) {
-				System.out.println("grabbing stack");
 				this.set(next.getItem().copy());
 				next.set(ItemStack.EMPTY);
 				next.onTake(playerIn, this.getItem());
@@ -848,7 +845,7 @@ public class MasterSpellCreationGui {
 
 			container.validate();
 			
-			return super.onTake(playerIn, stack);
+			super.onTake(playerIn, stack);
 		}
 		
 		@Override

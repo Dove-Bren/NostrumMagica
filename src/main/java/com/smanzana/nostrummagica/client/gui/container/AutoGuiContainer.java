@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.network.chat.Component;
@@ -33,8 +34,8 @@ public abstract class AutoGuiContainer<T extends AbstractContainerMenu> extends 
 	@Override
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
 		// Try passing to widgets first
-		for (AbstractWidget child : this.buttons) { // should be children?
-			if (child.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
+		for (Widget childWidget : this.renderables) { // should be children?
+			if (childWidget instanceof AbstractWidget child && child.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
 				//return true;
 			}
 		}

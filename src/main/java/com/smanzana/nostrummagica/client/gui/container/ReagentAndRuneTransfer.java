@@ -36,7 +36,7 @@ public final class ReagentAndRuneTransfer {
 		
 		boolean foundPlayerInv = false; // Make sure player inventory is represented on the screen in some form
 		for (Slot slot : container.slots) {
-			if (slot.container == player.inventory) {
+			if (slot.container == player.getInventory()) {
 				final int slotIdx = slot.getSlotIndex();
 				if (Inventory.isHotbarSlot(slotIdx) || slotIdx >= 36) {
 					continue; // hotbar or armor slot
@@ -68,7 +68,7 @@ public final class ReagentAndRuneTransfer {
 	public static final List<ItemStack> FindReagentBags(Player player) {
 		List<ItemStack> ret = new ArrayList<>();
 		
-		for (ItemStack item : player.inventory.items) {
+		for (ItemStack item : player.getInventory().items) {
 			if (!item.isEmpty() && item.getItem() instanceof ReagentBag) {
 				ret.add(item);
 			}
@@ -99,7 +99,7 @@ public final class ReagentAndRuneTransfer {
 	public static final List<ItemStack> FindRuneBags(Player player) {
 		List<ItemStack> ret = new ArrayList<>();
 		
-		for (ItemStack item : player.inventory.items) {
+		for (ItemStack item : player.getInventory().items) {
 			if (!item.isEmpty() && item.getItem() instanceof RuneBag) {
 				ret.add(item);
 			}
@@ -132,7 +132,7 @@ public final class ReagentAndRuneTransfer {
 		List<ItemStack> runeBags = FindRuneBags(player);
 		
 		for (Slot slot : container.slots) {
-			if (slot.container != player.inventory
+			if (slot.container != player.getInventory()
 					&& slot.hasItem() && !slot.getItem().isEmpty()) {
 				if (slot.getItem().getItem() instanceof ReagentItem) {
 					ItemStack toAdd = slot.getItem().copy();

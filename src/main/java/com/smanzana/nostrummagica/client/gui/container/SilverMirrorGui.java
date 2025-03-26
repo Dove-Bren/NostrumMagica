@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 
 import javax.annotation.Nonnull;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.IPositionHolderItem;
@@ -12,25 +13,25 @@ import com.smanzana.nostrummagica.util.ContainerUtil;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.inventory.ClickType;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.TickTask;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraftforge.fmllegacy.server.ServerLifecycleHooks;
 
 public class SilverMirrorGui {
 	
@@ -145,7 +146,7 @@ public class SilverMirrorGui {
 				ItemStack stack = slot.getItem();
 				if (inv == inventory) {
 					// shift-click in bag
-					if (playerIn.inventory.add(stack.copy())) {
+					if (playerIn.getInventory().add(stack.copy())) {
 						slot.set(ItemStack.EMPTY);
 					}
 				} else {
@@ -198,26 +199,19 @@ public class SilverMirrorGui {
 		}
 		
 		@Override
-		public @Nonnull ItemStack clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
+		public void clicked(int slotId, int dragType, ClickType clickTypeIn, Player player) {
 			if (slotId == mirrorPos) {
-				return ItemStack.EMPTY; // don't touch the mirror slot
+				return;
 			}
 			
-			ItemStack itemstack = ItemStack.EMPTY;
-			Inventory inventoryplayer = player.inventory;
-
 			if (clickTypeIn == ClickType.PICKUP && (dragType == 0 || dragType == 1)
-					&& slotId >= 0 && !inventoryplayer.getCarried().isEmpty()) {
+					&& slotId >= 0 && !getCarried().isEmpty()) {
 
 				Slot slot7 = (Slot)this.slots.get(slotId);
 
 				if (slot7 != null) {
 					ItemStack itemstack9 = slot7.getItem();
-					ItemStack itemstack12 = inventoryplayer.getCarried();
-
-					if (!itemstack9.isEmpty()) {
-						itemstack = itemstack9.copy();
-					}
+					ItemStack itemstack12 = getCarried();
 
 					if (itemstack9.isEmpty()) {
 						if (!itemstack12.isEmpty() && slot7.mayPlace(itemstack12)) {
@@ -230,23 +224,23 @@ public class SilverMirrorGui {
 							slot7.set(itemstack12.split(l2));
 
 							if (itemstack12.isEmpty()) {
-								inventoryplayer.setCarried(ItemStack.EMPTY);
+								setCarried(ItemStack.EMPTY);
 							}
 						}
 					} else if (slot7.mayPickup(player)) {
 						if (itemstack12.isEmpty()) {
 							if (!itemstack9.isEmpty()) {
 								int k2 = dragType == 0 ? itemstack9.getCount() : (itemstack9.getCount() + 1) / 2;
-								inventoryplayer.setCarried(slot7.remove(k2));
+								setCarried(slot7.remove(k2));
 
 								if (itemstack9.isEmpty()) {
 									slot7.set(ItemStack.EMPTY);
 								}
 
-								slot7.onTake(player, inventoryplayer.getCarried());
+								slot7.onTake(player, getCarried());
 							} else {
 								slot7.set(ItemStack.EMPTY);
-								inventoryplayer.setCarried(ItemStack.EMPTY);
+								setCarried(ItemStack.EMPTY);
 							}
 						} else if (slot7.mayPlace(itemstack12)) {
 							if (itemstack9.getItem() == itemstack12.getItem() && ItemStack.tagMatches(itemstack9, itemstack12)) {
@@ -263,13 +257,13 @@ public class SilverMirrorGui {
 								itemstack12.split(j2);
 
 								if (itemstack12.isEmpty()) {
-									inventoryplayer.setCarried(ItemStack.EMPTY);
+									setCarried(ItemStack.EMPTY);
 								}
 
 								itemstack9.grow(j2);
 							} else if (itemstack12.getCount() <= slot7.getMaxStackSize(itemstack12)) {
 								slot7.set(itemstack12);
-								inventoryplayer.setCarried(itemstack9);
+								setCarried(itemstack9);
 							}
 						} else if (itemstack9.getItem() == itemstack12.getItem() && itemstack12.getMaxStackSize() > 1 && ItemStack.tagMatches(itemstack9, itemstack12)) {
 							int i2 = itemstack9.getCount();
@@ -282,7 +276,7 @@ public class SilverMirrorGui {
 									slot7.set(ItemStack.EMPTY);
 								}
 
-								slot7.onTake(player, inventoryplayer.getCarried());
+								slot7.onTake(player, getCarried());
 							}
 						}
 					}
@@ -291,9 +285,9 @@ public class SilverMirrorGui {
 				}
 	            
 				this.broadcastChanges();
-				return itemstack;
+				return; // used to return itemstack
 			} else {
-				return super.clicked(slotId, dragType, clickTypeIn, player);
+				super.clicked(slotId, dragType, clickTypeIn, player);
 			}
 	        
 		}
@@ -301,7 +295,7 @@ public class SilverMirrorGui {
 		@Override
 		public void removed(Player playerIn) {
 			super.removed(playerIn);
-			this.clearContainer(playerIn, playerIn.level, inventory);
+			this.clearContainer(playerIn, inventory);
 		}
 	}
 	
@@ -319,7 +313,7 @@ public class SilverMirrorGui {
 			int horizontalMargin = (width - imageWidth) / 2;
 			int verticalMargin = (height - imageHeight) / 2;
 			
-			mc.getTextureManager().bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, horizontalMargin, verticalMargin,0, 0, GUI_WIDTH, GUI_HEIGHT, 256, 256);
 		}
 		

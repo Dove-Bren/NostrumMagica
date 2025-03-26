@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.widget.IMoveableWidget;
@@ -15,12 +16,13 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.TextComponent;
 
 public class SimpleInventoryWidget extends ParentWidget implements IScrollbarListener {
 	
@@ -88,6 +90,12 @@ public class SimpleInventoryWidget extends ParentWidget implements IScrollbarLis
 		@Override
 		public int getStartingY() {
 			return startY;
+		}
+
+		@Override
+		public void updateNarration(NarrationElementOutput p_169152_) {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 	
