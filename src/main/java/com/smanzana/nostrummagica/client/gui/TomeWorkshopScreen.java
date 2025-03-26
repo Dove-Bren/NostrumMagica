@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.SpellTome;
@@ -13,16 +14,17 @@ import com.smanzana.nostrummagica.network.message.SpellTomeSlotModifyMessage;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.AbstractButton;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public class TomeWorkshopScreen extends Screen {
 	
@@ -146,17 +148,18 @@ public class TomeWorkshopScreen extends Screen {
 		// Don't reset any selections in case we just got resized
 		
 		// Refresh the tome screen
-		this.children.clear();
-		this.buttons.clear();
+//		this.children.clear();
+//		this.buttons.clear();
+		this.clearWidgets();
 		refreshTomeScreen();
 		this.inventoryWidgets.clear();
 		setupInventorySlots();
 		scrollWidget = new Scrollbar(this, getGuiLeft() + POS_SCROLLBAR_HOFFSET, getGuiTop() + POS_SCROLLBAR_VOFFSET, POS_SCROLLBAR_WIDTH, POS_SCROLLBAR_HEIGHT);
-		this.addButton(scrollWidget);
+		this.addWidget(scrollWidget);
 		leftFlip = new PageFlipButton(this, true, getGuiLeft() + POS_LARROW_HOFFSET, getGuiTop() + POS_LARROW_VOFFSET, POS_LARROW_WIDTH, POS_LARROW_HEIGHT);
-		this.addButton(leftFlip);
+		this.addWidget(leftFlip);
 		rightFlip = new PageFlipButton(this, false, getGuiLeft() + POS_RARROW_HOFFSET, getGuiTop() + POS_RARROW_VOFFSET, POS_RARROW_WIDTH, POS_RARROW_HEIGHT);
-		this.addButton(rightFlip);
+		this.addWidget(rightFlip);
 	}
 	
 	@Override
@@ -207,9 +210,10 @@ public class TomeWorkshopScreen extends Screen {
 	}
 	
 	protected void removeWidget(AbstractWidget widget) {
+		super.removeWidget(widget);
 		// This is dumb
-		this.children.remove(widget);
-		this.buttons.remove(widget);
+//		this.children.remove(widget);
+//		this.buttons.remove(widget);
 	}
 	
 	protected int getGuiLeft() {
@@ -290,7 +294,7 @@ public class TomeWorkshopScreen extends Screen {
 			int y = yAnchor + (i * buttonHeight);
 			SpellSlotPane slot = new SpellSlotPane(this, i, x, y, buttonWidth, buttonHeight);
 			slot.setSpell(getSpellForSlot(i));
-			this.addButton(slot);
+			this.addWidget(slot);
 			this.spellSlotWidgets.add(slot);
 		}
 	}
@@ -306,7 +310,7 @@ public class TomeWorkshopScreen extends Screen {
 			final int y = yAnchor + (i * buttonHeight);
 			
 			SpellLibraryPane pane = new SpellLibraryPane(this, spell, i, x, y, buttonWidth, buttonHeight);
-			this.addButton(pane);
+			this.addWidget(pane);
 			spellLibraryWidgets.add(pane);
 		}
 	}
@@ -544,7 +548,7 @@ public class TomeWorkshopScreen extends Screen {
 				PretendInventorySlot slot = new PretendInventorySlot(this, this.playerInv, idx,
 						xOffset + (x * 18), yOffset + (y * 18),
 						18, 18);
-				this.addButton(slot);
+				this.addWidget(slot);
 				this.inventoryWidgets.add(slot);
 			}
 		}
@@ -556,7 +560,7 @@ public class TomeWorkshopScreen extends Screen {
 			PretendInventorySlot slot = new PretendInventorySlot(this, this.playerInv, idx,
 					xOffset + (x * 18), yOffset,
 					18, 18);
-			this.addButton(slot);
+			this.addWidget(slot);
 			this.inventoryWidgets.add(slot);
 		}
 	}
@@ -581,7 +585,7 @@ public class TomeWorkshopScreen extends Screen {
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(getGuiLeft(), getGuiTop(), 0);
 		{
-			mc.textureManager.bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, TEXT_GUI_HOFFSET, TEXT_GUI_VOFFSET, TEXT_GUI_WIDTH, TEXT_GUI_HEIGHT, TEXT_GUI_WIDTH, TEXT_GUI_HEIGHT, TEXT_WIDTH, TEXT_HEIGHT);
 			
 			if (this.isValidSelection(playerStackSelected)) {
@@ -733,7 +737,6 @@ public class TomeWorkshopScreen extends Screen {
 		
 		@Override
 		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-			final Minecraft mc = Minecraft.getInstance();
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(x, y, 0);
 			
@@ -742,7 +745,7 @@ public class TomeWorkshopScreen extends Screen {
 			}
 			
 			// Draw background
-			mc.textureManager.bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 					TEXT_LIBPANEL_HOFFSET, TEXT_LIBPANEL_VOFFSET,
 					TEXT_LIBPANEL_WIDTH, TEXT_LIBPANEL_HEIGHT,
@@ -768,6 +771,12 @@ public class TomeWorkshopScreen extends Screen {
 		}
 		
 		public void renderForeground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			
+		}
+
+		@Override
+		public void updateNarration(NarrationElementOutput p_169152_) {
+			// TODO Auto-generated method stub
 			
 		}
 	}
@@ -819,13 +828,11 @@ public class TomeWorkshopScreen extends Screen {
 		
 		@Override
 		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-			final Minecraft mc = Minecraft.getInstance();
-			
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(x, y, 0);
 			
 			// Draw background
-			mc.textureManager.bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			if (this.spell == null) {
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 						TEXT_SLOTEMPTY_HOFFSET, TEXT_SLOTEMPTY_VOFFSET,
@@ -859,6 +866,12 @@ public class TomeWorkshopScreen extends Screen {
 		}
 		
 		public void renderForeground(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
+			
+		}
+
+		@Override
+		public void updateNarration(NarrationElementOutput p_169152_) {
+			// TODO Auto-generated method stub
 			
 		}
 	}
@@ -922,6 +935,12 @@ public class TomeWorkshopScreen extends Screen {
 				}
 			}
 		}
+
+		@Override
+		public void updateNarration(NarrationElementOutput p_169152_) {
+			// TODO Auto-generated method stub
+			
+		}
 		
 	}
 	
@@ -951,13 +970,11 @@ public class TomeWorkshopScreen extends Screen {
 		
 		@Override
 		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-			final Minecraft mc = Minecraft.getInstance();
-			
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(x, y, 0);
 			
 			// Draw background
-			mc.textureManager.bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			if (this.isHovered() || pressed) {
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 					TEXT_SCROLLBAR_HIGH_HOFFSET, TEXT_SCROLLBAR_HIGH_VOFFSET,
@@ -973,6 +990,12 @@ public class TomeWorkshopScreen extends Screen {
 			}
 			
 			matrixStackIn.popPose();
+		}
+
+		@Override
+		public void updateNarration(NarrationElementOutput p_169152_) {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 	
@@ -993,7 +1016,6 @@ public class TomeWorkshopScreen extends Screen {
 		
 		@Override
 		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-			final Minecraft mc = Minecraft.getInstance();
 			
 			// Figure out if disasbled. Should be doing somewhere else...
 			final boolean disabled;
@@ -1007,7 +1029,7 @@ public class TomeWorkshopScreen extends Screen {
 			matrixStackIn.translate(x, y, 0);
 			
 			// Draw background
-			mc.textureManager.bind(TEXT);
+			RenderSystem.setShaderTexture(0, TEXT);
 			if (disabled) {
 				
 			} else {
@@ -1043,6 +1065,12 @@ public class TomeWorkshopScreen extends Screen {
 			}
 			
 			matrixStackIn.popPose();
+		}
+
+		@Override
+		public void updateNarration(NarrationElementOutput p_169152_) {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 	

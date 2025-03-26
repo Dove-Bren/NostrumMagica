@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.gui.widget;
 
 import java.util.List;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.ReagentAndRuneTransfer;
@@ -13,15 +14,16 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.AbstractButton;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 
 public class QuickMoveBagButton extends AbstractButton {
@@ -69,7 +71,7 @@ public class QuickMoveBagButton extends AbstractButton {
 		int maxY = -1;
 		
 		for (Slot slot : screen.getMenu().slots) {
-			if (slot.container == this.player.inventory) {
+			if (slot.container == this.player.getInventory()) {
 				final int slotIdx = slot.getSlotIndex();
 				if (Inventory.isHotbarSlot(slotIdx) || slotIdx >= 36) {
 					continue; // hotbar or armor slot
@@ -103,7 +105,7 @@ public class QuickMoveBagButton extends AbstractButton {
 		boolean foundReagent = false;
 		boolean foundRune = false;
 		for (Slot slot : screen.getMenu().slots) {
-			if (slot.container != player.inventory
+			if (slot.container != player.getInventory()
 					&& slot.hasItem() && !slot.getItem().isEmpty()) {
 				if (!foundReagent && slot.getItem().getItem() instanceof ReagentItem) {
 					foundReagent = true;
@@ -144,7 +146,7 @@ public class QuickMoveBagButton extends AbstractButton {
 			if (ReagentAndRuneTransfer.ShouldAddTo(player, screen.getMenu())) {
 				// May have already added button.
 				QuickMoveBagButton button = null;
-				for (AbstractWidget w : event.getWidgetList()) {
+				for (GuiEventListener w : event.getWidgetList()) {
 					if (w instanceof QuickMoveBagButton) {
 						button = (QuickMoveBagButton) w;
 						break;
@@ -160,6 +162,11 @@ public class QuickMoveBagButton extends AbstractButton {
 			}
 			
 		}
+	}
+
+	@Override
+	public void updateNarration(NarrationElementOutput p_169152_) {
+		this.defaultButtonNarrationText(p_169152_);
 	}
 
 }

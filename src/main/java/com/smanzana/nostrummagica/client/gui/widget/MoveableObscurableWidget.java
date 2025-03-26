@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.widget;
 
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 
 public class MoveableObscurableWidget extends ObscurableWidget implements IMoveableWidget {
@@ -37,6 +38,11 @@ public class MoveableObscurableWidget extends ObscurableWidget implements IMovea
 	@Override
 	public int getStartingY() {
 		return startY;
+	}
+
+	@Override
+	public void updateNarration(NarrationElementOutput p_169152_) {
+		
 	}
 
 }

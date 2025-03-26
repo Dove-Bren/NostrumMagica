@@ -1,14 +1,15 @@
 package com.smanzana.nostrummagica.client.gui.widget;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 
 public class ScrollbarWidget extends AbstractWidget {
 	
@@ -167,6 +168,12 @@ public class ScrollbarWidget extends AbstractWidget {
 	
 	protected void drawTrack(PoseStack matrixStackIn, int width, int height) {
 		RenderFuncs.drawRect(matrixStackIn, 0, 0, width, height, 0xFF000000);
+	}
+
+	@Override
+	public void updateNarration(NarrationElementOutput p_169152_) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

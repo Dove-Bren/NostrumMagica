@@ -3,28 +3,29 @@ package com.smanzana.nostrummagica.client.gui.petgui.arcanewolf;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector4f;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.WolfTypeCapability;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.nbt.CompoundTag;
-import com.mojang.math.Vector4f;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraftforge.fml.client.gui.GuiUtils;
+import net.minecraft.world.entity.player.Player;
 
 public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 
@@ -298,8 +299,14 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		
 		public void drawOverlay(Minecraft mc, PoseStack matrixStackIn, int sheetWidth, int sheetHeight, int mouseX, int mouseY) {
 			if (this.isHovered()) {
-				GuiUtils.drawHoveringText(matrixStackIn, Arrays.asList(this.tooltip), mouseX, mouseY, sheetWidth, sheetHeight, -1, mc.font);
+				mc.screen.renderTooltip(matrixStackIn, Arrays.asList(this.tooltip), Optional.empty(), mouseX, mouseY, mc.font);
 			}
+		}
+
+		@Override
+		public void updateNarration(NarrationElementOutput p_169152_) {
+			// TODO Auto-generated method stub
+			
 		}
 	}
 

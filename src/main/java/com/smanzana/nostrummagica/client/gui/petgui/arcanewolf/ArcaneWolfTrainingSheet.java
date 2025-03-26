@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.client.gui.petgui.arcanewolf;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
@@ -17,13 +18,13 @@ import com.smanzana.petcommand.api.client.petgui.PetGUIRenderHelper;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -324,7 +325,6 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 			if (x < 0 || y < 0) {
 				continue;
 			}
-			final int index = i;
 			Slot slotIn = new Slot(localInv, i, offsetX + x, offsetY + upperOffset + y) {
 				
 				@Override
@@ -351,7 +351,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 			petContainer.addSheetSlot(slotIn);
 		}
 		
-		Container playerInv = player.inventory;
+		Container playerInv = player.getInventory();
 		for (int i = 0; i < playerInvSize; i++) {
 			Slot slotIn = new Slot(playerInv, (i + 9) % 36, leftOffset + offsetX + (cellWidth * (i % invRow)),
 					(i < 27 ? 0 : 10) + playerTopOffset + offsetY + (cellWidth * (i / invRow)));
@@ -386,7 +386,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 			// Draw glyphs first
 			if (pet.getTrainingElement() != null || pet.getElementalType().getPrimary() != null)
 			{
-				mc.getTextureManager().bind(TEX_LOC);
+				RenderSystem.setShaderTexture(0, TEX_LOC);
 				final EMagicElement primary = pet.getElementalType().getPrimary();
 				
 				// Inner glyph for primary
@@ -486,7 +486,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 						blue = 1f - ((float) db / 255f) * brightness;
 					}
 					
-					mc.getTextureManager().bind(TEX_LOC);
+					RenderSystem.setShaderTexture(0, TEX_LOC);
 
 					// Level 1
 					{
@@ -534,7 +534,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 					matrixStackIn.popPose();
 				} else {
 					// Draw bowl
-					mc.getTextureManager().bind(TEX_LOC);
+					RenderSystem.setShaderTexture(0, TEX_LOC);
 					RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x + bowlHOffset,
 							upperOffset + y + bowlVOffset, GUI_SLOT_ICON_HOFFSET,
 							GUI_SLOT_ICON_VOFFSET, bowlWidth,

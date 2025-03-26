@@ -5,10 +5,13 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Matrix4f;
 import com.smanzana.autodungeons.util.DimensionUtils;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
@@ -19,17 +22,13 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
-import com.mojang.math.Matrix4f;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -166,10 +165,10 @@ public class ObeliskScreen extends Screen {
 			index++;
 		}
 		
-		this.addButton(centralButton);
-		for (AbstractWidget w : floatingButtons) addButton(w);
-		for (AbstractWidget w : listButtons) addButton(w);
-		for (AbstractWidget w : listRemoveButtons) addButton(w);
+		this.addWidget(centralButton);
+		for (AbstractWidget w : floatingButtons) addWidget(w);
+		for (AbstractWidget w : listButtons) addWidget(w);
+		for (AbstractWidget w : listRemoveButtons) addWidget(w);
 		
 		for (DestinationButton butt : listButtons) {
 			butt.visible = drawList;
@@ -408,7 +407,7 @@ public class ObeliskScreen extends Screen {
         //GlStateManager.disableTexture();
         //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         //GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
-        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+        buf.begin(VertexFormat.Mode.LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
         for (int i = 0; i < segments; i++) {
         	final float X = center.x + (diffPerX * i);
         	final float Y = center.y + (diffPerY * i);
@@ -466,10 +465,9 @@ public class ObeliskScreen extends Screen {
 		
 		@Override
 		public void renderButton(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-			final Minecraft mc = Minecraft.getInstance();
 			final float sat = (this.isHovered() ? 1f : .8f);
 			
-			mc.getTextureManager().bind(background);
+			RenderSystem.setShaderTexture(0, background);
             RenderSystem.enableBlend();
             RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStack, x, y,
             		TEXT_REMOVE_BUTT_HOFFSET, TEXT_REMOVE_BUTT_VOFFSET,
@@ -561,7 +559,7 @@ public class ObeliskScreen extends Screen {
                 }
                 
                 
-                mc.getTextureManager().bind(background);
+                RenderSystem.setShaderTexture(0, background);
                 RenderSystem.enableBlend();
                 RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x, y, textureX,
         				textureY, TEXT_ICON_LENGTH, TEXT_ICON_LENGTH, TEXT_WHOLE_WIDTH, TEXT_WHOLE_HEIGHT,

@@ -1,9 +1,11 @@
 package com.smanzana.nostrummagica.client.gui.petgui.reddragon;
 
+import java.util.Optional;
+
 import javax.annotation.Nonnull;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.entity.dragon.DragonGambit;
@@ -19,19 +21,18 @@ import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
 import com.smanzana.petcommand.api.client.petgui.PetGUIRenderHelper;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.Container;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
-import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraft.nbt.Tag;
-import net.minecraftforge.fml.client.gui.GuiUtils;
 
 public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	
@@ -59,8 +60,8 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	private RedDragonSpellInventory dragonInv;
 	private Container playerInv;
 	private IPetContainer<TameRedDragonEntity> container;
-	private int width;
-	private int height;
+	//private int width;
+	//private int height;
 	private int offsetX;
 	private int offsetY;
 	
@@ -128,9 +129,9 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 	public void showSheet(TameRedDragonEntity dragon, Player player, IPetContainer<TameRedDragonEntity> container, int width, int height, int offsetX, int offsetY) {
 		this.container = container;
 		this.dragonInv = this.dragon.getSpellInventory();
-		this.playerInv = player.inventory;
-		this.width = width;
-		this.height = height;
+		this.playerInv = player.getInventory();
+		//this.width = width;
+		//this.height = height;
 		this.offsetX = offsetX;
 		this.offsetY = offsetY;
 		
@@ -215,7 +216,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 			texOffsetX = gambit.getTexOffsetX();
 			texOffsetY = gambit.getTexOffsetY();
 		}
-		mc.getTextureManager().bind(DRAGON_ICON_TEXT);
+		RenderSystem.setShaderTexture(0, DRAGON_ICON_TEXT);
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, x,
 				y,
 				GUI_TEX_TOGGLE_HOFFSET + texOffsetX,
@@ -439,7 +440,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 			
 			DragonGambit gambit = dragonInv.getAllGambits()[index];
 			if (gambit != null) {
-				GuiUtils.drawHoveringText(matrixStackIn, gambit.getDesc(), mouseX, mouseY, this.width, this.height, 150, mc.font);
+				mc.screen.renderTooltip(matrixStackIn, gambit.getDesc(), Optional.empty(), mouseX, mouseY, mc.font);
 			}
 			
 			matrixStackIn.popPose();
