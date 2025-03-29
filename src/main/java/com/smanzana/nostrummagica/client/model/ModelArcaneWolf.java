@@ -7,9 +7,43 @@ import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 
 import net.minecraft.client.model.WolfModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
 
 public class ModelArcaneWolf extends WolfModel<ArcaneWolfEntity> {
+	
+	private static final MeshDefinition createWolfMeshClone() {
+		MeshDefinition meshdefinition = new MeshDefinition();
+      PartDefinition partdefinition = meshdefinition.getRoot();
+      PartDefinition partdefinition1 = partdefinition.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.offset(-1.0F, 13.5F, -7.0F));
+      partdefinition1.addOrReplaceChild("real_head", CubeListBuilder.create().texOffs(0, 0).addBox(-2.0F, -3.0F, -2.0F, 6.0F, 6.0F, 4.0F).texOffs(16, 14).addBox(-2.0F, -5.0F, 0.0F, 2.0F, 2.0F, 1.0F).texOffs(16, 14).addBox(2.0F, -5.0F, 0.0F, 2.0F, 2.0F, 1.0F).texOffs(0, 10).addBox(-0.5F, 0.0F, -5.0F, 3.0F, 3.0F, 4.0F), PartPose.ZERO);
+      partdefinition.addOrReplaceChild("body", CubeListBuilder.create().texOffs(18, 14).addBox(-3.0F, -2.0F, -3.0F, 6.0F, 9.0F, 6.0F), PartPose.offsetAndRotation(0.0F, 14.0F, 2.0F, ((float)Math.PI / 2F), 0.0F, 0.0F));
+      partdefinition.addOrReplaceChild("upper_body", CubeListBuilder.create().texOffs(21, 0).addBox(-3.0F, -3.0F, -3.0F, 8.0F, 6.0F, 7.0F), PartPose.offsetAndRotation(-1.0F, 14.0F, -3.0F, ((float)Math.PI / 2F), 0.0F, 0.0F));
+      CubeListBuilder cubelistbuilder = CubeListBuilder.create().texOffs(0, 18).addBox(0.0F, 0.0F, -1.0F, 2.0F, 8.0F, 2.0F);
+      partdefinition.addOrReplaceChild("right_hind_leg", cubelistbuilder, PartPose.offset(-2.5F, 16.0F, 7.0F));
+      partdefinition.addOrReplaceChild("left_hind_leg", cubelistbuilder, PartPose.offset(0.5F, 16.0F, 7.0F));
+      partdefinition.addOrReplaceChild("right_front_leg", cubelistbuilder, PartPose.offset(-2.5F, 16.0F, -4.0F));
+      partdefinition.addOrReplaceChild("left_front_leg", cubelistbuilder, PartPose.offset(0.5F, 16.0F, -4.0F));
+      PartDefinition partdefinition2 = partdefinition.addOrReplaceChild("tail", CubeListBuilder.create(), PartPose.offsetAndRotation(-1.0F, 12.0F, 8.0F, ((float)Math.PI / 5F), 0.0F, 0.0F));
+      partdefinition2.addOrReplaceChild("real_tail", CubeListBuilder.create().texOffs(9, 18).addBox(0.0F, 0.0F, -1.0F, 2.0F, 8.0F, 2.0F), PartPose.ZERO);
+      return meshdefinition;//LayerDefinition.create(meshdefinition, 64, 32);
+	}
+	
+	public static final LayerDefinition createLayer() {
+		MeshDefinition mesh = createWolfMeshClone();
+		PartDefinition root = mesh.getRoot();
+		
+		root.getChild("head").addOrReplaceChild("snoot_bridge", CubeListBuilder.create().texOffs(23, 14).addBox(0, 0, 0, 1, 1, 2), PartPose.offsetAndRotation(0.5F, -0.5F + (16 *.016F), 16 * -.075F, 10f, 0f, 0f));
+		root.getChild("body").addOrReplaceChild("butt_floof", CubeListBuilder.create().texOffs(21, 0).addBox(-3.5F, 1.5F, -3.5F, 7, 5, 7), PartPose.ZERO);
+		root.addOrReplaceChild("mane", CubeListBuilder.create().texOffs(21, 0).addBox(-3.0F, -3.0F, -3.0F, 8, 6, 7), PartPose.offset(-1.0F, 14.0F, 2.0F));
+		
+		
+		return LayerDefinition.create(mesh, 32, 32);
+	}
 	
 	// Want to use WolfModel's, which used to be public :(
 	protected ModelPart head;
@@ -23,56 +57,18 @@ public class ModelArcaneWolf extends WolfModel<ArcaneWolfEntity> {
 	
 	protected ModelPart headSnootBridge;
 	
-	public ModelArcaneWolf(int color) {
-		//super(); Don't bother creating parent model
+	public ModelArcaneWolf(ModelPart root) {
+		super(root);
 		
-		this.head = new ModelPart(this, 0, 0);
-		this.head.addBox(-2.0F, -3.0F, -2.0F, 6, 6, 4, 0.0F);
-		this.head.setPos(-1.0F, 13.5F, -7.0F);
-		this.head.texOffs(16, 14).addBox(-1.999F, -4.5F, 0.0F, 2, 2, 1, 0.0F); // Ear
-		this.head.texOffs(16, 11).addBox(-1.5F, -5.25F, -0.001F, 1, 1, 1, 0.0F); // EarTop TODO texture
-		this.head.texOffs(16, 14).addBox(1.999F, -4.5F, 0.0F, 2, 2, 1, 0.0F); // Ear
-		this.head.texOffs(16, 11).addBox(2.5F, -5.25F, -0.001F, 1, 1, 1, 0.0F); // EarTop TODO texture
-		this.head.texOffs(0, 10).addBox(-0.5F, 0.0F, -5.0F, 3, 3, 4, 0.0F); // Snoot
-		this.head.texOffs(42, 13).addBox(-2.5F, -1.5F, -1.5F, 1, 4, 3, 0.0F); // Right face floof // TODO texture
-		this.head.texOffs(42, 13).addBox(3.5F, -1.5F, -1.5F, 1, 4, 3, 0.0F); // Left face floof // TODO texture
-		//this.head.setTextureOffset(18, 14).addBox(0.5F, -1.0F, -4.0F, 1, 2, 2, 0.0F); // SnootBridge
-		headSnootBridge = new ModelPart(this, 23, 14);
-//		headSnootBridge.offsetX = 0;
-//		headSnootBridge.offsetY = .016F;
-//		headSnootBridge.offsetZ = -.075F;
-		headSnootBridge.setPos(0.5F, -0.5F + (16 *.016F), 16 * -.075F);
-		headSnootBridge.addBox(0, 0, 0, 1, 1, 2, 0.0F); // SnootBridge
-		headSnootBridge.xRot = 10f;
-		head.addChild(headSnootBridge);
-		this.body = new ModelPart(this, 18, 14);
-		this.body.addBox(-3.0F, -2.0F, -3.0F, 6, 9, 6, 0.0F);
-		this.body.setPos(0.0F, 14.0F, 2.0F);
-		this.body.texOffs(21, 0).addBox(-3.5F, 1.5F, -3.5F, 7, 5, 7, 0.0F); // Butt floof // TODO texture
-		
-		
-		mane = new ModelPart(this, 21, 0);
-		mane.addBox(-3.0F, -3.0F, -3.0F, 8, 6, 7, 0.0F);
-		mane.setPos(-1.0F, 14.0F, 2.0F);
-		this.legBackRight = new ModelPart(this, 0, 18);
-		this.legBackRight.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
-		this.legBackRight.setPos(-2.5F, 16.0F, 7.0F);
-		this.legBackLeft = new ModelPart(this, 0, 18);
-		this.legBackLeft.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
-		this.legBackLeft.setPos(0.5F, 16.0F, 7.0F);
-		this.legFrontRight = new ModelPart(this, 0, 18);
-		this.legFrontRight.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
-		this.legFrontRight.setPos(-2.5F, 16.0F, -4.0F);
-		this.legFrontLeft = new ModelPart(this, 0, 18);
-		this.legFrontLeft.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
-		this.legFrontLeft.setPos(0.5F, 16.0F, -4.0F);
-		tail = new ModelPart(this, 9, 18);
-		tail.addBox(0.0F, 0.0F, -1.0F, 2, 8, 2, 0.0F);
-		tail.setPos(-1.0F, 12.0F, 8.0F);
-	}
-	
-	public ModelArcaneWolf() {
-		this(-1);
+		this.head = root.getChild("head");
+		this.headSnootBridge = root.getChild("snoot_bridge");
+		this.body = root.getChild("body");
+		this.mane = root.getChild("mane");
+		this.legBackRight = root.getChild("right_hind_leg");
+		this.legBackLeft = root.getChild("left_hind_leg");
+		this.legFrontRight = root.getChild("right_front_leg");
+		this.legFrontLeft = root.getChild("left_front_leg");
+		this.tail = root.getChild("tail");
 	}
 	
 	protected Iterable<ModelPart> headParts() {

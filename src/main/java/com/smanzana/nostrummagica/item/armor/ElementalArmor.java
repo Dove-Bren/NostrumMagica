@@ -24,6 +24,7 @@ import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.model.ModelEnchantedArmorBase;
+import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
@@ -526,9 +527,11 @@ public class ElementalArmor extends ArmorItem
 		if (!NostrumMagica.instance.proxy.isServer()) {
 			if (armorModels == null) {
 				armorModels = new ArrayList<ModelEnchantedArmorBase<LivingEntity>>(5);
-				for (int i = 0; i < 5; i++) {
-					armorModels.add(i, new ModelEnchantedArmorBase<LivingEntity>(1f, i));
-				}
+				armorModels.add(0, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_0)));
+				armorModels.add(1, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_1)));
+				armorModels.add(2, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_2)));
+				armorModels.add(3, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_3)));
+				armorModels.add(4, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_4)));
 			}
 		}
 	}

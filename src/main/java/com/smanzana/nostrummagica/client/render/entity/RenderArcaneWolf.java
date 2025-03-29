@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelArcaneWolf;
+import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
 import com.smanzana.nostrummagica.client.render.layer.LayerArcaneWolfRunes;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 
@@ -16,7 +17,7 @@ public class RenderArcaneWolf extends MobRenderer<ArcaneWolfEntity, ModelArcaneW
 	private static final ResourceLocation ARCANE_WOLF_TEXTURE_BASE = new ResourceLocation(NostrumMagica.MODID, "textures/entity/arcane_wolf/base.png");
 	
 	public RenderArcaneWolf(EntityRendererProvider.Context renderManagerIn, float shadowSizeIn) {
-		super(renderManagerIn, new ModelArcaneWolf(), shadowSizeIn);
+		super(renderManagerIn, new ModelArcaneWolf(renderManagerIn.bakeLayer(NostrumModelLayers.ArcaneWolf)), shadowSizeIn);
 		this.addLayer(new LayerArcaneWolfRunes(this));
 	}
 	
