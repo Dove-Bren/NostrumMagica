@@ -15,9 +15,13 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.resources.ResourceLocation;
 
+/**
+ * An entity model that's mode up of regular baked models like block models or obj models.
+ * @param <T>
+ */
 public class ModelBaked<T extends Entity> extends EntityModel<T> {
 	
-	protected List<ModelRendererBaked> children;
+	protected List<ModelPartBaked> children;
 	
 	public ModelBaked(ResourceLocation ... models) {
 		this(RenderType::entityCutoutNoCull, models);
@@ -28,14 +32,14 @@ public class ModelBaked<T extends Entity> extends EntityModel<T> {
 		children = fetchModels(models);
 	}
 
-	protected @Nonnull List<ModelRendererBaked> fetchModels(@Nullable ResourceLocation[] modelLocations) {
+	protected @Nonnull List<ModelPartBaked> fetchModels(@Nullable ResourceLocation[] modelLocations) {
 		if (modelLocations == null || modelLocations.length == 0) {
 			return new ArrayList<>();
 		}
 		
-		List<ModelRendererBaked> list = new ArrayList<>(modelLocations.length);
+		List<ModelPartBaked> list = new ArrayList<>(modelLocations.length);
 		for (ResourceLocation loc : modelLocations) {
-			list.add(new ModelRendererBaked(this, loc));
+			list.add(new ModelPartBaked(loc));
 		}
 		return list;
 	}
@@ -50,13 +54,13 @@ public class ModelBaked<T extends Entity> extends EntityModel<T> {
 	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn,
 			float red, float green, float blue, float alpha) {
 		int i = 0;
-		for (ModelRendererBaked child : children) {
+		for (ModelPartBaked child : children) {
 			this.renderChild(child, i, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 			i++;
 		}
 	}
 	
-	protected void renderChild(ModelRendererBaked child, int index, PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn,
+	protected void renderChild(ModelPartBaked child, int index, PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn,
 			float red, float green, float blue, float alpha) {
 		child.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 	}

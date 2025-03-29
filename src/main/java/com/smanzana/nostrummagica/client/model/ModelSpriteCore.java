@@ -13,8 +13,8 @@ public class ModelSpriteCore extends ModelBaked<SpriteEntity> {
 	public static final ResourceLocation MODEL_CORE = new ResourceLocation(NostrumMagica.MODID, "entity/sprite_core");
 	public static final ResourceLocation MODEL_ARMS = new ResourceLocation(NostrumMagica.MODID, "entity/sprite_arms");
 	
-	protected ModelRendererBaked core;
-	protected ModelRendererBaked arms;
+	protected ModelPartBaked core;
+	protected ModelPartBaked arms;
 	
 	protected float red;
 	protected float green;
@@ -24,8 +24,8 @@ public class ModelSpriteCore extends ModelBaked<SpriteEntity> {
 	public ModelSpriteCore() {
 		super(); // Only a child class to use LookupModel
 		
-		core = new ModelRendererBaked(this, MODEL_CORE);
-		arms = new ModelRendererBaked(this, MODEL_ARMS);
+		core = new ModelPartBaked(this, MODEL_CORE);
+		arms = new ModelPartBaked(this, MODEL_ARMS);
 		this.children.add(core);
 		this.children.add(arms);
 	}
@@ -43,7 +43,7 @@ public class ModelSpriteCore extends ModelBaked<SpriteEntity> {
 	}
 	
 	@Override
-	protected void renderChild(ModelRendererBaked child, int index, PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn,
+	protected void renderChild(ModelPartBaked child, int index, PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn,
 			float red, float green, float blue, float alpha) {
 		super.renderChild(child, index, matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, 
 				red * this.red, green * this.green, blue * this.blue, alpha * this.alpha);
