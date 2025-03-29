@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelDragonFlightWings;
+import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
 import com.smanzana.nostrummagica.item.IDragonWingRenderItem;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
@@ -14,6 +15,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -25,12 +27,13 @@ import com.mojang.math.Vector3f;
 public class LayerDragonFlightWings extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
 
 	protected static final ResourceLocation TEXTURE_WINGS = new ResourceLocation(NostrumMagica.MODID, "textures/entity/dragonflightwing.png");
-	protected final ModelDragonFlightWings<AbstractClientPlayer> model = new ModelDragonFlightWings<>();
+	protected final ModelDragonFlightWings<AbstractClientPlayer> model;
 	protected final PlayerRenderer renderPlayer;
 	
 	public LayerDragonFlightWings(PlayerRenderer renderPlayerIn) {
 		super(renderPlayerIn);
 		this.renderPlayer = renderPlayerIn;
+		this.model = new ModelDragonFlightWings<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.FlightWings));
 	}
 	
 	@Override

@@ -6,8 +6,38 @@ import com.smanzana.nostrummagica.entity.dragon.DragonEggEntity;
 
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
 
 public class ModelDragonEgg extends EntityModel<DragonEggEntity> {
+	
+	private static final void addCyl(PartDefinition root, int y, int height, int radius, int idx) {
+		root.addOrReplaceChild("cyl" + idx, CubeListBuilder.create().addBox(-radius, y, -radius, radius * 2, -height, radius * 2), PartPose.offset(0, 20, 0));
+	}
+	
+	public static LayerDefinition createLayer() {
+		MeshDefinition mesh = new MeshDefinition();
+		PartDefinition root = mesh.getRoot();
+		
+		int y = 28;
+		int idx = 0;
+		
+		addCyl(root, y--, 1, 2, idx++);
+		addCyl(root, y--, 1, 4, idx++);
+		addCyl(root, y--, 1, 5, idx++);
+		addCyl(root, y, 2, 6, idx++); y -= 2;
+		addCyl(root, y, 4, 7, idx++); y -= 4;
+		addCyl(root, y, 2, 6, idx++); y -= 2;
+		addCyl(root, y, 2, 5, idx++); y -= 2;
+		addCyl(root, y--, 1, 4, idx++);
+		addCyl(root, y--, 1, 3, idx++);
+		addCyl(root, y--, 1, 2, idx++);
+		
+		return LayerDefinition.create(mesh, textureWidth, textureHeight);
+	}
 
 	private ModelPart main;
 	private float coldScale;
@@ -15,26 +45,25 @@ public class ModelDragonEgg extends EntityModel<DragonEggEntity> {
 	private static final int textureHeight = 32;
 	private static final int textureWidth = 32;
 	
-	private void addCyl(int y, int height, int radius) {
-		main.addBox(-radius, y, -radius, radius * 2, -height, radius * 2);
-	}
 	
-	public ModelDragonEgg() {
-		main = new ModelPart(this, 0, 0);
-		int y = 28;
-		
-		main.setTexSize(textureWidth, textureHeight);
-		main.setPos(0, 20, 0);
-		addCyl(y--, 1, 2);
-		addCyl(y--, 1, 4);
-		addCyl(y--, 1, 5);
-		addCyl(y, 2, 6); y -= 2;
-		addCyl(y, 4, 7); y -= 4;
-		addCyl(y, 2, 6); y -= 2;
-		addCyl(y, 2, 5); y -= 2;
-		addCyl(y--, 1, 4);
-		addCyl(y--, 1, 3);
-		addCyl(y--, 1, 2);
+	
+	public ModelDragonEgg(ModelPart part) {
+//		main = new ModelPart(this, 0, 0);
+//		int y = 28;
+//		
+//		main.setTexSize(textureWidth, textureHeight);
+//		main.setPos(0, 20, 0);
+//		addCyl(y--, 1, 2);
+//		addCyl(y--, 1, 4);
+//		addCyl(y--, 1, 5);
+//		addCyl(y, 2, 6); y -= 2;
+//		addCyl(y, 4, 7); y -= 4;
+//		addCyl(y, 2, 6); y -= 2;
+//		addCyl(y, 2, 5); y -= 2;
+//		addCyl(y--, 1, 4);
+//		addCyl(y--, 1, 3);
+//		addCyl(y--, 1, 2);
+		main = part;
 	}
 	
 	public void setColdScale(float scale) {

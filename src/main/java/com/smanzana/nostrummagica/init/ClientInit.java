@@ -29,7 +29,6 @@ import com.smanzana.nostrummagica.client.gui.container.SilverMirrorGui;
 import com.smanzana.nostrummagica.client.gui.widget.QuickMoveBagButton;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed;
-import com.smanzana.nostrummagica.client.model.ModelGolem;
 import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.render.IEffectRenderer;
@@ -292,13 +291,13 @@ public class ClientInit {
 	public static final void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
 		event.registerEntityRenderer(NostrumEntityTypes.spellProjectile, (manager) -> new RenderSpellProjectile(manager, 1f));
 		event.registerEntityRenderer(NostrumEntityTypes.spellBullet, (manager) -> new RenderSpellBullet(manager, 1f));
-		event.registerEntityRenderer(NostrumEntityTypes.golemEarth, (manager) -> new RenderGolem<MagicEarthGolemEntity>(manager, new ModelGolem<>(), .8f));
-		event.registerEntityRenderer(NostrumEntityTypes.golemFire, (manager) -> new RenderGolem<MagicFireGolemEntity>(manager, new ModelGolem<>(), .8f));
-		event.registerEntityRenderer(NostrumEntityTypes.golemIce, (manager) -> new RenderGolem<MagicIceGolemEntity>(manager, new ModelGolem<>(), .8f));
-		event.registerEntityRenderer(NostrumEntityTypes.golemLightning, (manager) -> new RenderGolem<MagicLightningGolemEntity>(manager, new ModelGolem<>(), .8f));
-		event.registerEntityRenderer(NostrumEntityTypes.golemEnder, (manager) -> new RenderGolem<MagicEnderGolemEntity>(manager, new ModelGolem<>(), .8f));
-		event.registerEntityRenderer(NostrumEntityTypes.golemPhysical, (manager) -> new RenderGolem<MagicPhysicalGolemEntity>(manager, new ModelGolem<>(), .8f));
-		event.registerEntityRenderer(NostrumEntityTypes.golemWind, (manager) -> new RenderGolem<MagicWindGolemEntity>(manager, new ModelGolem<>(), .8f));
+		event.registerEntityRenderer(NostrumEntityTypes.golemEarth, (manager) -> new RenderGolem<MagicEarthGolemEntity>(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.golemFire, (manager) -> new RenderGolem<MagicFireGolemEntity>(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.golemIce, (manager) -> new RenderGolem<MagicIceGolemEntity>(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.golemLightning, (manager) -> new RenderGolem<MagicLightningGolemEntity>(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.golemEnder, (manager) -> new RenderGolem<MagicEnderGolemEntity>(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.golemPhysical, (manager) -> new RenderGolem<MagicPhysicalGolemEntity>(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.golemWind, (manager) -> new RenderGolem<MagicWindGolemEntity>(manager));
 		event.registerEntityRenderer(NostrumEntityTypes.koid, (manager) -> new RenderKoid(manager, .3f));
 		event.registerEntityRenderer(NostrumEntityTypes.dragonRed, (manager) ->  new RenderDragonRed<RedDragonEntity>(manager, 5));
 		event.registerEntityRenderer(NostrumEntityTypes.dragonRedBodyPart, (manager) -> new RenderDragonRedPart(manager));

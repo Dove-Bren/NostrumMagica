@@ -6,48 +6,63 @@ import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 
 public class ModelDragonFlightWings<T extends LivingEntity> extends EntityModel<T> {
+	
+	private static final CubeListBuilder createWing(boolean mirror) {
+		return CubeListBuilder.create()
+			.texOffs(1, 10).addBox(-19, -13, 0, 19, 2, 1, mirror)
+			.texOffs(3, 8).addBox(-17, -14, 0, 15, 1, 1, mirror)
+			.texOffs(5, 6).addBox(-15, -15, 0, 11, 1, 1, mirror)
+			.texOffs(6, 4).addBox(-13, -16, 0, 8, 1, 1, mirror)
+			.texOffs(7, 2).addBox(-11, -17, 0, 5, 1, 1, mirror)
+			.texOffs(7, 0).addBox(-10, -18, 0, 4, 1, 1, mirror)
+			.texOffs(0, 13).addBox(-21, -11, 0, 22, 2, 1, mirror)
+			.texOffs(0, 16).addBox(-22, -9, 0, 23, 3, 1, mirror)
+			.texOffs(2, 20).addBox(-3, -6, 0, 2, 1, 1, mirror)
+			.texOffs(8, 20).addBox(-8, -6, 0, 3, 1, 1, mirror)
+			.texOffs(16, 20).addBox(-23, -6, 0, 12, 1, 1, mirror)
+			.texOffs(17, 22).addBox(-23, -5, 0, 11, 1, 1, mirror)
+			.texOffs(18, 24).addBox(-16, -4, 0, 4, 1, 1, mirror)
+			.texOffs(18, 26).addBox(-15, -3, 0, 3, 1, 1, mirror)
+			.texOffs(19, 28).addBox(-15, -2, 0, 2, 1, 1, mirror)
+			.texOffs(19, 30).addBox(-14, -1, 0, 1, 1, 1, mirror)
+			.texOffs(33, 30).addBox(-23, -1, 0, 1, 1, 1, mirror)
+			.texOffs(28, 24).addBox(-23, -4, 0, 4, 1, 1, mirror)
+			.texOffs(30, 26).addBox(-23, -3, 0, 3, 1, 1, mirror)
+			.texOffs(31, 28).addBox(-23, -2, 0, 2, 1, 1, mirror)
+			.texOffs(3, 22).addBox(-3, -5, 0, 1, 1, 1, mirror)
+			.texOffs(9, 22).addBox(-7, -5, 0, 1, 1, 1, mirror);
+	}
+	
+	public static final LayerDefinition createLayer() {
+		MeshDefinition mesh = new MeshDefinition();
+		PartDefinition root = mesh.getRoot();
+		
+		root.addOrReplaceChild("right", createWing(false), PartPose.ZERO);
+		root.addOrReplaceChild("left", createWing(true), PartPose.ZERO);
+		
+		return LayerDefinition.create(mesh, 64, 64);
+	}
 
 	private /* final */ ModelPart rightWing;
 	private final ModelPart leftWing;
-	
-	private static final <T extends LivingEntity> ModelPart createWing(EntityModel<T> base) {
-		ModelPart wing = new ModelPart(base);
-		wing.setPos(0.0F, 0, 0.0F);
-		wing.texOffs(1, 10).addBox(-19, -13, 0, 19, 2, 1, false);
-		wing.texOffs(3, 8).addBox(-17, -14, 0, 15, 1, 1, false);
-		wing.texOffs(5, 6).addBox(-15, -15, 0, 11, 1, 1, false);
-		wing.texOffs(6, 4).addBox(-13, -16, 0, 8, 1, 1, false);
-		wing.texOffs(7, 2).addBox(-11, -17, 0, 5, 1, 1, false);
-		wing.texOffs(7, 0).addBox(-10, -18, 0, 4, 1, 1, false);
-		wing.texOffs(0, 13).addBox(-21, -11, 0, 22, 2, 1, false);
-		wing.texOffs(0, 16).addBox(-22, -9, 0, 23, 3, 1, false);
-		wing.texOffs(2, 20).addBox(-3, -6, 0, 2, 1, 1, false);
-		wing.texOffs(8, 20).addBox(-8, -6, 0, 3, 1, 1, false);
-		wing.texOffs(16, 20).addBox(-23, -6, 0, 12, 1, 1, false);
-		wing.texOffs(17, 22).addBox(-23, -5, 0, 11, 1, 1, false);
-		wing.texOffs(18, 24).addBox(-16, -4, 0, 4, 1, 1, false);
-		wing.texOffs(18, 26).addBox(-15, -3, 0, 3, 1, 1, false);
-		wing.texOffs(19, 28).addBox(-15, -2, 0, 2, 1, 1, false);
-		wing.texOffs(19, 30).addBox(-14, -1, 0, 1, 1, 1, false);
-		wing.texOffs(33, 30).addBox(-23, -1, 0, 1, 1, 1, false);
-		wing.texOffs(28, 24).addBox(-23, -4, 0, 4, 1, 1, false);
-		wing.texOffs(30, 26).addBox(-23, -3, 0, 3, 1, 1, false);
-		wing.texOffs(31, 28).addBox(-23, -2, 0, 2, 1, 1, false);
-		wing.texOffs(3, 22).addBox(-3, -5, 0, 1, 1, 1, false);
-		wing.texOffs(9, 22).addBox(-7, -5, 0, 1, 1, 1, false);
-		return wing;
-	}
 
-	public ModelDragonFlightWings() {
-		texWidth = 64;
-		texHeight = 64;
-		this.rightWing = createWing(this);
-		this.leftWing = createWing(this);
-		this.leftWing.mirror = true;
+	public ModelDragonFlightWings(ModelPart root) {
+//		texWidth = 64;
+//		texHeight = 64;
+//		this.rightWing = createWing(this);
+//		this.leftWing = createWing(this);
+//		this.leftWing.mirror = true;
+		rightWing = root.getChild("right");
+		leftWing = root.getChild("left");
 	}
 
 	/**

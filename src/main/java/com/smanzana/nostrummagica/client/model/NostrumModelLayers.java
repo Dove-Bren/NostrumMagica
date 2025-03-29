@@ -11,6 +11,9 @@ import net.minecraftforge.fml.common.Mod;
 public class NostrumModelLayers {
 
 	public static final ModelLayerLocation Lux = make("lux");
+	public static final ModelLayerLocation DragonEgg = make("dragon_egg");
+	public static final ModelLayerLocation FlightWings = make("flight_wings");
+	public static final ModelLayerLocation Golem = make("golem");
 	
 	
 	
@@ -25,5 +28,8 @@ public class NostrumModelLayers {
 	@SubscribeEvent
 	public static void registerModelLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
 		event.registerLayerDefinition(Lux, ModelLux::createLayer);
+		event.registerLayerDefinition(DragonEgg, ModelDragonEgg::createLayer);
+		event.registerLayerDefinition(FlightWings, ModelDragonFlightWings::createLayer);
+		event.registerLayerDefinition(Golem, ModelGolem::createLayer);
 	}
 }

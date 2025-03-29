@@ -24,8 +24,8 @@ public class ModelSpriteCore extends ModelBaked<SpriteEntity> {
 	public ModelSpriteCore() {
 		super(); // Only a child class to use LookupModel
 		
-		core = new ModelPartBaked(this, MODEL_CORE);
-		arms = new ModelPartBaked(this, MODEL_ARMS);
+		core = new ModelPartBaked(MODEL_CORE);
+		arms = new ModelPartBaked(MODEL_ARMS);
 		this.children.add(core);
 		this.children.add(arms);
 	}

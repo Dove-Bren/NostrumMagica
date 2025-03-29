@@ -6,46 +6,67 @@ import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
 
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
 
 public class ModelGolem<T extends MagicGolemEntity> extends EntityModel<T> {
+	
+	private static final int textureHeight = 64;
+	private static final int textureWidth = 64;
+	
+	public static final LayerDefinition createLayer() {
+		MeshDefinition mesh = new MeshDefinition();
+		PartDefinition root = mesh.getRoot();
+
+		final int centerX, centerZ;
+		centerX = centerZ = 0;
+		
+		root.addOrReplaceChild("head", CubeListBuilder.create().addBox(-4, -5, -4, 8, 10, 8), PartPose.offset(centerX, 5.0f, centerZ));
+		root.addOrReplaceChild("body1", CubeListBuilder.create().addBox(-6, -3, -2, 16, 6, 10), PartPose.offset(centerX, 26.0f, centerZ));
+		root.addOrReplaceChild("body2", CubeListBuilder.create().addBox(-4, -4, -6, 10, 8, 8), PartPose.offset(centerX, 17.0f, centerZ));
+		root.addOrReplaceChild("body3", CubeListBuilder.create().addBox(-6, -2, -4, 8, 4, 8), PartPose.offset(centerX, 34.0f, centerZ));
+		
+		return LayerDefinition.create(mesh, textureWidth, textureHeight);
+	}
 
 	private ModelPart head;
 	private ModelPart body1;
 	private ModelPart body2;
 	private ModelPart body3;
 	
-	private static final int textureHeight = 64;
-	private static final int textureWidth = 64;
-	
 	//															   1.4 circles per second
 	private static final float rate1 = (float) (((2.0 * Math.PI) * 1.4) / 20.0f);
 	private static final float rate2 = (float) (((2.0 * Math.PI) * 0.3) / 20.0f);
 	private static final float rate3 = (float) (((2.0 * Math.PI) * 0.8) / 20.0f);
 	
-	public ModelGolem() {
+	public ModelGolem(ModelPart root) {
+		head = root.getChild("head");
+		body1 = root.getChild("body1");
+		body2 = root.getChild("body2");
+		body3 = root.getChild("body3");
 		
-		int centerX, centerZ;
-		centerX = centerZ = 0;
+//		head = new ModelPart(this, 0, 0);
+//		head.addBox(-4, -5, -4, 8, 10, 8);
+//		head.setTexSize(textureWidth, textureHeight);
+//		head.setPos(centerX, 5.0f, centerZ); // 34
 		
-		head = new ModelPart(this, 0, 0);
-		head.addBox(-4, -5, -4, 8, 10, 8);
-		head.setTexSize(textureWidth, textureHeight);
-		head.setPos(centerX, 5.0f, centerZ); // 34
-		
-		body1 = new ModelPart(this, 0, 0);
-		body1.addBox(-6, -3, -2, 16, 6, 10);
-		body1.setTexSize(textureWidth, textureHeight);
-		body1.setPos(centerX, 26.0f, centerZ); // 24
-		
-		body2 = new ModelPart(this, 0, 0);
-		body2.addBox(-4, -4, -6, 10, 8, 8);
-		body2.setTexSize(textureWidth, textureHeight);
-		body2.setPos(centerX, 17.0f, centerZ); // 14
-		
-		body3 = new ModelPart(this, 0, 0);
-		body3.addBox(-6, -2, -4, 8, 4, 8);
-		body3.setTexSize(textureWidth, textureHeight);
-		body3.setPos(centerX, 34.0f, centerZ); // 10
+//		body1 = new ModelPart(this, 0, 0);
+//		body1.addBox(-6, -3, -2, 16, 6, 10);
+//		body1.setTexSize(textureWidth, textureHeight);
+//		body1.setPos(centerX, 26.0f, centerZ); // 24
+//		
+//		body2 = new ModelPart(this, 0, 0);
+//		body2.addBox(-4, -4, -6, 10, 8, 8);
+//		body2.setTexSize(textureWidth, textureHeight);
+//		body2.setPos(centerX, 17.0f, centerZ); // 14
+//		
+//		body3 = new ModelPart(this, 0, 0);
+//		body3.addBox(-6, -2, -4, 8, 4, 8);
+//		body3.setTexSize(textureWidth, textureHeight);
+//		body3.setPos(centerX, 34.0f, centerZ); // 10
 		
 	}
 	

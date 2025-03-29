@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelGolem;
+import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
 import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
 
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -15,8 +16,8 @@ public class RenderGolem<T extends MagicGolemEntity> extends MobRenderer<T, Mode
 
 	private Map<String, ResourceLocation> texCache;
 	
-	public RenderGolem(EntityRendererProvider.Context renderManagerIn, ModelGolem<T> modelBaseIn, float shadowSizeIn) {
-		super(renderManagerIn, modelBaseIn, shadowSizeIn);
+	public RenderGolem(EntityRendererProvider.Context renderManagerIn) {
+		super(renderManagerIn, new ModelGolem<>(renderManagerIn.bakeLayer(NostrumModelLayers.Golem)), .8f);
 		texCache = new HashMap<>();
 	}
 	

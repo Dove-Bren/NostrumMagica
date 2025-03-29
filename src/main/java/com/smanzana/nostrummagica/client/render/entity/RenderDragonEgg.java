@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.client.render.entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelDragonEgg;
+import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
 import com.smanzana.nostrummagica.entity.dragon.DragonEggEntity;
 
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -13,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 public class RenderDragonEgg extends MobRenderer<DragonEggEntity, ModelDragonEgg> {
 
 	public RenderDragonEgg(EntityRendererProvider.Context renderManagerIn, float shadowSizeIn) {
-		super(renderManagerIn, new ModelDragonEgg(), shadowSizeIn);
+		super(renderManagerIn, new ModelDragonEgg(renderManagerIn.bakeLayer(NostrumModelLayers.DragonEgg)), shadowSizeIn);
 	}
 
 	@Override
