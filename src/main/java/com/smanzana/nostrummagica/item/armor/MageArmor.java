@@ -9,11 +9,13 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.model.ModelWitchHat;
+import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -165,7 +167,7 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 			public <A extends HumanoidModel<?>> A getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlot armorSlot, A _default) {
 				if (armorSlot == EquipmentSlot.HEAD && MageArmor.this.slot == armorSlot) {
 					if (model == null) {
-						model = new ModelWitchHat<>(0f);
+						model = new ModelWitchHat<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.WitchHat));
 					}
 					return (A) model;
 				}

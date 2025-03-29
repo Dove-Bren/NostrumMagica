@@ -10,43 +10,47 @@ import com.smanzana.nostrummagica.entity.WilloEntity;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
 
 public class ModelWillo extends EntityModel<WilloEntity> {
 	
 	private static final int SEGMENTS = 8;
 	private static final float PERIOD = 20f * 2;
 	
+	public static final LayerDefinition createLayer() {
+		MeshDefinition mesh = new MeshDefinition();
+		PartDefinition root = mesh.getRoot();
+		
+		final float offset = 16f * .75f;
+		final float spacing = 16f * .75f;
+		for (int i = 0; i < SEGMENTS; i++) {
+			root.addOrReplaceChild("left" + i, CubeListBuilder.create().texOffs(0, 18).addBox(-4.5f + (offset + (i+1) * spacing), -4.5f, -4.5f, 9, 9, 9), PartPose.ZERO);
+		}
+		
+		for (int i = 0; i < SEGMENTS; i++) {
+			root.addOrReplaceChild("right" + i, CubeListBuilder.create().texOffs(0, 18).addBox(-4.5f + (-offset + (i+1) * -spacing), -4.5f, -4.5f, 9, 9, 9), PartPose.ZERO);
+		}
+		
+		return LayerDefinition.create(mesh, 64, 64);
+	}
+	
 	private List<ModelPart> armLeft;
 	private List<ModelPart> armRight;
 	
 	protected float waveProg;
 	
-	public ModelWillo() {
+	public ModelWillo(ModelPart root) {
 		super(RenderType::entityCutoutNoCull);
-		this.texHeight = 64;
-		this.texWidth = 64;
 		
-		armLeft = new ArrayList<>();
-		armRight = new ArrayList<>();
-		
-		final float offset = 16f * .75f;
-		final float spacing = 16f * .75f;
+		armLeft = new ArrayList<>(SEGMENTS);
+		armRight = new ArrayList<>(SEGMENTS);
 		for (int i = 0; i < SEGMENTS; i++) {
-			ModelPart render = new ModelPart(this, 0, 0);
-			render.texOffs(0, 18);
-			render.addBox(-4.5f + (offset + (i+1) * spacing), -4.5f, -4.5f, 9, 9, 9);
-			//render.offsetX = offset + (i+1) * spacing;
-			//main.addChild(render);
-			armLeft.add(render);
-		}
-		
-		for (int i = 0; i < SEGMENTS; i++) {
-			ModelPart render = new ModelPart(this, 0, 0);
-			render.texOffs(0, 18);
-			render.addBox(-4.5f + (-offset + (i+1) * -spacing), -4.5f, -4.5f, 9, 9, 9);
-//			render.offsetX = -offset + (i+1) * -spacing;
-			//main.addChild(render);
-			armRight.add(render);
+			armLeft.set(0, root.getChild("left" + i));
+			armRight.set(0, root.getChild("right" + i));
 		}
 	}
 	

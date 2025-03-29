@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import net.minecraft.client.model.Model;
 import net.minecraft.resources.ResourceLocation;
 
 public class ModelRendererBakedWithOffset extends ModelPartBaked {
@@ -11,21 +10,12 @@ public class ModelRendererBakedWithOffset extends ModelPartBaked {
 	private float offsetY;
 	private float offsetZ;
 	
-	public ModelRendererBakedWithOffset(Model base, ResourceLocation model) {
-		super(base, model);
-	}
-	
 	public ModelRendererBakedWithOffset(ResourceLocation model) {
 		super(model);
 	}
 	
-	public ModelRendererBakedWithOffset(Model base, ResourceLocation model, float offsetX, float offsetY, float offsetZ) {
-		super(base, model);
-		setOffsets(offsetX, offsetY, offsetZ);
-	}
-	
 	public ModelRendererBakedWithOffset(ResourceLocation model, float offsetX, float offsetY, float offsetZ) {
-		super(model);
+		this(model);
 		setOffsets(offsetX, offsetY, offsetZ);
 	}
 	

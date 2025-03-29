@@ -6,6 +6,7 @@ import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelHookShot;
+import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.entity.HookShotEntity;
 import com.smanzana.nostrummagica.util.Projectiles;
@@ -29,7 +30,7 @@ public class RenderHookShot extends EntityRenderer<HookShotEntity> {
 	public RenderHookShot(EntityRendererProvider.Context renderManagerIn) {
 		super(renderManagerIn);
 		
-		this.model = new ModelHookShot();
+		this.model = new ModelHookShot(renderManagerIn.bakeLayer(NostrumModelLayers.HookshotAnchor));
 	}
 
 	@Override

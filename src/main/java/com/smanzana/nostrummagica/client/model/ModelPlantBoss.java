@@ -6,18 +6,29 @@ import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
 
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
 
 public class ModelPlantBoss extends EntityModel<PlantBossEntity> {
+	
+	public static final LayerDefinition createLayer() {
+		MeshDefinition mesh = new MeshDefinition();
+		PartDefinition root = mesh.getRoot();
+		
+		root.addOrReplaceChild("main", CubeListBuilder.create().addBox(-24f, -24f, -24f, 48, 48, 48), PartPose.ZERO);
+		
+		return LayerDefinition.create(mesh, 256, 256);
+	}
 	
 	private ModelPart body;
 	//private ModelRenderer northFrond; etc
 	// private ModelRenderer centerTree;
 	
-	public ModelPlantBoss() {
-		this.texHeight = 256;
-		this.texWidth = 256;
-		body = new ModelPart(this, 0, 0);
-		body.addBox(-24f, -24f, -24f, 48, 48, 48);
+	public ModelPlantBoss(ModelPart root) {
+		body = root;
 	}
 	
 	@Override

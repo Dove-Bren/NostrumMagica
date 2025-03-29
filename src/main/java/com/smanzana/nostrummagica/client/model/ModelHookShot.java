@@ -6,17 +6,30 @@ import com.smanzana.nostrummagica.entity.HookShotEntity;
 
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
 
 public class ModelHookShot extends EntityModel<HookShotEntity> {
 	
 	private static final float width = 2f;
 	private static final float height = 2f;
 	
+	public static final LayerDefinition createLayer() {
+		MeshDefinition mesh = new MeshDefinition();
+		PartDefinition root = mesh.getRoot();
+		
+		root.addOrReplaceChild("main", CubeListBuilder.create().addBox(-width, 0, -width, width*2, height*2, width*2), PartPose.ZERO);
+		
+		return LayerDefinition.create(mesh, 32, 32);
+	}
+	
 	private final ModelPart main;
 
-	public ModelHookShot() {
-		main = new ModelPart(this);
-		main.addBox(-width, 0, -width, width*2, height*2, width*2);
+	public ModelHookShot(ModelPart root) {
+		main = root;
 	}
 	
 	@Override

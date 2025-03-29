@@ -7,6 +7,7 @@ import com.mojang.math.Matrix4f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelPlantBoss;
 import com.smanzana.nostrummagica.client.model.ModelRenderShiv;
+import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
 import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
 import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity.PlantBossTreeType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -26,7 +27,7 @@ public class RenderPlantBoss extends MobRenderer<PlantBossEntity, ModelRenderShi
 	
 	public RenderPlantBoss(EntityRendererProvider.Context renderManagerIn, float shadowSizeIn) {
 		super(renderManagerIn, new ModelRenderShiv<>(), shadowSizeIn);
-		this.mainModel = new ModelPlantBoss();
+		this.mainModel = new ModelPlantBoss(renderManagerIn.bakeLayer(NostrumModelLayers.Plantboss));
 	}
 	
 	/**

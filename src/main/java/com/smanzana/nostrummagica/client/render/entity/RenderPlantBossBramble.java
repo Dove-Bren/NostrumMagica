@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelPlantBossBramble;
+import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
 import com.smanzana.nostrummagica.entity.plantboss.PlantBossBrambleEntity;
 
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -21,7 +22,7 @@ public class RenderPlantBossBramble extends EntityRenderer<PlantBossBrambleEntit
 	public RenderPlantBossBramble(EntityRendererProvider.Context renderManagerIn) {
 		super(renderManagerIn);
 		
-		mainModel = new ModelPlantBossBramble();
+		mainModel = new ModelPlantBossBramble(renderManagerIn.bakeLayer(NostrumModelLayers.PlantbossBramble));
 		
 		// TODO shadow? nah
 	}

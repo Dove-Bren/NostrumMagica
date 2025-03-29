@@ -8,6 +8,7 @@ import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.ModelRenderShiv;
 import com.smanzana.nostrummagica.client.model.ModelWillo;
+import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
 import com.smanzana.nostrummagica.entity.WilloEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
@@ -26,7 +27,7 @@ public class RenderWillo extends MobRenderer<WilloEntity, ModelRenderShiv<WilloE
 	
 	public RenderWillo(EntityRendererProvider.Context renderManagerIn, float scale) {
 		super(renderManagerIn, new ModelRenderShiv<WilloEntity>(RenderType::entityCutoutNoCull), .33f);
-		mainModel = new ModelWillo();
+		mainModel = new ModelWillo(renderManagerIn.bakeLayer(NostrumModelLayers.Willo));
 	}
 	
 	protected void renderFace(WilloEntity entity, PoseStack matrixStackIn, VertexConsumer buffer, int packedLightIn,
