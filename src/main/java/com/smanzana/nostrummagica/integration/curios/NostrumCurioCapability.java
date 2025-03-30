@@ -1,15 +1,14 @@
 package com.smanzana.nostrummagica.integration.curios;
 
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurio;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 
 public class NostrumCurioCapability implements ICurio {
@@ -25,23 +24,23 @@ public class NostrumCurioCapability implements ICurio {
 	}
 
 	@Override
-	public void curioTick(String identifier, int index, LivingEntity entity) {
-		getItem().onWornTick(stack, entity);
+	public void curioTick(SlotContext slot) {
+		getItem().onWornTick(stack, slot);
 	}
 
 	@Override
-	public void onEquip(String identifier, int index, LivingEntity entity) {
-		getItem().onEquipped(stack, entity);
+	public void onEquip(SlotContext slot, ItemStack prevStack) {
+		getItem().onEquipped(stack, slot);
 	}
 
 	@Override
-	public void onUnequip(String identifier, int index, LivingEntity entity) {
-		getItem().onUnequipped(stack, entity);
+	public void onUnequip(SlotContext slot, ItemStack prevStack) {
+		getItem().onUnequipped(stack, slot);
 	}
 
 	@Override
-	public boolean canEquip(String identifier, LivingEntity entity) {
-		return getItem().canEquip(stack, entity);
+	public boolean canEquip(SlotContext slot) {
+		return getItem().canEquip(stack, slot);
 	}
 
 	@Override
@@ -50,7 +49,7 @@ public class NostrumCurioCapability implements ICurio {
 	}
 
 	@Override
-	public boolean canSync(String identifier, int index, LivingEntity entity) {
+	public boolean canSync(SlotContext slot) {
 		return true;
 	}
 
@@ -66,15 +65,7 @@ public class NostrumCurioCapability implements ICurio {
 	}
 
 	@Override
-	public boolean canRender(String identifier, int index, LivingEntity entity) {
-		return getItem().hasRender(stack, entity);
+	public ItemStack getStack() {
+		return stack;
 	}
-
-	@Override
-	public void render(String identifier, int index, PoseStack matrixStackIn,
-			MultiBufferSource bufferIn, int light,
-			LivingEntity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-		getItem().doRender(stack, matrixStackIn, index, bufferIn, light, entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
-	}
-	
 }

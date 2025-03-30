@@ -13,7 +13,6 @@ import org.apache.commons.lang3.Validate;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -26,23 +25,23 @@ import com.smanzana.nostrummagica.network.message.StatSyncMessage;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import top.theillusivec4.curios.api.SlotContext;
 
 public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, ISpellEquipment {
 	
@@ -178,43 +177,44 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 	}
 	
 	@Override
-	public void onWornTick(ItemStack stack, LivingEntity entity) {
+	public void onWornTick(ItemStack stack, SlotContext slot) {
 		;
 	}
 
 	@Override
-	public void onEquipped(ItemStack stack, LivingEntity entity) {
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
+	public void onEquipped(ItemStack stack, SlotContext slot) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(slot.entity());
 		if (attr == null) {
 			return;
 		}
 		
 		if (this.manaBonus != 0) attr.addManaBonus(this.attribID, this.manaBonus);
 		
-		if (entity instanceof ServerPlayer) {
+		if (slot.entity() instanceof ServerPlayer player) {
 			NetworkHandler.sendTo(
-					new StatSyncMessage(attr), (ServerPlayer) entity);
+					new StatSyncMessage(attr), player);
 		}
 		
 	}
 
 	@Override
-	public void onUnequipped(ItemStack stack, LivingEntity entity) {
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
+	public void onUnequipped(ItemStack stack, SlotContext slot) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(slot.entity());
 		if (attr == null) {
 			return;
 		}
 		
 		attr.removeManaBonus(this.attribID);
 		
-		if (entity instanceof ServerPlayer) {
+		if (slot.entity() instanceof ServerPlayer player) {
 			NetworkHandler.sendTo(
-					new StatSyncMessage(attr), (ServerPlayer) entity);
+					new StatSyncMessage(attr), player);
 		}
 	}
 
 	@Override
-	public boolean canEquip(ItemStack stack, LivingEntity entity) {
+	public boolean canEquip(ItemStack stack, SlotContext slot) {
+		final LivingEntity entity = slot.entity();
 		if (entity.level.isClientSide && entity != NostrumMagica.instance.proxy.getPlayer()) {
 			return true; // Auto allow for other entities on client side when the server says they have them
 		}
@@ -259,19 +259,4 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 		
 		return builder.build();
 	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public boolean hasRender(ItemStack stack, LivingEntity living) {
-		return false;
-//		return !(stack.getItem() instanceof ICosmeticAttachable && !((ICosmeticAttachable) stack.getItem()).getCosmeticItem(stack).isEmpty())
-//				&& !(stack.getItem() instanceof IPhantomInkable && ((IPhantomInkable) stack.getItem()).hasPhantomInk(stack))
-//				&& ConfigHandler.CLIENT.renderAccessories.get()
-//				&& living.getActivePotionEffect(Effects.INVISIBILITY) == null;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public void doRender(ItemStack stack, PoseStack matrixStackIn, int index, MultiBufferSource bufferIn, int packedLightIn, LivingEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {}
-	
 }
