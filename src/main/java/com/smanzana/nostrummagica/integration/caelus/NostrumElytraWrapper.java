@@ -8,20 +8,19 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
-import com.smanzana.nostrummagica.item.IElytraRenderer;
 import com.smanzana.nostrummagica.item.armor.ICapeProvider;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import top.theillusivec4.caelus.api.CaelusApi;
-import top.theillusivec4.caelus.api.RenderElytraEvent;
+import top.theillusivec4.caelus.api.RenderCapeEvent;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, value = Dist.CLIENT)
 public class NostrumElytraWrapper {
@@ -47,7 +46,7 @@ public class NostrumElytraWrapper {
 	}
 	
 	public static final void AddElytraModifier(LivingEntity entity, AttributeModifier modifier) {
-		final AttributeInstance inst = entity.getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
+		final AttributeInstance inst = entity.getAttribute(CaelusApi.getInstance().getFlightAttribute());
 		if (inst == null) {
 			throw new RuntimeException("Caelus is required for NostrumMagica, but no Caelus attribute found.");
 		}
@@ -58,15 +57,15 @@ public class NostrumElytraWrapper {
 	}
 	
 	public static final void AddElytraModifier(Multimap<Attribute, AttributeModifier> map, AttributeModifier modifier) {
-		map.put(CaelusApi.ELYTRA_FLIGHT.get(), modifier);
+		map.put(CaelusApi.getInstance().getFlightAttribute(), modifier);
 	}
 	
 	public static final void AddElytraModifier(ImmutableMultimap.Builder<Attribute, AttributeModifier> map, AttributeModifier modifier) {
-		map.put(CaelusApi.ELYTRA_FLIGHT.get(), modifier);
+		map.put(CaelusApi.getInstance().getFlightAttribute(), modifier);
 	}
 	
 	public static final void RemoveElytraModifier(LivingEntity entity, AttributeModifier modifier) {
-		final AttributeInstance inst = entity.getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
+		final AttributeInstance inst = entity.getAttribute(CaelusApi.getInstance().getFlightAttribute());
 		if (inst == null) {
 			throw new RuntimeException("Caelus is required for NostrumMagica, but no Caelus attribute found.");
 		}
@@ -77,36 +76,37 @@ public class NostrumElytraWrapper {
 	}
 	
 	public static final void RemoveElytraModifier(Multimap<Attribute, AttributeModifier> map, AttributeModifier modifier) {
-		map.remove(CaelusApi.ELYTRA_FLIGHT.get(), modifier);
+		map.remove(CaelusApi.getInstance().getFlightAttribute(), modifier);
 	}
 	
 	@SubscribeEvent(priority=EventPriority.LOWEST)
-	public static void onRenderElytra(RenderElytraEvent event) {
+	public static void onRenderElytra(RenderCapeEvent event) {
 		
 		// Cancel if a cape is specifically suppressing it
 		final LivingEntity entity = event.getEntityLiving();
 		final boolean flying = entity.isFallFlying();
 		ItemStack cape = LayerAetherCloak.ShouldRender(entity);
 		if (!flying && !cape.isEmpty() && ((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(entity, cape)) {
-			event.setRender(false);
-			event.setEnchanted(false);
+			event.setCanceled(true);
 			return;
 		}
 		
-		// Everything from here can only turn ON rendering, so if it's already on go ahead and skip the work.
-		if (event.canRender()) {
-			return;
-		}
+		int unused; // REVIEW. Does this work anymore to turn ON rendering?
 		
-		// Check if any equipment uses our interface for things that want to render an elytra
-		for (@Nonnull ItemStack stack : entity.getAllSlots()) {
-			if (!stack.isEmpty() && stack.getItem() instanceof IElytraRenderer) {
-				if (((IElytraRenderer) stack.getItem()).shouldRenderElyta(entity, stack)) {
-					event.setRender(true);
-					event.setEnchanted(stack.isEnchanted());
-					return;
-				}
-			}
-		}
+//		// Everything from here can only turn ON rendering, so if it's already on go ahead and skip the work.
+//		if (event.canRender()) {
+//			return;
+//		}
+//		
+//		// Check if any equipment uses our interface for things that want to render an elytra
+//		for (@Nonnull ItemStack stack : entity.getAllSlots()) {
+//			if (!stack.isEmpty() && stack.getItem() instanceof IElytraRenderer) {
+//				if (((IElytraRenderer) stack.getItem()).shouldRenderElyta(entity, stack)) {
+//					event.setRender(true);
+//					event.setEnchanted(stack.isEnchanted());
+//					return;
+//				}
+//			}
+//		}
 	}
 }
