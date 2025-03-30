@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 import com.minecolonies.api.IMinecoloniesAPI;
 import com.minecolonies.api.colony.IColony;
-import com.minecolonies.api.entity.citizen.AbstractCivilianEntity;
+import com.minecolonies.api.entity.citizen.AbstractEntityCitizen;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -22,10 +22,10 @@ public class MinecoloniesUtils {
 			return null;
 		}
 		
-		if (ent instanceof AbstractCivilianEntity) {
-			AbstractCivilianEntity civilian = (AbstractCivilianEntity) ent;
-			if (civilian.getCivilianData() != null) {
-				return civilian.getCivilianData().getColony();
+		if (ent instanceof AbstractEntityCitizen) {
+			AbstractEntityCitizen civilian = (AbstractEntityCitizen) ent;
+			if (civilian.getCitizenData() != null) {
+				return civilian.getCitizenData().getColony();
 			}
 		}
 		
