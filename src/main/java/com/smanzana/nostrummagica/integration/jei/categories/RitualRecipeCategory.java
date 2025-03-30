@@ -3,8 +3,9 @@ package com.smanzana.nostrummagica.integration.jei.categories;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
@@ -28,17 +29,17 @@ import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Vector3f;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
 
 public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 
@@ -53,7 +54,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 	
 	public static final ResourceLocation UID = new ResourceLocation(NostrumMagica.MODID, "ritual_recipe");
 	
-	private String title;
+	private Component title;
 	private IDrawable backgroundTier1;
 	private IDrawable backgroundTier2;
 	private IDrawable backgroundTier3;
@@ -62,7 +63,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 	private String recipeName;
 	
 	public RitualRecipeCategory(IGuiHelper guiHelper) {
-		title = I18n.get("nei.category.ritual.name", (Object[]) null);
+		title = new TranslatableComponent("nei.category.ritual.name");
 		backgroundTier1 = guiHelper.drawableBuilder(TEXT_TIER1, 0, 0, BACK_WIDTH, BACK_HEIGHT).addPadding(10, 0, 0, 0).build();
 		backgroundTier2 = guiHelper.drawableBuilder(TEXT_TIER2, 0, 0, BACK_WIDTH, BACK_HEIGHT).addPadding(10, 0, 0, 0).build();
 		backgroundTier3 = guiHelper.drawableBuilder(TEXT_TIER3, 0, 0, BACK_WIDTH, BACK_HEIGHT).addPadding(10, 0, 0, 0).build();
@@ -81,7 +82,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 	}
 
 	@Override
-	public String getTitle() {
+	public Component getTitle() {
 		return title;
 	}
 
@@ -123,7 +124,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 		matrixStackIn.translate(-RING_WIDTH / 2, -RING_HEIGHT/2, 0);
 		
 		RenderSystem.enableBlend();
-		minecraft.getTextureManager().bind(TEXT_RING);
+		RenderSystem.setShaderTexture(0, TEXT_RING);
 		RenderFuncs.drawModalRectWithCustomSizedTextureImmediate(matrixStackIn, 0, 0, 0,
 				0, RING_WIDTH, RING_HEIGHT, RING_WIDTH, RING_HEIGHT,
 				red, green, blue, alpha);

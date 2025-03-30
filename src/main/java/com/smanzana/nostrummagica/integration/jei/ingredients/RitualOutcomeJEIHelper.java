@@ -6,6 +6,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
 
 import mezz.jei.api.ingredients.IIngredientHelper;
+import mezz.jei.api.ingredients.IIngredientType;
+import mezz.jei.api.ingredients.subtypes.UidContext;
 
 public class RitualOutcomeJEIHelper implements IIngredientHelper<RitualOutcomeWrapper> {
 
@@ -15,7 +17,7 @@ public class RitualOutcomeJEIHelper implements IIngredientHelper<RitualOutcomeWr
 //	}
 
 	@Override
-	public RitualOutcomeWrapper getMatch(Iterable<RitualOutcomeWrapper> ingredients, RitualOutcomeWrapper ingredientToMatch) {
+	public RitualOutcomeWrapper getMatch(Iterable<RitualOutcomeWrapper> ingredients, RitualOutcomeWrapper ingredientToMatch, UidContext context) {
 		return null;
 	}
 
@@ -25,13 +27,13 @@ public class RitualOutcomeJEIHelper implements IIngredientHelper<RitualOutcomeWr
 	}
 
 	@Override
-	public String getUniqueId(RitualOutcomeWrapper ingredient) {
+	public String getUniqueId(RitualOutcomeWrapper ingredient, UidContext context) {
 		return ingredient.getClass().getName();
 	}
 
 	@Override
 	public String getWildcardId(RitualOutcomeWrapper ingredient) {
-		return getUniqueId(ingredient);
+		return getUniqueId(ingredient, UidContext.Ingredient);
 	}
 
 	@Override
@@ -46,7 +48,7 @@ public class RitualOutcomeJEIHelper implements IIngredientHelper<RitualOutcomeWr
 
 	@Override
 	public String getErrorInfo(RitualOutcomeWrapper ingredient) {
-		return getUniqueId(ingredient);
+		return getUniqueId(ingredient, UidContext.Ingredient);
 	}
 
 	@Override
@@ -57,6 +59,11 @@ public class RitualOutcomeJEIHelper implements IIngredientHelper<RitualOutcomeWr
 	@Override
 	public RitualOutcomeWrapper copyIngredient(RitualOutcomeWrapper ingredient) {
 		return new RitualOutcomeWrapper(ingredient.getOutcome());
+	}
+
+	@Override
+	public IIngredientType<RitualOutcomeWrapper> getIngredientType() {
+		return RitualOutcomeIngredientType.instance;
 	}
 
 }

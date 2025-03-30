@@ -6,6 +6,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.component.Transmutation.TransmutationSource;
 
 import mezz.jei.api.ingredients.IIngredientHelper;
+import mezz.jei.api.ingredients.IIngredientType;
+import mezz.jei.api.ingredients.subtypes.UidContext;
 
 public class TransmuteSourceJEIHelper implements IIngredientHelper<TransmutationSource> {
 
@@ -15,7 +17,7 @@ public class TransmuteSourceJEIHelper implements IIngredientHelper<Transmutation
 //	}
 
 	@Override
-	public TransmutationSource getMatch(Iterable<TransmutationSource> ingredients, TransmutationSource ingredientToMatch) {
+	public TransmutationSource getMatch(Iterable<TransmutationSource> ingredients, TransmutationSource ingredientToMatch, UidContext context) {
 		return null;
 	}
 
@@ -25,13 +27,13 @@ public class TransmuteSourceJEIHelper implements IIngredientHelper<Transmutation
 	}
 
 	@Override
-	public String getUniqueId(TransmutationSource ingredient) {
+	public String getUniqueId(TransmutationSource ingredient, UidContext context) {
 		return ingredient.getClass().getName();
 	}
 
 	@Override
 	public String getWildcardId(TransmutationSource ingredient) {
-		return getUniqueId(ingredient);
+		return getUniqueId(ingredient, UidContext.Ingredient);
 	}
 
 	@Override
@@ -46,7 +48,7 @@ public class TransmuteSourceJEIHelper implements IIngredientHelper<Transmutation
 
 	@Override
 	public String getErrorInfo(TransmutationSource ingredient) {
-		return getUniqueId(ingredient);
+		return getUniqueId(ingredient, UidContext.Ingredient);
 	}
 
 	@Override
@@ -57,6 +59,11 @@ public class TransmuteSourceJEIHelper implements IIngredientHelper<Transmutation
 	@Override
 	public TransmutationSource copyIngredient(TransmutationSource ingredient) {
 		return ingredient.copy();
+	}
+
+	@Override
+	public IIngredientType<TransmutationSource> getIngredientType() {
+		return TransmuteSourceIngredientType.instance;
 	}
 
 }

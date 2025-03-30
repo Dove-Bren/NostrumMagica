@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.jei.RitualOutcomeWrapper;
 import com.smanzana.nostrummagica.ritual.outcome.IItemRitualOutcome;
@@ -15,10 +15,11 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraftforge.client.RenderProperties;
 
 public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutcomeWrapper> {
 	
@@ -41,7 +42,7 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 	public void render(PoseStack matrixStackIn, int xPosition, int yPosition, RitualOutcomeWrapper ingredient) {
 		if (ingredient == null)
 			return;
-		Minecraft.getInstance().getTextureManager().bind(RITUAL_TEXTURE);
+		RenderSystem.setShaderTexture(0, RITUAL_TEXTURE);
 		ItemStack item = fetchItem(ingredient.getOutcome());
 		RenderSystem.enableBlend();
 		if (item != null) {
@@ -85,7 +86,7 @@ public class RitualOutcomeJEIRenderer implements IIngredientRenderer<RitualOutco
 		Font render = null;
 		ItemStack stack = fetchItem(ingredient.getOutcome());
 		if (stack != null)
-			render = stack.getItem().getFontRenderer(stack);
+			render = RenderProperties.get(stack.getItem()).getFont(stack);
 		
 		if (render == null)
 			render = minecraft.font;

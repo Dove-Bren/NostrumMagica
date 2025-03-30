@@ -22,10 +22,11 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.resources.ResourceLocation;
 
 public class TransmutationItemCategory implements IRecipeCategory<TransmutationRecipe> {
 
@@ -38,7 +39,7 @@ public class TransmutationItemCategory implements IRecipeCategory<TransmutationR
 	public static final ResourceLocation UID_ITEMS = new ResourceLocation(NostrumMagica.MODID, "transmutation_item_recipe");
 	public static final ResourceLocation UID_BLOCKS = new ResourceLocation(NostrumMagica.MODID, "transmutation_block_recipe");
 	
-	private String title;
+	private Component title;
 	private IDrawable background;
 	private IDrawable icon;
 	private final ResourceLocation UID;
@@ -47,11 +48,11 @@ public class TransmutationItemCategory implements IRecipeCategory<TransmutationR
 		background = guiHelper.drawableBuilder(TEXT_BACK, 0, 0, BACK_WIDTH, BACK_HEIGHT).addPadding(0, 0, 0, 0).build();
 		
 		if (blocks) {
-			title = I18n.get("nei.category.transmutation.block.name", (Object[]) null);
+			title = new TranslatableComponent("nei.category.transmutation.block.name");
 			icon = guiHelper.drawableBuilder(TEXT_BACK, ICON_HOFFSET + 16, ICON_VOFFSET, 16, 16).build();
 			UID = UID_BLOCKS;
 		} else {
-			title = I18n.get("nei.category.transmutation.item.name", (Object[]) null);
+			title = new TranslatableComponent("nei.category.transmutation.item.name");
 			icon = guiHelper.drawableBuilder(TEXT_BACK, ICON_HOFFSET, ICON_VOFFSET, 16, 16).build();
 			UID = UID_ITEMS;
 		}
@@ -68,7 +69,7 @@ public class TransmutationItemCategory implements IRecipeCategory<TransmutationR
 	}
 
 	@Override
-	public String getTitle() {
+	public Component getTitle() {
 		return title;
 	}
 
