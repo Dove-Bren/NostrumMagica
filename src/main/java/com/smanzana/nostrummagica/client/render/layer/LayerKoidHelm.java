@@ -8,7 +8,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.autodungeons.util.ColorUtil;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.model.ModelRendererBakedWithOffset;
+import com.smanzana.nostrummagica.client.model.ModelPartBakedWithOffset;
 import com.smanzana.nostrummagica.item.armor.KoidHelmet;
 
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -27,7 +27,7 @@ public class LayerKoidHelm extends RenderLayer<AbstractClientPlayer, PlayerModel
 	
 	private static final ResourceLocation MODEL = new ResourceLocation(NostrumMagica.MODID, "entity/koid");
 	
-	protected ModelRendererBakedWithOffset model;
+	protected ModelPartBakedWithOffset model;
 
 	protected static final VertexConsumer GetBuffer(MultiBufferSource typeBuffer, @Nullable RenderType type) {
 		if (type == null) {
@@ -39,7 +39,7 @@ public class LayerKoidHelm extends RenderLayer<AbstractClientPlayer, PlayerModel
 	
 	public LayerKoidHelm(PlayerRenderer renderPlayerIn) {
 		super(renderPlayerIn);
-		this.model = new ModelRendererBakedWithOffset(MODEL);
+		this.model = new ModelPartBakedWithOffset(MODEL);
 	}
 	
 	@Override

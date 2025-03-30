@@ -296,4 +296,12 @@ public class ModelPartClone {
 	   public interface Visitor {
 		  void visit(PoseStack.Pose p_171342_, String p_171343_, int p_171344_, ModelPartClone.Cube p_171345_);
 	   }
+	   
+	   
+	   //// Begin Skyler Changes
+	   public void addChild(String name, ModelPartClone child) {
+		   if (null != this.children.putIfAbsent(name, child)) {
+			   throw new RuntimeException("Replacing child element");
+		   }
+	   }
 }

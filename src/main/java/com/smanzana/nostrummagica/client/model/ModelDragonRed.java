@@ -70,10 +70,10 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 	
 	protected static final MemoryPool<DragonArmorKey> KeyPool = new MemoryPool<>(() -> { return new DragonArmorKey(); });
 
-	private Map<EDragonPart, ModelRendererBakedWithOffset> renderers;
-	private Map<DragonArmorKey, ModelRendererBakedWithOffset> overlays;
+	private Map<EDragonPart, ModelPartBakedWithOffset> renderers;
+	private Map<DragonArmorKey, ModelPartBakedWithOffset> overlays;
 	private Map<EDragonArmorPart, EDragonOverlayMaterial> overlayMaterial;
-	private ModelRendererBakedWithOffset baseRenderer;
+	private ModelPartBakedWithOffset baseRenderer;
 	
 	private float[] color;
 	
@@ -85,8 +85,7 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 		renderers = new EnumMap<>(EDragonPart.class);
 		
 		for (EDragonPart part : EDragonPart.values()) {
-			ModelRendererBakedWithOffset render = new ModelRendererBakedWithOffset(this, part.getLoc());
-			render.texOffs(0, 0); // TODO add texture offsets?
+			ModelPartBakedWithOffset render = new ModelPartBakedWithOffset(part.getLoc());
 			// Set offset?
 			render.setOffsets((float) part.getX(), (float) part.getY(), (float) part.getZ());
 			//render.setRotationPoint((float) part.getX(), (float) part.getY(), (float) part.getZ());
@@ -98,11 +97,11 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 					baseRenderer = render;
 				}
 			} else {
-				ModelRendererBakedWithOffset parent = renderers.get(part.parent);
+				ModelPartBakedWithOffset parent = renderers.get(part.parent);
 				if (null == parent) {
 					NostrumMagica.logger.error("Dragon part iteration did not set up parents right!");
 				} else {
-					parent.addChild(render);
+					parent.addChild("part_" + part.name().toLowerCase(), render);
 				}
 			}
 			
@@ -119,18 +118,17 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 				}
 				
 				ResourceLocation loc = new ResourceLocation(NostrumMagica.MODID, part.getLocPrefix() + material.getSuffix() + "");
-				ModelRendererBakedWithOffset render = new ModelRendererBakedWithOffset(this, loc);
-				render.texOffs(0, 0); // TODO add texture offsets?
+				ModelPartBakedWithOffset render = new ModelPartBakedWithOffset(loc);
 				render.setOffsets((float) part.getX(), (float) part.getY(), (float) part.getZ());
 				
 				if (part.parent == null) {
 					NostrumMagica.logger.error("What part is " + part.name() + "   and why isn't it parented?");
 				} else {
-					ModelRendererBakedWithOffset parent = renderers.get(part.parent);
+					ModelPartBakedWithOffset parent = renderers.get(part.parent);
 					if (null == parent) {
 						NostrumMagica.logger.error("Dragon part iteration did not set up parents right!");
 					} else {
-						parent.addChild(render);
+						parent.addChild(material.name().toLowerCase() + "_" + part.name().toLowerCase(), render);
 					}
 				}
 				
@@ -287,7 +285,7 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
 		// Update overlay visibility
 		for (DragonArmorKey key : overlays.keySet()) {
-			final ModelRendererBakedWithOffset renderer = overlays.get(key);
+			final ModelPartBakedWithOffset renderer = overlays.get(key);
 			final EDragonOverlayMaterial material = overlayMaterial.get(key.part);
 			renderer.visible = (material == key.material);
 		}
@@ -320,13 +318,13 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 		
 		// Reset all rotations to 0
 		for (EDragonPart part : EDragonPart.values()) {
-			ModelRendererBakedWithOffset render = renderers.get(part);
+			ModelPartBakedWithOffset render = renderers.get(part);
 			render.xRot = render.yRot = render.zRot = 0f;
 		}
 		
-		ModelRendererBakedWithOffset wing_left = renderers.get(EDragonPart.WING_LEFT);
-		ModelRendererBakedWithOffset wing_right = renderers.get(EDragonPart.WING_RIGHT);
-		ModelRendererBakedWithOffset body = renderers.get(EDragonPart.BODY);
+		ModelPartBakedWithOffset wing_left = renderers.get(EDragonPart.WING_LEFT);
+		ModelPartBakedWithOffset wing_right = renderers.get(EDragonPart.WING_RIGHT);
+		ModelPartBakedWithOffset body = renderers.get(EDragonPart.BODY);
 		
 		final long now = System.currentTimeMillis();
 		long stateTime = now - dragon.getFlyStateTime();
@@ -475,18 +473,18 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 		
 		
 		
-		ModelRendererBakedWithOffset head = renderers.get(EDragonPart.HEAD);
+		ModelPartBakedWithOffset head = renderers.get(EDragonPart.HEAD);
 		head.yRot = (float) (netHeadYaw / -360f * 2 * Math.PI);
 		head.xRot = (float) (headPitch / 360f * 2 * Math.PI);
 		
-		ModelRendererBakedWithOffset frontleg_left = renderers.get(EDragonPart.LEG_FRONT_LEFT);
-		ModelRendererBakedWithOffset frontleg_right = renderers.get(EDragonPart.LEG_FRONT_RIGHT);
-		ModelRendererBakedWithOffset backleg_left = renderers.get(EDragonPart.LEG_BACK_LEFT);
-		ModelRendererBakedWithOffset backleg_right = renderers.get(EDragonPart.LEG_BACK_RIGHT);
+		ModelPartBakedWithOffset frontleg_left = renderers.get(EDragonPart.LEG_FRONT_LEFT);
+		ModelPartBakedWithOffset frontleg_right = renderers.get(EDragonPart.LEG_FRONT_RIGHT);
+		ModelPartBakedWithOffset backleg_left = renderers.get(EDragonPart.LEG_BACK_LEFT);
+		ModelPartBakedWithOffset backleg_right = renderers.get(EDragonPart.LEG_BACK_RIGHT);
 		
-		ModelRendererBakedWithOffset body = renderers.get(EDragonPart.BODY);
-		ModelRendererBakedWithOffset wing_left = renderers.get(EDragonPart.WING_LEFT);
-		ModelRendererBakedWithOffset wing_right = renderers.get(EDragonPart.WING_RIGHT);
+		ModelPartBakedWithOffset body = renderers.get(EDragonPart.BODY);
+		ModelPartBakedWithOffset wing_left = renderers.get(EDragonPart.WING_LEFT);
+		ModelPartBakedWithOffset wing_right = renderers.get(EDragonPart.WING_RIGHT);
 
 		backleg_left.setOffsetY((float) EDragonPart.BODY.offsetY - (float) EDragonPart.LEG_BACK_LEFT.offsetY); 
 		backleg_right.setOffsetY((float) EDragonPart.BODY.offsetY - (float) EDragonPart.LEG_BACK_RIGHT.offsetY);
@@ -558,7 +556,7 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 			head.xRot += ang;
 		}
 		
-		ModelRendererBakedWithOffset tail = renderers.get(EDragonPart.TAIL);
+		ModelPartBakedWithOffset tail = renderers.get(EDragonPart.TAIL);
 		
 		period = 80.0f;
 		frac = (float) (ageInTicks % period) / period;
@@ -572,7 +570,7 @@ public class ModelDragonRed<T extends RedDragonBaseEntity> extends EntityModel<T
 				continue;
 			}
 			DragonArmorKey key = KeyPool.claim().set(EDragonArmorPart.HEAD, mat);
-			ModelRendererBakedWithOffset headArmor = overlays.get(key); //TODO why is this needed? It avoids allocating a key each time we access the map
+			ModelPartBakedWithOffset headArmor = overlays.get(key); //TODO why is this needed? It avoids allocating a key each time we access the map
 			
 			headArmor.yRot = head.yRot;
 			headArmor.xRot = head.xRot;

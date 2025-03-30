@@ -84,8 +84,8 @@ public class MimicBlockBakedModel implements BakedModel {
 	
 	//////Things based on wrapped model
 	@Override
-	public TextureAtlasSprite getParticleTexture(IModelData data) {
-		return getModelToRender(data).getParticleTexture(data);
+	public TextureAtlasSprite getParticleIcon(IModelData data) {
+		return getModelToRender(data).getParticleIcon(data);
 	}
 	
 	protected static final List<BakedQuad> EmptyQuads = new ArrayList<>(0);

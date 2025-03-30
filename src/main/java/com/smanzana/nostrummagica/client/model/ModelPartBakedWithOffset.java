@@ -4,17 +4,17 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.resources.ResourceLocation;
 
-public class ModelRendererBakedWithOffset extends ModelPartBaked {
+public class ModelPartBakedWithOffset extends ModelPartBaked {
 	
 	private float offsetX;
 	private float offsetY;
 	private float offsetZ;
 	
-	public ModelRendererBakedWithOffset(ResourceLocation model) {
+	public ModelPartBakedWithOffset(ResourceLocation model) {
 		super(model);
 	}
 	
-	public ModelRendererBakedWithOffset(ResourceLocation model, float offsetX, float offsetY, float offsetZ) {
+	public ModelPartBakedWithOffset(ResourceLocation model, float offsetX, float offsetY, float offsetZ) {
 		this(model);
 		setOffsets(offsetX, offsetY, offsetZ);
 	}
