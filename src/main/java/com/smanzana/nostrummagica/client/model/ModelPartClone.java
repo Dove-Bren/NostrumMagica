@@ -13,6 +13,7 @@ import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import com.mojang.math.Vector4f;
 
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.core.Direction;
 import net.minecraftforge.api.distmarker.Dist;
@@ -58,6 +59,17 @@ public class ModelPartClone {
 		  this.y = p_104316_.y;
 		  this.z = p_104316_.z;
 	   }
+	   
+	   // Begin Skyler Change
+	   public void copyFrom(ModelPart p_104316_) {
+		  this.xRot = p_104316_.xRot;
+		  this.yRot = p_104316_.yRot;
+		  this.zRot = p_104316_.zRot;
+		  this.x = p_104316_.x;
+		  this.y = p_104316_.y;
+		  this.z = p_104316_.z;
+	   }
+	   // End Skyler Change
 
 	   public ModelPartClone getChild(String p_171325_) {
 		  ModelPartClone ModelPartClone = this.children.get(p_171325_);
