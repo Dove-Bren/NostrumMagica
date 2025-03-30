@@ -30,8 +30,6 @@ import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.integration.curios.CuriosClientProxy;
 import com.smanzana.nostrummagica.integration.curios.CuriosProxy;
 import com.smanzana.nostrummagica.integration.minecolonies.MinecoloniesProxy;
-import com.smanzana.nostrummagica.integration.musica.MusicaClientProxy;
-import com.smanzana.nostrummagica.integration.musica.MusicaProxy;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
@@ -108,7 +106,6 @@ public class NostrumMagica {
 	public final CuriosProxy curios;
 	public final AetheriaProxy aetheria;
 	//public final EnderIOProxy enderIO;
-	public final MusicaProxy musica;
 	public final MinecoloniesProxy minecolonies;
 
 	public static CreativeModeTab creativeTab;
@@ -142,7 +139,6 @@ public class NostrumMagica {
 		curios = DistExecutor.safeRunForDist(() -> CuriosClientProxy::new, () -> CuriosProxy::new);
 		aetheria = DistExecutor.safeRunForDist(() -> AetheriaClientProxy::new, () -> AetheriaProxy::new);
 		//enderIO = DistExecutor.safeRunForDist(() -> EnderIOClientProxy::new, () -> EnderIOProxy::new);
-		musica = DistExecutor.safeRunForDist(() -> MusicaClientProxy::new, () -> MusicaProxy::new);
 		minecolonies = new MinecoloniesProxy();
 		
 		(new ModConfig()).register();
@@ -202,9 +198,6 @@ public class NostrumMagica {
 //		if (ModList.get().isLoaded("enderio") || ModList.get().isLoaded("enderio")) {
 //			enderIO.enable();
 //		}
-		if (ModList.get().isLoaded("musica")) {
-			musica.enable();
-		}
 		if (ModList.get().isLoaded("minecolonies")) {
 			minecolonies.enable();
 		}

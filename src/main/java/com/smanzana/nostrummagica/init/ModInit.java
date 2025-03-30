@@ -197,7 +197,6 @@ public class ModInit {
 		NostrumMagica.instance.aetheria.preInit();
 		NostrumMagica.instance.curios.preInit();
 		//NostrumMagica.instance.enderIO.preInit();
-		NostrumMagica.instance.musica.preInit();
 		
 		// MID phase:
 		////////////////////////////////////////////
@@ -220,7 +219,6 @@ public class ModInit {
 		NostrumMagica.instance.aetheria.init();
 		NostrumMagica.instance.curios.init();
 		//NostrumMagica.instance.enderIO.init();
-		NostrumMagica.instance.musica.init();
 	
 		// LATE phase:
 		//////////////////////////////////////////
@@ -230,7 +228,6 @@ public class ModInit {
 		NostrumMagica.instance.aetheria.postInit();
 		//NostrumMagica.instance.curios.postInit();
 		//NostrumMagica.instance.enderIO.postInit();
-		NostrumMagica.instance.musica.postInit();
 		
 		event.enqueueWork(ModInit::registerCriteria);
 		
