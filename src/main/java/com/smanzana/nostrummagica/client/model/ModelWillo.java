@@ -49,8 +49,8 @@ public class ModelWillo extends EntityModel<WilloEntity> {
 		armLeft = new ArrayList<>(SEGMENTS);
 		armRight = new ArrayList<>(SEGMENTS);
 		for (int i = 0; i < SEGMENTS; i++) {
-			armLeft.set(0, root.getChild("left" + i));
-			armRight.set(0, root.getChild("right" + i));
+			armLeft.add(i, root.getChild("left" + i));
+			armRight.add(i, root.getChild("right" + i));
 		}
 	}
 	

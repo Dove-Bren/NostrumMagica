@@ -522,18 +522,6 @@ public class ElementalArmor extends ArmorItem
 		this.jumpBoost = calcArmorJumpBoost(slot, element, type);
 		this.speedBoost = calcArmorSpeedBoost(slot, element, type);
 		this.armorToughness = calcArmorToughness(slot, element, type);
-
-		// TODO move somewhere else?
-		if (!NostrumMagica.instance.proxy.isServer()) {
-			if (armorModels == null) {
-				armorModels = new ArrayList<ModelEnchantedArmorBase<LivingEntity>>(5);
-				armorModels.add(0, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_0)));
-				armorModels.add(1, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_1)));
-				armorModels.add(2, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_2)));
-				armorModels.add(3, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_3)));
-				armorModels.add(4, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_4)));
-			}
-		}
 	}
 
 	@Override
@@ -1067,6 +1055,15 @@ public class ElementalArmor extends ArmorItem
 			@Override
 			public HumanoidModel getArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot,
 					HumanoidModel defaultModel) {
+				if (armorModels == null) {
+					armorModels = new ArrayList<ModelEnchantedArmorBase<LivingEntity>>(5);
+					armorModels.add(0, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_0)));
+					armorModels.add(1, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_1)));
+					armorModels.add(2, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_2)));
+					armorModels.add(3, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_3)));
+					armorModels.add(4, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_4)));
+				}
+				
 				final int setCount = getSetPieces(entity);
 				final int index = (setCount - 1) + (type == Type.MASTER ? 1 : 0); // Boost 1 if ultimate armor
 				ModelEnchantedArmorBase<LivingEntity> model = armorModels.get(index % armorModels.size());

@@ -61,7 +61,7 @@ public class ModelArcaneWolf extends WolfModel<ArcaneWolfEntity> {
 		super(root);
 		
 		this.head = root.getChild("head");
-		this.headSnootBridge = root.getChild("snoot_bridge");
+		this.headSnootBridge = head.getChild("snoot_bridge");
 		this.body = root.getChild("body");
 		this.mane = root.getChild("mane");
 		this.legBackRight = root.getChild("right_hind_leg");

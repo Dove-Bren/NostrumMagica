@@ -39,8 +39,9 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 			
 			// Curios requires mixins
-			property 'mixin.env.remapRefMap', 'true'
-			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+			//property 'mixin.env.remapRefMap', 'true'
+			//property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+			property 'mixin.env.disableRefMap', 'true'
 
             mods {
                 nostrummagica {
@@ -60,8 +61,8 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 			
 			// Curios requires mixins
-			property 'mixin.env.remapRefMap', 'true'
-			property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+			//property 'mixin.env.remapRefMap', 'true'
+			//property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             mods {
                 nostrummagica {
@@ -165,7 +166,7 @@ dependencies {
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
 	
 	//compile 'top.theillusivec4.caelus:caelus-forge:${caelus_version}'
-	compileOnly fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}")
+	implementation fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}")
 	
 	//compileOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}:api")
 	////runtimeOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}")
@@ -179,9 +180,10 @@ dependencies {
 	runtimeOnly fg.deobf("com.smanzana:autodungeons:${autodungeons_version}")
 	compileOnly fg.deobf("com.smanzana:autodungeons:${autodungeons_version}")
 	
-	//compileOnly fg.deobf("local:minecolonies:${minecolonies_version}:api")
-	////runtimeOnly fg.deobf("local:minecolonies:${minecolonies_version}")
-	//implementation fg.deobf("curse.maven:structurize-298744:${structurize_version}")
+	compileOnly fg.deobf("local:minecolonies:${minecolonies_version}:api")
+	//runtimeOnly fg.deobf("local:minecolonies:${minecolonies_version}")
+	implementation fg.deobf("curse.maven:structurize-298744:${structurize_version}")
+	implementation fg.deobf("curse.maven:blockui-522992:${blockui_version}")
 }
 
 task sourcesJar(type: Jar) {

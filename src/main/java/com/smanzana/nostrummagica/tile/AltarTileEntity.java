@@ -2,10 +2,6 @@ package com.smanzana.nostrummagica.tile;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrumaetheria.api.blocks.IAetherInfusableTileEntity;
-import com.smanzana.nostrumaetheria.api.blocks.IAetherInfuserTileEntity;
-import com.smanzana.nostrumaetheria.api.item.IAetherInfuserLens;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -18,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class AltarTileEntity extends BlockEntity implements WorldlyContainer, IAetherInfusableTileEntity {
+public class AltarTileEntity extends BlockEntity implements WorldlyContainer/*, IAetherInfusableTileEntity*/ {
 	
 	private @Nonnull ItemStack stack = ItemStack.EMPTY;
 	
@@ -198,21 +194,22 @@ public class AltarTileEntity extends BlockEntity implements WorldlyContainer, IA
 		return stack.isEmpty();
 	}
 
-	@Override
-	public boolean canAcceptAetherInfuse(IAetherInfuserTileEntity source, int maxAether) {
-		return !stack.isEmpty() && stack.getItem() instanceof IAetherInfuserLens;
-	}
-
-	@Override
-	public int acceptAetherInfuse(IAetherInfuserTileEntity source, int maxAether) {
-		final IAetherInfuserLens infusable = ((IAetherInfuserLens) stack.getItem());
-		final int leftover;
-		if (infusable.canAcceptAetherInfuse(stack, worldPosition, source, maxAether)) {
-			leftover = infusable.acceptAetherInfuse(stack, worldPosition, source, maxAether);
-		} else {
-			leftover = maxAether;
-		}
-		return leftover;
-	}
+	private int unused;
+//	@Override
+//	public boolean canAcceptAetherInfuse(IAetherInfuserTileEntity source, int maxAether) {
+//		return !stack.isEmpty() && stack.getItem() instanceof IAetherInfuserLens;
+//	}
+//
+//	@Override
+//	public int acceptAetherInfuse(IAetherInfuserTileEntity source, int maxAether) {
+//		final IAetherInfuserLens infusable = ((IAetherInfuserLens) stack.getItem());
+//		final int leftover;
+//		if (infusable.canAcceptAetherInfuse(stack, worldPosition, source, maxAether)) {
+//			leftover = infusable.acceptAetherInfuse(stack, worldPosition, source, maxAether);
+//		} else {
+//			leftover = maxAether;
+//		}
+//		return leftover;
+//	}
 	
 }

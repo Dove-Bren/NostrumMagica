@@ -565,7 +565,7 @@ public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchant
 				return false;
 			}
 	
-			List<WispEntity> wisps = world.getEntitiesOfClass(WispEntity.class, bb, null);
+			List<WispEntity> wisps = world.getEntitiesOfClass(WispEntity.class, bb, a -> true);
 			return wisps.size() < 20;
 		} else {
 			// Nether has smaller pool, so make it harder to spawn there than simply using weight (cause a weight of 1 is still too large)

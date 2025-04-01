@@ -92,7 +92,7 @@ public class RenderKoid extends MobRenderer<KoidEntity, ModelRenderShiv<KoidEnti
 		matrixStackIn.translate(0, yOffset, 0);
 		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(rotY));
 		matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(rotX));
-		model.renderToBuffer(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+		modelBase.renderToBuffer(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		matrixStackIn.popPose();
 	}
 	

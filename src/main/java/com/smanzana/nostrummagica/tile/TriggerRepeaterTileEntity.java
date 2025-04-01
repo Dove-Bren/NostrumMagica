@@ -148,7 +148,7 @@ public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedT
 				if (feedbackPlayer != null) {
 					feedbackPlayer.sendMessage(new TextComponent("Cleaning out offset " + offset), Util.NIL_UUID);
 				}
-				it.discard();
+				it.remove();
 				count++;
 			}
 		}
