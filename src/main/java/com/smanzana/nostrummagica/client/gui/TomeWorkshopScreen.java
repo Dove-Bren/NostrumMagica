@@ -155,11 +155,11 @@ public class TomeWorkshopScreen extends Screen {
 		this.inventoryWidgets.clear();
 		setupInventorySlots();
 		scrollWidget = new Scrollbar(this, getGuiLeft() + POS_SCROLLBAR_HOFFSET, getGuiTop() + POS_SCROLLBAR_VOFFSET, POS_SCROLLBAR_WIDTH, POS_SCROLLBAR_HEIGHT);
-		this.addWidget(scrollWidget);
+		this.addRenderableWidget(scrollWidget);
 		leftFlip = new PageFlipButton(this, true, getGuiLeft() + POS_LARROW_HOFFSET, getGuiTop() + POS_LARROW_VOFFSET, POS_LARROW_WIDTH, POS_LARROW_HEIGHT);
-		this.addWidget(leftFlip);
+		this.addRenderableWidget(leftFlip);
 		rightFlip = new PageFlipButton(this, false, getGuiLeft() + POS_RARROW_HOFFSET, getGuiTop() + POS_RARROW_VOFFSET, POS_RARROW_WIDTH, POS_RARROW_HEIGHT);
-		this.addWidget(rightFlip);
+		this.addRenderableWidget(rightFlip);
 	}
 	
 	@Override
@@ -294,7 +294,7 @@ public class TomeWorkshopScreen extends Screen {
 			int y = yAnchor + (i * buttonHeight);
 			SpellSlotPane slot = new SpellSlotPane(this, i, x, y, buttonWidth, buttonHeight);
 			slot.setSpell(getSpellForSlot(i));
-			this.addWidget(slot);
+			this.addRenderableWidget(slot);
 			this.spellSlotWidgets.add(slot);
 		}
 	}
@@ -310,7 +310,7 @@ public class TomeWorkshopScreen extends Screen {
 			final int y = yAnchor + (i * buttonHeight);
 			
 			SpellLibraryPane pane = new SpellLibraryPane(this, spell, i, x, y, buttonWidth, buttonHeight);
-			this.addWidget(pane);
+			this.addRenderableWidget(pane);
 			spellLibraryWidgets.add(pane);
 		}
 	}
@@ -548,7 +548,7 @@ public class TomeWorkshopScreen extends Screen {
 				PretendInventorySlot slot = new PretendInventorySlot(this, this.playerInv, idx,
 						xOffset + (x * 18), yOffset + (y * 18),
 						18, 18);
-				this.addWidget(slot);
+				this.addRenderableWidget(slot);
 				this.inventoryWidgets.add(slot);
 			}
 		}
@@ -560,7 +560,7 @@ public class TomeWorkshopScreen extends Screen {
 			PretendInventorySlot slot = new PretendInventorySlot(this, this.playerInv, idx,
 					xOffset + (x * 18), yOffset,
 					18, 18);
-			this.addWidget(slot);
+			this.addRenderableWidget(slot);
 			this.inventoryWidgets.add(slot);
 		}
 	}

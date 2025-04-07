@@ -57,57 +57,21 @@ public class LoreTableGui {
 			super(NostrumContainers.LoreTable, windowId);
 			this.player = player;
 			this.table = table;
-			this.inputSlot = new Slot(null, 0, SLOT_INPUT_HOFFSET, SLOT_INPUT_VOFFSET) {
+			this.inputSlot = new Slot(table.getInventory(), 0, SLOT_INPUT_HOFFSET, SLOT_INPUT_VOFFSET) {
 				
 				@Override
 				public boolean mayPlace(@Nonnull ItemStack stack) {
 					return stack.isEmpty() || stack.getItem() instanceof ILoreTagged;
 				}
 				
-				@Override
-				public void set(@Nonnull ItemStack stack) {
-					// Swapping items does this instead of a take
-					if (!table.getItem().isEmpty()) {
-						table.onTakeItem(player);
-					}
-					
-					table.setItem(stack);
-					this.setChanged();
-				}
-				
-				@Override
-				public ItemStack getItem() {
-					return table.getItem();
-				}
-				
-				@Override
-				public void setChanged() {
-					table.setChanged();
-				}
-				
 				public int getMaxStackSize() {
 					return 1;
 				}
 				
-				public ItemStack remove(int amount) {
-					ItemStack item = table.getItem();
-					if (!item.isEmpty()) {
-						if (table.setItem(ItemStack.EMPTY))
-							return item.copy();
-					}
-					
-					return ItemStack.EMPTY;
+				@Override
+				public void onTake(Player player, ItemStack stack) {
+					table.onTakeItem(player);
 				}
-				
-				public boolean isSameInventory(Slot other) {
-					return false;
-				}
-				
-				public void onTake(Player playerIn, ItemStack stack) {
-					table.onTakeItem(playerIn);
-					super.onTake(playerIn, stack);
-				}
-				
 			};
 			
 			this.addSlot(inputSlot);

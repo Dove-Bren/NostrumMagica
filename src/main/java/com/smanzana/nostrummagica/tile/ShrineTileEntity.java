@@ -173,7 +173,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 			final EMagicElement element = getElement();
 			
 			if (attr.getElementalMastery(element) == EElementalMastery.UNKNOWN
-					&& attr.setElementalMastery(element, EElementalMastery.NOVICE)) {
+					&& NostrumMagica.UnlockElementalMastery(player, this.element, EElementalMastery.NOVICE)) {
 				// Just learned!
 				final int color = 0x80000000 | (0x00FFFFFF & element.getColor());
 				DoEffect(worldPosition, player, color);

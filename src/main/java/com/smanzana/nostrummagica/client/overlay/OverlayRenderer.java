@@ -45,6 +45,7 @@ import com.smanzana.nostrummagica.client.render.layer.LayerDragonFlightWings;
 import com.smanzana.nostrummagica.client.render.layer.LayerKoidHelm;
 import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
 import com.smanzana.nostrummagica.config.ModConfig;
+import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.inventory.EquipmentSetRegistry;
 import com.smanzana.nostrummagica.item.IRaytraceOverlay;
@@ -75,6 +76,7 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.core.BlockPos;
@@ -197,6 +199,7 @@ public class OverlayRenderer extends GuiComponent {
 				//GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 				RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 				final float depth = -91f;
+				RenderSystem.setShader(GameRenderer::getPositionColorShader);
 				bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 				bufferbuilder.vertex(transform, 0, height, depth).color(.3f, 0, .3f, .2f).endVertex();
 				bufferbuilder.vertex(transform, width, height, depth).color(.3f, 0, .3f, .2f).endVertex();
@@ -875,6 +878,8 @@ public class OverlayRenderer extends GuiComponent {
 			final int color = (lastReagentsUsed.contains(type) ? 0xFFFFFF40 : 0xFFFFFFFF);
 			
 			RenderFuncs.RenderGUIItem(getReagentStack(type), matrixStackIn, x, y, -30);
+			RenderSystem.setShader(GameRenderer::getPositionColorTexLightmapShader);
+			RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 			mc.font.draw(matrixStackIn, lastReagentCounts.get(type) + "", x + 18, y + 5, color);
 		}
 		matrixStackIn.popPose();
@@ -882,7 +887,7 @@ public class OverlayRenderer extends GuiComponent {
 	}
 	
 	private void renderArmorOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
-		if (ModConfig.config.displayArmorOverlay()) {
+		if (ModConfig.config.displayArmorOverlay() && gui.shouldDrawSurvivalElements()) {
 			final Minecraft mc = Minecraft.getInstance();
 			final LocalPlayer player = mc.player;
 			
@@ -1074,6 +1079,7 @@ public class OverlayRenderer extends GuiComponent {
 		matrixStackIn.pushPose();
 		RenderSystem.enableBlend();
 		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
 		RenderSystem.setShaderTexture(0, GUI_ICONS);
 		
 		matrixStackIn.translate(left, top, 0);
@@ -1141,23 +1147,26 @@ public class OverlayRenderer extends GuiComponent {
 	
 	private void renderCursedFireOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
 		final Minecraft mc = Minecraft.getInstance();
+		final LocalPlayer player = mc.player;
+		if (player.getEffect(NostrumEffects.cursedFire) != null) {
 		
-		matrixStackIn.pushPose();
-		matrixStackIn.translate(width *.2f, height * .95f, -500);
-		
-		matrixStackIn.pushPose();
-		matrixStackIn.scale(width, width, 1);
-		CursedFireEffectRenderer.renderFire(matrixStackIn, mc.renderBuffers().bufferSource(), CursedFireEffectRenderer.TEX_FIRE_0.sprite(), RenderFuncs.BrightPackedLight, 1f, 1f, 1f, 1f, 1f);
-		matrixStackIn.popPose();
-		
-		matrixStackIn.pushPose();
-		matrixStackIn.translate(width*.6f, 0, 0);
-		matrixStackIn.scale(width, width, 1);
-		CursedFireEffectRenderer.renderFire(matrixStackIn, mc.renderBuffers().bufferSource(), CursedFireEffectRenderer.TEX_FIRE_1.sprite(), RenderFuncs.BrightPackedLight, 1f, 1f, 1f, 1f, 1f);
-		matrixStackIn.popPose();
-		
-		mc.renderBuffers().bufferSource().endBatch();
-		matrixStackIn.popPose();
+			matrixStackIn.pushPose();
+			matrixStackIn.translate(width *.2f, height * .95f, -500);
+			
+			matrixStackIn.pushPose();
+			matrixStackIn.scale(width, width, 1);
+			CursedFireEffectRenderer.renderFire(matrixStackIn, mc.renderBuffers().bufferSource(), CursedFireEffectRenderer.TEX_FIRE_0.sprite(), RenderFuncs.BrightPackedLight, 1f, 1f, 1f, 1f, 1f);
+			matrixStackIn.popPose();
+			
+			matrixStackIn.pushPose();
+			matrixStackIn.translate(width*.6f, 0, 0);
+			matrixStackIn.scale(width, width, 1);
+			CursedFireEffectRenderer.renderFire(matrixStackIn, mc.renderBuffers().bufferSource(), CursedFireEffectRenderer.TEX_FIRE_1.sprite(), RenderFuncs.BrightPackedLight, 1f, 1f, 1f, 1f, 1f);
+			matrixStackIn.popPose();
+			
+			mc.renderBuffers().bufferSource().endBatch();
+			matrixStackIn.popPose();
+		}
 	}
 	
 	public void startManaWiggle(int wiggleCount) {

@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
 import com.smanzana.nostrummagica.block.dungeon.TogglePlatformBlock;
 import com.smanzana.nostrummagica.client.RainbowItemColor;
 import com.smanzana.nostrummagica.client.effects.ClientEffectIcon;
+import com.smanzana.nostrummagica.client.gui.EnchantableHintTooltipComponent;
 import com.smanzana.nostrummagica.client.gui.ISpellCraftPatternRenderer;
 import com.smanzana.nostrummagica.client.gui.SpellCraftPatternAutoRenderer;
 import com.smanzana.nostrummagica.client.gui.container.ActiveHopperGui;
@@ -29,6 +30,7 @@ import com.smanzana.nostrummagica.client.gui.container.SilverMirrorGui;
 import com.smanzana.nostrummagica.client.gui.widget.QuickMoveBagButton;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed;
+import com.smanzana.nostrummagica.client.particles.FilledOrbParticleType;
 import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.render.IEffectRenderer;
@@ -90,6 +92,7 @@ import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 import com.smanzana.nostrummagica.fluid.NostrumFluids;
+import com.smanzana.nostrummagica.item.EnchantableHintTooltip;
 import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
@@ -141,6 +144,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -186,8 +190,9 @@ public class ClientInit {
 		// Register client command registering command.
 		// Note that it's on the game event bus, so it has to be registered special
 		MinecraftForge.EVENT_BUS.addListener(ClientInit::registerCommands);
-		
 		MinecraftForge.EVENT_BUS.addListener(QuickMoveBagButton::OnContainerScreenShow);
+		MinecraftForge.EVENT_BUS.addListener(EnchantableHintTooltip::InjectTooltip);
+		MinecraftForge.EVENT_BUS.addListener(EnchantableHintTooltipComponent::CaptureTooltipDimensions);
 		
 		registerBlockRenderLayer();
 		//registerEntityRenderers();
@@ -201,7 +206,11 @@ public class ClientInit {
     	proxy.initDefaultEffects();
     	registerSpellShapeRenderers();
     	registerEffectRenderers();
-	}
+    	
+    	proxy.getOverlayRenderer().registerLayers();
+    	
+    	MinecraftForgeClient.registerTooltipComponentFactory(EnchantableHintTooltip.class, EnchantableHintTooltipComponent::new);
+    }
 	
 	// Subscribed to game bus in #clientSetup
 	public static final void registerCommands(RegisterCommandsEvent event) {
@@ -363,6 +372,8 @@ public class ClientInit {
 				}
 			});
 		}
+		
+		manager.register(NostrumParticles.FilledOrb, FilledOrbParticleType.Factory::new);
 	}
 	
 	private static final void registerBlockRenderLayer() {

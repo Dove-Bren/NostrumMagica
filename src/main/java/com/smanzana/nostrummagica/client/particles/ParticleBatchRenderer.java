@@ -13,6 +13,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -62,7 +63,8 @@ public class ParticleBatchRenderer {
 						tessellator.end();
 						last.teardownBatchedRender();
 					}
-					
+
+					RenderSystem.setShader(GameRenderer::getPositionColorTexLightmapShader);
 					RenderSystem.setShaderTexture(0, next.getTexture());
 					next.setupBatchedRender();
 					buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP);

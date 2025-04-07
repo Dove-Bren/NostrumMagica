@@ -282,13 +282,6 @@ public class ModelEnchantedArmorBase<T extends LivingEntity> extends HumanoidMod
 	
 	@Override
 	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-		body.visible = false;
-		head.visible = false;
-		hat.visible = false;
-		leftArm.visible = false;
-		rightArm.visible = false;
-		leftLeg.visible = false;
-		rightLeg.visible = false;
 		// We actually set parent to be invisible so this just gets angles and stuff... or it used to and now does nothing?
 		super.renderToBuffer(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 		

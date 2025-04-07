@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
@@ -48,7 +49,7 @@ public class ClientEffectFormFlat implements ClientEffectForm {
 		
 		final int light = ClientEffectForm.InferLightmap(matrixStackIn, mc);
 		
-		
+		RenderSystem.setShader(GameRenderer::getNewEntityShader);
 		RenderSystem.setShaderTexture(0, texture);
 		matrixStackIn.pushPose();
 		

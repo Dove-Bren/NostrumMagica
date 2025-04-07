@@ -65,6 +65,7 @@ import com.smanzana.nostrummagica.world.dimension.NostrumDimensionMapper;
 import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 import com.smanzana.petcommand.api.PetFuncs;
 
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -716,6 +717,22 @@ public class NostrumMagica {
 			
 			return true;
 		}).stream().map(ent -> (ITameDragon) ent).collect(Collectors.toList());
+	}
+	
+	public static boolean UnlockElementalMastery(LivingEntity entity, EMagicElement element, EElementalMastery mastery) {
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
+		if (attr != null
+				&& attr.setElementalMastery(element, mastery)) {
+			if (mastery != EElementalMastery.UNKNOWN) {
+				if (entity != null && !entity.level.isClientSide
+						&& entity instanceof Player player) {
+					player.sendMessage(new TranslatableComponent("info.element_mastery." + mastery.getTranslationKey(), element.getName()), Util.NIL_UUID);
+				}
+			}
+			return true;
+		}
+		
+		return false;
 	}
 
 	public static @Nullable Entity getEntityByUUID(Level world, UUID id) {

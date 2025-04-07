@@ -5,13 +5,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import com.smanzana.nostrummagica.tile.NostrumTileEntities;
 import com.smanzana.nostrummagica.tile.TemporaryPortalTileEntity;
+import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 import com.smanzana.nostrummagica.util.Location;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 
@@ -39,6 +43,11 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 		}
 		
 		return null;
+	}
+	
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.TemporaryPortalTileEntityType);
 	}
 	
 	protected static void spawnPortal(Level worldIn, BlockPos portalMaster, BlockState portalState, Location target, int duration) {

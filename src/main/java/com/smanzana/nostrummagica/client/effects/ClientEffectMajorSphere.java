@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
@@ -59,6 +60,7 @@ public class ClientEffectMajorSphere extends ClientEffect {
 //			GlStateManager.enableTexture();
 //			GlStateManager.color4f(0f, 0f, 0f, 0f);
 //			GlStateManager.color4f(1f, 1f, 1f, 1f);
+			RenderSystem.setShader(GameRenderer::getRendertypeTranslucentShader);
 			RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
 			final int light = ClientEffectForm.InferLightmap(matrixStackIn, mc);
 			

@@ -20,6 +20,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -42,6 +43,7 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.BaseComponent;
@@ -49,6 +51,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
@@ -395,7 +398,8 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        RenderSystem.disableTexture();
 	        RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 	        //GlStateManager.disableDepth();
-	        RenderSystem.lineWidth(3.5f);
+	        RenderSystem.lineWidth(4f);
+	        RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
 	        
 	        Vec2 child = new Vec2(x + ((float) width / 2f), y + ((float) height / 2f));
 	        Vec2 parent = new Vec2(other.x + ((float) other.width / 2f), other.y + ((float) other.height / 2f));
@@ -416,9 +420,15 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        		parent = new Vec2(parent.x - (-Math.signum(diff.x) * ((float) other.width / 2f)), parent.y);
 	        	}
 	        	
-	        	buf.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR);
-		        buf.vertex(child.x, child.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-		        buf.vertex(parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+	        	final float dx = parent.x - child.x;
+				final float dy = parent.y - child.y;
+				final float dd = Mth.sqrt(dx * dx + dy * dy);
+	        	
+	        	RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
+	        	RenderSystem.disableCull();
+	        	buf.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
+		        buf.vertex(child.x, child.y, 0).color(.8f, .8f, .8f, alpha).normal(dx / dd, dy / dd, 0).endVertex();
+		        buf.vertex(parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).normal(dx / dd, dy / dd, 0).endVertex();
 		        Tesselator.getInstance().end();
 	        } else {
 		        boolean vertical;// = (Math.abs(diff.y) > Math.abs(diff.x));
@@ -454,12 +464,23 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        	}
 		        
 		        {
+		        	final float childDx = childTo.x - child.x;
+					final float childDy = childTo.y - child.y;
+					final float childDd = Mth.sqrt(childDx * childDx + childDy * childDy);
+					
+					final float parentDx = parent.x - parentTo.x;
+					final float parentDy = parent.y - parentTo.y;
+					final float parentDd = Mth.sqrt(parentDx * parentDx + parentDy * parentDy);
+		        	
 		        	final Matrix4f transform = matrixStackIn.last().pose();
-			        buf.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR);
-			        buf.vertex(transform, child.x, child.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-			        buf.vertex(transform, childTo.x, childTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-			        buf.vertex(transform, parentTo.x, parentTo.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
-			        buf.vertex(transform, parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+		        	final Matrix3f normal = matrixStackIn.last().normal();
+		        	RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
+		        	RenderSystem.disableCull();
+			        buf.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
+			        buf.vertex(transform, child.x, child.y, 0).color(.8f, .8f, .8f, alpha).normal(normal, childDx / childDd, childDy / childDd, 0).endVertex();
+			        buf.vertex(transform, childTo.x, childTo.y, 0).color(.8f, .8f, .8f, alpha).normal(normal, childDx / childDd, childDy / childDd, 0).endVertex();
+			        buf.vertex(transform, parentTo.x, parentTo.y, 0).color(.8f, .8f, .8f, alpha).normal(normal, parentDx / parentDd, parentDy / parentDd, 0).endVertex();
+			        buf.vertex(transform, parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).normal(normal, parentDx / parentDd, parentDy / parentDd, 0).endVertex();
 			        Tesselator.getInstance().end();
 		        }
 		        
@@ -489,18 +510,28 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		        matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(rotate));
 		        {
 		        	final Matrix4f transform = matrixStackIn.last().pose();
-			        buf.begin(VertexFormat.Mode.LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+		        	final Matrix3f normal = matrixStackIn.last().normal();
+		        	RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
+		        	RenderSystem.disableCull();
+			        buf.begin(VertexFormat.Mode.LINE_STRIP, DefaultVertexFormat.POSITION_COLOR_NORMAL);
 			        for (int i = 0; i <= points; i++) {
 			        	float progress = (float) i / (float) points;
+			        	float nextProgress = (float) (i+1) / (float) points;
 			        	Vec2 point = Curves.alignedArc2D(progress, Vec2.ZERO, radius, flip);
-			        	buf.vertex(transform, point.x, point.y, 0).color(.8f, .8f, .8f, alpha).endVertex();
+			        	Vec2 nextPoint = Curves.alignedArc2D(nextProgress, Vec2.ZERO, radius, flip);
+			        	
+			        	final float dx = nextPoint.x - point.x;
+						final float dy = nextPoint.y - point.y;
+						final float dd = Mth.sqrt(dx * dx + dy * dy);
+			        	
+			        	buf.vertex(transform, point.x, point.y, 0).color(.8f, .8f, .8f, alpha).normal(normal, dx / dd, dy / dd, 0).endVertex();
 			        }
 			        Tesselator.getInstance().end();
 		        }
 		        matrixStackIn.popPose();
 	        }
 	        
-	        matrixStackIn.translate(child.x, child.y, .2);
+	        matrixStackIn.translate(child.x, child.y, 9);
 	        if (child.x < myCenter.x) {
 	        	// from left
 	        	matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(-90f));
@@ -518,6 +549,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 					TEX_ARROW_VOFFSET, TEX_ARROW_WIDTH, TEX_ARROW_HEIGHT, 14, 7, TEX_UTILS_WIDTH,  TEX_UTILS_HEIGHT,
 					1f, 1f, 1f, alpha);
 			RenderSystem.enableDepthTest();
+			RenderSystem.enableCull();
 			matrixStackIn.popPose();
 		}
 		

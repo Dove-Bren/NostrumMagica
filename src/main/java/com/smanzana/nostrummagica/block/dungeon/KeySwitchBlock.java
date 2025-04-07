@@ -1,6 +1,8 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
 import com.smanzana.nostrummagica.tile.KeySwitchBlockTileEntity;
+import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -10,6 +12,8 @@ import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -32,6 +36,11 @@ public class KeySwitchBlock extends SwitchBlock {
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new KeySwitchBlockTileEntity(pos, state);
+	}
+	
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.KeySwitchTileEntityType);
 	}
 	
 	@Override

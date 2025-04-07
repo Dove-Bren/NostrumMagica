@@ -563,8 +563,8 @@ public class ModificationTableGui {
 			
 			if (!container.inventory.getMainSlot().isEmpty()) {
 				if (container.hasBool) {
-					this.addWidget(new ToggleButton(x, y, false, this));
-					this.addWidget(new ToggleButton(x + 15, y, true, this));
+					this.addRenderableWidget(new ToggleButton(x, y, false, this));
+					this.addRenderableWidget(new ToggleButton(x + 15, y, true, this));
 					
 					y += 25;
 				}
@@ -581,13 +581,13 @@ public class ModificationTableGui {
 						for (int i = 0; i < SpellIcon.numIcons; i++) {
 							FloatButton button = new FloatButton(x + ((i % numHorizontal) * 16), y + ((i / numHorizontal) * 16), i, i, this);
 							
-							this.addWidget(button);
+							this.addRenderableWidget(button);
 						}
 					}
 				}
 			}
 			
-			this.addWidget(submitButton);
+			this.addRenderableWidget(submitButton);
 		}
 		
 		private static class ToggleButton extends Button {

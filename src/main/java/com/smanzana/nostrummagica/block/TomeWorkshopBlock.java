@@ -27,7 +27,9 @@ public class TomeWorkshopBlock extends Block {
 	
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
-		NostrumMagica.instance.proxy.openTomeWorkshopScreen();
+		if (worldIn.isClientSide()) {
+			NostrumMagica.instance.proxy.openTomeWorkshopScreen();
+		}
 		return InteractionResult.SUCCESS;
 	}
 	

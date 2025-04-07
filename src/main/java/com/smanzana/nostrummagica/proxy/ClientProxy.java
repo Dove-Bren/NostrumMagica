@@ -1049,6 +1049,10 @@ public class ClientProxy extends CommonProxy {
 		return this.selectionRenderer;
 	}
 	
+	public OverlayRenderer getOverlayRenderer() {
+		return this.overlayRenderer;
+	}
+	
 	@Override
 	public boolean attemptPlayerInteract(Player player, Level world, BlockPos pos, InteractionHand hand, BlockHitResult hit) {
 		if (!player.level.isClientSide()) {

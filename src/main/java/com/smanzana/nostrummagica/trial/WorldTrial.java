@@ -76,7 +76,7 @@ public abstract class WorldTrial {
 		}
 		
 		attr.endTrial(element);
-		attr.setElementalMastery(this.element, newMastery);
+		NostrumMagica.UnlockElementalMastery(player, this.element, newMastery);
 		
 		if (!player.level.isClientSide) {
 			NostrumMagicaSounds.LEVELUP.play(player);

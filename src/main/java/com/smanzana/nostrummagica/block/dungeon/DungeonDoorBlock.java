@@ -10,6 +10,8 @@ import com.smanzana.autodungeons.world.dungeon.DungeonRecord;
 import com.smanzana.autodungeons.world.dungeon.DungeonRoomInstance;
 import com.smanzana.nostrummagica.tile.DungeonDoorTileEntity;
 import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
+import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
 import net.minecraft.Util;
@@ -23,6 +25,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -44,6 +48,11 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 			return null;
 		
 		return new DungeonDoorTileEntity(pos, state);
+	}
+	
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.DungeonDoorTileEntityType);
 	}
 	
 	@Override

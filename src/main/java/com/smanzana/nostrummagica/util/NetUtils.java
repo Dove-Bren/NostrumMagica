@@ -7,18 +7,20 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.function.Function;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public class NetUtils {
 
@@ -30,6 +32,28 @@ public class NetUtils {
 	public static FriendlyByteBuf packDimension(FriendlyByteBuf buffer, ResourceKey<Level> dimension) {
 		buffer.writeResourceLocation(dimension.location());
 		return buffer;
+	}
+	
+	public static void packVec(FriendlyByteBuf buf, @Nullable Vec3 vec) {
+		if (vec == null) {
+			buf.writeBoolean(false);
+		} else {
+			buf.writeBoolean(true);
+			buf.writeDouble(vec.x);
+			buf.writeDouble(vec.y);
+			buf.writeDouble(vec.z);
+		}
+	}
+	
+	public static @Nullable Vec3 unpackVec(FriendlyByteBuf buf) {
+		final Vec3 vec;
+		if (buf.readBoolean()) {
+			vec = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
+		} else {
+			vec = null;
+		}
+		
+		return vec;
 	}
 	
 	public static Codec<Vec3> CODEC_VECTOR3D = Codec.DOUBLE.listOf().comapFlatMap(NetUtils::Vector3dUnpack, NetUtils::Vector3dPack);

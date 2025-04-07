@@ -7,10 +7,13 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.util.Inventories;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -18,7 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class LoreTableTileEntity extends BlockEntity implements TickableBlockEntity {
 
-	private @Nonnull ItemStack item;
+	private SimpleContainer inventory;
 	private float progress;
 	private String lorekey;
 	private int ticksExisted;
@@ -27,7 +30,8 @@ public class LoreTableTileEntity extends BlockEntity implements TickableBlockEnt
 		super(NostrumTileEntities.LoreTableEntityType, pos, state);
 		progress = 0f;
 		lorekey = null;
-		item = ItemStack.EMPTY;
+		inventory = new SimpleContainer(1);
+		inventory.addListener(c -> this.setChanged());
 		ticksExisted = 0;
 	}
 	
@@ -60,7 +64,11 @@ public class LoreTableTileEntity extends BlockEntity implements TickableBlockEnt
 	}
 	
 	public @Nonnull ItemStack getItem() {
-		return item;
+		return inventory.getItem(0);
+	}
+	
+	public Container getInventory() {
+		return this.inventory;
 	}
 	
 	public boolean setItem(@Nonnull ItemStack item) {
@@ -71,7 +79,7 @@ public class LoreTableTileEntity extends BlockEntity implements TickableBlockEnt
 			}
 		}
 		
-		this.item = item;
+		inventory.setItem(0, item);
 		progress = 0f;
 		this.dirty();
 		return true;
@@ -100,8 +108,7 @@ public class LoreTableTileEntity extends BlockEntity implements TickableBlockEnt
 		if (nbt == null)
 			nbt = new CompoundTag();
 		
-		if (!item.isEmpty())
-			nbt.put("item", item.serializeNBT());
+		nbt.put("inventory", Inventories.serializeInventory(inventory));
 		
 		if (lorekey != null)
 			nbt.putString("lore", lorekey);
@@ -119,10 +126,7 @@ public class LoreTableTileEntity extends BlockEntity implements TickableBlockEnt
 			return;
 		
 		this.progress = nbt.getFloat("progress");
-		if (nbt.contains("item", Tag.TAG_COMPOUND))
-			this.item = ItemStack.of(nbt.getCompound("item"));
-		else
-			this.item = ItemStack.EMPTY;
+		Inventories.deserializeInventory(inventory, nbt.get("inventory"));
 		
 		if (nbt.contains("lore", Tag.TAG_STRING))
 			this.lorekey = nbt.getString("lore");
@@ -135,15 +139,15 @@ public class LoreTableTileEntity extends BlockEntity implements TickableBlockEnt
 		ticksExisted++;
 		
 		if (level != null && !level.isClientSide) {
-			if (!item.isEmpty() && lorekey == null) {
+			if (!getItem().isEmpty() && lorekey == null) {
 				progress += 1f / (30f * 20f); // 30 seconds
 				if (ticksExisted % 5 == 0) {
 					setProgress(progress);
 				}
 				
 				if (progress >= 1f) {
-					if (item.getItem() instanceof ILoreTagged) {
-						this.lorekey = ((ILoreTagged) item.getItem()).getLoreKey();
+					if (getItem().getItem() instanceof ILoreTagged loreItem) {
+						this.lorekey = loreItem.getLoreKey();
 						NostrumMagicaSounds.DAMAGE_ICE.play(level,
 								worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
 					}

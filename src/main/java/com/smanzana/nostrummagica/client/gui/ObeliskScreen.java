@@ -165,10 +165,10 @@ public class ObeliskScreen extends Screen {
 			index++;
 		}
 		
-		this.addWidget(centralButton);
-		for (AbstractWidget w : floatingButtons) addWidget(w);
-		for (AbstractWidget w : listButtons) addWidget(w);
-		for (AbstractWidget w : listRemoveButtons) addWidget(w);
+		this.addRenderableWidget(centralButton);
+		for (AbstractWidget w : floatingButtons) addRenderableWidget(w);
+		for (AbstractWidget w : listButtons) addRenderableWidget(w);
+		for (AbstractWidget w : listRemoveButtons) addRenderableWidget(w);
 		
 		for (DestinationButton butt : listButtons) {
 			butt.visible = drawList;

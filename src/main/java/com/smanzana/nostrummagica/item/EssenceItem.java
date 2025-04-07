@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.item;
 
+import java.util.Optional;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
@@ -7,10 +9,11 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.effect.MobEffectInstance;
 
 public class EssenceItem extends Item implements ILoreTagged, IEnchantableItem {
 
@@ -118,5 +121,10 @@ public class EssenceItem extends Item implements ILoreTagged, IEnchantableItem {
 		NostrumMagica.magicEffectProxy.applyMagicBuff(entity, this.element, amt, count);
 		entity.addEffect(new MobEffectInstance(NostrumEffects.magicBuff, 60 * 20, (int) (amt - 1)));
 		return new Result(true, ItemStack.EMPTY);
+	}
+	
+	@Override
+	public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
+		return super.getTooltipImage(stack);
 	}
 }

@@ -121,7 +121,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setLightmapState(NO_LIGHTING)
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
 				.setOutputState(ITEM_ENTITY_TARGET)
-				.setShaderState(CUTOUT_SHADER)
+				.setShaderState(POSITION_TEX_SHADER)
 			.createCompositeState(false);
 		HOOKSHOT_CHAIN = RenderType.create(Name("hookshot_chain"), DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS, 128, false, false, glState);
 		
@@ -132,6 +132,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
 				.setTexturingState(MANAARMOR_GLINT)
+				.setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
 				// depth test?
 			.createCompositeState(false);
 		MANA_ARMOR = RenderType.create(Name("manaarmor"), DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 128, false, false, glState);
@@ -143,6 +144,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
 				.setTexturingState(SPELLSHAPE_TEXTURING)
+				.setShaderState(POSITION_COLOR_TEX_SHADER)
 				// depth test?
 			.createCompositeState(false);
 		SPELLSHAPE_QUADS = RenderType.create(Name("spellshape"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 128, false, false, glState);
@@ -154,6 +156,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
 				.setCullState(NO_CULL)
+				.setShaderState(POSITION_COLOR_TEX_SHADER)
 				//.texturing(SPELLSHAPE_TEXTURING)
 				// depth test?
 			.createCompositeState(false);
@@ -167,6 +170,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
 				.setTexturingState(SPELLSHAPE_TEXTURING)
 				.setLineState(LINE_3)
+				.setShaderState(POSITION_COLOR_TEX_SHADER)
 				// depth test?
 			.createCompositeState(false);
 		SPELLSHAPE_LINES = RenderType.create(Name("spellshape_lines"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.LINES, 32, false, false, glState);
@@ -179,6 +183,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
 				.setTexturingState(SPELLSHAPE_TEXTURING)
 				.setLineState(LINE_10)
+				.setShaderState(POSITION_COLOR_TEX_SHADER)
 				// depth test?
 			.createCompositeState(false);
 		SPELLSHAPE_LINES_THICK = RenderType.create(Name("spellshape_lines_thick"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.LINES, 32, false, false, glState);
@@ -189,6 +194,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setLightmapState(NO_LIGHTING)
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+				.setShaderState(POSITION_COLOR_TEX_SHADER)
 			.createCompositeState(false);
 		SWITCH_TRIGGER_BASE = RenderType.create(Name("switch_trigger_base"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.TRIANGLES, 64, false, false, glState);
 		
@@ -199,6 +205,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
 				//.depthTest(DEPTH_EQUAL)
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+				.setShaderState(POSITION_COLOR_TEX_SHADER)
 			.createCompositeState(false);
 		SWITCH_TRIGGER_CAGE = RenderType.create(Name("switch_trigger_cage"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.TRIANGLES, 64, false, false, glState);
 		
@@ -207,6 +214,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
 				.setLightmapState(NO_LIGHTING)
 				.setCullState(NO_CULL)
+				.setShaderState(POSITION_COLOR_TEX_LIGHTMAP_SHADER)
 			.createCompositeState(false);
 		NOSTRUM_PORTAL = RenderType.create(Name("nostrum_portal"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.TRIANGLES, 64, false, false, glState);
 		
@@ -216,6 +224,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setLightmapState(LIGHTMAP_ENABLED)
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
 				.setWriteMaskState(WRITE_TO_DEPTH_AND_COLOR)
+				.setShaderState(POSITION_COLOR_TEX_LIGHTMAP_SHADER)
 			.createCompositeState(false);
 		PROGRESSION_DOOR_LOCK = RenderType.create(Name("prog_door_lock"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.TRIANGLES, 64, false, false, glState);
 		
@@ -225,6 +234,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
 				.setLightmapState(LIGHTMAP_ENABLED)
 				.setCullState(NO_CULL)
+				.setShaderState(POSITION_COLOR_TEX_LIGHTMAP_SHADER)
 			.createCompositeState(false);
 		LOCKEDCHEST_LOCK = RenderType.create(Name("lockedchest_lock"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.QUADS, 32, false, false, glState);
 		
@@ -234,6 +244,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setLightmapState(LIGHTMAP_ENABLED)
 				.setCullState(NO_CULL)
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+				.setShaderState(POSITION_COLOR_TEX_LIGHTMAP_SHADER)
 			.createCompositeState(false);
 		LOCKEDCHEST_CHAIN = RenderType.create(Name("lockedchest_chain"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.QUADS, 64, false, false, glState);
 		
@@ -241,6 +252,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
 				.setLightmapState(NO_LIGHTING)
 				.setDepthTestState(NO_DEPTH)
+				.setShaderState(POSITION_COLOR_SHADER)
 			.createCompositeState(false);
 		WORLD_SELECT_HIGHLIGHT_CULL = RenderType.create(Name("WorldSelectCull"), DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 16, false, false, glState);
 		
@@ -249,6 +261,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setLightmapState(NO_LIGHTING)
 				.setDepthTestState(NO_DEPTH)
 				.setCullState(NO_CULL) // Previously only was no-cull if inside box
+				.setShaderState(POSITION_COLOR_SHADER)
 			.createCompositeState(false);
 		WORLD_SELECT_HIGHLIGHT = RenderType.create(Name("WorldSelect"), DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 16, false, false, glState);
 	}
@@ -269,6 +282,7 @@ public class NostrumRenderTypes extends RenderType {
 				//.layer(VIEW_OFFSET_Z_LAYERING)
 				//.target(ITEM_ENTITY_TARGET)
 				//.writeMask(WRITE_TO_DEPTH_AND_COLOR)
+				.setShaderState(POSITION_COLOR_TEX_LIGHTMAP_SHADER)
 			.createCompositeState(false);
 		return RenderType.create(Name("flaticon"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.QUADS, 32, false, false, glState);
 	}
@@ -304,6 +318,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setLightmapState(LIGHTMAP_ENABLED)
 				.setOverlayState(OVERLAY_ENABLED)
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+				.setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
 			.createCompositeState(affectsOutline);
 		return RenderType.create(Name("nostrum_blendedentity"), DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, false, false, glState);
 	}

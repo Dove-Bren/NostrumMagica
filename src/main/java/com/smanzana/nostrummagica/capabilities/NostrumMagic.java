@@ -34,7 +34,6 @@ import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
 import com.smanzana.nostrummagica.util.NetUtils;
 
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
@@ -43,7 +42,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -532,14 +530,6 @@ public class NostrumMagic implements INostrumMagic {
 	
 	public boolean setElementalMastery(EMagicElement element, EElementalMastery mastery) {
 		elementalMastery.put(element, mastery);
-		
-		if (mastery != EElementalMastery.UNKNOWN) {
-			if (this.entity != null && !this.entity.level.isClientSide
-					&& this.entity instanceof Player) {
-				Player player = (Player) this.entity;
-				player.sendMessage(new TranslatableComponent("info.element_mastery." + mastery.getTranslationKey(), element.getName()), Util.NIL_UUID);
-			}
-		}
 		
 		return true;
 	}

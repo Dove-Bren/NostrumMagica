@@ -249,7 +249,7 @@ public class BasicSpellCraftGui {
 				return s.codePoints().allMatch(SpellGui::isValidChar);
 			});
 			this.nameField.setValue(getMenu().getName());
-			this.addWidget(this.nameField);
+			this.addRenderableWidget(this.nameField);
 			
 			
 			// Spell icon buttons
@@ -269,14 +269,14 @@ public class BasicSpellCraftGui {
 						i,
 						this);
 				
-				this.addWidget(button);
+				this.addRenderableWidget(button);
 			}
 			
 			// Info panel
 			if (NostrumMagica.getMagicWrapper(getMenu().player).hasSkill(NostrumSkills.Spellcraft_Infopanel)) {
 				infoPanelWidget = new InfoPanel(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT);
 				infoPanelWidget.setContent(this::renderSpellPanel);
-				this.addWidget(infoPanelWidget);
+				this.addRenderableWidget(infoPanelWidget);
 				extraAreas.add(new Rect2i(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT));
 				{
 					// Weight status
@@ -287,16 +287,16 @@ public class BasicSpellCraftGui {
 			}
 			
 			// Status icon
-			this.addWidget(new SpellStatusIcon(this, horizontalMargin + POS_STATUS_HOFFSET, verticalMargin + POS_STATUS_VOFFSET, POS_STATUS_WIDTH, POS_STATUS_HEIGHT));
+			this.addRenderableWidget(new SpellStatusIcon(this, horizontalMargin + POS_STATUS_HOFFSET, verticalMargin + POS_STATUS_VOFFSET, POS_STATUS_WIDTH, POS_STATUS_HEIGHT));
 			
 			// Submit button
-			this.addWidget(new SubmitButton(this, horizontalMargin + POS_SUBMIT_HOFFSET, verticalMargin + POS_SUBMIT_VOFFSET, POS_SUBMIT_WIDTH, POS_SUBMIT_HEIGHT));
+			this.addRenderableWidget(new SubmitButton(this, horizontalMargin + POS_SUBMIT_HOFFSET, verticalMargin + POS_SUBMIT_VOFFSET, POS_SUBMIT_WIDTH, POS_SUBMIT_HEIGHT));
 			
 			// Extra inventory
 			if (this.getMenu().extraInventory != null) {
 				final SimpleInventoryContainerlet extraContainer = this.getMenu().extraInventory;
 				this.extraInventoryWidget = new SimpleInventoryWidget(this, extraContainer);
-				this.addWidget(this.extraInventoryWidget);
+				this.addRenderableWidget(this.extraInventoryWidget);
 				extraAreas.add(new Rect2i(horizontalMargin + extraContainer.x, verticalMargin + this.getMenu().extraInventory.y, this.getMenu().extraInventory.width, this.getMenu().extraInventory.height));
 			}
 			
@@ -318,7 +318,7 @@ public class BasicSpellCraftGui {
 						});
 					}
 				});
-				this.addWidget(partBarWidget);
+				this.addRenderableWidget(partBarWidget);
 			}
 
 			this.getMenu().validate();

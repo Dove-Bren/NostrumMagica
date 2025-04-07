@@ -366,7 +366,7 @@ public class MysticSpellCraftGui {
 				return s.codePoints().allMatch(SpellGui::isValidChar);
 			});
 			this.nameField.setValue(getMenu().getName());
-			this.addWidget(this.nameField);
+			this.addRenderableWidget(this.nameField);
 			
 			
 			// Spell icon buttons
@@ -386,14 +386,14 @@ public class MysticSpellCraftGui {
 						i,
 						this);
 				
-				this.addWidget(button);
+				this.addRenderableWidget(button);
 			}
 			
 			// Info panel
 			if (NostrumMagica.getMagicWrapper(getMenu().player).hasSkill(NostrumSkills.Spellcraft_Infopanel)) {
 				this.infoPanelWidget = new InfoPanel(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT);
 				this.infoPanelWidget.setContent(this::renderSpellPanel);
-				this.addWidget(infoPanelWidget);
+				this.addRenderableWidget(infoPanelWidget);
 				extraAreas.add(new Rect2i(horizontalMargin + POS_INFOPANEL_HOFFSET, verticalMargin + POS_INFOPANEL_VOFFSET, POS_INFOPANEL_WIDTH, POS_INFOPANEL_HEIGHT));
 				{
 					// Weight status
@@ -404,24 +404,24 @@ public class MysticSpellCraftGui {
 			}
 			
 			// Status icon
-			this.addWidget(new SpellStatusIcon(this, horizontalMargin + POS_STATUS_HOFFSET, verticalMargin + POS_STATUS_VOFFSET, POS_STATUS_WIDTH, POS_STATUS_HEIGHT));
+			this.addRenderableWidget(new SpellStatusIcon(this, horizontalMargin + POS_STATUS_HOFFSET, verticalMargin + POS_STATUS_VOFFSET, POS_STATUS_WIDTH, POS_STATUS_HEIGHT));
 			
 			// Submit button
-			this.addWidget(new SubmitButton(this, horizontalMargin + POS_SUBMIT_HOFFSET, verticalMargin + POS_SUBMIT_VOFFSET, POS_SUBMIT_WIDTH, POS_SUBMIT_HEIGHT));
+			this.addRenderableWidget(new SubmitButton(this, horizontalMargin + POS_SUBMIT_HOFFSET, verticalMargin + POS_SUBMIT_VOFFSET, POS_SUBMIT_WIDTH, POS_SUBMIT_HEIGHT));
 			
 			// Pattern arrows
-			this.addWidget(new PatternChangeButton(this, true, horizontalMargin + POS_LARROW_HOFFSET, verticalMargin + POS_LARROW_VOFFSET, POS_LARROW_WIDTH, POS_LARROW_HEIGHT));
-			this.addWidget(new PatternChangeButton(this, false, horizontalMargin + POS_RARROW_HOFFSET, verticalMargin + POS_RARROW_VOFFSET, POS_RARROW_WIDTH, POS_RARROW_HEIGHT));
+			this.addRenderableWidget(new PatternChangeButton(this, true, horizontalMargin + POS_LARROW_HOFFSET, verticalMargin + POS_LARROW_VOFFSET, POS_LARROW_WIDTH, POS_LARROW_HEIGHT));
+			this.addRenderableWidget(new PatternChangeButton(this, false, horizontalMargin + POS_RARROW_HOFFSET, verticalMargin + POS_RARROW_VOFFSET, POS_RARROW_WIDTH, POS_RARROW_HEIGHT));
 			
 			// Pattern icon
-			this.addWidget(new PatternIcon(this, horizontalMargin + POS_PATTERN_HOFFSET, verticalMargin + POS_PATTERN_VOFFSET, POS_PATTERN_WIDTH, POS_PATTERN_HEIGHT));
+			this.addRenderableWidget(new PatternIcon(this, horizontalMargin + POS_PATTERN_HOFFSET, verticalMargin + POS_PATTERN_VOFFSET, POS_PATTERN_WIDTH, POS_PATTERN_HEIGHT));
 
 			// Extra inventory
 			if (this.getMenu().extraInventory != null) {
 				final SimpleInventoryContainerlet extraContainer = this.getMenu().extraInventory;
 				this.extraInventoryWidget = new SimpleInventoryWidget(this, extraContainer);
 				this.extraInventoryWidget.setColor(0xFF263D5A);
-				this.addWidget(this.extraInventoryWidget);
+				this.addRenderableWidget(this.extraInventoryWidget);
 				extraAreas.add(new Rect2i(horizontalMargin + extraContainer.x, verticalMargin + this.getMenu().extraInventory.y, this.getMenu().extraInventory.width, this.getMenu().extraInventory.height));
 			}
 			
@@ -443,7 +443,7 @@ public class MysticSpellCraftGui {
 						});
 					}
 				});
-				this.addWidget(partBarWidget);
+				this.addRenderableWidget(partBarWidget);
 			}
 
 			this.getMenu().validate();

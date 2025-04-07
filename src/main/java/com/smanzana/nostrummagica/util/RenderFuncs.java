@@ -23,6 +23,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
@@ -131,6 +132,7 @@ public final class RenderFuncs {
 		//RenderSystem.multMatrix(matrixStackIn.last().pose());
 		mc.getItemRenderer().renderGuiItem(stack, 0, 0);
 		actualStack.popPose();
+		RenderSystem.applyModelViewMatrix();
 		//RenderSystem.popMatrix();
 	}
 	
@@ -165,6 +167,8 @@ public final class RenderFuncs {
 	public static void drawScaledCustomSizeModalRectImmediate(PoseStack matrixStackIn, int x, int y, float u, float v, int uWidth, int vHeight, int width, int height, float tileWidth, float tileHeight, float red, float green, float blue, float alpha) {
 		Tesselator tessellator = Tesselator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuilder();
+		
+		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
 		bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
 		
 		drawScaledCustomSizeModalRect(matrixStackIn, bufferbuilder, x, y, u, v, uWidth, vHeight, width, height, tileWidth, tileHeight,
@@ -210,6 +214,7 @@ public final class RenderFuncs {
 		RenderSystem.disableTexture();
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
 		//RenderSystem.shadeModel(GL11.GL_SMOOTH);
 		{
 			bufferbuilder.vertex(transform, minX, minY, 0).color(colorTL[0], colorTL[1], colorTL[2], colorTL[3]).endVertex();
@@ -695,6 +700,7 @@ public final class RenderFuncs {
 	}
 
 	private static final void innerBlit(Matrix4f matrix, int x1, int x2, int y1, int y2, int blitOffset, float minU, float maxU, float minV, float maxV, float red, float green, float blue, float alpha) {
+		RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
 		BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
 		bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
 		bufferbuilder.vertex(matrix, (float)x1, (float)y2, (float)blitOffset).color(red, green, blue, alpha).uv(minU, maxV).endVertex();

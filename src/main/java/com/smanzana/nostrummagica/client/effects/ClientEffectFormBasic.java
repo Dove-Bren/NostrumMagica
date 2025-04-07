@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlas;
@@ -47,6 +48,7 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 			matrixStackIn.translate(offset.x, offset.y, offset.z);
 		}
 		
+		RenderSystem.setShader(GameRenderer::getRendertypeTranslucentShader);
 		int unused; // make this be a passed in thing! Not all are objs!
 		RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
 		

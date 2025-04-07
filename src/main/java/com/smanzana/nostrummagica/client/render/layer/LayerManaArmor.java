@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.client.render.layer;
 
 import javax.annotation.Nullable;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -40,7 +41,7 @@ public class LayerManaArmor extends RenderLayer<AbstractClientPlayer, PlayerMode
 	}
 	
 	public int getColor(AbstractClientPlayer player) {
-		return 0x602244FF;
+		return 0xAA2244FF;
 	}
 	
 	private boolean recurseMarker = false;
@@ -58,6 +59,8 @@ public class LayerManaArmor extends RenderLayer<AbstractClientPlayer, PlayerMode
 			final float growAmt = (Mth.sin(progAdj * 3.1415f * 2) * growScale) + growScale;
 			
 			VertexConsumer buffer = typeBuffer.getBuffer(NostrumRenderTypes.MANA_ARMOR);
+			
+			RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 			
 			stack.pushPose();
 			stack.scale(1.002f + growAmt, 1.002f + growAmt, 1.002f + growAmt);

@@ -146,11 +146,11 @@ public class BookScreen extends Screen {
 		int leftOffset = (this.width - TEXT_WIDTH) / 2; //distance from left
 		int topOffset = (this.height - TEXT_HEIGHT) / 2;
 		backButton = new NextPageButton(this, leftOffset + 30, topOffset + PAGE_HEIGHT + 5, false);
-		this.addWidget(backButton);
+		this.addRenderableWidget(backButton);
 		nextButton = new NextPageButton(this, leftOffset + TEXT_WIDTH - (35 + 23), topOffset + PAGE_HEIGHT + 5, true);
-		this.addWidget(nextButton);
+		this.addRenderableWidget(nextButton);
 		homeButton = new HomeButton(this, leftOffset + 30 + 24, topOffset + PAGE_HEIGHT + 3);
-		this.addWidget(homeButton);
+		this.addRenderableWidget(homeButton);
 	}
 	
 	@Override	

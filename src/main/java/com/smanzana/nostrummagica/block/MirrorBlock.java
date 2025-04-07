@@ -73,7 +73,9 @@ public class MirrorBlock extends HorizontalDirectionalBlock {
 	
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
-		NostrumMagica.instance.proxy.openMirrorScreen();
+		if (worldIn.isClientSide()) {
+			NostrumMagica.instance.proxy.openMirrorScreen();
+		}
 		return InteractionResult.SUCCESS;
 	}
 	

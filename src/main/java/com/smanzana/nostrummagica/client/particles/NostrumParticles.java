@@ -33,11 +33,15 @@ public enum NostrumParticles {
 	WARD(new NostrumParticleType("ward"), ParticleWard.Factory.class),
 	;
 	
+	public static final FilledOrbParticleType FilledOrb = new FilledOrbParticleType();
+	
 	@SubscribeEvent
 	public static void registerParticles(RegistryEvent.Register<ParticleType<?>> event) {
 		for (NostrumParticles p : NostrumParticles.values()) {
 			event.getRegistry().register(p.getType());
 		}
+		
+		event.getRegistry().register(FilledOrb.setRegistryName(NostrumMagica.Loc("filled_orb_vanilla")));
 	}
 	
 	private final NostrumParticleType type;

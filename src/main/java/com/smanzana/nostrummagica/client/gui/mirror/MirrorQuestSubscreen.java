@@ -31,6 +31,7 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.BaseComponent;
@@ -38,6 +39,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -248,17 +250,28 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 //			GlStateManager.pushLightingAttributes();
 			matrixStackIn.translate(width / 2, height / 2, 0);
 			
+			matrixStackIn.translate(1, .5, 0);
+			
 			final Matrix4f transform = matrixStackIn.last().pose();
 			
+			final float dx = other.x - x;
+			final float dy = other.y - y;
+			final float dd = Mth.sqrt(dx * dx + dy * dy);
+			
 			BufferBuilder buf = Tesselator.getInstance().getBuilder();
+			RenderSystem.depthMask(true);
+			RenderSystem.disableCull();
 			RenderSystem.enableBlend();
+			RenderSystem.defaultBlendFunc();
 			RenderSystem.disableTexture();
 			RenderSystem.lineWidth(3f);
+			//RenderSystem.disableDepthTest();
 	        //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 //	        GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
-	        buf.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR);
-	        buf.vertex(transform, x, y, 0).color(1f, 1f, 1f, .6f).endVertex();
-	        buf.vertex(transform, other.x, other.y, 0).color(1f, 1f, 1f, .6f).endVertex();
+			RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
+	        buf.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
+	        buf.vertex(transform, x, y, 0).color(1f, 1f, 1f, .6f).normal(dx / dd, dy / dd, 0).endVertex();
+	        buf.vertex(transform, other.x, other.y, 0).color(1f, 1f, 1f, .6f).normal(dx / dd, dy / dd, 0).endVertex();
 	        Tesselator.getInstance().end();
 	        RenderSystem.enableTexture();
 //	        GlStateManager.enableTexture();
@@ -278,7 +291,7 @@ public class MirrorQuestSubscreen extends PanningMirrorSubscreen {
 				matrixStackIn.pushPose();
 				matrixStackIn.translate(0, 0, 0);
 				drawTreeLines(matrixStackIn, Minecraft.getInstance());
-				matrixStackIn.translate(0, 0, 1);
+				matrixStackIn.translate(0, 0, 10);
 				super.render(matrixStackIn, mouseX, mouseY, partialTicks);
 				matrixStackIn.popPose();
 			}

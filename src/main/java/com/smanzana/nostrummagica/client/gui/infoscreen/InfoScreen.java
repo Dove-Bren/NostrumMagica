@@ -118,7 +118,7 @@ public class InfoScreen extends StackableScreen {
 			if (butt.buttons == null || butt.buttons.isEmpty())
 				continue;
 			tabs.add(butt);
-			this.addWidget(butt);
+			this.addRenderableWidget(butt);
 		}
 		
 		// Open up startup location, if one was provided
@@ -257,9 +257,9 @@ public class InfoScreen extends StackableScreen {
 //		this.buttons.clear();
 //		this.children.clear();
 		
-		for (AbstractWidget w : this.tabs) { this.addWidget(w); }
-		for (AbstractWidget w : this.infoButtons) { this.addWidget(w); }
-		for (AbstractWidget w : this.subscreenButtons) { this.addWidget(w); }
+		for (AbstractWidget w : this.tabs) { this.addRenderableWidget(w); }
+		for (AbstractWidget w : this.infoButtons) { this.addRenderableWidget(w); }
+		for (AbstractWidget w : this.subscreenButtons) { this.addRenderableWidget(w); }
 //		this.buttons.addAll(this.tabs);
 //		this.buttons.addAll(this.infoButtons);
 //		this.buttons.addAll(this.subscreenButtons);
@@ -276,9 +276,9 @@ public class InfoScreen extends StackableScreen {
 //		this.buttons.clear();
 //		this.children.clear();
 		
-		for (AbstractWidget w : this.tabs) { this.addWidget(w); }
-		for (AbstractWidget w : this.infoButtons) { this.addWidget(w); }
-		for (AbstractWidget w : this.subscreenButtons) { this.addWidget(w); }
+		for (AbstractWidget w : this.tabs) { this.addRenderableWidget(w); }
+		for (AbstractWidget w : this.infoButtons) { this.addRenderableWidget(w); }
+		for (AbstractWidget w : this.subscreenButtons) { this.addRenderableWidget(w); }
 //		this.buttons.addAll(this.tabs);
 //		this.buttons.addAll(this.infoButtons);
 //		this.buttons.addAll(this.subscreenButtons);

@@ -117,13 +117,13 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 	
 	protected void addMainWidgets() {
 		for (MajorTabButton tab : majorTabs) {
-			this.addWidget(tab);
+			this.addRenderableWidget(tab);
 		}
 	}
 	
 	@Override
 	public void addWidget(AbstractWidget widget) {
-		this.addWidget(widget);
+		super.addRenderableWidget(widget);
 	}
 
 	@Override
@@ -145,7 +145,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 				POS_MINORTAB_WIDTH, POS_MINORTAB_HEIGHT
 				);
 		this.minorTabs.add(button);
-		this.addWidget(button);
+		this.addRenderableWidget(button);
 		
 		// If this was first, act like it got clicked
 		if (minorTabs.size() == 1) {

@@ -7,7 +7,9 @@ import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.AlterationSpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.ElementSpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.ShapeSpellRune;
+import com.smanzana.nostrummagica.tile.NostrumTileEntities;
 import com.smanzana.nostrummagica.tile.ShrineTileEntity;
+import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -20,6 +22,8 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
@@ -99,6 +103,11 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends BaseEnt
 			ShrineTileEntity.Element ent = new ShrineTileEntity.Element(pos, state);
 			return ent;
 		}
+		
+		@Override
+		public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+			return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.ElementShrineTileType);
+		}
 
 		@Override
 		protected InteractionResult handleConfigure(Level world, BlockPos pos, BlockState state, Player player, ItemStack heldItem) {
@@ -126,6 +135,11 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends BaseEnt
 		public ShrineTileEntity.Shape newBlockEntity(BlockPos pos, BlockState state) {
 			ShrineTileEntity.Shape ent = new ShrineTileEntity.Shape(pos, state);
 			return ent;
+		}
+		
+		@Override
+		public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+			return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.ShapeShrineTileType);
 		}
 
 		@Override
@@ -155,6 +169,11 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends BaseEnt
 			ShrineTileEntity.Alteration ent = new ShrineTileEntity.Alteration(pos, state);
 			return ent;
 		}
+		
+		@Override
+		public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+			return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.AlterationShrineTileType);
+		}
 
 		@Override
 		protected InteractionResult handleConfigure(Level world, BlockPos pos, BlockState state, Player player, ItemStack heldItem) {
@@ -182,6 +201,11 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends BaseEnt
 		public ShrineTileEntity.Tier newBlockEntity(BlockPos pos, BlockState state) {
 			ShrineTileEntity.Tier ent = new ShrineTileEntity.Tier(pos, state);
 			return ent;
+		}
+		
+		@Override
+		public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+			return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.TierShrineTileType);
 		}
 
 		@Override

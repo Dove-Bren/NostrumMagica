@@ -590,11 +590,11 @@ public class RuneShaperGui {
 		
 		protected void addBaseWidgets() {
 			if (this.extraInventoryWidget != null) {
-				this.addWidget(this.extraInventoryWidget);
+				this.addRenderableWidget(this.extraInventoryWidget);
 			}
-			this.addWidget(submitButton);
+			this.addRenderableWidget(submitButton);
 			
-			this.addWidget(new IngredientSlotWidget(this, this.getGuiLeft() + POS_SLOT_INGREDIENT_HOFFSET - 1, this.getGuiTop() + POS_SLOT_INGREDIENT_VOFFSET - 1, 
+			this.addRenderableWidget(new IngredientSlotWidget(this, this.getGuiLeft() + POS_SLOT_INGREDIENT_HOFFSET - 1, this.getGuiTop() + POS_SLOT_INGREDIENT_VOFFSET - 1, 
 					18, 18));
 		}
 		
@@ -609,7 +609,7 @@ public class RuneShaperGui {
 			}
 			
 			for (int i = 0; i < properties.size(); i++) {
-				this.addWidget(makePropertyWidget(shape, properties.get(i), i));
+				this.addRenderableWidget(makePropertyWidget(shape, properties.get(i), i));
 			}
 			
 			
@@ -629,7 +629,7 @@ public class RuneShaperGui {
 				for (int i = 0; i < values.length; i++) {
 					final int x = getGuiLeft() + xOffset + POS_VALUE_HOFFSET + (i % maxCol) * (width + width/2);
 					final int y = getGuiTop() + POS_VALUE_VOFFSET + (i / maxCol) * (height + height/2);
-					this.addWidget(new PropertyValueWidget(this, i, values[i], x, y, width, height));
+					this.addRenderableWidget(new PropertyValueWidget(this, i, values[i], x, y, width, height));
 				}
 			}
 			

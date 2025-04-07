@@ -45,7 +45,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 		rCol = red;
 		gCol = green;
 		bCol = blue;
-		alpha = 0f;
+		this.alpha = 0f;
 		this.maxAlpha = alpha;
 		this.lifetime = lifetime;
 		

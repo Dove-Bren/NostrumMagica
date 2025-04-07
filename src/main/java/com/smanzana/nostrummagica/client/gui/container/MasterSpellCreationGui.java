@@ -583,7 +583,7 @@ public class MasterSpellCreationGui {
 			});
 			this.buttons = new ArrayList<>(SpellIcon.numIcons);
 			
-			this.addWidget(nameField);
+			this.addRenderableWidget(nameField);
 		}
 		
 		@Override
@@ -610,10 +610,10 @@ public class MasterSpellCreationGui {
 						//int buttonId, int x, int y, int val, float actual, SpellCreationContainer container
 				
 				this.buttons.add(button);
-				this.addWidget(button);
+				this.addRenderableWidget(button);
 			}
 			
-			this.addWidget(nameField);
+			this.addRenderableWidget(nameField);
 			this.nameField.x = horizontalMargin + NAME_HOFFSET;
 			this.nameField.y = verticalMargin + NAME_VOFFSET;
 		}

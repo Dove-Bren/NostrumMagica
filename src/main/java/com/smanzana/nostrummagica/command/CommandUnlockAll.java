@@ -45,7 +45,7 @@ public class CommandUnlockAll {
 			attr.unlockAlteration(alt);
 		}
 		for (EMagicElement elem : EMagicElement.values()) {
-			attr.setElementalMastery(elem, EElementalMastery.MASTER);
+			NostrumMagica.UnlockElementalMastery(player, elem, EElementalMastery.MASTER);
 		}
 		NetworkHandler.sendTo(
 				new StatSyncMessage(attr)

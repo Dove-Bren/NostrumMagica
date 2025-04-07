@@ -12,7 +12,6 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -32,7 +31,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 		rCol = red;
 		gCol = green;
 		bCol = blue;
-		alpha = 0f;
+		this.alpha = 0f;
 		this.maxAlpha = alpha;
 		this.lifetime = lifetime;
 	}
@@ -94,7 +93,6 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 
 	@Override
 	public void setupBatchedRender() {
-		RenderSystem.setShader(GameRenderer::getParticleShader);
 		RenderSystem.depthMask(false);
 		RenderSystem.enableDepthTest();
 		RenderSystem.enableBlend();

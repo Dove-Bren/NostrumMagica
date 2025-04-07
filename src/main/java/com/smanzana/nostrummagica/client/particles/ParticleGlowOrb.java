@@ -35,7 +35,7 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 		rCol = red;
 		gCol = green;
 		bCol = blue;
-		alpha = 0f;
+		this.alpha = 0f;
 		this.maxAlpha = alpha;
 		this.lifetime = lifetime;
 		fixedRandom = -1f;
