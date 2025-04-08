@@ -26,7 +26,6 @@ import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.IPrintableAttribute;
-import com.smanzana.nostrummagica.block.ModificationTableBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
@@ -49,7 +48,6 @@ import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.inventory.EquipmentSetRegistry;
 import com.smanzana.nostrummagica.item.IRaytraceOverlay;
-import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
@@ -58,12 +56,9 @@ import com.smanzana.nostrummagica.item.equipment.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.item.set.EquipmentSet;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
-import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCooldownTracker.SpellCooldown;
-import com.smanzana.nostrummagica.spell.component.SpellAction;
-import com.smanzana.nostrummagica.spell.component.Transmutation;
 import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
@@ -93,7 +88,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
@@ -103,7 +97,6 @@ import net.minecraftforge.client.event.DrawSelectionEvent;
 import net.minecraftforge.client.event.RenderBlockOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
-import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.IIngameOverlay;
@@ -1265,109 +1258,6 @@ public class OverlayRenderer extends GuiComponent {
 		}
 		return lines;
 	}
-	
-	private void renderLoreIcon(PoseStack matrixStackIn, Boolean loreIsDeep) {
-		RenderFuncs.RenderGUIItem(new ItemStack(NostrumItems.spellScroll), matrixStackIn);
-		
-		if (loreIsDeep != null) {
-			final int u = (160 + (loreIsDeep ? 0 : 32));
-			RenderSystem.setShaderTexture(0, GUI_ICONS);
-			
-			matrixStackIn.pushPose();
-			matrixStackIn.translate(0, 0, 101); // items render z+100
-			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 8, 8, u, 0, 32, 32, 8, 8, 256, 256);
-			matrixStackIn.popPose();
-		}
-	}
-	
-	private void renderEnchantableIcon(PoseStack matrixStackIn) {
-		RenderSystem.enableBlend();
-		RenderSystem.setShaderTexture(0, GUI_ICONS);
-		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 6, 6, 192, 32, 32, 32, 12, 12, 256, 256);
-	}
-	
-	private void renderConfigurableIcon(PoseStack matrixStackIn) {
-		RenderSystem.enableBlend();
-		RenderSystem.setShaderTexture(0, GUI_ICONS);
-		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 8, 8, 160, 32, 32, 32, 8, 8, 256, 256);
-	}
-	
-	private void renderTransmutableIcon(PoseStack matrixStackIn) {
-		RenderSystem.enableBlend();
-		RenderSystem.setShaderTexture(0, GUI_ICONS);
-		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 8, 8, 224, 32, 32, 32, 8, 8, 256, 256);
-	}
-	
-	@SubscribeEvent
-	public void onTooltipRender(RenderTooltipEvent.PostBackground event) {
-		ItemStack stack = event.getStack();
-		if (stack.isEmpty()) {
-			return;
-		}
-
-		Minecraft mc = Minecraft.getInstance();
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(mc.player);
-		if (attr == null || !attr.isUnlocked()) {
-			return; // no highlights
-		}
-		
-		final PoseStack matrixStackIn = event.getMatrixStack();
-		
-		// Lore icon
-		final ILoreTagged tag;
-		if (stack.getItem() instanceof BlockItem) {
-			if (!(((BlockItem) stack.getItem()).getBlock() instanceof ILoreTagged)) {
-				tag = null;
-			} else {
-				tag = (ILoreTagged) ((BlockItem) stack.getItem()).getBlock();
-			}
-		} else if (!(stack.getItem() instanceof ILoreTagged)) {
-			tag = null;
-		} else {
-			tag = (ILoreTagged) stack.getItem();
-		}
-		
-		if (tag != null) {
-			final Boolean hasFullLore;
-			if (attr.hasFullLore(tag)) {
-				hasFullLore = true;
-			} else if (attr.hasLore(tag)) {
-				hasFullLore = false;
-			} else {
-				hasFullLore = null;
-			}
-			
-			matrixStackIn.pushPose();
-			matrixStackIn.translate(event.getX() + event.getWidth() - 4, event.getY() + event.getHeight() - 6, 500);
-			renderLoreIcon(matrixStackIn, hasFullLore);
-			matrixStackIn.popPose();
-		}
-		
-		// Enchantable?
-		if (SpellAction.isEnchantable(stack)) {
-			matrixStackIn.pushPose();
-			matrixStackIn.translate(event.getX() + event.getWidth() - 8, event.getY() - 16, 500);
-			renderEnchantableIcon(matrixStackIn);
-			matrixStackIn.popPose();
-		}
-		
-		// Configurable?
-		if (ModificationTableBlock.IsModifiable(stack)) {
-			matrixStackIn.pushPose();
-			matrixStackIn.translate(event.getX() - 15, event.getY() + event.getHeight() - 8, 500);
-			renderConfigurableIcon(matrixStackIn);
-			matrixStackIn.popPose();
-		}
-		
-		// Transmutable?
-		if (Transmutation.IsTransmutable(stack.getItem())) {
-			matrixStackIn.pushPose();
-			matrixStackIn.translate(event.getX() - 15, event.getY() - 16, 500);
-			renderTransmutableIcon(matrixStackIn);
-			matrixStackIn.popPose();
-		}
-	}
-		
 	
 	protected void renderRoots(PoseStack matrixStackIn, LivingEntity entity) {
 		if (entity.tickCount % 4 == 0) {

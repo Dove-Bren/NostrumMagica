@@ -3,13 +3,15 @@ package com.smanzana.nostrummagica.init;
 import java.util.Map;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.datafixers.util.Either;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.ModificationTableBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
 import com.smanzana.nostrummagica.block.dungeon.TogglePlatformBlock;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.RainbowItemColor;
 import com.smanzana.nostrummagica.client.effects.ClientEffectIcon;
-import com.smanzana.nostrummagica.client.gui.EnchantableHintTooltipComponent;
 import com.smanzana.nostrummagica.client.gui.ISpellCraftPatternRenderer;
 import com.smanzana.nostrummagica.client.gui.SpellCraftPatternAutoRenderer;
 import com.smanzana.nostrummagica.client.gui.container.ActiveHopperGui;
@@ -27,6 +29,11 @@ import com.smanzana.nostrummagica.client.gui.container.RuneBagGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneLibraryGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneShaperGui;
 import com.smanzana.nostrummagica.client.gui.container.SilverMirrorGui;
+import com.smanzana.nostrummagica.client.gui.tooltip.AbsoluteTooltipComponent;
+import com.smanzana.nostrummagica.client.gui.tooltip.ConfigurableHintTooltipComponent;
+import com.smanzana.nostrummagica.client.gui.tooltip.EnchantableHintTooltipComponent;
+import com.smanzana.nostrummagica.client.gui.tooltip.LoreHintTooltipComponent;
+import com.smanzana.nostrummagica.client.gui.tooltip.TransmutableHintTooltipComponent;
 import com.smanzana.nostrummagica.client.gui.widget.QuickMoveBagButton;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed;
@@ -92,7 +99,10 @@ import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 import com.smanzana.nostrummagica.fluid.NostrumFluids;
-import com.smanzana.nostrummagica.item.EnchantableHintTooltip;
+import com.smanzana.nostrummagica.inventory.tooltip.ConfigurableHintTooltip;
+import com.smanzana.nostrummagica.inventory.tooltip.EnchantableHintTooltip;
+import com.smanzana.nostrummagica.inventory.tooltip.LoreHintTooltip;
+import com.smanzana.nostrummagica.inventory.tooltip.TransmutableHintTooltip;
 import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
@@ -107,9 +117,12 @@ import com.smanzana.nostrummagica.item.equipment.MirrorShield;
 import com.smanzana.nostrummagica.item.equipment.MirrorShieldImproved;
 import com.smanzana.nostrummagica.item.equipment.SoulDagger;
 import com.smanzana.nostrummagica.item.equipment.ThanosStaff;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
+import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.component.Transmutation;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.spellcraft.pattern.NostrumSpellCraftPatterns;
 import com.smanzana.nostrummagica.tile.NostrumTileEntities;
@@ -138,6 +151,7 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Block;
@@ -150,6 +164,7 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
+import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
@@ -191,8 +206,8 @@ public class ClientInit {
 		// Note that it's on the game event bus, so it has to be registered special
 		MinecraftForge.EVENT_BUS.addListener(ClientInit::registerCommands);
 		MinecraftForge.EVENT_BUS.addListener(QuickMoveBagButton::OnContainerScreenShow);
-		MinecraftForge.EVENT_BUS.addListener(EnchantableHintTooltip::InjectTooltip);
-		MinecraftForge.EVENT_BUS.addListener(EnchantableHintTooltipComponent::CaptureTooltipDimensions);
+		MinecraftForge.EVENT_BUS.addListener(ClientInit::InjectTooltips);
+		MinecraftForge.EVENT_BUS.addListener(AbsoluteTooltipComponent::CaptureTooltipDimensions);
 		
 		registerBlockRenderLayer();
 		//registerEntityRenderers();
@@ -210,6 +225,10 @@ public class ClientInit {
     	proxy.getOverlayRenderer().registerLayers();
     	
     	MinecraftForgeClient.registerTooltipComponentFactory(EnchantableHintTooltip.class, EnchantableHintTooltipComponent::new);
+    	MinecraftForgeClient.registerTooltipComponentFactory(ConfigurableHintTooltip.class, ConfigurableHintTooltipComponent::new);
+    	MinecraftForgeClient.registerTooltipComponentFactory(TransmutableHintTooltip.class, TransmutableHintTooltipComponent::new);
+    	MinecraftForgeClient.registerTooltipComponentFactory(LoreHintTooltip.class, LoreHintTooltipComponent::new);
+    	
     }
 	
 	// Subscribed to game bus in #clientSetup
@@ -690,5 +709,53 @@ public class ClientInit {
 	
 	public static final NostrumItemSpecialRenderer makeSpellPatternTomeRenderer() {
 		return NostrumItemSpecialRenderer.INSTANCE;
+	}
+	
+	// Subscribed in client init
+	public static final void InjectTooltips(RenderTooltipEvent.GatherComponents event) {
+		// All of these require magic to be unlocked
+		Minecraft mc = Minecraft.getInstance();
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(mc.player);
+		if (attr == null || !attr.isUnlocked()) {
+			return;
+		}
+		
+		final ItemStack stack = event.getStack();
+		if (SpellAction.isEnchantable(stack)) {
+			event.getTooltipElements().add(Either.right(new EnchantableHintTooltip()));
+		}
+		if (ModificationTableBlock.IsModifiable(stack)) {
+			event.getTooltipElements().add(Either.right(new ConfigurableHintTooltip()));
+		}
+		if (Transmutation.IsTransmutable(stack.getItem())) {
+			event.getTooltipElements().add(Either.right(new TransmutableHintTooltip()));
+		}
+		
+		// Lore icon
+		final ILoreTagged tag;
+		if (stack.getItem() instanceof BlockItem) {
+			if (!(((BlockItem) stack.getItem()).getBlock() instanceof ILoreTagged)) {
+				tag = null;
+			} else {
+				tag = (ILoreTagged) ((BlockItem) stack.getItem()).getBlock();
+			}
+		} else if (!(stack.getItem() instanceof ILoreTagged)) {
+			tag = null;
+		} else {
+			tag = (ILoreTagged) stack.getItem();
+		}
+		
+		if (tag != null) {
+			final LoreHintTooltip.LoreLevel level;
+			if (attr.hasFullLore(tag)) {
+				level = LoreHintTooltip.LoreLevel.FULL;
+			} else if (attr.hasLore(tag)) {
+				level = LoreHintTooltip.LoreLevel.BASIC;
+			} else {
+				level = LoreHintTooltip.LoreLevel.NONE;
+			}
+			
+			event.getTooltipElements().add(Either.right(new LoreHintTooltip(level)));
+		}
 	}
 }

@@ -1,0 +1,10 @@
+package com.smanzana.nostrummagica.inventory.tooltip;
+
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
+
+public class EnchantableHintTooltip implements TooltipComponent {
+	
+	public EnchantableHintTooltip() {
+		
+	}
+}
