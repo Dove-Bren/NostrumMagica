@@ -9,19 +9,18 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.core.Registry;
 import net.minecraftforge.registries.ForgeRegistries;
-
-import net.minecraft.core.particles.ParticleOptions.Deserializer;
 
 public class NostrumParticleData implements ParticleOptions {
 	
+	@SuppressWarnings("deprecation")
 	public static final Deserializer<NostrumParticleData> DESERIALIZER = new Deserializer<NostrumParticleData>() {
 
 		@Override
@@ -38,6 +37,10 @@ public class NostrumParticleData implements ParticleOptions {
 		
 	};
 	
+	
+	// Note: This sucks. BUT apparently it's only for if you were to try and use the particle in a biome.
+	// It sucks that we have to have the particle_type be in here since it's outside of these params too (which is how
+	// the vanilla deserialization engine found this CODEC) but whatever.
 	public static final Codec<NostrumParticleData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			ResourceLocation.CODEC.fieldOf("particle_type").forGetter((d) -> d.getType().getRegistryName()),
 			SpawnParams.CODEC.fieldOf("params").forGetter(NostrumParticleData::getParams)

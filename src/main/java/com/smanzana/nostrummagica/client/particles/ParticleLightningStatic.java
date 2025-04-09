@@ -1,45 +1,28 @@
 package com.smanzana.nostrummagica.client.particles;
 
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
-public class ParticleLightningStatic extends BatchRenderParticle {
-	
-	private static final ResourceLocation[] TEX_1_LOCS = new ResourceLocation[] {
-			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning1_0.png"),
-			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning1_1.png"),
-			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning1_2.png"),
-			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning1_3.png"),
-	};
-	private static final ResourceLocation[] TEX_2_LOCS = new ResourceLocation[] {
-			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning2_0.png"),
-			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning2_1.png"),
-			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning2_2.png"),
-			new ResourceLocation(NostrumMagica.MODID, "textures/effects/lightning2_3.png"),
-	};
+public class ParticleLightningStatic extends TextureSheetParticle {
 	
 	protected final float maxAlpha;
 	protected Vec3 targetPos;
 	protected Entity targetEntity;
 	protected boolean dieOnTarget;
 	
-	protected int type;
-	protected int ticksExisted;
+	protected final SpriteSet sprites;
 	
-	public ParticleLightningStatic(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
+	public ParticleLightningStatic(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime,
+			SpriteSet sprites) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
 		rCol = red;
@@ -48,8 +31,11 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 		this.alpha = 0f;
 		this.maxAlpha = alpha;
 		this.lifetime = lifetime;
+		this.sprites = sprites;
 		
-		type = NostrumMagica.rand.nextInt(2);
+		this.setSpriteFromAge(sprites);
+		
+		this.quadSize = .05f;
 	}
 	
 	public ParticleLightningStatic setGravity(boolean gravity) {
@@ -95,67 +81,11 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 		this.dieOnTarget = die;
 	}
 	
-	protected float getDisplayProgress() {
-		return (float) age / (float) lifetime;
-	}
-	
-	protected static int GetDisplayFrame(float progress, int count) {
-		return progress < 1f ? (int) (progress * count) : count-1;
-	}
-	
-	protected ResourceLocation[] getAnimationTextures(int type) {
-		switch (type) {
-		default:
-		case 0: return TEX_1_LOCS;
-		case 1: return TEX_2_LOCS;
-		}
-	}
-	
-	@Override
-	public ResourceLocation getTexture() {
-		final ResourceLocation[] textures = getAnimationTextures(type);
-		return textures[GetDisplayFrame(getDisplayProgress(), textures.length)];
-	}
-
-	@Override
-	public void setupBatchedRender() {
-		RenderSystem.depthMask(false);
-		RenderSystem.enableDepthTest();
-		RenderSystem.enableBlend();
-		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		//RenderSystem.alphaFunc(GL11.GL_GREATER, 0);
-		//RenderSystem.disableLighting();
-		// Texture set up by batch renderer but would need to be here if this were a real particlerendertype
-		
-	}
-	
-	@Override
-	public void teardownBatchedRender() {
-		//RenderSystem.alphaFunc(GL11.GL_GREATER, 0.1F); // idk where this was copied from
-		RenderSystem.disableBlend();
-		RenderSystem.depthMask(true);
-	}
-	
-	@Override
-	public int hashCode() {
-		final ResourceLocation[] textures = getAnimationTextures(type);
-		final int idx = GetDisplayFrame(getDisplayProgress(), textures.length);
-		return type * 419 + 311 * idx + 19;
-	}
-
-	@Override
-	public int compareTo(BatchRenderParticle o) {
-		return hashCode() - o.hashCode();
-	}
-
-	@Override
-	public void renderBatched(PoseStack matrixStackIn, VertexConsumer buffer, Camera renderInfo, float partialTicks) {
-		BatchRenderParticle.RenderQuad(matrixStackIn, buffer, this, renderInfo, partialTicks, .05f);
-	}
-	
 	@Override
 	public void tick() {
 		super.tick();
+		
+		this.setSpriteFromAge(sprites);
 		
 		if (this.age < 20) {
 			// fade in in first second
@@ -181,11 +111,16 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 		}
 	}
+
+	@Override
+	public ParticleRenderType getRenderType() {
+		return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+	}
 	
 	public static final class Factory implements INostrumParticleFactory<ParticleLightningStatic> {
 
 		@Override
-		public ParticleLightningStatic createParticle(ClientLevel world, SpawnParams params) {
+		public ParticleLightningStatic createParticle(ClientLevel world, SpriteSet sprites, SpawnParams params) {
 			ParticleLightningStatic particle = null;
 			for (int i = 0; i < params.count; i++) {
 				final double spawnX = params.spawnX + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
@@ -195,7 +130,7 @@ public class ParticleLightningStatic extends BatchRenderParticle {
 						? new float[] {.2f, .4f, 1f, .3f}
 						: ColorUtil.ARGBToColor(params.color));
 				final int lifetime = params.lifetime + (params.lifetimeJitter > 0 ? NostrumMagica.rand.nextInt(params.lifetimeJitter) : 0);
-				particle = new ParticleLightningStatic(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime);
+				particle = new ParticleLightningStatic(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime, sprites);
 				
 				if (params.targetEntID != null) {
 					particle.setTarget(world.getEntity(params.targetEntID));

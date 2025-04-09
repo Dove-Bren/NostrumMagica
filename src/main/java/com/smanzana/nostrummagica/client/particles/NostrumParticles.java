@@ -13,7 +13,6 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.NetUtils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -33,15 +32,11 @@ public enum NostrumParticles {
 	WARD(new NostrumParticleType("ward"), ParticleWard.Factory.class),
 	;
 	
-	public static final FilledOrbParticleType FilledOrb = new FilledOrbParticleType();
-	
 	@SubscribeEvent
 	public static void registerParticles(RegistryEvent.Register<ParticleType<?>> event) {
 		for (NostrumParticles p : NostrumParticles.values()) {
 			event.getRegistry().register(p.getType());
 		}
-		
-		event.getRegistry().register(FilledOrb.setRegistryName(NostrumMagica.Loc("filled_orb_vanilla")));
 	}
 	
 	private final NostrumParticleType type;
@@ -107,10 +102,11 @@ public enum NostrumParticles {
 			final Minecraft mc = Minecraft.getInstance();
 			if (mc.gameRenderer.getMainCamera().getPosition().distanceToSqr(params.spawnX, params.spawnY, params.spawnZ)
 					<  50 * 50) {
-				INostrumParticleFactory<?> factory = type.getFactory();
-				if (factory != null) {
-					factory.createParticle((ClientLevel) world, params);
-				}
+//				INostrumParticleFactory<?> factory = type.getFactory();
+//				if (factory != null) {
+//					factory.createParticle((ClientLevel) world, mc.particleEngine., params);
+//				}
+				world.addParticle(new NostrumParticleData(type.getType(), params), true, params.spawnX, params.spawnY, params.spawnZ, 0, 0, 0);
 			}
 		}
 	}

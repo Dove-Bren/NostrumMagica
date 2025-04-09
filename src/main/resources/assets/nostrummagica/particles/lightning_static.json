@@ -1,2 +1,8 @@
 {
+	"textures": [
+		"nostrummagica:lightning1_0",
+		"nostrummagica:lightning1_1",
+		"nostrummagica:lightning1_2",
+		"nostrummagica:lightning1_3"
+	]
 }

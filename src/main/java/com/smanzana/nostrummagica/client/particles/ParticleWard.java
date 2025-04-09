@@ -1,25 +1,19 @@
 package com.smanzana.nostrummagica.client.particles;
 
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
-public class ParticleWard extends BatchRenderParticle {
-	
-	private static final ResourceLocation TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/effects/hexa_shield.png");
+public class ParticleWard extends TextureSheetParticle {
 	
 	protected final float maxAlpha;
 	protected Vec3 targetPos; // Absolute position to move to (if targetEntity == null) or offset from entity to go to
@@ -27,7 +21,9 @@ public class ParticleWard extends BatchRenderParticle {
 	protected boolean dieOnTarget;
 	protected TargetBehavior entityBehavior;
 	
-	public ParticleWard(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
+	protected final SpriteSet sprites;
+	
+	public ParticleWard(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime, SpriteSet sprites) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
 		rCol = red;
@@ -36,6 +32,10 @@ public class ParticleWard extends BatchRenderParticle {
 		this.alpha = 0f;
 		this.maxAlpha = alpha;
 		this.lifetime = lifetime;
+		
+		this.quadSize = .1f;
+		this.sprites = sprites;
+		this.setSpriteFromAge(sprites);
 	}
 	
 	public ParticleWard setGravity(boolean gravity) {
@@ -93,59 +93,10 @@ public class ParticleWard extends BatchRenderParticle {
 	}
 	
 	@Override
-	public ResourceLocation getTexture() {
-		return TEX_LOC;
-	}
-
-	@Override
-	public void setupBatchedRender() {
-//		GlStateManager.disableBlend();
-//		GlStateManager.enableBlend();
-//		GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-//		GlStateManager.disableAlphaTest();
-//		GlStateManager.enableAlphaTest();
-//		GlStateManager.enableLighting();
-//		GlStateManager.disableLighting();
-//		GlStateManager.alphaFunc(516, 0);
-//		GlStateManager.color4f(1f, 1f, 1f, .75f);
-//		GlStateManager.depthMask(false);
-//		//OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240, 240);
-		RenderSystem.depthMask(false);
-		RenderSystem.enableDepthTest();
-		RenderSystem.enableBlend();
-		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		//RenderSystem.alphaFunc(GL11.GL_GREATER, 0);
-		//RenderSystem.disableLighting();
-		// Texture set up by batch renderer but would need to be here if this were a real particlerendertype
-		
-	}
-	
-	@Override
-	public void teardownBatchedRender() {
-		//RenderSystem.alphaFunc(GL11.GL_GREATER, 0.1F); // idk where this was copied from
-		RenderSystem.disableBlend();
-		RenderSystem.depthMask(true);
-	}
-	
-	@Override
-	public int hashCode() {
-		return 47 * 419 + 5119;
-	}
-
-	@Override
-	public int compareTo(BatchRenderParticle o) {
-		return hashCode() - o.hashCode();
-	}
-
-	@Override
-	public void renderBatched(PoseStack matrixStackIn, VertexConsumer buffer, Camera renderInfo, float partialTicks) {
-		BatchRenderParticle.RenderQuad(matrixStackIn, buffer, this, renderInfo, partialTicks, .1f);
-		//BatchRenderParticle.RenderQuad(buffer, this, renderParams, partialTicks, .05f);
-	}
-	
-	@Override
 	public void tick() {
 		super.tick();
+		
+		this.setSpriteFromAge(sprites);
 		
 		if (this.age < 20) {
 			// fade in in first second
@@ -197,11 +148,16 @@ public class ParticleWard extends BatchRenderParticle {
 			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 		}
 	}
+
+	@Override
+	public ParticleRenderType getRenderType() {
+		return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+	}
 	
 	public static final class Factory implements INostrumParticleFactory<ParticleWard> {
 
 		@Override
-		public ParticleWard createParticle(ClientLevel world, SpawnParams params) {
+		public ParticleWard createParticle(ClientLevel world, SpriteSet sprites, SpawnParams params) {
 			ParticleWard particle = null;
 			for (int i = 0; i < params.count; i++) {
 				final double spawnX = params.spawnX + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
@@ -211,7 +167,7 @@ public class ParticleWard extends BatchRenderParticle {
 						? new float[] {.2f, .4f, 1f, .3f}
 						: ColorUtil.ARGBToColor(params.color));
 				final int lifetime = params.lifetime + (params.lifetimeJitter > 0 ? NostrumMagica.rand.nextInt(params.lifetimeJitter) : 0);
-				particle = new ParticleWard(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime);
+				particle = new ParticleWard(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime, sprites);
 				
 				if (params.targetEntID != null) {
 					particle.setTarget(world.getEntity(params.targetEntID));

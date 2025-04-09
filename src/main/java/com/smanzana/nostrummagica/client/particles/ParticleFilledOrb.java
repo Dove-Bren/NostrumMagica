@@ -1,31 +1,27 @@
 package com.smanzana.nostrummagica.client.particles;
 
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
-public class ParticleFilledOrb extends BatchRenderParticle {
+public class ParticleFilledOrb extends TextureSheetParticle {
 	
-	private static final ResourceLocation TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/effects/filled_orb.png");
 	
 	protected final float maxAlpha;
 	protected Vec3 targetPos; // Absolute position to move to (if targetEntity == null) or offset from entity to go to
 	protected Entity targetEntity;
 	protected boolean dieOnTarget;
+	protected final SpriteSet sprite;
 	
-	public ParticleFilledOrb(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
+	public ParticleFilledOrb(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime, SpriteSet sprite) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
 		rCol = red;
@@ -34,6 +30,11 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 		this.alpha = 0f;
 		this.maxAlpha = alpha;
 		this.lifetime = lifetime;
+		this.sprite = sprite;
+		
+		this.quadSize = 0.05f;
+		
+		this.setSpriteFromAge(sprite);
 	}
 	
 	public ParticleFilledOrb setGravity(boolean gravity) {
@@ -87,47 +88,15 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 	}
 	
 	@Override
-	public ResourceLocation getTexture() {
-		return TEX_LOC;
-	}
-
-	@Override
-	public void setupBatchedRender() {
-		RenderSystem.depthMask(false);
-		RenderSystem.enableDepthTest();
-		RenderSystem.enableBlend();
-		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		//RenderSystem.alphaFunc(GL11.GL_GREATER, 0);
-		//RenderSystem.disableLighting();
-		// Texture set up by batch renderer but would need to be here if this were a real particlerendertype
-		
-	}
-	
-	@Override
-	public void teardownBatchedRender() {
-		//RenderSystem.alphaFunc(GL11.GL_GREATER, 0.1F); // idk where this was copied from
-		RenderSystem.disableBlend();
-		RenderSystem.depthMask(true);
-	}
-	
-	@Override
 	public int hashCode() {
 		return 29 * 419 + 5119;
 	}
 
 	@Override
-	public int compareTo(BatchRenderParticle o) {
-		return hashCode() - o.hashCode();
-	}
-
-	@Override
-	public void renderBatched(PoseStack matrixStackIn, VertexConsumer buffer, Camera renderInfo, float partialTicks) {
-		BatchRenderParticle.RenderQuad(matrixStackIn, buffer, this, renderInfo, partialTicks, .05f);
-	}
-	
-	@Override
 	public void tick() {
 		super.tick();
+		
+		this.setSpriteFromAge(sprite);
 		
 		if (this.age < 20) {
 			// fade in in first second
@@ -164,7 +133,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 	public static final class Factory implements INostrumParticleFactory<ParticleFilledOrb> {
 
 		@Override
-		public ParticleFilledOrb createParticle(ClientLevel world, SpawnParams params) {
+		public ParticleFilledOrb createParticle(ClientLevel world, SpriteSet sprites, SpawnParams params) {
 			ParticleFilledOrb particle = null;
 			for (int i = 0; i < params.count; i++) {
 				final double spawnX = params.spawnX + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
@@ -174,7 +143,7 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 						? new float[] {.2f, .4f, 1f, .3f}
 						: ColorUtil.ARGBToColor(params.color));
 				final int lifetime = params.lifetime + (params.lifetimeJitter > 0 ? NostrumMagica.rand.nextInt(params.lifetimeJitter) : 0);
-				particle = new ParticleFilledOrb(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime);
+				particle = new ParticleFilledOrb(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime, sprites);
 				
 				if (params.targetEntID != null) {
 					particle.setTarget(world.getEntity(params.targetEntID));
@@ -197,4 +166,9 @@ public class ParticleFilledOrb extends BatchRenderParticle {
 		
 	}
 
+	@Override
+	public ParticleRenderType getRenderType() {
+		return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+	}
+	
 }

@@ -384,10 +384,10 @@ public class ClientInit {
 		ParticleEngine manager = mc.particleEngine;
 		
 		for (NostrumParticles particle : NostrumParticles.values()) {
-			manager.register(particle.getType(), new ParticleProvider<NostrumParticleData>() {
+			manager.register(particle.getType(), (sprites) -> new ParticleProvider<NostrumParticleData>() {
 				@Override
 				public Particle createParticle(NostrumParticleData typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-					return particle.getFactory().createParticle(worldIn, typeIn.getParams());
+					return particle.getFactory().createParticle(worldIn, sprites, typeIn.getParams());
 				}
 			});
 		}

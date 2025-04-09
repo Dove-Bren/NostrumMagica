@@ -92,52 +92,25 @@ public abstract class BatchRenderParticle extends Particle implements Comparable
 	}
 	
 	public static void RenderQuad(PoseStack matrixStackIn, VertexConsumer buffer, BatchRenderParticle particle, Camera renderInfo, float partialTicks, float scale) {
-		Vec3 originPos = renderInfo.getPosition();
-		final float offsetX = (float)((particle.xo + (particle.getPosX() - particle.xo) * partialTicks) - originPos.x()); // could use MathHelper.lerp
-		final float offsetY = (float)((particle.yo + (particle.getPosY() - particle.yo) * partialTicks) - originPos.y());
-		final float offsetZ = (float)((particle.zo + (particle.getPosZ() - particle.zo) * partialTicks) - originPos.z());
-		final float radius = /*particle.particleScale*/1 * scale;
 		final int lightmap = particle.getLightColor(partialTicks);
+		
+		RenderQuad(matrixStackIn, buffer, renderInfo, partialTicks, scale, particle.getPosX(), particle.getPosY(), particle.getPosZ(),
+				particle.xo, particle.yo, particle.zo, lightmap, particle.rCol, particle.gCol, particle.bCol, particle.alpha);
+	}
+	
+	public static void RenderQuad(PoseStack matrixStackIn, VertexConsumer buffer, Camera renderInfo, float partialTicks, float scale,
+			double x, double y, double z, double x0, double y0, double z0, int lightmap, float red, float green, float blue, float alpha) {
+		Vec3 originPos = renderInfo.getPosition();
+		final float offsetX = (float)((x0 + (x - x0) * partialTicks) - originPos.x()); // could use MathHelper.lerp
+		final float offsetY = (float)((y0 + (y - y0) * partialTicks) - originPos.y());
+		final float offsetZ = (float)((z0 + (z - z0) * partialTicks) - originPos.z());
+		final float radius = /*particle.particleScale*/1 * scale;
 		
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(offsetX, offsetY, offsetZ);
 		
-		RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, renderInfo, radius, lightmap, OverlayTexture.NO_OVERLAY, particle.rCol, particle.gCol, particle.bCol, particle.alpha);
+		RenderFuncs.renderSpaceQuadFacingCamera(matrixStackIn, buffer, renderInfo, radius, lightmap, OverlayTexture.NO_OVERLAY, red, green, blue, alpha);
 		matrixStackIn.popPose();
-		
-//		buffer.pos(offsetX - (rX * radius) - (rXY * radius), offsetY - (rZ * radius), offsetZ - (rYZ * radius) - (rXZ * radius))
-//			.tex(0, 0)
-//			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
-//			.normal(0, 0, 1).endVertex();
-//		buffer.pos(offsetX - (rX * radius) + (rXY * radius), offsetY + (rZ * radius), offsetZ - (rYZ * radius) + (rXZ * radius))
-//			.tex(0, 1)
-//			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
-//			.normal(0, 0, 1).endVertex();
-//		buffer.pos(offsetX + (rX * radius) + (rXY * radius), offsetY + (rZ * radius), offsetZ + (rYZ * radius) + (rXZ * radius))
-//			.tex(1, 1)
-//			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
-//			.normal(0, 0, 1).endVertex();
-//		buffer.pos(offsetX + (rX * radius) - (rXY * radius), offsetY - (rZ * radius), offsetZ + (rYZ * radius) - (rXZ * radius))
-//			.tex(1, 0)
-//			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
-//			.normal(0, 0, 1).endVertex();
-		
-//		buffer.pos(offsetX - (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ - (rZ * radius) - (rXY * radius))
-//			.tex(0, 0)
-//			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
-//			.normal(0, 0, 1).endVertex();
-//		buffer.pos(offsetX - (rX * radius) + (rYZ * radius), offsetY + (rXZ * radius), offsetZ - (rZ * radius) + (rXY * radius))
-//			.tex(0, 1)
-//			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
-//			.normal(0, 0, 1).endVertex();
-//		buffer.pos(offsetX + (rX * radius) + (rYZ * radius), offsetY + (rXZ * radius), offsetZ + (rZ * radius) + (rXY * radius))
-//			.tex(1, 1)
-//			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
-//			.normal(0, 0, 1).endVertex();
-//		buffer.pos(offsetX + (rX * radius) - (rYZ * radius), offsetY - (rXZ * radius), offsetZ + (rZ * radius) - (rXY * radius))
-//			.tex(1, 0)
-//			.color(particle.particleRed, particle.particleGreen, particle.particleBlue, particle.particleAlpha)
-//			.normal(0, 0, 1).endVertex();
 	}
 	
 }

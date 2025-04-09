@@ -3,8 +3,11 @@ package com.smanzana.nostrummagica.client.particles;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
@@ -13,13 +16,15 @@ import com.smanzana.nostrummagica.util.ColorUtil;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
-public class ParticleGlowOrb extends BatchRenderParticle {
-	
-	private static final ResourceLocation TEX_LOC = new ResourceLocation(NostrumMagica.MODID, "textures/effects/glow_orb.png");
+public class ParticleGlowOrb extends TextureSheetParticle {
 	
 	protected final float maxAlpha;
 	protected Vec3 targetPos;
@@ -29,7 +34,9 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	protected float orbitRadius;
 	private float fixedRandom; // Only generated when needed, hopefully. -1 means not generated
 	
-	public ParticleGlowOrb(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime) {
+	protected final SpriteSet sprites;
+	
+	public ParticleGlowOrb(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime, SpriteSet sprites) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
 		rCol = red;
@@ -39,6 +46,10 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 		this.maxAlpha = alpha;
 		this.lifetime = lifetime;
 		fixedRandom = -1f;
+		
+		this.quadSize = .1f;
+		this.sprites = sprites;
+		this.setSpriteFromAge(sprites);
 	}
 	
 	public ParticleGlowOrb setGravity(boolean gravity) {
@@ -99,11 +110,6 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 		this.orbitRadius = radius;
 	}
 	
-	@Override
-	public ResourceLocation getTexture() {
-		return TEX_LOC;
-	}
-	
 	protected float fixedRandom() {
 		if (this.fixedRandom == -1f) {
 			fixedRandom = NostrumMagica.rand.nextFloat();
@@ -113,43 +119,15 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 	}
 
 	@Override
-	public void setupBatchedRender() {
-		RenderSystem.depthMask(false);
-		RenderSystem.enableDepthTest();
-		RenderSystem.enableBlend();
-		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-		//RenderSystem.alphaFunc(GL11.GL_GREATER, 0);
-		//RenderSystem.disableLighting();
-		// Texture set up by batch renderer but would need to be here if this were a real particlerendertype
-		
-	}
-	
-	@Override
-	public void teardownBatchedRender() {
-		//RenderSystem.alphaFunc(GL11.GL_GREATER, 0.1F); // idk where this was copied from
-		RenderSystem.disableBlend();
-		RenderSystem.depthMask(true);
-	}
-	
-	@Override
-	public int hashCode() {
-		return 37 * 419 + 5119;
-	}
-
-	@Override
-	public int compareTo(BatchRenderParticle o) {
-		return hashCode() - o.hashCode();
-	}
-
-	@Override
-	public void renderBatched(PoseStack matrixStackIn, VertexConsumer buffer, Camera renderInfo, float partialTicks) {
-		BatchRenderParticle.RenderQuad(matrixStackIn, buffer, this, renderInfo, partialTicks, .1f);
-		BatchRenderParticle.RenderQuad(matrixStackIn, buffer, this, renderInfo, partialTicks, .05f);
+	public ParticleRenderType getRenderType() {
+		return GlowOrbRenderType;
 	}
 	
 	@Override
 	public void tick() {
 		super.tick();
+		
+		this.setSpriteFromAge(sprites);
 		
 		if (this.age < 20) {
 			// fade in in first second
@@ -226,10 +204,43 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 		}
 	}
 	
+	@Override
+	public void render(VertexConsumer buffer, Camera camera, float partialTicks) {
+		//BatchRenderParticle.RenderQuad(matrixStackIn, buffer, this, renderInfo, partialTicks, .1f);
+		//BatchRenderParticle.RenderQuad(matrixStackIn, buffer, this, renderInfo, partialTicks, .05f);
+		this.quadSize = .1f;
+		super.render(buffer, camera, partialTicks);
+//		this.quadSize = .05f;
+//		super.render(buffer, camera, partialTicks);
+	}
+	
+	protected static ParticleRenderType GlowOrbRenderType = new ParticleRenderType() {
+
+		@SuppressWarnings("deprecation")
+		@Override
+		public void begin(BufferBuilder bufferBuilder, TextureManager textureManager) {
+			RenderSystem.depthMask(false);
+			RenderSystem.enableDepthTest();
+			RenderSystem.enableBlend();
+			RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+			//RenderSystem.alphaFunc(GL11.GL_GREATER, 0);
+			//RenderSystem.disableLighting();
+			// Texture set up by batch renderer but would need to be here if this were a real particlerendertype
+			RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
+			bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
+		}
+
+		@Override
+		public void end(Tesselator tessellator) {
+			tessellator.end();
+		}
+		
+	};
+	
 	public static final class Factory implements INostrumParticleFactory<ParticleGlowOrb> {
 
 		@Override
-		public ParticleGlowOrb createParticle(ClientLevel world, SpawnParams params) {
+		public ParticleGlowOrb createParticle(ClientLevel world, SpriteSet sprites, SpawnParams params) {
 			ParticleGlowOrb particle = null;
 			for (int i = 0; i < params.count; i++) {
 				final double spawnX = params.spawnX + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
@@ -239,7 +250,7 @@ public class ParticleGlowOrb extends BatchRenderParticle {
 						? new float[] {.2f, .4f, 1f, .3f}
 						: ColorUtil.ARGBToColor(params.color));
 				final int lifetime = params.lifetime + (params.lifetimeJitter > 0 ? NostrumMagica.rand.nextInt(params.lifetimeJitter) : 0);
-				particle = new ParticleGlowOrb(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime);
+				particle = new ParticleGlowOrb(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime, sprites);
 				
 				if (params.targetEntID != null) {
 					particle.setTarget(world.getEntity(params.targetEntID));
