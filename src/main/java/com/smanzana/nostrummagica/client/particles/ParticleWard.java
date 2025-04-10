@@ -154,41 +154,36 @@ public class ParticleWard extends TextureSheetParticle {
 		return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
 	}
 	
-	public static final class Factory implements INostrumParticleFactory<ParticleWard> {
-
-		@Override
-		public ParticleWard createParticle(ClientLevel world, SpriteSet sprites, SpawnParams params) {
-			ParticleWard particle = null;
-			for (int i = 0; i < params.count; i++) {
-				final double spawnX = params.spawnX + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
-				final double spawnY = params.spawnY + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
-				final double spawnZ = params.spawnZ + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
-				final float[] colors = (params.color == null
-						? new float[] {.2f, .4f, 1f, .3f}
-						: ColorUtil.ARGBToColor(params.color));
-				final int lifetime = params.lifetime + (params.lifetimeJitter > 0 ? NostrumMagica.rand.nextInt(params.lifetimeJitter) : 0);
-				particle = new ParticleWard(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime, sprites);
-				
-				if (params.targetEntID != null) {
-					particle.setTarget(world.getEntity(params.targetEntID));
-				}
-				if (params.targetPos != null) {
-					particle.setTarget(params.targetPos);
-				}
-				if (params.velocity != null) {
-					particle.setMotion(params.velocity, params.velocityJitter == null ? Vec3.ZERO : params.velocityJitter);
-				}
-				if (params.gravityStrength != 0f) {
-					particle.setGravityStrength(params.gravityStrength);
-				}
-				particle.dieOnTarget(params.dieOnTarget);
-				particle.setEntityBehavior(params.targetBehavior);
-				Minecraft mc = Minecraft.getInstance();
-				mc.particleEngine.add(particle);
+	public static final ParticleWard MakeParticle(ClientLevel world, SpriteSet sprites, SpawnParams params) {
+		ParticleWard particle = null;
+		for (int i = 0; i < params.count; i++) {
+			final double spawnX = params.spawnX + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
+			final double spawnY = params.spawnY + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
+			final double spawnZ = params.spawnZ + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
+			final float[] colors = (params.color == null
+					? new float[] {.2f, .4f, 1f, .3f}
+					: ColorUtil.ARGBToColor(params.color));
+			final int lifetime = params.lifetime + (params.lifetimeJitter > 0 ? NostrumMagica.rand.nextInt(params.lifetimeJitter) : 0);
+			particle = new ParticleWard(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime, sprites);
+			
+			if (params.targetEntID != null) {
+				particle.setTarget(world.getEntity(params.targetEntID));
 			}
-			return particle;
+			if (params.targetPos != null) {
+				particle.setTarget(params.targetPos);
+			}
+			if (params.velocity != null) {
+				particle.setMotion(params.velocity, params.velocityJitter == null ? Vec3.ZERO : params.velocityJitter);
+			}
+			if (params.gravityStrength != 0f) {
+				particle.setGravityStrength(params.gravityStrength);
+			}
+			particle.dieOnTarget(params.dieOnTarget);
+			particle.setEntityBehavior(params.targetBehavior);
+			Minecraft mc = Minecraft.getInstance();
+			mc.particleEngine.add(particle);
 		}
-		
+		return particle;
 	}
 
 }

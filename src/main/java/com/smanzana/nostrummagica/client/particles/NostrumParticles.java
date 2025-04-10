@@ -1,7 +1,5 @@
 package com.smanzana.nostrummagica.client.particles;
 
-import java.lang.reflect.InvocationTargetException;
-
 import javax.annotation.Nullable;
 
 import com.mojang.serialization.Codec;
@@ -26,10 +24,10 @@ import net.minecraftforge.fmllegacy.network.PacketDistributor.TargetPoint;
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum NostrumParticles {
 
-	GLOW_ORB(new NostrumParticleType("glow_orb"), ParticleGlowOrb.Factory.class),
-	LIGHTNING_STATIC(new NostrumParticleType("lightning_static"), ParticleLightningStatic.Factory.class),
-	FILLED_ORB(new NostrumParticleType("filled_orb"), ParticleFilledOrb.Factory.class),
-	WARD(new NostrumParticleType("ward"), ParticleWard.Factory.class),
+	GLOW_ORB(new NostrumParticleType("glow_orb"), ParticleGlowOrb::MakeParticle),
+	LIGHTNING_STATIC(new NostrumParticleType("lightning_static"), ParticleLightningStatic::MakeParticle),
+	FILLED_ORB(new NostrumParticleType("filled_orb"), ParticleFilledOrb::MakeParticle),
+	WARD(new NostrumParticleType("ward"), ParticleWard::MakeParticle),
 	;
 	
 	@SubscribeEvent
@@ -40,43 +38,18 @@ public enum NostrumParticles {
 	}
 	
 	private final NostrumParticleType type;
-	private final Class<? extends INostrumParticleFactory<?>> factoryClazz;
 	private INostrumParticleFactory<?> factory;
 	
-	private <F extends INostrumParticleFactory<?>> NostrumParticles(NostrumParticleType type, Class<F> factoryClazz) {
+	private <F extends INostrumParticleFactory<?>> NostrumParticles(NostrumParticleType type, F factory) {
 		this.type = type;
-		this.factoryClazz = factoryClazz;
+		this.factory = factory;
 	}
 	
 	public NostrumParticleType getType() {
 		return this.type;
 	}
 
-	public @Nullable INostrumParticleFactory<?> getFactory() {
-		if (factory == null) {
-			try {
-				factory = factoryClazz.getDeclaredConstructor().newInstance();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		
+	public INostrumParticleFactory<?> getFactory() {
 		return factory;
 	}
 	

@@ -37,7 +37,6 @@ import com.smanzana.nostrummagica.client.gui.tooltip.TransmutableHintTooltipComp
 import com.smanzana.nostrummagica.client.gui.widget.QuickMoveBagButton;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed;
-import com.smanzana.nostrummagica.client.particles.FilledOrbParticleType;
 import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.render.IEffectRenderer;
@@ -391,8 +390,6 @@ public class ClientInit {
 				}
 			});
 		}
-		
-		manager.register(NostrumParticles.FilledOrb, FilledOrbParticleType.Factory::new);
 	}
 	
 	private static final void registerBlockRenderLayer() {

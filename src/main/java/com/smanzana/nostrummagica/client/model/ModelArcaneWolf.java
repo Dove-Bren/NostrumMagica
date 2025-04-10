@@ -42,7 +42,7 @@ public class ModelArcaneWolf extends WolfModel<ArcaneWolfEntity> {
 		root.addOrReplaceChild("mane", CubeListBuilder.create().texOffs(21, 0).addBox(-3.0F, -3.0F, -3.0F, 8, 6, 7), PartPose.offset(-1.0F, 14.0F, 2.0F));
 		
 		
-		return LayerDefinition.create(mesh, 32, 32);
+		return LayerDefinition.create(mesh, 64, 32);
 	}
 	
 	// Want to use WolfModel's, which used to be public :(

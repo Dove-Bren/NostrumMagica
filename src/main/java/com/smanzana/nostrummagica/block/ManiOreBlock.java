@@ -17,6 +17,7 @@ public class ManiOreBlock extends OreBlock {
 		super(Block.Properties.of(Material.STONE)
 				.strength(2.0f, 30.f)
 				.sound(SoundType.STONE)
+				.requiresCorrectToolForDrops()
 				);
 	}
 	

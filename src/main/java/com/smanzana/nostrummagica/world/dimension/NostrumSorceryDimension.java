@@ -5,7 +5,6 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef.DungeonRoomRef;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -462,25 +461,22 @@ public class NostrumSorceryDimension {
 				
 				int i = ((LivingEntity)entity).getEffect(MobEffects.BLINDNESS).getDuration();
 				float rangeMod = Mth.lerp(Math.min(1.0F, (float)i / 20.0F), farPlaneDistance, 5.0F);
-				final float near;
-				final float far;
 				if (event.getType() == FogRenderer.FogMode.FOG_SKY) {
-					near = 0.0F;
-					far = rangeMod * 0.8F;
-				} else {
-					near = rangeMod * 0.25F;
-					far = rangeMod;
+					rangeMod *= .8f;
 				}
 
 //				RenderSystem.fogStart(near);
 //				RenderSystem.fogEnd(far);
 //				RenderSystem.fogMode(GlStateManager.FogMode.LINEAR);
 //				RenderSystem.setupNvFogDistance();
-				RenderSystem.setShaderFogStart(near);
-				RenderSystem.setShaderFogEnd(far);
-				net.minecraftforge.client.ForgeHooksClient.onFogRender(event.getType(), event.getInfo(), (float) event.getRenderPartialTicks(), far);
+//				RenderSystem.setShaderFogStart(near);
+//				RenderSystem.setShaderFogEnd(far);
+//				net.minecraftforge.client.ForgeHooksClient.onFogRender(event.getType(), event.getInfo(), (float) event.getRenderPartialTicks(), far);
+				
+				event.setDensity(rangeMod * 3);
 			} else {
-				event.setDensity(.03f);
+				// this is the number of blocks/2 that can be seen before th fog completely conceals
+				event.setDensity(128f);
 			}
 		}
 		

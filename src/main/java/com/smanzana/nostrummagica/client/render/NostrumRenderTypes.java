@@ -68,8 +68,6 @@ public class NostrumRenderTypes extends RenderType {
 	private static final RenderStateShard.LightmapStateShard LIGHTMAP_ENABLED = new RenderStateShard.LightmapStateShard(true);
 	private static final RenderStateShard.OverlayStateShard OVERLAY_ENABLED = new RenderStateShard.OverlayStateShard(true);
 	
-	private static final RenderStateShard.ShaderStateShard CUTOUT_SHADER = RenderStateShard.RENDERTYPE_CUTOUT_SHADER;
-	
 	//private static final RenderState.FogState NO_FOG = new RenderState.FogState("no_fog", () -> {}, () -> {});
 	
 	private static final RenderStateShard.LineStateShard LINE_3 = new RenderStateShard.LineStateShard(OptionalDouble.of(3f));

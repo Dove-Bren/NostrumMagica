@@ -73,10 +73,10 @@ public class ModelWitchHat<T extends LivingEntity> extends HumanoidModel<T> {
 	public void renderToBuffer(PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn, int packedOverlayIn,
 			float red, float green, float blue, float alpha) {
 		//this.hat.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn);
-		this.head.visible = false;
-		this.hat.visible = false;
+		this.head.visible = true;
+		this.hat.visible = true;
 		//super.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-		this.hat.copyFrom(this.hat);
+		this.hat.copyFrom(super.hat);
 		//this.hat.setRotationPoint(-5.0F, -10.03125F, -5.0F);
 		//this.hat.setRotationPoint(-4.5f, -10.03125F, -4.5f);
 		this.hat.x = 0f;

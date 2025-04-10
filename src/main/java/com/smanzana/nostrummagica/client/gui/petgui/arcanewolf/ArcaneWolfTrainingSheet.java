@@ -334,7 +334,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 				
 				@Override
 				public boolean mayPlace(ItemStack stack) {
-					return canSetInSlot(pet, index, stack);
+					return canSetInSlot(pet, this.getSlotIndex(), stack);
 				}
 				
 				@Override

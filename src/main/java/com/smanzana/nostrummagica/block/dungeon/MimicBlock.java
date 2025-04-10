@@ -70,6 +70,11 @@ public abstract class MimicBlock extends BaseEntityBlock implements EntityBlock 
 	}
 	
 	@Override
+	public RenderShape getRenderShape(BlockState state) {
+		return RenderShape.MODEL;
+	}
+	
+	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new MimicBlockTileEntity(pos, state);
 	}

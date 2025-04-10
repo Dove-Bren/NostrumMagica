@@ -233,7 +233,6 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 //	    GL11.glLoadIdentity();
 		
 		RenderSystem.viewport(0, 0, mc.getWindow().getScreenWidth(), mc.getWindow().getScreenHeight());
-		int unused; // review!
 //		RenderSystem.matrixMode(GL11.GL_PROJECTION);
 //		RenderSystem.loadIdentity();
 //		RenderSystem.ortho(0.0D, mc.getWindow().getGuiScaledWidth(), mc.getWindow().getGuiScaledHeight(), 0.0D, 1000.0D, ForgeHooksClient.getGuiFarPlane());

@@ -48,7 +48,7 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 			matrixStackIn.translate(offset.x, offset.y, offset.z);
 		}
 		
-		RenderSystem.setShader(GameRenderer::getRendertypeTranslucentShader);
+		RenderSystem.setShader(GameRenderer::getPositionColorTexLightmapShader);
 		int unused; // make this be a passed in thing! Not all are objs!
 		RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
 		

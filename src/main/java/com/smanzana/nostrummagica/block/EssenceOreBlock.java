@@ -29,6 +29,7 @@ public class EssenceOreBlock extends OreBlock {
 		super(Block.Properties.of(Material.STONE)
 				.strength(1.7f, 30.0f)
 				.sound(SoundType.STONE)
+				.requiresCorrectToolForDrops()
 				);
 		
 	}
