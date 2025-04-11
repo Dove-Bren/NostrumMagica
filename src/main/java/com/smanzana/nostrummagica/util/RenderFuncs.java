@@ -512,14 +512,18 @@ public final class RenderFuncs {
 			float red, float green, float blue, float alpha) {
 		
 		final Vec3 diff = end.subtract(start);
+		final Vec3 normVec = diff.normalize();
+		final float nx = (float) normVec.x;
+		final float ny = (float) normVec.y;
+		final float nz = (float) normVec.z;
 		
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(start.x(), start.y(), start.z());
 		final Matrix4f transform = matrixStackIn.last().pose();
 		final Matrix3f normal = matrixStackIn.last().normal();
 		RenderSystem.lineWidth(width);
-		buffer.vertex(transform, 0, 0, 0).color(red, green, blue, alpha).uv(0, 0).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
-		buffer.vertex(transform, (float) diff.x(), (float) diff.y(), (float) diff.z()).color(red, green, blue, alpha).uv(1, 1).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, 0, 1, 0).endVertex();
+		buffer.vertex(transform, 0, 0, 0).color(red, green, blue, alpha).uv(0, 0).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, nx, ny, nz).endVertex();
+		buffer.vertex(transform, (float) diff.x(), (float) diff.y(), (float) diff.z()).color(red, green, blue, alpha).uv(1, 1).overlayCoords(combinedOverlayIn).uv2(combinedLightIn).normal(normal, nx, ny, nz).endVertex();
 		//RenderSystem.lineWidth(1f);
 		matrixStackIn.popPose();
 	}

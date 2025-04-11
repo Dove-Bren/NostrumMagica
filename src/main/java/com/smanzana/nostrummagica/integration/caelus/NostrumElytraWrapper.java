@@ -81,7 +81,6 @@ public class NostrumElytraWrapper {
 	
 	@SubscribeEvent(priority=EventPriority.LOWEST)
 	public static void onRenderElytra(RenderCapeEvent event) {
-		
 		// Cancel if a cape is specifically suppressing it
 		final LivingEntity entity = event.getEntityLiving();
 		final boolean flying = entity.isFallFlying();
@@ -90,23 +89,5 @@ public class NostrumElytraWrapper {
 			event.setCanceled(true);
 			return;
 		}
-		
-		int unused; // REVIEW. Does this work anymore to turn ON rendering?
-		
-//		// Everything from here can only turn ON rendering, so if it's already on go ahead and skip the work.
-//		if (event.canRender()) {
-//			return;
-//		}
-//		
-//		// Check if any equipment uses our interface for things that want to render an elytra
-//		for (@Nonnull ItemStack stack : entity.getAllSlots()) {
-//			if (!stack.isEmpty() && stack.getItem() instanceof IElytraRenderer) {
-//				if (((IElytraRenderer) stack.getItem()).shouldRenderElyta(entity, stack)) {
-//					event.setRender(true);
-//					event.setEnchanted(stack.isEnchanted());
-//					return;
-//				}
-//			}
-//		}
 	}
 }

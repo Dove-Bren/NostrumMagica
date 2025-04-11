@@ -28,7 +28,7 @@ public interface TickableBlockEntity {
 	}
 	
 	public static <E extends BlockEntity & TickableBlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> worldType, BlockEntityType<E> expectedType) {
-		return createTickerHelper(worldType, expectedType, TickableBlockEntity::Tick);
+		return createTickerHelper(worldType, expectedType, (world, pos, state, entity) -> entity.tick());
 	}
 	
 }

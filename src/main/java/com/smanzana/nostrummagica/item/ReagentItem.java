@@ -211,7 +211,7 @@ public class ReagentItem extends Item implements ILoreTagged, ICapabilityProvide
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 		
-		if (NostrumMagica.instance.aetheria.isEnabled() && cap != null && cap == AetheriaProxy.AetherBurnableCapability) {
+		if (NostrumMagica.instance.aetheria.isEnabled() && cap != null && cap == AetheriaProxy.AetherBurnableCapability && cap.isRegistered()) {
 			return AetherBurnableLazy.cast();
 		}
 		

@@ -168,10 +168,11 @@ public class NostrumRenderTypes extends RenderType {
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
 				.setTexturingState(SPELLSHAPE_TEXTURING)
 				.setLineState(LINE_3)
-				.setShaderState(POSITION_COLOR_TEX_SHADER)
+				.setShaderState(RENDERTYPE_LINES_SHADER)
+				.setCullState(NO_CULL)
 				// depth test?
 			.createCompositeState(false);
-		SPELLSHAPE_LINES = RenderType.create(Name("spellshape_lines"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.LINES, 32, false, false, glState);
+		SPELLSHAPE_LINES = RenderType.create(Name("spellshape_lines"), DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.LINES, 32, false, false, glState);
 		
 		glState = RenderType.CompositeState.builder()
 				//.texture(new RenderState.TextureState(SpellShapeRenderer.TEXTURE_FLOW, true, false))
@@ -181,10 +182,11 @@ public class NostrumRenderTypes extends RenderType {
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
 				.setTexturingState(SPELLSHAPE_TEXTURING)
 				.setLineState(LINE_10)
-				.setShaderState(POSITION_COLOR_TEX_SHADER)
+				.setShaderState(RENDERTYPE_LINES_SHADER)
+				.setCullState(NO_CULL)
 				// depth test?
 			.createCompositeState(false);
-		SPELLSHAPE_LINES_THICK = RenderType.create(Name("spellshape_lines_thick"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.LINES, 32, false, false, glState);
+		SPELLSHAPE_LINES_THICK = RenderType.create(Name("spellshape_lines_thick"), DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.LINES, 32, false, false, glState);
 		
 		glState = RenderType.CompositeState.builder()
 				.setTextureState(new RenderStateShard.TextureStateShard(ModelSwitchTrigger.TEXT, false, true))

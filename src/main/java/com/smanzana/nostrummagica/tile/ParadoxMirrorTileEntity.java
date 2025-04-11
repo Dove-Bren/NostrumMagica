@@ -7,6 +7,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrumaetheria.api.blocks.IAetherInfusableTileEntity;
+import com.smanzana.nostrumaetheria.api.blocks.IAetherInfuserTileEntity;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.ParadoxMirrorBlock;
@@ -29,7 +31,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBlockEntity/*, IAetherInfusableTileEntity*/ {
+public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBlockEntity, IAetherInfusableTileEntity {
 	
 	private @Nullable BlockPos linkedPosition;
 	
@@ -121,23 +123,22 @@ public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBloc
 		setChanged();
 	}
 
-	private int unused;
-//	@Override
-//	public boolean canAcceptAetherInfuse(IAetherInfuserTileEntity source, int maxAether) {
-//		return this.isInCooldown();
-//	}
-//
-//	@Override
-//	public int acceptAetherInfuse(IAetherInfuserTileEntity source, int maxAether) {
-//		
-//		// take one aether point and reduce time by up to 4 ticks.  That means -5 ticks per tick or 5x as fast
-//		if (maxAether > 0) {
-//			maxAether--;
-//			this.cooldownTicks -= Math.min(cooldownTicks, 4);
-//		}
-//		
-//		return maxAether;
-//	}
+	@Override
+	public boolean canAcceptAetherInfuse(IAetherInfuserTileEntity source, int maxAether) {
+		return this.isInCooldown();
+	}
+
+	@Override
+	public int acceptAetherInfuse(IAetherInfuserTileEntity source, int maxAether) {
+		
+		// take one aether point and reduce time by up to 4 ticks.  That means -5 ticks per tick or 5x as fast
+		if (maxAether > 0) {
+			maxAether--;
+			this.cooldownTicks -= Math.min(cooldownTicks, 4);
+		}
+		
+		return maxAether;
+	}
 	
 	@Override
 	public void tick() {

@@ -40,6 +40,7 @@ import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.client.render.effect.CursedFireEffectRenderer;
 import com.smanzana.nostrummagica.client.render.layer.EntityEffectLayer;
 import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
+import com.smanzana.nostrummagica.client.render.layer.LayerArmorElytra;
 import com.smanzana.nostrummagica.client.render.layer.LayerDragonFlightWings;
 import com.smanzana.nostrummagica.client.render.layer.LayerKoidHelm;
 import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
@@ -1345,12 +1346,12 @@ public class OverlayRenderer extends GuiComponent {
 		if (!InjectedSet.containsKey(event.getRenderer())) {
 			InjectedSet.put(event.getRenderer(), true);
 			
-			// EnderIO injects custom cape layer so that capes don't render if an elytra-like item is present. We won't bother.
 			// Instead, we just inject a layer for our custom elytras, and another for dragon-flight wings
 			event.getRenderer().addLayer(new LayerDragonFlightWings(event.getRenderer()));
 			event.getRenderer().addLayer(new LayerAetherCloak(event.getRenderer()));
 			event.getRenderer().addLayer(new LayerManaArmor(event.getRenderer()));
 			event.getRenderer().addLayer(new LayerKoidHelm(event.getRenderer()));
+			event.getRenderer().addLayer(new LayerArmorElytra<>(event.getRenderer(), Minecraft.getInstance().getEntityModels()));
 		}
 
 		Minecraft mc = Minecraft.getInstance();

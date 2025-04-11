@@ -136,7 +136,7 @@ public class CursedGlass extends SwitchBlock {
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.SwitchBlockTileEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.CursedGlassType);
 	}
 	
 	@Override
