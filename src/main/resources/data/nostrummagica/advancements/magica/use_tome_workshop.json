@@ -20,7 +20,7 @@
 			"conditions": {
 				"location": {
 					"block": {
-						"block": "nostrummagica:tome_workshop"
+						"blocks": ["nostrummagica:tome_workshop"]
 					}
 				}
 			}

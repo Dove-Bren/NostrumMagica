@@ -20,7 +20,7 @@
 			"conditions": {
 				"items": [
 					{
-						"item": "nostrummagica:hookshot_strong"
+						"items": ["nostrummagica:hookshot_strong"]
 					}
 				]
 			}

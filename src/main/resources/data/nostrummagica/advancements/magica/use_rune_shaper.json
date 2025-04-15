@@ -20,7 +20,7 @@
 			"conditions": {
 				"location": {
 					"block": {
-						"block": "nostrummagica:rune_shaper"
+						"blocks": ["nostrummagica:rune_shaper"]
 					}
 				}
 			}

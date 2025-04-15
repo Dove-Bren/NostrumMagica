@@ -20,7 +20,7 @@
 			"conditions": {
 				"location": {
 					"block": {
-						"block": "nostrummagica:modification_table"
+						"blocks": ["nostrummagica:modification_table"]
 					}
 				}
 			}

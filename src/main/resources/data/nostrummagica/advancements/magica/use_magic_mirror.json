@@ -20,7 +20,7 @@
 			"conditions": {
 				"location": {
 					"block": {
-						"block": "nostrummagica:mirror_block"
+						"blocks": ["nostrummagica:mirror_block"]
 					}
 				}
 			}

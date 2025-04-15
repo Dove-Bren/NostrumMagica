@@ -43,7 +43,7 @@
 			"trigger": "minecraft:consume_item",
 			"conditions": {
 				"item": {
-					"item": "nostrummagica:seeking_gem"
+					"items": ["nostrummagica:seeking_gem"]
 				}
 			}
 		}
