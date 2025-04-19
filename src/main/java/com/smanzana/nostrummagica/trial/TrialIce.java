@@ -4,16 +4,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.core.Registry;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeDictionary.Type;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -38,11 +34,10 @@ public class TrialIce extends WorldTrial {
 				return;
 			
 			Vec3 pos = e.getEntityLiving().position();
-			Biome biome = e.getEntityLiving().level.getBiome(
-					new BlockPos(pos.x, pos.y, pos.z));
-			ResourceKey<Biome> biomeKey = ResourceKey.create(Registry.BIOME_REGISTRY, biome.getRegistryName());
+			final boolean cold = e.getEntityLiving().level.getBiome(
+					new BlockPos(pos.x, pos.y, pos.z)).containsTag(Tags.Biomes.IS_COLD);
 			
-			if (!BiomeDictionary.hasType(biomeKey, Type.COLD))
+			if (!cold)
 				return;
 			
 			this.complete((Player) e.getEntityLiving());

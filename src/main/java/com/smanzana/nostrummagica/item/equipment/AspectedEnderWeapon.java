@@ -102,7 +102,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 		if (repair.isEmpty()) {
 			return false;
 		} else {
-			return NostrumTags.Items.InfusedGemEnder.contains(repair.getItem());
+			return repair.is(NostrumTags.Items.InfusedGemEnder);
 		}
     }
 

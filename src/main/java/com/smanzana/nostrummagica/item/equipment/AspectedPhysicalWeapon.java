@@ -67,13 +67,16 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 		if (toolAction == ToolActions.AXE_DIG) {
 			return true;
 		}
+		if (net.minecraftforge.common.ToolActions.DEFAULT_SHIELD_ACTIONS.contains(toolAction)) {
+			return true;
+		}
 		return super.canPerformAction(stack, toolAction);
 	}
 	
 	@Override
 	public float getDestroySpeed(ItemStack stack, BlockState state) {
 		// Simulate axe
-		if (BlockTags.MINEABLE_WITH_AXE.contains(state.getBlock())) {
+		if (state.is(BlockTags.MINEABLE_WITH_AXE)) {
 			return 8f;
 		}
 		return 1.0f;
@@ -124,7 +127,7 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 		if (repair.isEmpty()) {
 			return false;
 		} else {
-			return NostrumTags.Items.InfusedGemVoid.contains(repair.getItem());
+			return repair.is(NostrumTags.Items.InfusedGemVoid);
 		}
     }
 
@@ -157,11 +160,6 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	@Override
 	public int getUseDuration(ItemStack stack) {
 		return 270000;
-	}
-	
-	@Override
-	public boolean isShield(ItemStack stack, @Nullable LivingEntity entity) {
-		return true;
 	}
 	
 	@Override

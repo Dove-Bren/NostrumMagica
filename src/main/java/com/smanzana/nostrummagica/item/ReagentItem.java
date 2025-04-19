@@ -24,7 +24,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
-public class ReagentItem extends Item implements ILoreTagged, ICapabilityProvider {
+public class ReagentItem extends Item implements ILoreTagged/*, ICapabilityProvider*/ {
 
 	public static enum ReagentType implements StringRepresentable {
 		// Do not rearrange.
@@ -206,20 +206,21 @@ public class ReagentItem extends Item implements ILoreTagged, ICapabilityProvide
 		return InfoScreenTabs.INFO_REAGENTS;
 	}
 	
-	private LazyOptional<?> AetherBurnableLazy = LazyOptional.of(() -> NostrumMagica.instance.aetheria.makeBurnable(100, 150f));
-
-	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		
-		if (NostrumMagica.instance.aetheria.isEnabled() && cap != null && cap == AetheriaProxy.AetherBurnableCapability && cap.isRegistered()) {
-			return AetherBurnableLazy.cast();
-		}
-		
-		return LazyOptional.empty();
-	}
-	
-	@Override
-	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
-		return this::getCapability;
-	}
+	private int unused;
+//	private LazyOptional<?> AetherBurnableLazy = LazyOptional.of(() -> NostrumMagica.instance.aetheria.makeBurnable(100, 150f));
+//
+//	@Override
+//	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+//		
+//		if (NostrumMagica.instance.aetheria.isEnabled() && cap != null && cap == AetheriaProxy.AetherBurnableCapability && cap.isRegistered()) {
+//			return AetherBurnableLazy.cast();
+//		}
+//		
+//		return LazyOptional.empty();
+//	}
+//	
+//	@Override
+//	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
+//		return this::getCapability;
+//	}
 }

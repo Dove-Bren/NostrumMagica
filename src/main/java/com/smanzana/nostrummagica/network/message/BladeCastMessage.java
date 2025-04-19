@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.item.equipment.WarlockSword;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 /**
  * Client has cast a spell

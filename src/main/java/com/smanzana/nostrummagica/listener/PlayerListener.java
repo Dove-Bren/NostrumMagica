@@ -84,6 +84,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
@@ -111,7 +112,6 @@ import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fmllegacy.LogicalSidedProvider;
 
 /**
  * I lied. It's actually the one and only listener. It listens to time, too. And
@@ -1023,7 +1023,8 @@ public class PlayerListener {
 			// Regain mana
 			if (tickCount % 10 == 0) {
 				
-				for (ServerLevel world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getAllLevels()) {
+				// Crash here if workqueue stops being a minecraft server. I'm not sure of the RIGHT way of doing this.
+				for (ServerLevel world : ((MinecraftServer) LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)).getAllLevels()) {
 					if (world.players().isEmpty()) {
 						continue;
 					}
@@ -1061,11 +1062,11 @@ public class PlayerListener {
 			
 			PortalBlock.serverTick();
 			TeleportRuneTileEntity.tickChargeMap();
-			for (ServerLevel world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getAllLevels()) {
+			for (ServerLevel world : ((MinecraftServer) LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)).getAllLevels()) {
 				ElementalArmor.ServerWorldTick(world);
 			}
 		} else if (event.phase == Phase.END) {
-			for (ServerLevel world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getAllLevels()) {
+			for (ServerLevel world : ((MinecraftServer) LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)).getAllLevels()) {
 				// Do cursed fire check
 				world.getEntities(EntityTypeTest.forClass(LivingEntity.class), e -> e.getEffect(NostrumEffects.cursedFire) != null && e.isInWaterRainOrBubble())
 					.forEach(e -> {

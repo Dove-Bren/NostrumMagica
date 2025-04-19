@@ -51,8 +51,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fmllegacy.network.NetworkHooks;
-import net.minecraftforge.fmllegacy.network.PacketDistributor.TargetPoint;
+import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.network.PacketDistributor.TargetPoint;
 
 public class CommonProxy {
 	

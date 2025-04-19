@@ -1,27 +1,24 @@
-buildscript {
-    repositories {
-		mavenCentral()
-		maven { url = 'https://maven.minecraftforge.net/' }
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-    }
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
-apply plugin: 'net.minecraftforge.gradle'
-// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
 
-version = "1.17.1-1.12.0"
-group= "com.smanzana.nostrummagica" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "nostrummagica"
+version = mod_version
+group = mod_group_id
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-	mappings channel: 'official', version: "1.17.1"
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+	mappings channel: mapping_channel, version: mapping_version
+	
+	copyIdeResources = true
 	
 	 // Structures in 1.16.x require you to place them in some vanilla maps which are private variables
     // The access transformer allows us to make them public so we can place our structures in them
@@ -109,8 +106,10 @@ repositories {
 	}
 	
 	maven {
-        url = "https://maven.blamejared.com"
-    }
+		// location of the maven that hosts JEI files since January 2023
+		name = "Jared's maven"
+		url = "https://maven.blamejared.com/"
+	  }
     maven {
         // location of the maven that hosts JEI files
         name = "Progwml6 maven"
@@ -157,10 +156,10 @@ repositories {
 }
 
 dependencies {
-	minecraft 'net.minecraftforge:forge:1.17.1-37.1.1'
+	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 	
-    compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
+    compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"))
+    runtimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
 
 	runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
@@ -168,11 +167,8 @@ dependencies {
 	//compile 'top.theillusivec4.caelus:caelus-forge:${caelus_version}'
 	implementation fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}")
 	
-	compileOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}:api")
-	runtimeOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}")
-	
-	//compileOnly fg.deobf("com.smanzana:musica:${musica_version}")
-	//runtimeOnly fg.deobf("com.smanzana:musica:${musica_version}")
+	//compileOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}:api")
+	//runtimeOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}")
 	
 	runtimeOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}")
 	compileOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}:api")
@@ -182,17 +178,17 @@ dependencies {
 	
 	compileOnly fg.deobf("local:minecolonies:${minecolonies_version}:api")
 	//runtimeOnly fg.deobf("local:minecolonies:${minecolonies_version}")
-	implementation fg.deobf("curse.maven:structurize-298744:${structurize_version}")
-	implementation fg.deobf("curse.maven:blockui-522992:${blockui_version}")
+	//implementation fg.deobf("curse.maven:structurize-298744:${structurize_version}")
+	//implementation fg.deobf("curse.maven:blockui-522992:${blockui_version}")
 }
 
 task sourcesJar(type: Jar) {
-    classifier = 'sources'
+    archiveClassifier.set('sources')
     from sourceSets.main.allJava
 }
 
 task deobfJar(type: Jar) {
-    classifier = 'deobf'
+    archiveClassifier.set('deobf')
     from sourceSets.main.output
 }
 
@@ -211,25 +207,39 @@ tasks.build.dependsOn sourcesJar, deobfJar
 //	classifier = 'core'
 //}
 
-jar {
-	exclude 'com/smanzana/nostrummagica/transforms/**'
-	//from(coreJar.archivePath.absolutePath) {
-	//	include '*'
-	//	into ("META-INF/libraries")
-	//}
-	manifest {
-		attributes ([
-			//"ContainedDeps": coreJar.archivePath.name,
-			"Specification-Title": "nostrummagica",
-            "Specification-Vendor": "smanzanares",
-            "Specification-Version": "1", // We are version 1 of ourselves
-            "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
-            "Implementation-Vendor" :"smanzanares",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-		])
-	}
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+            minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
+            forge_version: forge_version, forge_version_range: forge_version_range,
+            loader_version_range: loader_version_range,
+            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+            mod_authors: mod_authors, mod_description: mod_description,
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
+    }
 }
 
+// Example for how to get properties into the manifest for reading by the runtime..
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                'Specification-Title'     : mod_id,
+                'Specification-Vendor'    : mod_authors,
+                'Specification-Version'   : '1', // We are version 1 of ourselves
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_authors,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
 
+    // This is the preferred method to reobfuscate your jar file
+    finalizedBy 'reobfJar'
+}
 
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}

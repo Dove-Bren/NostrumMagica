@@ -6,29 +6,23 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableSet;
 import com.smanzana.nostrummagica.NostrumMagica;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.StairBlock;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import net.minecraft.core.SectionPos;
-import net.minecraft.core.Vec3i;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.Level;
-import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.world.level.levelgen.feature.StructureFeature;
-import net.minecraft.world.level.levelgen.structure.StructurePiece;
-import net.minecraft.world.level.levelgen.structure.StructureStart;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class WorldUtil {
 
@@ -253,39 +247,6 @@ public class WorldUtil {
 	
 	// Copied from StructurePiece
 	private static final Set<Block> VANILLA_BLOCKS_NEEDING_POSTPROCESSING = ImmutableSet.<Block>builder().add(Blocks.NETHER_BRICK_FENCE).add(Blocks.TORCH).add(Blocks.WALL_TORCH).add(Blocks.OAK_FENCE).add(Blocks.SPRUCE_FENCE).add(Blocks.DARK_OAK_FENCE).add(Blocks.ACACIA_FENCE).add(Blocks.BIRCH_FENCE).add(Blocks.JUNGLE_FENCE).add(Blocks.LADDER).add(Blocks.IRON_BARS).build();
-	
-	/**
-	 * Check whether the given position is within a structure of the provided type.
-	 * @param world
-	 * @param pos
-	 * @param structure
-	 * @param insideCheck if false, only check the outer bounds of a structure rather than the individual structure piece bounds.
-	 * 					 AKA check one giant bounding box for the whole structure instead of checking if the position is actually in a structure piece.
-	 * @return
-	 */
-	public static final boolean IsInStructure(ServerLevel world, BlockPos pos, StructureFeature<?> structure, boolean insideCheck) {
-		return GetContainingStructure(world, pos, structure, insideCheck).isValid();
-	}
-	
-	/**
-	 * Get the first matching structure start (instance) for the specified type and position.
-	 * @param world
-	 * @param pos
-	 * @param structure
-	 * @param insideCheck if false, only check the outer bounds of a structure rather than the individual structure piece bounds.
-	 * 					 AKA check one giant bounding box for the whole structure instead of checking if the position is actually in a structure piece.
-	 * @return
-	 */
-	public static final @Nonnull StructureStart<?> GetContainingStructure(ServerLevel world, BlockPos pos, StructureFeature<?> structure, boolean insideCheck) {
-		return world.structureFeatureManager().getStructureAt(pos, insideCheck, structure);
-	}
-	
-	public static final @Nullable StructurePiece GetContainingStructurePiece(ServerLevel world, BlockPos pos, StructureFeature<?> structure, boolean insideCheck) {
-		return world.structureFeatureManager().startsForFeature(SectionPos.of(pos), structure).filter((start) -> {
-	         return start.getBoundingBox().isInside(pos);
-	      }).flatMap(start -> start.getPieces().stream()).filter(piece -> piece.getBoundingBox().isInside(pos))
-				.findFirst().orElse(null);
-	}
 	
 	public static final boolean IsWorldGen(LevelAccessor world) {
 		return world instanceof WorldGenRegion;

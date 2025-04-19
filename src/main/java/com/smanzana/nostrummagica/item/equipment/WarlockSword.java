@@ -118,7 +118,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	
 	@Override
 	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-        return !repair.isEmpty() && NostrumTags.Items.CrystalMedium.contains(repair.getItem());
+        return !repair.isEmpty() && repair.is(NostrumTags.Items.CrystalMedium);
     }
 
 	@Override

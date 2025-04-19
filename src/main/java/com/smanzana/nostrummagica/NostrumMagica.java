@@ -86,14 +86,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fmllegacy.server.ServerLifecycleHooks;
-import net.minecraftforge.fmlserverevents.FMLServerStoppedEvent;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import top.theillusivec4.curios.api.CuriosApi;
 
 @Mod(NostrumMagica.MODID)
@@ -844,7 +844,7 @@ public class NostrumMagica {
 	}
 
 	@SubscribeEvent
-	public void onServerShutdown(FMLServerStoppedEvent event) {
+	public void onServerShutdown(ServerStoppedEvent event) {
 		// Clean up dimension mapping info.
 		// For standalones, this is sort-of meaningless.
 		// For integrated, this prevents previous world's dimensions from bleeding over

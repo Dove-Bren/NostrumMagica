@@ -160,7 +160,7 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 		if (repair.isEmpty()) {
 			return false;
 		} else {
-			return NostrumTags.Items.CrystalSmall.contains(repair.getItem());
+			return repair.is(NostrumTags.Items.CrystalSmall);
 		}
     }
 

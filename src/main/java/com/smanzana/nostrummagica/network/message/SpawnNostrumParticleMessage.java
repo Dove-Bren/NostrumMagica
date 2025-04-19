@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 /**
  * Server is signalling that some particles should be spawned

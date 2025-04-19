@@ -90,7 +90,7 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 	
 	@Override
 	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-		return !repair.isEmpty() && NostrumTags.Items.CrystalSmall.contains(repair.getItem());
+		return !repair.isEmpty() && repair.is(NostrumTags.Items.CrystalSmall);
 	}
 	
 	@Override
@@ -162,14 +162,13 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 	public void initializeClient(Consumer<IItemRenderProperties> props) {
 		super.initializeClient(props);
 		props.accept(new IItemRenderProperties() {
-			@SuppressWarnings("unchecked")
 			@Override
-			public <A extends HumanoidModel<?>> A getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlot armorSlot, A _default) {
+			public HumanoidModel<?> getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlot armorSlot, HumanoidModel<?> _default) {
 				if (armorSlot == EquipmentSlot.HEAD && MageArmor.this.slot == armorSlot) {
 					if (model == null) {
 						model = new ModelWitchHat<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.WitchHat));
 					}
-					return (A) model;
+					return model;
 				}
 				return _default;
 			}

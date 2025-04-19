@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.client.gui.container.ReagentAndRuneTransfer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 /**
  * Client has toggled vacuum setting on their rune bag

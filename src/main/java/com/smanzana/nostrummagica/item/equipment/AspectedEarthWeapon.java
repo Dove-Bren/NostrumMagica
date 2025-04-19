@@ -150,7 +150,7 @@ public class AspectedEarthWeapon extends DiggerItem implements ILoreTagged, ISpe
 		if (repair.isEmpty()) {
 			return false;
 		} else {
-			return NostrumTags.Items.InfusedGemEarth.contains(repair.getItem());
+			return repair.is(NostrumTags.Items.InfusedGemEarth);
 		}
     }
 

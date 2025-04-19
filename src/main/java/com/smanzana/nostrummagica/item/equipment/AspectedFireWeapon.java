@@ -94,7 +94,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 		if (repair.isEmpty()) {
 			return false;
 		} else {
-			return NostrumTags.Items.InfusedGemFire.contains(repair.getItem());
+			return repair.is(NostrumTags.Items.InfusedGemFire);
 		}
     }
 

@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.capabilities.IBonusJumpCapability;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraftforge.client.event.InputUpdateEvent;
+import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -31,9 +31,9 @@ public class ClientPlayerListener extends PlayerListener {
 	}
 	
 	@SubscribeEvent
-	public void onInputUpdate(InputUpdateEvent event) {
-		final boolean newPress = !jumpPressedLastFrame && event.getMovementInput().jumping;
-		jumpPressedLastFrame = event.getMovementInput().jumping;
+	public void onInputUpdate(MovementInputUpdateEvent event) {
+		final boolean newPress = !jumpPressedLastFrame && event.getInput().jumping;
+		jumpPressedLastFrame = event.getInput().jumping;
 		// 
 		
 		if (newPress) {
@@ -50,7 +50,7 @@ public class ClientPlayerListener extends PlayerListener {
 		
 		if (jumpConsumedThisPress) {
 			// Keep eating the jump so that it never appears to transition to on in the regular player loop
-			event.getMovementInput().jumping = false;
+			event.getInput().jumping = false;
 		}
 	}
 	

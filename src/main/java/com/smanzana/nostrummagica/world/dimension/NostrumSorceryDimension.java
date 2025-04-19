@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.client.renderer.FogRenderer.FogMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
@@ -31,6 +31,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.portal.PortalInfo;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.client.event.EntityViewRenderEvent.RenderFogEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -445,8 +446,8 @@ public class NostrumSorceryDimension {
 		}
 		
 		@SubscribeEvent
-		public void onFogDensityCheck(EntityViewRenderEvent.FogDensity event) {
-			final Entity entity = event.getInfo().getEntity();
+		public void onFogDensityCheck(RenderFogEvent event) {
+			final Entity entity = event.getCamera().getEntity();
 			if (!checkDimension(entity.level)) {
 				return;
 			}
@@ -461,28 +462,25 @@ public class NostrumSorceryDimension {
 				
 				int i = ((LivingEntity)entity).getEffect(MobEffects.BLINDNESS).getDuration();
 				float rangeMod = Mth.lerp(Math.min(1.0F, (float)i / 20.0F), farPlaneDistance, 5.0F);
-				if (event.getType() == FogRenderer.FogMode.FOG_SKY) {
-					rangeMod *= .8f;
+				final float near;
+				final float far;
+				if (event.getMode() == FogMode.FOG_SKY) {
+					near = 0.0F;
+					far = rangeMod * 0.8F;
+				} else {
+					near = rangeMod * 0.25F;
+					far = rangeMod;
 				}
-
-//				RenderSystem.fogStart(near);
-//				RenderSystem.fogEnd(far);
-//				RenderSystem.fogMode(GlStateManager.FogMode.LINEAR);
-//				RenderSystem.setupNvFogDistance();
-//				RenderSystem.setShaderFogStart(near);
-//				RenderSystem.setShaderFogEnd(far);
-//				net.minecraftforge.client.ForgeHooksClient.onFogRender(event.getType(), event.getInfo(), (float) event.getRenderPartialTicks(), far);
-				
-				event.setDensity(rangeMod * 3);
+				event.setNearPlaneDistance(near);
+				event.setFarPlaneDistance(far);
 			} else {
-				// this is the number of blocks/2 that can be seen before th fog completely conceals
-				event.setDensity(128f);
+				event.setFarPlaneDistance(64f);
 			}
 		}
 		
 		@SubscribeEvent
 		public void onFogColorCheck(EntityViewRenderEvent.FogColors event) {
-			if (!checkDimension(event.getInfo().getEntity().level)) {
+			if (!checkDimension(event.getCamera().getEntity().level)) {
 				return;
 			}
 			event.setRed(.2f);

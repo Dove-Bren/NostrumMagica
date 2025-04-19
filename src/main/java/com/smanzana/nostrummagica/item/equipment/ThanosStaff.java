@@ -95,7 +95,7 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellEquipme
 	
 	@Override
 	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-        return !repair.isEmpty() && NostrumTags.Items.CrystalSmall.contains(repair.getItem());
+        return !repair.isEmpty() && repair.is(NostrumTags.Items.CrystalSmall);
     }
 
 	@Override

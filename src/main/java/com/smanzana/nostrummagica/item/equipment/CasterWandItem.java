@@ -116,7 +116,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 		if (repair.isEmpty()) {
 			return false;
 		} else {
-			return NostrumTags.Items.WispPebble.contains(repair.getItem());
+			return repair.is(NostrumTags.Items.WispPebble);
 		}
     }
 

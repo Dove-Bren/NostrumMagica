@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.spellcraft.pattern;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
@@ -10,15 +11,15 @@ import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.util.TextUtils;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraftforge.event.RegistryEvent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.NewRegistryEvent;
 import net.minecraftforge.registries.ObjectHolder;
 import net.minecraftforge.registries.RegistryBuilder;
 
@@ -32,7 +33,7 @@ import net.minecraftforge.registries.RegistryBuilder;
 @ObjectHolder(NostrumMagica.MODID)
 public abstract class SpellCraftPattern extends ForgeRegistryEntry<SpellCraftPattern> {
 
-	protected static IForgeRegistry<SpellCraftPattern> REGISTRY;
+	protected static Supplier<IForgeRegistry<SpellCraftPattern>> REGISTRY;
 	
 	public SpellCraftPattern() {
 		
@@ -63,21 +64,21 @@ public abstract class SpellCraftPattern extends ForgeRegistryEntry<SpellCraftPat
 	
 	
 	public static final @Nullable SpellCraftPattern Get(ResourceLocation id) {
-		return REGISTRY.getValue(id);
+		return REGISTRY.get().getValue(id);
 	}
 	
 	public static final Collection<SpellCraftPattern> GetAll() {
-		return REGISTRY.getValues();
+		return REGISTRY.get().getValues();
 	}
 	
 	@SubscribeEvent
-	public static final void CreateRegistry(RegistryEvent.NewRegistry event) {
-		REGISTRY = new RegistryBuilder<SpellCraftPattern>()
+	public static final void CreateRegistry(NewRegistryEvent event) {
+		REGISTRY = event.create(new RegistryBuilder<SpellCraftPattern>()
 				.setName(NostrumMagica.Loc("spellcraft_pattern"))
 				.setType(SpellCraftPattern.class)
 				.setMaxID(Integer.MAX_VALUE - 1) // copied from GameData, AKA Forge's registration
 				.disableSaving()
-			.create();
+			);
 	}
 	
 }

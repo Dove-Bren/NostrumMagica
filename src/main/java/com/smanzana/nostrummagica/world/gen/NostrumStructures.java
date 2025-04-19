@@ -1,30 +1,24 @@
 package com.smanzana.nostrummagica.world.gen;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-import com.google.common.collect.ImmutableMap;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.DragonStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.PlantBossStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.PortalStructure;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.Registry;
+import net.minecraft.core.Holder;
 import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
-import net.minecraft.world.level.levelgen.StructureSettings;
-import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
-import net.minecraft.server.level.ServerChunkCache;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
+import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ObjectHolder;
@@ -41,20 +35,19 @@ public class NostrumStructures {
 	private static final String DUNGEONGEN_PLANTBOSS_CONF_ID = "configured_" + DUNGEONGEN_PLANTBOSS_ID;
 	
 	@ObjectHolder(DUNGEONGEN_PORTAL_ID) public static PortalStructure DUNGEON_PORTAL;
-	public static ConfiguredStructureFeature<?, ?> CONFIGURED_DUNGEON_PORTAL;
+	protected static ConfiguredStructureFeature<?, ?> CONFIGURED_DUNGEON_PORTAL;
+	public static Holder<ConfiguredStructureFeature<?, ?>> REF_DUNGEON_PORTAL;
 	
 	@ObjectHolder(DUNGEONGEN_DRAGON_ID) public static DragonStructure DUNGEON_DRAGON;
 	public static ConfiguredStructureFeature<?, ?> CONFIGURED_DUNGEON_DRAGON;
+	public static Holder<ConfiguredStructureFeature<?, ?>> REF_DUNGEON_DRAGON;
 	
 	@ObjectHolder(DUNGEONGEN_PLANTBOSS_ID) public static PlantBossStructure DUNGEON_PLANTBOSS;
 	public static ConfiguredStructureFeature<?, ?> CONFIGUREDDUNGEON_PLANTBOSS;
-
-	protected static final Map<StructureFeature<?>, StructureFeatureConfiguration> CUSTOM_SEPARATION_SETTINGS = new HashMap<>();
+	public static Holder<ConfiguredStructureFeature<?, ?>> REF_DUNGEON_PLANTBOSS;
 
 	@SubscribeEvent
 	public static void registerStructures(RegistryEvent.Register<StructureFeature<?>> event) {
-		CUSTOM_SEPARATION_SETTINGS.clear();
-		
 		StructureFeature<NoneFeatureConfiguration> structure;
 		ConfiguredStructureFeature<?, ?> configured;
 		
@@ -68,56 +61,76 @@ public class NostrumStructures {
 		// (max-min) ?
 		
 		structure = new PortalStructure();
-		configured = structure.configured(FeatureConfiguration.NONE);
+		configured = structure.configured(FeatureConfiguration.NONE, Tags.Biomes.IS_OVERWORLD);
 		// Avg dist: sqrt(24^2 + 24^2) = 543 blocks
-		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PORTAL_ID), NostrumMagica.Loc(DUNGEONGEN_PORTAL_CONF_ID), 12, 24, 0x26F1BDCF);
 		CONFIGURED_DUNGEON_PORTAL = configured;
+		REF_DUNGEON_PORTAL = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PORTAL_ID), NostrumMagica.Loc(DUNGEONGEN_PORTAL_CONF_ID));
 		
 		structure = new DragonStructure();
-		configured = structure.configured(FeatureConfiguration.NONE);
+		configured = structure.configured(FeatureConfiguration.NONE, Tags.Biomes.IS_OVERWORLD);
 		// Avg dist: sqrt(32^2 + 32^2) = 724 blocks
-		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_DRAGON_ID), NostrumMagica.Loc(DUNGEONGEN_DRAGON_CONF_ID), 24, 32, 0x4558c30e);
 		CONFIGURED_DUNGEON_DRAGON = configured;
+		REF_DUNGEON_DRAGON = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_DRAGON_ID), NostrumMagica.Loc(DUNGEONGEN_DRAGON_CONF_ID));
 		
 		structure = new PlantBossStructure();
-		configured = structure.configured(FeatureConfiguration.NONE);
+		configured = structure.configured(FeatureConfiguration.NONE, Tags.Biomes.IS_OVERWORLD);
 		// Avg dist: sqrt(32^2 + 32^2) = 724 blocks
-		registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_ID), NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_CONF_ID), 20, 38, 0x2cc3005e);
 		CONFIGUREDDUNGEON_PLANTBOSS = configured;
-
-		MinecraftForge.EVENT_BUS.addListener(NostrumStructures::loadWorld);
+		REF_DUNGEON_PLANTBOSS = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_ID), NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_CONF_ID));
+		
+		
+		// Register structure sets, which include rules of how to place them and distances between things in the same set.
+		// Putting everything into ONE set so that dungeons don't generate into eachother, but making portal weight by heigher.
+		final int averageChunks = 45; // 702 block average
+		final int minChunks = 16; // 256 block minimum
+		StructureSet structures = new StructureSet(
+				List.of(
+						new StructureSet.StructureSelectionEntry(REF_DUNGEON_PORTAL, 2),
+						new StructureSet.StructureSelectionEntry(REF_DUNGEON_DRAGON, 1),
+						new StructureSet.StructureSelectionEntry(REF_DUNGEON_PLANTBOSS, 1)
+				),
+				new RandomSpreadStructurePlacement(averageChunks, minChunks, RandomSpreadType.LINEAR, 0x26F1BDCF)
+		);
+		BuiltinRegistries.register(BuiltinRegistries.STRUCTURE_SETS, NostrumMagica.Loc("dungeon_structures"), structures);
 	}
 	
-	private static void registerStructure(RegistryEvent.Register<StructureFeature<?>> event, StructureFeature<?> structure, ConfiguredStructureFeature<?, ?> config, ResourceLocation structName, ResourceLocation confName, int min, int max, int rand) {
+	private static Holder<ConfiguredStructureFeature<?, ?>> registerStructure(RegistryEvent.Register<StructureFeature<?>> event, StructureFeature<?> structure, ConfiguredStructureFeature<?, ?> config, ResourceLocation structName, ResourceLocation confName) {
 		// Register structure itself
 		event.getRegistry().register(structure.setRegistryName(structName));
-		StructureFeature.STRUCTURES_REGISTRY.put(structName.toString(), structure);
 		
-		// Create seperation settings for structure
-		StructureFeatureConfiguration seperation = new StructureFeatureConfiguration(max, min, rand);
+		// Register configured structure feature and return reference to it
+		return BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE, confName, config);
 		
-		// Force into dimension structure settings map
-		StructureSettings.DEFAULTS = ImmutableMap.<StructureFeature<?>, StructureFeatureConfiguration>builder().putAll(StructureSettings.DEFAULTS).
-				put(structure, seperation).build();
 		
-		// Stash seperation settings in our own map for injection on world load
-		CUSTOM_SEPARATION_SETTINGS.put(structure, seperation);
-		
-		// Register the configured version of our structure
-		Registry.register(BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE, confName, config);
-		
-		// Put in flat generation settings, which apparently is useful for playing nice with other mods
-		FlatLevelGeneratorSettings.STRUCTURE_FEATURES.put(structure, config);
+//		StructureFeature.STRUCTURES_REGISTRY.put(structName.toString(), structure);
+//		
+//		// Create seperation settings for structure
+//		StructureFeatureConfiguration seperation = new StructureFeatureConfiguration(max, min, rand);
+//		
+//		// Force into dimension structure settings map
+//		StructureSettings.DEFAULTS = ImmutableMap.<StructureFeature<?>, StructureFeatureConfiguration>builder().putAll(StructureSettings.DEFAULTS).
+//				put(structure, seperation).build();
+//		
+//		// Stash seperation settings in our own map for injection on world load
+//		CUSTOM_SEPARATION_SETTINGS.put(structure, seperation);
+//		
+//		// Register the configured version of our structure
+//		Registry.register(BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE, confName, config);
+//		
+//		// Put in flat generation settings, which apparently is useful for playing nice with other mods
+//		FlatLevelGeneratorSettings.STRUCTURE_FEATURES.put(structure, config);
+//		
+//		BuiltinRegistries.STRUCTURE_SETS;
 	}
 	
 	//@SubscribeEvent subscribed to listener in #registerStructures as a hack because we can't mix busses
-	public static void loadWorld(WorldEvent.Load event) {
-		if(event.getWorld() instanceof ServerLevel && DimensionUtils.IsOverworld((ServerLevel)event.getWorld())) {
-			final ServerLevel serverWorld = (ServerLevel)event.getWorld();
-			final ServerChunkCache provider = serverWorld.getChunkSource();
-			Map<StructureFeature<?>, StructureFeatureConfiguration> tempMap = new HashMap<>(provider.generator.getSettings().structureConfig());
-			tempMap.putAll(CUSTOM_SEPARATION_SETTINGS);
-			provider.generator.getSettings().structureConfig = tempMap;
-		}
-	}
+//	public static void loadWorld(WorldEvent.Load event) {
+//		if(event.getWorld() instanceof ServerLevel && DimensionUtils.IsOverworld((ServerLevel)event.getWorld())) {
+//			final ServerLevel serverWorld = (ServerLevel)event.getWorld();
+//			final ServerChunkCache provider = serverWorld.getChunkSource();
+//			Map<StructureFeature<?>, StructureFeatureConfiguration> tempMap = new HashMap<>(provider.generator.getSettings().structureConfig());
+//			tempMap.putAll(CUSTOM_SEPARATION_SETTINGS);
+//			provider.generator.getSettings().structureConfig = tempMap;
+//		}
+//	}
 }

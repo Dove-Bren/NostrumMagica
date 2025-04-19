@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 /**
  * Server is refreshing client's view on a player's mana

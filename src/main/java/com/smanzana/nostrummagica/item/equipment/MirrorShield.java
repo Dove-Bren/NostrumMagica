@@ -77,7 +77,7 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 		if (repair.isEmpty()) {
 			return false;
 		} else {
-			return NostrumTags.Items.CrystalMedium.contains(repair.getItem());
+			return repair.is(NostrumTags.Items.CrystalMedium);
 		}
     }
 	
@@ -148,11 +148,6 @@ public class MirrorShield extends ShieldItem implements ISpellActionListener, IL
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		return;
-	}
-	
-	@Override
-	public boolean isShield(ItemStack stack, @Nullable LivingEntity entity) {
-		return true;
 	}
 	
 //	@Override

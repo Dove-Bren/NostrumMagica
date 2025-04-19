@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 /**
  * Server is informing the client to discard all spell cooldowns

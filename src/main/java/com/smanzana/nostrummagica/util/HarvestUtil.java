@@ -117,11 +117,11 @@ public class HarvestUtil {
 	}
 	
 	private static boolean isTree(BlockState state) {
-		return state != null && BlockTags.LOGS.contains(state.getBlock());
+		return state != null && state.is(BlockTags.LOGS);
 	}
 	
 	private static boolean isLeaves(BlockState state) {
-		return state != null && BlockTags.LEAVES.contains(state.getBlock());
+		return state != null && state.is(BlockTags.LEAVES);
 	}
 	
 	public static boolean canHarvestTree(BlockState state) {
@@ -311,8 +311,8 @@ public class HarvestUtil {
 		
 		public default boolean canVeinMine(Level world, BlockPos pos, BlockState state) {
 			return state != null && (
-					Tags.Blocks.ORES.contains(state.getBlock())
-						|| Tags.Blocks.STONE.contains(state.getBlock())
+					state.is(Tags.Blocks.ORES)
+						|| state.is(Tags.Blocks.STONE)
 					);
 		}
 		

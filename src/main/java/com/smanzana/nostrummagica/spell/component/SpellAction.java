@@ -1860,7 +1860,7 @@ public class SpellAction {
 			
 			boolean onlyStone = (level <= 1);
 			if (onlyStone && caster instanceof Player) {
-				if (!Tags.Blocks.STONE.contains(state.getBlock())) {
+				if (!state.is(Tags.Blocks.STONE)) {
 					return;
 				}
 			}

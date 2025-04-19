@@ -25,8 +25,7 @@ public class TrialEarth extends WorldTrial {
 		
 		if (!attr.hasTrial(this.element))
 			return;
-		
-		if (!Tags.Blocks.OBSIDIAN.contains(e.getState().getBlock()))
+		if (!e.getState().is(Tags.Blocks.OBSIDIAN))
 			return;
 		
 		if (!e.getPlayer().getMainHandItem().isEmpty())

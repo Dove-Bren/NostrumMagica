@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 /**
  * Client is requesting the stats for an entity

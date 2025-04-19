@@ -109,7 +109,7 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 	
 	@Override
 	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-        return !repair.isEmpty() && NostrumTags.Items.CrystalSmall.contains(repair.getItem());
+        return !repair.isEmpty() && repair.is(NostrumTags.Items.CrystalSmall);
     }
 
 	@Override

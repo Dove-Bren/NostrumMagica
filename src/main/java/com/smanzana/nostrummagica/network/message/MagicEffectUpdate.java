@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 /**
  * Server is updating client's local value for a special effect

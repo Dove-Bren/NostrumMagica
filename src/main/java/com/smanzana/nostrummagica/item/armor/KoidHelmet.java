@@ -55,7 +55,7 @@ public class KoidHelmet extends ArmorItem implements ILoreTagged {
 	
 	@Override
 	public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-		return !repair.isEmpty() && NostrumTags.Items.InfusedGem.contains(repair.getItem());
+		return !repair.isEmpty() && repair.is(NostrumTags.Items.InfusedGem);
 	}
 	
 	@Override

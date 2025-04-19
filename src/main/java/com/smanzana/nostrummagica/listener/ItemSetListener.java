@@ -29,12 +29,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fmllegacy.LogicalSidedProvider;
 
 public class ItemSetListener {
 	
@@ -184,7 +184,7 @@ public class ItemSetListener {
 	@SubscribeEvent
 	public void ServerWorldTick(ServerTickEvent event) {
 		if (event.phase == TickEvent.Phase.END) {
-			for (ServerLevel world : LogicalSidedProvider.INSTANCE.<MinecraftServer>get(LogicalSide.SERVER).getAllLevels()) {
+			for (ServerLevel world : ((MinecraftServer) LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)).getAllLevels()) {
 				world.getEntities().get(EntityTypeTest.forClass(LivingEntity.class), (ent) -> {
 					if (ent instanceof LivingEntity) {
 						LivingEntity living = (LivingEntity) ent;

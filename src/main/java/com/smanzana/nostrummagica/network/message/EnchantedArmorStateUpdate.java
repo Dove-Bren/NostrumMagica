@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 /**
  * Sent from a client to server, or from a server to a bunch of clients. Updates state information about
