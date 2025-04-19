@@ -264,7 +264,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		
 		@Override
 		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
-			final float tint = (this.isHovered() ? .8f : 1f) * (active ? .8f : 1f);
+			final float tint = (this.isHoveredOrFocused() ? .8f : 1f) * (active ? .8f : 1f);
 			
 			RenderSystem.setShaderTexture(0, Texture.TEXT);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
@@ -281,7 +281,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 						tint, tint, tint, 1f);
 			}
 			
-			if (this.isHovered()) {
+			if (this.isHoveredOrFocused()) {
 				final Component title = (stageSummary.getShape() == null ? new TextComponent("Start") : stageSummary.getShape().getDisplayName());
 				final Minecraft mc = Minecraft.getInstance();
 				mc.screen.renderTooltip(matrixStackIn, title, mouseX, mouseY);

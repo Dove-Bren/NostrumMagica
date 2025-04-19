@@ -465,7 +465,7 @@ public class ObeliskScreen extends Screen {
 		
 		@Override
 		public void renderButton(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-			final float sat = (this.isHovered() ? 1f : .8f);
+			final float sat = (this.isHoveredOrFocused() ? 1f : .8f);
 			
 			RenderSystem.setShaderTexture(0, background);
             RenderSystem.enableBlend();

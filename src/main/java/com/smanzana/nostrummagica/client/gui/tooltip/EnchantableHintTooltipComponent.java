@@ -8,7 +8,6 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 
 public class EnchantableHintTooltipComponent extends AbsoluteTooltipComponent {
@@ -32,7 +31,7 @@ public class EnchantableHintTooltipComponent extends AbsoluteTooltipComponent {
 	}
 	
 	@Override
-	public void renderImage(Font font, int x, int y, PoseStack matrixStackIn, ItemRenderer itemRenderer, int z, TextureManager textureManager) {
+	public void renderImage(Font font, int x, int y, PoseStack matrixStackIn, ItemRenderer itemRenderer, int z) {
 		// I think in 1.18 this loses its textureManager param?
 		
 		RenderSystem.enableBlend();

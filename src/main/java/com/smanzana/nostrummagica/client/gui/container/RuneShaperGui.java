@@ -302,7 +302,7 @@ public class RuneShaperGui {
 					vh = TEX_SUBMIT_HEIGHT;
 				}
 				
-				final float[] color = ColorUtil.ARGBToColor(this.isHovered() ? 0xFFAAAAAA : 0xFFFFFFFF);
+				final float[] color = ColorUtil.ARGBToColor(this.isHoveredOrFocused() ? 0xFFAAAAAA : 0xFFFFFFFF);
 
 				RenderSystem.setShaderTexture(0, TEXT);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, this.x, this.y,
@@ -399,7 +399,7 @@ public class RuneShaperGui {
 				if (isSelected()) {
 					color -= 0x004F4F4F;
 				}
-				if (isHovered()) {
+				if (isHoveredOrFocused()) {
 					color -= 0x00202020;
 				}
 				
@@ -465,7 +465,7 @@ public class RuneShaperGui {
 				}
 				
 				int color = 0xFFFFFFFF;
-				if (isHovered()) {
+				if (isHoveredOrFocused()) {
 					color -= 0x00202020;
 				}
 				

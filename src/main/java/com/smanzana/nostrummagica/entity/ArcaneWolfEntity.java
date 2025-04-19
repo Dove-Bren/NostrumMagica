@@ -101,12 +101,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
-import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.scores.Team;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ForgeMod;
 
 public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPet, IPetWithSoul, IStabbableEntity, IMagicEntity {
 	
@@ -553,7 +554,9 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 			.add(Attributes.ARMOR, 10.0D)
 			.add(Attributes.FOLLOW_RANGE, 60.0)
 			.add(NostrumAttributes.magicResist, 20.0D)
-			.add(Attributes.ATTACK_DAMAGE, 6.0D);
+			.add(Attributes.ATTACK_DAMAGE, 6.0D)
+			.add(ForgeMod.STEP_HEIGHT_ADDITION.get(), 1.1)
+			;
 	}
 	
 	@Override
@@ -750,7 +753,6 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 	@Override
 	public void tick() {
 		super.tick();
-		this.maxUpStep = 1.1f;
 		checkAndHandleLava();
 	}
 	
@@ -876,7 +878,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 	}
 	
 	@Override
-	public boolean canStandOnFluid(Fluid fluid) {
+	public boolean canStandOnFluid(FluidState fluid) {
 		// Copied from Strider
 		if (this.hasWolfCapability(WolfTypeCapability.LAVA_WALK)) {
 			return fluid.is(FluidTags.LAVA);
@@ -1037,7 +1039,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		}
 	}
 	
-	public int getLevel() {
+	public int getWolfLevel() {
 		return this.entityData.get(ATTRIBUTE_LEVEL);
 	}
 	
@@ -1054,7 +1056,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 	}
 
 	public int getMaxXP() {
-		return this.getMaxXP(getLevel());
+		return this.getMaxXP(getWolfLevel());
 	}
 
 	public int getMana() {
@@ -1411,7 +1413,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		
 		compound.putBoolean(NBT_SOUL_BOUND, this.isSoulBound());
 		compound.putInt(NBT_ATTR_XP, this.getXP());
-		compound.putInt(NBT_ATTR_LEVEL, this.getLevel());
+		compound.putInt(NBT_ATTR_LEVEL, this.getWolfLevel());
 		compound.putFloat(NBT_ATTR_BOND, this.getBond());
 		compound.putFloat(NBT_MANA_REGEN, this.getManaRegen());
 		// Ignore max health; already saved
@@ -1655,7 +1657,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 	}
 	
 	public void levelup() {
-		int level = this.getLevel();
+		int level = this.getWolfLevel();
 		
 		Random rand = getRandom();
 		float roll;

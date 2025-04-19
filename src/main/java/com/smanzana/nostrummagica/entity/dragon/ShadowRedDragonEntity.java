@@ -23,6 +23,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraft.nbt.Tag;
 
 public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreSupplier {
@@ -39,7 +40,6 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreS
 	public ShadowRedDragonEntity(EntityType<? extends ShadowRedDragonEntity> type, Level worldIn) {
 		super(type, worldIn);
 		
-        this.maxUpStep = 2;
         this.targetInitted = false;
 	}
 	
@@ -142,7 +142,9 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreS
 	        .add(Attributes.ATTACK_DAMAGE, 5.0D)
 	        .add(Attributes.ARMOR, 8.0D)
 	        .add(Attributes.ATTACK_SPEED, 0.5D)
-	        .add(Attributes.FOLLOW_RANGE, 64D);
+	        .add(Attributes.FOLLOW_RANGE, 64D)
+	        .add(ForgeMod.STEP_HEIGHT_ADDITION.get(), 2)
+	        ;
     }
 	
 	@Override

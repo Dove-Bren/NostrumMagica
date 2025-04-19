@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.gui.container;
 import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.world.inventory.MenuType;
-import net.minecraftforge.common.extensions.IForgeContainerType;
+import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -33,19 +33,19 @@ public class NostrumContainers {
 	public static void registerContainers(final RegistryEvent.Register<MenuType<?>> event) {
 		final IForgeRegistry<MenuType<?>> registry = event.getRegistry();
 		
-		registry.register(IForgeContainerType.create(ActiveHopperGui.ActiveHopperContainer::FromNetwork).setRegistryName(ActiveHopperGui.ActiveHopperContainer.ID));
-		registry.register(IForgeContainerType.create(LoreTableGui.LoreTableContainer::FromNetwork).setRegistryName(LoreTableGui.LoreTableContainer.ID));
-		registry.register(IForgeContainerType.create(ModificationTableGui.ModificationTableContainer::FromNetwork).setRegistryName(ModificationTableGui.ModificationTableContainer.ID));
-		registry.register(IForgeContainerType.create(PutterBlockGui.PutterBlockContainer::FromNetwork).setRegistryName(PutterBlockGui.PutterBlockContainer.ID));
-		registry.register(IForgeContainerType.create(ReagentBagGui.BagContainer::FromNetwork).setRegistryName(ReagentBagGui.BagContainer.ID));
-		registry.register(IForgeContainerType.create(RuneBagGui.BagContainer::FromNetwork).setRegistryName(RuneBagGui.BagContainer.ID));
-		registry.register(IForgeContainerType.create(MasterSpellCreationGui.SpellCreationContainer::FromNetwork).setRegistryName(MasterSpellCreationGui.SpellCreationContainer.ID));
-		registry.register(IForgeContainerType.create(BasicSpellCraftGui.BasicSpellCraftContainer::FromNetwork).setRegistryName(BasicSpellCraftGui.BasicSpellCraftContainer.ID));
-		registry.register(IForgeContainerType.create(RuneShaperGui.RuneShaperContainer::FromNetwork).setRegistryName(RuneShaperGui.RuneShaperContainer.ID));
-		registry.register(IForgeContainerType.create(RedwoodSpellCraftGui.RedwoodContainer::FromNetwork).setRegistryName(RedwoodSpellCraftGui.RedwoodContainer.ID));
-		registry.register(IForgeContainerType.create(MysticSpellCraftGui.MysticContainer::FromNetwork).setRegistryName(MysticSpellCraftGui.MysticContainer.ID));
-		registry.register(IForgeContainerType.create(RuneLibraryGui.RuneLibraryContainer::FromNetwork).setRegistryName(RuneLibraryGui.RuneLibraryContainer.ID));
-		registry.register(IForgeContainerType.create(LauncherBlockGui.LauncherBlockContainer::FromNetwork).setRegistryName(LauncherBlockGui.LauncherBlockContainer.ID));
-		registry.register(IForgeContainerType.create(SilverMirrorGui.MirrorContainer::FromNetwork).setRegistryName(SilverMirrorGui.MirrorContainer.ID));
+		registry.register(IForgeMenuType.create(ActiveHopperGui.ActiveHopperContainer::FromNetwork).setRegistryName(ActiveHopperGui.ActiveHopperContainer.ID));
+		registry.register(IForgeMenuType.create(LoreTableGui.LoreTableContainer::FromNetwork).setRegistryName(LoreTableGui.LoreTableContainer.ID));
+		registry.register(IForgeMenuType.create(ModificationTableGui.ModificationTableContainer::FromNetwork).setRegistryName(ModificationTableGui.ModificationTableContainer.ID));
+		registry.register(IForgeMenuType.create(PutterBlockGui.PutterBlockContainer::FromNetwork).setRegistryName(PutterBlockGui.PutterBlockContainer.ID));
+		registry.register(IForgeMenuType.create(ReagentBagGui.BagContainer::FromNetwork).setRegistryName(ReagentBagGui.BagContainer.ID));
+		registry.register(IForgeMenuType.create(RuneBagGui.BagContainer::FromNetwork).setRegistryName(RuneBagGui.BagContainer.ID));
+		registry.register(IForgeMenuType.create(MasterSpellCreationGui.SpellCreationContainer::FromNetwork).setRegistryName(MasterSpellCreationGui.SpellCreationContainer.ID));
+		registry.register(IForgeMenuType.create(BasicSpellCraftGui.BasicSpellCraftContainer::FromNetwork).setRegistryName(BasicSpellCraftGui.BasicSpellCraftContainer.ID));
+		registry.register(IForgeMenuType.create(RuneShaperGui.RuneShaperContainer::FromNetwork).setRegistryName(RuneShaperGui.RuneShaperContainer.ID));
+		registry.register(IForgeMenuType.create(RedwoodSpellCraftGui.RedwoodContainer::FromNetwork).setRegistryName(RedwoodSpellCraftGui.RedwoodContainer.ID));
+		registry.register(IForgeMenuType.create(MysticSpellCraftGui.MysticContainer::FromNetwork).setRegistryName(MysticSpellCraftGui.MysticContainer.ID));
+		registry.register(IForgeMenuType.create(RuneLibraryGui.RuneLibraryContainer::FromNetwork).setRegistryName(RuneLibraryGui.RuneLibraryContainer.ID));
+		registry.register(IForgeMenuType.create(LauncherBlockGui.LauncherBlockContainer::FromNetwork).setRegistryName(LauncherBlockGui.LauncherBlockContainer.ID));
+		registry.register(IForgeMenuType.create(SilverMirrorGui.MirrorContainer::FromNetwork).setRegistryName(SilverMirrorGui.MirrorContainer.ID));
 	}
 }

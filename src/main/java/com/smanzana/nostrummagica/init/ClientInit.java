@@ -165,7 +165,7 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ForgeModelBakery;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -259,19 +259,19 @@ public class ClientInit {
 			if (icon.usesModel()) {
 				//"effect/orb_cloudy", "effect/orb_scaled", "effects/cyl", 
 				final String modelLoc = "effect/" + icon.getKey(); // This should be hardcoded somewhere else...
-				ModelLoader.addSpecialModel(NostrumMagica.Loc(modelLoc));
+				ForgeModelBakery.addSpecialModel(NostrumMagica.Loc(modelLoc));
 			}
 		}
 		
 		for (String key : new String[] {"block/orb_crystal", "entity/orb", "entity/sprite_core", "entity/sprite_arms", "entity/magic_saucer", "entity/koid"}) {
-			ModelLoader.addSpecialModel(NostrumMagica.Loc(key));
+			ForgeModelBakery.addSpecialModel(NostrumMagica.Loc(key));
 		}
 		
 		for (ResourceLocation loc : ModelDragonRed.getModelParts()) {
-			ModelLoader.addSpecialModel(loc);
+			ForgeModelBakery.addSpecialModel(loc);
 		}
 		
-		ModelLoader.addSpecialModel(NostrumItemSpecialRenderer.BASE_MODEL);
+		ForgeModelBakery.addSpecialModel(NostrumItemSpecialRenderer.BASE_MODEL);
 	}
 	
 	@SubscribeEvent
@@ -472,7 +472,7 @@ public class ClientInit {
 	@SuppressWarnings("deprecation")
 	@SubscribeEvent
 	public void stitchEventPre(TextureStitchEvent.Pre event) {
-		if(event.getMap().location() != TextureAtlas.LOCATION_BLOCKS) {
+		if(event.getAtlas().location() != TextureAtlas.LOCATION_BLOCKS) {
 			return;
 		}
 		
@@ -717,7 +717,7 @@ public class ClientInit {
 			return;
 		}
 		
-		final ItemStack stack = event.getStack();
+		final ItemStack stack = event.getItemStack();
 		if (SpellAction.isEnchantable(stack)) {
 			event.getTooltipElements().add(Either.right(new EnchantableHintTooltip()));
 		}

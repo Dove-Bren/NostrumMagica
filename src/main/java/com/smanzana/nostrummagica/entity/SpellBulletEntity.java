@@ -32,7 +32,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.fmllegacy.network.NetworkHooks;
+import net.minecraftforge.network.NetworkHooks;
 
 // Like shulker bullets but have spells in them
 public class SpellBulletEntity extends ShulkerBullet {
@@ -183,7 +183,7 @@ public class SpellBulletEntity extends ShulkerBullet {
 
 		// Blocky movement looks for next block and tries to move to that one, using random if multiple spots still
 		// move in the right direction.
-		if (blockyPath && targetPos.distSqr(this.getX(), this.getY(), this.getZ(), true) >= 4.0D) {
+		if (!targetPos.closerToCenterThan(this.position(), 2)) {
 			BlockPos blockpos1 = this.blockPosition();
 			List<Direction> list = Lists.<Direction>newArrayList();
 

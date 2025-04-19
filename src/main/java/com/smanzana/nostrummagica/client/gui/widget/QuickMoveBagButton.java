@@ -24,7 +24,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
+import net.minecraftforge.client.event.ScreenEvent.InitScreenEvent;
 
 public class QuickMoveBagButton extends AbstractButton {
 	
@@ -44,7 +44,7 @@ public class QuickMoveBagButton extends AbstractButton {
 	@Override
 	public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 		final float color[] = ColorUtil.ARGBToColor(shouldBeClickable() ? 0xFFFFFFFF : 0xFF808080);
-		if (this.isHovered()) {
+		if (this.isHoveredOrFocused()) {
 			color[0] *= .8f;
 			color[1] *= .8f;
 			color[2] *= .8f;
@@ -138,15 +138,15 @@ public class QuickMoveBagButton extends AbstractButton {
 		return false;
 	}
 	
-	public static final void OnContainerScreenShow(InitGuiEvent.Post event) {
-		if (event.getGui() instanceof AbstractContainerScreen) {
+	public static final void OnContainerScreenShow(InitScreenEvent.Post event) {
+		if (event.getScreen() instanceof AbstractContainerScreen) {
 			final Minecraft mc = Minecraft.getInstance();
 			Player player = mc.player;
-			final AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) event.getGui();
+			final AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) event.getScreen();
 			if (ReagentAndRuneTransfer.ShouldAddTo(player, screen.getMenu())) {
 				// May have already added button.
 				QuickMoveBagButton button = null;
-				for (GuiEventListener w : event.getWidgetList()) {
+				for (GuiEventListener w : event.getListenersList()) {
 					if (w instanceof QuickMoveBagButton) {
 						button = (QuickMoveBagButton) w;
 						break;
@@ -155,7 +155,7 @@ public class QuickMoveBagButton extends AbstractButton {
 				
 				if (button == null) {
 					button = new QuickMoveBagButton(0, 0, 10, 10, player, screen);
-					event.addWidget(button);
+					event.addListener(button);
 				}
 				
 				button.handleLayout(screen);

@@ -21,14 +21,13 @@ import com.smanzana.nostrummagica.spell.component.shapes.TouchShape;
 import com.smanzana.nostrummagica.util.SpellUtils;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
@@ -60,7 +59,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.Tags;
 
 public class SpriteEntity extends PathfinderMob implements ILoreSupplier, IElementalEntity {
 	
@@ -444,12 +443,12 @@ public class SpriteEntity extends PathfinderMob implements ILoreSupplier, IEleme
 	@Override
 	public float getWalkTargetValue(BlockPos pos, LevelReader worldIn) {
 		// Want to use dimension key but not available with IWorldReadyer
-		ResourceKey<Biome> biomeKey = ResourceKey.create(Registry.BIOME_REGISTRY, worldIn.getBiome(pos).getRegistryName());
+		Holder<Biome> biomeKey = worldIn.getBiome(pos);
 		
 //		if (DimensionUtils.IsNether(worldIn.)) {
 //			return 0; // Nether is very bright
 //		}
-		if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.NETHER)) {
+		if (biomeKey.containsTag(Tags.Biomes.IS_DRY_NETHER)) {
 			return 0;
 		}
 		

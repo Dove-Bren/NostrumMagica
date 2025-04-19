@@ -98,6 +98,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.Team;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameableEntity, ITameDragon, IChangeListener, IPetWithSoul, IStabbableEntity {
@@ -196,8 +197,6 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 	public TameRedDragonEntity(EntityType<? extends TameRedDragonEntity> type, Level worldIn) {
 		super(type, worldIn);
 		
-        this.maxUpStep = 2;
-        
         this.inventory = new SimpleContainer(DRAGON_INV_SIZE);
         this.equipment = new DragonEquipmentInventory(this);
         this.spellInventory = new RedDragonSpellInventory();
@@ -706,7 +705,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		compound.putBoolean(NBT_CAP_MAGIC, this.getCanUseMagic());
 		compound.putInt(NBT_CAP_MAGIC_SIZE, this.getMagicMemorySize());
 		compound.putInt(NBT_ATTR_XP, this.getXP());
-		compound.putInt(NBT_ATTR_LEVEL, this.getLevel());
+		compound.putInt(NBT_ATTR_LEVEL, this.getDragonLevel());
 		compound.putFloat(NBT_ATTR_BOND, this.getBond());
 		
 		// Write inventory
@@ -1083,7 +1082,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 			magicMemory = rand.nextInt(2) + 1;
 		}
 		
-		//this.setStats(canFly, bonusJumps, bonusJumpHeight, bonusSpeed, health, health, mana, mana, regen, hasMagic, magicMemory, this.getXP(), this.getLevel(), this.getBond());
+		//this.setStats(canFly, bonusJumps, bonusJumpHeight, bonusSpeed, health, health, mana, mana, regen, hasMagic, magicMemory, this.getXP(), this.getDragonLevel(), this.getBond());
 		return new RedDragonSpawnData(
 				canFly,
 				bonusJumps,
@@ -1187,7 +1186,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 	}
 	
 	public void levelup() {
-		int level = this.getLevel();
+		int level = this.getDragonLevel();
 		
 		// Red dragons possible gain jump height, max Health, max Mana, and Speed.
 		Random rand = getRandom();
@@ -1360,7 +1359,9 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 	        .add(Attributes.ATTACK_DAMAGE, 10.0D)
 	        .add(Attributes.ARMOR, 10.0D)
 	        .add(Attributes.ATTACK_SPEED, 0.5D)
-	        .add(Attributes.FOLLOW_RANGE, 64D);
+	        .add(Attributes.FOLLOW_RANGE, 64D)
+	        .add(ForgeMod.STEP_HEIGHT_ADDITION.get(), 2)
+	        ;
     }
 	
 	@Override
@@ -1699,7 +1700,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		};
 	}
 	
-	public int getLevel() {
+	public int getDragonLevel() {
 		return this.entityData.get(ATTRIBUTE_LEVEL);
 	}
 	
@@ -1714,7 +1715,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 
 	@Override
 	public int getMaxXP() {
-		return this.getMaxXP(getLevel());
+		return this.getMaxXP(getDragonLevel());
 	}
 
 	@Override
@@ -2419,7 +2420,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 					hasMagic,
 					magicMemory,
 					dragon.getXP(),
-					dragon.getLevel(),
+					dragon.getDragonLevel(),
 					dragon.getBond()
 					);
 		}

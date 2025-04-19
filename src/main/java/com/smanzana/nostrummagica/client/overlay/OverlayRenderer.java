@@ -1305,7 +1305,7 @@ public class OverlayRenderer extends GuiComponent {
 	public void onEntityRender(RenderLivingEvent.Post<LivingEntity, EntityModel<LivingEntity>> event) {
 		if (!renderRecurseMarker) {
 			final LivingEntity entity = event.getEntity();
-			final PoseStack matrixStackIn = event.getMatrixStack();
+			final PoseStack matrixStackIn = event.getPoseStack();
 			
 			//final float partialTicks = event.getPartialRenderTick();
 			renderRecurseMarker = true;
@@ -1373,15 +1373,15 @@ public class OverlayRenderer extends GuiComponent {
 			return;
 		}
 		
-		BlockState state = event.getInfo().getEntity().level.getBlockState(RayTrace.blockPosFromResult(event.getTarget()));
+		BlockState state = event.getCamera().getEntity().level.getBlockState(RayTrace.blockPosFromResult(event.getTarget()));
 		if (state == null) {
 			return;
 		}
 		
 		// Dungeon Air wants no overlay
 		if (state.getBlock() instanceof DungeonAirBlock) {
-			if (!(event.getInfo().getEntity() instanceof Player)
-					|| ((Player) event.getInfo().getEntity()).isCreative()) {
+			if (!(event.getCamera().getEntity() instanceof Player)
+					|| ((Player) event.getCamera().getEntity()).isCreative()) {
 				event.setCanceled(true);
 				return;
 			}

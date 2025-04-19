@@ -98,7 +98,7 @@ public class MimicBlockBakedModel implements BakedModel {
 		BlockState nested = getNestedState(extraData);
 		if (nested == null || nested.isAir()) {
 			return this.undisguisedModel.getQuads(state, side, rand, extraData);
-		}else if (ItemBlockRenderTypes.canRenderInLayer(state, MinecraftForgeClient.getRenderLayer())) {
+		}else if (ItemBlockRenderTypes.canRenderInLayer(state, MinecraftForgeClient.getRenderType())) {
 			return getModelToRender(nested).getQuads(nested, side, rand, extraData);
 		} else {
 			return EmptyQuads;

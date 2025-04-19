@@ -10,7 +10,6 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
@@ -49,7 +48,7 @@ public class LoreHintTooltipComponent extends AbsoluteTooltipComponent {
 	}
 	
 	@Override
-	public void renderImage(Font font, int x, int y, PoseStack matrixStackIn, ItemRenderer itemRenderer, int z, TextureManager textureManager) {
+	public void renderImage(Font font, int x, int y, PoseStack matrixStackIn, ItemRenderer itemRenderer, int z) {
 		// I think in 1.18 this loses its textureManager param?
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(mouseX + tooltipWidth - 4, mouseY + tooltipHeight - 6, z);

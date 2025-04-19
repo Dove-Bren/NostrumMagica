@@ -151,7 +151,7 @@ public class MysticWaterFluid extends Fluid {
 				worldIn.setBlock(pos, state.setValue(LEVEL_1_8, newLevel).createLegacyBlock(), 3);
 			}
 		}
-		worldIn.getLiquidTicks().scheduleTick(pos, this, this.getTickDelay(worldIn));
+		worldIn.scheduleTick(pos, this, this.getTickDelay(worldIn));
 	}
 	
 	@Override // no clue what this is

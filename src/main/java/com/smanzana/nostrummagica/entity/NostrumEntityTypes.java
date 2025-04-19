@@ -37,6 +37,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -300,7 +301,7 @@ public class NostrumEntityTypes {
 		SpawnPlacements.register(lux, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING, Animal::checkAnimalSpawnRules);
 		
 		// Can't mix buses, so manually register spawn handling to the game bus
-		MinecraftForge.EVENT_BUS.addListener(NostrumEntityTypes::registerSpawns);
+		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, NostrumEntityTypes::registerSpawns);
 	}
 	
 	//@SubscribeEvent registered in #registerEntityPlacement above

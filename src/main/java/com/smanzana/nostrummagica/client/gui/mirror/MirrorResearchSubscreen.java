@@ -587,7 +587,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			
 			switch (research.getSize()) {
 			case GIANT:
-				if (this.isHovered()) {
+				if (this.isHoveredOrFocused()) {
 					textureX = TEX_RESEARCHBUTTON_GIANT_HIGH_HOFFSET;
 					textureY = TEX_RESEARCHBUTTON_GIANT_HIGH_VOFFSET;
 				} else {
@@ -598,7 +598,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 				textureH = TEX_RESEARCHBUTTON_GIANT_HEIGHT;
 				break;
 			case LARGE:
-				if (this.isHovered()) {
+				if (this.isHoveredOrFocused()) {
 					textureX = TEX_RESEARCHBUTTON_LARGE_HIGH_HOFFSET;
 					textureY = TEX_RESEARCHBUTTON_LARGE_HIGH_VOFFSET;
 				} else {
@@ -611,7 +611,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 				break;
 			case NORMAL:
 			default:
-				if (this.isHovered()) {
+				if (this.isHoveredOrFocused()) {
 					textureX = TEX_RESEARCHBUTTON_SMALL_HIGH_HOFFSET;
 					textureY = TEX_RESEARCHBUTTON_SMALL_HIGH_VOFFSET;
 				} else {
@@ -660,7 +660,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		
 		@Override
 		public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
-			if (shouldShow() && this.visible && isHovered()) {
+			if (shouldShow() && this.visible && isHoveredOrFocused()) {
 				final Minecraft mc = Minecraft.getInstance();
 				final Font font = mc.font;
 		        matrixStackIn.pushPose();

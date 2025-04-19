@@ -719,7 +719,7 @@ public class SpellCreationGui {
 					v = TEXT_SUBMIT_VOFFSET;
 					wu = TEXT_SUBMIT_WIDTH;
 					hv = TEXT_SUBMIT_HEIGHT;
-					tint = this.isHovered() ? .8f : 1f;
+					tint = this.isHoveredOrFocused() ? .8f : 1f;
 				} else {
 					u = TEXT_SUBMIT_DISABLED_HOFFSET;
 					v = TEXT_SUBMIT_DISABLED_VOFFSET;
@@ -734,7 +734,7 @@ public class SpellCreationGui {
 						tint, tint, tint, 1f
 						);
 				
-				if (this.isHovered()) {
+				if (this.isHoveredOrFocused()) {
 					matrixStackIn.pushPose();
 					matrixStackIn.translate(0, 0, 100);
 					this.renderToolTip(matrixStackIn, mouseX, mouseY);
@@ -786,7 +786,7 @@ public class SpellCreationGui {
 						this.width, this.height, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT
 						);
 				
-				if (this.isHovered()) {
+				if (this.isHoveredOrFocused()) {
 					matrixStackIn.pushPose();
 					matrixStackIn.translate(0, 0, 100);
 					this.renderToolTip(matrixStackIn, mouseX, mouseY);
@@ -862,7 +862,7 @@ public class SpellCreationGui {
 						meterWidth, meterHeight, TEXT_UTILS_WIDTH, TEXT_UTILS_HEIGHT
 						);
 				
-				if (this.isHovered()) {
+				if (this.isHoveredOrFocused()) {
 					matrixStackIn.pushPose();
 					matrixStackIn.translate(0, 0, 100);
 					this.renderToolTip(matrixStackIn, mouseX, mouseY);
@@ -934,7 +934,7 @@ public class SpellCreationGui {
 						matrixStackIn.popPose();
 					}
 					
-					if (this.isHovered()) {
+					if (this.isHoveredOrFocused()) {
 						matrixStackIn.pushPose();
 						matrixStackIn.translate(0, 0, 100);
 						this.renderToolTip(matrixStackIn, mouseX, mouseY);
@@ -1005,7 +1005,7 @@ public class SpellCreationGui {
 				}
 				matrixStackIn.popPose();
 				
-				if (this.isHovered()) {
+				if (this.isHoveredOrFocused()) {
 					RenderFuncs.drawRect(matrixStackIn, x, y, x + width, y + height, 0x20FFFFFF);
 					
 					if (onHover != null) {
@@ -1019,7 +1019,7 @@ public class SpellCreationGui {
 					}
 				}
 				
-				wasHovered = this.isHovered();
+				wasHovered = this.isHoveredOrFocused();
 			}
 			
 			@Override

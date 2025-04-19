@@ -2,15 +2,9 @@ package com.smanzana.nostrummagica.integration.aetheria;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrumaetheria.api.capability.IAetherBurnable;
-import com.smanzana.nostrumaetheria.api.proxy.APIProxy;
-
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -24,7 +18,7 @@ public class AetheriaProxy {
 	@ObjectHolder("nostrumaetheria:shield_ring_large") public static @Nullable Item ringShieldLarge; // Requires Aether
 	@ObjectHolder("nostrumaetheria:elude_cloak") public static @Nullable Item eludeCape; // Requires Aether
 	
-	public static @Nullable Capability<IAetherBurnable> AetherBurnableCapability = CapabilityManager.get(new CapabilityToken<>(){});
+	//public static @Nullable Capability<IAetherBurnable> AetherBurnableCapability = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	private boolean enabled;
 	
@@ -70,8 +64,10 @@ public class AetheriaProxy {
 	}
 	
 	protected Item.Properties propAetheria() {
-		return new Item.Properties()
-				.tab(APIProxy.creativeTab);
+		int unused;
+		return new Item.Properties();
+//		return new Item.Properties()
+//				.tab(APIProxy.creativeTab);
 	}
 	
 	@SubscribeEvent
@@ -135,7 +131,9 @@ public class AetheriaProxy {
 	}
 
 	public Object makeBurnable(int burnTicks, float aether) {
-		return APIProxy.makeBurnable(burnTicks, aether);
+		int unused;
+		return null;
+		//return APIProxy.makeBurnable(burnTicks, aether);
 	}
 	
 	

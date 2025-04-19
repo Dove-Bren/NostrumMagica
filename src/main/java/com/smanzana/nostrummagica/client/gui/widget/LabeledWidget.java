@@ -93,7 +93,7 @@ public class LabeledWidget extends MoveableObscurableWidget {
 	
 	@Override
 	public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
-		if (this.isHovered() && this.tooltip != null) {
+		if (this.isHoveredOrFocused() && this.tooltip != null) {
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 100);
 			parent.renderComponentTooltip(matrixStackIn, tooltip, mouseX, mouseY);

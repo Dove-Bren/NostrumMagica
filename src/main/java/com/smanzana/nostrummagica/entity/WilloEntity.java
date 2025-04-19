@@ -40,14 +40,13 @@ import com.smanzana.nostrummagica.util.SpellUtils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -84,7 +83,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.Tags;
 
 public class WilloEntity extends Monster implements ILoreSupplier, IElementalEntity {
 	
@@ -602,13 +601,14 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 			return false;
 		}
 		
+		
 		// Want to use dimension key but not available with IWorldReadyer
-		ResourceKey<Biome> biomeKey = ResourceKey.create(Registry.BIOME_REGISTRY, world.getBiome(this.blockPosition()).getRegistryName());
+		Holder<Biome> biomeKey = world.getBiome(this.blockPosition());
 		
 //		if (!DimensionUtils.IsOverworld(world) && !DimensionUtils.IsNether(world)) {
 //			return false;
 //		}
-		if (BiomeDictionary.hasType(biomeKey, BiomeDictionary.Type.END)) {
+		if (biomeKey.containsTag(Tags.Biomes.IS_END)) {
 			return false;
 		}
 		

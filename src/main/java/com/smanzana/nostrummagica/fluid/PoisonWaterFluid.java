@@ -148,7 +148,7 @@ public abstract class PoisonWaterFluid extends ForgeFlowingFluid {
 	
 	@Override // no clue what this is
 	public boolean canBeReplacedWith(FluidState p_215665_1_, BlockGetter p_215665_2_, BlockPos p_215665_3_, Fluid p_215665_4_, Direction p_215665_5_) {
-		return p_215665_5_ == Direction.DOWN && !p_215665_4_.is(FluidTags.WATER);
+		return p_215665_5_ == Direction.DOWN && !p_215665_1_.is(FluidTags.WATER);
 	}
 
 	@Override

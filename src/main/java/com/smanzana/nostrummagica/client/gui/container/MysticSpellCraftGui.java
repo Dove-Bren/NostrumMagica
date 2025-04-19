@@ -279,7 +279,7 @@ public class MysticSpellCraftGui {
 			public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final int u, v, wu, hv;
 				
-				if (this.isHovered()) {
+				if (this.isHoveredOrFocused()) {
 					if (this.isLeft) {
 						u = TEX_LARROW_HIGH_HOFFSET;
 						v = TEX_LARROW_HIGH_VOFFSET;

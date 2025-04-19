@@ -104,7 +104,7 @@ public class OutlineRenderer {
 	public final void onEntityRender(RenderLivingEvent.Post<LivingEntity, EntityModel<LivingEntity>> event) {
 		if (!renderRecurseMarker) {
 			final LivingEntity entity = event.getEntity();
-			final PoseStack matrixStackIn = event.getMatrixStack();
+			final PoseStack matrixStackIn = event.getPoseStack();
 			
 			if (Minecraft.getInstance().shouldEntityAppearGlowing(entity)) {
 				renderEntityDoingGlow = true; // Note that vanilla is doing glow rendering
@@ -115,7 +115,7 @@ public class OutlineRenderer {
 				outline = this.outlineEntities.get(entity);
 			}
 			if (outline != null) {
-				final float partialTicks = event.getPartialRenderTick();
+				final float partialTicks = event.getPartialTick();
 				renderRecurseMarker = true;
 				{
 					renderEntityOutline(matrixStackIn, entity, outline, entity.getViewYRot(partialTicks), partialTicks);

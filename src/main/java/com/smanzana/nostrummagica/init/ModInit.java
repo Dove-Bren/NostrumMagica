@@ -131,8 +131,6 @@ import com.smanzana.nostrummagica.trial.WorldTrial;
 import com.smanzana.nostrummagica.util.Ingredients;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
-import com.smanzana.nostrummagica.world.gen.NostrumFeatures;
-import com.smanzana.nostrummagica.world.gen.NostrumStructures;
 
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.commands.CommandSourceStack;
@@ -150,12 +148,10 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -1472,9 +1468,10 @@ public class ModInit {
 						new OutcomeSpawnItem(new ItemStack(NostrumBlocks.paradoxMirror, 2))));
 		
 		// Try to use silver, but use iron if no silver is in the modpack
-		Ingredient silver = NostrumTags.Items.SilverIngot.getValues().isEmpty()
-				? Ingredient.of(Tags.Items.INGOTS_IRON)
-				: Ingredient.of(NostrumTags.Items.SilverIngot);
+		Ingredient silver = //NostrumTags.Items.SilverIngot.getValues().isEmpty()
+				/*?*/ Ingredient.of(Tags.Items.INGOTS_IRON)
+				//: Ingredient.of(NostrumTags.Items.SilverIngot)
+				;
 		
 		registry.register(RitualRecipe.createTier3(
 				"silver_mirror", new ItemStack(NostrumItems.silverMirror), null, new ReagentType[] { ReagentType.MANI_DUST,
@@ -2140,17 +2137,18 @@ public class ModInit {
 			return;
 		}
 		
-		// Filter this list maybe?
-		final BiomeGenerationSettingsBuilder gen = event.getGeneration();
-		gen.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, NostrumFeatures.CONFFEATURE_FLOWER_CRYSTABLOOM);
-		gen.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, NostrumFeatures.CONFFEATURE_FLOWER_MIDNIGHTIRIS);
-		
-		gen.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, NostrumFeatures.CONFFEATURE_ORE_MANI);
-		gen.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, NostrumFeatures.CONFFEATURE_ORE_ESSORE);
-		
-		gen.addStructureStart(NostrumStructures.CONFIGURED_DUNGEON_PORTAL);
-		gen.addStructureStart(NostrumStructures.CONFIGURED_DUNGEON_DRAGON);
-		gen.addStructureStart(NostrumStructures.CONFIGUREDDUNGEON_PLANTBOSS);
+		int unused; // not needed anymore?
+//		// Filter this list maybe?
+//		final BiomeGenerationSettingsBuilder gen = event.getGeneration();
+//		gen.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, NostrumFeatures.CONFFEATURE_FLOWER_CRYSTABLOOM);
+//		gen.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, NostrumFeatures.CONFFEATURE_FLOWER_MIDNIGHTIRIS);
+//		
+//		gen.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, NostrumFeatures.CONFFEATURE_ORE_MANI);
+//		gen.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, NostrumFeatures.CONFFEATURE_ORE_ESSORE);
+//		
+//		gen.addStructureStart(NostrumStructures.CONFIGURED_DUNGEON_PORTAL);
+//		gen.addStructureStart(NostrumStructures.CONFIGURED_DUNGEON_DRAGON);
+//		gen.addStructureStart(NostrumStructures.CONFIGUREDDUNGEON_PLANTBOSS);
 ////		  Have to add structures as structures AND features.
 ////		 Vanilla adds all structs as features and then only some as structures to turn them on for different biomes.
 ////		 Adding as struct makes the world generate starts and the logical part. Adding as features makes them actually place in the world.

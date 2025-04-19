@@ -35,7 +35,7 @@ public abstract class AbsoluteTooltipComponent implements ClientTooltipComponent
 		int tooltipHeight = event.getComponents().size() == 1 ? -2 : 0; // copied from renderTooltipInternal
 		List<AbsoluteTooltipComponent> listeners = new ArrayList<>(1);
 		for (ClientTooltipComponent comp : event.getComponents()) {
-			tooltipWidth = Math.max(tooltipWidth, comp.getWidth(event.getFontRenderer()));
+			tooltipWidth = Math.max(tooltipWidth, comp.getWidth(event.getFont()));
 			tooltipHeight += comp.getHeight();
 			if (comp instanceof AbsoluteTooltipComponent tooltip) {
 				listeners.add(tooltip);

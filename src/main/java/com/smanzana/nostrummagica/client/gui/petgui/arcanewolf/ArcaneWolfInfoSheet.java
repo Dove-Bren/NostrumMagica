@@ -298,7 +298,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		}
 		
 		public void drawOverlay(Minecraft mc, PoseStack matrixStackIn, int sheetWidth, int sheetHeight, int mouseX, int mouseY) {
-			if (this.isHovered()) {
+			if (this.isHoveredOrFocused()) {
 				mc.screen.renderTooltip(matrixStackIn, Arrays.asList(this.tooltip), Optional.empty(), mouseX, mouseY, mc.font);
 			}
 		}

@@ -58,7 +58,6 @@ import com.smanzana.nostrummagica.tile.TeleportRuneTileEntity;
 import com.smanzana.nostrummagica.util.Projectiles;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -84,7 +83,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
@@ -111,7 +109,7 @@ import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 /**
  * I lied. It's actually the one and only listener. It listens to time, too. And
@@ -1024,7 +1022,7 @@ public class PlayerListener {
 			if (tickCount % 10 == 0) {
 				
 				// Crash here if workqueue stops being a minecraft server. I'm not sure of the RIGHT way of doing this.
-				for (ServerLevel world : ((MinecraftServer) LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)).getAllLevels()) {
+				for (ServerLevel world : ServerLifecycleHooks.getCurrentServer().getAllLevels()) {
 					if (world.players().isEmpty()) {
 						continue;
 					}
@@ -1062,11 +1060,11 @@ public class PlayerListener {
 			
 			PortalBlock.serverTick();
 			TeleportRuneTileEntity.tickChargeMap();
-			for (ServerLevel world : ((MinecraftServer) LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)).getAllLevels()) {
+			for (ServerLevel world : ServerLifecycleHooks.getCurrentServer().getAllLevels()) {
 				ElementalArmor.ServerWorldTick(world);
 			}
 		} else if (event.phase == Phase.END) {
-			for (ServerLevel world : ((MinecraftServer) LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)).getAllLevels()) {
+			for (ServerLevel world : ServerLifecycleHooks.getCurrentServer().getAllLevels()) {
 				// Do cursed fire check
 				world.getEntities(EntityTypeTest.forClass(LivingEntity.class), e -> e.getEffect(NostrumEffects.cursedFire) != null && e.isInWaterRainOrBubble())
 					.forEach(e -> {

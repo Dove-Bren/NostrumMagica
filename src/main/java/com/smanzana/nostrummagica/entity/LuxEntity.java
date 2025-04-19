@@ -1043,7 +1043,7 @@ public class LuxEntity extends Animal implements ILoreSupplier/*, ITameableEntit
 		// We only care about nostrum flowers
 		return (state != null
 				&& (state.getBlock() instanceof MagicaFlowerBlock
-						|| BlockTags.SMALL_FLOWERS.contains(state.getBlock())));
+						|| state.is(BlockTags.SMALL_FLOWERS)));
 	}
 	
 	/**

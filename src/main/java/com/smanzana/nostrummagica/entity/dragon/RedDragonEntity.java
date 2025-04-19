@@ -59,6 +59,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerBossEvent;
@@ -188,7 +189,6 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	
 	public RedDragonEntity(EntityType<? extends RedDragonEntity> type, Level worldIn) {
 		super(type, worldIn);
-		this.maxUpStep = 2;
 		this.noCulling = true;
 		this.xpReward = 1000;
 		this.noPhysics = false;
@@ -376,7 +376,9 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 	        .add(Attributes.ATTACK_DAMAGE, 15.0D)
 	        .add(Attributes.ARMOR, 15.0D)
 	        .add(Attributes.ATTACK_SPEED, 0.5D)
-	        .add(Attributes.FOLLOW_RANGE, 64D);
+	        .add(Attributes.FOLLOW_RANGE, 64D)
+	        .add(ForgeMod.STEP_HEIGHT_ADDITION.get(), 2)
+	        ;
     }
 	
 	@Override

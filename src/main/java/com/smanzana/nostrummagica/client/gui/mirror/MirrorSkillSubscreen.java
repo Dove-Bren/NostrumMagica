@@ -425,7 +425,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 				v = TEX_ICON_BUTTON_OWNED_VOFFSET;
 			}
 			
-			if (this.isHovered()) {
+			if (this.isHoveredOrFocused()) {
 				color[0] *= .8f;
 				color[1] *= .8f;
 				color[2] *= .8f;
@@ -455,7 +455,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 		
 		@Override
 		public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
-			if (this.isHovered()) { 
+			if (this.isHoveredOrFocused()) { 
 				final Minecraft mc = Minecraft.getInstance();
 				final Font font = mc.font;
 				matrixStackIn.pushPose();

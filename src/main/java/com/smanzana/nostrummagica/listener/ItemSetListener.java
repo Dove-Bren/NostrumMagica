@@ -18,7 +18,6 @@ import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 import com.smanzana.nostrummagica.item.set.EquipmentSet;
 
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -29,12 +28,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class ItemSetListener {
 	
@@ -184,7 +182,7 @@ public class ItemSetListener {
 	@SubscribeEvent
 	public void ServerWorldTick(ServerTickEvent event) {
 		if (event.phase == TickEvent.Phase.END) {
-			for (ServerLevel world : ((MinecraftServer) LogicalSidedProvider.WORKQUEUE.get(LogicalSide.SERVER)).getAllLevels()) {
+			for (ServerLevel world : ServerLifecycleHooks.getCurrentServer().getAllLevels()) {
 				world.getEntities().get(EntityTypeTest.forClass(LivingEntity.class), (ent) -> {
 					if (ent instanceof LivingEntity) {
 						LivingEntity living = (LivingEntity) ent;

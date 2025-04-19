@@ -184,9 +184,10 @@ public class CuriosProxy {
 		registry.register(recipe);
 		
 		// Try to use silver, but use iron if no silver is in the modpack
-		Ingredient silver = NostrumTags.Items.SilverIngot.getValues().isEmpty()
-				? Ingredient.of(Tags.Items.INGOTS_IRON)
-				: Ingredient.of(NostrumTags.Items.SilverIngot);
+		Ingredient silver = //NostrumTags.Items.SilverIngot.getValues().isEmpty()
+				/*?*/ Ingredient.of(Tags.Items.INGOTS_IRON)
+				//: Ingredient.of(NostrumTags.Items.SilverIngot)
+				;
 		
 		recipe = RitualRecipe.createTier3("ring_silver",
 				new ItemStack(NostrumCurios.ringSilver),

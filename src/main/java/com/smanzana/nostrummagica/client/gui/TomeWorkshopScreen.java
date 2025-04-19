@@ -762,7 +762,7 @@ public class TomeWorkshopScreen extends Screen {
 				RenderFuncs.drawRect(matrixStackIn, 1, 1, this.width - 1, this.height - 1, 0x3088FF55);
 			}
 			
-			if (this.isHovered()) {
+			if (this.isHoveredOrFocused()) {
 				final int slotHighlightColor = -2130706433; // copied from ContainerScreen
 				RenderFuncs.drawRect(matrixStackIn, 1, 1, this.width - 1 , this.height - 1, slotHighlightColor);
 			}
@@ -857,7 +857,7 @@ public class TomeWorkshopScreen extends Screen {
 				RenderFuncs.drawRect(matrixStackIn, 1, 1, this.width - 1, this.height - 1, 0x3088FF55);
 			}
 			
-			if (this.isHovered()) {
+			if (this.isHoveredOrFocused()) {
 				final int slotHighlightColor = -2130706433; // copied from ContainerScreen
 				RenderFuncs.drawRect(matrixStackIn, 1, 1, this.width - 1 , this.height - 1, slotHighlightColor);
 			}
@@ -920,7 +920,7 @@ public class TomeWorkshopScreen extends Screen {
 				matrixStackIn.translate(0, 0, 10);
 			}
 			 
-			if (this.isHovered()) {
+			if (this.isHoveredOrFocused()) {
 				final int slotHighlightColor = -2130706433; // copied from ContainerScreen
 				RenderFuncs.drawRect(matrixStackIn, 0, 0, this.width -2 , this.height - 2, slotHighlightColor);
 			}
@@ -975,7 +975,7 @@ public class TomeWorkshopScreen extends Screen {
 			
 			// Draw background
 			RenderSystem.setShaderTexture(0, TEXT);
-			if (this.isHovered() || pressed) {
+			if (this.isHoveredOrFocused() || pressed) {
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 					TEXT_SCROLLBAR_HIGH_HOFFSET, TEXT_SCROLLBAR_HIGH_VOFFSET,
 					TEXT_SCROLLBAR_HIGH_WIDTH, TEXT_SCROLLBAR_HIGH_HEIGHT,
@@ -1033,7 +1033,7 @@ public class TomeWorkshopScreen extends Screen {
 			if (disabled) {
 				
 			} else {
-				if (this.isHovered()) {
+				if (this.isHoveredOrFocused()) {
 					if (this.isLeft) {
 						RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
 							TEXT_LARROW_HIGH_HOFFSET, TEXT_LARROW_HIGH_VOFFSET,

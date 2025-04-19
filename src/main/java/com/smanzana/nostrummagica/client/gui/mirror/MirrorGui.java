@@ -545,7 +545,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		public void renderButton(PoseStack matrixStackIn, int mouseX, int mouseY, float partialTicks) {
 				final int textureX;
 				final int textureY;
-				if (this.isHovered()) {
+				if (this.isHoveredOrFocused()) {
 					textureX = TEX_MAJORTAB_HOFFSET;
 					textureY = TEX_MAJORTAB_VOFFSET;
 				} else {
@@ -568,7 +568,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		
 		@Override
 		public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
-			if (this.isHovered()) { 
+			if (this.isHoveredOrFocused()) { 
 				matrixStackIn.pushPose();
 				matrixStackIn.translate(0, 0, 250);
 				gui.renderTooltip(matrixStackIn, this.subscreen.getName(), mouseX, mouseY);
@@ -606,7 +606,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 			if (isSelected()) {
 				textureX = TEX_MINORTAB_HOFFSET;
 				textureY = TEX_MINORTAB_VOFFSET;
-			} else if (this.isHovered()) {
+			} else if (this.isHoveredOrFocused()) {
 				textureX = TEX_MINORTAB_HIGH_HOFFSET;
 				textureY = TEX_MINORTAB_HIGH_VOFFSET;
 			} else {
@@ -637,7 +637,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		
 		@Override
 		public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
-			if (this.isHovered()) {
+			if (this.isHoveredOrFocused()) {
 				gui.renderTooltip(matrixStackIn, this.tab.getName(), mouseX, mouseY);
 			}
 		}
