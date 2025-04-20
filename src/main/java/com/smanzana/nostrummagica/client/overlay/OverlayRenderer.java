@@ -96,9 +96,10 @@ import net.minecraft.world.phys.HitResult.Type;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.DrawSelectionEvent;
 import net.minecraftforge.client.event.RenderBlockOverlayEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.IIngameOverlay;
 import net.minecraftforge.client.gui.OverlayRegistry;
@@ -1317,7 +1318,11 @@ public class OverlayRenderer extends GuiComponent {
 	}
 	
 	@SubscribeEvent
-	public void onRenderLast(RenderWorldLastEvent event) {
+	public void onRenderLast(RenderLevelStageEvent event) {
+		if (event.getStage() != Stage.AFTER_PARTICLES) {
+			return;
+		}
+		
 		// Copy of what vanilla uses to figure out if it should render the render entity:
 		Minecraft mc = Minecraft.getInstance();
 		final boolean shouldRenderMe = (
@@ -1327,7 +1332,7 @@ public class OverlayRenderer extends GuiComponent {
 		
 		if (!shouldRenderMe) {
 			// Normal render didn't happen. Do rooted render manually instead.
-			renderRoots(event.getMatrixStack(), NostrumMagica.instance.proxy.getPlayer());
+			renderRoots(event.getPoseStack(), NostrumMagica.instance.proxy.getPlayer());
 		}
 	}
 	

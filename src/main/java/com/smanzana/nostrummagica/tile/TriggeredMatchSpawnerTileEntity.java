@@ -29,12 +29,10 @@ public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		
 		nbt.putBoolean(NBT_TRIGGERED, isTriggered());
-		
-		return nbt;
 	}
 	
 	@Override

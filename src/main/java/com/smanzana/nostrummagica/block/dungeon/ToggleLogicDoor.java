@@ -86,7 +86,7 @@ public class ToggleLogicDoor extends LogicDoorBlock {
 		if (isToggled(state)) {
 			// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
 			if (context != CollisionContext.empty() && context instanceof EntityCollisionContext) {
-				final @Nullable Entity entity = ((EntityCollisionContext) context).getEntity().orElse(null);
+				final @Nullable Entity entity = ((EntityCollisionContext) context).getEntity();
 				if (entity == null || !(entity instanceof Player) || !((Player) entity).isCreative()) {
 					return Shapes.empty();
 				}

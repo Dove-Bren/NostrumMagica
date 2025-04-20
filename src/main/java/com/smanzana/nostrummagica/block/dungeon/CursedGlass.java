@@ -100,9 +100,9 @@ public class CursedGlass extends SwitchBlock {
 		
 		// If creative, still be full cube even when broken
 		if (context instanceof EntityCollisionContext
-				&& ((EntityCollisionContext) context).getEntity().isPresent()
-				&& ((EntityCollisionContext)context).getEntity().get() instanceof Player
-				&& ((Player) ((EntityCollisionContext)context).getEntity().get()).isCreative()) {
+				&& ((EntityCollisionContext) context).getEntity() != null
+				&& ((EntityCollisionContext)context).getEntity() instanceof Player player
+				&& player.isCreative()) {
 			return Shapes.block();
 		}
 		

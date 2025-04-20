@@ -102,30 +102,27 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		
 		if (target != null) {
 			nbt.put(NBT_TARGET, target.toNBT());
 		}
-		
-		return nbt;
 	}
 	
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override
 	public CompoundTag getUpdateTag() {
-		return this.save(new CompoundTag());
+		return this.saveWithoutMetadata();
 	}
 	
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getTag());
 	}
 	
 }

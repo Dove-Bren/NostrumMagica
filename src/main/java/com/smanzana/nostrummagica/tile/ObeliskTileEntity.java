@@ -35,7 +35,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.fmllegacy.server.ServerLifecycleHooks;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class ObeliskTileEntity extends BlockEntity implements TickableBlockEntity {
 	
@@ -172,9 +172,8 @@ public class ObeliskTileEntity extends BlockEntity implements TickableBlockEntit
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
-		
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		ListTag list = new ListTag();
 		
 		if (master && targets.size() > 0)
@@ -195,7 +194,6 @@ public class ObeliskTileEntity extends BlockEntity implements TickableBlockEntit
 			nbt.putBoolean(NBT_ONESIDE_UPGRADED, upgradeOneside);
 			nbt.putBoolean(NBT_DIMENSION_UPGRADED, upgradeDimension);
 		}
-		return nbt;
 	}
 	
 	@Override
@@ -206,6 +204,7 @@ public class ObeliskTileEntity extends BlockEntity implements TickableBlockEntit
 			return;
 
 		this.master = nbt.getBoolean(NBT_MASTER);
+		this.targets.clear();
 		ListTag list = nbt.getList(NBT_TARGETS, Tag.TAG_COMPOUND);
 		if (list != null && list.size() > 0) {
 			this.targets = new ArrayList<>(list.size());
@@ -457,18 +456,17 @@ public class ObeliskTileEntity extends BlockEntity implements TickableBlockEntit
 	
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override
 	public CompoundTag getUpdateTag() {
-		return this.save(new CompoundTag());
+		return this.saveWithoutMetadata();
 	}
 	
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getTag());
 	}
 	
 	// Registers this TE as a chunk loader. Gets a ticket and forces the chunk.

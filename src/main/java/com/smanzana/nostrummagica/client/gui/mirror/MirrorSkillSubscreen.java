@@ -377,6 +377,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 			RenderSystem.enableBlend();
 			RenderSystem.disableTexture();
 			RenderSystem.lineWidth(3f);
+			RenderSystem.disableCull();
 
 			RenderSystem.defaultBlendFunc();
 			//RenderSystem.disableAlphaTest();
@@ -392,6 +393,7 @@ public class MirrorSkillSubscreen extends PanningMirrorSubscreen {
 //	        GlStateManager.enableTexture();
 	        RenderSystem.disableBlend();
 			RenderSystem.lineWidth(1f);
+			RenderSystem.enableCull();
 			
 //	        GlStateManager.popAttributes();
 	        matrixStackIn.popPose();

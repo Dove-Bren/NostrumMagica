@@ -48,12 +48,9 @@ public class PutterBlockTileEntity extends BlockEntity implements TickableBlockE
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
-		
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		nbt.put(NBT_INVENTORY, Inventories.serializeInventory(inventory));
-		
-		return nbt;
 	}
 	
 	@Override

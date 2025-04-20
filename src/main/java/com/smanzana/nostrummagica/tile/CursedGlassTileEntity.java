@@ -52,16 +52,13 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	private static final String NBT_NO_SWITCH = "no_switch";
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
-		
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		nbt.putFloat(NBT_REQUIRED_DAMAGE, this.requiredDamage);
 		if (this.requiredElement != null) {
 			nbt.put(NBT_REQUIRED_ELEMENT, this.requiredElement.toNBT());
 		}
 		nbt.putBoolean(NBT_NO_SWITCH, this.noSwitch);
-		
-		return nbt;
 	}
 	
 	@Override

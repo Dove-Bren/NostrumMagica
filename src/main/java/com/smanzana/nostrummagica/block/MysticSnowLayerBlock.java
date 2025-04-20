@@ -58,7 +58,7 @@ public class MysticSnowLayerBlock extends Block {
 	
 	@Override
 	public void onPlace(BlockState state, Level worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
-		worldIn.getBlockTicks().scheduleTick(pos, state.getBlock(), DECAY_TICKS);
+		worldIn.scheduleTick(pos, state.getBlock(), DECAY_TICKS);
 	}
 	
 	@Override

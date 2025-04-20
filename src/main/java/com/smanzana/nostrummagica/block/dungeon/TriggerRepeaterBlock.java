@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionHand;
@@ -26,6 +27,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -71,7 +73,7 @@ public class TriggerRepeaterBlock extends BaseEntityBlock implements ITriggeredB
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
 		if (context != CollisionContext.empty() && context instanceof EntityCollisionContext) {
-			final @Nullable Entity entity = ((EntityCollisionContext) context).getEntity().orElse(null);
+			final @Nullable Entity entity = ((EntityCollisionContext) context).getEntity();
 			if (entity != null && entity instanceof Player && ((Player) entity).isCreative()) {
 				return Shapes.block();
 			}
@@ -88,7 +90,7 @@ public class TriggerRepeaterBlock extends BaseEntityBlock implements ITriggeredB
 	@Override
 	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
 		if (worldIn.isClientSide() && NostrumMagica.instance.proxy.getPlayer() != null && NostrumMagica.instance.proxy.getPlayer().isCreative()) {
-			worldIn.addParticle(ParticleTypes.BARRIER, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 0, 0, 0);
+			worldIn.addParticle(new BlockParticleOption(ParticleTypes.BLOCK_MARKER, Blocks.BARRIER.defaultBlockState()), pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 0, 0, 0);
 		}
 	}
 	

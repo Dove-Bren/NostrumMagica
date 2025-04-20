@@ -56,13 +56,6 @@ public class AdvancedSpellTableTileEntity extends BasicSpellTableTileEntity {
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
-		
-		return nbt;
-	}
-	
-	@Override
 	public void load(CompoundTag nbt) {
 		super.load(nbt);
 	}

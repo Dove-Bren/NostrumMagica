@@ -456,7 +456,7 @@ public class NostrumSorceryDimension {
 			
 			if (entity instanceof LivingEntity && ((LivingEntity)entity).hasEffect(MobEffects.BLINDNESS)) {
 				//final Minecraft mc = Minecraft.getInstance();
-				float farPlaneDistance = event.getRenderer().getRenderDistance();
+				float farPlaneDistance = Math.min(event.getRenderer().getRenderDistance(), 48); // 48 being the normal distance specified below
 				//final Vector3d cameraPos = event.getInfo().getProjectedView();
 				//boolean nearFog = ((ClientWorld) entity.world).effects().isFoggyAt(MathHelper.floor(cameraPos.getX()), MathHelper.floor(cameraPos.getY())) || mc.ingameGUI.getBossOverlay().shouldCreateFog();
 				
@@ -468,13 +468,14 @@ public class NostrumSorceryDimension {
 					near = 0.0F;
 					far = rangeMod * 0.8F;
 				} else {
-					near = rangeMod * 0.25F;
+					near = Math.min(4, rangeMod * 0.25F);
 					far = rangeMod;
 				}
 				event.setNearPlaneDistance(near);
 				event.setFarPlaneDistance(far);
 			} else {
-				event.setFarPlaneDistance(64f);
+				event.setNearPlaneDistance(4f);
+				event.setFarPlaneDistance(48f);
 			}
 		}
 		

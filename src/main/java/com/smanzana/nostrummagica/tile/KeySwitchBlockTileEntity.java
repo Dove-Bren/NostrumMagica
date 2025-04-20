@@ -49,14 +49,11 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	private static final String NBT_TRIGGERED = "triggered";
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
-		
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		nbt.put(NBT_KEY, this.key.asNBT());
 		nbt.putString(NBT_COLOR, this.color.name());
 		nbt.putBoolean(NBT_TRIGGERED, this.isTriggered());
-		
-		return nbt;
 	}
 	
 	@Override

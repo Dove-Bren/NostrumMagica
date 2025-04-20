@@ -45,18 +45,18 @@ public class DungeonKeyChestTileEntity extends BlockEntity implements IWorldKeyH
 	
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override
 	public CompoundTag getUpdateTag() {
-		return this.save(new CompoundTag());
+		return this.saveWithoutMetadata();
 	}
 	
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getTag());
+		//handleUpdateTag(pkt.getTag());
 	}
 	
 	protected void dirty() {
@@ -68,13 +68,10 @@ public class DungeonKeyChestTileEntity extends BlockEntity implements IWorldKeyH
 	private static final String NBT_TRIGGERED = "triggered";
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
-		
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		nbt.put(NBT_KEY, this.key.asNBT());
 		nbt.putBoolean(NBT_TRIGGERED, this.isTriggered());
-		
-		return nbt;
 	}
 	
 	@Override

@@ -102,9 +102,8 @@ public class LoreTableTileEntity extends BlockEntity implements TickableBlockEnt
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
-		
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		if (nbt == null)
 			nbt = new CompoundTag();
 		
@@ -114,8 +113,6 @@ public class LoreTableTileEntity extends BlockEntity implements TickableBlockEnt
 			nbt.putString("lore", lorekey);
 		
 		nbt.putFloat("progress", progress);
-		
-		return nbt;
 	}
 	
 	@Override

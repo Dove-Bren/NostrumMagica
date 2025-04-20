@@ -17,8 +17,9 @@ import net.minecraft.client.renderer.PostChain;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.client.event.EntityViewRenderEvent.CameraSetup;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
 import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -137,13 +138,17 @@ public class OutlineRenderer {
 	}
 	
 	@SubscribeEvent
-	public final void onRenderLast(RenderWorldLastEvent event) {
+	public final void onRenderLast(RenderLevelStageEvent event) {
+		if (event.getStage() != Stage.AFTER_PARTICLES) {
+			return;
+		}
+		
 		if (!renderEntityDoingGlow) {
 			// Vanilla not doing normal outline rendering, so force it ourselves
 			if (outlineBuffer != null) {
 				outlineBuffer.finish();
 			}
-			forceRenderOutline(event.getPartialTicks());
+			forceRenderOutline(event.getPartialTick());
 		}
 	}
 	

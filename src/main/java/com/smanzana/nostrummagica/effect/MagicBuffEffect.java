@@ -51,7 +51,6 @@ public class MagicBuffEffect extends MobEffect {
 			@Override
 		    public void renderInventoryEffect(MobEffectInstance effect, EffectRenderingInventoryScreen<?> gui, PoseStack matrixStackIn, int x, int y, float z) {
 				final Minecraft mc = gui.getMinecraft();
-				PotionIcon.ENCHANT.draw(matrixStackIn, mc, x + 6, y + 7);
 				
 				EffectData data = NostrumMagica.magicEffectProxy.getData(mc.player, SpecialEffect.MAGIC_BUFF);
 				int count = data == null ? 0 : data.getCount();
@@ -67,7 +66,6 @@ public class MagicBuffEffect extends MobEffect {
 			@Override
 		    public void renderHUDEffect(MobEffectInstance effect, GuiComponent gui, PoseStack matrixStackIn, int x, int y, float z, float alpha) {
 				Minecraft mc = Minecraft.getInstance();
-				PotionIcon.ENCHANT.draw(matrixStackIn, mc, x + 3, y + 3);
 				
 				EffectData data = NostrumMagica.magicEffectProxy.getData(mc.player, SpecialEffect.MAGIC_BUFF);
 				int count = data == null ? 0 : data.getCount();

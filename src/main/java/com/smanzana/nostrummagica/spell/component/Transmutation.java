@@ -503,7 +503,7 @@ public class Transmutation {
 
 		@Override
 		public String getName() {
-			return "transmute_source.item." + item.getRegistryName().toString();
+			return "transmute_source.item." + item.getRegistryName().getNamespace() + "." + item.getRegistryName().getPath();
 		}
 
 		@Override
@@ -538,7 +538,7 @@ public class Transmutation {
 
 		@Override
 		public String getName() {
-			return "transmute_source.block." + block.getRegistryName().toString();
+			return "transmute_source.block." + block.getRegistryName().getNamespace() + "." + block.getRegistryName().getPath();
 		}
 
 		@Override

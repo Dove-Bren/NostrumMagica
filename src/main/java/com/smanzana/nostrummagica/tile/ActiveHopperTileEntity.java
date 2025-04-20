@@ -42,9 +42,8 @@ public class ActiveHopperTileEntity extends BlockEntity implements Hopper, World
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
-		
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		if (!slot.isEmpty()) {
 			nbt.put(NBT_SLOT, slot.serializeNBT());
 		}
@@ -54,8 +53,6 @@ public class ActiveHopperTileEntity extends BlockEntity implements Hopper, World
 		}
 		
 		nbt.putInt(NBT_COOLDOWN, transferCooldown);
-		
-		return nbt;
 	}
 	
 	@Override

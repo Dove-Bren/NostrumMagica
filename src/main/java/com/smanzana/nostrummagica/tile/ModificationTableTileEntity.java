@@ -145,8 +145,8 @@ public class ModificationTableTileEntity extends BlockEntity implements Containe
 	
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		CompoundTag compound = new CompoundTag();
 		
 		for (int i = 0; i < getContainerSize(); i++) {
@@ -161,7 +161,6 @@ public class ModificationTableTileEntity extends BlockEntity implements Containe
 			nbt = new CompoundTag();
 		
 		nbt.put(NBT_INV, compound);
-		return nbt;
 	}
 	
 	@Override

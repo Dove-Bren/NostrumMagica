@@ -58,7 +58,7 @@ public class CursedFireBlock extends FireBlock {
 			worldIn.removeBlock(pos, false);
 			return;
 		}
-		worldIn.getBlockTicks().scheduleTick(pos, this, 30 + worldIn.random.nextInt(10));
+		worldIn.scheduleTick(pos, this, 30 + worldIn.random.nextInt(10));
 		
 		int age = state.getValue(AGE);
 		

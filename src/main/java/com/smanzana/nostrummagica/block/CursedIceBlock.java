@@ -65,10 +65,8 @@ public class CursedIceBlock extends HalfTransparentBlock {
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
-		final Block adjacentBlock = adjacentBlockState.getBlock();
-		
-		return (Tags.Blocks.GLASS.contains(adjacentBlock) || Tags.Blocks.STAINED_GLASS.contains(adjacentBlock)
-				|| BlockTags.ICE.contains(adjacentBlock) || adjacentBlock == this);
+		return (adjacentBlockState.is(Tags.Blocks.GLASS) || adjacentBlockState.is(Tags.Blocks.STAINED_GLASS)
+				|| adjacentBlockState.is(BlockTags.ICE) || adjacentBlockState.getBlock() == this);
 	}
 	
 	@Override
@@ -93,14 +91,14 @@ public class CursedIceBlock extends HalfTransparentBlock {
 			if (!worldIn.isEmptyBlock(target)) {
 				BlockState bs = worldIn.getBlockState(target);
 				Block b = bs.getBlock();
-				if (!BlockTags.ICE.contains(b) && !(b == this)) {
+				if (!bs.is(BlockTags.ICE) && !(b == this)) {
 					if (bs.getDestroySpeed(worldIn, target) >= 0.0f &&
 							bs.getDestroySpeed(worldIn, target) <= Math.pow(2.0f, level)) {
 						worldIn.setBlockAndUpdate(target, Blocks.ICE.defaultBlockState());
 						return;
 					}
 					
-				} else if (BlockTags.ICE.contains(b)) {
+				} else if (bs.is(BlockTags.ICE)) {
 					// It's ice. Convert to cursed ice
 					worldIn.setBlockAndUpdate(target, defaultBlockState());
 					return;

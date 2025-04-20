@@ -147,7 +147,7 @@ public class DungeonAirBlock extends HalfTransparentBlock {
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
 		if (context != CollisionContext.empty() && context instanceof EntityCollisionContext) {
-			@Nullable Entity entity = ((EntityCollisionContext) context).getEntity().orElse(null);
+			@Nullable Entity entity = ((EntityCollisionContext) context).getEntity();
 			if (entity == null || !(entity instanceof Player) || !((Player) entity).isCreative()) {
 				return Shapes.empty();
 			}

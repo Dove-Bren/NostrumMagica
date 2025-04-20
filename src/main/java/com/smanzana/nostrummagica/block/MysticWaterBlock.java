@@ -131,12 +131,12 @@ public class MysticWaterBlock extends Block implements BucketPickup {
 	
 	@Override
 	public void onPlace(BlockState state, Level worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
-		worldIn.getLiquidTicks().scheduleTick(pos, state.getFluidState().getType(), this.getFluid().getTickDelay(worldIn));
+		worldIn.scheduleTick(pos, state.getFluidState().getType(), this.getFluid().getTickDelay(worldIn));
 	}
 	
 	@Override
 	public BlockState updateShape(BlockState stateIn, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
-		worldIn.getLiquidTicks().scheduleTick(currentPos, stateIn.getFluidState().getType(), this.getFluid().getTickDelay(worldIn));
+		worldIn.scheduleTick(currentPos, stateIn.getFluidState().getType(), this.getFluid().getTickDelay(worldIn));
 		return stateIn;
 	}
 

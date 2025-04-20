@@ -18,11 +18,12 @@ import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -69,15 +70,19 @@ public class SpellShapeRenderer {
 	}
 	
 	@SubscribeEvent
-	public void onRender(RenderWorldLastEvent event) {
+	public void onRender(RenderLevelStageEvent event) {
 		if (!enabled) {
+			return;
+		}
+		
+		if (event.getStage() != Stage.AFTER_PARTICLES) {
 			return;
 		}
 		
 		Minecraft mc = Minecraft.getInstance();
 		LocalPlayer player = mc.player;
-		PoseStack matrixStackIn = event.getMatrixStack();
-		final float partialTicks = event.getPartialTicks();
+		PoseStack matrixStackIn = event.getPoseStack();
+		final float partialTicks = event.getPartialTick();
 		
 		// Figure out if we should show a preview
 		SpellShapePreview preview = null;

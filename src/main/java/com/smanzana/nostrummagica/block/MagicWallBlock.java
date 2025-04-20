@@ -79,7 +79,7 @@ public class MagicWallBlock extends HalfTransparentBlock {
 				worldIn.removeBlock(pos, false);
 			} else {
 				worldIn.setBlockAndUpdate(pos, state.setValue(DECAY, decay));
-				worldIn.getBlockTicks().scheduleTick(pos, state.getBlock(), DECAY_TICKS);
+				worldIn.scheduleTick(pos, state.getBlock(), DECAY_TICKS);
 			}
     }
 	
@@ -89,7 +89,7 @@ public class MagicWallBlock extends HalfTransparentBlock {
 		int level = state.getValue(LEVEL);
 		
 		final @Nullable Entity entity = (context instanceof EntityCollisionContext) ?
-				((EntityCollisionContext) context).getEntity().orElse(null)
+				((EntityCollisionContext) context).getEntity()
 				: null;
 		
 		if (level <= 0
@@ -103,7 +103,7 @@ public class MagicWallBlock extends HalfTransparentBlock {
 	
 	@Override
 	public void onPlace(BlockState state, Level worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
-		worldIn.getBlockTicks().scheduleTick(pos, state.getBlock(), DECAY_TICKS);
+		worldIn.scheduleTick(pos, state.getBlock(), DECAY_TICKS);
 	}
 	
 	@Override

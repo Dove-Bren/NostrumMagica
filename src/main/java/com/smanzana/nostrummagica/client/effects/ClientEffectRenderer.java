@@ -24,7 +24,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -87,7 +88,11 @@ public class ClientEffectRenderer {
 	}
 	
 	@SubscribeEvent
-	public void onRender(RenderWorldLastEvent event) {
+	public void onRender(RenderLevelStageEvent event) {
+		if (event.getStage() != Stage.AFTER_PARTICLES) {
+			return;
+		}
+		
 		if (!ModConfig.config.displayEffects() || activeEffects.isEmpty()) {
 			clearEffects();
 			return;
@@ -95,7 +100,7 @@ public class ClientEffectRenderer {
 
 		Minecraft mc = Minecraft.getInstance();
 		final Camera renderInfo = mc.gameRenderer.getMainCamera();
-		PoseStack stack = event.getMatrixStack();//RenderFuncs.makeNewMatrixStack(renderInfo);
+		PoseStack stack = event.getPoseStack();//RenderFuncs.makeNewMatrixStack(renderInfo);
 		
 		stack.pushPose();
 		
@@ -109,7 +114,7 @@ public class ClientEffectRenderer {
 			Iterator<ClientEffect> it = activeEffects.iterator();
 			while (it.hasNext()) {
 				ClientEffect ef = it.next();
-				if (!ef.displayTick(mc, stack, event.getPartialTicks())) {
+				if (!ef.displayTick(mc, stack, event.getPartialTick())) {
 					ef.onEnd();
 					it.remove();
 				}

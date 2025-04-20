@@ -124,7 +124,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
 		if (context != CollisionContext.empty() && context instanceof EntityCollisionContext) {
-			final @Nullable Entity entity = ((EntityCollisionContext) context).getEntity().orElse(null);
+			final @Nullable Entity entity = ((EntityCollisionContext) context).getEntity();
 			if (entity == null || !(entity instanceof Player) || !((Player) entity).isCreative()) {
 				// Hide if looking at from the right way
 				final Vec3 center = getEntEffectivePos(entity, null);
@@ -169,7 +169,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 		if (!isDoor) {
 			solid = false;
 		} else if (context instanceof EntityCollisionContext) {
-			final @Nullable Entity entityIn = ((EntityCollisionContext) context).getEntity().orElse(null);
+			final @Nullable Entity entityIn = ((EntityCollisionContext) context).getEntity();
 			if (entityIn != null) {
 				final Vec3 motion = this.getEntEffectiveMotion(entityIn);
 				final Vec3 center = this.getEntEffectivePos(entityIn, motion);
@@ -225,30 +225,30 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	public void onBlockHighlight(DrawSelectionEvent.HighlightBlock event) {
 		if (event.getTarget().getType() == HitResult.Type.BLOCK) {
 			BlockPos pos = new BlockPos(event.getTarget().getLocation());
-			BlockState hit = event.getInfo().getEntity().level.getBlockState(pos);
+			BlockState hit = event.getCamera().getEntity().level.getBlockState(pos);
 			if (hit != null && hit.getBlock() == this) {
 				Direction face = hit.getValue(FACING);
 				boolean outside = false;
 				
 				switch (face) {
 				case DOWN:
-					outside = event.getInfo().getPosition().y < pos.getY();
+					outside = event.getCamera().getPosition().y < pos.getY();
 					break;
 				case EAST:
-					outside = event.getInfo().getPosition().x > pos.getX() + 1;
+					outside = event.getCamera().getPosition().x > pos.getX() + 1;
 					break;
 				case NORTH:
-					outside = event.getInfo().getPosition().z < pos.getZ();
+					outside = event.getCamera().getPosition().z < pos.getZ();
 					break;
 				case SOUTH:
-					outside = event.getInfo().getPosition().z > pos.getZ() + 1;
+					outside = event.getCamera().getPosition().z > pos.getZ() + 1;
 					break;
 				case UP:
 				default:
-					outside =  event.getInfo().getPosition().y > pos.getY() + 1;
+					outside =  event.getCamera().getPosition().y > pos.getY() + 1;
 					break;
 				case WEST:
-					outside = event.getInfo().getPosition().x < pos.getX();
+					outside = event.getCamera().getPosition().x < pos.getX();
 					break;
 				}
 				

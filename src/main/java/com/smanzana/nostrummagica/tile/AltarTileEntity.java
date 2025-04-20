@@ -55,16 +55,13 @@ public class AltarTileEntity extends BlockEntity implements WorldlyContainer, IA
 	private static final String NBT_ITEM = "item";
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
-		
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		if (stack != ItemStack.EMPTY) {
 			CompoundTag tag = new CompoundTag();
 			tag = stack.save(tag);
 			nbt.put(NBT_ITEM, tag);
 		}
-		
-		return nbt;
 	}
 	
 	@Override
@@ -84,18 +81,18 @@ public class AltarTileEntity extends BlockEntity implements WorldlyContainer, IA
 	
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override
 	public CompoundTag getUpdateTag() {
-		return this.save(new CompoundTag());
+		return this.saveWithId(); // force ID so that it's non-empty and will always be read on client
 	}
 	
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getTag());
+		//handleUpdateTag(pkt.getTag());
 	}
 	
 	private void dirty() {

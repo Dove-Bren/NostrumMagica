@@ -11,6 +11,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import com.smanzana.autodungeons.util.DimensionUtils;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -25,6 +26,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
@@ -366,8 +368,9 @@ public class ObeliskScreen extends Screen {
 	private void renderLine(PoseStack matrixStackIn, DestinationButton center, DestinationButton other, float partialTicks) {
 		matrixStackIn.pushPose();
 		//GlStateManager.pushLightingAttributes();
-		matrixStackIn.translate(TEXT_ICON_LENGTH / 2, TEXT_ICON_LENGTH / 2, 0);
+		matrixStackIn.translate(TEXT_ICON_LENGTH / 2, TEXT_ICON_LENGTH / 2, -10);
 		final Matrix4f transform = matrixStackIn.last().pose();
+		final Matrix3f normal = matrixStackIn.last().normal();
 		
 		final float red, green, blue, alpha;
 		final int segments;
@@ -395,8 +398,8 @@ public class ObeliskScreen extends Screen {
 		
 		final float diffX = other.x - center.x;
 		final float diffY = other.y - center.y;
-		final float diffPerX = diffX / (segments-1);
-		final float diffPerY = diffY / (segments-1);
+		final float diffPerX = diffX / (segments);
+		final float diffPerY = diffY / (segments);
 		
 		
 		BufferBuilder buf = Tesselator.getInstance().getBuilder();
@@ -404,13 +407,17 @@ public class ObeliskScreen extends Screen {
 		RenderSystem.disableTexture();
 		RenderSystem.lineWidth(3f);
 		RenderSystem.enableDepthTest();
+		RenderSystem.disableCull();
         //GlStateManager.disableTexture();
         //GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         //GlStateManager.color4f(1.0f, 1.0f, 1.0f, 0.6f);
-        buf.begin(VertexFormat.Mode.LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+		RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
+		buf.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
         for (int i = 0; i < segments; i++) {
         	final float X = center.x + (diffPerX * i);
         	final float Y = center.y + (diffPerY * i);
+        	final float nextX = center.x + (diffPerX * (i + 1));
+        	final float nextY = center.y + (diffPerY * (i + 1));
         	
         	final float r, g, b;
         	if (highlightInterval != 0 && i % highlightInterval == highlightIdxOffset % highlightInterval) {
@@ -423,11 +430,22 @@ public class ObeliskScreen extends Screen {
         		b = blue;
         	}
         	
-	        buf.vertex(transform, X, Y, 0).color(r, g, b, alpha).endVertex();
+        	final float dx = nextX - X;
+        	final float dy = nextY - Y;
+        	final float dist = (float) Math.sqrt(dx * dx + dy * dy);
+        	
+        	final float nx, ny, nz;
+        	nx = dx / dist;
+        	ny = dy / dist;
+        	nz = 0;
+        	
+	        buf.vertex(transform, X, Y, 0).color(r, g, b, alpha).normal(normal, nx, ny, nz).endVertex();
+	        buf.vertex(transform, nextX, nextY, 0).color(r, g, b, alpha).normal(normal, nx, ny, nz).endVertex();
         }
         Tesselator.getInstance().end();
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
+        RenderSystem.enableCull();
 		
 //        GlStateManager.popAttributes();
         matrixStackIn.popPose();

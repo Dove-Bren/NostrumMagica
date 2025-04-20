@@ -149,9 +149,8 @@ public class ProgressionDoorTileEntity extends BlockEntity {
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag compound) {
-		CompoundTag nbt = super.save(compound);
-		
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		if (this.requiredLevel > 0)
 			nbt.putInt(NBT_LEVEL, this.requiredLevel);
 		
@@ -164,24 +163,21 @@ public class ProgressionDoorTileEntity extends BlockEntity {
 			}
 			nbt.put(NBT_COMPS, list);
 		}
-		
-		return nbt;
 	}
 	
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override
 	public CompoundTag getUpdateTag() {
-		return this.save(new CompoundTag());
+		return this.saveWithoutMetadata();
 	}
 	
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getTag());
 	}
 	
 	protected void dirty() {

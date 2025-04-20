@@ -148,7 +148,7 @@ public abstract class MimicBlock extends BaseEntityBlock implements EntityBlock 
     @Nullable
     @Override
     public BlockPathTypes getAiPathNodeType(BlockState state, BlockGetter world, BlockPos pos, @Nullable Mob entity) {
-        return getValue(state, world, pos, (mirror, reader, pos1) -> mirror.getAiPathNodeType(reader, pos1, entity), () -> super.getAiPathNodeType(state, world, pos, entity));
+        return getValue(state, world, pos, (mirror, reader, pos1) -> mirror.getBlockPathType(reader, pos1, entity), () -> super.getAiPathNodeType(state, world, pos, entity));
     }
 
     @Override

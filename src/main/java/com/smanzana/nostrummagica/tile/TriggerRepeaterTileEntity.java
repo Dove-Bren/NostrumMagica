@@ -62,31 +62,28 @@ public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedT
 	
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override
 	public CompoundTag getUpdateTag() {
-		return this.save(new CompoundTag());
+		return this.saveWithoutMetadata();
 	}
 	
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getTag());
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag compound) {
-		super.save(compound);
+	public void saveAdditional(CompoundTag compound) {
+		super.saveAdditional(compound);
 		
 		ListTag list = new ListTag();
 		for (BlockPos offset : offsets) {
 			list.add(NbtUtils.writeBlockPos(offset));
 		}
 		compound.put(NBT_OFFSET_LIST, list);
-		
-		return compound;
 	}
 	
 	@Override

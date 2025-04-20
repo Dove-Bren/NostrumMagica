@@ -137,9 +137,8 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
-		
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		if (triggerOffset != null) {
 			nbt.put(NBT_TRIGGER_OFFSET, NbtUtils.writeBlockPos(triggerOffset));
 		}
@@ -148,8 +147,6 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 		} else if (this.unlinkedEntID != null) {
 			nbt.putUUID(NBT_ENTITY_ID, this.unlinkedEntID);
 		}
-		
-		return nbt;
 	}
 	
 	@Override

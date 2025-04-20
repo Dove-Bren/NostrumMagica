@@ -235,7 +235,7 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 				}
 				
 				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, type));
-			} else if (NostrumTags.Items.DragonWing.contains(heldItem.getItem())) {
+			} else if (heldItem.is(NostrumTags.Items.DragonWing)) {
 				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, Type.DRAGON_RED));
 			} else if (heldItem.getItem() == Items.SUGAR_CANE) {
 				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, Type.PLANT_BOSS));

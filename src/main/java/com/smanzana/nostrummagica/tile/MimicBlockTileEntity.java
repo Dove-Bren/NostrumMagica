@@ -13,6 +13,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -45,6 +46,9 @@ public class MimicBlockTileEntity extends BlockEntity {
 	@Override
 	public CompoundTag getUpdateTag() {
 		CompoundTag tag = super.getUpdateTag();
+		if (tag.isEmpty()) {
+			tag = saveWithId(); // ID here to prevent empty which gets sent as null and crashes otehr side
+		}
 		
 		if (this.getData().mimicState != null) {
 			tag.put("nested_state", NbtUtils.writeBlockState(this.getData().mimicState));
@@ -55,12 +59,15 @@ public class MimicBlockTileEntity extends BlockEntity {
 	
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		return new ClientboundBlockEntityDataPacket(this.worldPosition, -1, this.getUpdateTag());
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 	
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-		this.handleUpdateTag(pkt.getTag());
+		CompoundTag compoundtag = pkt.getTag();
+		if (compoundtag != null) {
+			this.handleUpdateTag(compoundtag);
+		}
 	}
 	
 	protected @Nonnull BlockState refreshState() {
@@ -99,6 +106,13 @@ public class MimicBlockTileEntity extends BlockEntity {
 		}
 	}
 	
+	@Override
+	public void onLoad() {
+		super.onLoad();
+		// Trigger a refresh since we don't send update packets when tile entities are placed anymore
+		this.updateBlock();
+	}
+	
 	protected void signalBlockUpdate() {
 		// On client, request a render update
 		// On server, send TE updates
@@ -106,7 +120,7 @@ public class MimicBlockTileEntity extends BlockEntity {
 			
 			if (this.level.isClientSide()) {
 				this.requestModelDataUpdate();
-				level.sendBlockUpdated(getBlockPos(), this.getBlockState(), this.getBlockState(), 11); // On client, rerenders. Server flushes data.
+				level.sendBlockUpdated(getBlockPos(), this.getBlockState(), this.getBlockState(), Block.UPDATE_ALL_IMMEDIATE); // On client, rerenders. Server flushes data.
 			} else {
 				// I want to just do this, but I think sometimes it makes packets not fire since it doesn't look
 				// like anything's changed.

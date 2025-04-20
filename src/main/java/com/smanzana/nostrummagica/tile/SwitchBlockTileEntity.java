@@ -75,16 +75,14 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	private static final String NBT_COOOLDOWN_TICKS = "trigger_cooldown_ticks";
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		
 		nbt.putInt(NBT_HIT_TYPE, this.hitType.ordinal());
 		nbt.putInt(NBT_TRIGGER_TYPE, this.triggerType.ordinal());
 		nbt.put(NBT_OFFSET, NbtUtils.writeBlockPos(this.triggerOffset));
 		nbt.putLong(NBT_TRIGGER_TICKS, this.triggerWorldTicks);
 		nbt.putLong(NBT_COOOLDOWN_TICKS, cooldownTicks);
-		
-		return nbt;
 	}
 	
 	@Override

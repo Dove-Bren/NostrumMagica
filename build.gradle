@@ -158,6 +158,7 @@ repositories {
 dependencies {
 	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 	
+	compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"))
     compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"))
     runtimeOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"))
 
@@ -167,8 +168,8 @@ dependencies {
 	//compile 'top.theillusivec4.caelus:caelus-forge:${caelus_version}'
 	implementation fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}")
 	
-	//compileOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}:api")
-	//runtimeOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}")
+	compileOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}:api")
+	runtimeOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}")
 	
 	runtimeOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}")
 	compileOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}:api")
@@ -214,6 +215,13 @@ tasks.named('processResources', ProcessResources).configure {
             loader_version_range: loader_version_range,
             mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
             mod_authors: mod_authors, mod_description: mod_description,
+			
+			curios_version: curios_version,
+			caelus_version: caelus_version,
+			aetheria_version: aetheria_version,
+			petcommand_version: petcommand_version,
+			autodungeons_version: autodungeons_version,
+			minecolonies_version: minecolonies_version,
     ]
     inputs.properties replaceProperties
 

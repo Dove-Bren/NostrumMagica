@@ -47,7 +47,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fmllegacy.network.PacketDistributor.TargetPoint;
+import net.minecraftforge.network.PacketDistributor.TargetPoint;
 
 public class CandleBlock extends BaseEntityBlock {
 
@@ -148,7 +148,7 @@ public class CandleBlock extends BaseEntityBlock {
 	    	world.setBlockAndUpdate(pos, state.setValue(LIT, true));
 			
 			if (!world.getBlockTicks().hasScheduledTick(pos, state.getBlock())) {
-				world.getBlockTicks().scheduleTick(pos, state.getBlock(), TICK_DELAY);
+				world.scheduleTick(pos, state.getBlock(), TICK_DELAY);
 			}
     	}
     }
@@ -171,7 +171,7 @@ public class CandleBlock extends BaseEntityBlock {
     	
     	if (!force && CandleBlock.IsCandleEnhanced(world, pos)) {
     		if (!world.getBlockTicks().hasScheduledTick(pos, state.getBlock())) {
-				world.getBlockTicks().scheduleTick(pos, state.getBlock(), TICK_DELAY);
+				world.scheduleTick(pos, state.getBlock(), TICK_DELAY);
 			}
 			return;
     	}
@@ -275,7 +275,7 @@ public class CandleBlock extends BaseEntityBlock {
 			}
 			
 			if (!worldIn.getBlockTicks().hasScheduledTick(pos, this)) {
-				worldIn.getBlockTicks().scheduleTick(pos, this, TICK_DELAY);
+				worldIn.scheduleTick(pos, this, TICK_DELAY);
 			}
 		}
 		

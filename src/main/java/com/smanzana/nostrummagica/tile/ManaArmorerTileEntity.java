@@ -393,17 +393,14 @@ public class ManaArmorerTileEntity extends BlockEntity implements TickableBlockE
 	private static final String NBT_TARGET_MANA = "target_mana";
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
-		
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		if (this.getActiveEntity() != null) {
 			nbt.putUUID(NBT_ENTITY_ID, this.getActiveEntity().getUUID());
 		}
 		
 		nbt.putInt(NBT_MANA, this.getCurrentMana());
 		nbt.putInt(NBT_TARGET_MANA, this.getTargetMana());
-		
-		return nbt;
 	}
 	
 	@Override
@@ -427,18 +424,18 @@ public class ManaArmorerTileEntity extends BlockEntity implements TickableBlockE
 	
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override
 	public CompoundTag getUpdateTag() {
-		return this.save(new CompoundTag());
+		return this.saveWithoutMetadata();
 	}
 	
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getTag());
+		//handleUpdateTag(pkt.getTag());
 	}
 	
 	private void dirty() {

@@ -82,11 +82,9 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		
 		nbt.putLong("EXPIRE", endticks);
-		
-		return nbt;
 	}
 }

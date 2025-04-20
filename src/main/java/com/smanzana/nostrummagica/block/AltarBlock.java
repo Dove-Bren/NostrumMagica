@@ -104,7 +104,7 @@ public class AltarBlock extends BaseEntityBlock {
 	@Override
 	public void onPlace(BlockState state, Level worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
 		if (!worldIn.getBlockTicks().hasScheduledTick(pos, this)) {
-			worldIn.getBlockTicks().scheduleTick(pos, this, TICK_DELAY);
+			worldIn.scheduleTick(pos, this, TICK_DELAY);
 		}
 		
 		if (!worldIn.isClientSide()) {
@@ -144,7 +144,7 @@ public class AltarBlock extends BaseEntityBlock {
 		}
 		
 		if (!worldIn.getBlockTicks().hasScheduledTick(pos, this)) {
-			worldIn.getBlockTicks().scheduleTick(pos, this, TICK_DELAY);
+			worldIn.scheduleTick(pos, this, TICK_DELAY);
 		}
 		
 		super.tick(state, worldIn, pos, rand);

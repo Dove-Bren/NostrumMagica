@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.item.ISelectionItem;
 import com.smanzana.nostrummagica.util.RenderFuncs;
@@ -8,13 +9,13 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -25,10 +26,14 @@ public class SelectionRenderer {
 	}
 	
 	@SubscribeEvent
-	public void onRender(RenderWorldLastEvent event) {
+	public void onRender(RenderLevelStageEvent event) {
+		if (event.getStage() != Stage.AFTER_TRIPWIRE_BLOCKS) {
+			return;
+		}
+		
 		Minecraft mc = Minecraft.getInstance();
 		LocalPlayer player = mc.player;
-		final PoseStack matrixStackIn = event.getMatrixStack();
+		final PoseStack matrixStackIn = event.getPoseStack();
 		
 		final ItemStack selectionStack = this.findStackToRender(player);
 		if (!selectionStack.isEmpty()) {
@@ -58,13 +63,13 @@ public class SelectionRenderer {
 										Math.max(anchor.getY(), freePos.getY()),
 										Math.max(anchor.getZ(), freePos.getZ())),
 								
-								event.getPartialTicks(),
+								event.getPartialTick(),
 								provider.isSelectionValid(player, selectionStack));
 					}
 					
 					// Render anchor anchor block special
 					final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.WORLD_SELECT_HIGHLIGHT);
-					renderAnchorBlock(matrixStackIn, buffer, anchor, event.getPartialTicks());
+					renderAnchorBlock(matrixStackIn, buffer, anchor, event.getPartialTick());
 					bufferIn.endBatch();
 				}
 			}

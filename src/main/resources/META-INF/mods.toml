@@ -1,58 +1,56 @@
 modLoader="javafml" #mandatory
-loaderVersion="[37,)"
+loaderVersion="${loader_version_range}"
 
 # The license for your mod. This is mandatory and allows for easier comprehension of your redistributive properties.
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
-license="All Rights Reserved"
+license="${mod_license}"
 
 [[mods]]
-modId="nostrummagica"
-version="${file.jarVersion}"
-displayName="Nostrum Magica"
+modId="${mod_id}" 
+version="${mod_version}"
+displayName="${mod_name}"
 #logoFile="examplemod.png" #optional
-authors="Skyler Manzanares"
-description='''
-Immersive & Complex Spellcrafting
-'''
+authors="{$mod_authors}"
+description='''${mod_description}'''
 
 [[dependencies.nostrummagica]]
 	modId="forge"
 	mandatory=true
-	versionRange="[37,)"
+	versionRange="${loader_version_range}"
 	ordering="NONE"
 	side="BOTH"
 
 [[dependencies.nostrummagica]]
 	modId="curios"
 	mandatory=false
-	versionRange="[1.17.1-5.0.2.7,)"
+	versionRange="[${curios_version},)"
 	ordering="AFTER"
 	side="BOTH"
 
 [[dependencies.nostrummagica]]
 	modId="petcommand"
 	mandatory=true
-	versionRange="[1.17.1-1.0.0,)"
+	versionRange="[${petcommand_version},)"
 	ordering="AFTER"
 	side="BOTH"
 
 [[dependencies.nostrummagica]]
 	modId="caelus"
 	mandatory=true
-	versionRange="[1.17.1-3.0.0.2,)"
+	versionRange="[${caelus_version},)"
 	ordering="AFTER"
 	side="BOTH"
 
 [[dependencies.nostrummagica]]
 	modId="autodungeons"
 	mandatory=true
-	versionRange="[1.17.1-1.0.0,)"
+	versionRange="[${autodungeons_version},)"
 	ordering="AFTER"
 	side="BOTH"
 
 [[dependencies.nostrummagica]]
 	modId="minecolonies"
 	mandatory=false
-	versionRange="[1.17.1-1.0.978,)"
+	versionRange="[${minecolonies_version},)"
 	ordering="AFTER"
 	side="BOTH"

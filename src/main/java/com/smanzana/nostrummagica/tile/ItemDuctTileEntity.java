@@ -156,9 +156,8 @@ public class ItemDuctTileEntity extends BlockEntity implements /* IInventory, */
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
-		
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		ListTag list = new ListTag();
 		for (ItemDuctTileEntity.ItemEntry entry : itemQueue) {
 			list.add(entry.toNBT());
@@ -166,8 +165,6 @@ public class ItemDuctTileEntity extends BlockEntity implements /* IInventory, */
 		nbt.put(NBT_SORTED, list);
 		
 		nbt.putLong(NBT_TICKS, ticks);
-		
-		return nbt;
 	}
 	
 	@Override

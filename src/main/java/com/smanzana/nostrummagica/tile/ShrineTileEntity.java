@@ -90,12 +90,10 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		
 		nbt.putInt(NBT_HITS, this.getHitCount());
-		
-		return nbt;
 	}
 	
 	@Override
@@ -139,12 +137,10 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag nbt) {
-			nbt = super.save(nbt);
+		public void saveAdditional(CompoundTag nbt) {
+			super.saveAdditional(nbt);
 			
 			nbt.put(NBT_ELEMENT, element.toNBT());
-			
-			return nbt;
 		}
 		
 		@Override
@@ -215,12 +211,10 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag nbt) {
-			nbt = super.save(nbt);
+		public void saveAdditional(CompoundTag nbt) {
+			super.saveAdditional(nbt);
 			
 			nbt.put(NBT_ALTERATION, alteration.toNBT());
-			
-			return nbt;
 		}
 		
 		@Override
@@ -290,14 +284,12 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag nbt) {
-			nbt = super.save(nbt);
+		public void saveAdditional(CompoundTag nbt) {
+			super.saveAdditional(nbt);
 			
 			if (getShape() != null) {
 				nbt.putString(NBT_SHAPE, getShape().getShapeKey());
 			}
-			
-			return nbt;
 		}
 		
 		@Override
@@ -364,12 +356,10 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		}
 		
 		@Override
-		public CompoundTag save(CompoundTag nbt) {
-			nbt = super.save(nbt);
+		public void saveAdditional(CompoundTag nbt) {
+			super.saveAdditional(nbt);
 			
 			nbt.put(NBT_TIER, getTier().toNBT());
-			
-			return nbt;
 		}
 		
 		@Override

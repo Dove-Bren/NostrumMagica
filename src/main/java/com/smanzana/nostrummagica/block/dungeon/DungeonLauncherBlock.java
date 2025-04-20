@@ -68,7 +68,7 @@ public class DungeonLauncherBlock extends DirectionalBlock implements ITriggered
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.PutterBlockTileEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.DungeonLauncherTileType);
 	}
 	
 	@Override

@@ -216,7 +216,7 @@ public class ItemDuctBlock extends PipeBlock implements SimpleWaterloggedBlock, 
 	
 	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
 		if (state.getValue(WATERLOGGED)) {
-			worldIn.getLiquidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
+			worldIn.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(worldIn));
 		}
 		
 		final boolean connect = canConnect(worldIn, currentPos, facing);

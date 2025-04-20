@@ -73,16 +73,13 @@ public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBloc
 	private static final String NBT_LINKED_POS = "linked_pos";
 	
 	@Override
-	public CompoundTag save(CompoundTag nbt) {
-		nbt = super.save(nbt);
-		
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
 		if (linkedPosition != null) {
 			nbt.put(NBT_LINKED_POS, NbtUtils.writeBlockPos(linkedPosition));
 		}
 		
 		// Could save and load cooldown but client won't use it and I don't care if people save/load over and over to transfer fast
-		
-		return nbt;
 	}
 	
 	@Override
@@ -104,18 +101,17 @@ public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBloc
 	
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
-		return new ClientboundBlockEntityDataPacket(this.worldPosition, 3, this.getUpdateTag());
+		return ClientboundBlockEntityDataPacket.create(this);
 	}
 
 	@Override
 	public CompoundTag getUpdateTag() {
-		return this.save(new CompoundTag());
+		return this.saveWithoutMetadata();
 	}
 	
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
 		super.onDataPacket(net, pkt);
-		handleUpdateTag(pkt.getTag());
 	}
 	
 	private void dirty() {
@@ -123,7 +119,7 @@ public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBloc
 		setChanged();
 	}
 
-	@Override
+		@Override
 	public boolean canAcceptAetherInfuse(IAetherInfuserTileEntity source, int maxAether) {
 		return this.isInCooldown();
 	}
