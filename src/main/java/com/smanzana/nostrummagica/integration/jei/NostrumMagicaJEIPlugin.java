@@ -153,18 +153,18 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 	@Override
 	public void registerRecipes(IRecipeRegistration registry) {
 		NostrumMagica.logger.info("Registering rituals with JEI...");
-		registry.addRecipes(RitualRegistry.instance().getRegisteredRituals(), RitualRecipeCategory.UID);
+		registry.addRecipes(RitualRecipeCategory.Type, RitualRegistry.instance().getRegisteredRituals());
 		NostrumMagica.logger.info("Registered " + RitualRegistry.instance().getRegisteredRituals().size() + " rituals");
 		
 		
 		NostrumMagica.logger.info("Registering transmutations with JEI...");
 		transmuteItemRecipes = TransmutationRecipe.GetItemRecipes();
 		Collections.shuffle(transmuteItemRecipes, new Random(442)); // Shuffle so the same input isn't grouped together :P
-		registry.addRecipes(transmuteItemRecipes, TransmutationItemCategory.UID_ITEMS);
+		registry.addRecipes(TransmutationItemCategory.TYPE_ITEMS, transmuteItemRecipes);
 		
 		transmuteBlockRecipes = TransmutationRecipe.GetBlocksRecipes();
 		Collections.shuffle(transmuteBlockRecipes, new Random(442)); // Shuffle so the same input isn't grouped together :P
-		registry.addRecipes(transmuteBlockRecipes, TransmutationItemCategory.UID_BLOCKS);
+		registry.addRecipes(TransmutationItemCategory.TYPE_BLOCKS, transmuteBlockRecipes);
 		NostrumMagica.logger.info("Registered " + ((transmuteBlockRecipes.size() + transmuteItemRecipes.size())/2) + " transmutations");
 		
 		
@@ -175,7 +175,7 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 	
 	@Override
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registry) {
-		registry.addRecipeCatalyst(new ItemStack(NostrumItems.altarItem), RitualRecipeCategory.UID);
+		registry.addRecipeCatalyst(new ItemStack(NostrumItems.altarItem), RitualRecipeCategory.Type);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -217,21 +217,29 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 		// Hide and unhide transmutation recipes based on whether a player has seen a given
 		if (runtime != null) {
 			IRecipeManager manager = runtime.getRecipeManager();
+			List<TransmutationRecipe> visible = new ArrayList<>(transmuteItemRecipes.size());
+			List<TransmutationRecipe> hidden = new ArrayList<>(transmuteItemRecipes.size());
 			for (TransmutationRecipe recipe : transmuteItemRecipes) {
 				if (recipe.isRevealed(player)) {
-					manager.unhideRecipe(recipe, TransmutationItemCategory.UID_ITEMS);
+					visible.add(recipe);
 				} else {
-					manager.hideRecipe(recipe, TransmutationItemCategory.UID_ITEMS);
+					hidden.add(recipe);
 				}
 			}
+			manager.unhideRecipes(TransmutationItemCategory.TYPE_ITEMS, visible);
+			manager.hideRecipes(TransmutationItemCategory.TYPE_ITEMS, hidden);
 
+			visible.clear();
+			hidden.clear();
 			for (TransmutationRecipe recipe : transmuteBlockRecipes) {
 				if (recipe.isRevealed(player)) {
-					manager.unhideRecipe(recipe, TransmutationItemCategory.UID_BLOCKS);
+					visible.add(recipe);
 				} else {
-					manager.hideRecipe(recipe, TransmutationItemCategory.UID_BLOCKS);
+					hidden.add(recipe);
 				}
 			}
+			manager.unhideRecipes(TransmutationItemCategory.TYPE_BLOCKS, visible);
+			manager.hideRecipes(TransmutationItemCategory.TYPE_BLOCKS, hidden);
 		}
 	}
 	

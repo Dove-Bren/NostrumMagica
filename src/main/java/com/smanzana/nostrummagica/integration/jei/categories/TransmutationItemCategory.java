@@ -1,25 +1,22 @@
 package com.smanzana.nostrummagica.integration.jei.categories;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.jei.ingredients.TransmuteSourceIngredientType;
 import com.smanzana.nostrummagica.spell.component.Transmutation.TransmutationRecipe;
-import com.smanzana.nostrummagica.spell.component.Transmutation.TransmutationSource;
 
 import mezz.jei.api.constants.VanillaTypes;
-import mezz.jei.api.gui.IRecipeLayout;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
-import mezz.jei.api.gui.ingredient.IGuiIngredientGroup;
-import mezz.jei.api.gui.ingredient.IGuiItemStackGroup;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.ingredients.IIngredients;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -38,11 +35,14 @@ public class TransmutationItemCategory implements IRecipeCategory<TransmutationR
 	
 	public static final ResourceLocation UID_ITEMS = new ResourceLocation(NostrumMagica.MODID, "transmutation_item_recipe");
 	public static final ResourceLocation UID_BLOCKS = new ResourceLocation(NostrumMagica.MODID, "transmutation_block_recipe");
+	public static final RecipeType<TransmutationRecipe> TYPE_ITEMS = new RecipeType<>(UID_ITEMS, TransmutationRecipe.class);
+	public static final RecipeType<TransmutationRecipe> TYPE_BLOCKS = new RecipeType<>(UID_BLOCKS, TransmutationRecipe.class);
 	
 	private Component title;
 	private IDrawable background;
 	private IDrawable icon;
 	private final ResourceLocation UID;
+	private final RecipeType<TransmutationRecipe> type;
 	
 	public TransmutationItemCategory(IGuiHelper guiHelper, boolean blocks) {
 		background = guiHelper.drawableBuilder(TEXT_BACK, 0, 0, BACK_WIDTH, BACK_HEIGHT).addPadding(0, 0, 0, 0).build();
@@ -51,19 +51,28 @@ public class TransmutationItemCategory implements IRecipeCategory<TransmutationR
 			title = new TranslatableComponent("nei.category.transmutation.block.name");
 			icon = guiHelper.drawableBuilder(TEXT_BACK, ICON_HOFFSET + 16, ICON_VOFFSET, 16, 16).build();
 			UID = UID_BLOCKS;
+			type = TYPE_BLOCKS;
 		} else {
 			title = new TranslatableComponent("nei.category.transmutation.item.name");
 			icon = guiHelper.drawableBuilder(TEXT_BACK, ICON_HOFFSET, ICON_VOFFSET, 16, 16).build();
 			UID = UID_ITEMS;
+			type = TYPE_ITEMS;
 		}
 	}
 	
 	@Override
+	public RecipeType<TransmutationRecipe> getRecipeType() {
+		return type;
+	}
+	
+	@Override
+	@Deprecated(forRemoval = true, since = "9.5.0")
 	public ResourceLocation getUid() {
 		return UID;
 	}
 	
 	@Override
+	@Deprecated(forRemoval = true, since = "9.5.0")
 	public Class<TransmutationRecipe> getRecipeClass() {
 		return TransmutationRecipe.class;
 	}
@@ -79,7 +88,7 @@ public class TransmutationItemCategory implements IRecipeCategory<TransmutationR
 	}
 
 	@Override
-	public void draw(TransmutationRecipe recipe, PoseStack matrixStackIn, double mouseX, double mouseY) {
+	public void draw(TransmutationRecipe recipe, IRecipeSlotsView recipeSlotsView, PoseStack matrixStackIn, double mouseX, double mouseY) {
 		// Only thing to draw is the transmutation jump power
 		
 		final int jump = recipe.getLevel();
@@ -89,54 +98,26 @@ public class TransmutationItemCategory implements IRecipeCategory<TransmutationR
 	}
 	
 	@Override
-	public void setIngredients(TransmutationRecipe recipe, IIngredients ingredients) {
-		
-		// We will always have an output, but may have an input or may have a hidden one
-		final @Nonnull ItemStack output;
-		final @Nullable List<ItemStack> input;
-		
-		output = recipe.getOutput();
-		Ingredient inputIng = recipe.getRevealedIngredient();
-		if (inputIng == null || inputIng == Ingredient.EMPTY || inputIng.isEmpty()) {
-			input = null;
-		} else {
-			input = Lists.newArrayList(inputIng.getItems());
-		}
-		
-		ingredients.setOutput(VanillaTypes.ITEM, output);
-		if (input != null) {
-			List<List<ItemStack>> inputs = new ArrayList<List<ItemStack>>();
-			inputs.add(input);
-			ingredients.setInputLists(VanillaTypes.ITEM, inputs);
-		} else {
-			ingredients.setInput(TransmuteSourceIngredientType.instance, recipe.getSource());
-		}
-	}
-
-	@Override
-	public void setRecipe(IRecipeLayout recipeLayout, TransmutationRecipe recipe, IIngredients ingredients) {
-		IGuiItemStackGroup guiItemStacks = recipeLayout.getItemStacks();
-		IGuiIngredientGroup<TransmutationSource> sourceStacks = recipeLayout.getIngredientsGroup(TransmuteSourceIngredientType.instance);
-		
+	public void setRecipe(IRecipeLayoutBuilder recipeLayout, TransmutationRecipe recipe, IFocusGroup focuses) {
 		/*
 		 * Input is either an item stack or a source. Output is always an item stack.
-		 * Idk how this maps slots to items in the ingredients list...
 		 */
+		// We will always have an output, but may have an input or may have a hidden one
+		final @Nonnull ItemStack output = recipe.getOutput();
+		final @Nullable Ingredient input = recipe.getRevealedIngredient();
 		
-		if (recipe.getRevealedIngredient() != null) {
-			// Assume two itemstacks
-			guiItemStacks.init(0, true, 13, 7);
-			guiItemStacks.init(1, false, 68, 7);
+		IRecipeSlotBuilder slot = recipeLayout.addSlot(RecipeIngredientRole.INPUT, 14, 8);
+		if (input == null || input.isEmpty()) {
+			// undiscovered mapping so add a source ingredient
+			slot.addIngredient(TransmuteSourceIngredientType.instance, recipe.getSource());
 		} else {
-			// Input is a source
-			sourceStacks.init(0, true, 13, 7);
-			guiItemStacks.init(1, false, 68, 7);
+			slot.addIngredients(input);
 		}
 		
-		guiItemStacks.set(ingredients);
-		sourceStacks.set(ingredients);
+		recipeLayout.addSlot(RecipeIngredientRole.OUTPUT, 69, 8)
+			.addIngredient(VanillaTypes.ITEM_STACK, output);
 	}
-
+	
 	@Override
 	public IDrawable getIcon() {
 		return icon;
