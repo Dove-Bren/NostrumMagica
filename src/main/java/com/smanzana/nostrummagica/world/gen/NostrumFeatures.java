@@ -10,6 +10,8 @@ import net.minecraft.data.worldgen.features.FeatureUtils;
 import net.minecraft.data.worldgen.features.OreFeatures;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -23,6 +25,7 @@ import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.RarityFilter;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ObjectHolder;
@@ -63,13 +66,32 @@ public class NostrumFeatures {
 		PLACED_FLOWER_MIDNIGHTIRIS = PlacementUtils.register(ID.toString(), CONFFEATURE_FLOWER_MIDNIGHTIRIS, RarityFilter.onAverageOnceEvery(32), InSquarePlacement.spread(), PlacementUtils.HEIGHTMAP);
 		
 		ID = NostrumMagica.Loc(ID_ORE_MANI);
-		final List<OreConfiguration.TargetBlockState> ORE_MANI_TARGET_LIST = List.of(OreConfiguration.target(OreFeatures.STONE_ORE_REPLACEABLES, NostrumBlocks.maniOre.defaultBlockState()));
+		final List<OreConfiguration.TargetBlockState> ORE_MANI_TARGET_LIST = List.of(OreConfiguration.target(OreFeatures.STONE_ORE_REPLACEABLES, NostrumBlocks.maniOreStone.defaultBlockState()), OreConfiguration.target(OreFeatures.DEEPSLATE_ORE_REPLACEABLES, NostrumBlocks.maniOreDeepslate.defaultBlockState()));
 		CONFFEATURE_ORE_MANI = FeatureUtils.register(ID.toString(), Feature.ORE, new OreConfiguration(ORE_MANI_TARGET_LIST, 9));
 		PLACED_ORE_MANI = PlacementUtils.register(ID.toString(), CONFFEATURE_ORE_MANI, CountPlacement.of(15), HeightRangePlacement.uniform(VerticalAnchor.bottom(), VerticalAnchor.aboveBottom(128)));
 		
 		ID = NostrumMagica.Loc(ID_ORE_ESSORE);
 		final List<OreConfiguration.TargetBlockState> ORE_ESSORE_TARGET_LIST = List.of(OreConfiguration.target(OreFeatures.STONE_ORE_REPLACEABLES, NostrumBlocks.essenceOre.defaultBlockState()));
 		CONFFEATURE_ORE_ESSORE = FeatureUtils.register(ID.toString(), Feature.ORE, new OreConfiguration(ORE_ESSORE_TARGET_LIST, 4));
-		PLACED_ORE_ESSORE = PlacementUtils.register(ID.toString(), CONFFEATURE_ORE_ESSORE, CountPlacement.of(8), HeightRangePlacement.uniform(VerticalAnchor.bottom(), VerticalAnchor.aboveBottom(60)));
+		PLACED_ORE_ESSORE = PlacementUtils.register(ID.toString(), CONFFEATURE_ORE_ESSORE, CountPlacement.of(8), HeightRangePlacement.uniform(VerticalAnchor.aboveBottom(60), VerticalAnchor.aboveBottom(100)));
+	}
+	
+	public static final void onBiomeLoad(BiomeLoadingEvent event) {
+		Biome.BiomeCategory category = event.getCategory();
+		
+		if (category == Biome.BiomeCategory.THEEND) {
+			return;
+		}
+		
+		if (category == Biome.BiomeCategory.NETHER) {
+			return;
+		}
+		
+		// Filter this list maybe?
+		event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, NostrumFeatures.PLACED_FLOWER_CRYSTABLOOM);
+		event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, NostrumFeatures.PLACED_FLOWER_MIDNIGHTIRIS);
+		
+		event.getGeneration().addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, NostrumFeatures.PLACED_ORE_ESSORE);
+		event.getGeneration().addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, NostrumFeatures.PLACED_ORE_MANI);
 	}
 }

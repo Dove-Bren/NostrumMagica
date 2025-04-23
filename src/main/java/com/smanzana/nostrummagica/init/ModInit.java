@@ -131,6 +131,7 @@ import com.smanzana.nostrummagica.trial.WorldTrial;
 import com.smanzana.nostrummagica.util.Ingredients;
 import com.smanzana.nostrummagica.world.NostrumLootHandler;
 import com.smanzana.nostrummagica.world.dimension.NostrumDimensions;
+import com.smanzana.nostrummagica.world.gen.NostrumFeatures;
 
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.commands.CommandSourceStack;
@@ -146,7 +147,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
@@ -156,7 +156,6 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TagsUpdatedEvent;
-import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -184,7 +183,7 @@ public class ModInit {
     	// NOTE: These registering methods are on the regular gameplay BUS,
     	// because they depend on data and re-fire when data is reloaded?
 		MinecraftForge.EVENT_BUS.addListener(ModInit::registerCommands);
-		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ModInit::onBiomeLoad);
+		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, NostrumFeatures::onBiomeLoad);
 		MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, ModInit::onTagsUpdated);
 		MinecraftForge.EVENT_BUS.addListener(ModInit::registerDataLoaders);
 		MinecraftForge.EVENT_BUS.addListener(ModInit::registerDefaultRituals);
@@ -2123,38 +2122,6 @@ public class ModInit {
 		
 		// These are client-only, but need to be registered as server ones to work at all.
 		CommandInfoScreenGoto.register(dispatcher);
-	}
-	
-	public static final void onBiomeLoad(BiomeLoadingEvent event) {
-		// Note: not in ModInit because it's not a MOD bus event.
-		Biome.BiomeCategory category = event.getCategory();
-		
-		if (category == Biome.BiomeCategory.THEEND) {
-			return;
-		}
-		
-		if (category == Biome.BiomeCategory.NETHER) {
-			return;
-		}
-		
-		int unused; // not needed anymore?
-//		// Filter this list maybe?
-//		final BiomeGenerationSettingsBuilder gen = event.getGeneration();
-//		gen.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, NostrumFeatures.CONFFEATURE_FLOWER_CRYSTABLOOM);
-//		gen.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, NostrumFeatures.CONFFEATURE_FLOWER_MIDNIGHTIRIS);
-//		
-//		gen.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, NostrumFeatures.CONFFEATURE_ORE_MANI);
-//		gen.addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, NostrumFeatures.CONFFEATURE_ORE_ESSORE);
-//		
-//		gen.addStructureStart(NostrumStructures.CONFIGURED_DUNGEON_PORTAL);
-//		gen.addStructureStart(NostrumStructures.CONFIGURED_DUNGEON_DRAGON);
-//		gen.addStructureStart(NostrumStructures.CONFIGUREDDUNGEON_PLANTBOSS);
-////		  Have to add structures as structures AND features.
-////		 Vanilla adds all structs as features and then only some as structures to turn them on for different biomes.
-////		 Adding as struct makes the world generate starts and the logical part. Adding as features makes them actually place in the world.
-//		gen.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.portalDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
-//		gen.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.dragonDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
-//		gen.withFeature(GenerationStage.Decoration.SURFACE_STRUCTURES, Biome.createDecoratedFeature(NostrumFeatures.plantbossDungeon, new NostrumDungeonConfig(), Placement.NOPE, IPlacementConfig.NO_PLACEMENT_CONFIG));
 	}
 	
 	public static final void onTagsUpdated(TagsUpdatedEvent event) {

@@ -32,6 +32,9 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.resources.ResourceLocation;
@@ -67,7 +70,8 @@ public class NostrumBlocks {
 	@ObjectHolder(ManiCrystalBlock.ID_MANI) public static ManiCrystalBlock maniCrystalBlock;
 	@ObjectHolder(ManiCrystalBlock.ID_KANI) public static ManiCrystalBlock kaniCrystalBlock;
 	@ObjectHolder(ManiCrystalBlock.ID_VANI) public static ManiCrystalBlock vaniCrystalBlock;
-	@ObjectHolder(ManiOreBlock.ID) public static ManiOreBlock maniOre;
+	@ObjectHolder(ManiOreBlock.ID_STONE) public static ManiOreBlock maniOreStone;
+	@ObjectHolder(ManiOreBlock.ID_DEEPSLATE) public static ManiOreBlock maniOreDeepslate;
 	@ObjectHolder(MimicOnesidedBlock.ID_FACADE) public static MimicBlock mimicFacade;
 	@ObjectHolder(MimicOnesidedBlock.ID_FACADE_UNBREAKABLE) public static MimicBlock mimicFacadeUnbreakable;
 	@ObjectHolder(MimicOnesidedBlock.ID_DOOR) public static MimicBlock mimicDoor;
@@ -159,7 +163,8 @@ public class NostrumBlocks {
     	//registerBlockItem(maniCrystalBlock, maniCrystalBlock.getRegistryName(), registry);
     	//registerBlockItem(kaniCrystalBlock, kaniCrystalBlock.getRegistryName(), registry);
     	//registerBlockItem(vaniCrystalBlock, vaniCrystalBlock.getRegistryName(), registry);
-    	registerBlockItem(maniOre, maniOre.getRegistryName(), registry);
+    	registerBlockItem(maniOreStone, maniOreStone.getRegistryName(), registry);
+    	registerBlockItem(maniOreDeepslate, maniOreDeepslate.getRegistryName(), registry);
     	registerBlockItem(mimicFacade, mimicFacade.getRegistryName(), registry);
     	registerBlockItem(mimicFacadeUnbreakable, mimicFacadeUnbreakable.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(mimicDoor, mimicDoor.getRegistryName(), registry);
@@ -242,7 +247,16 @@ public class NostrumBlocks {
     	registerBlock(new ManiCrystalBlock(0), ManiCrystalBlock.ID_MANI, registry);
     	registerBlock(new ManiCrystalBlock(1), ManiCrystalBlock.ID_KANI, registry);
     	registerBlock(new ManiCrystalBlock(2), ManiCrystalBlock.ID_VANI, registry);
-    	registerBlock(new ManiOreBlock(), ManiOreBlock.ID, registry);
+    	registerBlock(new ManiOreBlock(Block.Properties.of(Material.STONE)
+    			.strength(3.0f, 5.f)
+    			.color(MaterialColor.STONE)
+    			.sound(SoundType.STONE)
+    			.requiresCorrectToolForDrops()), ManiOreBlock.ID_STONE, registry);
+    	registerBlock(new ManiOreBlock(Block.Properties.of(Material.STONE)
+    			.strength(4.5f, 5.f)
+    			.color(MaterialColor.DEEPSLATE)
+    			.sound(SoundType.DEEPSLATE)
+    			.requiresCorrectToolForDrops()), ManiOreBlock.ID_DEEPSLATE, registry);
     	registerBlock(new MimicOnesidedBlock(false, false), MimicOnesidedBlock.ID_FACADE, registry);
     	registerBlock(new MimicOnesidedBlock(false, true), MimicOnesidedBlock.ID_FACADE_UNBREAKABLE, registry);
     	registerBlock(new MimicOnesidedBlock(true, false), MimicOnesidedBlock.ID_DOOR, registry);

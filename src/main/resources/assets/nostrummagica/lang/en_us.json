@@ -117,6 +117,7 @@
 
     "item.nostrummagica.magic_wall": "Magic Wall",
     "item.nostrummagica.mani_ore": "Mani Ore",
+	"item.nostrummagica.deepslate_mani_ore": "Deepslate Mani Ore",
     "item.nostrummagica.magic_dirt": "Crystadirt",
     "item.nostrummagica.crystadirt": "Crystadirt",
     "item.nostrummagica.essore": "Essore",
@@ -410,6 +411,7 @@
 
     "block.nostrummagica.magic_wall": "Magic Wall",
     "block.nostrummagica.mani_ore": "Mani Ore",
+	"block.nostrummagica.deepslate_mani_ore": "Deepslate Mani Ore",
     "block.nostrummagica.magic_dirt": "Crystadirt",
     "block.nostrummagica.essore": "Essore",
     "block.nostrummagica.cursed_ice": "Cursed Ice",

@@ -4,21 +4,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.OreBlock;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 
 public class ManiOreBlock extends OreBlock {
 
-	public static final String ID = "mani_ore";
+	public static final String ID_STONE = "mani_ore";
+	public static final String ID_DEEPSLATE = "deepslate_mani_ore";
 	
 	
-	public ManiOreBlock() {
-		super(Block.Properties.of(Material.STONE)
-				.strength(2.0f, 30.f)
-				.sound(SoundType.STONE)
-				.requiresCorrectToolForDrops()
-				);
+	public ManiOreBlock(Block.Properties props) {
+		super(props);
 	}
 	
 //	@Override
