@@ -274,12 +274,16 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	
 	protected void refreshButtonPositions() {
 		for (ResearchButton button : researchButtons.values()) {
-			final int offsetX = button.getStartingX() - (width / 2);
-			final int offsetY = button.getStartingY() - (height / 2);
+			final int buttonWidth = WidthForSize(button.research.getSize());
+			final int buttonHeight = HeightForSize(button.research.getSize());
 			
 			
-			final int scaledX = (width/2) + (int) ((offsetX + this.getPanX()) * this.getPanScale());
-			final int scaledY = (height/2) + (int) ((offsetY + this.getPanY()) * this.getPanScale());
+			final int offsetX = (button.getStartingX() + (buttonWidth / 2)) - (width / 2);
+			final int offsetY = (button.getStartingY() + (buttonHeight / 2)) - (height / 2);
+			
+			
+			final int scaledX = (width/2) + (int) ((offsetX + this.getPanX()) * this.getPanScale()) + (-buttonWidth / 2);
+			final int scaledY = (height/2) + (int) ((offsetY + this.getPanY()) * this.getPanScale()) + (-buttonHeight / 2);
 			button.setPosition(scaledX, scaledY);
 		}
 	}
@@ -392,6 +396,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			float alpha = (float) (this.animStartMS == 0 ? 1 : ((double)(System.currentTimeMillis() - animStartMS) / 500.0));
 			
 			matrixStackIn.pushPose();
+			matrixStackIn.translate(.5f, 0, 0); // lines are all shifted left by 1???
 			BufferBuilder buf = Tesselator.getInstance().getBuilder();
 	        RenderSystem.enableBlend();
 	        RenderSystem.disableColorLogicOp();
@@ -407,10 +412,10 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        
 	        Vec2 myCenter = child; // Stash for later
 	        
-	        if (child.x == parent.x || child.y == parent.y) {
+	        if (this.research.getX() == other.research.getX() || this.research.getY() == other.research.getY()) {
 	        	// Straight line
 	        	
-	        	if (child.x == parent.x) {
+	        	if (this.research.getX() == other.research.getX()) {
 	        		// vertical line. Shrink both sides in y
 	        		child = new Vec2(child.x, child.y + (-Math.signum(diff.y) * ((float) height / 2f)));
 	        		parent = new Vec2(parent.x, parent.y - (-Math.signum(diff.y) * ((float) other.height / 2f)));
@@ -423,12 +428,15 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        	final float dx = parent.x - child.x;
 				final float dy = parent.y - child.y;
 				final float dd = Mth.sqrt(dx * dx + dy * dy);
+				
+				final Matrix4f transform = matrixStackIn.last().pose();
+	        	final Matrix3f normal = matrixStackIn.last().normal();
 	        	
 	        	RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
 	        	RenderSystem.disableCull();
 	        	buf.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
-		        buf.vertex(child.x, child.y, 0).color(.8f, .8f, .8f, alpha).normal(dx / dd, dy / dd, 0).endVertex();
-		        buf.vertex(parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).normal(dx / dd, dy / dd, 0).endVertex();
+		        buf.vertex(transform, child.x, child.y, 0).color(.8f, .8f, .8f, alpha).normal(normal, dx / dd, dy / dd, 0).endVertex();
+		        buf.vertex(transform, parent.x, parent.y, 0).color(.8f, .8f, .8f, alpha).normal(normal, dx / dd, dy / dd, 0).endVertex();
 		        Tesselator.getInstance().end();
 	        } else {
 		        boolean vertical;// = (Math.abs(diff.y) > Math.abs(diff.x));
@@ -531,7 +539,8 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		        matrixStackIn.popPose();
 	        }
 	        
-	        matrixStackIn.translate(child.x, child.y, 9);
+	        // note: -1 to undo shift right for lines
+	        matrixStackIn.translate(child.x - .5, child.y, 9);
 	        if (child.x < myCenter.x) {
 	        	// from left
 	        	matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(-90f));
@@ -542,6 +551,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	        	// from bottom
 	        	matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(180f));
 	        }
+	        
 	        RenderSystem.enableTexture();
 			RenderSystem.enableBlend();
 			RenderSystem.setShaderTexture(0, RES_ICONS);

@@ -923,7 +923,7 @@ public class OverlayRenderer extends GuiComponent {
 	}
 	
 	private void renderShieldOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
-		if (ModConfig.config.displayShieldHearts()) {
+		if (ModConfig.config.displayShieldHearts() && gui.shouldDrawSurvivalElements()) {
 			final Minecraft mc = Minecraft.getInstance();
 			final LocalPlayer player = mc.player;
 			double physical = 0;

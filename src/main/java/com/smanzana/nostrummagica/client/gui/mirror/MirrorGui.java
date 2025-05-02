@@ -322,7 +322,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		// Setup mask so only central area is drawn in
 		{
 			matrixStackIn.pushPose();
-			matrixStackIn.translate(0, 0, 10);
+			matrixStackIn.translate(0, 0, 500);
 			RenderSystem.enableDepthTest();
 			RenderSystem.depthMask(true);
 			RenderSystem.colorMask(false, false, false, false);
@@ -352,7 +352,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 		// Undo mask and allow free drawing again
 		{
 			matrixStackIn.pushPose();
-			matrixStackIn.translate(0, 0, -800);
+			matrixStackIn.translate(0, 0, 0);
 			RenderSystem.enableDepthTest();
 			RenderSystem.depthMask(true);
 			RenderSystem.depthFunc(GL11.GL_GEQUAL);
@@ -554,7 +554,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 				}
 				
 				matrixStackIn.pushPose();
-				matrixStackIn.translate(0, 0, 10); // Hackily make sure to render on top of children widgets and the screen mask
+				matrixStackIn.translate(0, 0, 500); // Hackily make sure to render on top of children widgets and the screen mask
 				
 				RenderSystem.setShaderTexture(0, RES_BASE);
 				RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, x, y,
@@ -615,7 +615,7 @@ public class MirrorGui extends Screen implements IMirrorScreen {
 			}
 			
 			matrixStackIn.pushPose();
-			matrixStackIn.translate(x, y, 10); // Hackily make su re to render on top of children widgets
+			matrixStackIn.translate(x, y, 500); // Hackily make su re to render on top of children widgets
 			
 			RenderSystem.setShaderTexture(0, RES_BASE);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0,
