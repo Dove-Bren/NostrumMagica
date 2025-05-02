@@ -46,12 +46,12 @@ import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.petcommand.api.PetCommandAPI;
 import com.smanzana.petcommand.api.PetFuncs;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
-import com.smanzana.petcommand.api.client.petgui.PetGUIStatAdapter;
 import com.smanzana.petcommand.api.entity.IEntityPet;
 import com.smanzana.petcommand.api.entity.ITameableEntity;
+import com.smanzana.petcommand.api.pet.EPetAction;
 import com.smanzana.petcommand.api.pet.PetInfo;
-import com.smanzana.petcommand.api.pet.PetInfo.PetAction;
-import com.smanzana.petcommand.api.pet.PetInfo.SecondaryFlavor;
+import com.smanzana.petcommand.api.pet.PetInfo.PetValue;
+import com.smanzana.petcommand.api.pet.PetInfo.ValueFlavor;
 
 import net.minecraft.Util;
 import net.minecraft.core.NonNullList;
@@ -61,6 +61,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -129,7 +130,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
     protected static final EntityDataAccessor<Float> ATTRIBUTE_BOND  = SynchedEntityData.<Float>defineId(TameRedDragonEntity.class, EntityDataSerializers.FLOAT);
     
     protected static final EntityDataAccessor<Float> SYNCED_MAX_HEALTH  = SynchedEntityData.<Float>defineId(TameRedDragonEntity.class, EntityDataSerializers.FLOAT);
-    protected static final EntityDataAccessor<PetAction> DATA_PET_ACTION = SynchedEntityData.<PetAction>defineId(TameRedDragonEntity.class, PetJobSerializer.GetInstance());
+    protected static final EntityDataAccessor<EPetAction> DATA_PET_ACTION = SynchedEntityData.<EPetAction>defineId(TameRedDragonEntity.class, PetJobSerializer.GetInstance());
     
     protected static final EntityDataAccessor<ItemStack> DATA_ARMOR_BODY = SynchedEntityData.<ItemStack>defineId(TameRedDragonEntity.class, EntityDataSerializers.ITEM_STACK);
     protected static final EntityDataAccessor<ItemStack> DATA_ARMOR_HELM = SynchedEntityData.<ItemStack>defineId(TameRedDragonEntity.class, EntityDataSerializers.ITEM_STACK);
@@ -225,7 +226,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		this.entityData.define(ATTRIBUTE_LEVEL, 0);
 		this.entityData.define(ATTRIBUTE_BOND, 0f);
 		this.entityData.define(SYNCED_MAX_HEALTH, 100.0f);
-		this.entityData.define(DATA_PET_ACTION, PetAction.WAITING);
+		this.entityData.define(DATA_PET_ACTION, EPetAction.IDLE);
 		this.entityData.define(HATCHED, false);
 		this.entityData.define(SOULBOUND, false);
 		this.entityData.define(DATA_ARMOR_BODY, ItemStack.EMPTY);
@@ -468,11 +469,17 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		super.baseTick();
 		
 		if (level != null && !level.isClientSide) {
+			final @Nullable EPetAction order = PetInfo.GetOrderAction(this);
+			if (order != null) {
+				setPetAction(order);
+				return;
+			}
+			
 			if (!this.isEntitySitting()) {
 				if (this.getTarget() == null) {
-					setPetAction(PetAction.WAITING);
+					setPetAction(EPetAction.IDLE);
 				} else {
-					setPetAction(PetAction.ATTACKING);
+					setPetAction(EPetAction.ATTACK);
 				}
 			}
 		}
@@ -515,7 +522,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 				
 				if (player.isShiftKeyDown()) {
 					if (!this.level.isClientSide) {
-						this.setSitting(!this.isEntitySitting());
+						this.setEntitySitting(!this.isEntitySitting());
 						if (player.isCreative()) {
 							this.setBond(1f);
 						}
@@ -790,7 +797,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		
 		this.setSoulBound(compound.getBoolean(NBT_SOUL_BOUND));
 		
-		this.setSitting(compound.getBoolean(NBT_SITTING));
+		this.setEntitySitting(compound.getBoolean(NBT_SITTING));
 		this.setGrowingAge(compound.getFloat(NBT_AGE));
 		
 		if (compound.contains(NBT_EGG_ID)) { // 1.16.5 crashes without this if no UUID present, which is awful
@@ -884,7 +891,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 				this.setTarget(null);
 				this.setHealth((float) this.getAttribute(Attributes.MAX_HEALTH).getBaseValue());
 				this.setOwnerId(player.getUUID());
-				this.setSitting(true);
+				this.setEntitySitting(true);
 				
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 				if (attr != null) {
@@ -1329,9 +1336,11 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		return this.entityData.get(SITTING);
 	}
 	
-	public void setSitting(boolean sitting) {
+	@Override
+	public boolean setEntitySitting(boolean sitting) {
 		this.entityData.set(SITTING, sitting);
-		setPetAction(PetAction.SITTING);
+		setPetAction(EPetAction.STAY);
+		return true;
 	}
 	
 	public float getGrowingAge() {
@@ -1648,58 +1657,6 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 				new RedDragonSpellSheet(this));
 	}
 
-	@Override
-	public PetGUIStatAdapter<TameRedDragonEntity> getGUIAdapter() {
-		return new PetGUIStatAdapter<TameRedDragonEntity>() {
-
-			@Override
-			public float getSecondaryAmt(TameRedDragonEntity pet) {
-				return pet.getMana();
-			}
-
-			@Override
-			public float getMaxSecondaryAmt(TameRedDragonEntity pet) {
-				return pet.getMaxMana();
-			}
-
-			@Override
-			public String getSecondaryLabel(TameRedDragonEntity pet) {
-				return "Mana";
-			}
-
-			@Override
-			public float getTertiaryAmt(TameRedDragonEntity pet) {
-				return pet.getBond();
-			}
-
-			@Override
-			public float getMaxTertiaryAmt(TameRedDragonEntity pet) {
-				return 1f;
-			}
-
-			@Override
-			public String getTertiaryLabel(TameRedDragonEntity pet) {
-				return "Bond";
-			}
-
-			@Override
-			public float getQuaternaryAmt(TameRedDragonEntity pet) {
-				return pet.getXP();
-			}
-
-			@Override
-			public float getMaxQuaternaryAmt(TameRedDragonEntity pet) {
-				return pet.getMaxXP();
-			}
-
-			@Override
-			public String getQuaternaryLabel(TameRedDragonEntity pet) {
-				return "XP";
-			}
-
-		};
-	}
-	
 	public int getDragonLevel() {
 		return this.entityData.get(ATTRIBUTE_LEVEL);
 	}
@@ -1933,12 +1890,12 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		return player != null && player.is(this.getOwner()) && this.getBond() >= BOND_LEVEL_MANA;
 	}
 	
-	public void setPetAction(PetAction action) {
+	public void setPetAction(EPetAction action) {
 		entityData.set(DATA_PET_ACTION, action);
 	}
 
 	@Override
-	public PetAction getPetAction() {
+	public EPetAction getPetAction() {
 		return entityData.get(DATA_PET_ACTION);
 	}
 	
@@ -2427,9 +2384,17 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		
 	}
 	
+	protected static final Component LABEL_XP = new TextComponent("XP");
+	protected static final Component LABEL_MANA = new TextComponent("Mana");
+	protected static final Component LABEL_BOND = new TextComponent("Bond");
+	
 	@Override
 	public PetInfo getPetSummary() {
-		return PetInfo.claim(getHealth(), getMaxHealth(), getXP(), getMaxXP(), SecondaryFlavor.PROGRESS, getPetAction());
+		return PetInfo.claim(getPetAction(), getHealth(), getMaxHealth(),
+				new PetValue(getXP(), getMaxXP(), ValueFlavor.PROGRESS, LABEL_XP),
+				new PetValue(getMana(), getMaxMana(), ValueFlavor.GOOD, LABEL_MANA),
+				new PetValue(getBond(), 1f, ValueFlavor.GRADUAL_GOOD, LABEL_BOND)
+			);
 	}
 
 	@Override

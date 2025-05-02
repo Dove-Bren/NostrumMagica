@@ -2,10 +2,9 @@ package com.smanzana.nostrummagica.entity.dragon;
 
 import com.smanzana.nostrummagica.entity.IMagicEntity;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
-import com.smanzana.petcommand.api.client.petgui.PetGUIStatAdapter;
 import com.smanzana.petcommand.api.entity.IEntityPet;
 import com.smanzana.petcommand.api.entity.IRerollablePet;
-import com.smanzana.petcommand.api.pet.PetInfo.PetAction;
+import com.smanzana.petcommand.api.pet.EPetAction;
 
 import net.minecraft.world.entity.player.Player;
 
@@ -13,9 +12,6 @@ public interface ITameDragon extends IEntityPet, IRerollablePet, IMagicEntity {
 
 	@Override
 	public IPetGUISheet<? extends IEntityPet>[] getContainerSheets(Player player);
-	
-	@Override
-	public PetGUIStatAdapter<? extends ITameDragon> getGUIAdapter();
 	
 	//public UUID getUniqueID();
 	
@@ -36,7 +32,7 @@ public interface ITameDragon extends IEntityPet, IRerollablePet, IMagicEntity {
 	
 	public boolean sharesMana(Player player);
 	
-	public PetAction getPetAction();
+	public EPetAction getPetAction();
 	
 	public boolean isSoulBound();
 }

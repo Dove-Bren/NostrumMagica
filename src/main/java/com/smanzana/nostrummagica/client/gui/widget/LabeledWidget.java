@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 
-public class LabeledWidget extends MoveableObscurableWidget {
+public class LabeledWidget extends ObscurableChildWidget {
 	
 	public static interface ILabel {
 		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color);
@@ -32,7 +32,7 @@ public class LabeledWidget extends MoveableObscurableWidget {
 	protected final ILabel label;
 	protected final IValue value;
 	
-	protected @Nullable List<Component> tooltip;
+	protected @Nullable Supplier<List<Component>> tooltip;
 	protected int colorLabel = 0xFFAAAAAA;
 	protected int colorValue = 0xFFE4E5D5;
 	protected float scale = 1f;
@@ -45,12 +45,21 @@ public class LabeledWidget extends MoveableObscurableWidget {
 	}
 	
 	public LabeledWidget tooltip(List<Component> tooltip) {
-		this.tooltip = tooltip;
+		this.tooltip = () -> tooltip;
 		return this;
 	}
 	
 	public LabeledWidget tooltip(Component tooltip) {
 		return tooltip(Lists.newArrayList(tooltip));
+	}
+	
+	public LabeledWidget tooltip(Supplier<List<Component>> tooltip) {
+		this.tooltip = tooltip;
+		return this;
+	}
+	
+	public LabeledWidget tooltip(Supplier<Component> tooltip, int dummy) {
+		return tooltip(() -> Lists.newArrayList(tooltip.get()));
 	}
 	
 	public LabeledWidget color(int labelColor, int valueColor) {
@@ -96,9 +105,14 @@ public class LabeledWidget extends MoveableObscurableWidget {
 		if (this.isHoveredOrFocused() && this.tooltip != null) {
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(0, 0, 100);
-			parent.renderComponentTooltip(matrixStackIn, tooltip, mouseX, mouseY);
+			parent.renderComponentTooltip(matrixStackIn, tooltip.get(), mouseX, mouseY);
 			matrixStackIn.popPose();
 		}
+	}
+	
+	@Override
+	protected boolean isValidClickButton(int button) {
+		return false; // no click consumption
 	}
 	
 	public static class TextLabel implements ILabel {
@@ -109,8 +123,14 @@ public class LabeledWidget extends MoveableObscurableWidget {
 			this.label = label;
 		}
 		
+		protected Component getLabel() {
+			return label;
+		}
+		
 		@Override
 		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
+			final Component label = getLabel();
+			
 			final Minecraft mc = Minecraft.getInstance();
 			final Font font = mc.font;
 			final int len = font.width(label);

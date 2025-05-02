@@ -7,7 +7,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.widget.IMoveableWidget;
-import com.smanzana.nostrummagica.client.gui.widget.ObscurableWidget;
+import com.smanzana.nostrummagica.client.gui.widget.ObscurableChildWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ScrollbarWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ScrollbarWidget.IScrollbarListener;
@@ -24,13 +24,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
-public class SimpleInventoryWidget extends ParentWidget implements IScrollbarListener {
+public class SimpleInventoryWidget extends ParentWidget<ObscurableChildWidget> implements IScrollbarListener {
 	
 	public static interface IHiddenSlotFactory {
 		public HideableSlot apply(Container inventory, int slotIdx, int x, int y);
 	}
 	
-	protected static class SlotWidget extends ObscurableWidget implements IMoveableWidget {
+	protected static class SlotWidget extends ObscurableChildWidget implements IMoveableWidget {
 		
 		protected final HideableSlot slot;
 		protected final int startX;

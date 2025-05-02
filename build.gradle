@@ -106,6 +106,12 @@ repositories {
 	}
 	
 	maven {
+		// Local mods that aren't available on the net
+		name = "Local Maven"
+		url = "file://${local_maven_path}"
+	}
+	
+	maven {
 		// location of the maven that hosts JEI files since January 2023
 		name = "Jared's maven"
 		url = "https://maven.blamejared.com/"
@@ -168,14 +174,14 @@ dependencies {
 	//compile 'top.theillusivec4.caelus:caelus-forge:${caelus_version}'
 	implementation fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}")
 	
-	compileOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}:api")
-	runtimeOnly fg.deobf("com.smanzana:nostrumaetheria:${aetheria_version}")
+	compileOnly fg.deobf("com.smanzana.nostrumaetheria:nostrumaetheria:${aetheria_version}:api")
+	runtimeOnly fg.deobf("com.smanzana.nostrumaetheria:nostrumaetheria:${aetheria_version}")
 	
-	runtimeOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}")
-	compileOnly fg.deobf("com.smanzana:petcommand:${petcommand_version}:api")
+	runtimeOnly fg.deobf("com.smanzana.petcommand:petcommand:${petcommand_version}")
+	compileOnly fg.deobf("com.smanzana.petcommand:petcommand:${petcommand_version}:api")
 	
-	runtimeOnly fg.deobf("com.smanzana:autodungeons:${autodungeons_version}")
-	compileOnly fg.deobf("com.smanzana:autodungeons:${autodungeons_version}")
+	runtimeOnly fg.deobf("com.smanzana.autodungeons:autodungeons:${autodungeons_version}")
+	compileOnly fg.deobf("com.smanzana.autodungeons:autodungeons:${autodungeons_version}")
 	
 	compileOnly fg.deobf("local:minecolonies:${minecolonies_version}:api")
 	//runtimeOnly fg.deobf("local:minecolonies:${minecolonies_version}")
@@ -246,6 +252,19 @@ tasks.named('jar', Jar).configure {
 
     // This is the preferred method to reobfuscate your jar file
     finalizedBy 'reobfJar'
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        maven {
+            url "file://${local_maven_path}"
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {

@@ -14,10 +14,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.widget.LabeledWidget;
+import com.smanzana.nostrummagica.client.gui.widget.ObscurableChildWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ObscurableWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ScrollbarWidget;
 import com.smanzana.nostrummagica.client.gui.widget.TextWidget;
+import com.smanzana.nostrummagica.client.gui.widget.Tooltip;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.log.SpellLogEffectLine;
@@ -88,7 +90,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		final Component title = (summary.getShape() == null ? new TextComponent("Start") : summary.getShape().getDisplayName());
 		widgets.add(new TextWidget(mc.screen, title,
 				x + (width / 2), y + GUI.STAGE_SECTION_VOFFSET, 1, 1)
-				.center());
+				.centerHorizontal());
 		
 		
 		final String entCount = " " + summary.getAffectedEntCounts().size();
@@ -430,7 +432,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 	}
 	
-	private static class EffectSummaryWidget extends ParentWidget {
+	private static class EffectSummaryWidget extends ParentWidget<ObscurableChildWidget> {
 		
 		private final ScrollbarWidget scrollbar;
 		private final List<EffectLineWidget> lineWidgets;
@@ -461,7 +463,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 			final Component title = entity.getName();
 			addChild(new TextWidget(mc.screen, title,
 					x + (width / 2), y + height, 1, 1)
-					.center());
+					.centerHorizontal());
 			height += mc.font.lineHeight + 12;
 			
 			lineWidgets = new ArrayList<>(summary.getElements().size());
@@ -523,7 +525,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 	}
 	
-	private static class EffectLineWidget extends ParentWidget {
+	private static class EffectLineWidget extends ParentWidget<ObscurableChildWidget> {
 		
 		private SpellLogEffectLine line;
 		
@@ -536,19 +538,19 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 			height += 2; // top margin 
 
 			final Minecraft mc = Minecraft.getInstance();
-			this.addChild(new TextWidget(mc.screen, line.getName(), x + 2, y + height, 100, 10)
-					.tooltip(line.getDescription()));
+			this.addChild(new TextWidget(mc.screen, line.getName(), 2, height, 100, 10)
+					.tooltip(Tooltip.create(line.getDescription())));
 			
 			if (line instanceof SpellLogEffectLine.Damage) {
 				final String damageText = String.format(" %.1f", line.getTotalDamage());
 				final @Nullable EMagicElement element = ((SpellLogEffectLine.Damage)line).getElement();
-				this.addChild(new LabeledWidget(mc.screen, new DamageLabel(element, 16, 16), new LabeledWidget.TextValue(() -> damageText), x + width - (12 + 40), y + height, 10, 10)
+				this.addChild(new LabeledWidget(mc.screen, new DamageLabel(element, 16, 16), new LabeledWidget.TextValue(() -> damageText), width - (12 + 40), height, 10, 10)
 						.tooltip(new TextComponent((element == null ? "Raw" : element.getName()) + " Damage"))
 						.scale(.75f));
 			} else if (line instanceof SpellLogEffectLine.Heal) {
 				final String healText = String.format(" %.1f", line.getTotalHeal());
 				final @Nullable EMagicElement element = ((SpellLogEffectLine.Heal)line).getElement();
-				this.addChild(new LabeledWidget(mc.screen, new HealLabel(element, 16, 16), new LabeledWidget.TextValue(() -> healText), x + width - (12 + 40), y + height, 10, 10)
+				this.addChild(new LabeledWidget(mc.screen, new HealLabel(element, 16, 16), new LabeledWidget.TextValue(() -> healText),width - (12 + 40), height, 10, 10)
 						.tooltip(new TextComponent((element == null ? "Raw" : element.getName()) + " Healing"))
 						.scale(.75f));
 			}
@@ -556,17 +558,19 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 			height += 12;
 			
 			if (line.getModifiers().isEmpty()) {
-				this.addChild(new TextWidget(mc.screen, new TextComponent("No modifiers"), x + 8, y + height, 100, 10).scale(.75f));
+				this.addChild(new TextWidget(mc.screen, new TextComponent("No modifiers"), 8, height, 100, 10).scale(.75f));
 				height += (int) (mc.font.lineHeight * .75f);
 			} else {
 				for (SpellLogModifier mod : line.getModifiers()) {
-					final ModifierWidget modWidget = new ModifierWidget(mod, x + 8, y + height, 100, 10);
+					final ModifierWidget modWidget = new ModifierWidget(mod, 8, height, 100, 10);
 					this.addChild(modWidget);
 					height += modWidget.getHeight();
 				}
 			}
 
 			height += 2; // bottom margin
+			
+			this.updateChildPositions();
 		}
 		
 		@Override
@@ -587,7 +591,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 	}
 	
-	private static class ModifierWidget extends ParentWidget {
+	private static class ModifierWidget extends ParentWidget<ObscurableChildWidget> {
 		
 		public ModifierWidget(SpellLogModifier modifier, int x, int y, int width, int heightIn) {
 			super(x, y, width, heightIn, TextComponent.EMPTY);

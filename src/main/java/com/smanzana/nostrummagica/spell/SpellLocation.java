@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.spell;
 
 import java.util.Objects;
 
+import com.smanzana.nostrummagica.util.RayTrace;
+
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
@@ -88,24 +90,10 @@ public class SpellLocation {
 	}
 	
 	
-	/**
-	 * Raytrace hit vecs are right on the edge of the block. That means we end up 'rounding up' when
-	 * hitting certain faces. Calculate the right outside blockpos.
-	 * @param hitVec
-	 * @param selectedPos
-	 * @return
-	 */
-	protected static final BlockPos GetHitPos(Vec3 hitVec, BlockPos selectedPos) {
-		final Vec3 diff = hitVec.subtract(Vec3.atCenterOf(selectedPos));
-		return new BlockPos(
-				hitVec.add(diff.normalize().scale(.05))
-				);
-	}
-	
 	public SpellLocation(Level world, BlockHitResult rayTrace) {
 		this(world,
 			rayTrace.getLocation(),
-			GetHitPos(rayTrace.getLocation(), rayTrace.getBlockPos()),
+			RayTrace.outsideBlockPosFromResult(rayTrace),
 			rayTrace.getBlockPos(),
 			Vec3.atCenterOf(rayTrace.getBlockPos())
 		);

@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.gui.widget;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
 
@@ -37,6 +38,48 @@ public abstract class FixedWidget extends AbstractWidget {
 		}
 		
 		return false;
+	}
+	
+	@Override
+	public boolean mouseClicked(double p_93641_, double p_93642_, int p_93643_) {
+		// The vanilla implementation:
+		
+		//
+		//if (this.active && this.visible) {
+		//	if (this.isValidClickButton(p_93643_)) {
+		//		boolean flag = this.clicked(p_93641_, p_93642_);
+		//		if (flag) {
+		//			this.playDownSound(Minecraft.getInstance().getSoundManager());
+		//			this.onClick(p_93641_, p_93642_);
+		//			return true;
+		//		}
+		//	}
+		//
+		//	return false;
+		//} else {
+		//	return false;
+		//}
+		//////////////////////////////////////////
+		
+		
+		if (this.active && this.visible) {
+			if (this.isValidClickButton(p_93643_)) {
+				boolean flag = this.clicked(p_93641_, p_93642_);
+				if (flag) {
+					this.playDownSound(Minecraft.getInstance().getSoundManager());
+					this.onClick(p_93641_, p_93642_, p_93643_);
+					return true;
+				}
+			}
+
+			return false;
+		} else {
+			return false;
+		}
+	}
+	
+	public void onClick(double mouseX, double mouseY, int button) {
+		this.onClick(mouseX, mouseY);
 	}
 	
 	

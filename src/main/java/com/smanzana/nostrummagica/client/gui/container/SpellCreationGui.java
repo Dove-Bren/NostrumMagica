@@ -18,7 +18,7 @@ import com.smanzana.nostrummagica.client.gui.ISpellCraftPatternRenderer;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellGui.SpellPartBar.IHoverHandler;
-import com.smanzana.nostrummagica.client.gui.widget.FixedWidget;
+import com.smanzana.nostrummagica.client.gui.widget.ObscurableChildWidget;
 import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.item.BlankScroll;
@@ -801,7 +801,7 @@ public class SpellCreationGui {
 			}
 		}
 		
-		protected static class WeightStatus extends AbstractWidget {
+		protected static class WeightStatus extends ObscurableChildWidget {
 			
 			private final SpellGui<?> gui;
 			
@@ -950,7 +950,7 @@ public class SpellCreationGui {
 			}
 		}
 		
-		private static class SpellPartSegment extends FixedWidget {
+		private static class SpellPartSegment extends ObscurableChildWidget {
 
 			private final SpellGui<?> gui;
 			private final SpellPartSummary part;
@@ -1034,7 +1034,7 @@ public class SpellCreationGui {
 			}
 		}
 		
-		protected static class SpellPartBar extends com.smanzana.nostrummagica.client.gui.widget.ParentWidget {
+		protected static class SpellPartBar extends com.smanzana.nostrummagica.client.gui.widget.ParentWidget<ObscurableChildWidget> {
 			
 			public static interface IHoverHandler {
 				public void onHover(@Nullable SpellPartSummary summary, PoseStack matrixStackIn, int mouseX, int mouseY);
@@ -1086,7 +1086,7 @@ public class SpellCreationGui {
 			}
 		}
 		
-		public static class InfoPanel extends ParentWidget {
+		public static class InfoPanel extends ParentWidget<ObscurableChildWidget> {
 			
 			public static interface InfoPanelContent {
 				public void render(PoseStack matrixStackIn, int width, int height, float partialTicks);

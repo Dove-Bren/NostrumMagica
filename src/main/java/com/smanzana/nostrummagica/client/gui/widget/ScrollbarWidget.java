@@ -3,15 +3,14 @@ package com.smanzana.nostrummagica.client.gui.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 
-public class ScrollbarWidget extends AbstractWidget {
+public class ScrollbarWidget extends ObscurableChildWidget {
 	
 	public static interface IScrollbarListener {
 		/**
@@ -116,10 +115,10 @@ public class ScrollbarWidget extends AbstractWidget {
 		return true;
 	}
 	
-	private static final ResourceLocation TEXT = NostrumMagica.Loc("textures/gui/misc_widget.png");
+	private static final ResourceLocation TEXT = new ResourceLocation(NostrumMagica.MODID, "textures/gui/misc_widget.png");
 	
-	private static final int TEX_WIDTH = 32;
-	private static final int TEX_HEIGHT = 32;
+	private static final int TEX_WIDTH = 64;
+	private static final int TEX_HEIGHT = 64;
 	
 	private static final int TEX_SCROLLBAR_HOFFSET = 0;
 	private static final int TEX_SCROLLBAR_VOFFSET = 0;
@@ -153,21 +152,29 @@ public class ScrollbarWidget extends AbstractWidget {
 			barPos = yMargin + getYForScroll(this.scroll);
 		}
 		
+		if (this.active) {
+			RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+		} else {
+			RenderSystem.setShaderColor(.2f, .2f, .2f, 1f);
+		}
+		
 		matrixStackIn.pushPose();
 		matrixStackIn.translate(xMargin, barPos, 0);
 		this.drawScrollbar(matrixStackIn, POS_SCROLLBAR_WIDTH, POS_SCROLLBAR_HEIGHT);
 		matrixStackIn.popPose();
+		
+		RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 		
 		matrixStackIn.popPose();
 	}
 	
 	protected void drawScrollbar(PoseStack matrixStackIn, int width, int height) {
 		RenderSystem.setShaderTexture(0, TEXT);
-		RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, 0, 0, TEX_SCROLLBAR_HOFFSET, TEX_SCROLLBAR_VOFFSET, TEX_SCROLLBAR_WIDTH, TEX_SCROLLBAR_HEIGHT, width, height, TEX_WIDTH, TEX_HEIGHT);
+		blit(matrixStackIn, 0, 0, width, height, TEX_SCROLLBAR_HOFFSET, TEX_SCROLLBAR_VOFFSET, TEX_SCROLLBAR_WIDTH, TEX_SCROLLBAR_HEIGHT, TEX_WIDTH, TEX_HEIGHT);
 	}
 	
 	protected void drawTrack(PoseStack matrixStackIn, int width, int height) {
-		RenderFuncs.drawRect(matrixStackIn, 0, 0, width, height, 0xFF000000);
+		GuiComponent.fill(matrixStackIn, 0, 0, width, height, 0xFF000000);
 	}
 
 	@Override

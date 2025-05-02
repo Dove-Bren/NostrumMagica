@@ -48,12 +48,12 @@ import com.smanzana.nostrummagica.util.Inventories;
 import com.smanzana.petcommand.api.PetCommandAPI;
 import com.smanzana.petcommand.api.PetFuncs;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
-import com.smanzana.petcommand.api.client.petgui.PetGUIStatAdapter;
 import com.smanzana.petcommand.api.entity.IEntityPet;
 import com.smanzana.petcommand.api.entity.ITameableEntity;
+import com.smanzana.petcommand.api.pet.EPetAction;
 import com.smanzana.petcommand.api.pet.PetInfo;
-import com.smanzana.petcommand.api.pet.PetInfo.PetAction;
-import com.smanzana.petcommand.api.pet.PetInfo.SecondaryFlavor;
+import com.smanzana.petcommand.api.pet.PetInfo.PetValue;
+import com.smanzana.petcommand.api.pet.PetInfo.ValueFlavor;
 
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
@@ -482,7 +482,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
     
     protected static final EntityDataAccessor<Integer> MANA  = SynchedEntityData.<Integer>defineId(ArcaneWolfEntity.class, EntityDataSerializers.INT);
     protected static final EntityDataAccessor<Integer> MAX_MANA  = SynchedEntityData.<Integer>defineId(ArcaneWolfEntity.class, EntityDataSerializers.INT);
-    protected static final EntityDataAccessor<PetAction> DATA_PET_ACTION = SynchedEntityData.<PetAction>defineId(ArcaneWolfEntity.class, PetJobSerializer.GetInstance());
+    protected static final EntityDataAccessor<EPetAction> DATA_PET_ACTION = SynchedEntityData.<EPetAction>defineId(ArcaneWolfEntity.class, PetJobSerializer.GetInstance());
     protected static final EntityDataAccessor<Integer> RUNE_COLOR = SynchedEntityData.<Integer>defineId(ArcaneWolfEntity.class, EntityDataSerializers.INT);
     
     protected static final EntityDataAccessor<ArcaneWolfElementalType> ELEMENTAL_TYPE = SynchedEntityData.<ArcaneWolfElementalType>defineId(ArcaneWolfEntity.class, ArcaneWolfElementalTypeSerializer.instance);
@@ -536,7 +536,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		entityData.define(ATTRIBUTE_LEVEL, 0);
 		entityData.define(ATTRIBUTE_BOND, 0f);
 		entityData.define(ATTRIBUTE_MANA_REGEN, 1f);
-		entityData.define(DATA_PET_ACTION, PetAction.WAITING);
+		entityData.define(DATA_PET_ACTION, EPetAction.IDLE);
 		entityData.define(MANA, 0);
 		entityData.define(MAX_MANA, 100);
 		entityData.define(RUNE_COLOR, 0x00000000);
@@ -740,11 +740,17 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		super.baseTick();
 		
 		if (level != null && !level.isClientSide) {
+			final @Nullable EPetAction order = PetInfo.GetOrderAction(this);
+			if (order != null) {
+				setPetAction(order);
+				return;
+			}
+			
 			if (!this.isOrderedToSit()) {
 				if (this.getTarget() == null) {
-					setPetAction(PetAction.WAITING);
+					setPetAction(EPetAction.IDLE);
 				} else {
-					setPetAction(PetAction.ATTACKING);
+					setPetAction(EPetAction.ATTACK);
 				}
 			}
 		}
@@ -929,7 +935,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		if (this.isTame() && player == this.getOwner()) {
 			if (player.isShiftKeyDown()) {
 				if (!this.level.isClientSide) {
-					this.setSitting(!this.isOrderedToSit());
+					this.setEntitySitting(!this.isOrderedToSit());
 					if (player.isCreative()) {
 						this.setBond(1f);
 						this.addTrainingXP(500);
@@ -1031,12 +1037,14 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		super.setOrderedToSit(sitting); // SetSitting
 	}
 	
-	public void setSitting(boolean sitting) {
+	@Override
+	public boolean setEntitySitting(boolean sitting) {
 		setOrderedToSit(sitting);
 		this.setInSittingPose(sitting);
 		if (sitting) {
-			setPetAction(PetAction.SITTING);
+			setPetAction(EPetAction.STAY);
 		}
+		return true;
 	}
 	
 	public int getWolfLevel() {
@@ -1285,18 +1293,37 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		entityData.set(TRAINING_LEVEL, level);
 	}
 	
-	public void setPetAction(PetAction action) {
+	public void setPetAction(EPetAction action) {
 		entityData.set(DATA_PET_ACTION, action);
 	}
 
-	public PetAction getPetAction() {
+	public EPetAction getPetAction() {
 		return entityData.get(DATA_PET_ACTION);
 	}
 	
+	protected static final Component LABEL_XP = new TextComponent("XP");
+	protected static final Component LABEL_MANA = new TextComponent("Mana");
+	protected static final Component LABEL_BOND = new TextComponent("Bond");
+	protected static final Component LABEL_TRAINING_XP = new TextComponent("Elemental XP");
+	
 	@Override
 	public PetInfo getPetSummary() {
-		return PetInfo.claim(getHealth(), getMaxHealth(), getXP(), getMaxXP(), SecondaryFlavor.PROGRESS, getPetAction());
-		//return PetInfo.claim(getHealth(), getMaxHealth(), getMana(), getMaxMana(), SecondaryFlavor.GOOD, getPetAction());
+		final PetValue[] values;
+		if (this.getTrainingElement() == null) {
+			values = new PetValue[] {
+				new PetValue(getXP(), getMaxXP(), ValueFlavor.PROGRESS, LABEL_XP),
+				new PetValue(getMana(), getMaxMana(), ValueFlavor.GOOD, LABEL_MANA),
+				new PetValue(getBond(), 1f, ValueFlavor.GRADUAL_GOOD, LABEL_BOND)
+			};
+		} else {
+			values = new PetValue[] {
+					new PetValue(getXP(), getMaxXP(), ValueFlavor.PROGRESS, LABEL_XP),
+					new PetValue(getMana(), getMaxMana(), ValueFlavor.GOOD, LABEL_MANA),
+					new PetValue(getBond(), 1f, ValueFlavor.GRADUAL_GOOD, LABEL_BOND),
+					new PetValue(this.getTrainingXP(), this.getMaxTrainingXP(), ValueFlavor.PROGRESS, LABEL_TRAINING_XP)
+			};
+		}
+		return PetInfo.claim(getPetAction(), getHealth(), getMaxHealth(), values);
 	}
 	
 	public int getBonusJumps() {
@@ -1931,57 +1958,6 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		);
 	}
 
-	@Override
-	public PetGUIStatAdapter<ArcaneWolfEntity> getGUIAdapter() {
-		return new PetGUIStatAdapter<ArcaneWolfEntity>() {
-
-			@Override
-			public float getSecondaryAmt(ArcaneWolfEntity pet) {
-				return pet.getMana();
-			}
-
-			@Override
-			public float getMaxSecondaryAmt(ArcaneWolfEntity pet) {
-				return pet.getMaxMana();
-			}
-
-			@Override
-			public String getSecondaryLabel(ArcaneWolfEntity pet) {
-				return "Mana";
-			}
-
-			@Override
-			public float getTertiaryAmt(ArcaneWolfEntity pet) {
-				return pet.getBond();
-			}
-
-			@Override
-			public float getMaxTertiaryAmt(ArcaneWolfEntity pet) {
-				return 1f;
-			}
-
-			@Override
-			public String getTertiaryLabel(ArcaneWolfEntity pet) {
-				return "Bond";
-			}
-
-			@Override
-			public float getQuaternaryAmt(ArcaneWolfEntity pet) {
-				return pet.getXP();
-			}
-
-			@Override
-			public float getMaxQuaternaryAmt(ArcaneWolfEntity pet) {
-				return pet.getMaxXP();
-			}
-
-			@Override
-			public String getQuaternaryLabel(ArcaneWolfEntity pet) {
-				return "XP";
-			}
-		};
-	}
-	
 	public boolean hasWolfCapability(WolfBondCapability capability) {
 		return this.getBond() >= capability.bond;
 	}

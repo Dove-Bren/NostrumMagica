@@ -117,6 +117,27 @@ public class RayTrace {
 		return ((BlockHitResult) result).getBlockPos();
 	}
 	
+	protected static final BlockPos GetHitPos(Vec3 hitVec, BlockPos selectedPos) {
+		final Vec3 diff = hitVec.subtract(Vec3.atCenterOf(selectedPos));
+		return new BlockPos(
+				hitVec.add(diff.normalize().scale(.05))
+				);
+	}
+	
+	/**
+	 * Raytrace hit vecs are right on the edge of the block. That means we end up 'rounding up' when
+	 * hitting certain faces. Calculate the right outside blockpos.
+	 * @return
+	 */
+	public static final @Nullable BlockPos outsideBlockPosFromResult(HitResult result) {
+		if (result == null || result.getType() != HitResult.Type.BLOCK) {
+			return null;
+		}
+		
+		BlockHitResult blockResult = ((BlockHitResult) result);
+		return GetHitPos(blockResult.getLocation(), blockResult.getBlockPos());
+	}
+	
 	public static HitResult raytrace(Level world, @Nonnull Entity tracingEntity, Vec3 fromPos, float pitch,
 			float yaw, float maxDistance, Predicate<? super Entity> selector) {
 		if (world == null || fromPos == null)
