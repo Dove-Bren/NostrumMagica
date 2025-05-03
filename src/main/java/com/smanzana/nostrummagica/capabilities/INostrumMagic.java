@@ -26,7 +26,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface INostrumMagic extends INBTSerializable<CompoundTag> {
+public interface INostrumMagic extends INBTSerializable<CompoundTag>, INostrumMana {
 	
 	public static class TransmuteKnowledge {
 		public final String key;
@@ -93,10 +93,13 @@ public interface INostrumMagic extends INBTSerializable<CompoundTag> {
 	public void takeResearchPoint();
 	
 	// Mana
+	@Override
 	public int getMana();
+	@Override
 	public int getMaxMana();
 	public int getMaxMana(boolean includeReserved);
 	public void setMana(int mana);
+	@Override
 	public void addMana(int mana);
 	public void setMaxMana(int max);
 	public int getReservedMana();

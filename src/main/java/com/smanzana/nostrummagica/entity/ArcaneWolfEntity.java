@@ -11,7 +11,9 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
+import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.INostrumMana;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfAbilitySheet;
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfBondInfoSheet;
@@ -56,6 +58,7 @@ import com.smanzana.petcommand.api.pet.PetInfo.PetValue;
 import com.smanzana.petcommand.api.pet.PetInfo.ValueFlavor;
 
 import net.minecraft.Util;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -108,8 +111,10 @@ import net.minecraft.world.scores.Team;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 
-public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPet, IPetWithSoul, IStabbableEntity, IMagicEntity {
+public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPet, IPetWithSoul, IStabbableEntity, INostrumMana {
 	
 	public static enum ArcaneWolfElementalType {
 		NONELEMENTAL("nonelemental", 0x00000000, null),
@@ -1171,15 +1176,14 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 	}
 	
 	@Override
-	public int addMana(int mana) {
+	public void addMana(int mana) {
 		int orig = this.getMana();
 		int cur = Math.max(0, Math.min(orig + mana, this.getMaxMana()));
 		
 		this.setMana(cur);
-		return mana - (cur - orig);
+		//return mana - (cur - orig);
 	}
 	
-	@Override
 	public boolean takeMana(int mana) {
 		final int cur = getMana();
 		if (cur >= mana) {
@@ -2106,5 +2110,16 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 	@Override
 	public boolean isBigPet() {
 		return false;
+	}
+	
+	private final LazyOptional<ArcaneWolfEntity> selfOptional = LazyOptional.of(() -> this);
+	
+	@Override
+	public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction face) {
+		if (cap == CapabilityHandler.CAPABILITY_MANA) {
+			return selfOptional.cast();
+		}
+		
+		return super.getCapability(cap, face);
 	}
 }

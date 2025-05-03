@@ -20,6 +20,7 @@ import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.IBonusJumpCapability;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.INostrumMana;
 import com.smanzana.nostrummagica.capabilities.ISpellCrafting;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.IMultiPartEntityPart;
@@ -243,6 +244,14 @@ public class NostrumMagica {
 		}
 		
 		return e.getCapability(CapabilityHandler.CAPABILITY_BONUSJUMP).orElse(null);
+	}
+	
+	public static INostrumMana getManaWrapper(Entity e) {
+		if (e == null) {
+			return null;
+		}
+		
+		return e.getCapability(CapabilityHandler.CAPABILITY_MANA).orElse(null);
 	}
 
 	public static ItemStack findTome(Player entity, int tomeID) {

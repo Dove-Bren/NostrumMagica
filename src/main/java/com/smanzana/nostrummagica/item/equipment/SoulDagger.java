@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.INostrumMana;
 import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.PredefinedEffect;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
@@ -28,8 +28,15 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RayTrace;
 
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -37,21 +44,14 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tiers;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -198,36 +198,6 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 		
 		int durationTicks = (target instanceof Player ? 20 : 60);
 		
-//		//TODO testing code; remove!
-//		{
-//			{
-////				ClientEffect effect = new ClientEffectMirrored(Vector3d.ZERO,
-////						new ClientEffectFormBasic(ClientEffectIcon.ARROW_SLASH, (-16f/24f), (-16f/24f), (-16f/24f)),
-////						30, 5);
-//				ClientEffect effect = new ClientEffectMirrored(Vector3d.ZERO,
-//						new ClientEffectFormBasic(ClientEffectIcon.ARROW_SLASH, (-8f/24f), (8f/24f), (-12f/24f)),
-//						durationTicks, 5);
-//				
-//					effect.modify(new ClientEffectModifierFollow(target));
-//				
-//				effect
-//				.modify(new ClientEffectModifierColor(0xFF000000, 0xFF800000))
-//				//.modify(new ClientEffectModifierTranslate(0, 0, 0))
-//				.modify(new ClientEffectModifierMove(new Vector3d(2, 2, 0), new Vector3d(0, 0, 0), 0f, .1f))
-//				.modify(new ClientEffectModifierGrow(2f, 0f, 2f, 1f, .05f))
-//				.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .75f))
-//				;
-////				.modify(new ClientEffectModifierColor(element.getColor(), element.getColor()))
-////				.modify(new ClientEffectModifierRotate(0f, .4f, 0f))
-////				.modify(new ClientEffectModifierTranslate(0, 0, -1))
-////				.modify(new ClientEffectModifierMove(new Vector3d(0, 1.5, 0), new Vector3d(0, .5, .7), .5f, 1f))
-////				.modify(new ClientEffectModifierGrow(.1f, .3f, .2f, .8f, .5f))
-////				;
-//				//return effect;
-//				
-//				ClientEffectRenderer.instance().addEffect(effect);
-//			}
-//		}
 		NostrumMagica.instance.proxy.playPredefinedEffect(PredefinedEffect.SOUL_DAGGER_STAB, durationTicks, target.level, target);
 		
 		float damage = 6.0f + EnchantmentHelper.getDamageBonus(dagger, target.getMobType());
@@ -255,8 +225,8 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 			// Mana:
 			{
 				final int manaDrawn;
-				INostrumMagic attr = NostrumMagica.getMagicWrapper(target);
-				INostrumMagic attrSelf = NostrumMagica.getMagicWrapper(attacker);
+				INostrumMana attr = NostrumMagica.getManaWrapper(target);
+				INostrumMana attrSelf = NostrumMagica.getManaWrapper(attacker);
 				if (attrSelf == null || (attr == null && target instanceof Player)) {
 					manaDrawn = 0;
 				} else if (attrSelf != null && attr == null && target instanceof Mob) {
@@ -265,6 +235,7 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 				} else {
 					int manaCost = NostrumMagica.rand.nextInt(50) + 50;
 					manaCost = Math.min(manaCost, attr.getMana());
+					attr.addMana(-manaCost);
 					manaDrawn = Math.min(manaCost, attrSelf.getMaxMana() - attrSelf.getMana());
 				}
 				

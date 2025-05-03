@@ -24,6 +24,7 @@ public class CapabilityHandler {
 	public static final Capability<IManaArmor> CAPABILITY_MANAARMOR = CapabilityManager.get(new CapabilityToken<>(){});
 	public static final Capability<ISpellCrafting> CAPABILITY_SPELLCRAFTING = CapabilityManager.get(new CapabilityToken<>(){});
 	public static final Capability<IBonusJumpCapability> CAPABILITY_BONUSJUMP = CapabilityManager.get(new CapabilityToken<>(){});
+	public static final Capability<INostrumMana> CAPABILITY_MANA = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	public CapabilityHandler() {
 		MinecraftForge.EVENT_BUS.register(this);
@@ -32,11 +33,10 @@ public class CapabilityHandler {
 	@SubscribeEvent
 	public void attachCapability(AttachCapabilitiesEvent<Entity> event) {
 		
-		//if player. Or not. Should get config going. For now, if it's a player make it?
-		//also need to catch death, etc
+		// Automatically add things for players. Otherwise, let mod devs more natively support the capabilities.
 		if (event.getObject() instanceof Player) {
 			Player player = (Player) event.getObject();
-			event.addCapability(CAPABILITY_MAGIC_LOC, new AutoCapabilityProvider<>(CAPABILITY_MAGIC, new NostrumMagic(player)));
+			event.addCapability(CAPABILITY_MAGIC_LOC, new NostrumMagicProvider(new NostrumMagic(player)));
 			event.addCapability(CAPABILITY_MANARMOR_LOC, new AutoCapabilityProvider<>(CAPABILITY_MANAARMOR, new ManaArmor(player)));
 			event.addCapability(CAPABILITY_SPELLCRAFTING_LOC, new AutoCapabilityProvider<>(CAPABILITY_SPELLCRAFTING, new SpellCraftingCapability()));
 			event.addCapability(CAPABILITY_BONUSJUMP_LOC, new AutoCapabilityProvider<>(CAPABILITY_BONUSJUMP, new BonusJumpCapability()));

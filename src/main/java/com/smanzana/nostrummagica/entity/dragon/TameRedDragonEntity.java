@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
+import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonBondInfoSheet;
@@ -54,6 +55,7 @@ import com.smanzana.petcommand.api.pet.PetInfo.PetValue;
 import com.smanzana.petcommand.api.pet.PetInfo.ValueFlavor;
 
 import net.minecraft.Util;
+import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -100,6 +102,8 @@ import net.minecraft.world.scores.Team;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameableEntity, ITameDragon, IChangeListener, IPetWithSoul, IStabbableEntity {
@@ -1866,15 +1870,14 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 	}
 	
 	@Override
-	public int addMana(int mana) {
+	public void addMana(int mana) {
 		int orig = this.getMana();
 		int cur = Math.max(0, Math.min(orig + mana, this.getMaxMana()));
 		
 		this.entityData.set(CAPABILITY_MANA, cur);
-		return mana - (cur - orig);
+		//return mana - (cur - orig);
 	}
 	
-	@Override
 	public boolean takeMana(int mana) {
 		final int cur = getMana();
 		if (cur >= mana) {
@@ -2513,6 +2516,17 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 	@Override
 	public boolean isBigPet() {
 		return true;
+	}
+	
+	private final LazyOptional<TameRedDragonEntity> selfOptional = LazyOptional.of(() -> this);
+	
+	@Override
+	public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction face) {
+		if (cap == CapabilityHandler.CAPABILITY_MANA) {
+			return selfOptional.cast();
+		}
+		
+		return super.getCapability(cap, face);
 	}
 	
 }
