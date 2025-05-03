@@ -54,6 +54,7 @@ public class SeekingBulletShape extends SpellShape {
 		private final float yaw;
 		private final boolean ignoreAllies;
 		private final SpellCharacteristics characteristics;
+		private final @Nullable LivingEntity targetHint;
 		
 		public SeekingBulletShapeInstance(ISpellState state, Level world, Vec3 pos, float pitch, float yaw, boolean ignoreAllies, SpellCharacteristics characteristics) {
 			super(state);
@@ -63,13 +64,14 @@ public class SeekingBulletShape extends SpellShape {
 			this.yaw = yaw;
 			this.ignoreAllies = ignoreAllies;
 			this.characteristics = characteristics;
+			this.targetHint = state.getTargetHint();
 		}
 		
 		@Override
 		public void spawn(LivingEntity caster) {
 			final Vec3 start = this.getState().getSelf().getEyePosition(0f);
 			final Vec3 dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
-			LivingEntity target = FindTarget(this.getState().getSelf(), start, dir, this.ignoreAllies);
+			LivingEntity target = FindTarget(this.getState().getSelf(), start, dir, this.ignoreAllies, this.targetHint);
 			
 			// Get axis from where target is
 			Direction.Axis axis = Direction.Axis.Y;
@@ -138,7 +140,14 @@ public class SeekingBulletShape extends SpellShape {
 		}
 	}
 	
-	protected static final @Nullable LivingEntity FindTarget(LivingEntity self, Vec3 start, Vec3 direction, boolean ignoreAllies) {
+	protected static final @Nullable LivingEntity FindTarget(LivingEntity self, Vec3 start, Vec3 direction, boolean ignoreAllies, @Nullable LivingEntity targetHint) {
+		// If client provided a target, use it
+		if (targetHint != null && targetHint.isAlive() // entity is valid possible target
+				&& (!ignoreAllies || !NostrumMagica.IsSameTeam(targetHint, self)) // shape configuration allows this entity
+				&& self.distanceTo(targetHint) <= MAX_DIST) {
+			return targetHint;
+		}
+		
 		// Do a little more work of getting a good vector for things
 		// that aren't players
 		LivingEntity target;
@@ -265,7 +274,7 @@ public class SeekingBulletShape extends SpellShape {
 	public boolean addToPreview(SpellShapePreview builder, ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final Vec3 start = state.getSelf().getEyePosition(0f);
 		final Vec3 dir = SeekingBulletShape.getVectorForRotation(pitch, yaw);
-		@Nullable LivingEntity target = FindTarget(state.getSelf(), start, dir, getIgnoresAllies(properties));
+		@Nullable LivingEntity target = FindTarget(state.getSelf(), start, dir, getIgnoresAllies(properties), state.getTargetHint());
 		if (target != null) {
 			state.trigger(Lists.newArrayList(target), null);
 			return true;

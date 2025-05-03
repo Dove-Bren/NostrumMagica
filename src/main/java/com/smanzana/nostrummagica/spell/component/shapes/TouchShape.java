@@ -13,11 +13,12 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.util.RayTrace;
 
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.core.NonNullList;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
@@ -71,8 +72,15 @@ public class TouchShape extends InstantShape implements ISelectableShape {
 	protected TriggerData getTargetData(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
 		final float range = getTouchRange(state, params);
 		
-		HitResult trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, pitch, yaw, range, 
-				this.affectsEntities(params) ? new RayTrace.OtherLiving(state.getCaster()) : (e) -> false);
+		final HitResult trace;
+		final LivingEntity targetHint = state.getTargetHint();
+		final double rangeWithWidthSq = targetHint == null ? 0 : Math.pow(range + targetHint.getBbWidth() / 2, 2);
+		if (this.affectsEntities(params) && targetHint != null && targetHint.isAlive() && targetHint.distanceToSqr(location.shooterPosition) < rangeWithWidthSq) {
+			trace = new EntityHitResult(targetHint);
+		} else {
+			trace = RayTrace.raytrace(location.world, state.getSelf(), location.shooterPosition, pitch, yaw, range, 
+					this.affectsEntities(params) ? new RayTrace.OtherLiving(state.getCaster()) : (e) -> false);
+		}
 		
 		if (trace == null || trace.getType() == HitResult.Type.MISS) {
 			final boolean ignoreAirHits = getIgnoreAirHits(params);

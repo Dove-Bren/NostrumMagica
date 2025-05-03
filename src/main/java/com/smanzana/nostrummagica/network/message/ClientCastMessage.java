@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.network.message;
 
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.spell.Spell;
@@ -9,6 +11,8 @@ import com.smanzana.nostrummagica.spell.SpellCasting;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -36,11 +40,22 @@ public class ClientCastMessage {
 			return;
 		}
 		
-		boolean isScroll = message.isScroll;
-		int tomeID = message.tomeId;
+		final boolean isScroll = message.isScroll;
+		final int tomeID = message.tomeId;
+		final int entHintID = message.entityHintId;
+		
 		
 		ctx.get().enqueueWork(() -> {
 			boolean success = true;
+			
+			// Find matching hint entity, if one was indicated
+			final @Nullable LivingEntity hintEntity;
+			if (entHintID != -1) {
+				@Nullable Entity raw = sp.getLevel().getEntity(entHintID);
+				hintEntity = raw != null &&  raw instanceof LivingEntity living ? living : null;
+			} else {
+				hintEntity = null;
+			}
 			
 			// Look up tome if there's supposed to be one
 			ItemStack tome = ItemStack.EMPTY;
@@ -51,13 +66,13 @@ public class ClientCastMessage {
 				if (!tome.isEmpty() && tome.getItem() instanceof SpellTome
 						&& SpellTome.getTomeID(tome) == tomeID) {
 					// Casting from a tome.
-					success = SpellCasting.AttemptToolCast(spell, sp, tome).succeeded;
+					success = SpellCasting.AttemptToolCast(spell, sp, tome, hintEntity).succeeded;
 				} else {
 					NostrumMagica.logger.warn("Got cast from client with mismatched tome");
 					success = false;
 				}
 			} else {
-				success = SpellCasting.AttemptScrollCast(spell, sp).succeeded;
+				success = SpellCasting.AttemptScrollCast(spell, sp, hintEntity).succeeded;
 			}
 
 			// Whether it failed or not, sync attributes to client.
@@ -74,25 +89,32 @@ public class ClientCastMessage {
 	private final int id;
 	private final int tomeId;
 	private final boolean isScroll;
+	private final int entityHintId;
 	
-	public ClientCastMessage(Spell spell, boolean scroll, int tomeID) {
-		this(spell.getRegistryID(), scroll, tomeID);
+	public ClientCastMessage(Spell spell, boolean scroll, int tomeID, @Nullable Entity entityHint) {
+		this(spell.getRegistryID(), scroll, tomeID, entityHint == null ? -1 : entityHint.getId());
 	}
 	
 	public ClientCastMessage(int id, boolean scroll, int tomeID) {
+		this(id, scroll, tomeID, -1);
+	}
+	
+	public ClientCastMessage(int id, boolean scroll, int tomeID, int entityHintId) {
 		this.id = id;
 		this.isScroll = scroll;
 		this.tomeId = tomeID;
+		this.entityHintId = entityHintId;
 	}
 
 	public static ClientCastMessage decode(FriendlyByteBuf buf) {
-		return new ClientCastMessage(buf.readInt(), buf.readBoolean(), buf.readInt());
+		return new ClientCastMessage(buf.readInt(), buf.readBoolean(), buf.readInt(), buf.readInt());
 	}
 
 		public static void encode(ClientCastMessage msg, FriendlyByteBuf buf) {
 		buf.writeInt(msg.id);
 		buf.writeBoolean(msg.isScroll);
 		buf.writeInt(msg.tomeId);
+		buf.writeInt(msg.entityHintId);
 	}
 
 }

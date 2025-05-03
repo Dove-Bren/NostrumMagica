@@ -72,6 +72,7 @@ public class Spell {
 	public static interface ISpellState {
 		public LivingEntity getSelf();
 		public LivingEntity getCaster();
+		public @Nullable LivingEntity getTargetHint();
 		
 		public boolean isPreview();
 		// May not be supported if isPreview() is true
@@ -89,6 +90,7 @@ public class Spell {
 		protected final Spell spell;
 		protected final LivingEntity caster;
 		protected float efficiency;
+		protected final @Nullable LivingEntity targetHint;
 		protected final ISpellLogBuilder log;
 		
 		private final long startTicks;
@@ -97,11 +99,12 @@ public class Spell {
 		private LivingEntity self;
 		private SpellShapeInstance shapeInstance;
 		
-		public SpellState(Spell spell, LivingEntity caster, float efficiency, ISpellLogBuilder log) {
+		public SpellState(Spell spell, LivingEntity caster, float efficiency, @Nullable LivingEntity targetHint, ISpellLogBuilder log) {
 			index = -1;
 			this.caster = this.self = caster;
 			this.efficiency = efficiency;
 			this.spell = spell;
+			this.targetHint = targetHint;
 			this.log = log;
 			
 			this.startTicks = caster.level.getGameTime();
@@ -109,6 +112,11 @@ public class Spell {
 		
 		public int getIndex() {
 			return index;
+		}
+		
+		@Override
+		public @Nullable LivingEntity getTargetHint() {
+			return this.targetHint;
 		}
 		
 		@Override
@@ -209,7 +217,7 @@ public class Spell {
 		}
 		
 		protected SpellState split() {
-			SpellState spawn = new SpellState(spell, caster, this.efficiency, this.log);
+			SpellState spawn = new SpellState(spell, caster, this.efficiency, this.targetHint, this.log);
 			spawn.index = this.index;
 			
 			return spawn;
@@ -443,7 +451,7 @@ public class Spell {
 		private final float partialTicks;
 		
 		public PreviewState(Spell spell, LivingEntity caster, SpellShapePreview previewBuilder, float partialTicks) {
-			super(spell, caster, 1f, ISpellLogBuilder.Dummy);
+			super(spell, caster, 1f, null, ISpellLogBuilder.Dummy);
 			this.previewBuilder = previewBuilder;
 			this.partialTicks = partialTicks;
 		}
@@ -652,6 +660,10 @@ public class Spell {
 	}
 	
 	public void cast(LivingEntity caster, float efficiency) {
+		cast(caster, efficiency, null);
+	}
+	
+	public void cast(LivingEntity caster, float efficiency, @Nullable LivingEntity targetHint) {
 		if (!caster.getServer().isSameThread()) {
 			throw new IllegalStateException("Can't cast spell on a thread other than the game thread");
 		}
@@ -663,7 +675,7 @@ public class Spell {
 		} else {
 			logger = ISpellLogBuilder.Dummy;
 		}
-		SpellState state = new SpellState(this, caster, efficiency, logger);
+		SpellState state = new SpellState(this, caster, efficiency, targetHint, logger);
 		state.trigger(Lists.newArrayList(caster), null);
 		
 		NostrumMagicaSounds.CAST_LAUNCH.play(caster);

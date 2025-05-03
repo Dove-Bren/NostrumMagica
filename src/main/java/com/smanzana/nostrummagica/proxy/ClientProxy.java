@@ -66,6 +66,7 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
+import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.nostrummagica.util.ContainerUtil.IPackedContainerProvider;
 
 import net.minecraft.Util;
@@ -89,6 +90,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
@@ -264,8 +266,10 @@ public class ClientProxy extends CommonProxy {
 		ItemStack tome = NostrumMagica.getCurrentTome(player); 
 		if (!tome.isEmpty()) {
 			if (SpellCasting.CheckToolCast(spell, player, tome).succeeded) {
+				HitResult mop = RayTrace.raytraceApprox(player.getLevel(), player, player.getEyePosition(), player.getXRot(), player.getYRot(), 100, (e) -> e != player && e instanceof LivingEntity, .5);
+				
 				NetworkHandler.sendToServer(
-		    			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome)));
+		    			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome), RayTrace.entFromRaytrace(mop)));
 				NostrumMagica.playerListener.overrideLastSpell(player, spell);
 			} else {
 				for (int i = 0; i < 15; i++) {

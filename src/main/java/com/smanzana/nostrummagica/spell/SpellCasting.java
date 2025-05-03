@@ -22,12 +22,12 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
 
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 
 public class SpellCasting {
@@ -54,22 +54,22 @@ public class SpellCasting {
 		}
 	}
 	
-	public static final SpellCastResult AttemptScrollCast(Spell spell, LivingEntity entity) {
-		return AttemptCast(spell, entity, ItemStack.EMPTY, true, false);
+	public static final SpellCastResult AttemptScrollCast(Spell spell, LivingEntity entity, @Nullable LivingEntity targetHint) {
+		return AttemptCast(spell, entity, ItemStack.EMPTY, targetHint, true, false);
 	}
 	
-	public static final SpellCastResult AttemptToolCast(Spell spell, LivingEntity entity, ItemStack tool) {
+	public static final SpellCastResult AttemptToolCast(Spell spell, LivingEntity entity, ItemStack tool, @Nullable LivingEntity targetHint) {
 		final boolean freeCast = entity instanceof Player
 				? ((Player) entity).isCreative()
 				: false;
-		return AttemptCast(spell, entity, tool, freeCast, false);
+		return AttemptCast(spell, entity, tool, targetHint, freeCast, false);
 	}
 	
 	public static final SpellCastResult CheckToolCast(Spell spell, LivingEntity entity, ItemStack tool) {
 		final boolean freeCast = entity instanceof Player
 				? ((Player) entity).isCreative()
 				: false;
-		return AttemptCast(spell, entity, tool, freeCast, true);
+		return AttemptCast(spell, entity, tool, null, freeCast, true);
 	}
 	
 	private static final SpellCastResult EmitCastPostEvent(SpellCastResult result) {
@@ -77,7 +77,7 @@ public class SpellCasting {
 		return result;
 	}
 
-	protected static final SpellCastResult AttemptCast(Spell spell, LivingEntity entity, ItemStack tool, boolean freeCast, boolean checking) {
+	protected static final SpellCastResult AttemptCast(Spell spell, LivingEntity entity, ItemStack tool, @Nullable LivingEntity targetHint, boolean freeCast, boolean checking) {
 		INostrumMagic att = NostrumMagica.getMagicWrapper(entity);
 		@Nullable Player playerCast = (entity instanceof Player) ? (Player) entity : null;
 		
@@ -271,7 +271,7 @@ public class SpellCasting {
 		}
 		
 		if (!checking) {
-			spell.cast(entity, summary.getEfficiency());
+			spell.cast(entity, summary.getEfficiency(), targetHint);
 			
 			// No xp if magic isn't unlocked
 			if (!att.isUnlocked()) {
