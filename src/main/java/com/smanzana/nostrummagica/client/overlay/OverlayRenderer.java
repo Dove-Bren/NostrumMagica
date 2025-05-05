@@ -55,9 +55,9 @@ import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.item.set.EquipmentSet;
+import com.smanzana.nostrummagica.listener.ClientPlayerListener;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
-import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCooldownTracker.SpellCooldown;
 import com.smanzana.nostrummagica.util.RayTrace;
@@ -589,23 +589,23 @@ public class OverlayRenderer extends GuiComponent {
 	
 	private String getBindingForSlot(int slot) {
 		String binding = null;
-		ClientProxy proxy = (ClientProxy) NostrumMagica.instance.proxy;
+		ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
 		@Nullable KeyMapping key = null;
 		switch (slot) {
 		case 0:
-			key = proxy.getBindingCast1();
+			key = listener.getBindingCast1();
 			break;
 		case 1:
-			key = proxy.getBindingCast2();
+			key = listener.getBindingCast2();
 			break;
 		case 2:
-			key = proxy.getBindingCast3();
+			key = listener.getBindingCast3();
 			break;
 		case 3:
-			key = proxy.getBindingCast4();
+			key = listener.getBindingCast4();
 			break;
 		case 4:
-			key = proxy.getBindingCast5();
+			key = listener.getBindingCast5();
 			break;
 		}
 		
@@ -735,8 +735,8 @@ public class OverlayRenderer extends GuiComponent {
 			; // fall through
 			break;
 		case HOLD: {
-				ClientProxy proxy = (ClientProxy) NostrumMagica.instance.proxy;
-				if (!proxy.getHUDKey().isDown()) {
+				ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
+				if (!listener.getHUDKey().isDown()) {
 					return;
 				}
 			}

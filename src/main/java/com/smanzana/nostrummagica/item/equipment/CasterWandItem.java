@@ -17,10 +17,10 @@ import com.smanzana.nostrummagica.item.IRaytraceOverlay;
 import com.smanzana.nostrummagica.item.ISpellCastingTool;
 import com.smanzana.nostrummagica.item.ISpellContainerItem;
 import com.smanzana.nostrummagica.item.NostrumItems;
+import com.smanzana.nostrummagica.listener.ClientPlayerListener;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
-import com.smanzana.nostrummagica.proxy.ClientProxy;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCastEvent;
@@ -257,7 +257,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 					}
 					
 					NostrumMagicaSounds.CAST_FAIL.playClient(playerIn);
-					((ClientProxy) NostrumMagica.instance.proxy).doManaWiggle(2);
+					((ClientPlayerListener) NostrumMagica.playerListener).doManaWiggle(2);
 				}
 			} else {
 				if (SpellCasting.AttemptToolCast(spell, playerIn, stack, null).succeeded) {
