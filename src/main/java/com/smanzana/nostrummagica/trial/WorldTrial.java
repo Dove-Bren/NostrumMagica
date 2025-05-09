@@ -47,7 +47,7 @@ public abstract class WorldTrial {
 		if (mastery == EElementalMastery.NOVICE) {
 			if (!player.level.isClientSide) {
 				NostrumMagicaSounds.STATUS_DEBUFF3.play(player);
-				player.sendMessage(new TranslatableComponent("info.element.starttrial", new Object[] {this.element.getName()}), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.element.starttrial", this.element.getDisplayName()), Util.NIL_UUID);
 			}
 		} else {
 			complete(player);

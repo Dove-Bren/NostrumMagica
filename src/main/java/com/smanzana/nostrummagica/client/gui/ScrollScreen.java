@@ -61,8 +61,8 @@ public class ScrollScreen extends Screen {
 			
 			for (SpellEffectPart part : spell.getSpellEffectParts()) {
 				final String intensity = SpellPlate.toRoman(part.getElementCount());	
-				this.components.add("   " + part.getElement().getName() + " " + intensity
-						+ (part.getAlteration() == null ? "" : (" [" + part.getAlteration().getName() + "]")));
+				this.components.add("   " + part.getElement().getBareName() + " " + intensity
+						+ (part.getAlteration() == null ? "" : (" [" + part.getAlteration().getBareName() + "]")));
 			}
 		}
 	}

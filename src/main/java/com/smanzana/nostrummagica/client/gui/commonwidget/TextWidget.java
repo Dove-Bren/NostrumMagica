@@ -1,6 +1,4 @@
-package com.smanzana.nostrummagica.client.gui.widget;
-
-import javax.annotation.Nullable;
+package com.smanzana.nostrummagica.client.gui.commonwidget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -12,12 +10,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FormattedCharSequence;
 
-public class TextWidget extends ObscurableChildWidget {
+public class TextWidget extends ObscurableChildWidget<TextWidget> {
 	
 	protected final Screen parent;
 	protected final Component text;
 	
-	protected @Nullable ITooltip tooltip;
 	protected int color = 0xFFDDDDDD;
 	protected float scale = 1f;
 	protected boolean centerHorizontal = false;
@@ -31,29 +28,24 @@ public class TextWidget extends ObscurableChildWidget {
 		this.text = text;
 	}
 	
-	public TextWidget tooltip(ITooltip tooltip) {
-		this.tooltip = tooltip;
-		return this;
-	}
-	
 	public TextWidget color(int color) {
 		this.color = color;
-		return this;
+		return self();
 	}
 	
 	public TextWidget scale(float scale) {
 		this.scale = scale;
-		return this;
+		return self();
 	}
 	
 	public TextWidget centerHorizontal() {
 		this.centerHorizontal = true;
-		return this;
+		return self();
 	}
 	
 	public TextWidget centerVertical() {
 		this.centerVertical = true;
-		return this;
+		return self();
 	}
 	
 	/**
@@ -63,12 +55,12 @@ public class TextWidget extends ObscurableChildWidget {
 	 */
 	public TextWidget centerInBounds() {
 		this.centerInBounds = true;
-		return this;
+		return self();
 	}
 	
 	public TextWidget truncate() {
 		this.truncate = true;
-		return this;
+		return self();
 	}
 	
 	private int getOffsetX(float scale, int textWidth) {
@@ -118,13 +110,6 @@ public class TextWidget extends ObscurableChildWidget {
 		final int actingX = x + offsetX;
 		final int actingY = y + offsetY;
 		this.isHovered = mouseX >= actingX && mouseY >= actingY && mouseX < actingX + actingWidth && mouseY < actingY + actingHeight;
-	}
-	
-	@Override
-	public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
-		if (this.isHoveredOrFocused() && this.tooltip != null) {
-			Tooltip.RenderTooltip(this.tooltip, parent, matrixStackIn, mouseX, mouseY);
-		}
 	}
 	
 	@Override

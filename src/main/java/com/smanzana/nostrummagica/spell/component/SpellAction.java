@@ -1130,8 +1130,8 @@ public class SpellAction {
 					}
 				});
 				
-				final Component LABEL_SUMMON_NAME = new TranslatableComponent("spelllog.nostrummagica.summon.name", this.element.getName());
-				final Component LABEL_SUMMON_DESC = new TranslatableComponent("spelllog.nostrummagica.summon.desc", this.element.getName(), "" + power, "" + ((float) (baseTime) / 20f), "" + ((float) time / 20f));
+				final Component LABEL_SUMMON_NAME = new TranslatableComponent("spelllog.nostrummagica.summon.name", this.element.getDisplayName());
+				final Component LABEL_SUMMON_DESC = new TranslatableComponent("spelllog.nostrummagica.summon.desc", this.element.getDisplayName(), "" + power, "" + ((float) (baseTime) / 20f), "" + ((float) time / 20f));
 				log.generalEffectStart(LABEL_SUMMON_NAME, LABEL_SUMMON_DESC, false);
 				log.generalEffectFinish(0f, 0f);
 			} else {

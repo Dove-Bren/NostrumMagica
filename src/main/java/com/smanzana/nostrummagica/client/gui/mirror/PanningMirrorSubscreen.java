@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.client.gui.mirror;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.smanzana.nostrummagica.client.gui.widget.FixedWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.FixedWidget;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.client.gui.narration.NarrationElementOutput;

@@ -21,7 +21,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Matrix4f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.widget.MoveableObscurableWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.MoveableObscurableWidget;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.ClientPurchaseSkillMessage;

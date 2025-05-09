@@ -46,7 +46,7 @@ public class SpellCasting {
 		}
 		
 		protected static final SpellCastResult fail(Spell spell, LivingEntity caster) {
-			return fail(spell, caster, new SpellCastSummary(spell.getManaCost(), spell.getXP(true)));
+			return fail(spell, caster, new SpellCastSummary(spell.getManaCost(), spell.getXP(true), spell.getCastTicks()));
 		}
 		
 		protected static final SpellCastResult fail(Spell spell, LivingEntity caster, SpellCastSummary summary) {
@@ -72,8 +72,8 @@ public class SpellCasting {
 		return AttemptCast(spell, entity, tool, null, freeCast, true);
 	}
 	
-	private static final SpellCastResult EmitCastPostEvent(SpellCastResult result) {
-		MinecraftForge.EVENT_BUS.post(new SpellCastEvent.Post(result.spell, result.caster, result));
+	private static final SpellCastResult EmitCastPostEvent(SpellCastResult result, boolean checking) {
+		MinecraftForge.EVENT_BUS.post(new SpellCastEvent.Post(result.spell, result.caster, result, checking));
 		return result;
 	}
 
@@ -81,7 +81,7 @@ public class SpellCasting {
 		INostrumMagic att = NostrumMagica.getMagicWrapper(entity);
 		@Nullable Player playerCast = (entity instanceof Player) ? (Player) entity : null;
 		
-		final SpellCastEvent.Pre event = new SpellCastEvent.Pre(spell, entity);
+		final SpellCastEvent.Pre event = new SpellCastEvent.Pre(spell, entity, checking);
 		if (MinecraftForge.EVENT_BUS.post(event)) {
 			NostrumMagica.logger.debug("Spell cast cancelled");
 		} else {
@@ -90,7 +90,7 @@ public class SpellCasting {
 		
 		if (att == null) {
 			NostrumMagica.logger.warn("Could not look up entity magic wrapper");
-			return EmitCastPostEvent(SpellCastResult.fail(spell, entity));
+			return EmitCastPostEvent(SpellCastResult.fail(spell, entity), checking);
 		}
 		
 		// Check that the player can cast this (if it's not creative)
@@ -101,18 +101,18 @@ public class SpellCasting {
 				for (Component problem : problems) {
 					entity.sendMessage(problem, Util.NIL_UUID);
 				}
-				return EmitCastPostEvent(SpellCastResult.fail(spell, entity));
+				return EmitCastPostEvent(SpellCastResult.fail(spell, entity), checking);
 			}
 		}
 		
 		if (NostrumMagica.instance.getSpellCooldownTracker(entity.level).hasCooldown(playerCast, spell)) {
 			NostrumMagica.logger.warn("Received spell cast while spell in cooldown: " + entity);
-			return EmitCastPostEvent(SpellCastResult.fail(spell, entity));
+			return EmitCastPostEvent(SpellCastResult.fail(spell, entity), checking);
 		}
 		
 		// Cast it!
 		boolean seen = att.wasSpellDone(spell);
-		SpellCastSummary summary = new SpellCastSummary(spell.getManaCost(), spell.getXP(seen));
+		SpellCastSummary summary = new SpellCastSummary(spell.getManaCost(), spell.getXP(seen), spell.getCastTicks());
 		
 		// Add player's base magic potency
 		summary.addEfficiency((float) entity.getAttribute(NostrumAttributes.magicPotency).getValue() / 100f);
@@ -163,6 +163,9 @@ public class SpellCasting {
 			summary.addEfficiency(.1f);
 		}
 		
+		//////////////////////////////////////////////////////////
+		//       NO MORE SUMMARY EDITS AFTER THIS POINT
+		
 		int cost = Math.max(0, summary.getFinalCost());
 		float xp = summary.getFinalXP();
 		
@@ -187,7 +190,7 @@ public class SpellCasting {
 			}
 			
 			if (mana < cost) {
-				return EmitCastPostEvent(SpellCastResult.fail(spell, entity, summary));
+				return EmitCastPostEvent(SpellCastResult.fail(spell, entity, summary), checking);
 			}
 			
 			reagents = CalculateRequiredReagents(spell, entity, summary);
@@ -198,7 +201,7 @@ public class SpellCasting {
 					int count = NostrumMagica.getReagentCount(playerCast, row.getKey());
 					if (count < row.getValue()) {
 						playerCast.sendMessage(new TranslatableComponent("info.spell.bad_reagent", row.getKey().prettyName()), Util.NIL_UUID);
-						return EmitCastPostEvent(SpellCastResult.fail(spell, entity, summary));
+						return EmitCastPostEvent(SpellCastResult.fail(spell, entity, summary), checking);
 					}
 				}
 				
@@ -232,7 +235,7 @@ public class SpellCasting {
 				}
 				
 				if (cost > 0) {
-					return EmitCastPostEvent(SpellCastResult.fail(spell, entity, summary));
+					return EmitCastPostEvent(SpellCastResult.fail(spell, entity, summary), checking);
 				}
 			} else {
 				int avail = att.getMana();
@@ -265,7 +268,7 @@ public class SpellCasting {
 //				}
 				
 				if (cost > 0) {
-					return EmitCastPostEvent(SpellCastResult.fail(spell, entity, summary));
+					return EmitCastPostEvent(SpellCastResult.fail(spell, entity, summary), checking);
 				}
 			}
 		}
@@ -305,7 +308,7 @@ public class SpellCasting {
 			}
 		}
 		
-		return EmitCastPostEvent(new SpellCastResult(true, spell, entity, summary));
+		return EmitCastPostEvent(new SpellCastResult(true, spell, entity, summary), checking);
 	}
 	
 	public static final int CalculateEffectiveSpellWeight(Spell spell, @Nullable LivingEntity caster, SpellCastSummary summary) {

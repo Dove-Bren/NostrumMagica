@@ -29,7 +29,7 @@ import com.smanzana.nostrummagica.capabilities.NostrumMagic;
 import com.smanzana.nostrummagica.client.gui.book.BookScreen;
 import com.smanzana.nostrummagica.client.gui.book.IBookPage;
 import com.smanzana.nostrummagica.client.gui.book.ReferencePage;
-import com.smanzana.nostrummagica.client.gui.widget.MoveableObscurableWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.MoveableObscurableWidget;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.ClientPurchaseResearchMessage;

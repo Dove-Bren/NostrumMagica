@@ -14,6 +14,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class Entities {
 
@@ -38,6 +39,16 @@ public class Entities {
 			return (LivingEntity) ent;
 		}
 		
+		return null;
+	}
+	
+	public static @Nullable Entity FindEntityAnyLevel(UUID id) {
+		for (Level level : ServerLifecycleHooks.getCurrentServer().getAllLevels()) {
+			Entity ent = FindEntity(level, id);
+			if (ent != null) {
+				return ent;
+			}
+		}
 		return null;
 	}
 	

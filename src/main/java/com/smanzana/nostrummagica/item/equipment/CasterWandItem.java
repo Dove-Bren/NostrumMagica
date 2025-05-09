@@ -286,7 +286,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 		// Notice and respond any time any spell is cast.
 		// Note that our spell caster handler will have put in a smaller one already, so this will replace it.
 		final SpellCastResult result = event.getCastResult();
-		if (result.succeeded && result.caster != null && result.caster instanceof Player && NostrumMagica.getMagicWrapper(result.caster) != null && !result.caster.isDeadOrDying()) {
+		if (!event.isChecking && result.succeeded && result.caster != null && result.caster instanceof Player && NostrumMagica.getMagicWrapper(result.caster) != null && !result.caster.isDeadOrDying()) {
 			if (!NostrumMagica.getMagicWrapper(result.caster).hasSkill(NostrumSkills.Spellcasting_ToolCooldown)) {
 				final int cooldownTicks = SpellCasting.CalculateSpellCooldown(result);
 				((Player) result.caster).getCooldowns().addCooldown(NostrumItems.casterWand, cooldownTicks);

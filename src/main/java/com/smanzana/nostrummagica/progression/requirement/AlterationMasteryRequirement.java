@@ -7,11 +7,10 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.EAlteration;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Player;
 
 public class AlterationMasteryRequirement implements IRequirement{
 
@@ -36,6 +35,6 @@ public class AlterationMasteryRequirement implements IRequirement{
 	@Override
 	public List<Component> getDescription(Player player) {
 		return Lists.newArrayList(new TranslatableComponent("info.requirement.alteration", 
-				new TextComponent(alteration.getName()).withStyle(ChatFormatting.AQUA)));
+				alteration.getDisplayName().copy().withStyle(ChatFormatting.AQUA)));
 	}
 }

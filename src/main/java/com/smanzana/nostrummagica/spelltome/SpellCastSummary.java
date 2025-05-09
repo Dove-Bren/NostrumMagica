@@ -4,20 +4,24 @@ public class SpellCastSummary {
 
 	private final float baseXP;
 	private final int baseCost;
+	private final int baseCastTicks;
 	
 	private float reagentCost;
 	private float xpRate;
 	private float costRate;
 	private float efficiencyRate;
 	private int weightDiscount;
+	private float castSpeedRate;
 	
-	public SpellCastSummary(int cost, float xp) {
+	public SpellCastSummary(int cost, float xp, int castTicks) {
 		this.baseCost = cost;
 		this.baseXP = xp;
+		this.baseCastTicks = castTicks;
 		this.reagentCost
 			= this.xpRate
 			= this.costRate
 			= this.efficiencyRate
+			= this.castSpeedRate
 			= 1.0f;
 		this.weightDiscount = 0;
 	}
@@ -40,6 +44,14 @@ public class SpellCastSummary {
 	
 	public void addWeightDiscount(int diff) {
 		this.weightDiscount += diff;
+	}
+	
+	/**
+	 * 
+	 * @param diff negative numbers make it faster. -.2f is 20% reduced cast time
+	 */
+	public void addCastSpeedRate(float diff) {
+		this.castSpeedRate += diff;
 	}
 
 	public float getBaseXP() {
@@ -70,12 +82,20 @@ public class SpellCastSummary {
 		return this.weightDiscount;
 	}
 	
+	public float getCastSpeedRate() {
+		return this.castSpeedRate;
+	}
+	
 	public float getFinalXP() {
 		return baseXP * xpRate;
 	}
 	
 	public int getFinalCost() {
 		return (int) ((float) baseCost * costRate);
+	}
+	
+	public int getFinalCastTicks() {
+		return (int) ((float) baseCastTicks * castSpeedRate);
 	}
 	
 }

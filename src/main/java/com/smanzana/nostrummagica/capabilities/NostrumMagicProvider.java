@@ -27,6 +27,9 @@ public class NostrumMagicProvider implements ICapabilitySerializable<CompoundTag
 		if (capability == CapabilityHandler.CAPABILITY_MANA) {
 			return CapabilityHandler.CAPABILITY_MANA.orEmpty(capability, LazyOptional.of(() -> instance));
 		}
+		if (capability == CapabilityHandler.CAPABILITY_INCANTATION_HOLDER) {
+			return CapabilityHandler.CAPABILITY_INCANTATION_HOLDER.orEmpty(capability, LazyOptional.of(() -> instance));
+		}
 		
 		return LazyOptional.empty();
 	}

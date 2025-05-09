@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.client.gui.widget;
+package com.smanzana.nostrummagica.client.gui.commonwidget;
 
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;

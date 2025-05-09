@@ -141,7 +141,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 				continue;
 			}
 			
-			String str = " + " + elem.getChatColor() + Math.floor(f) + " " + elem.getName() + ChatFormatting.RESET + " damage";
+			String str = " + " + elem.getChatColor() + Math.floor(f) + " " + elem.getBareName() + ChatFormatting.RESET + " damage";
 			if (extra) {
 				str += " (" + Math.floor(100 * (f - Math.floor(f))) + "%)";
 			}

@@ -138,7 +138,7 @@ public class ArcaneWolfInfoSheet implements IPetGUISheet<ArcaneWolfEntity> {
 			x += w;
 			
 			
-			fonter.draw(matrixStackIn, training == null ? "Nothing" : training.getName(), x, y, dataColor);
+			fonter.draw(matrixStackIn, training == null ? "Nothing" : training.getBareName(), x, y, dataColor);
 			y += h + smallMargin;
 		}
 		

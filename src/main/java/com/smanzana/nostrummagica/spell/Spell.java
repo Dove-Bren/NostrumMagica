@@ -769,6 +769,17 @@ public class Spell {
 		return total;
 	}
 	
+	public int getCastTicks() {
+		final int weight = getWeight();
+		int base = 20;
+//		if (caster != null && NostrumMagica.getMagicWrapper(caster) != null) {
+//			if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Spellcasting_CooldownReduc)) {
+//				base = 10;
+//			}
+//		}
+		return base + (20 * weight); 
+	}
+	
 	public static final SpellAction solveAction(EAlteration alteration,	EMagicElement element, int elementCount) {
 		
 		// Could do a registry with hooks here, if wanted it to be extensible
@@ -1143,6 +1154,18 @@ public class Spell {
 	 * @return
 	 */
 	public static Spell fromNBT(CompoundTag nbt, int id) {
+		Spell spell = fromNBT(nbt); 
+		spell.registryID = id;
+		return spell;
+	}
+	
+	public static Spell transientFromNBT(CompoundTag nbt) {
+		Spell spell = fromNBT(nbt);
+		spell.registryID = NostrumMagica.instance.getSpellRegistry().registerTransient(spell);
+		return spell;
+	}
+	
+	protected static Spell fromNBT(CompoundTag nbt) {
 		if (nbt == null)
 			return null;
 		
@@ -1151,15 +1174,7 @@ public class Spell {
 		int manaCost = nbt.getInt(NBT_MANA_COST);
 		int weight = nbt.getInt(NBT_WEIGHT);
 		
-		{
-			if (!nbt.contains(NBT_MANA_COST)) {
-				NostrumMagica.logger.warn("Found spell with no recorded mana cost! Making absurd. " + name + "[" + id + "]");
-				manaCost = 10000;
-			}
-		}
-		
 		Spell spell = new Spell(name, manaCost, weight, false);
-		spell.registryID = id;
 		spell.iconIndex = index;
 		
 		ListTag list = nbt.getList(NBT_SHAPE_LIST, Tag.TAG_COMPOUND);

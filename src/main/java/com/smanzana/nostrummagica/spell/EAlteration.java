@@ -6,55 +6,68 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
 
 public enum EAlteration {
 
-	INFLICT("Inflict", 5, 1, ReagentType.GRAVE_DUST),
-	RESIST("Resist", 10, 1, ReagentType.CRYSTABLOOM),
-	SUPPORT("Support", 10, 1, ReagentType.GINSENG),
-	GROWTH("Growth", 15, 1, ReagentType.SKY_ASH),
-	ENCHANT("Enchant", 15, 1, ReagentType.BLACK_PEARL),
-	CONJURE("Conjure", 20, 1, ReagentType.MANDRAKE_ROOT),
-	SUMMON("Summon", 30, 2, ReagentType.MANI_DUST),
-	RUIN("Ruin", 15, 2, ReagentType.SPIDER_SILK),
-	CORRUPT("Corrupt", 15, 1, ReagentType.GRAVE_DUST, () -> new ItemStack(Items.PHANTOM_MEMBRANE)),
+	INFLICT(5, 1, ReagentType.GRAVE_DUST),
+	RESIST(10, 1, ReagentType.CRYSTABLOOM),
+	SUPPORT(10, 1, ReagentType.GINSENG),
+	GROWTH(15, 1, ReagentType.SKY_ASH),
+	ENCHANT(15, 1, ReagentType.BLACK_PEARL),
+	CONJURE(20, 1, ReagentType.MANDRAKE_ROOT),
+	SUMMON(30, 2, ReagentType.MANI_DUST),
+	RUIN(15, 2, ReagentType.SPIDER_SILK),
+	CORRUPT(15, 1, ReagentType.GRAVE_DUST, () -> new ItemStack(Items.PHANTOM_MEMBRANE)),
 	;
 	
 	private final ResourceLocation glyph;
-	private final String name;
 	private final int cost;
 	private final int weight; // Should be 1+
 	private final ReagentType reagent;
 	private final Supplier<ItemStack> craftItemSupplier;
 	private ItemStack craftItem;
+	private final Component name;
+	private final Component description;
 	
-	private EAlteration(String base, int cost, int weight, ReagentType reagent) {
-		this(base, cost, weight, reagent, () -> ReagentItem.CreateStack(reagent, 1));
+	private EAlteration(int cost, int weight, ReagentType reagent) {
+		this(cost, weight, reagent, () -> ReagentItem.CreateStack(reagent, 1));
 	}
 	
-	private EAlteration(String base, int cost, int weight, ReagentType reagent, Supplier<ItemStack> craftItem) {
-		this.name = base;
-		this.glyph = new ResourceLocation(NostrumMagica.MODID, base.toLowerCase());
+	private EAlteration(int cost, int weight, ReagentType reagent, Supplier<ItemStack> craftItem) {
+		this.glyph = new ResourceLocation(NostrumMagica.MODID, name().toLowerCase());
 		this.reagent = reagent;
 		this.craftItemSupplier = craftItem;
 		this.craftItem = ItemStack.EMPTY;
 		
 		this.cost = cost;
 		this.weight = weight;
+		
+		this.name = new TranslatableComponent("alteration." + name().toLowerCase() + ".name");
+		this.description = new TranslatableComponent("alteration." + name().toLowerCase() + ".desc");
 	}
 
 	public ResourceLocation getGlyph() {
 		return glyph;
 	}
 
-	public String getName() {
-		return name;
+	public String getBareName() {
+		return name.getString();
+	}
+	
+	public Component getDisplayName() {
+		return this.name;
+	}
+	
+	public Component getDescription() {
+		return this.description;
 	}
 	
 	public int getCost() {

@@ -562,7 +562,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 						substr = "Master";
 						break;
 					}
-					str = pet.getTrainingElement().getName() + " " + substr;
+					str = pet.getTrainingElement().getBareName() + " " + substr;
 					strWidth = mc.font.width(str);
 					mc.font.drawShadow(matrixStackIn, str, 0 + (width/2) - (strWidth/2), 0 + 2 + 2 + mc.font.lineHeight, pet.getTrainingElement().getColor());
 				}

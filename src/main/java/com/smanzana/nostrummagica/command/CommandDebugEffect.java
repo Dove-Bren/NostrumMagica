@@ -49,7 +49,7 @@ public class CommandDebugEffect {
 			context.getSource().sendSuccess(new TextComponent("Player is not under that effect"), true);
 		} else {
 			String result = "Effect found with element {"
-					+ (data.getElement() == null ? "NULL" : data.getElement().getName())
+					+ (data.getElement() == null ? "NULL" : data.getElement().name())
 					+ "}, amount {"
 					+ data.getAmt()
 					+ "}, and count {"

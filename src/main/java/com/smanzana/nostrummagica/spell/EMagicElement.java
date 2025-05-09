@@ -4,33 +4,46 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public enum EMagicElement {
 
-	PHYSICAL("Physical", 0xFF223344),
-	LIGHTNING("Lightning", 0xFFA5A530),
-	FIRE("Fire", 0xFFC21C00),
-	EARTH("Earth", 0xFF60350D),
-	ICE("Ice", 0xFF3294A3),
-	WIND("Wind", 0xFF36A035),
-	ENDER("Ender", 0xFF41117F);
+	PHYSICAL(0xFF223344),
+	FIRE(0xFFC21C00),
+	ICE(0xFF3294A3),
+	EARTH(0xFF60350D),
+	WIND(0xFF36A035),
+	LIGHTNING(0xFFA5A530),
+	ENDER(0xFF41117F);
 	
-	private final String name;
 	private final int color;
+	private final Component name;
+	private final Component description;
 	
-	private EMagicElement(String name, int color) {
-		this.name = name;
+	private EMagicElement(int color) {
 		this.color = color;
 		// I wanted to store opposite, but can't do that in constructor here
+		
+		this.name = new TranslatableComponent("element." + name().toLowerCase() + ".name");
+		this.description = new TranslatableComponent("element." + name().toLowerCase() + ".desc");
 	}
 
-	public String getName() {
-		return name;
+	public String getBareName() {
+		return name.getString();
+	}
+	
+	public Component getDisplayName() {
+		return this.name;
+	}
+	
+	public Component getDescription() {
+		return this.description;
 	}
 
 	public int getColor() {
@@ -123,15 +136,6 @@ public enum EMagicElement {
 	
 	public static EMagicElement getRandom(Random rand) {
 		return EMagicElement.values()[rand.nextInt(EMagicElement.values().length)];
-	}
-	
-	public static String[] GetNames() {
-		String[] names = new String[values().length];
-		int i = 0;
-		for (EMagicElement elem : values()) {
-			names[i++] = elem.getName();
-		}
-		return names;
 	}
 	
 	public Tag toNBT() {

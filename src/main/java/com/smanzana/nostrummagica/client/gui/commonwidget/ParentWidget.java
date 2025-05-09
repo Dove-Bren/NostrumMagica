@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.client.gui.widget;
+package com.smanzana.nostrummagica.client.gui.commonwidget;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,7 +9,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 
-public abstract class ParentWidget<T extends ObscurableChildWidget> extends ObscurableChildWidget {
+public abstract class ParentWidget<W extends ParentWidget<W, T>, T extends ObscurableChildWidget<?>> extends ObscurableChildWidget<W> {
 	
 	protected final List<T> children;
 	
@@ -60,6 +60,8 @@ public abstract class ParentWidget<T extends ObscurableChildWidget> extends Obsc
 	@Override
 	public void renderButton(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		// This is maybe a rude assumption, but assume all parent widgets never want to render default vanilla the button background
+		
+		//fill(matrixStack, x, y, x + width, y + height, 0xFF202020);
 	}
 	
 	/**

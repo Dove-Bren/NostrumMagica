@@ -385,7 +385,7 @@ public class ModificationTableGui {
 					int topY = y;
 					
 					if (summary == null || !container.isValid) {
-						summary = new SpellCastSummary(0, 0);
+						summary = new SpellCastSummary(0, 0, 0);
 						SpellTome.applyEnhancements(tome, summary, container.player);
 					}
 					

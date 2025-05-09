@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.client.gui.widget;
+package com.smanzana.nostrummagica.client.gui.commonwidget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -10,7 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 
-public class ScrollbarWidget extends ObscurableChildWidget {
+public class ScrollbarWidget extends ObscurableChildWidget<ScrollbarWidget> {
 	
 	public static interface IScrollbarListener {
 		/**

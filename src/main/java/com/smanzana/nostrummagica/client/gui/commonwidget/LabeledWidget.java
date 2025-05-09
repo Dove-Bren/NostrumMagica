@@ -1,15 +1,8 @@
-package com.smanzana.nostrummagica.client.gui.widget;
+package com.smanzana.nostrummagica.client.gui.commonwidget;
 
-import java.util.List;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
-
-import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
-import com.smanzana.nostrummagica.client.gui.SpellIcon;
-import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -18,7 +11,7 @@ import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 
-public class LabeledWidget extends ObscurableChildWidget {
+public class LabeledWidget extends ObscurableChildWidget<LabeledWidget> {
 	
 	public static interface ILabel {
 		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color);
@@ -32,7 +25,6 @@ public class LabeledWidget extends ObscurableChildWidget {
 	protected final ILabel label;
 	protected final IValue value;
 	
-	protected @Nullable Supplier<List<Component>> tooltip;
 	protected int colorLabel = 0xFFAAAAAA;
 	protected int colorValue = 0xFFE4E5D5;
 	protected float scale = 1f;
@@ -42,24 +34,6 @@ public class LabeledWidget extends ObscurableChildWidget {
 		this.parent = parent;
 		this.label = label;
 		this.value = value;
-	}
-	
-	public LabeledWidget tooltip(List<Component> tooltip) {
-		this.tooltip = () -> tooltip;
-		return this;
-	}
-	
-	public LabeledWidget tooltip(Component tooltip) {
-		return tooltip(Lists.newArrayList(tooltip));
-	}
-	
-	public LabeledWidget tooltip(Supplier<List<Component>> tooltip) {
-		this.tooltip = tooltip;
-		return this;
-	}
-	
-	public LabeledWidget tooltip(Supplier<Component> tooltip, int dummy) {
-		return tooltip(() -> Lists.newArrayList(tooltip.get()));
 	}
 	
 	public LabeledWidget color(int labelColor, int valueColor) {
@@ -101,16 +75,6 @@ public class LabeledWidget extends ObscurableChildWidget {
 	}
 	
 	@Override
-	public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
-		if (this.isHoveredOrFocused() && this.tooltip != null) {
-			matrixStackIn.pushPose();
-			matrixStackIn.translate(0, 0, 100);
-			parent.renderComponentTooltip(matrixStackIn, tooltip.get(), mouseX, mouseY);
-			matrixStackIn.popPose();
-		}
-	}
-	
-	@Override
 	protected boolean isValidClickButton(int button) {
 		return false; // no click consumption
 	}
@@ -144,46 +108,6 @@ public class LabeledWidget extends ObscurableChildWidget {
 	public static class StringLabel extends TextLabel {
 		public StringLabel(String label) {
 			super(new TextComponent(label));
-		}
-	}
-	
-	public static class SpellIconLabel implements ILabel {
-		
-		protected final SpellIcon icon;
-		protected final int width;
-		protected final int height;
-		
-		public SpellIconLabel(SpellIcon icon, int width, int height) {
-			this.icon = icon;
-			this.width = width;
-			this.height = height;
-		}
-		
-		@Override
-		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
-			final float[] colors = ColorUtil.ARGBToColor(color);
-			this.icon.render(Minecraft.getInstance(), matrixStackIn, x, y, width, height, colors[0], colors[1], colors[2], colors[3]);
-			return new Rect2i(x, y, width, height);
-		}
-	}
-	
-	public static class ComponentIconLabel implements ILabel {
-		
-		protected final SpellComponentIcon icon;
-		protected final int width;
-		protected final int height;
-		
-		public ComponentIconLabel(SpellComponentIcon icon, int width, int height) {
-			this.icon = icon;
-			this.width = width;
-			this.height = height;
-		}
-		
-		@Override
-		public Rect2i render(PoseStack matrixStackIn, int x, int y, float partialTicks, int color) {
-			final float[] colors = ColorUtil.ARGBToColor(color);
-			this.icon.draw(matrixStackIn, x, y, width, height, colors[0], colors[1], colors[2], colors[3]);
-			return new Rect2i(x, y, width, height);
 		}
 	}
 	

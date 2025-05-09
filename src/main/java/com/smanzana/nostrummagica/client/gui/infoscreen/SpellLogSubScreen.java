@@ -13,13 +13,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
-import com.smanzana.nostrummagica.client.gui.widget.LabeledWidget;
-import com.smanzana.nostrummagica.client.gui.widget.ObscurableChildWidget;
-import com.smanzana.nostrummagica.client.gui.widget.ObscurableWidget;
-import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
-import com.smanzana.nostrummagica.client.gui.widget.ScrollbarWidget;
-import com.smanzana.nostrummagica.client.gui.widget.TextWidget;
-import com.smanzana.nostrummagica.client.gui.widget.Tooltip;
+import com.smanzana.nostrummagica.client.gui.commonwidget.LabeledWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.ObscurableChildWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.ObscurableWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.ParentWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.ScrollbarWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.TextWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.Tooltip;
+import com.smanzana.nostrummagica.client.gui.widget.ComponentIconLabel;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.log.SpellLogEffectLine;
@@ -100,7 +101,8 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		final LabeledWidget entIcon = new LabeledWidget(mc.screen, new AffectedEntsLabel(GUI.AFFECTED_LEN, GUI.AFFECTED_LEN), new LabeledWidget.TextValue(() -> entCount),
 				x + (width / 2) - (GUI.AFFECTED_LEN + 14), y + GUI.STAGE_SECTION_VOFFSET + 12,
 				10, 10)
-				.tooltip(tooltip);
+				;
+		entIcon.tooltip(Tooltip.create(tooltip));
 		
 		final String locCount = " " + summary.getAffectedLocCounts().size();
 		tooltip = new ArrayList<>();
@@ -108,8 +110,8 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		summary.getAffectedLocCounts().entrySet().stream().map(e -> new TextComponent(String.format("(%d, %d, %d) x%d", e.getKey().hitBlockPos.getX(), e.getKey().hitBlockPos.getY(), e.getKey().hitBlockPos.getZ(), e.getValue()))).forEachOrdered(tooltip::add);
 		final LabeledWidget locIcon = new LabeledWidget(mc.screen, new AffectedLocsLabel(GUI.AFFECTED_LEN, GUI.AFFECTED_LEN), new LabeledWidget.TextValue(() -> locCount),
 				x + (width / 2) + 10, y + GUI.STAGE_SECTION_VOFFSET + 12,
-				10, 10)
-				.tooltip(tooltip);
+				10, 10);
+		locIcon.tooltip(Tooltip.create(tooltip));
 		
 		if (summary.getAffectedLocCounts().isEmpty() && !summary.getAffectedEntCounts().isEmpty()) {
 			entIcon.x = x + ((width-GUI.AFFECTED_LEN) / 2); 
@@ -127,13 +129,13 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 			if (summary.getTotalDamage() > 0 || summary.getTotalHeal() == 0f) {
 				final String damageText = String.format(" %.1f", summary.getTotalDamage());
 				widgets.add(new LabeledWidget(mc.screen, new TotalDamageLabel(16, 16), new LabeledWidget.TextValue(() -> damageText), x + 10, y + GUI.STAGE_SECTION_VOFFSET + 20, 10, 10)
-						.tooltip(new TextComponent("Total Damage")));
+						.tooltip(Tooltip.create(new TextComponent("Total Damage"))));
 				shift = true;
 			}
 			if (summary.getTotalHeal() > 0f) {
 				final String healText = String.format(" +%.1f", summary.getTotalHeal());
 				widgets.add(new LabeledWidget(mc.screen, new TotalHealLabel(16, 16), new LabeledWidget.TextValue(() -> healText), x + 10 + (shift ? 50 : 0), y + GUI.STAGE_SECTION_VOFFSET + 20, 10, 10)
-						.tooltip(new TextComponent("Total Healing")));
+						.tooltip(Tooltip.create(new TextComponent("Total Healing"))));
 			}
 			
 			// For now, just find first entity stage effect and display it?
@@ -305,7 +307,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 	}
 	
-	private static class AffectedEntsLabel extends LabeledWidget.ComponentIconLabel {
+	private static class AffectedEntsLabel extends ComponentIconLabel {
 		
 		public AffectedEntsLabel(int width, int height) {
 			super(SpellComponentIcon.get(NostrumSpellShapes.AtFeet), width-2, height-2);
@@ -322,7 +324,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 	}
 	
-	private static class AffectedLocsLabel extends LabeledWidget.ComponentIconLabel {
+	private static class AffectedLocsLabel extends ComponentIconLabel {
 		
 		public AffectedLocsLabel(int width, int height) {
 			super(SpellComponentIcon.get(NostrumSpellShapes.Proximity), width-2, height-2);
@@ -432,7 +434,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 	}
 	
-	private static class EffectSummaryWidget extends ParentWidget<ObscurableChildWidget> {
+	private static class EffectSummaryWidget extends ParentWidget<EffectSummaryWidget, ObscurableChildWidget<?>> {
 		
 		private final ScrollbarWidget scrollbar;
 		private final List<EffectLineWidget> lineWidgets;
@@ -449,14 +451,14 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 			if (summary.getTotalDamage() > 0 || summary.getTotalHeal() == 0f) {
 				final String damageText = String.format(" %.1f", summary.getTotalDamage());
 				this.addChild(new LabeledWidget(mc.screen, new TotalDamageLabel(16, 16), new LabeledWidget.TextValue(() -> damageText), x + 10, y + height, 10, 10)
-						.tooltip(new TextComponent("Damaged"))
+						.tooltip(Tooltip.create(new TextComponent("Damaged")))
 						.scale(.75f));
 				shift = true;
 			}
 			if (summary.getTotalHeal() > 0f) {
 				final String healText = String.format(" %.1f", summary.getTotalHeal());
 				this.addChild(new LabeledWidget(mc.screen, new TotalHealLabel(16, 16), new LabeledWidget.TextValue(() -> healText), x + 10 + (shift ? 40 : 0), y + height, 10, 10)
-						.tooltip(new TextComponent("Healed"))
+						.tooltip(Tooltip.create(new TextComponent("Healed")))
 						.scale(.75f));
 			}
 			
@@ -525,7 +527,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 	}
 	
-	private static class EffectLineWidget extends ParentWidget<ObscurableChildWidget> {
+	private static class EffectLineWidget extends ParentWidget<EffectLineWidget, ObscurableChildWidget<?>> {
 		
 		private SpellLogEffectLine line;
 		
@@ -545,13 +547,13 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 				final String damageText = String.format(" %.1f", line.getTotalDamage());
 				final @Nullable EMagicElement element = ((SpellLogEffectLine.Damage)line).getElement();
 				this.addChild(new LabeledWidget(mc.screen, new DamageLabel(element, 16, 16), new LabeledWidget.TextValue(() -> damageText), width - (12 + 40), height, 10, 10)
-						.tooltip(new TextComponent((element == null ? "Raw" : element.getName()) + " Damage"))
+						.tooltip(Tooltip.create(new TextComponent((element == null ? "Raw" : element.getBareName()) + " Damage")))
 						.scale(.75f));
 			} else if (line instanceof SpellLogEffectLine.Heal) {
 				final String healText = String.format(" %.1f", line.getTotalHeal());
 				final @Nullable EMagicElement element = ((SpellLogEffectLine.Heal)line).getElement();
 				this.addChild(new LabeledWidget(mc.screen, new HealLabel(element, 16, 16), new LabeledWidget.TextValue(() -> healText),width - (12 + 40), height, 10, 10)
-						.tooltip(new TextComponent((element == null ? "Raw" : element.getName()) + " Healing"))
+						.tooltip(Tooltip.create(new TextComponent((element == null ? "Raw" : element.getBareName()) + " Healing")))
 						.scale(.75f));
 			}
 			
@@ -591,7 +593,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 		}
 	}
 	
-	private static class ModifierWidget extends ParentWidget<ObscurableChildWidget> {
+	private static class ModifierWidget extends ParentWidget<ModifierWidget, TextWidget> {
 		
 		public ModifierWidget(SpellLogModifier modifier, int x, int y, int width, int heightIn) {
 			super(x, y, width, heightIn, TextComponent.EMPTY);

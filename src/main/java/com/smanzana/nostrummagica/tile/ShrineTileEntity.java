@@ -244,7 +244,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 			if (!attr.getAlterations().getOrDefault(alteration, false)) {
 				attr.unlockAlteration(alteration);
 				DoEffect(worldPosition, player, 0x80808ABF);
-				player.sendMessage(new TranslatableComponent("info.shrine.alteration", alteration.getName()), Util.NIL_UUID);
+				player.sendMessage(new TranslatableComponent("info.shrine.alteration", alteration.getDisplayName()), Util.NIL_UUID);
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
 			}
 		}

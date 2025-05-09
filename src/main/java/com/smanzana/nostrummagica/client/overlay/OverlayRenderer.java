@@ -139,6 +139,7 @@ public class OverlayRenderer extends GuiComponent {
 	protected IIngameOverlay traceOverlay;
 	protected IIngameOverlay contingencyOverlay;
 	protected IIngameOverlay mysticAirOverlay;
+	protected IIngameOverlay spellChargeOverlay;
 	
 	private int wiggleIndex; // set to multiples of 12 for each wiggle
 	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
@@ -172,6 +173,7 @@ public class OverlayRenderer extends GuiComponent {
 		traceOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.CROSSHAIR_ELEMENT, "NostrumMagica::traceOverlay", this::renderTraceOverlay);
 		contingencyOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.POTION_ICONS_ELEMENT, "NostrumMagica::contingencyOverlay", this::renderContingencyOverlay);
 		mysticAirOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.VIGNETTE_ELEMENT, "NostrumMagica::mysticAirOverlay", this::renderMysticAirOverlay);
+		spellChargeOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.CROSSHAIR_ELEMENT, "NostrumMagica::spellChargeOverlay", this::renderSpellChargeOverlay);
 	}
 	
 	private void renderMysticAirOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
@@ -1160,6 +1162,27 @@ public class OverlayRenderer extends GuiComponent {
 			matrixStackIn.popPose();
 			
 			mc.renderBuffers().bufferSource().endBatch();
+			matrixStackIn.popPose();
+		}
+	}
+	
+	private void renderSpellChargeOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
+		
+		ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
+		if (listener.getChargeManager().getCurrentCharge() != null) {
+			matrixStackIn.pushPose();
+			matrixStackIn.translate(width/2, (height/2) + 12, 0);
+			
+			// ICON
+			final int barHalfWidth = 10;
+			final int barHeight = 6;
+			ForgeIngameGui.fill(matrixStackIn, -(barHalfWidth+1), -1, barHalfWidth+1, barHeight+1, 0xFF000000);
+			ForgeIngameGui.fill(matrixStackIn, -barHalfWidth, 0, barHalfWidth, barHeight, 0xFF404040);
+			
+			final int pixels = Math.round((2 * barHalfWidth) * listener.getChargeManager().getChargePercent());
+			ForgeIngameGui.fill(matrixStackIn, -barHalfWidth, 0, -barHalfWidth + pixels, barHeight, 0xFFAAAAAA);
+			
+			
 			matrixStackIn.popPose();
 		}
 	}

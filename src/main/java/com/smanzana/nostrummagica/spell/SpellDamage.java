@@ -350,7 +350,7 @@ public class SpellDamage {
 		final double reducAttrib = AttributeUtil.GetAttributeValueSafe(target, NostrumAttributes.GetReduceAttribute(element))
 				+ AttributeUtil.GetAttributeValueSafe(target, NostrumAttributes.reduceAll);
 		if (attr != null && reducAttrib != 0.0D) {
-			damage.finalFlat("FlatReducAttribute_" + element.getName(), (float) -reducAttrib);
+			damage.finalFlat("FlatReducAttribute_" + element.name().toLowerCase(), (float) -reducAttrib);
 		}
 		
 		return damage.calc();

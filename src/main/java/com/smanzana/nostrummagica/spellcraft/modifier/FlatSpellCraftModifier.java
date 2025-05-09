@@ -106,11 +106,11 @@ public class FlatSpellCraftModifier implements ISpellCraftModifier {
 					.withStyle(elementCountModifier > 0 ? STYLE_GOOD : STYLE_BAD));
 		}
 		if (elementOverride != null) {
-			lines.add(new TranslatableComponent("spellcraftmod.override.element", elementOverride.getName())
+			lines.add(new TranslatableComponent("spellcraftmod.override.element", elementOverride.getDisplayName())
 					.withStyle(STYLE_OVERRIDE));
 		}
 		if (alterationOverride != null) {
-			lines.add(new TranslatableComponent("spellcraftmod.override.alteration", alterationOverride.getName())
+			lines.add(new TranslatableComponent("spellcraftmod.override.alteration", alterationOverride.getDisplayName())
 					.withStyle(STYLE_OVERRIDE));
 		}
 		if (shapeOverride != null) {

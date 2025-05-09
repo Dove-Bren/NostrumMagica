@@ -299,6 +299,10 @@ public abstract class InfoScreenTab {
 							new PersonalSubScreen.PersonalStatsScreen(attr),
 							new ItemStack(NostrumItems.spellTomePage)));
 					
+					buttons.add(new SubscreenInfoButton(screen, "incantation",
+							new PersonalSubScreen.PersonalIncantationScreen(attr, screen),
+							new ItemStack(NostrumItems.mageStaff)));
+					
 					buttons.add(new SubscreenInfoButton(screen, "growth",
 							new PersonalSubScreen.PersonalGrowthScreen(attr),
 							new ItemStack(Items.COMPASS)));

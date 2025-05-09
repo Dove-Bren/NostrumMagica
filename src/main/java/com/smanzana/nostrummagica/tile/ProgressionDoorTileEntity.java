@@ -111,14 +111,14 @@ public class ProgressionDoorTileEntity extends BlockEntity {
 						Boolean known = attr.getKnownElements().get(comp.getElement());
 						if (known == null || !known) {
 							if (missingDepStrings != null)
-								missingDepStrings.add(new TranslatableComponent("info.door.missing.element", comp.getElement().getName()));
+								missingDepStrings.add(new TranslatableComponent("info.door.missing.element", comp.getElement().getDisplayName()));
 							meets = false;
 						}
 					} else if (comp.isAlteration()) {
 						Boolean known = attr.getAlterations().get(comp.getAlteration());
 						if (known == null || !known) {
 							if (missingDepStrings != null)
-								missingDepStrings.add(new TranslatableComponent("info.door.missing.alteration", comp.getAlteration().getName()));
+								missingDepStrings.add(new TranslatableComponent("info.door.missing.alteration", comp.getAlteration().getDisplayName()));
 							meets = false;
 						}
 					}

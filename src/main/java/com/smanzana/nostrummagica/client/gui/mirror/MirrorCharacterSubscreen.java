@@ -8,7 +8,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.widget.LabeledWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.LabeledWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.Tooltip;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.RenderFuncs;
@@ -95,7 +96,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			y += yPer;
 			parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel("Bonus Mana (Flat): "), new LabeledWidget.TextValue(() -> "" + attr.getManaBonus()), x, y, width/2, yPer).scale(scale));
 			y += yPer;
-			parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel("Reserved Mana: "), new LabeledWidget.TextValue(() -> "" + attr.getReservedMana()), x, y, width/2, yPer).scale(scale).tooltip(getMiscDesc("info.reserved_mana.desc")));
+			parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel("Reserved Mana: "), new LabeledWidget.TextValue(() -> "" + attr.getReservedMana()), x, y, width/2, yPer).scale(scale).tooltip(Tooltip.create(getMiscDesc("info.reserved_mana.desc"))));
 			y += yPer;
 		}
 		
@@ -120,7 +121,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			};
 			
 			for (Attribute attribute : list) {
-				parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(I18n.get(attribute.getDescriptionId()) + ": "), new LabeledWidget.TextValue(() -> String.format("%.1f%%", player.getAttribute(attribute).getValue())), x, y, width/2, yPer).scale(scale).tooltip(getAttribDesc(attribute)	));
+				parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(I18n.get(attribute.getDescriptionId()) + ": "), new LabeledWidget.TextValue(() -> String.format("%.1f%%", player.getAttribute(attribute).getValue())), x, y, width/2, yPer).scale(scale).tooltip(Tooltip.create(getAttribDesc(attribute))));
 				y += yPer;
 			}
 			
@@ -139,7 +140,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			};
 			
 			for (Attribute attribute : list) {
-				parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(I18n.get(attribute.getDescriptionId()) + ": "), new LabeledWidget.TextValue(() -> String.format("%.1f", (float) player.getAttribute(attribute).getValue())), x, y, width/2, yPer).scale(scale).tooltip(getAttribDesc(attribute)));
+				parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(I18n.get(attribute.getDescriptionId()) + ": "), new LabeledWidget.TextValue(() -> String.format("%.1f", (float) player.getAttribute(attribute).getValue())), x, y, width/2, yPer).scale(scale).tooltip(Tooltip.create(getAttribDesc(attribute))));
 				y += yPer;
 			}
 		}
@@ -160,7 +161,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			int elemCount = 0;
 			for (EMagicElement element : EMagicElement.values()) {
 				if (attr.getElementalMastery(element).isGreaterOrEqual(EElementalMastery.NOVICE)) {
-					parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(element.getName() + " Points: "), new LabeledWidget.TextValue(() -> "" + attr.getElementalSkillPoints(element)), x, y, width / 5, yPer).scale(scale));
+					parent.addWidget(new LabeledWidget(helper, new LabeledWidget.StringLabel(element.getBareName() + " Points: "), new LabeledWidget.TextValue(() -> "" + attr.getElementalSkillPoints(element)), x, y, width / 5, yPer).scale(scale));
 					x += (width/5);
 					if (++elemCount >= 4) {
 						x = leftMargin + 4;

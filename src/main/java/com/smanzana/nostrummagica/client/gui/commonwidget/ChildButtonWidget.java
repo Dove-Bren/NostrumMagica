@@ -1,6 +1,4 @@
-package com.smanzana.nostrummagica.client.gui.widget;
-
-import javax.annotation.Nullable;
+package com.smanzana.nostrummagica.client.gui.commonwidget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -12,16 +10,15 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
-public class ChildButtonWidget extends ObscurableChildWidget {
+public class ChildButtonWidget<T extends ChildButtonWidget<T>> extends ObscurableChildWidget<T> {
 	
 	// Mirror of Button.OnPress
 	public static interface OnPress {
-		 void onPress(ChildButtonWidget button);
+		 void onPress(ChildButtonWidget<?> button);
 	}
 	
 	protected final Screen parent;
 	
-	protected @Nullable ITooltip tooltip;
 	protected final OnPress onPress;
 	
 	public ChildButtonWidget(Screen parent, int x, int y, int width, int height, Component label, OnPress onPress) {
@@ -30,9 +27,10 @@ public class ChildButtonWidget extends ObscurableChildWidget {
 		this.onPress = onPress;
 	}
 	
-	public ChildButtonWidget tooltip(ITooltip tooltip) {
-		this.tooltip = tooltip;
-		return this;
+	protected void renderButtonIcon(PoseStack matrixStackIn, int iconX, int iconY, int iconWidth, int iconHeight, float partialTicks) {
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShaderTexture(0, WIDGETS_LOCATION);
+		blit(matrixStackIn, iconX, iconY, iconWidth, iconHeight, 2, 68, (width - 2), Math.min(height - 2, 14), 256, 256);
 	}
 	
 	@Override
@@ -51,9 +49,7 @@ public class ChildButtonWidget extends ObscurableChildWidget {
 			// gonna just render outside border, and then grainy texture. Will scale if button is too large?
 			fill(matrixStackIn, x, y, x + width, y + height, this.active && this.isHoveredOrFocused() ? 0xFFCCCCCC : 0xFF000000);
 			
-			RenderSystem.setShader(GameRenderer::getPositionTexShader);
-			RenderSystem.setShaderTexture(0, WIDGETS_LOCATION);
-			blit(matrixStackIn, x + 1, y + 1, width - 2, height - 2, 2, 68, (width - 2), Math.min(height - 2, 14), 256, 256);
+			renderButtonIcon(matrixStackIn, x + 1, y + 1, width - 2, height - 2, partialTicks);
 			
 			// highlights
 			fill(matrixStackIn, x + 1, y + 1, x + (width - 1), y + 2, 0x40FFFFFF);
@@ -75,13 +71,6 @@ public class ChildButtonWidget extends ObscurableChildWidget {
 			}
 			drawCenteredString(matrixStackIn, font, this.getMessage(), 0, -(font.lineHeight / 2), j | Mth.ceil(this.alpha * 255.0F) << 24);
 			matrixStackIn.popPose();
-		}
-	}
-	
-	@Override
-	public void renderToolTip(PoseStack matrixStackIn, int mouseX, int mouseY) {
-		if (this.isHoveredOrFocused() && tooltip != null) {
-			Tooltip.RenderTooltip(tooltip, parent, matrixStackIn, mouseX, mouseY);
 		}
 	}
 	

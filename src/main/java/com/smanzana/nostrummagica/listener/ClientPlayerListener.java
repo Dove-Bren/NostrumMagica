@@ -22,25 +22,31 @@ import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.BladeCastMessage;
+import com.smanzana.nostrummagica.network.message.ClientCastAdhocMessage;
 import com.smanzana.nostrummagica.network.message.ClientCastMessage;
 import com.smanzana.nostrummagica.network.message.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spell.Incantation;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCasting;
+import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
+import com.smanzana.nostrummagica.spell.SpellChargeTracker.SpellCharge;
 import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.ClientRegistry;
-import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.client.event.InputEvent.KeyInputEvent;
 import net.minecraftforge.client.event.InputEvent.MouseScrollEvent;
+import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.common.MinecraftForge;
@@ -59,21 +65,23 @@ public class ClientPlayerListener extends PlayerListener {
 	// Whether this current frame has a jump that was unconsumed
 	private boolean hasJump;
 	
-	private KeyMapping bindingCast1;
-	private KeyMapping bindingCast2;
-	private KeyMapping bindingCast3;
-	private KeyMapping bindingCast4;
-	private KeyMapping bindingCast5;
-	private KeyMapping bindingScroll;
-	private KeyMapping bindingInfo;
-	private KeyMapping bindingBladeCast;
-	private KeyMapping bindingHUD;
-	private KeyMapping bindingShapeHelp;
-	private OverlayRenderer overlayRenderer;
-	private ClientEffectRenderer effectRenderer;
-	private OutlineRenderer outlineRenderer;
-	private SpellShapeRenderer spellshapeRenderer;
-	private SelectionRenderer selectionRenderer;
+	private final KeyMapping bindingCastSlow;
+	private final KeyMapping bindingCast1;
+	private final KeyMapping bindingCast2;
+	private final KeyMapping bindingCast3;
+	private final KeyMapping bindingCast4;
+	private final KeyMapping bindingCast5;
+	private final KeyMapping bindingScroll;
+	private final KeyMapping bindingInfo;
+	private final KeyMapping bindingBladeCast;
+	private final KeyMapping bindingHUD;
+	private final KeyMapping bindingShapeHelp;
+	private final OverlayRenderer overlayRenderer;
+	private final ClientEffectRenderer effectRenderer;
+	private final OutlineRenderer outlineRenderer;
+	private final SpellShapeRenderer spellshapeRenderer;
+	private final SelectionRenderer selectionRenderer;
+	private final ClientChargeManager chargeManager;
 	
 	public ClientPlayerListener() {
 		super();
@@ -83,29 +91,33 @@ public class ClientPlayerListener extends PlayerListener {
 		this.outlineRenderer = new OutlineRenderer();
 		this.spellshapeRenderer = new SpellShapeRenderer(this.outlineRenderer);
 		this.selectionRenderer = new SelectionRenderer();
+		this.chargeManager = new ClientChargeManager();
+		
+		bindingCast1 = new KeyMapping("key.cast1.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, "key.nostrummagica.desc");
+		bindingCast2 = new KeyMapping("key.cast2.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X, "key.nostrummagica.desc");
+		bindingCast3 = new KeyMapping("key.cast3.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_C, "key.nostrummagica.desc");
+		bindingCast4 = new KeyMapping("key.cast4.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.nostrummagica.desc");
+		bindingCast5 = new KeyMapping("key.cast5.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.nostrummagica.desc");
+		bindingScroll = new KeyMapping("key.spellscroll.desc", GLFW.GLFW_KEY_LEFT_SHIFT, "key.nostrummagica.desc");
+		bindingInfo = new KeyMapping("key.infoscreen.desc", GLFW.GLFW_KEY_HOME, "key.nostrummagica.desc");
+		bindingBladeCast = new KeyMapping("key.bladecast.desc", GLFW.GLFW_KEY_Y, "key.nostrummagica.desc");
+		bindingHUD = new KeyMapping("key.hud.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_TAB, "key.nostrummagica.desc");
+		bindingShapeHelp = new KeyMapping("key.shapehelp.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.nostrummagica.desc");
+		bindingCastSlow = new KeyMapping("key.castslow.desc", KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, "key.nostrummagica.desc");
 	}
 	
 	public void initKeybinds() {
-		bindingCast1 = new KeyMapping("key.cast1.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingCast1);
-		bindingCast2 = new KeyMapping("key.cast2.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingCast2);
-		bindingCast3 = new KeyMapping("key.cast3.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_C, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingCast3);
-		bindingCast4 = new KeyMapping("key.cast4.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingCast4);
-		bindingCast5 = new KeyMapping("key.cast5.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingCast5);
-		bindingScroll = new KeyMapping("key.spellscroll.desc", GLFW.GLFW_KEY_LEFT_SHIFT, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingScroll);
-		bindingInfo = new KeyMapping("key.infoscreen.desc", GLFW.GLFW_KEY_HOME, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingInfo);
-		bindingBladeCast = new KeyMapping("key.bladecast.desc", GLFW.GLFW_KEY_R, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingBladeCast);
-		bindingHUD = new KeyMapping("key.hud.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_TAB, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingHUD);
-		bindingShapeHelp = new KeyMapping("key.shapehelp.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_V, "key.nostrummagica.desc");
 		ClientRegistry.registerKeyBinding(bindingShapeHelp);
+		ClientRegistry.registerKeyBinding(bindingCastSlow);
 	}
 	
 	public KeyMapping getBindingCast1() {
@@ -146,6 +158,10 @@ public class ClientPlayerListener extends PlayerListener {
 	
 	public ClientEffectRenderer getEffectRenderer() {
 		return this.effectRenderer;
+	}
+	
+	public ClientChargeManager getChargeManager() {
+		return this.chargeManager;
 	}
 	
 	@SubscribeEvent
@@ -211,30 +227,49 @@ public class ClientPlayerListener extends PlayerListener {
 			this.overlayRenderer.toggleHUD();
 		} else if (bindingShapeHelp.consumeClick()) {
 			this.spellshapeRenderer.toggle();
+		} else if (bindingCastSlow.consumeClick()) {
+			if (chargeManager.getCurrentCharge() != null) {
+				chargeManager.cancelCharge(false);
+			} else {
+				startIncantationCast();
+			}
 		}
 	}
 	
 	@SubscribeEvent
 	public void onInputUpdate(MovementInputUpdateEvent event) {
-		final boolean newPress = !jumpPressedLastFrame && event.getInput().jumping;
-		jumpPressedLastFrame = event.getInput().jumping;
-		// 
-		
-		if (newPress) {
-			jumpConsumedThisPress = false;
-			final PlayerJumpEvent.Pre jumpEvent = new PlayerJumpEvent.Pre(event.getPlayer());
-			MinecraftForge.EVENT_BUS.post(jumpEvent);
-			
-			if (jumpEvent.isConsumed()) {
-				jumpConsumedThisPress = true;
-			} else {
-				hasJump = true;
+		// Movement spell charging interrupt
+		{
+			final Input input = event.getInput();
+			if (input.down || input.up || input.left || input.right || input.jumping) {
+				if (this.chargeManager.getCurrentCharge() != null) {
+					this.interruptSpellCharge();
+				}
 			}
 		}
 		
-		if (jumpConsumedThisPress) {
-			// Keep eating the jump so that it never appears to transition to on in the regular player loop
-			event.getInput().jumping = false;
+		// Jumping
+		{
+			final boolean newPress = !jumpPressedLastFrame && event.getInput().jumping;
+			jumpPressedLastFrame = event.getInput().jumping;
+			// 
+			
+			if (newPress) {
+				jumpConsumedThisPress = false;
+				final PlayerJumpEvent.Pre jumpEvent = new PlayerJumpEvent.Pre(event.getPlayer());
+				MinecraftForge.EVENT_BUS.post(jumpEvent);
+				
+				if (jumpEvent.isConsumed()) {
+					jumpConsumedThisPress = true;
+				} else {
+					hasJump = true;
+				}
+			}
+			
+			if (jumpConsumedThisPress) {
+				// Keep eating the jump so that it never appears to transition to on in the regular player loop
+				event.getInput().jumping = false;
+			}
 		}
 	}
 	
@@ -247,6 +282,7 @@ public class ClientPlayerListener extends PlayerListener {
 			if (mc.player != null) {
 				PortalBlock.clientTick();
 				//TeleportRune.tick();
+				spellChargeTick();
 			}
 		} else if (event.phase == Phase.END) {
 			if (hasJump) {
@@ -319,6 +355,62 @@ public class ClientPlayerListener extends PlayerListener {
 				NostrumMagicaSounds.CAST_FAIL.play(player);
 				doManaWiggle(2);
 			}
+		}
+	}
+	
+	protected void startIncantationCast() {
+		final Player player = NostrumMagica.instance.proxy.getPlayer();
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		if (attr != null && attr.isUnlocked()) {
+			Incantation incant = attr.getIncantation();
+			if (incant != null) {
+				Spell spell = incant.makeSpell();
+				
+				SpellCastResult result = SpellCasting.CheckToolCast(spell, player, ItemStack.EMPTY);
+				if (result.succeeded) {
+					// We think we can cast it, so start charging
+					this.chargeManager.startCharging(new SpellCharge(incant.getElement(), result.summary.getFinalCastTicks()));
+				} else {
+					for (int i = 0; i < 15; i++) {
+						double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
+						double offsetz = Math.sin(i * (2 * Math.PI / 15)) * 1.0;
+						player.level
+							.addParticle(ParticleTypes.LARGE_SMOKE,
+									player.getX() + offsetx, player.getY(), player.getZ() + offsetz,
+									0, -.5, 0);
+						
+					}
+					
+					NostrumMagicaSounds.CAST_FAIL.play(player);
+					doManaWiggle(2);
+				}
+			}
+		}
+	}
+	
+	protected void finishIncantationCast() {
+		final Player player = NostrumMagica.instance.proxy.getPlayer();
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		if (attr != null && attr.isUnlocked()) {
+			Incantation incant = attr.getIncantation();
+			if (incant != null) {
+				Spell spell = incant.makeSpell();
+				HitResult mop = RayTrace.raytraceApprox(player.getLevel(), player, player.getEyePosition(), player.getXRot(), player.getYRot(), 100, (e) -> e != player && e instanceof LivingEntity, .5);
+				final @Nullable Entity targetHint = com.smanzana.petcommand.util.RayTrace.entFromRaytrace(mop);
+				
+				NetworkHandler.sendToServer(new ClientCastAdhocMessage(spell, targetHint));
+			}
+		}
+	}
+	
+	protected void interruptSpellCharge() {
+		this.chargeManager.cancelCharge(true);
+	}
+	
+	protected void spellChargeTick() {
+		if (this.chargeManager.isDoneCharging()) {
+			finishIncantationCast();
+			this.chargeManager.cancelCharge(false);
 		}
 	}
 }

@@ -8,11 +8,10 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Player;
 
 public class ElementMasteryRequirement implements IRequirement{
 
@@ -44,7 +43,7 @@ public class ElementMasteryRequirement implements IRequirement{
 	public List<Component> getDescription(Player player) {
 		return Lists.newArrayList(new TranslatableComponent("info.requirement.element",
 					level.getName(),
-					new TextComponent(element.getName()).withStyle(ChatFormatting.DARK_RED)
+					element.getDisplayName().copy().withStyle(ChatFormatting.DARK_RED)
 				));
 	}
 }

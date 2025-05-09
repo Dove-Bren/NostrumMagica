@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.widget.FixedWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.FixedWidget;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.RuneShaperMessage;

@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
 
@@ -62,7 +63,7 @@ public abstract class SpellLogEffectLine {
 			super(base, total, modifiers);
 			
 			name = new TranslatableComponent("spelllog.damage.name");
-			desc = new TranslatableComponent("spelllog.damage.desc", String.format("%.1f", base), String.format("%.1f", total), element == null ? "" : (element.getName() + " "));
+			desc = new TranslatableComponent("spelllog.damage.desc", String.format("%.1f", base), String.format("%.1f", total), element == null ? TextComponent.EMPTY : element.getDisplayName());
 			this.element = element;
 		}
 
@@ -106,7 +107,7 @@ public abstract class SpellLogEffectLine {
 			super(base, total, modifiers);
 
 			name = new TranslatableComponent("spelllog.heal.name");
-			desc = new TranslatableComponent("spelllog.heal.desc", String.format("%.1f", base), String.format("%.1f", total), element == null ? "" : (element.getName() + " "));
+			desc = new TranslatableComponent("spelllog.heal.desc", String.format("%.1f", base), String.format("%.1f", total), element == null ? TextComponent.EMPTY : element.getDisplayName());
 			this.element = element;
 		}
 

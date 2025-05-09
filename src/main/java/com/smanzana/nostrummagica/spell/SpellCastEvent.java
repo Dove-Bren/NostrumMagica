@@ -16,16 +16,19 @@ import net.minecraftforge.eventbus.api.Cancelable;
  *
  */
 public abstract class SpellCastEvent extends SpellEvent {
+	
+	public final boolean isChecking;
 
-	public SpellCastEvent(Spell spell, @Nonnull LivingEntity caster) {
+	public SpellCastEvent(Spell spell, @Nonnull LivingEntity caster, boolean isChecking) {
 		super(spell, caster);
+		this.isChecking = isChecking;
 	}
 
 	@Cancelable
 	public static class Pre extends SpellCastEvent {
 		
-		public Pre(Spell spell, @Nonnull LivingEntity caster) {
-			super(spell, caster);
+		public Pre(Spell spell, @Nonnull LivingEntity caster, boolean isChecking) {
+			super(spell, caster, isChecking);
 		}
 
 		/**
@@ -41,8 +44,8 @@ public abstract class SpellCastEvent extends SpellEvent {
 
 		protected final SpellCastResult result;
 		
-		public Post(Spell spell, LivingEntity caster, SpellCastResult result) {
-			super(spell, caster);
+		public Post(Spell spell, LivingEntity caster, SpellCastResult result, boolean isChecking) {
+			super(spell, caster, isChecking);
 			this.result = result;
 		}
 		

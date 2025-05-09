@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.network;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.network.message.BladeCastMessage;
 import com.smanzana.nostrummagica.network.message.CandleIgniteMessage;
+import com.smanzana.nostrummagica.network.message.ClientCastAdhocMessage;
 import com.smanzana.nostrummagica.network.message.ClientCastMessage;
 import com.smanzana.nostrummagica.network.message.ClientEffectVfxRenderMessage;
 import com.smanzana.nostrummagica.network.message.ClientPurchaseResearchMessage;
@@ -11,6 +12,7 @@ import com.smanzana.nostrummagica.network.message.ClientShapeVfxRenderMessage;
 import com.smanzana.nostrummagica.network.message.ClientTomeDropSpellMessage;
 import com.smanzana.nostrummagica.network.message.ClientUpdateQuestMessage;
 import com.smanzana.nostrummagica.network.message.EnchantedArmorStateUpdate;
+import com.smanzana.nostrummagica.network.message.IncantationSelectionMessage;
 import com.smanzana.nostrummagica.network.message.LoreMessage;
 import com.smanzana.nostrummagica.network.message.MagicEffectUpdate;
 import com.smanzana.nostrummagica.network.message.ManaArmorSyncMessage;
@@ -27,6 +29,8 @@ import com.smanzana.nostrummagica.network.message.RuneShaperMessage;
 import com.smanzana.nostrummagica.network.message.SpawnNostrumParticleMessage;
 import com.smanzana.nostrummagica.network.message.SpawnNostrumRitualEffectMessage;
 import com.smanzana.nostrummagica.network.message.SpawnPredefinedEffectMessage;
+import com.smanzana.nostrummagica.network.message.SpellChargeClientUpdateMessage;
+import com.smanzana.nostrummagica.network.message.SpellChargeServerUpdateMessage;
 import com.smanzana.nostrummagica.network.message.SpellCooldownMessage;
 import com.smanzana.nostrummagica.network.message.SpellCooldownResetMessage;
 import com.smanzana.nostrummagica.network.message.SpellCraftMessage;
@@ -126,6 +130,10 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, QuickMoveBagMessage.class, QuickMoveBagMessage::encode, QuickMoveBagMessage::decode, QuickMoveBagMessage::handle);
 		syncChannel.registerMessage(discriminator++, RuneShaperMessage.class, RuneShaperMessage::encode, RuneShaperMessage::decode, RuneShaperMessage::handle);
 		syncChannel.registerMessage(discriminator++, RemoteInteractMessage.class, RemoteInteractMessage::encode, RemoteInteractMessage::decode, RemoteInteractMessage::handle);
+		syncChannel.registerMessage(discriminator++, SpellChargeServerUpdateMessage.class, SpellChargeServerUpdateMessage::encode, SpellChargeServerUpdateMessage::decode, SpellChargeServerUpdateMessage::handle);
+		syncChannel.registerMessage(discriminator++, SpellChargeClientUpdateMessage.class, SpellChargeClientUpdateMessage::encode, SpellChargeClientUpdateMessage::decode, SpellChargeClientUpdateMessage::handle);
+		syncChannel.registerMessage(discriminator++, ClientCastAdhocMessage.class, ClientCastAdhocMessage::encode, ClientCastAdhocMessage::decode, ClientCastAdhocMessage::handle);
+		syncChannel.registerMessage(discriminator++, IncantationSelectionMessage.class, IncantationSelectionMessage::encode, IncantationSelectionMessage::decode, IncantationSelectionMessage::handle);
 	}
 	
 	//NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
@@ -153,6 +161,10 @@ public class NetworkHandler {
 
 	public static <T> void sendToAllTracking(T msg, Entity ent) {
 		NetworkHandler.syncChannel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> ent), msg);
+	}
+	
+	public static <T> void sendToAllTrackingExcept(T msg, Entity ent) {
+		NetworkHandler.syncChannel.send(PacketDistributor.TRACKING_ENTITY.with(() -> ent), msg);
 	}
 
 }

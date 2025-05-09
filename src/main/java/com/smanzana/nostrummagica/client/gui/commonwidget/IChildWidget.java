@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.client.gui.widget;
+package com.smanzana.nostrummagica.client.gui.commonwidget;
 
 /**
  * Widget specifically parented to another widget, with its location being relative to its parent.
@@ -17,7 +17,7 @@ public interface IChildWidget extends IMoveableWidget {
 		this.setAbsolutePosition(getParentOffsetX() + parentX, getParentOffsetY() + parentY);
 	}
 	
-	public default <T extends ParentWidget<?>> void setParent(T parent) {
+	public default <T extends ParentWidget<?, ?>> void setParent(T parent) {
 		;
 	}
 

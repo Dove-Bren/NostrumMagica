@@ -16,7 +16,7 @@ import com.mojang.math.Matrix4f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
-import com.smanzana.nostrummagica.client.gui.widget.MoveableObscurableWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.MoveableObscurableWidget;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.ClientUpdateQuestMessage;

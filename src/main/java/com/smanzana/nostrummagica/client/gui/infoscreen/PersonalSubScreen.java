@@ -9,11 +9,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
+import com.smanzana.nostrummagica.client.gui.commonwidget.FixedWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.GridWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.ScrollbarWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.TextWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.Tooltip;
+import com.smanzana.nostrummagica.client.gui.widget.SpellComponentButton;
+import com.smanzana.nostrummagica.client.gui.widget.SpellComponentButton.AlterationButton;
+import com.smanzana.nostrummagica.client.gui.widget.SpellComponentButton.ElementButton;
+import com.smanzana.nostrummagica.client.gui.widget.SpellComponentButton.SpellShapeButton;
+import com.smanzana.nostrummagica.client.gui.widget.SpellComponentWidget;
+import com.smanzana.nostrummagica.network.NetworkHandler;
+import com.smanzana.nostrummagica.network.message.IncantationSelectionMessage;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -22,7 +36,9 @@ import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -331,7 +347,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				
 				if (mouseX >= drawX && mouseY >= drawY
 						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
-					tooltipText = new TextComponent(elem.getName() + ": ")
+					tooltipText = new TextComponent(elem.getBareName() + ": ")
 							.append(mastery.getName());
 				}
 				
@@ -417,7 +433,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				if (mouseX >= drawX && mouseY >= drawY
 						&& mouseX <= drawX + iconWidth && mouseY <= drawY + iconWidth) {
 					if (has != null && has) {
-						tooltipText = new TextComponent(alteration.getName());
+						tooltipText = alteration.getDisplayName();
 					} else {
 						tooltipText = new TextComponent("Unknown Alteration");
 					}
@@ -472,7 +488,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 					
 					int curY = posY * yOffset;
 					
-					Header head = new Header(40 + posX * xOffset, curY, elem.getName());
+					Header head = new Header(40 + posX * xOffset, curY, elem.getBareName());
 					curY += 10;
 					headers.add(head);
 					
@@ -555,7 +571,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			public Row(int x, int y, INostrumMagic attr, EMagicElement element, EAlteration alteration) {
 				this.x = x;
 				this.y = y;
-				this.alterationName = alteration == null ? "  -  " : alteration.getName();
+				this.alterationName = alteration == null ? "  -  " : alteration.getBareName();
 				this.width = 0;
 				
 				SpellAction action = getAction(element, alteration);
@@ -618,6 +634,261 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			}
 			
 			return action;
+		}
+		
+	}
+	
+	// Screen for defining your personal incantation
+	public static class PersonalIncantationScreen extends PersonalSubScreen {
+		
+		private final List<FixedWidget> widgets;
+		private final InfoScreen parent;
+
+		public PersonalIncantationScreen(INostrumMagic attr, InfoScreen parent) {
+			super(attr);
+			
+			this.widgets = new ArrayList<>();
+			this.parent = parent;
+		}
+
+		@Override
+		public void draw(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
+			
+			final int middleSpace = 125;
+
+			//final int scrollbarWidth = 8;
+			//final int listWidth = (width / 3) - (scrollbarWidth);
+			final int listHeight = Math.max(50, (height - middleSpace));
+			
+			matrixStackIn.pushPose();
+			matrixStackIn.translate(x, y, 0);
+			
+			String title = "Incantation";
+			int len = mc.font.width(title);
+			mc.font.drawShadow(matrixStackIn, title, width / 2 + (-len / 2), 0, 0xFFFFFFFF);
+			
+			// Selection background
+			GuiComponent.fill(matrixStackIn, (width/2) - 150, (middleSpace/2) - 30, (width/2) + 150, (middleSpace/2) + 30, 0xFF404040);
+			RenderFuncs.drawGradientRect(matrixStackIn,
+					(width/2) + -100 + -12, (middleSpace/2) + -24, (width/2) + -100 + 12, (middleSpace/2), 
+					0xFF000000, 0xFF000000, 0xFF404040, 0xFF404040);
+			
+			RenderFuncs.drawGradientRect(matrixStackIn,
+					(width/2) + 0 + -12, (middleSpace/2) + -24, (width/2) + 0 + 12, (middleSpace/2), 
+					0xFF000000, 0xFF000000, 0xFF404040, 0xFF404040);
+			
+			RenderFuncs.drawGradientRect(matrixStackIn,
+					(width/2) + 100 + -12, (middleSpace/2) + -24, (width/2) + 100 + 12, (middleSpace/2), 
+					0xFF000000, 0xFF000000, 0xFF404040, 0xFF404040);
+			
+			// List backgrounds
+			for (int i = 0; i < 3; i++) {
+				final int lx = 0 + (i * width/3);
+				final int ly = height - listHeight;
+				RenderFuncs.drawGradientRect(matrixStackIn,
+						lx, ly, lx + (width/3), ly + listHeight, 
+						0xFF202030, 0xFF303040, 0xFF202030, 0xFF404050);
+			}
+			
+			matrixStackIn.popPose();
+		}
+		
+		@Override
+		public void drawForeground(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
+			final int middleSpace = 125;
+
+			//final int scrollbarWidth = 8;
+			//final int listWidth = (width / 3) - (scrollbarWidth);
+			final int listHeight = Math.max(50, (height - middleSpace));
+			GuiComponent.fill(matrixStackIn, x, y + (height + -listHeight + -24), x + width, y + (height + -listHeight), 0xFF000000);
+			
+			String title = "Shapes";
+			int len = mc.font.width(title);
+			mc.font.draw(matrixStackIn, title, x + width / 6 + (-len / 2), y + height + -listHeight + -10, 0xFFFFFFFF);
+			
+			title = "Elements";
+			len = mc.font.width(title);
+			mc.font.draw(matrixStackIn, title, x + width / 2 + (-len / 2), y + height + -listHeight + -10, 0xFFFFFFFF);
+			
+			title = "Alterations";
+			len = mc.font.width(title);
+			mc.font.draw(matrixStackIn, title, x + (5*width) / 6 + (-len / 2), y + height + -listHeight + -10, 0xFFFFFFFF);
+			
+			matrixStackIn.pushPose();
+			matrixStackIn.translate(0, 0, 100);
+			
+			for (FixedWidget widget : widgets) {
+				widget.renderToolTip(matrixStackIn, mouseX, mouseY);
+			}
+			matrixStackIn.popPose();
+		}
+
+		@Override
+		public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
+			widgets.clear();
+			
+			final int middleSpace = 125;
+			
+			widgets.add(new TextWidget(parent, new TextComponent("Shape"), x + (width / 2) + -100, y + (middleSpace/2) + 5, 48, 24).centerHorizontal());
+			widgets.add(new SpellComponentWidget(() -> getActiveShape() == null ? null : SpellComponentIcon.get(getActiveShape()),
+					x + (width / 2) + -100 + -12, y + (middleSpace/2) + -24, 24, 24)
+					.tooltip(this::getShapeTooltip)
+					);
+			
+			widgets.add(new TextWidget(parent, new TextComponent("Element"), x + (width / 2), y + (middleSpace/2) + 5, 48, 24).centerHorizontal());
+			widgets.add(new SpellComponentWidget(() -> getActiveElement() == null ? null : SpellComponentIcon.get(getActiveElement()),
+					x + (width / 2) + -12, y + (middleSpace/2) + -24, 24, 24)
+					.tooltip(this::getElementTooltip)
+					);
+			
+			widgets.add(new TextWidget(parent, new TextComponent("Alteration"), x + (width / 2) + 100, y + (middleSpace/2) + 5, 48, 24).centerHorizontal());
+			widgets.add(new SpellComponentWidget(() -> getActiveAlteration() == null ? null : SpellComponentIcon.get(getActiveAlteration()),
+					x + (width / 2) + 100 + -12, y + (middleSpace/2) + -24, 24, 24)
+					.tooltip(this::getAlterationTooltip)
+					);
+			
+			final int scrollbarWidth = 10;
+			final int listWidth = (width / 3) - (scrollbarWidth);
+			final int listHeight = Math.max(50, (height - middleSpace));
+			
+			final int buttonLen = 24;
+			
+			GridWidget<SpellShapeButton> shapeList = new GridWidget<>(x + 0, y + height - listHeight, listWidth, listHeight, TextComponent.EMPTY);
+			GridWidget<ElementButton> elementList = new GridWidget<>(x + width/3, y + height - listHeight, listWidth, listHeight, TextComponent.EMPTY);
+			GridWidget<AlterationButton> alterationList = new GridWidget<>(x + (2 * width) / 3, y + height - listHeight, listWidth, listHeight, TextComponent.EMPTY);
+			
+			final int margin = 2;
+			final int minSpacing = 0;
+			final int expectedPerRow = listWidth / buttonLen;
+			final int extraSpace = listWidth - ((margin * 2) + (expectedPerRow * buttonLen) + ((expectedPerRow-1) * minSpacing));
+			final int actualSpacing = extraSpace / (expectedPerRow-1);
+			final int actualMargin = margin + (extraSpace - (actualSpacing * (expectedPerRow-1)))/2;
+			shapeList.setMargin(actualMargin).setSpacing(actualSpacing);
+			elementList.setMargin(actualMargin).setSpacing(actualSpacing);
+			alterationList.setMargin(actualMargin).setSpacing(actualSpacing);
+			
+			ScrollbarWidget shapeScroller = new ScrollbarWidget(shapeList, shapeList.x + shapeList.getWidth(), shapeList.y, scrollbarWidth, shapeList.getHeight());
+			shapeList.setScrollbar(shapeScroller);
+			
+			ScrollbarWidget elementScroller = new ScrollbarWidget(elementList, elementList.x + elementList.getWidth(), elementList.y, scrollbarWidth, elementList.getHeight());
+			elementList.setScrollbar(elementScroller);
+			
+			ScrollbarWidget alterationScroller = new ScrollbarWidget(alterationList, alterationList.x + alterationList.getWidth(), alterationList.y, scrollbarWidth, alterationList.getHeight());
+			alterationList.setScrollbar(alterationScroller);
+			
+			List<SpellShapeButton> shapes = new ArrayList<>(32);
+			for (SpellShape shape : attr.getShapes()) {
+				var button = new SpellShapeButton(parent, 0, 0, buttonLen, buttonLen, shape, this::setActiveShape);
+				button.tooltip(Tooltip.create(getShapeTooltip(shape)));
+				shapes.add(button);
+			}
+			shapeList.addChildren(shapes);
+			widgets.add(shapeList);
+			widgets.add(shapeScroller);
+			
+			List<ElementButton> elements = new ArrayList<>(EMagicElement.values().length);
+			for (EMagicElement elem : EMagicElement.values()) {
+				if (!attr.getElementalMastery(elem).isGreaterOrEqual(EElementalMastery.NOVICE)) {
+					continue;
+				}
+				
+				var button = new ElementButton(parent, 0, 0, buttonLen, buttonLen, elem, this::setActiveElement);
+				button.tooltip(Tooltip.create(getElementTooltip(elem)));
+				
+				elements.add(button);
+			}
+			elementList.addChildren(elements);
+			widgets.add(elementList);
+			widgets.add(elementScroller);
+
+			List<AlterationButton> alterations = new ArrayList<>(EAlteration.values().length);
+			for (EAlteration alteration : EAlteration.values()) {
+				if (!attr.getAlterations().getOrDefault(alteration, Boolean.FALSE)) {
+					continue;
+				}
+				
+				var button = new AlterationButton(parent, 0, 0, buttonLen, buttonLen, alteration, this::setActiveAlteration);
+				button.tooltip(Tooltip.create(getAlterationTooltip(alteration)));
+				
+				alterations.add(button);
+			}
+			alterationList.addChildren(alterations);
+			widgets.add(alterationList);
+			widgets.add(alterationScroller);
+			
+			return List.copyOf(widgets);
+		}
+		
+		protected @Nullable SpellShape getActiveShape() {
+			return this.attr.getIncantationShape();
+		}
+		
+		protected void setActiveShape(SpellComponentButton<SpellShape> ignored, @Nullable SpellShape shape) {
+			attr.setIncantationShape(shape);
+			NetworkHandler.sendToServer(new IncantationSelectionMessage(shape));
+		}
+		
+		protected @Nullable EMagicElement getActiveElement() {
+			return attr.getIncantationElement();
+		}
+		
+		protected void setActiveElement(SpellComponentButton<EMagicElement> ignored, @Nullable EMagicElement element) {
+			attr.setIncantationElement(element);
+			NetworkHandler.sendToServer(new IncantationSelectionMessage(element));
+		}
+		
+		protected @Nullable EAlteration getActiveAlteration() {
+			return attr.getIncantationAlteration();
+		}
+		
+		protected void setActiveAlteration(SpellComponentButton<EAlteration> ignored, @Nullable EAlteration alteration) {
+			attr.setIncantationAlteration(alteration);
+			NetworkHandler.sendToServer(new IncantationSelectionMessage(alteration));
+		}
+		
+		protected List<Component> getShapeTooltip(@Nullable SpellShape shape) {
+			if (shape == null) {
+				return null;
+			}
+			
+			return List.of(
+					shape.getDisplayName().copy().withStyle(ChatFormatting.BOLD),
+					shape.getDescription()
+				);
+		}
+		
+		protected List<Component> getShapeTooltip() {
+			return getShapeTooltip(getActiveShape());
+		}
+		
+		protected List<Component> getElementTooltip(@Nullable EMagicElement element) {
+			if (element == null) {
+				return null;
+			}
+			
+			return List.of(
+					element.getDisplayName().copy().withStyle(ChatFormatting.BOLD),
+					element.getDescription()
+				);
+		}
+		
+		protected List<Component> getElementTooltip() {
+			return getElementTooltip(getActiveElement());
+		}
+		
+		protected List<Component> getAlterationTooltip(@Nullable EAlteration alteration) {
+			if (alteration == null) {
+				return null;
+			}
+			
+			return List.of(
+					alteration.getDisplayName().copy().withStyle(ChatFormatting.BOLD),
+					alteration.getDescription()
+				);
+		}
+		
+		protected List<Component> getAlterationTooltip() {
+			return getAlterationTooltip(getActiveAlteration());
 		}
 		
 	}

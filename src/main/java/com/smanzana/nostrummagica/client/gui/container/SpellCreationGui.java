@@ -17,9 +17,9 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.ISpellCraftPatternRenderer;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.client.gui.commonwidget.ObscurableChildWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.ParentWidget;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellGui.SpellPartBar.IHoverHandler;
-import com.smanzana.nostrummagica.client.gui.widget.ObscurableChildWidget;
-import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.item.BlankScroll;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
@@ -801,7 +801,7 @@ public class SpellCreationGui {
 			}
 		}
 		
-		protected static class WeightStatus extends ObscurableChildWidget {
+		protected static class WeightStatus extends ObscurableChildWidget<WeightStatus> {
 			
 			private final SpellGui<?> gui;
 			
@@ -950,7 +950,7 @@ public class SpellCreationGui {
 			}
 		}
 		
-		private static class SpellPartSegment extends ObscurableChildWidget {
+		private static class SpellPartSegment extends ObscurableChildWidget<SpellPartSegment> {
 
 			private final SpellGui<?> gui;
 			private final SpellPartSummary part;
@@ -1034,7 +1034,7 @@ public class SpellCreationGui {
 			}
 		}
 		
-		protected static class SpellPartBar extends com.smanzana.nostrummagica.client.gui.widget.ParentWidget<ObscurableChildWidget> {
+		protected static class SpellPartBar extends com.smanzana.nostrummagica.client.gui.commonwidget.ParentWidget<SpellPartBar, ObscurableChildWidget<?>> {
 			
 			public static interface IHoverHandler {
 				public void onHover(@Nullable SpellPartSummary summary, PoseStack matrixStackIn, int mouseX, int mouseY);
@@ -1086,7 +1086,7 @@ public class SpellCreationGui {
 			}
 		}
 		
-		public static class InfoPanel extends ParentWidget<ObscurableChildWidget> {
+		public static class InfoPanel extends ParentWidget<InfoPanel, ObscurableChildWidget<?>> {
 			
 			public static interface InfoPanelContent {
 				public void render(PoseStack matrixStackIn, int width, int height, float partialTicks);
@@ -1114,12 +1114,12 @@ public class SpellCreationGui {
 				this.green = green;
 				this.blue = blue;
 				this.alpha = alpha;
-				return this;
+				return self();
 			}
 			
 			public InfoPanel setContent(InfoPanelContent content) {
 				this.content = content;
-				return this;
+				return self();
 			}
 			
 			protected void renderBackground(PoseStack matrixStackIn) {

@@ -51,7 +51,7 @@ public class RenderCursedGlassTrigger extends RenderSwitchTrigger {
 		renderLivingLabel(entityIn, String.format("Requires %.2f damage", te.getRequiredDamage()), matrixStackIn, bufferIn, packedLightIn, .4f);
 		final EMagicElement elem = te.getRequiredElement();
 		if (elem != null) {
-			renderLivingLabel(entityIn, String.format("Requires %s element", te.getRequiredElement().getName()), matrixStackIn, bufferIn, packedLightIn, .6f);
+			renderLivingLabel(entityIn, String.format("Requires %s element", te.getRequiredElement().getBareName()), matrixStackIn, bufferIn, packedLightIn, .6f);
 		}
 	}
 	

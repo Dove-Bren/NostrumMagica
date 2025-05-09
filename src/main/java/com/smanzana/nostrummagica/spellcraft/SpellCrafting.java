@@ -49,7 +49,7 @@ public class SpellCrafting {
 			if (SpellRune.isElement(stack)) {
 				foundElement = true;
 			} else if (SpellRune.isAlteration(stack)) {
-				if (!context.magic.hasSkill(NostrumSkills.Spellcraft_Alterations)) {
+				if (context.isValid() && !context.magic.hasSkill(NostrumSkills.Spellcraft_Alterations)) {
 					errorsOut.add("You lack the skill to use alteration runes");
 					valid = false;
 				}
@@ -64,7 +64,7 @@ public class SpellCrafting {
 					valid = false;
 				} else if (shapeCount > 1) {
 					int max = 1;
-					if (context.magic.hasSkill(NostrumSkills.Spellcraft_TwoShapes)) {
+					if (context.isValid() && context.magic.hasSkill(NostrumSkills.Spellcraft_TwoShapes)) {
 						max++;
 					}
 					if (shapeCount > max) {
@@ -187,10 +187,10 @@ public class SpellCrafting {
 		}
 		
 		float discount = 0f;
-		if (context.magic.hasSkill(NostrumSkills.Spellcraft_ManaDiscount1)) {
+		if (context.isValid() && context.magic.hasSkill(NostrumSkills.Spellcraft_ManaDiscount1)) {
 			discount += .05f;
 		}
-		if (context.magic.hasSkill(NostrumSkills.Spellcraft_ManaDiscount2)) {
+		if (context.isValid() && context.magic.hasSkill(NostrumSkills.Spellcraft_ManaDiscount2)) {
 			discount += .1f;
 		}
 		if (discount != 0 && cost > 0) {
@@ -241,7 +241,7 @@ public class SpellCrafting {
 	
 	public static final int CalculateWeight(SpellCraftContext context, SpellEffectPart part) {
 		int raw = CalculateWeight(context, part.getElement(), part.getElementCount(), part.getAlteration());
-		if (raw > 0 && context.magic.hasSkill(NostrumSkills.Spellcraft_ElemWeight)) {
+		if (raw > 0 && context.isValid() && context.magic.hasSkill(NostrumSkills.Spellcraft_ElemWeight)) {
 			if (context.magic.getElementalMastery(part.getElement()).isGreaterOrEqual(EElementalMastery.MASTER)) {
 				raw--;
 			}
@@ -267,7 +267,7 @@ public class SpellCrafting {
 		for (SpellCraftPart part : parts) {
 			weight += CalculateWeight(context, part);
 		}
-		if (weight > 0 && context.magic.hasSkill(NostrumSkills.Spellcraft_Weight1)) {
+		if (weight > 0 && context.isValid() && context.magic.hasSkill(NostrumSkills.Spellcraft_Weight1)) {
 			weight--;
 		}
 		return weight;
@@ -428,7 +428,7 @@ public class SpellCrafting {
 						elementalInterference = true;
 						efficiency -= .5f;
 					} else if (element.isSupportingElement(previousElement)
-							&& context.magic.hasSkill(NostrumSkills.Spellcraft_ElemBuilding)) {
+							&& context.isValid() && context.magic.hasSkill(NostrumSkills.Spellcraft_ElemBuilding)) {
 						elementalBoost = true;
 						efficiency += .5f;
 					}

@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.client.gui.widget;
+package com.smanzana.nostrummagica.client.gui.commonwidget;
 
 import java.util.Collection;
 
@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 
-public abstract class AutoLayoutParentWidget<T extends ObscurableChildWidget> extends ParentWidget<T> implements ScrollbarWidget.IScrollbarListener {
+public abstract class AutoLayoutParentWidget<W extends AutoLayoutParentWidget<W, T>, T extends ObscurableChildWidget<?>> extends ParentWidget<W, T> implements ScrollbarWidget.IScrollbarListener {
 
 	protected @Nullable ScrollbarWidget scrollbar;
 	protected float curScroll;
@@ -21,22 +21,22 @@ public abstract class AutoLayoutParentWidget<T extends ObscurableChildWidget> ex
 		super(x, y, width, height, title);
 	}
 	
-	public AutoLayoutParentWidget<T> setScrollbar(ScrollbarWidget scrollbar) {
+	public AutoLayoutParentWidget<W, T> setScrollbar(ScrollbarWidget scrollbar) {
 		this.scrollbar = scrollbar;
 		this.updateScrollbar();
-		return this;
+		return self();
 	}
 	
-	public AutoLayoutParentWidget<T> setSpacing(int pixels) {
+	public AutoLayoutParentWidget<W, T> setSpacing(int pixels) {
 		this.itemSpacing = pixels;
 		this.resetLayout();
-		return this;
+		return self();
 	}
 	
-	public AutoLayoutParentWidget<T> setMargin(int pixels) {
+	public AutoLayoutParentWidget<W, T> setMargin(int pixels) {
 		this.itemMargin = pixels;
 		this.resetLayout();
-		return this;
+		return self();
 	}
 	
 	/**
@@ -44,10 +44,10 @@ public abstract class AutoLayoutParentWidget<T extends ObscurableChildWidget> ex
 	 * Height is not adjusted to allow each component to specify their own size.
 	 * @return
 	 */
-	public AutoLayoutParentWidget<T> setAutoSizeChildren() {
+	public AutoLayoutParentWidget<W, T> setAutoSizeChildren() {
 		this.autoSizeChildren = true;
 		this.resetLayout();
-		return this;
+		return self();
 	}
 	
 	@Override

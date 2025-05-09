@@ -6,11 +6,11 @@ import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.widget.IMoveableWidget;
-import com.smanzana.nostrummagica.client.gui.widget.ObscurableChildWidget;
-import com.smanzana.nostrummagica.client.gui.widget.ParentWidget;
-import com.smanzana.nostrummagica.client.gui.widget.ScrollbarWidget;
-import com.smanzana.nostrummagica.client.gui.widget.ScrollbarWidget.IScrollbarListener;
+import com.smanzana.nostrummagica.client.gui.commonwidget.IMoveableWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.ObscurableChildWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.ParentWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.ScrollbarWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.ScrollbarWidget.IScrollbarListener;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
@@ -24,13 +24,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
-public class SimpleInventoryWidget extends ParentWidget<ObscurableChildWidget> implements IScrollbarListener {
+public class SimpleInventoryWidget extends ParentWidget<SimpleInventoryWidget, ObscurableChildWidget<?>> implements IScrollbarListener {
 	
 	public static interface IHiddenSlotFactory {
 		public HideableSlot apply(Container inventory, int slotIdx, int x, int y);
 	}
 	
-	protected static class SlotWidget extends ObscurableChildWidget implements IMoveableWidget {
+	protected static class SlotWidget extends ObscurableChildWidget<SlotWidget> implements IMoveableWidget {
 		
 		protected final HideableSlot slot;
 		protected final int startX;

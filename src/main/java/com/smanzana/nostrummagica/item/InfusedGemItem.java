@@ -33,7 +33,7 @@ public class InfusedGemItem extends Item implements ILoreTagged, IEnchantableIte
 
 	public static final String ID_PREFIX = "nostrum_gem_";
 	public static final String MakeID(EMagicElement element) {
-		return ID_PREFIX + element.getName().toLowerCase();
+		return ID_PREFIX + element.name().toLowerCase();
 	}
 	
 	protected final EMagicElement element;

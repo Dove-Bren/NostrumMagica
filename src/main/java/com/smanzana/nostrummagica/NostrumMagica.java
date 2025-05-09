@@ -55,6 +55,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellChargeTracker;
 import com.smanzana.nostrummagica.spell.SpellCooldownTracker;
 import com.smanzana.nostrummagica.spell.SpellRegistry;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
@@ -121,6 +122,7 @@ public class NostrumMagica {
 	public static MagicEffectProxy magicEffectProxy;
 	public static ManaArmorListener manaArmorListener;
 	public static ItemSetListener itemSetListener;
+	public static SpellChargeTracker spellChargeTracker;
 	
 	// Better way to do this?
 	private static SpellCooldownTracker server_spellCooldownTracker;
@@ -150,6 +152,7 @@ public class NostrumMagica {
 		manaArmorListener = new ManaArmorListener();
 		statListener = new PlayerStatListener();
 		itemSetListener = new ItemSetListener();
+		spellChargeTracker = new SpellChargeTracker();
 
 		NostrumMagica.creativeTab = new CreativeModeTab(MODID) {
 			@Override
@@ -705,7 +708,7 @@ public class NostrumMagica {
 			final EElementalMastery currentMastery = attr.getElementalMastery(elem);
 			if (!currentMastery.isGreaterOrEqual(neededMastery)) {
 				success = false;
-				problemsOut.add(new TranslatableComponent("info.spell.low_mastery", neededMastery.getName(), elem.getName(), currentMastery.getName()));
+				problemsOut.add(new TranslatableComponent("info.spell.low_mastery", neededMastery.getName(), elem.getDisplayName(), currentMastery.getName()));
 			}
 		}
 
@@ -735,7 +738,7 @@ public class NostrumMagica {
 			if (mastery != EElementalMastery.UNKNOWN) {
 				if (entity != null && !entity.level.isClientSide
 						&& entity instanceof Player player) {
-					player.sendMessage(new TranslatableComponent("info.element_mastery." + mastery.getTranslationKey(), element.getName()), Util.NIL_UUID);
+					player.sendMessage(new TranslatableComponent("info.element_mastery." + mastery.getTranslationKey(), element.getDisplayName()), Util.NIL_UUID);
 				}
 			}
 			return true;
@@ -1013,6 +1016,10 @@ public class NostrumMagica {
 			}
 			return server_spellCooldownTracker;
 		}
+	}
+
+	public SpellChargeTracker getSpellChargeTracker() {
+		return spellChargeTracker;
 	}
 	
 	public static final @Nonnull ResourceLocation Loc(String path) {

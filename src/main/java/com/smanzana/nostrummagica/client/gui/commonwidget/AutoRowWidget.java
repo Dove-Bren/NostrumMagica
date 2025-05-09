@@ -1,9 +1,9 @@
-package com.smanzana.nostrummagica.client.gui.widget;
+package com.smanzana.nostrummagica.client.gui.commonwidget;
 
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 
-public class AutoRowWidget<T extends ObscurableChildWidget> extends AutoLayoutParentWidget<T> {
+public class AutoRowWidget<T extends ObscurableChildWidget<?>> extends AutoLayoutParentWidget<AutoRowWidget<T>, T> {
 	
 	public AutoRowWidget(int x, int y, int width, int height, Component title) {
 		super(x, y, width, height, title);

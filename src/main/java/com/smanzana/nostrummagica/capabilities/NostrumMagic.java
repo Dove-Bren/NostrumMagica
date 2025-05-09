@@ -27,8 +27,10 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.Incantation;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
@@ -148,6 +150,11 @@ public class NostrumMagic implements INostrumMagic {
 	private BlockPos sorceryPortalPos;
 	private @Nullable VanillaRespawnInfo savedRespawnInfo;
 	private Map<TransmuteKnowledge, Boolean> transmuteKnowledge;
+	
+	// Incantation holder
+	private @Nullable EMagicElement incantationElem;
+	private @Nullable EAlteration incantationAlteration;
+	private @Nullable SpellShape incantationShape;
 	
 	private final LivingEntity entity;
 	
@@ -662,6 +669,9 @@ public class NostrumMagic implements INostrumMagic {
 		this.skills.clear(); this.skills.addAll(cap.getSkills());
 		this.elementalXP.clear(); this.elementalXP.putAll(cap.getElementalXPMap());
 		this.elementalSkillPoints.clear(); this.elementalSkillPoints.putAll(cap.getElementalSkillPointsMap());
+		this.incantationElem = cap.getIncantationElement();
+		this.incantationAlteration = cap.getIncantationAlteration();
+		this.incantationShape = cap.getIncantationShape();
 	}
 	
 	@Override
@@ -1084,6 +1094,10 @@ public class NostrumMagic implements INostrumMagic {
 	
 	private static final String NBT_TRANSMUTE_KNOWLEDGE = "transmute_knowledge";
 
+	private static final String NBT_INCANT_ELEM = "incant_elem";
+	private static final String NBT_INCANT_ALTERATION = "incant_alteration";
+	private static final String NBT_INCANT_SHAPE = "incant_shape";
+
 	@Override
 	public CompoundTag serializeNBT() {
 		CompoundTag nbt = new CompoundTag();
@@ -1293,6 +1307,16 @@ public class NostrumMagic implements INostrumMagic {
 			list.add(subtag);
 		}
 		nbt.put(NBT_TRANSMUTE_KNOWLEDGE, list);
+		
+		if (this.incantationElem != null) {
+			nbt.put(NBT_INCANT_ELEM, this.incantationElem.toNBT());
+		}
+		if (this.incantationAlteration != null) {
+			nbt.put(NBT_INCANT_ALTERATION, this.incantationAlteration.toNBT());
+		}
+		if (this.incantationShape != null) {
+			nbt.putString(NBT_INCANT_SHAPE, this.incantationShape.getShapeKey());
+		}
 		
 		return nbt;
 	}
@@ -1533,6 +1557,63 @@ public class NostrumMagic implements INostrumMagic {
 				giveTransmuteKnowledge(knowledge.key, knowledge.level);
 			}
 		}
+		
+		// Incantation builder
+		if (tag.contains(NBT_INCANT_ELEM)) {
+			this.incantationElem = EMagicElement.FromNBT(tag.get(NBT_INCANT_ELEM));
+		} else {
+			this.incantationElem = null;
+		}
+		if (tag.contains(NBT_INCANT_ALTERATION)) {
+			this.incantationAlteration = EAlteration.FromNBT(tag.get(NBT_INCANT_ALTERATION));
+		} else {
+			this.incantationAlteration = null;
+		}
+		if (tag.contains(NBT_INCANT_SHAPE)) {
+			this.incantationShape = SpellShape.get(tag.getString(NBT_INCANT_SHAPE));
+		} else {
+			this.incantationShape = null;
+		}
+	}
+
+	@Override
+	public Incantation getIncantation() {
+		if (this.incantationElem != null && this.incantationShape != null) {
+			return new Incantation(this.incantationShape, this.incantationElem, this.incantationAlteration);
+		} else {
+			// TODO testing code
+			return new Incantation(NostrumSpellShapes.Touch, EMagicElement.WIND, EAlteration.CONJURE);
+		}
+	}
+
+	@Override
+	public EMagicElement getIncantationElement() {
+		return this.incantationElem;
+	}
+
+	@Override
+	public EAlteration getIncantationAlteration() {
+		return this.incantationAlteration;
+	}
+
+	@Override
+	public SpellShape getIncantationShape() {
+		return this.incantationShape;
+	}
+
+	@Override
+	public void setIncantationElement(EMagicElement element) {
+		this.incantationElem = element;
+	}
+
+	@Override
+	public void setIncantationAlteration(EAlteration alteration) {
+		this.incantationAlteration = alteration;
+	}
+
+	@Override
+	public void setIncantationShape(SpellShape shape) {
+		this.incantationShape = shape;
 	}
 	
 }

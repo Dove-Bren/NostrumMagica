@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.client.gui.widget;
+package com.smanzana.nostrummagica.client.gui.commonwidget;
 
 import java.util.List;
 
@@ -29,10 +29,13 @@ public class Tooltip implements ITooltip {
 	}
 	
 	public static final void RenderTooltip(ITooltip tooltip, Screen parent, PoseStack matrixStackIn, int mouseX, int mouseY) {
-		matrixStackIn.pushPose();
-		matrixStackIn.translate(0, 0, 100);
-		parent.renderComponentTooltip(matrixStackIn, tooltip.get(), mouseX, mouseY);
-		matrixStackIn.popPose();
+		final var rawTooltip = tooltip.get();
+		if (rawTooltip != null && !rawTooltip.isEmpty()) {
+			matrixStackIn.pushPose();
+			matrixStackIn.translate(0, 0, 100);
+			parent.renderComponentTooltip(matrixStackIn, rawTooltip, mouseX, mouseY);
+			matrixStackIn.popPose();
+		}
 	}
 	
 }
