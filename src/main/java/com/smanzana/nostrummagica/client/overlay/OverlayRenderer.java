@@ -6,9 +6,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.WeakHashMap;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
@@ -28,22 +26,9 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.IPrintableAttribute;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.effects.ClientEffect;
-import com.smanzana.nostrummagica.client.effects.ClientEffectAnimated;
-import com.smanzana.nostrummagica.client.effects.ClientEffectFormBasic;
-import com.smanzana.nostrummagica.client.effects.ClientEffectIcon;
-import com.smanzana.nostrummagica.client.effects.ClientEffectRenderer;
-import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierGrow;
-import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierShrink;
-import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifierTranslate;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
+import com.smanzana.nostrummagica.client.listener.ClientPlayerListener;
 import com.smanzana.nostrummagica.client.render.effect.CursedFireEffectRenderer;
-import com.smanzana.nostrummagica.client.render.layer.EntityEffectLayer;
-import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
-import com.smanzana.nostrummagica.client.render.layer.LayerArmorElytra;
-import com.smanzana.nostrummagica.client.render.layer.LayerDragonFlightWings;
-import com.smanzana.nostrummagica.client.render.layer.LayerKoidHelm;
-import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
@@ -51,11 +36,9 @@ import com.smanzana.nostrummagica.inventory.EquipmentSetRegistry;
 import com.smanzana.nostrummagica.item.IRaytraceOverlay;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.item.set.EquipmentSet;
-import com.smanzana.nostrummagica.listener.ClientPlayerListener;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.spell.Spell;
@@ -64,17 +47,13 @@ import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.CameraType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -93,13 +72,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.HitResult.Type;
-import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.DrawSelectionEvent;
-import net.minecraftforge.client.event.RenderBlockOverlayEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
-import net.minecraftforge.client.event.RenderLivingEvent;
-import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.client.gui.IIngameOverlay;
 import net.minecraftforge.client.gui.OverlayRegistry;
@@ -1283,192 +1255,4 @@ public class OverlayRenderer extends GuiComponent {
 		}
 		return lines;
 	}
-	
-	protected void renderRoots(PoseStack matrixStackIn, LivingEntity entity) {
-		if (entity.tickCount % 4 == 0) {
-			EffectData data = NostrumMagica.magicEffectProxy.getData(entity, SpecialEffect.ROOTED);
-			if (data != null && data.getCount() != 0) {
-				final ClientEffect effect = new ClientEffectAnimated(entity.position(), 1000L,
-						new ClientEffect[] {
-							new ClientEffect(Vec3.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_0, 0, 0, 0), 1500L),
-							new ClientEffect(Vec3.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_1, 0, 0, 0), 1500L),
-							new ClientEffect(Vec3.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_2, 0, 0, 0), 1500L),
-							new ClientEffect(Vec3.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_3, 0, 0, 0), 1500L),
-							new ClientEffect(Vec3.ZERO, new ClientEffectFormBasic(ClientEffectIcon.THORN_4, 0, 0, 0), 1500L),
-						},
-						new float[] {
-							.1f,
-							.2f,
-							.3f,
-							.4f,
-							1f
-						});
-				effect
-					.modify(new ClientEffectModifierTranslate(NostrumMagica.rand.nextFloat() - .5f, 0, NostrumMagica.rand.nextFloat() - .5f, 0, NostrumMagica.rand.nextFloat() * 360f))
-					.modify(new ClientEffectModifierGrow(.05f, 1f, .1f, 1f, .2f))
-					.modify(new ClientEffectModifierShrink(1f, 1f, 1f, .0f, .8f));
-				ClientEffectRenderer.instance().addEffect(effect);
-			}
-		}
-	}
-	
-	private static final Map<LivingEntityRenderer<?, ?>, Boolean> LivingInjectedSet = new WeakHashMap<>();
-	
-	@SubscribeEvent
-	public <T extends LivingEntity, M extends EntityModel<T>> void onEntityRender(RenderLivingEvent.Pre<T, M> event) {
-		final LivingEntityRenderer<T, M> renderer = event.getRenderer();
-		if (!LivingInjectedSet.containsKey(renderer)) {
-			LivingInjectedSet.put(renderer, true);
-			renderer.addLayer(new EntityEffectLayer<T, M>(renderer));
-		}
-	}
-	
-	private boolean renderRecurseMarker = false;
-	
-	@SubscribeEvent
-	public void onEntityRender(RenderLivingEvent.Post<LivingEntity, EntityModel<LivingEntity>> event) {
-		if (!renderRecurseMarker) {
-			final LivingEntity entity = event.getEntity();
-			final PoseStack matrixStackIn = event.getPoseStack();
-			
-			//final float partialTicks = event.getPartialRenderTick();
-			renderRecurseMarker = true;
-			{
-				renderRoots(matrixStackIn, entity);
-			}
-			renderRecurseMarker = false;
-		}
-	}
-	
-	@SubscribeEvent
-	public void onRenderLast(RenderLevelStageEvent event) {
-		if (event.getStage() != Stage.AFTER_PARTICLES) {
-			return;
-		}
-		
-		// Copy of what vanilla uses to figure out if it should render the render entity:
-		Minecraft mc = Minecraft.getInstance();
-		final boolean shouldRenderMe = (
-				mc.options.getCameraType() != CameraType.FIRST_PERSON
-				|| (mc.getCameraEntity() instanceof LivingEntity && ((LivingEntity)mc.getCameraEntity()).isSleeping())
-				);
-		
-		if (!shouldRenderMe) {
-			// Normal render didn't happen. Do rooted render manually instead.
-			renderRoots(event.getPoseStack(), NostrumMagica.instance.proxy.getPlayer());
-		}
-	}
-	
-	@SubscribeEvent
-	public void onPlayerRender(RenderPlayerEvent.Pre event) {
-		if (LayerKoidHelm.ShouldRender(event.getPlayer())) {
-			event.getRenderer().getModel().head.visible = false;
-			event.getRenderer().getModel().jacket.visible = false;
-		}
-	}
-	
-	private static final Map<PlayerRenderer, Boolean> InjectedSet = new WeakHashMap<>();
-	
-	@SubscribeEvent
-	public void onPlayerRender(RenderPlayerEvent.Post event) {
-		if (!InjectedSet.containsKey(event.getRenderer())) {
-			InjectedSet.put(event.getRenderer(), true);
-			
-			// Instead, we just inject a layer for our custom elytras, and another for dragon-flight wings
-			event.getRenderer().addLayer(new LayerDragonFlightWings(event.getRenderer()));
-			event.getRenderer().addLayer(new LayerAetherCloak(event.getRenderer()));
-			event.getRenderer().addLayer(new LayerManaArmor(event.getRenderer()));
-			event.getRenderer().addLayer(new LayerKoidHelm(event.getRenderer()));
-			event.getRenderer().addLayer(new LayerArmorElytra<>(event.getRenderer(), Minecraft.getInstance().getEntityModels()));
-		}
-
-		Minecraft mc = Minecraft.getInstance();
-		if (event.getPlayer() != mc.player) {
-			// For other players, possibly do armor render ticks
-			for (@Nonnull ItemStack equipStack : event.getPlayer().getArmorSlots()) {
-				if (equipStack.isEmpty() || !(equipStack.getItem() instanceof ElementalArmor)) {
-					continue;
-				}
-				
-				((ElementalArmor) equipStack.getItem()).onArmorTick(equipStack, event.getPlayer().level, event.getPlayer());
-			}
-		}
-	}
-	
-	@SubscribeEvent
-	public void onBlockHighlight(DrawSelectionEvent.HighlightBlock event) {
-		if (event.isCanceled() || event.getTarget().getType() != HitResult.Type.BLOCK) {
-			return;
-		}
-		
-		BlockState state = event.getCamera().getEntity().level.getBlockState(RayTrace.blockPosFromResult(event.getTarget()));
-		if (state == null) {
-			return;
-		}
-		
-		// Dungeon Air wants no overlay
-		if (state.getBlock() instanceof DungeonAirBlock) {
-			if (!(event.getCamera().getEntity() instanceof Player)
-					|| ((Player) event.getCamera().getEntity()).isCreative()) {
-				event.setCanceled(true);
-				return;
-			}
-		}
-	}
-	
-	@SubscribeEvent
-	public void onBlockOverlay(RenderBlockOverlayEvent event) {
-		
-//		// Forge overlays aren't set up. Have to do it manually. (Some copied from EnderIO)
-//		if (!event.isCanceled() && event.getOverlayType() == OverlayType.WATER) {
-//			final PlayerEntity player = event.getPlayer();
-//			// the event has the wrong BlockPos (entity center instead of eyes)
-//			final BlockPos blockpos = new BlockPos(player.getPosX(), player.getPosY() + player.getEyeHeight(), player.getPosZ());
-//			final BlockState state = player.world.getBlockState(blockpos);
-//			final Block block = state.getBlock();
-//			final IFluidState fluidState = state.getFluidState();
-//
-//			if (block instanceof PoisonWaterBlock || (fluidState != null && fluidState.getFluid() instanceof FluidPoisonWater)) {
-//				
-//				
-//				
-//				BlockFluidBase fblock = (BlockFluidBase) block;
-//				Vector3d fogColor = fblock.getFogColor(player.world, blockpos, state, player,
-//						player.world.getFogColor(event.getRenderPartialTicks()),
-//						event.getRenderPartialTicks());
-//				float fogColorRed = (float) fogColor.x;
-//				float fogColorGreen = (float) fogColor.y;
-//				float fogColorBlue = (float) fogColor.z;
-//				
-//				final ResourceLocation r = fblock.getFluid().getOverlay();
-//				if (r != null) {
-//					mc.getTextureManager().bindTexture(
-//							new ResourceLocation(r.getResourceDomain(), "textures/" + r.getResourcePath() + ".png")
-//							);
-//					Tessellator tessellator = Tessellator.getInstance();
-//					BufferBuilder vertexbuffer = tessellator.getBuffer();
-//					float f = player.getBrightness();
-//					GlStateManager.color4f(f * fogColorRed, f * fogColorGreen, f * fogColorBlue, 0.5F);
-//					GlStateManager.enableBlend();
-//					GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
-//							GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-//					matrixStackIn.push();
-//					float f7 = -player.rotationYaw / 64.0F;
-//					float f8 = player.rotationPitch / 64.0F;
-//					vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-//					vertexbuffer.pos(-1.0D, -1.0D, -0.5D).tex(4.0F + f7, 4.0F + f8).endVertex();
-//					vertexbuffer.pos(1.0D, -1.0D, -0.5D).tex(0.0F + f7, 4.0F + f8).endVertex();
-//					vertexbuffer.pos(1.0D, 1.0D, -0.5D).tex(0.0F + f7, 0.0F + f8).endVertex();
-//					vertexbuffer.pos(-1.0D, 1.0D, -0.5D).tex(4.0F + f7, 0.0F + f8).endVertex();
-//					tessellator.draw();
-//					matrixStackIn.pop();
-//					GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-//					GlStateManager.disableBlend();
-//					
-//					event.setCanceled(true);
-//				}
-//			}
-//		}
-	}
-	
 }

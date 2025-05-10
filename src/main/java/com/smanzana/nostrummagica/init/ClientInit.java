@@ -51,6 +51,7 @@ import com.smanzana.nostrummagica.client.gui.tooltip.EnchantableHintTooltipCompo
 import com.smanzana.nostrummagica.client.gui.tooltip.LoreHintTooltipComponent;
 import com.smanzana.nostrummagica.client.gui.tooltip.TransmutableHintTooltipComponent;
 import com.smanzana.nostrummagica.client.gui.widget.QuickMoveBagButton;
+import com.smanzana.nostrummagica.client.listener.ClientPlayerListener;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.model.ModelDragonRed;
 import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
@@ -132,7 +133,6 @@ import com.smanzana.nostrummagica.item.equipment.MirrorShield;
 import com.smanzana.nostrummagica.item.equipment.MirrorShieldImproved;
 import com.smanzana.nostrummagica.item.equipment.SoulDagger;
 import com.smanzana.nostrummagica.item.equipment.ThanosStaff;
-import com.smanzana.nostrummagica.listener.ClientPlayerListener;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;

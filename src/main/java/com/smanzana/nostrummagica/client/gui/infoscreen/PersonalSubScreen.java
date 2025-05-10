@@ -842,6 +842,9 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		}
 		
 		protected void setActiveAlteration(SpellComponentButton<EAlteration> ignored, @Nullable EAlteration alteration) {
+			if (alteration == getActiveAlteration()) {
+				alteration = null;
+			}
 			attr.setIncantationAlteration(alteration);
 			NetworkHandler.sendToServer(new IncantationSelectionMessage(alteration));
 		}

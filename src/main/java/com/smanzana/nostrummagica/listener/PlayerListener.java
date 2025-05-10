@@ -52,7 +52,6 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellActionSummary;
 import com.smanzana.nostrummagica.spell.SpellCastEvent;
 import com.smanzana.nostrummagica.spell.SpellCasting;
-import com.smanzana.nostrummagica.spell.SpellChargeTracker.SpellCharge;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.tile.TeleportRuneTileEntity;
@@ -1063,18 +1062,6 @@ public class PlayerListener {
 			TeleportRuneTileEntity.tickChargeMap();
 			for (ServerLevel world : ServerLifecycleHooks.getCurrentServer().getAllLevels()) {
 				ElementalArmor.ServerWorldTick(world);
-			}
-			
-			int unused; // Testing code; remove!
-			{
-				for (ServerLevel world : ServerLifecycleHooks.getCurrentServer().getAllLevels()) {
-					for (Entity e : world.getAllEntities()) {
-						if (NostrumMagica.spellChargeTracker.isCharging(e)) {
-							SpellCharge charge = NostrumMagica.spellChargeTracker.getCharge(e);
-							NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(2, e.getX(), e.getY(), e.getZ(), .5, 40, 0, new Vec3(0, .05, 0), Vec3.ZERO).color(charge.element().getColor()));
-						}
-					}
-				}
 			}
 		} else if (event.phase == Phase.END) {
 			for (ServerLevel world : ServerLifecycleHooks.getCurrentServer().getAllLevels()) {

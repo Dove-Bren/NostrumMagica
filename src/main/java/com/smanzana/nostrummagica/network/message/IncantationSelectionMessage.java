@@ -34,10 +34,10 @@ public class IncantationSelectionMessage {
 			
 			if (message.element != null) {
 				att.setIncantationElement(message.element);
-			} else if (message.alteration != null) {
-				att.setIncantationAlteration(message.alteration);
 			} else if (message.shape != null) {
 				att.setIncantationShape(message.shape);
+			} else {
+				att.setIncantationAlteration(message.alteration);
 			}
 			
 			// Don't resync stats and let client handle modification

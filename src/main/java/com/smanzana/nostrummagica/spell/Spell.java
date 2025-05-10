@@ -777,7 +777,7 @@ public class Spell {
 //				base = 10;
 //			}
 //		}
-		return base + (20 * weight); 
+		return base + (20 * Math.max(0, weight-2)); // incantations superficially add 2 weight so reduce that a bit 
 	}
 	
 	public static final SpellAction solveAction(EAlteration alteration,	EMagicElement element, int elementCount) {
