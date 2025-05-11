@@ -36,7 +36,6 @@ import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -854,10 +853,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				return null;
 			}
 			
-			return List.of(
-					shape.getDisplayName().copy().withStyle(ChatFormatting.BOLD),
-					shape.getDescription()
-				);
+			return shape.getTooltip();
 		}
 		
 		protected List<Component> getShapeTooltip() {
@@ -869,10 +865,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				return null;
 			}
 			
-			return List.of(
-					element.getDisplayName().copy().withStyle(ChatFormatting.BOLD),
-					element.getDescription()
-				);
+			return element.getTooltip();
 		}
 		
 		protected List<Component> getElementTooltip() {
@@ -884,10 +877,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				return null;
 			}
 			
-			return List.of(
-					alteration.getDisplayName().copy().withStyle(ChatFormatting.BOLD),
-					alteration.getDescription()
-				);
+			return alteration.getTooltip();
 		}
 		
 		protected List<Component> getAlterationTooltip() {

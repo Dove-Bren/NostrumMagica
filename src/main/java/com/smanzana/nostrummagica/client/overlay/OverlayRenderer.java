@@ -6,6 +6,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
@@ -43,6 +44,7 @@ import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCooldownTracker.SpellCooldown;
+import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
@@ -82,6 +84,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public class OverlayRenderer extends GuiComponent {
 	
 	private static final ResourceLocation GUI_ICONS = new ResourceLocation(NostrumMagica.MODID, "textures/gui/icons.png");
+	private static final ResourceLocation GUI_CAST_CENTER = new ResourceLocation(NostrumMagica.MODID, "textures/gui/cast_swirl_hand.png");
+	private static final ResourceLocation GUI_CAST_TAIL = new ResourceLocation(NostrumMagica.MODID, "textures/gui/cast_swirl_tail.png");
 	private static final int GUI_ORB_WIDTH = 9;
 	private static final int GUI_ORB_HEIGHT = 9;
 	private static final int GUI_BAR_WIDTH = 17;
@@ -99,6 +103,8 @@ public class OverlayRenderer extends GuiComponent {
 	private static final int GUI_CONTINGENCY_ICON_OFFSETX = 22;
 	private static final int GUI_CONTINGENCY_ICON_OFFSETY = 37;
 	private static final int GUI_CONTINGENCY_ICON_LENGTH = 18;
+	private static final int GUI_CAST_SWIRL_WIDTH = 48;
+	private static final int GUI_CAST_SWIRL_HEIGHT = 48;
 	
 	protected IIngameOverlay hookshotOverlay;
 	protected IIngameOverlay cursedFireOverlay;
@@ -112,6 +118,7 @@ public class OverlayRenderer extends GuiComponent {
 	protected IIngameOverlay contingencyOverlay;
 	protected IIngameOverlay mysticAirOverlay;
 	protected IIngameOverlay spellChargeOverlay;
+	protected IncantSelectionOverlay incantationSelectOverlay;
 	
 	private int wiggleIndex; // set to multiples of 12 for each wiggle
 	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
@@ -146,6 +153,7 @@ public class OverlayRenderer extends GuiComponent {
 		contingencyOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.POTION_ICONS_ELEMENT, "NostrumMagica::contingencyOverlay", this::renderContingencyOverlay);
 		mysticAirOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.VIGNETTE_ELEMENT, "NostrumMagica::mysticAirOverlay", this::renderMysticAirOverlay);
 		spellChargeOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.CROSSHAIR_ELEMENT, "NostrumMagica::spellChargeOverlay", this::renderSpellChargeOverlay);
+		incantationSelectOverlay = new IncantSelectionOverlay(); OverlayRegistry.registerOverlayTop("NostrumMagica::incantationSelectOverlay", incantationSelectOverlay);
 	}
 	
 	private void renderMysticAirOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
@@ -1139,20 +1147,37 @@ public class OverlayRenderer extends GuiComponent {
 	}
 	
 	private void renderSpellChargeOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
-		
 		ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
 		if (listener.getChargeManager().getCurrentCharge() != null) {
+			final float progress = listener.getChargeManager().getChargePercent();
+			final float[] colorBase = ColorUtil.ARGBToColor(listener.getChargeManager().getCurrentCharge().incant().getElement().getColor());
+			
+			RenderSystem.enableBlend();
+			RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+			RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+			RenderSystem.setShaderTexture(0, GUI_CAST_CENTER);
+			
+			final int iconwidth = 16;
+			final int iconheight = 16; 
+			
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(width/2, (height/2) + 12, 0);
 			
-			// ICON
-			final int barHalfWidth = 10;
-			final int barHeight = 6;
-			ForgeIngameGui.fill(matrixStackIn, -(barHalfWidth+1), -1, barHalfWidth+1, barHeight+1, 0xFF000000);
-			ForgeIngameGui.fill(matrixStackIn, -barHalfWidth, 0, barHalfWidth, barHeight, 0xFF404040);
+			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, -iconwidth/2, -iconheight/2,
+					0, 0, GUI_CAST_SWIRL_WIDTH, GUI_CAST_SWIRL_HEIGHT, iconwidth, iconheight, GUI_CAST_SWIRL_WIDTH, GUI_CAST_SWIRL_HEIGHT,
+					colorBase[0] * .5f, colorBase[1] * .5f, colorBase[2] * .5f, 1f);
 			
-			final int pixels = Math.round((2 * barHalfWidth) * listener.getChargeManager().getChargePercent());
-			ForgeIngameGui.fill(matrixStackIn, -barHalfWidth, 0, -barHalfWidth + pixels, barHeight, 0xFFAAAAAA);
+			RenderSystem.setShaderTexture(0, GUI_CAST_TAIL);
+			
+			final double glowPeriod = 1000;
+			final float glowProg = (float)((System.currentTimeMillis() % glowPeriod) / glowPeriod);
+			
+			Function<Float, float[]> color = (f) -> {
+				final float thisProg = (f - glowProg) % 1f;
+				final float glow = .25f + .25f * Mth.sin(thisProg * 2 * Mth.PI);
+				return new float[] {colorBase[0] * glow, colorBase[1] * glow, colorBase[2] * glow, 1f};
+			};
+			RenderFuncs.drawRadialProgressQuadImmediate(matrixStackIn, -iconwidth/2, -iconheight/2, 0, iconwidth, iconheight, 0, 1, 0, 1, progress, color);
 			
 			
 			matrixStackIn.popPose();
@@ -1174,6 +1199,12 @@ public class OverlayRenderer extends GuiComponent {
 	public void toggleHUD() {
 		this.HUDToggle = !this.HUDToggle;
 		this.fadeInReagents();
+	}
+	
+	public void enableIncantationSelection() {
+		if (!this.incantationSelectOverlay.isEnabled()) {
+			this.incantationSelectOverlay.enableSelection(true);
+		}
 	}
 	
 	private static ItemStack EquipmentSetCacheKey = ItemStack.EMPTY;

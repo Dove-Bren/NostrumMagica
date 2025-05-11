@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.spell;
 
+import java.util.List;
 import java.util.Random;
 
 import javax.annotation.Nullable;
@@ -25,6 +26,7 @@ public enum EMagicElement {
 	private final int color;
 	private final Component name;
 	private final Component description;
+	private final List<Component> tooltip;
 	
 	private EMagicElement(int color) {
 		this.color = color;
@@ -32,6 +34,10 @@ public enum EMagicElement {
 		
 		this.name = new TranslatableComponent("element." + name().toLowerCase() + ".name");
 		this.description = new TranslatableComponent("element." + name().toLowerCase() + ".desc");
+		this.tooltip = List.of(
+				name.copy().withStyle(ChatFormatting.BOLD),
+				description
+			);
 	}
 
 	public String getBareName() {
@@ -150,5 +156,9 @@ public enum EMagicElement {
 			;
 		}
 		return element;
+	}
+
+	public List<Component> getTooltip() {
+		return tooltip;
 	}
 }

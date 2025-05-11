@@ -1,0 +1,679 @@
+package com.smanzana.nostrummagica.client.overlay;
+
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+import javax.annotation.Nullable;
+
+import org.lwjgl.glfw.GLFW;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Matrix4f;
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
+import com.smanzana.nostrummagica.client.gui.commonwidget.ITooltip;
+import com.smanzana.nostrummagica.client.gui.commonwidget.Tooltip;
+import com.smanzana.nostrummagica.client.listener.ClientPlayerListener;
+import com.smanzana.nostrummagica.spell.EAlteration;
+import com.smanzana.nostrummagica.spell.EElementalMastery;
+import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.Incantation;
+import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
+import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
+import com.smanzana.nostrummagica.util.RenderFuncs;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.event.InputEvent.RawMouseEvent;
+import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.gui.IIngameOverlay;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+
+/**
+ * Renders an overlay to screen (when enabled) that allows players to use their mouse to select
+ * incantation components
+ */
+public class IncantSelectionOverlay implements IIngameOverlay {
+	
+	private static final double FADE_MS = 250;
+	
+	protected boolean enabled;
+	protected long showTime; // for animating
+	
+	// Selection variables
+	private @Nullable EMagicElement element;
+	private @Nullable SpellShape shape;
+	private @Nullable EAlteration alteration;
+	
+	private WheelSlice<?>[] elementSlices;
+	private WheelSlice<?>[][] shapeSlices;
+	private WheelSlice<?>[] alterationSlices;
+	private int shapePage;
+	
+	// Tooltip stuff
+	private @Nullable WheelSlice<?> hovered;
+	private long hoverTime;
+	
+	private final Minecraft mc;
+	
+	public IncantSelectionOverlay() {
+		MinecraftForge.EVENT_BUS.register(this);
+		this.mc = Minecraft.getInstance();
+	}
+	
+	protected boolean isEnabled() {
+		return enabled;
+	}
+	
+	protected void onEnable() {
+		initSlices();
+		
+		resetFadeTimer();
+		mc.mouseHandler.releaseMouse();
+	}
+	
+	protected void onDisable() {
+		resetFadeTimer();
+//		resetSelection(); dont reset here; wait for fade out
+		mc.mouseHandler.grabMouse();
+	}
+	
+	public void enableSelection(boolean enabled) {
+		final boolean wasEnabled = isEnabled();
+		this.enabled = enabled;
+		
+		if (wasEnabled != enabled) {
+			if (enabled) {
+				onEnable();
+			} else {
+				onDisable();
+			}
+		}
+	}
+	
+	protected void resetFadeTimer() {
+		// Use any previous in-progress fade to smooth this out
+		final long diff = System.currentTimeMillis() - showTime;
+		if (diff < FADE_MS) {
+			showTime = System.currentTimeMillis() - (long)(FADE_MS - diff);
+		} else {
+			showTime = System.currentTimeMillis();
+		}
+	}
+	
+	protected void resetSelection() {
+		element = null;
+		shape = null;
+		alteration = null;
+	}
+	
+	protected void submitSelection() {
+		ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
+		listener.startIncantationCast(new Incantation(this.shape, this.element, this.alteration));
+		this.enableSelection(false);
+	}
+	
+	protected @Nullable WheelSlice<?>[] getCurrentStage() {
+		if (this.shape == null) {
+			return this.shapeSlices[shapePage];
+		} else if (this.element == null) {
+			return this.elementSlices;
+		} else {
+			return this.alterationSlices;
+		}
+	}
+	
+	protected @Nullable WheelSlice<?> getSelection(int width, int height, int mouseX, int mouseY) {
+		if (!this.isEnabled()) {
+			return null;
+		}
+		
+		@Nullable WheelSlice<?>[] stage = this.getCurrentStage();
+		if (stage == null) {
+			return null;
+		}
+		
+		final int mouseOffsetX = mouseX - (width/2);
+		final int mouseOffsetY = mouseY - (height/2);
+		
+		final double angleRad = (Mth.atan2(mouseOffsetY, mouseOffsetX) + (Math.PI * 2)) % (Math.PI * 2);
+		final float anglePerc = (float) (angleRad / (Math.PI * 2));
+		final float dist = Mth.sqrt(mouseOffsetX * mouseOffsetX + mouseOffsetY * mouseOffsetY);
+		
+		if (dist < 30) {
+			return null;
+		}
+		
+		for (WheelSlice<?> slice : stage) {
+			if (slice == null) {
+				continue;
+			}
+			
+			final float angleDiff = Math.min(Math.abs(anglePerc - slice.rotationPerc()), Math.abs(anglePerc - (1f+slice.rotationPerc())));
+			if (angleDiff < slice.width()) {
+				return slice;
+			}
+		}
+		
+		return null; // can this happen? Should return last slice?
+	}
+	
+	protected void initSlices() {
+		// Remake slices each time to allow attr to change
+		Player player = NostrumMagica.instance.proxy.getPlayer();
+		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		
+		// elements
+		{
+			// elements are even split of the circle
+			final int count = EMagicElement.values().length;
+			elementSlices = new WheelSlice[count];
+			
+			final float perSlice = (1f / (float) count);
+			for (int i = 0; i < count; i++) {
+				final float prog = (.75f + (i * perSlice)) % 1; // start at 75% around which is up
+				final EMagicElement elem = EMagicElement.values()[i];
+				
+				if (attr == null || !attr.isUnlocked() || !attr.getElementalMastery(elem).isGreaterOrEqual(EElementalMastery.NOVICE)) {
+					elementSlices[i] = WheelSlice.Hidden(prog, perSlice/2f);
+				} else {
+					elementSlices[i] = new WheelSlice<>(elem, SpellComponentIcon.get(elem), elem.getDisplayName(), elem::getTooltip, prog, perSlice/2f, this::setElement, false);
+				}
+			}
+		}
+		
+		// Shapes
+		{
+			final Component nextTitle = new TextComponent("Next");
+			final ITooltip nextTooltip = Tooltip.create(new TextComponent("View the next page of shapes"));
+			
+			final Component prevTitle = new TextComponent("Previous");
+			final ITooltip prevTooltip = Tooltip.create(new TextComponent("View the previous page of shapes"));
+			
+			// Shapes are mostly even, with a few called out specifically.
+			final SpellShape[] specials = {NostrumSpellShapes.Projectile, NostrumSpellShapes.Touch, NostrumSpellShapes.Self};
+			
+			// Specials are bigger than the others
+			final float specialWidth = .1125f;
+			
+			// TODO fix holding down R. Require a key-up to re-show menu.
+			
+			Comparator<SpellShape> compare = (a, b) -> {
+				// first sort based on weight
+				final int weightDiff = a.getWeight(a.getDefaultProperties()) - b.getWeight(b.getDefaultProperties()); 
+				if (weightDiff != 0) {
+					return weightDiff;
+				}
+				
+				// Then sort by mana
+				final int manaDiff = a.getManaCost(a.getDefaultProperties()) - b.getManaCost(b.getDefaultProperties());
+				if (manaDiff != 0) {
+					return manaDiff;
+				}
+				
+				// If all equal, sort by name?
+				return a.getShapeKey().compareToIgnoreCase(b.getShapeKey());
+			};
+			
+			List<SpellShape> shapes = Lists.newArrayList(specials);
+			Set<SpellShape> seen = Sets.newHashSet(specials);
+			SpellShape.getAllShapes().stream().filter(seen::add).sorted(compare).forEach(shapes::add);
+			Set<SpellShape> known = (attr != null && attr.isUnlocked()) ? Set.copyOf(attr.getShapes()) : new HashSet<>();
+			
+			final int countPerPage = 11;
+			final int count = shapes.size();
+			final int specialPerPage = specials.length + 2;
+			final int standardPerPage = countPerPage - specialPerPage;
+			final int numPages = (((count-specials.length) + standardPerPage-1) / standardPerPage);
+			shapeSlices = new WheelSlice[numPages][];
+			
+			final float standardWidth = ((1f - (specialWidth * specials.length)) / (float) (countPerPage-specials.length));
+			
+			final int buttonsIdx = (((countPerPage - specials.length)-1) / 2) + specials.length;
+			
+			for (int page = 0; page < numPages; page++) {
+				shapeSlices[page] = new WheelSlice[countPerPage];
+				WheelSlice<?>[] curSlices = shapeSlices[page];
+				for (int i = 0; i < countPerPage; i++) {
+					final SpellShape shape;
+					final float prog;
+					final float sliceWidth;
+					// note that 75% around is up
+					if (i < specials.length) {
+						final float progStart = (.75f + (-specialWidth * ((specials.length-1)/2f)));
+						prog = (progStart + (i * specialWidth)) % 1;
+						sliceWidth = specialWidth;
+						shape = shapes.get(i);
+					} else {
+						final int subi = (i-specials.length);
+						final float progStart = (.75f + (specialWidth*specials.length) / 2f) + (standardWidth / 2); 
+						prog = (progStart + (subi * standardWidth)) % 1;
+						sliceWidth = standardWidth;
+						
+						if (i < buttonsIdx || i > buttonsIdx + 1) {
+							int shapeIdx = specials.length + (standardPerPage)*page + subi;
+							if (i > buttonsIdx) {
+								shapeIdx -= 2;
+							}
+							shape = shapeIdx < shapes.size() ? shapes.get(shapeIdx) : null;
+						} else {
+							shape = null;
+						}
+					}
+					
+					if (i == buttonsIdx && page < numPages - 1) {
+						// next button
+						curSlices[i] = new WheelSlice<>(Boolean.TRUE, null, nextTitle, nextTooltip, prog, sliceWidth/2f, this::moveShapePage, true);
+					} else if (i == buttonsIdx + 1 && page > 0) {
+						// prev button
+						curSlices[i] = new WheelSlice<>(Boolean.FALSE, null, prevTitle, prevTooltip, prog, sliceWidth/2f, this::moveShapePage, true);
+					} else if (shape == null) {
+						curSlices[i] = null; // no slice
+					} else if (!known.contains(shape)) {
+						curSlices[i] = WheelSlice.Hidden(prog, sliceWidth/2f);
+					} else {
+						curSlices[i] = new WheelSlice<>(shape, SpellComponentIcon.get(shape), shape.getDisplayName(), shape::getTooltip, prog, sliceWidth/2f, this::setShape, i < specials.length);
+					}
+				}
+			}
+		}
+		
+		// Alterations
+		{
+			// Alterations are even, with "NO ALTERATION" being on top
+			final Component noneTitle = new TextComponent("None");
+			final ITooltip noneTooltip = Tooltip.create(new TextComponent("Do not use an alteration"));
+			
+			final int count = EAlteration.values().length + 1;
+			alterationSlices = new WheelSlice[count];
+			final Predicate<EAlteration> check = (a) -> attr != null && attr.isUnlocked() && (a == null || attr.getAlterations().getOrDefault(a, Boolean.FALSE));
+			
+			final float perSlice = (1f / (float) count);
+			for (int i = 0; i < count; i++) {
+				final float prog = (.75f + (i * perSlice)) % 1; // start at 75% around which is up
+				final EAlteration alter = i == 0 ? null : EAlteration.values()[i-1];
+				
+				if (!check.test(alter)) {
+					alterationSlices[i] = WheelSlice.Hidden(prog, perSlice/2f);
+				} else {
+					alterationSlices[i] = new WheelSlice<>(alter, alter == null ? null : SpellComponentIcon.get(alter),
+							alter == null ? noneTitle : alter.getDisplayName(),
+							alter == null ? noneTooltip : alter::getTooltip,		
+							prog, perSlice/2f, this::setAlteration, false);
+				}
+			}
+		}
+	}
+	
+	protected void setElement(EMagicElement element) {
+		this.element = element;
+		
+		// If no alterations are discovered, submit now
+		Player player = NostrumMagica.instance.proxy.getPlayer();
+		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		if (attr == null || !attr.getAlterations().values().stream().filter(Objects::nonNull).anyMatch(Boolean::booleanValue)) {
+			this.submitSelection();
+		}
+	}
+	
+	protected void setAlteration(EAlteration alteration) {
+		this.alteration = alteration;
+		this.submitSelection();
+	}
+	
+	protected void setShape(SpellShape shape) {
+		this.shape = shape;
+	}
+	
+	protected void moveShapePage(Boolean isNext) {
+		this.shapePage = Mth.clamp(this.shapePage + (isNext ? 1 : -1), 0, this.shapeSlices.length);
+	}
+	
+	protected float getFadeProgress() {
+		final long diff = System.currentTimeMillis() - showTime;
+		final float progRaw = (float)((double) diff / FADE_MS);
+		final float prog = (isEnabled() ? progRaw : 1f - progRaw);
+		return Mth.clamp(prog, 0f, 1f);
+	}
+	
+	@SubscribeEvent
+	public void onMouseRaw(RawMouseEvent event) {
+		if (isEnabled() && event.getAction() == GLFW.GLFW_PRESS) {
+			event.setCanceled(true);
+			final boolean isLeft = event.getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT;
+			final boolean isRight = event.getButton() == GLFW.GLFW_MOUSE_BUTTON_RIGHT;
+			if (isLeft || isRight) {
+				final int width = mc.getWindow().getGuiScaledWidth();
+				final int height = mc.getWindow().getGuiScaledHeight();
+				final double wScale = (double) width/ (double)mc.getWindow().getScreenWidth();
+				final double hScale = (double) height / (double)mc.getWindow().getScreenHeight();
+				
+				final int mouseX = (int)(mc.mouseHandler.xpos() * wScale);
+				final int mouseY = (int)(mc.mouseHandler.ypos() * hScale);
+				
+				final @Nullable WheelSlice<?> current = this.getSelection(width, height, mouseX, mouseY);
+				if (current != null) {
+					current.click();
+
+					// Special handling for right-clicking an element to skip alteration
+					if (this.element != null && this.shape != null && isRight) {
+						this.submitSelection();
+					}
+				}
+				
+			}
+		}
+	}
+
+	public void render(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
+		ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
+		if (this.isEnabled() || this.getFadeProgress() > 0f) {
+			final float fade = this.getFadeProgress();
+			Player player = NostrumMagica.instance.proxy.getPlayer();
+			final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+			if (attr != null) {
+				final float radius = 75f;
+				
+				final double wScale = (double)mc.getWindow().getGuiScaledWidth() / (double)mc.getWindow().getScreenWidth();
+				final double hScale = (double)mc.getWindow().getGuiScaledHeight() / (double)mc.getWindow().getScreenHeight();
+				
+				final int mouseX = (int)(mc.mouseHandler.xpos() * wScale);
+				final int mouseY = (int)(mc.mouseHandler.ypos() * hScale);
+			
+				matrixStackIn.pushPose();
+				matrixStackIn.translate(width/2, (height/2), 10);
+				renderWheel(matrixStackIn, partialTicks, radius, fade, width, height, mouseX, mouseY);
+				matrixStackIn.popPose();
+				
+				final WheelSlice<?> selected = this.getSelection(width, height, mouseX, mouseY);
+				if (selected != this.hovered) {
+					this.hovered = selected;
+					this.hoverTime = System.currentTimeMillis();
+				} else if (this.hovered != null && System.currentTimeMillis() - this.hoverTime > 1000) {
+					this.renderWheelSliceTooltip(this.hovered, matrixStackIn, partialTicks, mouseX, mouseY);
+				}
+			}
+		}
+		
+		// This will also be what turns itself off
+		if (this.isEnabled() && !listener.getBindingIncant().isDown()) {
+			this.enableSelection(false);
+		}
+		
+		if (!this.isEnabled() && this.getFadeProgress() <= 0f) {
+			resetSelection();
+		}
+	}
+	
+	protected void renderWheel(PoseStack matrixStackIn, float partialTicks, float radius, float fadeAlpha, int screenwidth, int screenheight, int mouseX, int mouseY) {
+		renderWheelBackground(matrixStackIn, partialTicks, radius, fadeAlpha);
+		
+		WheelSlice<?>[] stage = this.getCurrentStage();
+		final WheelSlice<?> selected = this.getSelection(screenwidth, screenheight, mouseX, mouseY);
+		if (stage != null) {
+			for (WheelSlice<?> slice : stage) {
+				if (slice == null) {
+					continue;
+				}
+				renderWheelSlice(slice, matrixStackIn, partialTicks, radius, fadeAlpha, selected == slice);
+			}
+		}
+		
+		renderWheelForeground(matrixStackIn, partialTicks, radius, fadeAlpha);
+	}
+	
+	protected void renderWheelBackground(PoseStack matrixStackIn, float partialTicks, float radius, float fadeAlpha) {
+		
+		matrixStackIn.pushPose();
+		BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+		buffer.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.disableTexture();
+		RenderSystem.disableCull();
+		
+		RenderFuncs.drawEllipse(radius, radius, 32, matrixStackIn, buffer, 0, .7f, .3f, .7f, fadeAlpha * .7f);
+		
+		Tesselator.getInstance().end();
+		
+		RenderSystem.enableCull();
+		matrixStackIn.popPose();
+	}
+	
+	protected void renderWheelForeground(PoseStack matrixStackIn, float partialTicks, float radius, float fadeAlpha) {
+		matrixStackIn.pushPose();
+		BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+		buffer.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
+		RenderSystem.setShader(GameRenderer::getPositionColorShader);
+		RenderSystem.disableTexture();
+		RenderSystem.disableCull();
+		RenderSystem.enableBlend();
+		
+		RenderFuncs.drawEllipse(30, 30, 32, matrixStackIn, buffer, 0, .6f, .5f, .6f, fadeAlpha);
+		
+		Tesselator.getInstance().end();
+		
+		if (this.shape != null) {
+			matrixStackIn.pushPose();
+			matrixStackIn.translate(-12, -3, 0);
+			SpellComponentIcon.get(this.shape).draw(matrixStackIn, -6, -6, 12, 12, 1f, 1f, 1f, fadeAlpha);
+			matrixStackIn.translate(0, 7, 0);
+			matrixStackIn.scale(.5f, .5f, 1f);
+			final int len = mc.font.width(this.shape.getDisplayName());
+			mc.font.draw(matrixStackIn, this.shape.getDisplayName(), -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
+			matrixStackIn.popPose();
+		}
+		
+		if (this.element != null) {
+			matrixStackIn.pushPose();
+			matrixStackIn.translate(12, -3, 0);
+			SpellComponentIcon.get(this.element).draw(matrixStackIn, -6, -6, 12, 12, 1f, 1f, 1f, fadeAlpha);
+			matrixStackIn.translate(0, 7, 0);
+			matrixStackIn.scale(.5f, .5f, 1f);
+			final int len = mc.font.width(this.element.getDisplayName());
+			mc.font.draw(matrixStackIn, this.element.getDisplayName(), -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
+			matrixStackIn.popPose();
+		}
+		
+		RenderSystem.enableCull();
+		matrixStackIn.popPose();
+	}
+	
+	protected void renderWheelSliceTooltip(WheelSlice<?> slice, PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
+		final List<Component> components = slice.tooltip() == null ? null : slice.tooltip().get();
+		if (components != null && !components.isEmpty()) {
+			final int width = 150;
+			int height = 20;
+			
+			RenderSystem.enableDepthTest();
+			RenderSystem.depthMask(true);
+			
+			matrixStackIn.pushPose();
+			matrixStackIn.translate(mouseX + 10, mouseY + -10, 100);
+			
+			if (mc.getWindow().getGuiScaledWidth() - mouseX < width + 5) {
+				matrixStackIn.translate(-width + -10 + -20, 0, 0);
+			}
+			
+			// Draw text first higher to figure out width/height
+			{
+				matrixStackIn.pushPose();
+				matrixStackIn.translate(2, 2, 0);
+				
+				int y = 0;
+				for (Component component : components) {
+					for (FormattedCharSequence line : mc.font.split(component, width-4)) {
+						mc.font.draw(matrixStackIn, line, 0, y, 0xFFC0C0C0);
+						y += mc.font.lineHeight + (y == 0 ? 5 : 2);
+					}
+				}
+				
+				if (y > height) {
+					height = y;
+				}
+				
+				matrixStackIn.popPose();
+			}
+			
+			RenderSystem.enableDepthTest();
+			RenderSystem.depthMask(true);
+			
+			matrixStackIn.translate(0, 0, -1);
+			RenderFuncs.drawRect(matrixStackIn, -1, -1, width+1, height+1, 0xFF000000);
+			RenderFuncs.drawRect(matrixStackIn, 0, 0, width, height, 0xFF404040);
+			
+			matrixStackIn.popPose();
+		}
+	}
+	
+	protected void renderWheelSlice(WheelSlice<?> slice, PoseStack matrixStackIn, float partialTicks, float radius, float fadeAlpha, boolean highlight) {
+		final float leftX = Mth.cos((slice.rotationPerc + slice.width()) * 2 * Mth.PI) * radius;
+		final float leftY = Mth.sin((slice.rotationPerc + slice.width()) * 2 * Mth.PI) * radius;
+		
+		final float rightX = Mth.cos((slice.rotationPerc - slice.width()) * 2 * Mth.PI) * radius;
+		final float rightY = Mth.sin((slice.rotationPerc - slice.width()) * 2 * Mth.PI) * radius;
+		
+		if (slice.decorate()) {
+			final float sat = (0f);
+			{
+				Matrix4f transform = matrixStackIn.last().pose();
+				
+				final float leftSmallX = Mth.cos((slice.rotationPerc + slice.width()) * 2 * Mth.PI) * 29.5f;
+				final float leftSmallY = Mth.sin((slice.rotationPerc + slice.width()) * 2 * Mth.PI) * 29.5f;
+				
+				final float midSmallX = Mth.cos((slice.rotationPerc) * 2 * Mth.PI) * 35f;
+				final float midSmallY = Mth.sin((slice.rotationPerc) * 2 * Mth.PI) * 35f;
+				
+				final float rightSmallX = Mth.cos((slice.rotationPerc - slice.width()) * 2 * Mth.PI) * 29.5f;
+				final float rightSmallY = Mth.sin((slice.rotationPerc - slice.width()) * 2 * Mth.PI) * 29.5f;
+			
+				RenderSystem.setShader(GameRenderer::getPositionColorShader);
+				RenderSystem.disableTexture();
+				RenderSystem.disableCull();
+				RenderSystem.enableBlend();
+				BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+				buffer.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
+				
+				buffer.vertex(transform, midSmallX, midSmallY, 0).color(sat, sat, sat, 0).endVertex();
+				buffer.vertex(transform, rightSmallX, rightSmallY, 0).color(sat, sat, sat, fadeAlpha).endVertex();
+				buffer.vertex(transform, leftSmallX, leftSmallY, 0).color(sat, sat, sat, fadeAlpha).endVertex();
+				
+				Tesselator.getInstance().end();
+				
+				RenderSystem.enableCull();
+			}
+		}
+		
+		// Border lines
+		{
+			RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
+			RenderSystem.disableCull();
+			RenderSystem.enableBlend();
+			BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+			buffer.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
+			
+			RenderFuncs.renderLine(matrixStackIn, buffer, new Vec3(1f, 1f, 0), new Vec3(leftX, leftY, 0), 4, OverlayTexture.NO_OVERLAY, 0, 0f, 0f, 0f, fadeAlpha);
+			RenderFuncs.renderLine(matrixStackIn, buffer, new Vec3(1f, 1f, 0), new Vec3(rightX, rightY, 0), 4, OverlayTexture.NO_OVERLAY, 0, 0f, 0f, 0f, fadeAlpha);
+			
+			Tesselator.getInstance().end();
+			RenderSystem.enableCull();
+		}
+		
+		matrixStackIn.pushPose();
+		
+		final float armRadius = radius * .75f;
+		final float offsetX = Mth.cos(slice.rotationPerc * 2 * Mth.PI) * armRadius;
+		final float offsetY = Mth.sin(slice.rotationPerc * 2 * Mth.PI) * armRadius;
+		
+		matrixStackIn.translate(offsetX, offsetY, 0);
+		if (slice.isHidden()) {
+			if (slice.name() != null) {
+				matrixStackIn.pushPose();
+				matrixStackIn.scale(.5f, .5f, .5f);
+				final int len = mc.font.width(slice.name());
+				mc.font.draw(matrixStackIn, slice.name(), -len/2, -mc.font.lineHeight / 2, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
+				matrixStackIn.popPose();
+			}
+		} else {
+			matrixStackIn.translate(0, -5, 0);
+			if (slice.icon() != null) {
+				slice.icon().draw(matrixStackIn, -8, -8, 16, 16, 1f, 1f, 1f, fadeAlpha);
+			}
+			
+			if (slice.name() != null) {
+				matrixStackIn.pushPose();
+				matrixStackIn.translate(0, 10, 0);
+				matrixStackIn.scale(.5f, .5f, .5f);
+				final int len = mc.font.width(slice.name());
+				mc.font.draw(matrixStackIn, slice.name(), -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
+				matrixStackIn.popPose();
+			}
+		}
+		
+		matrixStackIn.popPose();
+		
+		if (highlight) {
+			final float sat = (slice.isHidden() ? .3f : 1f);
+			{
+				Matrix4f transform = matrixStackIn.last().pose();
+			
+				RenderSystem.setShader(GameRenderer::getPositionColorShader);
+				RenderSystem.disableTexture();
+				RenderSystem.disableCull();
+				RenderSystem.enableBlend();
+				BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+				buffer.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
+				
+				buffer.vertex(transform, 0, 0, 0).color(sat, sat, sat, .5f * fadeAlpha).endVertex();
+				buffer.vertex(transform, rightX, rightY, 0).color(sat, sat, sat, 0f).endVertex();
+				buffer.vertex(transform, leftX, leftY, 0).color(sat, sat, sat, 0f).endVertex();
+				
+				Tesselator.getInstance().end();
+				
+				RenderSystem.enableCull();
+			}
+		}
+	}
+	
+	private static final record WheelSlice<T>(T val, @Nullable SpellComponentIcon icon, Component name, ITooltip tooltip, float rotationPerc, float width, Consumer<T> onClick, boolean decorate) {
+		private static final Component HiddenName = new TextComponent("?");
+		private static final ITooltip HiddenTooltip = Tooltip.create(new TextComponent("An undiscovered component"));
+		
+		
+		public static WheelSlice<Object> Hidden(float rotationPerc, float width) {
+			return new WheelSlice<>(null, null, HiddenName, HiddenTooltip, rotationPerc, width, null, false);
+		}
+		
+		public void click() {
+			if (this.onClick != null) {
+				this.onClick().accept(val);
+			}
+		}
+
+		public boolean isHidden() {
+			return this.icon == null && onClick == null;
+		}
+		
+	}
+	
+}

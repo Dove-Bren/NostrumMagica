@@ -200,6 +200,10 @@ public class ClientPlayerListener extends PlayerListener {
 	public KeyMapping getBindingInfo() {
 		return bindingInfo;
 	}
+
+	public KeyMapping getBindingIncant() {
+		return bindingCastSlow;
+	}
 	
 	public SelectionRenderer getSelectionRenderer() {
 		return this.selectionRenderer;
@@ -281,10 +285,12 @@ public class ClientPlayerListener extends PlayerListener {
 		} else if (bindingShapeHelp.consumeClick()) {
 			this.spellshapeRenderer.toggle();
 		} else if (bindingCastSlow.consumeClick()) {
-			if (chargeManager.getCurrentCharge() != null) {
-				chargeManager.cancelCharge(false);
-			} else {
-				startIncantationCast();
+			if (chargeManager.getCurrentCharge() == null && NostrumMagica.instance.getSpellCooldownTracker(mc.player.level).getCooldowns(mc.player).getGlobalCooldown().endTicks < mc.player.tickCount) {
+				Player player = mc.player;
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+				if (attr != null && attr.isUnlocked()) {
+					this.overlayRenderer.enableIncantationSelection();
+				}
 			}
 		}
 	}
@@ -418,18 +424,17 @@ public class ClientPlayerListener extends PlayerListener {
 		}
 	}
 	
-	protected void startIncantationCast() {
+	public void startIncantationCast(Incantation incant) {
 		final Player player = NostrumMagica.instance.proxy.getPlayer();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr != null && attr.isUnlocked()) {
-			Incantation incant = attr.getIncantation();
 			if (incant != null) {
 				Spell spell = incant.makeSpell();
 				
 				SpellCastResult result = SpellCasting.CheckToolCast(spell, player, ItemStack.EMPTY);
 				if (result.succeeded) {
 					// We think we can cast it, so start charging
-					this.chargeManager.startCharging(new SpellCharge(incant.getElement(), result.summary.getFinalCastTicks()));
+					this.chargeManager.startCharging(new SpellCharge(incant, result.summary.getFinalCastTicks()));
 				} else {
 					for (int i = 0; i < 15; i++) {
 						double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
@@ -448,15 +453,15 @@ public class ClientPlayerListener extends PlayerListener {
 		}
 	}
 	
-	protected void finishIncantationCast() {
+	protected void finishIncantationCast(SpellCharge charge) {
 		final Player player = NostrumMagica.instance.proxy.getPlayer();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr != null && attr.isUnlocked()) {
-			Incantation incant = attr.getIncantation();
+			Incantation incant = charge.incant();
 			if (incant != null) {
 				Spell spell = incant.makeSpell();
 				HitResult mop = RayTrace.raytraceApprox(player.getLevel(), player, player.getEyePosition(), player.getXRot(), player.getYRot(), 100, (e) -> e != player && e instanceof LivingEntity, .5);
-				final @Nullable Entity targetHint = com.smanzana.petcommand.util.RayTrace.entFromRaytrace(mop);
+				final @Nullable Entity targetHint = RayTrace.entFromRaytrace(mop);
 				
 				NetworkHandler.sendToServer(new ClientCastAdhocMessage(spell, targetHint));
 				player.swing(InteractionHand.MAIN_HAND);
@@ -473,7 +478,8 @@ public class ClientPlayerListener extends PlayerListener {
 		final Minecraft mc = Minecraft.getInstance();
 		
 		if (!mc.isPaused() && this.chargeManager.isDoneCharging()) {
-			finishIncantationCast();
+			SpellCharge charge = this.chargeManager.getCurrentCharge();
+			finishIncantationCast(charge);
 			this.chargeManager.cancelCharge(false);
 		}
 	}
@@ -583,7 +589,7 @@ public class ClientPlayerListener extends PlayerListener {
 			for (HumanoidArm hand : HumanoidArm.values()) {
 				if (NostrumMagica.rand.nextInt(4) == 0) {
 					SpellCharge charge = NostrumMagica.spellChargeTracker.getCharge(player);
-					final EMagicElement elem = (charge == null ? EMagicElement.ICE : charge.element());
+					final EMagicElement elem = charge.incant().getElement();
 					
 					final boolean left = hand == HumanoidArm.LEFT;
 					ModelPart part = left ? event.getRenderer().getModel().leftArm : event.getRenderer().getModel().rightArm;
@@ -657,7 +663,7 @@ public class ClientPlayerListener extends PlayerListener {
 			final Minecraft mc = Minecraft.getInstance();
 			final float partialTicks = mc.getDeltaFrameTime();
 			SpellCharge charge = NostrumMagica.spellChargeTracker.getCharge(player);
-			final EMagicElement elem = (charge == null ? EMagicElement.ICE : charge.element());
+			final EMagicElement elem = charge.incant().getElement();
 			
 			base.mulPose(Vector3f.ZP.rotationDegrees((isLeft ? -1 : 1) * 30f * this.getChargeManager().getChargePercent()));
 			base.mulPose(Vector3f.XN.rotationDegrees(30f * this.getChargeManager().getChargePercent()));

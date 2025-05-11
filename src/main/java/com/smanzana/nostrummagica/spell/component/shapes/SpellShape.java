@@ -15,8 +15,10 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.BaseComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -283,6 +285,13 @@ public abstract class SpellShape {
 			}
 		}
 		return prop;
+	}
+
+	public List<Component> getTooltip() {
+		return List.of(
+				getDisplayName().copy().withStyle(ChatFormatting.BOLD),
+				getDescription()
+			);
 	}
 	
 	

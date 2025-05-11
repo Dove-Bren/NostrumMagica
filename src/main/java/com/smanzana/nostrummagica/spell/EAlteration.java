@@ -1,11 +1,13 @@
 package com.smanzana.nostrummagica.spell;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
@@ -36,6 +38,7 @@ public enum EAlteration {
 	private ItemStack craftItem;
 	private final Component name;
 	private final Component description;
+	private final List<Component> tooltip;
 	
 	private EAlteration(int cost, int weight, ReagentType reagent) {
 		this(cost, weight, reagent, () -> ReagentItem.CreateStack(reagent, 1));
@@ -52,6 +55,10 @@ public enum EAlteration {
 		
 		this.name = new TranslatableComponent("alteration." + name().toLowerCase() + ".name");
 		this.description = new TranslatableComponent("alteration." + name().toLowerCase() + ".desc");
+		this.tooltip = List.of(
+				name.copy().withStyle(ChatFormatting.BOLD),
+				description
+			);
 	}
 
 	public ResourceLocation getGlyph() {
@@ -106,6 +113,10 @@ public enum EAlteration {
 			;
 		}
 		return alteration;
+	}
+
+	public List<Component> getTooltip() {
+		return tooltip;
 	}
 	
 }

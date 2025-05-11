@@ -34,23 +34,22 @@ import net.minecraft.world.entity.player.Player;
  */
 public class SpellChargeTracker {
 	
-	public static final record SpellCharge(EMagicElement element, int duration) {
+	public static final record SpellCharge(Incantation incant, int duration) {
 		
 		public CompoundTag toNBT() {
 			CompoundTag tag = new CompoundTag();
 			
-			tag.putString("elem", element == null ? "" : element.name());
+			tag.put("incant", incant.toNBT());
 			tag.putInt("duration", duration);
 			
 			return tag;
 		}
 		
 		public static final SpellCharge FromNBT(CompoundTag nbt) {
-			final String raw = nbt.getString("elem");
-			final EMagicElement element = raw.isEmpty() ? null : EMagicElement.valueOf(raw);
+			Incantation incant = Incantation.FromNBT(nbt.getCompound("incant"));
 			final int duration = nbt.getInt("duration");
 			
-			return new SpellCharge(element, duration);
+			return new SpellCharge(incant, duration);
 		}
 		
 	}

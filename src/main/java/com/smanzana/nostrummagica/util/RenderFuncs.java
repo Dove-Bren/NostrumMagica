@@ -33,6 +33,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
@@ -397,6 +398,7 @@ public final class RenderFuncs {
 	 * 
 	 * @param width
 	 * @param height
+	 * @param points
 	 * @param matrixStackIn
 	 * @param buffer should be set up to draw TRIANGLES
 	 * @param packedLightIn
@@ -423,6 +425,12 @@ public final class RenderFuncs {
 	 * @param alpha
 	 */
 	public static final void drawEllipse(float horizontalRadius, float verticalRadius, int points, float rotationPercent, PoseStack matrixStackIn, VertexConsumer buffer, int packedLightIn, float red, float green, float blue, float alpha) {
+		RenderFuncs.drawEllipse(horizontalRadius, verticalRadius, points, rotationPercent, matrixStackIn, buffer, packedLightIn, red, green, blue, alpha, red, green, blue, alpha);
+	}
+	
+	public static final void drawEllipse(float horizontalRadius, float verticalRadius, int points, float rotationPercent, PoseStack matrixStackIn, VertexConsumer buffer, int packedLightIn,
+			float redInner, float greenInner, float blueInner, float alphaInner,
+			float redOuter, float greenOuter, float blueOuter, float alphaOuter) {
 		
 		final double angleOffset = rotationPercent * Math.PI;
 		final Matrix4f transform = matrixStackIn.last().pose();
@@ -442,6 +450,11 @@ public final class RenderFuncs {
 				double uy = Math.sin(aheadAngle) * verticalRadius;
 				float u = (float) ((ux + (horizontalRadius)) / (horizontalRadius * 2));
 				float v = (float) ((uy + (verticalRadius)) / (verticalRadius * 2));
+				
+				final float red = (j == i-2 ? redInner : redOuter);
+				final float green = (j == i-2 ? greenInner : greenOuter);
+				final float blue = (j == i-2 ? blueInner : blueOuter);
+				final float alpha = (j == i-2 ? alphaInner : alphaOuter);
 				
 				buffer.vertex(transform, vx, vy, 0f).color(red, green, blue, alpha).uv(u, v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normal, 0, 0, -1f).endVertex();
 				
@@ -769,6 +782,99 @@ public final class RenderFuncs {
 			bufferIn.vertex(transform, vx1, vy1, 0).color(red, green, blue, alpha).uv(u1, v1).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n2.x(), n2.y(), n2.z()).endVertex();
 			bufferIn.vertex(transform, vx2, vy2, 0).color(red, green, blue, alpha).uv(u2, v2).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n2.x(), n2.y(), n2.z()).endVertex();
 		}
+	}
+	
+	public static final int ARGBFade(int ARGB, float alphaMultiplier) {
+		int rawAlpha = (ARGB >> 24) & 0xFF;
+		rawAlpha = Mth.clamp((int) (rawAlpha * alphaMultiplier), 0, 255);
+		return ((rawAlpha << 24) & 0xFF000000) | (ARGB & 0x00FFFFFF);
+	}
+	
+	public static final void drawRadialProgressQuadImmediate(PoseStack matrixStackIn, int x, int y, int z, int width, int height,
+			float uMin, float uMax, float vMin, float vMax,
+			float progress, Function<Float, float[]> colorProvider
+			) {
+		final BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+		buffer.begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR_TEX);
+		
+		drawRadialProgressQuad(matrixStackIn, buffer, x, y, z, width, height, uMin, uMax, vMin, vMax, progress, colorProvider);
+		
+		Tesselator.getInstance().end();
+	}
+	
+	public static final void drawRadialProgressQuad(PoseStack matrixStackIn, BufferBuilder buffer, int x, int y, int z, int width, int height,
+			float uMin, float uMax, float vMin, float vMax,
+			float progress, Function<Float, float[]> colorProvider
+			) {
+		matrixStackIn.pushPose();
+		matrixStackIn.translate(x, y, z);
+		final Matrix4f transform = matrixStackIn.last().pose();
+		matrixStackIn.popPose();
+		
+		final int pieces = 8;
+		final float progPerPiece = 1f / (float) pieces;
+		final int fullTris = Math.min(pieces, (int) (progress / progPerPiece));
+		
+		final float uDiffH = (uMax - uMin) / 2f;
+		final float vDiffH = (vMax - vMin) / 2f;
+		
+		final float uHalf = uMin + uDiffH;
+		final float vHalf = vMin + vDiffH;
+		
+		/*
+		 new float[]{width/2,	height, 	0, uHalf, 	vMax}, // bottom center
+			new float[]{width, 		height,		0, uMax,	vMax}, // bottom right
+			new float[]{width, 		height/2,	0, uMax,	vHalf}, // right center
+			new float[]{width, 		0,			0, uMax, 	vMin}, // top right
+			new float[]{width/2,	0,			0, uHalf, 	vMin}, // top center
+			new float[]{0,			0, 			0, uMin, 	vMin}, // top left
+			new float[]{0,			height/2, 	0, uMin, 	vHalf}, // left center
+			new float[]{0,			height, 	0, uMin, 	vMax}, // bottom left
+			
+			new float[]{width/2,	height, 	0, uHalf, 	vMax}, // bottom center
+		 */
+		
+		// x, y, z, u, v
+		final float[][] coords = new float[][] {
+			new float[]{width/2,	height, 	0, uHalf, 	vMax}, // bottom center
+			new float[]{0,			height, 	0, uMin, 	vMax}, // bottom left
+			new float[]{0,			height/2, 	0, uMin, 	vHalf}, // left center
+			new float[]{0,			0, 			0, uMin, 	vMin}, // top left
+			new float[]{width/2,	0,			0, uHalf, 	vMin}, // top center
+			new float[]{width, 		0,			0, uMax, 	vMin}, // top right
+			new float[]{width, 		height/2,	0, uMax,	vHalf}, // right center
+			new float[]{width, 		height,		0, uMax,	vMax}, // bottom right
+			
+			new float[]{width/2,	height, 	0, uHalf, 	vMax}, // bottom center
+		};
+		
+		// triangle fans. 1 per quarter. auto draw around
+		// Want to display progress clockwise, so add vertices backwards
+		
+		float[] color = colorProvider.apply(-1f);
+		buffer.vertex(transform, width/2f, height/2f, 0).color(color[0], color[1], color[2], color[3]).uv(uHalf, vHalf).endVertex();
+		
+		// draw partial
+		if (fullTris < pieces) {
+			color = colorProvider.apply(progress);
+			final float partial = (progress - (fullTris * progPerPiece)) * pieces; // TODO this line is suspect
+			buffer
+				.vertex(transform, coords[fullTris][0] * (1f-partial) + coords[fullTris+1][0] * partial,
+					 coords[fullTris][1] * (1f-partial) + coords[fullTris+1][1] * partial,
+					 coords[fullTris][2] * (1f-partial) + coords[fullTris+1][2] * partial)
+				.color(color[0], color[1], color[2], color[3])
+				.uv(coords[fullTris][3] * (1f-partial) + coords[fullTris+1][3] * partial,
+					 coords[fullTris][4] * (1f-partial) + coords[fullTris+1][4] * partial)
+				.endVertex();
+		}
+		
+		for (int i = fullTris; i >= 0; i--) {
+			final float prog = i * progPerPiece;
+			color = colorProvider.apply(prog);
+			buffer.vertex(transform, coords[i][0], coords[i][1], coords[i][2]).color(color[0], color[1], color[2], color[3]).uv(coords[i][3], coords[i][4]).endVertex();
+		}
+		
+		
 	}
 	
 }
