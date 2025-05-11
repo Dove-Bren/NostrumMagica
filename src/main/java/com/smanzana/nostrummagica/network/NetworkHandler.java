@@ -12,7 +12,6 @@ import com.smanzana.nostrummagica.network.message.ClientShapeVfxRenderMessage;
 import com.smanzana.nostrummagica.network.message.ClientTomeDropSpellMessage;
 import com.smanzana.nostrummagica.network.message.ClientUpdateQuestMessage;
 import com.smanzana.nostrummagica.network.message.EnchantedArmorStateUpdate;
-import com.smanzana.nostrummagica.network.message.IncantationSelectionMessage;
 import com.smanzana.nostrummagica.network.message.LoreMessage;
 import com.smanzana.nostrummagica.network.message.MagicEffectUpdate;
 import com.smanzana.nostrummagica.network.message.ManaArmorSyncMessage;
@@ -133,7 +132,6 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, SpellChargeServerUpdateMessage.class, SpellChargeServerUpdateMessage::encode, SpellChargeServerUpdateMessage::decode, SpellChargeServerUpdateMessage::handle);
 		syncChannel.registerMessage(discriminator++, SpellChargeClientUpdateMessage.class, SpellChargeClientUpdateMessage::encode, SpellChargeClientUpdateMessage::decode, SpellChargeClientUpdateMessage::handle);
 		syncChannel.registerMessage(discriminator++, ClientCastAdhocMessage.class, ClientCastAdhocMessage::encode, ClientCastAdhocMessage::decode, ClientCastAdhocMessage::handle);
-		syncChannel.registerMessage(discriminator++, IncantationSelectionMessage.class, IncantationSelectionMessage::encode, IncantationSelectionMessage::decode, IncantationSelectionMessage::handle);
 	}
 	
 	//NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),

@@ -26,7 +26,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface INostrumMagic extends INBTSerializable<CompoundTag>, INostrumMana, IIncantationHolder {
+public interface INostrumMagic extends INBTSerializable<CompoundTag>, INostrumMana {
 	
 	public static class TransmuteKnowledge {
 		public final String key;
@@ -241,14 +241,6 @@ public interface INostrumMagic extends INBTSerializable<CompoundTag>, INostrumMa
 	}
 	public @Nullable VanillaRespawnInfo getSavedRespawnInfo();
 	public void setSavedRespawnInfo(@Nullable VanillaRespawnInfo info);
-	
-	// Incantation builder helpers
-	public @Nullable EMagicElement getIncantationElement();
-	public @Nullable EAlteration getIncantationAlteration();
-	public @Nullable SpellShape getIncantationShape();
-	public void setIncantationElement(@Nullable EMagicElement element);
-	public void setIncantationAlteration(@Nullable EAlteration alteration);
-	public void setIncantationShape(@Nullable SpellShape shape);
 	
 	// Refresh attributes and rescan for them
 	public void refresh(ServerPlayer player);
