@@ -110,6 +110,8 @@ public class NostrumTags {
 
 		private static final String TAG_LUX_TEMPT_ITEM = "lux_tempt_items";
 		
+		private static final String TAG_SPELL_CHANNELING = "spell_channeling";
+		
 		public static final TagKey<Item> RuneAny = tag(TAG_RUNE);
 		
 		public static final TagKey<Item> Reagent = tag(TAG_REAGENT);
@@ -205,6 +207,8 @@ public class NostrumTags {
 		public static final TagKey<Item> TransmutableItem = tag(TAG_TRANSMUTABLE_ITEM);
 		
 		public static final TagKey<Item> LuxTemptItem = tag(TAG_LUX_TEMPT_ITEM);
+
+		public static final TagKey<Item> SpellChanneling = tag(TAG_SPELL_CHANNELING);
 		
 		private static TagKey<Item> tag(String path) {
 			return ItemTags.create(new ResourceLocation(NostrumMagica.MODID, path));

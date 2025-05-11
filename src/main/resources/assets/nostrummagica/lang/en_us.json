@@ -1002,6 +1002,9 @@
 	
 	"info.affects_entities": "Affects Entities",
 	"info.affects_blocks": "Affects Blocks",
+	
+	"info.item.spellchanneling": "Spell Channeling",
+	"info.incant.nohands": "You must have a free hand or Spell Channeling item in your hands",
 
     "gambit.always.name": "Always",
     "gambit.always.desc": "Dragon will%1$s always%2$s try to use this spell.|Only passed if dragon doesn't have enough mana",

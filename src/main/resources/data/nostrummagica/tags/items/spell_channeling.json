@@ -1,0 +1,14 @@
+{
+	"replace": false,
+	"values": [
+		"nostrummagica:mage_staff",
+		"#nostrummagica:spell_tome",
+		"nostrummagica:pendant_whole",
+		"nostrummagica:thanos_staff",
+		"nostrummagica:warlock_sword",
+		"nostrummagica:mage_blade",
+		"nostrummagica:sword_fire",
+		"nostrummagica:sword_ender",
+		"nostrummagica:caster_wand"
+	]
+}

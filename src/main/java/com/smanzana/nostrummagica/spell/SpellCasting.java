@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.item.ISpellCastingTool;
 import com.smanzana.nostrummagica.item.ISpellEquipment;
@@ -25,6 +26,7 @@ import com.smanzana.nostrummagica.stat.PlayerStatTracker;
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -390,5 +392,14 @@ public class SpellCasting {
 			
 			reagents.put(type, cost);
 		}
+	}
+	
+	public static final boolean ItemAllowsCasting(ItemStack stack, @Nullable EquipmentSlot slot) {
+		// Empty hands work. Otherwise, needs to actually match
+		if (stack.isEmpty()) {
+			return slot == EquipmentSlot.MAINHAND || slot == EquipmentSlot.OFFHAND;
+		}
+		
+		return stack.is(NostrumTags.Items.SpellChanneling);
 	}
 }

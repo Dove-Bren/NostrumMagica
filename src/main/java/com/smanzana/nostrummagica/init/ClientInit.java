@@ -102,6 +102,7 @@ import com.smanzana.nostrummagica.client.render.tile.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityPortalRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityProgressionDoorRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityTrialRenderer;
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.ChakramSpellSaucerEntity;
 import com.smanzana.nostrummagica.entity.CyclerSpellSaucerEntity;
@@ -152,6 +153,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleEngine;
@@ -167,6 +169,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.LivingEntity;
@@ -773,6 +776,10 @@ public class ClientInit {
 			}
 			
 			event.getTooltipElements().add(Either.right(new LoreHintTooltip(level)));
+		}
+		
+		if (Screen.hasShiftDown() && stack.is(NostrumTags.Items.SpellChanneling)) {
+			event.getTooltipElements().add(Either.left(new TranslatableComponent("info.item.spellchanneling")));
 		}
 	}
 	
