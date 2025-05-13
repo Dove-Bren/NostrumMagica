@@ -3,6 +3,7 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+	id 'org.spongepowered.mixin' version '0.7.+'
 }
 
 version = mod_version
@@ -163,6 +164,7 @@ repositories {
 
 dependencies {
 	minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 	
 	compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"))
     compileOnly(fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}"))
@@ -187,6 +189,14 @@ dependencies {
 	//runtimeOnly fg.deobf("local:minecolonies:${minecolonies_version}")
 	//implementation fg.deobf("curse.maven:structurize-298744:${structurize_version}")
 	//implementation fg.deobf("curse.maven:blockui-522992:${blockui_version}")
+}
+
+mixin {
+	add sourceSets.main, "nostrummagica.refmap.json"
+	
+	config "nostrummagica.mixins.json"
+	
+	debug.verbose = true
 }
 
 task sourcesJar(type: Jar) {

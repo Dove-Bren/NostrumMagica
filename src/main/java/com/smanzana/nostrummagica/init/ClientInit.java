@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.init;
 
 import java.util.Map;
+import java.util.Objects;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Either;
@@ -122,6 +123,7 @@ import com.smanzana.nostrummagica.inventory.tooltip.LoreHintTooltip;
 import com.smanzana.nostrummagica.inventory.tooltip.TransmutableHintTooltip;
 import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.item.NostrumItems;
+import com.smanzana.nostrummagica.item.SpellTome.TomeStyle;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.item.equipment.AspectedEnderWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedFireWeapon;
@@ -494,83 +496,88 @@ public class ClientInit {
 	
 	@SuppressWarnings("deprecation")
 	@SubscribeEvent
-	public void stitchEventPre(TextureStitchEvent.Pre event) {
-		if(event.getAtlas().location() != TextureAtlas.LOCATION_BLOCKS) {
+	public static void stitchEventPre(TextureStitchEvent.Pre event) {
+		if(!Objects.equals(event.getAtlas().location(), TextureAtlas.LOCATION_BLOCKS)) {
 			return;
 		}
 		
-		// We have to request loading textures that aren't explicitly loaded by any of the normal registered models.
-		// That means entity OBJ models, or textures we load on the fly, etc.
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "entity/koid"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "entity/golem_ender"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "entity/dragon_c"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "models/armor/dragon_scales"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "models/armor/dragon_scales_gold"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "models/armor/dragon_scales_diamond"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "entity/sprite_core"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "entity/sprite_arms"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "entity/magic_blade"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "block/portal"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "models/item/blade"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "models/item/hilt"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "models/item/ruby"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "models/item/wood"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "models/white"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "models/crystal"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "models/crystal_blank"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "entity/dragonflightwing"));
+//		// We have to request loading textures that aren't explicitly loaded by any of the normal registered models.
+//		// That means entity OBJ models, or textures we load on the fly, etc.
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "entity/koid"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "entity/golem_ender"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "entity/dragon_c"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "models/armor/dragon_scales"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "models/armor/dragon_scales_gold"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "models/armor/dragon_scales_diamond"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "entity/sprite_core"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "entity/sprite_arms"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "entity/magic_blade"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "block/portal"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "models/item/blade"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "models/item/hilt"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "models/item/ruby"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "models/item/wood"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "models/white"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "models/crystal"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "models/crystal_blank"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "entity/dragonflightwing"));
+//		
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "models/block/chain_link"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "models/block/lock_plate"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "block/key_cage"));
+//
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "effects/mist_bad"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "effects/mist_good"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "effects/thornskin"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "effects/ting1"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "effects/ting2"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "effects/ting3"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "effects/ting4"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "effects/ting5"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "effects/shield"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "effects/arrow_down"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "effects/arrow_up"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "effects/slate"));
+//		event.addSprite(new ResourceLocation(
+//				NostrumMagica.MODID, "effects/arrow_slash"));
 		
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "models/block/chain_link"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "models/block/lock_plate"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "block/key_cage"));
-
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/mist_bad"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/mist_good"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/thornskin"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/ting1"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/ting2"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/ting3"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/ting4"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/ting5"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/shield"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/arrow_down"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/arrow_up"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/slate"));
-		event.addSprite(new ResourceLocation(
-				NostrumMagica.MODID, "effects/arrow_slash"));
+		// Tome renderer materials
+		for (TomeStyle style : TomeStyle.values()) {
+			event.addSprite(NostrumMagica.Loc("entity/spelltome_render_" + style.name().toLowerCase()));
+		}
     }
 	
 	@SubscribeEvent

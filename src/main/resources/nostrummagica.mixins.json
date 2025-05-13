@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "com.smanzana.nostrummagica.mixins",
+	"compatibilityLevel": "JAVA_17",
+	"client": [
+		"PlayerModelMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"refmap": "nostrummagica.refmap.json"
+}

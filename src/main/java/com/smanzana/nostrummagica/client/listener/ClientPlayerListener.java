@@ -34,7 +34,6 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer;
 import com.smanzana.nostrummagica.client.render.SelectionRenderer;
 import com.smanzana.nostrummagica.client.render.SpellShapeRenderer;
-import com.smanzana.nostrummagica.client.render.entity.RenderCastingPlayer;
 import com.smanzana.nostrummagica.client.render.layer.EntityEffectLayer;
 import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
 import com.smanzana.nostrummagica.client.render.layer.LayerArmorElytra;
@@ -44,6 +43,7 @@ import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
+import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.listener.ClientChargeManager;
@@ -75,7 +75,6 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.core.particles.ParticleTypes;
@@ -305,6 +304,14 @@ public class ClientPlayerListener extends PlayerListener {
 	protected boolean hasIncantHand(Player player) {
 		for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND}) {
 			if (SpellCasting.ItemAllowsCasting(player.getItemBySlot(slot), slot)) {
+				return true;
+			}
+		}
+		
+		// Check tome slot
+		@Nullable IInventorySlotKey<LivingEntity> key = NostrumMagica.instance.curios.getTomeSlotKey(player);
+		if (key != null) {
+			if (SpellCasting.ItemAllowsCasting(key.getHeldStack(player), null)) {
 				return true;
 			}
 		}
@@ -578,7 +585,7 @@ public class ClientPlayerListener extends PlayerListener {
 		}
 	}
 	
-	private RenderCastingPlayer castingRender = null;
+	//private RenderCastingPlayer castingRender = null;
 	
 	protected final boolean playerIsCasting(Player player) {
 		return NostrumMagica.spellChargeTracker.isCharging(player);
@@ -588,20 +595,7 @@ public class ClientPlayerListener extends PlayerListener {
 	public void onPlayerRender(RenderPlayerEvent.Pre event) {
 		final Player player = event.getPlayer();
 		
-		if (playerIsCasting(player) && !(event.getRenderer() instanceof RenderCastingPlayer)) {
-			final Minecraft mc = Minecraft.getInstance();
-			if (castingRender == null) {
-				castingRender = new RenderCastingPlayer(new EntityRendererProvider.Context(mc.getEntityRenderDispatcher(), mc.getItemRenderer(), mc.getResourceManager(), mc.getEntityModels(), mc.font));
-			}
-			
-			event.setCanceled(true);
-			final float rotD = Mth.lerp(event.getPartialTick(), player.yRotO, player.getYRot());
-			
-			castingRender.render((AbstractClientPlayer) player, rotD, event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());
-			return;
-		}
-		
-		if (!Minecraft.getInstance().isPaused() && playerIsCasting(player) && (event.getRenderer() instanceof RenderCastingPlayer)) {
+		if (!Minecraft.getInstance().isPaused() && playerIsCasting(player)) {
 			// maybe add particle
 			for (HumanoidArm hand : HumanoidArm.values()) {
 				if (NostrumMagica.rand.nextInt(4) == 0) {

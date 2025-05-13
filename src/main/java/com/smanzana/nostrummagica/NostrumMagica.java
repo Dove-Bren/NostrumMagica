@@ -32,6 +32,7 @@ import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.integration.curios.CuriosClientProxy;
 import com.smanzana.nostrummagica.integration.curios.CuriosProxy;
 import com.smanzana.nostrummagica.integration.minecolonies.MinecoloniesProxy;
+import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
@@ -260,6 +261,14 @@ public class NostrumMagica {
 	public static ItemStack findTome(Player entity, int tomeID) {
 		// We look in mainhand first, then offhand, then just down
 		// hotbar.
+		@Nullable IInventorySlotKey<LivingEntity> key = NostrumMagica.instance.curios.getTomeSlotKey(entity);
+		if (key != null) {
+			final ItemStack item = key.getHeldStack(entity);
+			if (!item.isEmpty() && item.getItem() instanceof SpellTome)
+				if (SpellTome.getTomeID(item) == tomeID)
+					return item;
+		}
+		
 		for (ItemStack item : entity.getInventory().items) {
 			if (!item.isEmpty() && item.getItem() instanceof SpellTome)
 				if (SpellTome.getTomeID(item) == tomeID)
@@ -279,8 +288,13 @@ public class NostrumMagica {
 		// We look in mainhand first, then offhand, then just down
 		// hotbar.
 		ItemStack tome = ItemStack.EMPTY;
+		
+		@Nullable IInventorySlotKey<LivingEntity> key = NostrumMagica.instance.curios.getTomeSlotKey(entity);
+		final ItemStack tomeSlotItem = (key == null ? ItemStack.EMPTY : key.getHeldStack(entity));
 
-		if (!entity.getMainHandItem().isEmpty() && entity.getMainHandItem().getItem() instanceof SpellTome) {
+		if (!tomeSlotItem.isEmpty() && tomeSlotItem.getItem() instanceof SpellTome) {
+			tome = tomeSlotItem;
+		} else if (!entity.getMainHandItem().isEmpty() && entity.getMainHandItem().getItem() instanceof SpellTome) {
 			tome = entity.getMainHandItem();
 		} else if (!entity.getOffhandItem().isEmpty()
 				&& entity.getOffhandItem().getItem() instanceof SpellTome) {

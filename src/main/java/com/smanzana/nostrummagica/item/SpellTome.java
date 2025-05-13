@@ -144,8 +144,11 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	
 	public static final String ID_PREFIX = "spelltome_";
 	
-	public SpellTome() {
+	protected final TomeStyle style;
+	
+	public SpellTome(TomeStyle style) {
 		super(NostrumItems.PropTomeUnstackable().rarity(Rarity.UNCOMMON));
+		this.style = style;
 	}
 	
 	public static SpellTome GetTomeForStyle(TomeStyle style) {
@@ -1079,5 +1082,9 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		}
 		
 		return ret;
+	}
+
+	public TomeStyle getTomeStyle() {
+		return style;
 	}
 }

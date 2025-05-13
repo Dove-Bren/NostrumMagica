@@ -2,11 +2,15 @@ package com.smanzana.nostrummagica.integration.curios;
 
 import java.util.function.Predicate;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.integration.curios.inventory.CurioInventoryWrapper;
+import com.smanzana.nostrummagica.integration.curios.inventory.CurioSlotReference;
 import com.smanzana.nostrummagica.integration.curios.items.DragonWingPendantItem;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
+import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
@@ -21,13 +25,13 @@ import com.smanzana.nostrummagica.ritual.outcome.OutcomeModifyCenterItemGeneric;
 import com.smanzana.nostrummagica.ritual.outcome.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -50,6 +54,8 @@ public class CuriosProxy {
 		InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE, () -> SlotTypePreset.BACK.getMessageBuilder().build());
 		InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE, () -> new SlotTypeMessage.Builder("pendant").priority(10).icon(
 		        new ResourceLocation(CuriosApi.MODID, "item/empty_" + "curio" + "_slot")).build());
+		InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE, () -> new SlotTypeMessage.Builder("spelltome").priority(10).icon(
+		        new ResourceLocation(CuriosApi.MODID, "slot/empty_spelltome_slot")).build());
 	}
 	
 	private boolean enabled;
@@ -351,6 +357,14 @@ public class CuriosProxy {
 		}
 		
 		CurioInventoryWrapper.forEach(entity, action);
+	}
+	
+	public @Nullable IInventorySlotKey<LivingEntity> getTomeSlotKey(LivingEntity entity) {
+		if (!enabled) {
+			return null;
+		}
+		
+		return new CurioSlotReference("spelltome", 0);
 	}
 	
 	public boolean isEnabled() {
