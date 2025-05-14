@@ -294,5 +294,9 @@ public abstract class SpellShape {
 			);
 	}
 	
+	public boolean canIncant() {
+		return true;
+	}
+	
 	
 }

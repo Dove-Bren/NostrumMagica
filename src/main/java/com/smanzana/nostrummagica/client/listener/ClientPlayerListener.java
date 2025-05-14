@@ -332,7 +332,7 @@ public class ClientPlayerListener extends PlayerListener {
 		{
 			final Input input = event.getInput();
 			if (input.down || input.up || input.left || input.right || input.jumping) {
-				if (this.chargeManager.getCurrentCharge() != null) {
+				if (this.chargeManager.getCurrentCharge() != null && !NostrumMagica.instance.proxy.getPlayer().isCrouching()) {
 					this.interruptSpellCharge();
 				}
 			}
@@ -459,6 +459,14 @@ public class ClientPlayerListener extends PlayerListener {
 				if (result.succeeded) {
 					// We think we can cast it, so start charging
 					this.chargeManager.startCharging(new SpellCharge(incant, result.summary.getFinalCastTicks()));
+					
+//					{
+//						final UUID id = UUID.fromString("637ec07c-9931-45ca-bd8e-e47c7f9b50a6");
+//						Multimap<Attribute, AttributeModifier> multimap = ImmutableListMultimap.of(Attributes.MOVEMENT_SPEED,
+//								new AttributeModifier(id, "Incanting Speed Mod", -.4, AttributeModifier.Operation.MULTIPLY_TOTAL));
+//						
+//						player.getAttributes().addTransientAttributeModifiers(multimap);
+//					}
 				} else {
 					for (int i = 0; i < 15; i++) {
 						double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;
@@ -495,6 +503,9 @@ public class ClientPlayerListener extends PlayerListener {
 	
 	protected void interruptSpellCharge() {
 		this.chargeManager.cancelCharge(true);
+		
+//		final UUID id = UUID.fromString("637ec07c-9931-45ca-bd8e-e47c7f9b50a6");
+//		NostrumMagica.instance.proxy.getPlayer().getAttributes().getInstance(Attributes.MOVEMENT_SPEED).removeModifier(id);
 	}
 	
 	protected void spellChargeTick() {
@@ -505,6 +516,8 @@ public class ClientPlayerListener extends PlayerListener {
 			SpellCharge charge = this.chargeManager.getCurrentCharge();
 			finishIncantationCast(charge);
 			this.chargeManager.cancelCharge(false);
+//			final UUID id = UUID.fromString("637ec07c-9931-45ca-bd8e-e47c7f9b50a6");
+//			NostrumMagica.instance.proxy.getPlayer().getAttributes().getInstance(Attributes.MOVEMENT_SPEED).removeModifier(id);
 		}
 	}
 	

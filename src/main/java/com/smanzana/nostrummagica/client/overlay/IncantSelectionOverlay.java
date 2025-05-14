@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.overlay;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +36,7 @@ import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -57,6 +59,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public class IncantSelectionOverlay implements IIngameOverlay {
 	
 	private static final double FADE_MS = 250;
+	
+	private static final Component noneTitle = new TextComponent("None");
+	private static final ITooltip noneTooltip = Tooltip.create(new TextComponent("Do not use an alteration"));
 	
 	protected boolean enabled;
 	protected long showTime; // for animating
@@ -198,7 +203,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 				if (attr == null || !attr.isUnlocked() || !attr.getElementalMastery(elem).isGreaterOrEqual(EElementalMastery.NOVICE)) {
 					elementSlices[i] = WheelSlice.Hidden(prog, perSlice/2f);
 				} else {
-					elementSlices[i] = new WheelSlice<>(elem, SpellComponentIcon.get(elem), elem.getDisplayName(), elem::getTooltip, prog, perSlice/2f, this::setElement, false);
+					elementSlices[i] = new WheelSlice<>(elem, SpellComponentIcon.get(elem), elem.getDisplayName(), () -> this.getElementTooltip(elem), prog, perSlice/2f, this::setElement, false);
 				}
 			}
 		}
@@ -220,16 +225,15 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 			// TODO fix holding down R. Require a key-up to re-show menu.
 			
 			Comparator<SpellShape> compare = (a, b) -> {
-				// first sort based on weight
-				final int weightDiff = a.getWeight(a.getDefaultProperties()) - b.getWeight(b.getDefaultProperties()); 
-				if (weightDiff != 0) {
-					return weightDiff;
-				}
+				final int aIdx = (a.getWeight(a.getDefaultProperties())) * 100
+						//+ (a.getManaCost(a.getDefaultProperties())) * 10
+						;
+				final int bIdx = (b.getWeight(a.getDefaultProperties())) * 100
+						//+ (b.getManaCost(a.getDefaultProperties())) * 10
+						;
 				
-				// Then sort by mana
-				final int manaDiff = a.getManaCost(a.getDefaultProperties()) - b.getManaCost(b.getDefaultProperties());
-				if (manaDiff != 0) {
-					return manaDiff;
+				if (aIdx != bIdx) {
+					return aIdx - bIdx;
 				}
 				
 				// If all equal, sort by name?
@@ -238,7 +242,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 			
 			List<SpellShape> shapes = Lists.newArrayList(specials);
 			Set<SpellShape> seen = Sets.newHashSet(specials);
-			SpellShape.getAllShapes().stream().filter(seen::add).sorted(compare).forEach(shapes::add);
+			SpellShape.getAllShapes().stream().filter(SpellShape::canIncant).filter(seen::add).sorted(compare).forEach(shapes::add);
 			Set<SpellShape> known = (attr != null && attr.isUnlocked()) ? Set.copyOf(attr.getShapes()) : new HashSet<>();
 			
 			final int countPerPage = 11;
@@ -293,7 +297,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 					} else if (!known.contains(shape)) {
 						curSlices[i] = WheelSlice.Hidden(prog, sliceWidth/2f);
 					} else {
-						curSlices[i] = new WheelSlice<>(shape, SpellComponentIcon.get(shape), shape.getDisplayName(), shape::getTooltip, prog, sliceWidth/2f, this::setShape, i < specials.length);
+						curSlices[i] = new WheelSlice<>(shape, SpellComponentIcon.get(shape), shape.getDisplayName(), () -> this.getShapeTooltip(shape), prog, sliceWidth/2f, this::setShape, i < specials.length);
 					}
 				}
 			}
@@ -302,8 +306,6 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		// Alterations
 		{
 			// Alterations are even, with "NO ALTERATION" being on top
-			final Component noneTitle = new TextComponent("None");
-			final ITooltip noneTooltip = Tooltip.create(new TextComponent("Do not use an alteration"));
 			
 			final int count = EAlteration.values().length + 1;
 			alterationSlices = new WheelSlice[count];
@@ -319,7 +321,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 				} else {
 					alterationSlices[i] = new WheelSlice<>(alter, alter == null ? null : SpellComponentIcon.get(alter),
 							alter == null ? noneTitle : alter.getDisplayName(),
-							alter == null ? noneTooltip : alter::getTooltip,		
+							() -> getAlterationTooltip(alter),		
 							prog, perSlice/2f, this::setAlteration, false);
 				}
 			}
@@ -344,6 +346,44 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	
 	protected void setShape(SpellShape shape) {
 		this.shape = shape;
+	}
+	
+	protected List<Component> getShapeTooltip(SpellShape shape) {
+		final int mana = shape.getManaCost(shape.getDefaultProperties());
+		final int weight = shape.getWeight(shape.getDefaultProperties());
+		
+		List<Component> tooltip = new ArrayList<>(shape.getTooltip());
+		tooltip.add(new TextComponent(" "));
+		tooltip.add(makeManaLine(mana));
+		tooltip.add(makeWeightLine(weight));
+		return tooltip;
+	}
+	
+	protected List<Component> getElementTooltip(EMagicElement element) {
+		return element.getTooltip();
+	}
+	
+	protected List<Component> getAlterationTooltip(@Nullable EAlteration alteration) {
+		if (alteration == null) {
+			return noneTooltip.get();
+		}
+		
+		final int mana = alteration.getCost();
+		final int weight = alteration.getWeight();
+		
+		List<Component> tooltip = new ArrayList<>(alteration.getTooltip());
+		tooltip.add(new TextComponent(" "));
+		tooltip.add(makeManaLine(mana));
+		tooltip.add(makeWeightLine(weight));
+		return tooltip;
+	}
+	
+	protected Component makeManaLine(int mana) {
+		return new TextComponent(mana + "").append(new TextComponent(" Mana").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
+	}
+	
+	protected Component makeWeightLine(int weight) {
+		return new TextComponent(weight + "").append(new TextComponent(" Weight").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.BOLD));
 	}
 	
 	protected void moveShapePage(Boolean isNext) {
@@ -393,7 +433,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 			Player player = NostrumMagica.instance.proxy.getPlayer();
 			final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr != null) {
-				final float radius = 75f;
+				final float radius = 90f;
 				
 				final double wScale = (double)mc.getWindow().getGuiScaledWidth() / (double)mc.getWindow().getScreenWidth();
 				final double hScale = (double)mc.getWindow().getGuiScaledHeight() / (double)mc.getWindow().getScreenHeight();
@@ -509,7 +549,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 			RenderSystem.depthMask(true);
 			
 			matrixStackIn.pushPose();
-			matrixStackIn.translate(mouseX + 10, mouseY + -10, 100);
+			matrixStackIn.translate(mouseX + 10, mouseY + -10, 400);
 			
 			if (mc.getWindow().getGuiScaledWidth() - mouseX < width + 5) {
 				matrixStackIn.translate(-width + -10 + -20, 0, 0);
@@ -624,8 +664,16 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 				matrixStackIn.pushPose();
 				matrixStackIn.translate(0, 10, 0);
 				matrixStackIn.scale(.5f, .5f, .5f);
-				final int len = mc.font.width(slice.name());
-				mc.font.draw(matrixStackIn, slice.name(), -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
+				{
+					final int len = mc.font.width(slice.name());
+					mc.font.draw(matrixStackIn, slice.name(), -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
+//					int y = 0;
+//					for (FormattedCharSequence line : mc.font.split(slice.name(), 40)) {
+//						final int len = mc.font.width(line);
+//						mc.font.draw(matrixStackIn, line, -len/2, y, 0xFFC0C0C0);
+//						y += mc.font.lineHeight + (y == 0 ? 5 : 2);
+//					}
+				}
 				matrixStackIn.popPose();
 			}
 		}

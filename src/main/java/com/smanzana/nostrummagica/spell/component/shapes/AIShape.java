@@ -71,4 +71,9 @@ public class AIShape extends InstantShape {
 	public boolean supportsPreview(SpellShapeProperties params) {
 		return false;
 	}
+	
+	@Override
+	public boolean canIncant() {
+		return false;
+	}
 }

@@ -69,16 +69,11 @@ public class SpelltomeRenderer {
 		
 		matrixStack.pushPose();
 		
-		// todo rotation too so that it stays on hip
 		if (!isCharging) translateIfSneaking(matrixStack, entity);
 		if (!isCharging) rotateIfSneaking(matrixStack, entity);
 		
-		// TODO some sort of floating bob?
 		final Vec3 offset = this.getAnimPos(isCharging, animTicks);
 		matrixStack.translate(offset.x, offset.y, offset.z);
-//		matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-100.0F));
-//		matrixStack.mulPose(Vector3f.YP.rotationDegrees(-15.0F));
-//		matrixStack.mulPose(Vector3f.XP.rotationDegrees(115.0F));
 		matrixStack.mulPose(this.getAnimRot(isCharging, animTicks));
 		matrixStack.scale(.75f, .75f, .75f);
 		
@@ -111,7 +106,10 @@ public class SpelltomeRenderer {
 	}
 	
 	protected Vec3 getCastingAnimPos(float ticksElapsed) {
-		return getLerpedAnimPos(ticksElapsed / 10f);
+		final float bobPeriod = 20;
+		final float bobProg = (ticksElapsed % bobPeriod) / bobPeriod;
+		final float bobAmt = .05f * Mth.sin(Mth.PI * 2 * bobProg);
+		return getLerpedAnimPos(ticksElapsed / 10f).add(0, bobAmt, 0);
 	}
 	
 	protected Vec3 getClosingAnimPos(float ticksElapsed) {
@@ -127,29 +125,6 @@ public class SpelltomeRenderer {
 	}
 	
 	protected Quaternion getLerpedAnimRot(float prog) {
-//		matrixStack.mulPose(Vector3f.ZP.rotationDegrees(-100.0F));
-//		matrixStack.mulPose(Vector3f.YP.rotationDegrees(-15.0F));
-//		matrixStack.mulPose(Vector3f.XP.rotationDegrees(115.0F));
-//		final Quaternion full = Vector3f.ZP.rotationDegrees(-100.0F);
-//			full.mul(Vector3f.YP.rotationDegrees(-15.0F));
-//			full.mul(Vector3f.XP.rotationDegrees(115.0F));
-//		final Quaternion start = Vector3f.ZP.rotationDegrees(-100.0F);
-//			start.mul(Vector3f.YP.rotationDegrees(180.0F));
-//			start.mul(Vector3f.XP.rotationDegrees(85.0F));
-//		
-//		if (prog >= 1f) {
-//			return full;
-//		} else if (prog <= 0f) {
-//			return start;
-//		} else {
-//			return new Quaternion(
-//					Mth.rotLerp(prog, start.i(), full.i()),
-//					Mth.rotLerp(prog, start.j(), full.j()),
-//					Mth.rotLerp(prog, start.k(), full.k()),
-//					Mth.rotLerp(prog, start.r(), full.r())
-//					);
-//		}
-
 		final float fullX = 60f;
 		final float fullY = 255f;
 		final float fullZ = 0f;
