@@ -10,14 +10,22 @@ import com.smanzana.nostrummagica.spell.SpellChargeTracker.SpellCharge;
  */
 public class ClientChargeManager {
 	
-	protected @Nullable SpellCharge currentCharge;
+	public static class ClientSpellCharge {
+		public final SpellCharge charge;
+		
+		public ClientSpellCharge(SpellCharge charge) {
+			this.charge = charge;
+		}
+	}
+	
+	protected @Nullable ClientSpellCharge currentCharge;
 	protected long chargeStartMS; // 
 	
 	public ClientChargeManager() {
 		currentCharge = null;
 	}
 	
-	public @Nullable SpellCharge getCurrentCharge() {
+	public @Nullable ClientSpellCharge getCurrentCharge() {
 		return this.currentCharge;
 	}
 	
@@ -25,16 +33,16 @@ public class ClientChargeManager {
 		this.setCharge(null);
 	}
 	
-	public void startCharging(SpellCharge charge) {
+	public void startCharging(ClientSpellCharge charge) {
 		this.setCharge(charge);
 	}
 	
-	protected void setCharge(@Nullable SpellCharge charge) {
-		final @Nullable SpellCharge oldCharge = currentCharge;
+	protected void setCharge(@Nullable ClientSpellCharge charge) {
+		final @Nullable ClientSpellCharge oldCharge = currentCharge;
 		this.currentCharge = charge;
 		this.chargeStartMS = System.currentTimeMillis();
 		
-		NostrumMagica.spellChargeTracker.setCharging(NostrumMagica.instance.proxy.getPlayer(), charge);
+		NostrumMagica.spellChargeTracker.setCharging(NostrumMagica.instance.proxy.getPlayer(), charge == null ? null : charge.charge);
 		if (oldCharge == null && charge != null) {
 			// start charging
 			// FX?
@@ -50,7 +58,7 @@ public class ClientChargeManager {
 		}
 		
 		// Adjust to MS. There are 20 ticks per second (divide by 20) and 1000 ms in a second (* by 1000)
-		return chargeStartMS + (currentCharge.duration() * (1000 / 20)); 
+		return chargeStartMS + (currentCharge.charge.duration() * (1000 / 20)); 
 	}
 	
 	public boolean isDoneCharging() {
@@ -63,7 +71,7 @@ public class ClientChargeManager {
 		}
 		
 		final long elapsedMS = System.currentTimeMillis() - chargeStartMS;
-		return (float) ((double) elapsedMS / (double) (currentCharge.duration() * (1000 / 20)));
+		return (float) ((double) elapsedMS / (double) (currentCharge.charge.duration() * (1000 / 20)));
 	}
 	
 	public int getRemainingTicks() {

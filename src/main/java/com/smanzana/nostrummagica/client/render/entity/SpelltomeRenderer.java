@@ -12,6 +12,8 @@ import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.SpellTome.TomeStyle;
+import com.smanzana.nostrummagica.spell.SpellChargeTracker.ChargeType;
+import com.smanzana.nostrummagica.spell.SpellChargeTracker.SpellCharge;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.BookModel;
@@ -59,7 +61,8 @@ public class SpelltomeRenderer {
 	}
 	
 	public void render(PoseStack matrixStack, LivingEntity entity, MultiBufferSource renderTypeBuffer, float partialTicks, float ageInTicks, int light, @Nullable TomeStyle style) {
-		final boolean isCharging = NostrumMagica.spellChargeTracker.isCharging(entity);
+		final SpellCharge charge = NostrumMagica.spellChargeTracker.getCharge(entity); 
+		final boolean isCharging = charge != null && charge.type() == ChargeType.TOME_CAST;
 		final float animTicks = getAnimTicks(entity) + partialTicks;
 		
 		// update animation 

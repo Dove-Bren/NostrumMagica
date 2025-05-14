@@ -34,22 +34,30 @@ import net.minecraft.world.entity.player.Player;
  */
 public class SpellChargeTracker {
 	
-	public static final record SpellCharge(Incantation incant, int duration) {
+	public static enum ChargeType {
+		INCANTATION,
+		TOME_CAST,
+		;
+	}
+	
+	public static record SpellCharge(Spell spell, int duration, ChargeType type) {
 		
 		public CompoundTag toNBT() {
 			CompoundTag tag = new CompoundTag();
 			
-			tag.put("incant", incant.toNBT());
+			tag.put("spell", spell.toNBT());
 			tag.putInt("duration", duration);
+			tag.putString("type", type.name());
 			
 			return tag;
 		}
 		
 		public static final SpellCharge FromNBT(CompoundTag nbt) {
-			Incantation incant = Incantation.FromNBT(nbt.getCompound("incant"));
+			Spell incant = Spell.fromNBT(nbt.getCompound("spell"));
 			final int duration = nbt.getInt("duration");
+			final ChargeType type = ChargeType.valueOf("type");
 			
-			return new SpellCharge(incant, duration);
+			return new SpellCharge(incant, duration, type);
 		}
 		
 	}

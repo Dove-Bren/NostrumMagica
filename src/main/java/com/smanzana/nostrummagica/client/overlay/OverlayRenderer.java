@@ -1150,7 +1150,7 @@ public class OverlayRenderer extends GuiComponent {
 		ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
 		if (listener.getChargeManager().getCurrentCharge() != null) {
 			final float progress = listener.getChargeManager().getChargePercent();
-			final float[] colorBase = ColorUtil.ARGBToColor(listener.getChargeManager().getCurrentCharge().incant().getElement().getColor());
+			final float[] colorBase = ColorUtil.ARGBToColor(listener.getChargeManager().getCurrentCharge().charge.spell().getPrimaryElement().getColor());
 			
 			RenderSystem.enableBlend();
 			RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
