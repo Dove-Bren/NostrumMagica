@@ -126,6 +126,9 @@ public class SpellCasting {
 		// Add xp bonuses
 		summary.addXPRate((float) entity.getAttribute(NostrumAttributes.xpBonus).getValue() / 100f);
 		
+		// Add bonus/penalty to cast time for held item status
+		summary.addCastSpeedRate(CalculateHandsSpellCastModifier(entity));
+		
 		// Add tome enchancements
 		if (!tool.isEmpty() && tool.getItem() instanceof ISpellCastingTool) {
 			((ISpellCastingTool) tool.getItem()).onStartCastFromTool(entity, summary, tool);
@@ -401,5 +404,24 @@ public class SpellCasting {
 		}
 		
 		return stack.is(NostrumTags.Items.SpellChanneling);
+	}
+	
+	/**
+	 * Calculate bonus or penalty to cast speed based on the equipment in the entity's hands.
+	 * This does not include special bonuses from pieces of equpiment etc. and only based on the
+	 * spell channeling status of held items.
+	 * @param entity
+	 * @return
+	 */
+	public static final float CalculateHandsSpellCastModifier(LivingEntity entity) {
+		// +25% per hand that doesn't have a spellchanneling item for a max of a 50% penalty
+		float penalty = 0f;
+		if (!ItemAllowsCasting(entity.getMainHandItem(), EquipmentSlot.MAINHAND)) {
+			penalty += .25f;
+		}
+		if (!ItemAllowsCasting(entity.getOffhandItem(), EquipmentSlot.OFFHAND)) {
+			penalty += .25f;
+		}
+		return penalty;
 	}
 }

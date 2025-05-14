@@ -94,29 +94,33 @@ public class WallShape extends AreaShape {
 			
 			List<LivingEntity> ret = new ArrayList<>();
 			
-			final Vec3 center = new Vec3(instantLocation.hitBlockPos.getX() + .5, instantLocation.hitBlockPos.getY(), instantLocation.hitBlockPos.getZ() + .5);
-			final float radiusEnts = this.radius + .5f;
-			
-			for (Entity entity : world.getEntities(null, 
-					new AABB(center.x() - radiusEnts,
-							center.y() - radiusEnts,
-							center.z() - radiusEnts,
-							center.x() + radiusEnts,
-							center.y() + radiusEnts,
-							center.z() + radiusEnts))) {
-				LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
-				if (living != null) {
-					if (this.isInArea(living)) {
-						ret.add(living);
+			if (this.affectsEnts) {
+				final Vec3 center = new Vec3(instantLocation.hitBlockPos.getX() + .5, instantLocation.hitBlockPos.getY(), instantLocation.hitBlockPos.getZ() + .5);
+				final float radiusEnts = this.radius + .5f;
+				
+				for (Entity entity : world.getEntities(null, 
+						new AABB(center.x() - radiusEnts,
+								center.y() - radiusEnts,
+								center.z() - radiusEnts,
+								center.x() + radiusEnts,
+								center.y() + radiusEnts,
+								center.z() + radiusEnts))) {
+					LivingEntity living = NostrumMagica.resolveLivingEntity(entity);
+					if (living != null) {
+						if (this.isInArea(living)) {
+							ret.add(living);
+						}
 					}
 				}
 			}
 			
 			List<SpellLocation> positions = new ArrayList<>();
-			for (int x = bounds.minX(); x <= bounds.maxX(); x++)
-			for (int y = bounds.minY(); y <= bounds.maxY(); y++)
-			for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
-				positions.add(new SpellLocation(world, new BlockPos(x, y, z)));
+			if (this.affectsGround) {
+				for (int x = bounds.minX(); x <= bounds.maxX(); x++)
+				for (int y = bounds.minY(); y <= bounds.maxY(); y++)
+				for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
+					positions.add(new SpellLocation(world, new BlockPos(x, y, z)));
+				}
 			}
 			
 			state.trigger(ret, positions, 1f, true);
@@ -271,6 +275,12 @@ public class WallShape extends AreaShape {
 	protected void registerProperties() {
 		super.registerProperties();
 		this.baseProperties.addProperty(LINGER).addProperty(RADIUS).addProperty(SpellShapeSelector.PROPERTY);
+	}
+	
+	@Override
+	public SpellShapeProperties getDefaultProperties() {
+		// Wall wants to, by default, affect blocks
+		return super.getDefaultProperties().setValue(SpellShapeSelector.PROPERTY, SpellShapeSelector.BLOCKS);
 	}
 	
 	protected boolean isLingering(SpellShapeProperties properties) {

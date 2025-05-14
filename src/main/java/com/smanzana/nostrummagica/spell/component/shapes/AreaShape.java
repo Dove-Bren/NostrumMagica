@@ -37,8 +37,8 @@ public abstract class AreaShape extends SpellShape implements ISelectableShape {
 		protected final int tickRate;
 		protected final int duration;
 		private final boolean continuous;
-		private final boolean affectsGround;
-		private final boolean affectsEnts;
+		protected final boolean affectsGround;
+		protected final boolean affectsEnts;
 		
 		private final float radiusHint;
 		

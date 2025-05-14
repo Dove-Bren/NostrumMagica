@@ -771,13 +771,13 @@ public class Spell {
 	
 	public int getCastTicks() {
 		final int weight = getWeight();
-		int base = 20;
+		int base = 0;
 //		if (caster != null && NostrumMagica.getMagicWrapper(caster) != null) {
 //			if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Spellcasting_CooldownReduc)) {
 //				base = 10;
 //			}
 //		}
-		return base + (20 * Math.max(0, weight-2)); // incantations superficially add 2 weight so reduce that a bit 
+		return base + (20 * Math.max(0, weight)); 
 	}
 	
 	public static final SpellAction solveAction(EAlteration alteration,	EMagicElement element, int elementCount) {

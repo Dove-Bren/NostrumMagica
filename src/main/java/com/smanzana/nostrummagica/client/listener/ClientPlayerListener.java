@@ -437,7 +437,12 @@ public class ClientPlayerListener extends PlayerListener {
 		if (!tome.isEmpty()) {
 			SpellCastResult result = SpellCasting.CheckToolCast(spell, player, tome);
 			if (result.succeeded) {
-				this.chargeManager.startCharging(new ClientTomeCharge(new SpellCharge(spell, result.summary.getFinalCastTicks(), ChargeType.TOME_CAST), castSlot));
+				final ClientTomeCharge charge = new ClientTomeCharge(new SpellCharge(spell, result.summary.getFinalCastTicks(), ChargeType.TOME_CAST), castSlot);
+				if (result.summary.getFinalCastTicks() > 0) {
+					this.chargeManager.startCharging(charge);
+				} else {
+					this.finishSpellCast(player, charge);
+				}
 				NostrumMagica.playerListener.overrideLastSpell(player, spell);
 			} else {
 				for (int i = 0; i < 15; i++) {

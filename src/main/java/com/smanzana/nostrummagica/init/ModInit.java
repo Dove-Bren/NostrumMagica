@@ -1543,18 +1543,18 @@ public class ModInit {
 		x = 1;
 		y = 2;
 		new NostrumQuest("uniqspells1", "spells2", x, y++, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.UniqueSpellsCast, 5));
-		new NostrumQuest("uniqspells2", "uniqspells1", x, y++, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.UniqueSpellsCast, 10));
-		new NostrumQuest("uniqspells3", "uniqspells2", x, y++, wrapAttribute(AwardType.COST, -0.01f), new StatRequirement(PlayerStat.UniqueSpellsCast, 20));
-		new NostrumQuest("uniqspells4", "uniqspells3", x, y++, wrapAttribute(AwardType.COST, -0.01f), new StatRequirement(PlayerStat.UniqueSpellsCast, 50));
-		new NostrumQuest("uniqspells5", "uniqspells4", x, y++, wrapAttribute(AwardType.COST, -0.02f), new StatRequirement(PlayerStat.UniqueSpellsCast, 100));
+		new NostrumQuest("uniqspells2", "uniqspells1", x, y++, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.UniqueSpellsCast, 20));
+		new NostrumQuest("uniqspells3", "uniqspells2", x, y++, wrapAttribute(AwardType.COST, -0.01f), new StatRequirement(PlayerStat.UniqueSpellsCast, 50));
+		new NostrumQuest("uniqspells4", "uniqspells3", x, y++, wrapAttribute(AwardType.COST, -0.01f), new StatRequirement(PlayerStat.UniqueSpellsCast, 100));
+		new NostrumQuest("uniqspells5", "uniqspells4", x, y++, wrapAttribute(AwardType.COST, -0.02f), new StatRequirement(PlayerStat.UniqueSpellsCast, 200));
 		
 		x = -1;
 		y = 2;
-		new NostrumQuest("spellweight1", "spells2", x, y++, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.TotalSpellWeight, 5));
-		new NostrumQuest("spellweight2", "spellweight1", x, y++, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.TotalSpellWeight, 25));
-		new NostrumQuest("spellweight3", "spellweight2", x, y++, wrapAttribute(AwardType.COST, -0.01f), new StatRequirement(PlayerStat.TotalSpellWeight, 100));
-		new NostrumQuest("spellweight4", "spellweight3", x, y++, wrapAttribute(AwardType.COST, -0.01f), new StatRequirement(PlayerStat.TotalSpellWeight, 500));
-		new NostrumQuest("spellweight5", "spellweight4", x, y++, wrapAttribute(AwardType.COST, -0.02f), new StatRequirement(PlayerStat.TotalSpellWeight, 1000));
+		new NostrumQuest("spellweight1", "spells2", x, y++, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.TotalSpellWeight, 10));
+		new NostrumQuest("spellweight2", "spellweight1", x, y++, wrapAttribute(AwardType.COST, -0.005f), new StatRequirement(PlayerStat.TotalSpellWeight, 50));
+		new NostrumQuest("spellweight3", "spellweight2", x, y++, wrapAttribute(AwardType.COST, -0.01f), new StatRequirement(PlayerStat.TotalSpellWeight, 500));
+		new NostrumQuest("spellweight4", "spellweight3", x, y++, wrapAttribute(AwardType.COST, -0.01f), new StatRequirement(PlayerStat.TotalSpellWeight, 2000));
+		new NostrumQuest("spellweight5", "spellweight4", x, y++, wrapAttribute(AwardType.COST, -0.02f), new StatRequirement(PlayerStat.TotalSpellWeight, 10000));
 		
 		x = -2;
 		y = 1;
