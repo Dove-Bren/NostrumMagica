@@ -10,4 +10,8 @@ public interface IRaytraceOverlay {
 	
 	public double getTraceRange(Level world, Player player, ItemStack stack);
 	
+	public default boolean shouldOutline(Level world, Player player, ItemStack stack) {
+		return true;
+	}
+	
 }

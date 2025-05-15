@@ -247,6 +247,13 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	}
 	
 	@Override
+	public boolean shouldOutline(Level world, Player player, ItemStack stack) {
+		return false;
+		// Ideally this would be true, but scroll casting is done server side with no client hint, so don't show it
+		// and confuse players into thinking it will help them
+	}
+	
+	@Override
 	public int getMaxDamage(ItemStack stack) {
 		return getMaxDurability(stack);
 	}

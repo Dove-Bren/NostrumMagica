@@ -32,6 +32,7 @@ import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer;
+import com.smanzana.nostrummagica.client.render.OutlineRenderer.Outline;
 import com.smanzana.nostrummagica.client.render.SelectionRenderer;
 import com.smanzana.nostrummagica.client.render.SpellShapeRenderer;
 import com.smanzana.nostrummagica.client.render.layer.EntityEffectLayer;
@@ -44,6 +45,7 @@ import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
+import com.smanzana.nostrummagica.item.IRaytraceOverlay;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.listener.ClientChargeManager;
@@ -139,6 +141,7 @@ public class ClientPlayerListener extends PlayerListener {
 	private final SpellShapeRenderer spellshapeRenderer;
 	private final SelectionRenderer selectionRenderer;
 	private final ClientChargeManager chargeManager;
+	private final ClientTargetManager targetManager;
 	
 	public ClientPlayerListener() {
 		super();
@@ -149,6 +152,7 @@ public class ClientPlayerListener extends PlayerListener {
 		this.spellshapeRenderer = new SpellShapeRenderer(this.outlineRenderer);
 		this.selectionRenderer = new SelectionRenderer();
 		this.chargeManager = new ClientChargeManager();
+		this.targetManager = new ClientTargetManager();
 		
 		bindingCast1 = new KeyMapping("key.cast1.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, "key.nostrummagica.desc");
 		bindingCast2 = new KeyMapping("key.cast2.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X, "key.nostrummagica.desc");
@@ -223,6 +227,10 @@ public class ClientPlayerListener extends PlayerListener {
 	
 	public ClientChargeManager getChargeManager() {
 		return this.chargeManager;
+	}
+	
+	public ClientTargetManager getTargetManager() {
+		return targetManager;
 	}
 	
 	@SubscribeEvent
@@ -375,6 +383,7 @@ public class ClientPlayerListener extends PlayerListener {
 				PortalBlock.clientTick();
 				//TeleportRune.tick();
 				spellChargeTick();
+				targeterUpdateTick();
 			}
 		} else if (event.phase == Phase.END) {
 			if (hasJump) {
@@ -513,15 +522,12 @@ public class ClientPlayerListener extends PlayerListener {
 		// Find the tome this was cast from, if any
 		ItemStack tome = NostrumMagica.getCurrentTome(player); 
 		
-		HitResult mop = RayTrace.raytraceApprox(player.getLevel(), player, player.getEyePosition(), player.getXRot(), player.getYRot(), 100, (e) -> e != player && e instanceof LivingEntity, .5);
-		
 		NetworkHandler.sendToServer(
-    			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome), RayTrace.entFromRaytrace(mop)));
+    			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome), this.getTargetManager().getLastTarget(1f)));
 	}
 	
 	protected void finishIncantationCast(Player player, ClientSpellCharge charge) {
-		HitResult mop = RayTrace.raytraceApprox(player.getLevel(), player, player.getEyePosition(), player.getXRot(), player.getYRot(), 100, (e) -> e != player && e instanceof LivingEntity, .5);
-		final @Nullable Entity targetHint = RayTrace.entFromRaytrace(mop);
+		final @Nullable Entity targetHint = this.getTargetManager().getLastTarget(1f);
 		
 		NetworkHandler.sendToServer(new ClientCastAdhocMessage(charge.charge.spell(), targetHint));
 		player.swing(InteractionHand.MAIN_HAND);
@@ -559,6 +565,76 @@ public class ClientPlayerListener extends PlayerListener {
 			this.chargeManager.cancelCharge(false);
 //			final UUID id = UUID.fromString("637ec07c-9931-45ca-bd8e-e47c7f9b50a6");
 //			NostrumMagica.instance.proxy.getPlayer().getAttributes().getInstance(Attributes.MOVEMENT_SPEED).removeModifier(id);
+		}
+	}
+	
+	protected HitResult defaultTrace() {
+		final Minecraft mc = Minecraft.getInstance();
+		final Player player = NostrumMagica.instance.proxy.getPlayer();
+		final float partialTicks = mc.getFrameTime();
+		
+		double range = 0f;
+		
+		if (this.getChargeManager().getCurrentCharge() != null) {
+			range = this.getChargeManager().getCurrentCharge().charge.spell().getTraceRange(player);
+		}
+		
+		ItemStack stack = player.getMainHandItem();
+		if (range <= 0f && !stack.isEmpty() && stack.getItem() instanceof IRaytraceOverlay traced && traced.shouldTrace(player.level, player, stack)) {
+			range = traced.getTraceRange(player.level, player, stack);
+		}
+		
+		stack = player.getOffhandItem();
+		if (range <= 0f && !stack.isEmpty() && stack.getItem() instanceof IRaytraceOverlay traced && traced.shouldTrace(player.level, player, stack)) {
+			range = traced.getTraceRange(player.level, player, stack);
+		}
+		
+		if (range <= 0f) {
+			// default
+			range = 10f;
+		}
+		
+		return RayTrace.raytrace(player.level, player, player.getEyePosition(partialTicks), player.getViewXRot(partialTicks), player.getViewYRot(partialTicks), (float) range, new RayTrace.OtherLiving(player));
+	}
+	
+	protected boolean shouldDoTargetting() {
+		final Player player = NostrumMagica.instance.proxy.getPlayer();
+		if (this.getChargeManager().getCurrentCharge() != null
+				&& this.getChargeManager().getCurrentCharge().charge.spell().shouldTrace(player)) {
+			return true;
+		}
+		
+		ItemStack stack = player.getMainHandItem();
+		if (!stack.isEmpty() && stack.getItem() instanceof IRaytraceOverlay traced && traced.shouldTrace(player.level, player, stack)) {
+			return true;
+		}
+		
+		stack = player.getOffhandItem();
+		if (!stack.isEmpty() && stack.getItem() instanceof IRaytraceOverlay traced && traced.shouldTrace(player.level, player, stack)) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	protected void targeterUpdateTick() {
+		if (shouldDoTargetting()) {
+			@Nullable LivingEntity lastTarget = this.getTargetManager().getLastTarget(1f);
+			@Nullable LivingEntity target = this.getTargetManager().traceOrLastTarget(this::defaultTrace, ClientTargetManager.STANDARD_VIEW);
+			if (target != lastTarget) {
+				if (lastTarget != null) {
+					this.outlineRenderer.remove(lastTarget);
+				}
+				if (target != null) {
+					this.outlineRenderer.add(target, new Outline(1f, 1f, 1f, 1f));
+				}
+			}
+		} else {
+			@Nullable LivingEntity lastTarget = this.getTargetManager().getLastTarget(1f);
+			if (lastTarget != null) {
+				this.outlineRenderer.remove(lastTarget);
+			}
+			this.getTargetManager().clearTarget();
 		}
 	}
 	

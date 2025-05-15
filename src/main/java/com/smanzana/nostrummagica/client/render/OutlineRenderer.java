@@ -48,6 +48,7 @@ public class OutlineRenderer {
 	
 	// Per-frame tracking of whether vanilla is going to do any glow rendering
 	private boolean renderEntityDoingGlow = false;
+	private boolean renderedOutlines = false; // and whether we've done any outlining this frame
 
 	private CustomOutlineTypeBuffer outlineBuffer;
 	private boolean renderRecurseMarker = false;
@@ -119,6 +120,7 @@ public class OutlineRenderer {
 				final float partialTicks = event.getPartialTick();
 				renderRecurseMarker = true;
 				{
+					renderedOutlines = true;
 					renderEntityOutline(matrixStackIn, entity, outline, entity.getViewYRot(partialTicks), partialTicks);
 					if (renderEntityDoingGlow) {
 						// Flush our outlines to the framebuffer since vanilla's going to render it
@@ -135,6 +137,7 @@ public class OutlineRenderer {
 	@SubscribeEvent
 	public final void onRenderWorldBegin(CameraSetup event) {
 		this.renderEntityDoingGlow = false; // Reset at beginning of render frame
+		this.renderedOutlines = false;
 	}
 	
 	@SubscribeEvent
@@ -143,7 +146,8 @@ public class OutlineRenderer {
 			return;
 		}
 		
-		if (!renderEntityDoingGlow) {
+		
+		if (renderedOutlines && !renderEntityDoingGlow) {
 			// Vanilla not doing normal outline rendering, so force it ourselves
 			if (outlineBuffer != null) {
 				outlineBuffer.finish();
