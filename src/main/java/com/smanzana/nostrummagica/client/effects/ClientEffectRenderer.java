@@ -20,6 +20,7 @@ import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -89,7 +90,7 @@ public class ClientEffectRenderer {
 	
 	@SubscribeEvent
 	public void onRender(RenderLevelStageEvent event) {
-		if (event.getStage() != Stage.AFTER_PARTICLES) {
+		if (event.getStage() != Stage.AFTER_TRIPWIRE_BLOCKS) {
 			return;
 		}
 		
@@ -101,6 +102,7 @@ public class ClientEffectRenderer {
 		Minecraft mc = Minecraft.getInstance();
 		final Camera renderInfo = mc.gameRenderer.getMainCamera();
 		PoseStack stack = event.getPoseStack();//RenderFuncs.makeNewMatrixStack(renderInfo);
+		final MultiBufferSource buffers = mc.renderBuffers().bufferSource();;
 		
 		stack.pushPose();
 		
@@ -114,12 +116,14 @@ public class ClientEffectRenderer {
 			Iterator<ClientEffect> it = activeEffects.iterator();
 			while (it.hasNext()) {
 				ClientEffect ef = it.next();
-				if (!ef.displayTick(mc, stack, event.getPartialTick())) {
+				if (!ef.displayTick(mc, stack, event.getPartialTick(), buffers)) {
 					ef.onEnd();
 					it.remove();
 				}
 			}
 		}
+		
+		mc.renderBuffers().bufferSource().endBatch();
 		
 		stack.popPose();
 		

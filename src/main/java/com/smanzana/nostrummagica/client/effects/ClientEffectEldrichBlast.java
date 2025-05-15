@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.ArcaneWolfElementalType;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.phys.Vec3;
@@ -56,7 +57,7 @@ public class ClientEffectEldrichBlast extends ClientEffect {
 	}
 	
 	@Override
-	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, MultiBufferSource buffersIn, float progress, float partialTicks) {
 		if (!this.modifiers.isEmpty())
 			for (ClientEffectModifier mod : modifiers) {
 				mod.apply(matrixStackIn, detail, progress, partialTicks);

@@ -7,6 +7,8 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.listener.PlayerListener.Event;
+import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
@@ -17,11 +19,12 @@ import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.RayTrace;
 
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.core.NonNullList;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.Lazy;
@@ -31,10 +34,84 @@ import net.minecraftforge.common.util.Lazy;
  * @author Skyler
  *
  */
-public class BeamShape extends InstantShape {
+public class BeamShape extends SpellShape {
+	
+	public static class BeamShapeInstance extends SpellShape.SpellShapeInstance implements IGenericListener {
+		
+		protected final Level world;
+		protected final Vec3 start;
+		protected final Vec3 end;
+		protected final int duration;
+		protected final boolean hitsAir;
+		
+		protected int aliveCycles;
+
+		public BeamShapeInstance(ISpellState state, Level world, Vec3 start, Vec3 end, int duration, boolean hitsAir) {
+			super(state);
+			
+			this.world = world;
+			this.start = start;
+			this.end = end;
+			this.duration = duration;
+			this.hitsAir = hitsAir;
+			
+			this.aliveCycles = 0;
+		}
+
+		@Override
+		public void spawn(LivingEntity caster) {
+			NostrumMagica.playerListener.registerTimer(this, 0, 5); // once every 5 ticks
+		}
+		
+		@Override
+		public boolean onEvent(Event type, LivingEntity entity, Object unused) {
+			if (type == Event.TIME) {
+				// Cast from eyes
+				Collection<HitResult> traces = RayTrace.allInPath(world, this.getState().getSelf(), start, end, new RayTrace.OtherLiving(this.getState().getCaster()), hitsAir);
+				List<LivingEntity> targs = null;
+				List<SpellLocation> blocks = null;
+				
+				if (traces != null && !traces.isEmpty()) {
+					targs = new LinkedList<>();
+					blocks = new LinkedList<>();
+					
+					for (HitResult trace : traces) {
+						if (trace == null)
+							continue;
+						
+						if (trace.getType() == HitResult.Type.MISS)
+							continue;
+						
+						if (trace.getType() == HitResult.Type.ENTITY) {
+							if (RayTrace.livingFromRaytrace(trace) != null) {
+								targs.add(RayTrace.livingFromRaytrace(trace));
+							}
+						} else {
+							blocks.add(new SpellLocation(world, trace));
+						}
+					}
+					
+					TriggerData data = new TriggerData(
+							targs,
+							blocks
+							);
+					
+					this.trigger(data, .25f, true);
+				}
+				
+				aliveCycles++;
+				if (aliveCycles >= duration / 4) {
+					return true;
+				}
+			}
+			
+			return false;
+		}
+	}
 
 	public static final String ID = "beam";
 	public static final float BEAM_RANGE = 15.0f;
+	public static final int BEAM_DURATION_TICKS = 50;
 	
 	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.of(ItemStack.EMPTY, ReagentItem.CreateStack(ReagentType.MANI_DUST, 1),
 			ReagentItem.CreateStack(ReagentType.GRAVE_DUST, 1)));
@@ -74,46 +151,6 @@ public class BeamShape extends InstantShape {
 		} else {
 			return super.getPropertyItemRequirements(property);
 		}
-	}
-
-	@Override
-	protected TriggerData getTargetData(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
-		final boolean hitsAir = hitsAir(params);
-		// Cast from eyes
-		final Vec3 start = location.shooterPosition;
-		final Vec3 dir = RayTrace.directionFromAngles(pitch, yaw);
-		final Vec3 end = start.add(dir.normalize().scale(BEAM_RANGE));
-		Collection<HitResult> traces = RayTrace.allInPath(location.world, state.getSelf(), start, end, new RayTrace.OtherLiving(state.getCaster()), hitsAir);
-		List<LivingEntity> targs = null;
-		List<SpellLocation> blocks = null;
-		
-		if (traces != null && !traces.isEmpty()) {
-			targs = new LinkedList<>();
-			blocks = new LinkedList<>();
-			
-			for (HitResult trace : traces) {
-				if (trace == null)
-					continue;
-				
-				if (trace.getType() == HitResult.Type.MISS)
-					continue;
-				
-				if (trace.getType() == HitResult.Type.ENTITY) {
-					if (RayTrace.livingFromRaytrace(trace) != null) {
-						targs.add(RayTrace.livingFromRaytrace(trace));
-					}
-				} else {
-					blocks.add(new SpellLocation(location.world, trace));
-				}
-			}
-		}
-		
-		if (!state.isPreview()) {
-			NostrumMagica.instance.proxy.spawnSpellShapeVfx(location.world, this, params,
-					null, start, null, end, characteristics);
-		}
-		
-		return new TriggerData(targs, blocks);
 	}
 
 	@Override
@@ -158,6 +195,27 @@ public class BeamShape extends InstantShape {
 		final Vec3 maxDist = from.add(dir.normalize().scale(BEAM_RANGE));
 		builder.add(new SpellShapePreviewComponent.AoELine(from.add(0, -.25, 0).add(Vec3.directionFromRotation(pitch, yaw+90).scale(.1f)), maxDist, 3f));
 		return super.addToPreview(builder, state, entity, location, pitch, yaw, properties, characteristics);
+	}
+
+	@Override
+	public SpellShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location,
+			float pitch, float yaw, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+		
+		final Vec3 dir = RayTrace.directionFromAngles(pitch, yaw).normalize();
+		final Vec3 start = location.shooterPosition.add(dir.scale(.25f));
+		final Vec3 end = start.add(dir.scale(BEAM_RANGE));
+		
+		if (!state.isPreview()) {
+			NostrumMagica.instance.proxy.spawnSpellShapeVfx(location.world, this, properties,
+					null, start, null, end, characteristics);
+		}
+		
+		return new BeamShapeInstance(state, location.world, start, end, BEAM_DURATION_TICKS, hitsAir(properties));
+	}
+
+	@Override
+	public boolean supportsPreview(SpellShapeProperties params) {
+		return true;
 	}
 
 }

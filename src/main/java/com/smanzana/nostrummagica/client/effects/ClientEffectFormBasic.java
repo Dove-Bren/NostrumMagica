@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlas;
@@ -42,7 +43,7 @@ public class ClientEffectFormBasic implements ClientEffectForm {
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public void draw(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
+	public void draw(PoseStack matrixStackIn, Minecraft mc, MultiBufferSource buffersIn, float partialTicks, int color, float progress) {
 		matrixStackIn.pushPose();
 		if (this.offset != null) {
 			matrixStackIn.translate(offset.x, offset.y, offset.z);

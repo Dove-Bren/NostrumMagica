@@ -63,7 +63,7 @@ public class WallShape extends AreaShape {
 		private BoundingBox bounds;
 		
 		public WallShapeInstance(ISpellState state, SpellLocation location, WallFacing facing, float radius, boolean lingering, SpellShapeProperties properties, SpellCharacteristics characteristics) {
-			super(state, location.world, new Vec3(location.hitBlockPos.getX() + .5, location.hitBlockPos.getY(), location.hitBlockPos.getZ() + .5), TICK_RATE, NUM_TICKS, 2*radius, true, affectsEntities(properties), affectsBlocks(properties), characteristics);
+			super(state, location.world, new Vec3(location.selectedBlockPos.getX() + .5, location.selectedBlockPos.getY(), location.selectedBlockPos.getZ() + .5), TICK_RATE, NUM_TICKS, 2*radius, true, affectsEntities(properties), affectsBlocks(properties), characteristics);
 			this.radius = radius;
 			this.facing = facing;
 			this.characteristics = characteristics;
@@ -95,7 +95,7 @@ public class WallShape extends AreaShape {
 			List<LivingEntity> ret = new ArrayList<>();
 			
 			if (this.affectsEnts) {
-				final Vec3 center = new Vec3(instantLocation.hitBlockPos.getX() + .5, instantLocation.hitBlockPos.getY(), instantLocation.hitBlockPos.getZ() + .5);
+				final Vec3 center = new Vec3(instantLocation.selectedBlockPos.getX() + .5, instantLocation.selectedBlockPos.getY(), instantLocation.selectedBlockPos.getZ() + .5);
 				final float radiusEnts = this.radius + .5f;
 				
 				for (Entity entity : world.getEntities(null, 
@@ -364,7 +364,7 @@ public class WallShape extends AreaShape {
 		
 		// Determine facing based on actual hit position, but use hitPos (where we'll actually place it) to determine if it's grounded
 		WallFacing facing = MakeFacing(state.getCaster(), location.hitPosition, pitch, yaw, !location.world.isEmptyBlock(location.selectedBlockPos) && location.world.isEmptyBlock(location.selectedBlockPos.above()));
-		BoundingBox bounds = MakeBounds(location.hitBlockPos, facing, radius);
+		BoundingBox bounds = MakeBounds(location.selectedBlockPos, facing, radius);
 		
 		// Do block preview if affecting blocks at all
 		if (this.affectsBlocks(properties)) {

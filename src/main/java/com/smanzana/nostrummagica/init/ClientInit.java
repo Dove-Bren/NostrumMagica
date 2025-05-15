@@ -143,6 +143,7 @@ import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.Transmutation;
+import com.smanzana.nostrummagica.spell.component.shapes.BeamShape;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.spellcraft.pattern.NostrumSpellCraftPatterns;
@@ -876,10 +877,10 @@ public class ClientInit {
 				(source, sourcePos, target, targetPos, properties, characteristics) -> {
 					ClientEffect effect = new ClientEffectBeam(sourcePos == null ? source.position() : sourcePos,
 							targetPos == null ? target.position() : targetPos,
-							500L);
+							BeamShape.BEAM_DURATION_TICKS + 10);
 					
-					//if (target != null)
-					//	effect.modify(new ClientEffectModifierFollow(target));
+					if (source != null)
+						effect.modify(new ClientEffectModifierFollow(source));
 					
 					effect.modify(new ClientEffectModifierColor(characteristics.getElement().getColor(), characteristics.getElement().getColor()));
 					

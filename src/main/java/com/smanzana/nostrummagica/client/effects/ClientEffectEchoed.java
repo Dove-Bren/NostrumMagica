@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -32,7 +33,7 @@ public class ClientEffectEchoed extends ClientEffect {
 	}
 	
 	@Override
-	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, MultiBufferSource buffersIn, float progress, float partialTicks) {
 		// Span is centered on actual progress.
 		// So at start and at end there will be part chopped off
 		// Calculate that part now and ignore in loop
@@ -56,7 +57,7 @@ public class ClientEffectEchoed extends ClientEffect {
 					mod.apply(matrixStackIn, newDetail, progress + diff, partialTicks);
 				}
 			
-			effect.drawForm(matrixStackIn, newDetail, mc, progress + diff, partialTicks);
+			effect.drawForm(matrixStackIn, newDetail, mc, buffersIn, progress + diff, partialTicks);
 			matrixStackIn.popPose();
 		}
 		

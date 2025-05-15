@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
@@ -41,7 +42,7 @@ public class ClientEffectFormFlat implements ClientEffectForm {
 	}
 
 	@Override
-	public void draw(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
+	public void draw(PoseStack matrixStackIn, Minecraft mc, MultiBufferSource buffersIn, float partialTicks, int color, float progress) {
 		final float blue = (float) (color & 0xFF) / 255f;
 		final float green = (float) ((color >>> 8) & 0xFF) / 255f;
 		final float red = (float) ((color >>> 16) & 0xFF) / 255f;

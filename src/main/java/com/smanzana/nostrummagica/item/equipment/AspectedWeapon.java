@@ -108,7 +108,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	public static final String ID_LIGHTNING_ADEPT = ID_PREFIX + "lightning_" + ID_SUFFIX_ADEPT;
 	public static final String ID_LIGHTNING_MASTER = ID_PREFIX + "lightning_" + ID_SUFFIX_MASTER;
 	
-	private static final int WIND_COST = 15;
+	private static final int WIND_COST = 30;
 	
 
 	public static boolean isWeaponElement(EMagicElement element) {
@@ -861,10 +861,11 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				motion = new Vec3(motion.x, 0, motion.z);
 			}
 			if (motion.length() < 1.0 || player.isFallFlying()) {
-				propelAction.apply(player, player, 1f, ISpellLogBuilder.Dummy);
+				propelAction.apply(player, player, 2f, ISpellLogBuilder.Dummy);
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 				attr.addMana(-WIND_COST);
 				NostrumMagica.instance.proxy.sendMana(player);
+				player.startAutoSpinAttack(20);
 			}
 		} else {
 			player.releaseUsingItem();

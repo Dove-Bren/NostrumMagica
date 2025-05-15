@@ -5,11 +5,12 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -66,7 +67,7 @@ public class ClientEffect {
 		return this;
 	}
 	
-	public boolean displayTick(Minecraft mc, PoseStack matrixStackIn, float partialTicks) {
+	public boolean displayTick(Minecraft mc, PoseStack matrixStackIn, float partialTicks, MultiBufferSource buffersIn) {
 		long sysTime = System.currentTimeMillis();
 		if (startTime == 0)
 			startTime = sysTime;
@@ -88,7 +89,7 @@ public class ClientEffect {
 		preModHook(matrixStackIn, detail, progress, partialTicks);
 		
 		setupRenderState();
-		drawForm(matrixStackIn, detail, mc, progress, partialTicks);
+		drawForm(matrixStackIn, detail, mc, buffersIn, progress, partialTicks);
 		teardownRenderState();
 		
 		matrixStackIn.popPose();
@@ -116,14 +117,14 @@ public class ClientEffect {
 //		RenderSystem.disableFog();
 	}
 	
-	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, MultiBufferSource buffersIn, float progress, float partialTicks) {
 
 		if (!this.modifiers.isEmpty())
 		for (ClientEffectModifier mod : modifiers) {
 			mod.apply(matrixStackIn, detail, progress, partialTicks);
 		}
 		
-		form.draw(matrixStackIn, mc, partialTicks, detail.getColor());
+		form.draw(matrixStackIn, mc, buffersIn, partialTicks, detail.getColor(), progress);
 	}
 	
 	protected void preModHook(PoseStack matrixStackIn, ClientEffectRenderDetail detail, float progress, float partialTicks) {

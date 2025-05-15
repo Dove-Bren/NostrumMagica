@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -73,7 +74,7 @@ public class ClientEffectAnimated extends ClientEffect {
 	}
 	
 	@Override
-	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, MultiBufferSource buffersIn, float progress, float partialTicks) {
 		// Figure out which frame we're on.
 		// I'm tempted to make this keep a little local int so we don't have to scan through each time, but am also interested
 		// in keeping 'progress' absolute. Maybe a little int of the last index AND the last float progress we cached off of?
@@ -88,7 +89,7 @@ public class ClientEffectAnimated extends ClientEffect {
 			mod.apply(matrixStackIn, detail, progress, partialTicks);
 		}
 		
-		frame.effect.drawForm(matrixStackIn, detail, mc, partialTicks, detail.getColor());
+		frame.effect.drawForm(matrixStackIn, detail, mc, buffersIn, partialTicks, detail.getColor());
 	}
 	
 }

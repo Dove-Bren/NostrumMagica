@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.client.effects;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.Vec3;
 import com.mojang.math.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;
@@ -45,7 +46,7 @@ public class ClientEffectMirrored extends ClientEffect {
 	}
 	
 	@Override
-	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, MultiBufferSource buffersIn, float progress, float partialTicks) {
 		for (int i = 0; i < this.count; i++) {
 			ClientEffectRenderDetail newDetail = new ClientEffectRenderDetail();
 			newDetail.alpha = detail.alpha;
@@ -55,7 +56,7 @@ public class ClientEffectMirrored extends ClientEffect {
 			
 			matrixStackIn.pushPose();
 			matrixStackIn.mulPose(this.eulers.rotationDegrees(dAngle * (float) i));
-			super.drawForm(matrixStackIn, newDetail, mc, progress, partialTicks);
+			super.drawForm(matrixStackIn, newDetail, mc, buffersIn, progress, partialTicks);
 			matrixStackIn.popPose();
 		}
 		

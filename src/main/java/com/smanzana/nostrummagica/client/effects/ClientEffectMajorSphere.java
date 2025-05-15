@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
@@ -35,7 +36,7 @@ public class ClientEffectMajorSphere extends ClientEffect {
 		
 		@SuppressWarnings("deprecation")
 		@Override
-		public void draw(PoseStack matrixStackIn, Minecraft mc, float partialTicks, int color) {
+		public void draw(PoseStack matrixStackIn, Minecraft mc, MultiBufferSource buffersIn, float partialTicks, int color, float progress) {
 			
 			final BakedModel model;
 			if (cloudy) {

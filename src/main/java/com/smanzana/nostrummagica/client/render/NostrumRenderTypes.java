@@ -9,6 +9,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Matrix4f;
+import com.smanzana.nostrummagica.client.effects.ClientEffectBeam;
 import com.smanzana.nostrummagica.client.model.ModelSwitchTrigger;
 import com.smanzana.nostrummagica.client.render.entity.RenderHookShot;
 import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
@@ -38,6 +39,8 @@ public class NostrumRenderTypes extends RenderType {
 	public static final RenderType SPELLSHAPE_LINES_THICK;
 	public static final RenderType WORLD_SELECT_HIGHLIGHT;
 	public static final RenderType WORLD_SELECT_HIGHLIGHT_CULL;
+	public static final RenderType SPELL_BEAM_SOLID;
+	public static final RenderType SPELL_BEAM_TRANSLUCENT;
 	
 	private static final String Name(String suffix) {
 		return "nostrumrender_" + suffix;
@@ -264,6 +267,24 @@ public class NostrumRenderTypes extends RenderType {
 				.setShaderState(POSITION_COLOR_SHADER)
 			.createCompositeState(false);
 		WORLD_SELECT_HIGHLIGHT = RenderType.create(Name("WorldSelect"), DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 16, false, false, glState);
+		
+		{
+			RenderType.CompositeState.CompositeStateBuilder beamBuilder = RenderType.CompositeState.builder()
+					.setShaderState(RENDERTYPE_BEACON_BEAM_SHADER)
+					.setTextureState(new RenderStateShard.TextureStateShard(ClientEffectBeam.TEX_BEAM, false, false))
+					.setTransparencyState(NO_TRANSPARENCY)
+					.setWriteMaskState(COLOR_DEPTH_WRITE)
+					;
+			
+			glState = beamBuilder.createCompositeState(false);
+			SPELL_BEAM_SOLID = RenderType.create(Name("SpellBeam_Solid"), DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 32, false, false, glState);
+			
+			glState = beamBuilder
+					.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+					.setWriteMaskState(COLOR_WRITE)
+				.createCompositeState(false);
+			SPELL_BEAM_TRANSLUCENT = RenderType.create(Name("SpellBeam_Trans"), DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 32, false, true, glState);
+		}
 	}
 	
 	private NostrumRenderTypes(String string, VertexFormat vertexFormat, VertexFormat.Mode mode, int i, boolean bl, boolean bl2, Runnable runnable, Runnable runnable2) {

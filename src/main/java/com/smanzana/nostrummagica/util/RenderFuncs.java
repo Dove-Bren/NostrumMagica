@@ -37,6 +37,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -235,25 +236,37 @@ public final class RenderFuncs {
 			float radius,
 			int combinedLightmapIn, int combinedOverlayIn, float red, float green, float blue, float alpha
 			) {
+		final float uMin = 0;
+		final float uMax = 1;
+		final float vMin = 0;
+		final float vMax = 1;
+		RenderFuncs.renderSpaceQuad(stack, buffer, radius, uMin, uMax, vMin, vMax, combinedLightmapIn, combinedOverlayIn, red, green, blue, alpha);
+	} 
+	
+	public static final void renderSpaceQuad(PoseStack stack, VertexConsumer buffer,
+			float radius, float uMin, float uMax, float vMin, float vMax,
+			int combinedLightmapIn, int combinedOverlayIn, float red, float green, float blue, float alpha
+			) {
+		final Vec2 posMin = new Vec2(-1f, -1f).scale(radius);
+		final Vec2 posMax = new Vec2(1f, 1f).scale(radius);
+		
+		RenderFuncs.renderSpaceQuad(stack, buffer, posMin, posMax, uMin, uMax, vMin, vMax, combinedLightmapIn, combinedOverlayIn, red, green, blue, alpha);
+	}
+	
+	public static final void renderSpaceQuad(PoseStack stack, VertexConsumer buffer,
+			Vec2 posMin, Vec2 posMax, float uMin, float uMax, float vMin, float vMax,
+			int combinedLightmapIn, int combinedOverlayIn, float red, float green, float blue, float alpha
+			) {
 		
 		// Copied and adapted from vanilla particle instead of manually drawing a space quad.
 		// One big difference is it pushes to global render state the transform first, and in it's render
 		// func just draws the little particle.
 		// We pass that through instead of using global state.
-		Vector3f[] avector3f = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
+		Vector3f[] avector3f = new Vector3f[]{new Vector3f(posMin.x, posMin.y, 0), new Vector3f(posMin.x, posMax.y, 0.0F), new Vector3f(posMax.x, posMax.y, 0), new Vector3f(posMax.x, posMin.y, 0.0F)};
 
-		for(int i = 0; i < 4; ++i) {
-			Vector3f vector3f = avector3f[i];
-			vector3f.mul(radius);
-		}
-		
 		final Matrix4f transform = stack.last().pose();
 		final Matrix3f normal = stack.last().normal();
 
-		final float uMin = 0;
-		final float uMax = 1;
-		final float vMin = 0;
-		final float vMax = 1;
 		buffer.vertex(transform, avector3f[0].x(), avector3f[0].y(), avector3f[0].z()).color(red, green, blue, alpha).uv(uMax, vMax).overlayCoords(combinedOverlayIn).uv2(combinedLightmapIn).normal(normal, 0, 0, 1).endVertex();
 		buffer.vertex(transform, avector3f[1].x(), avector3f[1].y(), avector3f[1].z()).color(red, green, blue, alpha).uv(uMax, vMin).overlayCoords(combinedOverlayIn).uv2(combinedLightmapIn).normal(normal, 0, 0, 1).endVertex();
 		buffer.vertex(transform, avector3f[2].x(), avector3f[2].y(), avector3f[2].z()).color(red, green, blue, alpha).uv(uMin, vMin).overlayCoords(combinedOverlayIn).uv2(combinedLightmapIn).normal(normal, 0, 0, 1).endVertex();

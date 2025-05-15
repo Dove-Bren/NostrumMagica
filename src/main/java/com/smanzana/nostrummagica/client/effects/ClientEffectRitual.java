@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -364,7 +365,7 @@ public class ClientEffectRitual extends ClientEffect {
 	}
 	
 	@Override
-	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float progress, float partialTicks) {
+	protected void drawForm(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, MultiBufferSource buffersIn, float progress, float partialTicks) {
 		if (!this.modifiers.isEmpty())
 			for (ClientEffectModifier mod : modifiers) {
 				mod.apply(matrixStackIn, detail, progress, partialTicks);
