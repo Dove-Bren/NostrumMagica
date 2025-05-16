@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.effect;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.sounds.SoundEvents;

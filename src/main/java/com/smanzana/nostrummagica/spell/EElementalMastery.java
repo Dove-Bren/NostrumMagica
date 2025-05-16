@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.spell;
 
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 

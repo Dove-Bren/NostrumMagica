@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpawnNostrumParticleMessage;
 import com.smanzana.nostrummagica.util.ColorUtil;
@@ -28,6 +29,7 @@ public enum NostrumParticles {
 	LIGHTNING_STATIC(new NostrumParticleType("lightning_static"), ParticleLightningStatic::MakeParticle),
 	FILLED_ORB(new NostrumParticleType("filled_orb"), ParticleFilledOrb::MakeParticle),
 	WARD(new NostrumParticleType("ward"), ParticleWard::MakeParticle),
+	LIGHT_EXPLOSION(new NostrumParticleType("light_explosion"), ParticleLightExplosion::MakeParticle),
 	;
 	
 	@SubscribeEvent
@@ -85,11 +87,6 @@ public enum NostrumParticles {
 	}
 	
 	public static class SpawnParams {
-		
-		public static enum TargetBehavior {
-			JOIN, // Fly towards and into the target (ent: x, y + h/2, z, pos: x, y, z)
-			ORBIT, // Fly towards and then orbit the entity (r = w*2 by default for ents, 1 for pos)
-		}
 		
 		public static final Codec<SpawnParams> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 				Codec.INT.fieldOf("count").forGetter((p) -> p.count),

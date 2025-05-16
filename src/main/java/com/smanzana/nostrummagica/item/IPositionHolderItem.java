@@ -2,10 +2,10 @@ package com.smanzana.nostrummagica.item;
 
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 public interface IPositionHolderItem {

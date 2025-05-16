@@ -12,8 +12,8 @@ import com.smanzana.nostrummagica.network.message.SpellCooldownMessage;
 import com.smanzana.nostrummagica.network.message.SpellCooldownResetMessage;
 import com.smanzana.nostrummagica.network.message.SpellGlobalCooldownMessage;
 
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 /**
  * Like Vanilla's cooldown tracker, except for spells

@@ -198,7 +198,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
 				.setShaderState(POSITION_COLOR_TEX_SHADER)
-			.createCompositeState(false);
+			.createCompositeState(true);
 		SWITCH_TRIGGER_BASE = RenderType.create(Name("switch_trigger_base"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.TRIANGLES, 64, false, false, glState);
 		
 		glState = RenderType.CompositeState.builder()

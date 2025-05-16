@@ -74,11 +74,11 @@ public class OnDamageShape extends SpellShape {
 							Lists.newArrayList(affectCaster ? getState().getCaster() : entity),
 							null
 							);
-					
+
+					expired = true;
 					this.trigger(data);
 					NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_DAMAGE, this.entity);
 					
-					expired = true;
 				}
 			} else if (type == Event.TIME) {
 				if (!expired) {

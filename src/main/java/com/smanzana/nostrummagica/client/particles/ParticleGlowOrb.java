@@ -10,7 +10,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.Camera;
@@ -39,13 +39,13 @@ public class ParticleGlowOrb extends TextureSheetParticle {
 	public ParticleGlowOrb(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime, SpriteSet sprites) {
 		super(worldIn, x, y, z, 0, 0, 0);
 		
-		rCol = red;
-		gCol = green;
-		bCol = blue;
+		this.rCol = red;
+		this.gCol = green;
+		this.bCol = blue;
 		this.alpha = 0f;
 		this.maxAlpha = alpha;
 		this.lifetime = lifetime;
-		fixedRandom = -1f;
+		this.fixedRandom = -1f;
 		
 		this.quadSize = .1f;
 		this.sprites = sprites;

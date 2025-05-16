@@ -77,14 +77,13 @@ public class OnHealthShape extends OnMetricLevelShape {
 							Lists.newArrayList(this.getState().getSelf()),
 							null
 							);
-					
+
+					expired = true; // prevents recursion, too
 					this.trigger(data);
 					NostrumMagica.instance.proxy.spawnSpellShapeVfx(this.getState().getSelf().level,
 							NostrumSpellShapes.OnHealth, properties,
 							this.getState().getSelf(), null, this.getState().getSelf(), null, characteristics);
 					NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_HEALTH, this.entity);
-					
-					expired = true;
 				}
 			} else if (type == Event.TIME) {
 				if (!expired) {

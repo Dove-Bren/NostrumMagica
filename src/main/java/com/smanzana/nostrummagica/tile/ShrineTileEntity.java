@@ -67,15 +67,20 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 	@Override
 	public void trigger(LivingEntity entity, DamageSource source, float damage) {
 		if (entity != null && entity instanceof Player && canPlayerSee((Player) entity)) {
+			final Vec3 pos = Vec3.atLowerCornerOf(this.getBlockPos()).add(getEntityOffset());
+			final float yOffset = (this.getTriggerEntity() == null ? 0 : this.getTriggerEntity().getBbHeight()/2f);
 			final int origHitCount = getHitCount();
 			if (origHitCount+1 >= MAX_HITS) {
 				this.setHitCount(0);
 				this.doReward((Player) entity);
+				
+				NostrumParticles.LIGHT_EXPLOSION.spawn(level, new SpawnParams(
+						50, pos.x(), pos.y() + yOffset, pos.z(), 0, 100, 0, Vec3.ZERO, Vec3.ZERO
+						).color(getParticleColor()));
 			} else {
 				this.setHitCount(origHitCount+1);
 			}
-			final Vec3 pos = Vec3.atLowerCornerOf(this.getBlockPos()).add(getEntityOffset());
-			final float yOffset = (this.getTriggerEntity() == null ? 0 : this.getTriggerEntity().getBbHeight()/2f);
+			
 			this.getLevel().playSound(null, pos.x(), pos.y() + yOffset, pos.z(), SoundEvents.ENDER_DRAGON_HURT, SoundSource.BLOCKS, 1f, 1f);
 			NostrumParticles.FILLED_ORB.spawn(this.getLevel(), new SpawnParams(30, pos.x(), pos.y() + yOffset, pos.z(), .3,
 					40, 20, new Vec3(0, .1, 0), new Vec3(.1, .05, .1)).gravity(true).color(getParticleColor()));

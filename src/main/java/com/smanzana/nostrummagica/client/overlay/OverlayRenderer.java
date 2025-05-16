@@ -40,9 +40,11 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem.HookshotType;
 import com.smanzana.nostrummagica.item.set.EquipmentSet;
+import com.smanzana.nostrummagica.listener.ClientChargeManager.ClientSpellCharge;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.SpellCooldownTracker.SpellCooldown;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RayTrace;
@@ -64,6 +66,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -1148,9 +1151,10 @@ public class OverlayRenderer extends GuiComponent {
 	
 	private void renderSpellChargeOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
 		ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
-		if (listener.getChargeManager().getCurrentCharge() != null) {
+		final ClientSpellCharge charge = listener.getChargeManager().getCurrentCharge();
+		if (charge != null) {
 			final float progress = listener.getChargeManager().getChargePercent();
-			final float[] colorBase = ColorUtil.ARGBToColor(listener.getChargeManager().getCurrentCharge().charge.spell().getPrimaryElement().getColor());
+			final float[] colorBase = ColorUtil.ARGBToColor(charge.charge.spell().getPrimaryElement().getColor());
 			
 			RenderSystem.enableBlend();
 			RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
@@ -1179,6 +1183,43 @@ public class OverlayRenderer extends GuiComponent {
 			};
 			RenderFuncs.drawRadialProgressQuadImmediate(matrixStackIn, -iconwidth/2, -iconheight/2, 0, iconwidth, iconheight, 0, 1, 0, 1, progress, color);
 			
+			final float elapsedTicks = (float) charge.charge.duration() - ((float) listener.getChargeManager().getRemainingTicks());
+			
+			// Flash cast info for first part
+			if (elapsedTicks < 40) {
+				final float infoAlpha = Mth.sin(Mth.PI * (Math.min(40f, elapsedTicks) / 40f));
+				
+				// Rate
+				if (charge.chargeSpeed != 0f) {
+					matrixStackIn.pushPose();
+					matrixStackIn.translate(0, 12, 0);
+					matrixStackIn.scale(.5f, .5f, 1f);
+					final String rate = String.format("%+.0f%%", charge.chargeSpeed * 100);
+					final int len = gui.getFont().width(rate);
+					gui.getFont().draw(matrixStackIn, rate, -len / 2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, infoAlpha));
+					matrixStackIn.popPose();
+				}
+				
+				RenderSystem.setShaderColor(1f, 1f, 0f, infoAlpha);
+				// Items
+				if (!charge.mainhandItem.isEmpty() && !SpellCasting.ItemAllowsCasting(charge.mainhandItem, EquipmentSlot.MAINHAND)) {
+					matrixStackIn.pushPose();
+					matrixStackIn.translate(4, 20, 0);
+					matrixStackIn.scale(.25f, .25f, .25f);
+					RenderFuncs.RenderGUIItem(charge.mainhandItem, matrixStackIn, -8, -8, -1);
+					matrixStackIn.popPose();
+				}
+				
+				if (!charge.offhandItem.isEmpty() && !SpellCasting.ItemAllowsCasting(charge.offhandItem, EquipmentSlot.OFFHAND)) {
+					matrixStackIn.pushPose();
+					matrixStackIn.translate(-4, 20, 0);
+					matrixStackIn.scale(.25f, .25f, .25f);
+					RenderFuncs.RenderGUIItem(charge.offhandItem, matrixStackIn, -8, -8, -1);
+					matrixStackIn.popPose();
+				}
+				RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+				
+			}
 			
 			matrixStackIn.popPose();
 		}

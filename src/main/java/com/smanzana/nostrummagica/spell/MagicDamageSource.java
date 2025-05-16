@@ -2,12 +2,12 @@ package com.smanzana.nostrummagica.spell;
 
 import javax.annotation.Nullable;
 
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.damagesource.EntityDamageSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
 public class MagicDamageSource extends EntityDamageSource {
 	

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.particles;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams.TargetBehavior;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.Minecraft;

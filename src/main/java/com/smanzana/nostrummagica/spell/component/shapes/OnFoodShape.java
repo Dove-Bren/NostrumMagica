@@ -84,14 +84,14 @@ public class OnFoodShape extends OnMetricLevelShape {
 							Lists.newArrayList(this.getState().getSelf()),
 							null
 							);
-					
+
+					expired = true;
 					this.trigger(data);
 					NostrumMagica.instance.proxy.spawnSpellShapeVfx(this.getState().getSelf().level,
 							NostrumSpellShapes.OnFood, properties,
 							this.getState().getSelf(), null, this.getState().getSelf(), null, characteristics);
 					NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_FOOD, this.entity);
 					
-					expired = true;
 				}
 			} else if (type == Event.TIME) {
 				if (!expired) {

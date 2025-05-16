@@ -5,6 +5,8 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.SpellChargeTracker.SpellCharge;
 
+import net.minecraft.world.item.ItemStack;
+
 /**
  * Wrap up tracking of us (the client) charging and then casting a spell
  */
@@ -12,9 +14,15 @@ public class ClientChargeManager {
 	
 	public static class ClientSpellCharge {
 		public final SpellCharge charge;
+		public final ItemStack mainhandItem;
+		public final ItemStack offhandItem;
+		public final float chargeSpeed;
 		
-		public ClientSpellCharge(SpellCharge charge) {
+		public ClientSpellCharge(SpellCharge charge, ItemStack mainhand, ItemStack offhand, float displayRate) {
 			this.charge = charge;
+			this.mainhandItem = mainhand;
+			this.offhandItem = offhand;
+			this.chargeSpeed = displayRate;
 		}
 	}
 	
@@ -80,7 +88,8 @@ public class ClientChargeManager {
 		}
 		
 		final long remainingMS = getFinishMS() - System.currentTimeMillis();
-		return (int) ((remainingMS + 19) / 20); // +19 rounds up
+		final int remainingTicks = (int) ((remainingMS + ((1000 / 20)-1)) / (1000 / 20));
+		return remainingTicks;
 	}
 
 }

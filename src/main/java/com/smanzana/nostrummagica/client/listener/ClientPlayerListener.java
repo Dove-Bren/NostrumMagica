@@ -422,8 +422,8 @@ public class ClientPlayerListener extends PlayerListener {
 	
 	private static final class ClientTomeCharge extends ClientSpellCharge {
 		public final int castSlot;
-		public ClientTomeCharge(SpellCharge charge, int castSlot) {
-			super(charge);
+		public ClientTomeCharge(SpellCharge charge, ItemStack mainhand, ItemStack offhand, float displayRate, int castSlot) {
+			super(charge, mainhand, offhand, displayRate);
 			this.castSlot = castSlot;
 		}
 	}
@@ -446,7 +446,11 @@ public class ClientPlayerListener extends PlayerListener {
 		if (!tome.isEmpty()) {
 			SpellCastResult result = SpellCasting.CheckToolCast(spell, player, tome);
 			if (result.succeeded) {
-				final ClientTomeCharge charge = new ClientTomeCharge(new SpellCharge(spell, result.summary.getFinalCastTicks(), ChargeType.TOME_CAST), castSlot);
+				final ClientTomeCharge charge = new ClientTomeCharge(
+						new SpellCharge(spell, result.summary.getFinalCastTicks(), ChargeType.TOME_CAST),
+						player.getMainHandItem(), player.getOffhandItem(),
+						1f - result.summary.getCastSpeedRate(), // 1.5f -> -.5f; .8f -> .2f
+						castSlot);
 				if (result.summary.getFinalCastTicks() > 0) {
 					this.chargeManager.startCharging(charge);
 				} else {
@@ -480,7 +484,10 @@ public class ClientPlayerListener extends PlayerListener {
 				SpellCastResult result = SpellCasting.CheckToolCast(spell, player, ItemStack.EMPTY);
 				if (result.succeeded) {
 					// We think we can cast it, so start charging
-					this.chargeManager.startCharging(new ClientSpellCharge(new SpellCharge(spell, result.summary.getFinalCastTicks(), ChargeType.INCANTATION)));
+					this.chargeManager.startCharging(new ClientSpellCharge(
+							new SpellCharge(spell, result.summary.getFinalCastTicks(), ChargeType.INCANTATION),
+							player.getMainHandItem(), player.getOffhandItem(),
+							1f - result.summary.getCastSpeedRate()));
 					
 //					{
 //						final UUID id = UUID.fromString("637ec07c-9931-45ca-bd8e-e47c7f9b50a6");
@@ -489,6 +496,7 @@ public class ClientPlayerListener extends PlayerListener {
 //						
 //						player.getAttributes().addTransientAttributeModifiers(multimap);
 //					}
+					
 				} else {
 					for (int i = 0; i < 15; i++) {
 						double offsetx = Math.cos(i * (2 * Math.PI / 15)) * 1.0;

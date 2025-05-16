@@ -22,6 +22,7 @@ import com.smanzana.nostrummagica.loretag.LoreCache;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.LoreMessage;
+import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
@@ -29,6 +30,7 @@ import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
+import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
@@ -998,6 +1000,12 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public void addSkill(Skill skill) {
 		skills.add(skill);
+		
+		// Hacky place to do this...
+		if (skill == NostrumSkills.Wind_Adept) {
+			// skills don't have rewards tied to them but maybe they should?
+			this.addShape(NostrumSpellShapes.Cutter);
+		}
 	}
 
 	@Override

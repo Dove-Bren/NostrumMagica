@@ -77,13 +77,13 @@ public class OnManaShape extends OnMetricLevelShape {
 							Lists.newArrayList(this.getState().getSelf()),
 							null
 							);
-					
+
+					expired = true;
 					this.trigger(data);
 					NostrumMagica.instance.proxy.spawnSpellShapeVfx(this.getState().getSelf().level,
 							NostrumSpellShapes.OnMana, properties,
 							this.getState().getSelf(), null, this.getState().getSelf(), null, characteristics);
 					NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_MANA, this.entity);
-					expired = true;
 				}
 			} else if (type == Event.TIME) {
 				if (!expired) {
