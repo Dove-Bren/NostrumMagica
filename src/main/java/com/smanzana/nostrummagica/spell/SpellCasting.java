@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
+import com.smanzana.nostrummagica.enchantment.SpellChannelingEnchantment;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.item.ISpellCastingTool;
 import com.smanzana.nostrummagica.item.ISpellEquipment;
@@ -30,6 +31,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.common.MinecraftForge;
 
 public class SpellCasting {
@@ -401,6 +403,10 @@ public class SpellCasting {
 		// Empty hands work. Otherwise, needs to actually match
 		if (stack.isEmpty()) {
 			return slot == EquipmentSlot.MAINHAND || slot == EquipmentSlot.OFFHAND;
+		}
+		
+		if (EnchantmentHelper.getItemEnchantmentLevel(SpellChannelingEnchantment.instance(), stack) > 0) {
+			return true;
 		}
 		
 		return stack.is(NostrumTags.Items.SpellChanneling);

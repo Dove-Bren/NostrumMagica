@@ -1574,6 +1574,9 @@
     "enhancement.eff_bonus.desc": "Amplifies the potency of cast spells",
 
     "enchantment.nostrummagica.nostrum_enchantment_mana_recovery": "Mana Recovery",
+	"enchantment.nostrummagica.nostrum_enchantment_mana_recovery.desc": "Improves mana recovery speed",
+	"enchantment.nostrummagica.spell_channeling": "Spell Channeling",
+	"enchantment.nostrummagica.spell_channeling.desc": "Item allows spellcasting when held and does not reduce cast speed",
 
     "reward.attrib.mana": "Bonus Mana %+.2f%%",
     "reward.attrib.cost": "Mana Cost %+.2f%%",
@@ -1791,7 +1794,7 @@
 	"skill.nostrummagica.wind.novice": "Wind Novice Training",
 	"skill.nostrummagica.wind.novice.desc": "Boosts potency of wind effects by 20%%.",
 	"skill.nostrummagica.wind.adept": "Wind Adept Training",
-	"skill.nostrummagica.wind.adept.desc": "Unlocks the 'Cutter' shape, which is a projectile that piercing entities and blocks.",
+	"skill.nostrummagica.wind.adept.desc": "Unlocks the 'Cutter' shape, which is a projectile that pierces entities and blocks.",
 	"skill.nostrummagica.wind.master": "Wind Master Training",
 	"skill.nostrummagica.wind.master.desc": "Regain mana based on how fast you're moving. Teleportation doesn't work for this effect.",
 	"skill.nostrummagica.wind.corrupt": "Gravity Master",

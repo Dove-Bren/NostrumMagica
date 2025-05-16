@@ -48,9 +48,9 @@ public class CombatTrialWind extends CombatTrialStaged {
 			Mob ent = super.provideEntity(world);
 			
 			if (ent instanceof WilloEntity) {
-				((WilloEntity) ent).setElement(EMagicElement.PHYSICAL);
+				((WilloEntity) ent).setElement(EMagicElement.WIND);
 			} else if (ent instanceof KoidEntity) {
-				((KoidEntity) ent).setElement(EMagicElement.PHYSICAL);
+				((KoidEntity) ent).setElement(EMagicElement.WIND);
 			} else if (ent instanceof IronGolem) {
 				; // Thought I was going to have to do something but doesn't seem like it
 			}

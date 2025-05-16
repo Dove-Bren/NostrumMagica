@@ -44,6 +44,7 @@ import com.smanzana.nostrummagica.criteria.CraftSpellCriteriaTrigger;
 import com.smanzana.nostrummagica.criteria.RitualCriteriaTrigger;
 import com.smanzana.nostrummagica.criteria.TierCriteriaTrigger;
 import com.smanzana.nostrummagica.enchantment.ManaRecoveryEnchantment;
+import com.smanzana.nostrummagica.enchantment.SpellChannelingEnchantment;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.WolfTameLore;
 import com.smanzana.nostrummagica.entity.KoidEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
@@ -2063,6 +2064,7 @@ public class ModInit {
     @SubscribeEvent
     public static void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
     	event.getRegistry().register(ManaRecoveryEnchantment.instance());
+    	event.getRegistry().register(SpellChannelingEnchantment.instance());
     }
     
     @SubscribeEvent
