@@ -55,11 +55,13 @@ import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.petcommand.api.PetFuncs;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.BaseComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -87,6 +89,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FarmBlock;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -1747,10 +1750,25 @@ public class SpellAction {
 		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			BlockPos pos = location.hitBlockPos;
 			if (location.world.isEmptyBlock(pos) || location.world.getBlockState(pos).getBlock() instanceof MysticWaterBlock) {
-				location.world.setBlockAndUpdate(pos, NostrumBlocks.mysticWaterBlock.getStateWithPower(this.waterLevel));
-				NostrumMagicaSounds.DAMAGE_ICE.play(location.world, pos);
-				resultBuilder.applied |= true;
-				resultBuilder.affectedPos = new SpellLocation(location.world, pos);
+				boolean allowed = true;
+				
+				// In sorcery dimension, make sure no lava is nearby
+				if (DimensionUtils.IsSorceryDim(location.world)) {
+					for (Direction direction : LiquidBlock.POSSIBLE_FLOW_DIRECTIONS) {
+						BlockPos blockpos = pos.relative(direction);
+			            if (location.world.getFluidState(blockpos).is(FluidTags.LAVA)) {
+			            	allowed = false;
+			            	break;
+			            }
+					}
+				}
+				
+				if (allowed) {
+					location.world.setBlockAndUpdate(pos, NostrumBlocks.mysticWaterBlock.getStateWithPower(this.waterLevel));
+					NostrumMagicaSounds.DAMAGE_ICE.play(location.world, pos);
+					resultBuilder.applied |= true;
+					resultBuilder.affectedPos = new SpellLocation(location.world, pos);
+				}
 			}
 		}
 		
