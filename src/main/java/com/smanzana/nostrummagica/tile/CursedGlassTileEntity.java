@@ -13,10 +13,14 @@ import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.SpellEffectEvent.SpellEffectEndEvent;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -245,6 +249,11 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 		((CursedGlass) this.getBlockState().getBlock()).setBroken(level, worldPosition, state);
 		
 		// VFX
+		((ServerLevel) this.getLevel()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.GLASS.defaultBlockState()),
+				worldPosition.getX(), worldPosition.getY() + 1.5, worldPosition.getZ(),
+				1000,
+				1.5, 1, 1.5,
+				.15f);
 	}
 	
 	@Override

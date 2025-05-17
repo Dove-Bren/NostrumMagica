@@ -210,9 +210,9 @@ public class ParticleLightExplosion extends Particle {
 
 		@Override
 		public void end(Tesselator tesselator) {
-			RenderSystem.defaultBlendFunc();
-			//RenderSystem.enableCull();
 			tesselator.end();
+			RenderSystem.defaultBlendFunc();
+			RenderSystem.enableCull();
 		}
 		
 		@Override
