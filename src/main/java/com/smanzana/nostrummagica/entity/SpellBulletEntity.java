@@ -183,7 +183,7 @@ public class SpellBulletEntity extends ShulkerBullet {
 
 		// Blocky movement looks for next block and tries to move to that one, using random if multiple spots still
 		// move in the right direction.
-		if (!targetPos.closerToCenterThan(this.position(), 4)) {
+		if (this.blockyPath && !targetPos.closerToCenterThan(this.position(), 2)) {
 			BlockPos blockpos1 = this.blockPosition();
 			List<Direction> list = Lists.<Direction>newArrayList();
 

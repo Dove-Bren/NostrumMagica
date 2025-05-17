@@ -523,7 +523,13 @@ public class ClientPlayerListener extends PlayerListener {
 								attr.getShapes() == null || attr.getShapes().isEmpty() ? NostrumSpellShapes.Touch : attr.getShapes().get(0),
 								EMagicElement.PHYSICAL, // hardcoding that physical is first element
 								null
-								));
+								) {
+							@Override
+							public int getWeight() {
+								// Special default baby spell has no weight so it's free
+								return 0;
+							}
+						});
 						this.tutorial.onStarterIncantationCast();
 					} else {
 						this.overlayRenderer.enableIncantationSelection();

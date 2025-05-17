@@ -73,7 +73,7 @@ public class ModelPlantBossLeaf extends EntityModel<PlantBossEntity.PlantBossLea
 				.addBox(30, -4, 8, 2, 2, 29)
 				, PartPose.ZERO);
 		
-		return LayerDefinition.create(mesh, 32, 32);
+		return LayerDefinition.create(mesh, 256, 256);
 	}
 	
 	private ModelPart main;
