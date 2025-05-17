@@ -14,6 +14,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.listener.NostrumTutorial;
 import com.smanzana.nostrummagica.criteria.TierCriteriaTrigger;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -22,6 +23,7 @@ import com.smanzana.nostrummagica.loretag.LoreCache;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.LoreMessage;
+import com.smanzana.nostrummagica.network.message.TutorialMessage;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -207,6 +209,10 @@ public class NostrumMagic implements INostrumMagic {
 			this.giveBasicLore(NostrumItems.blankScroll);
 			this.giveBasicLore(NostrumItems.spellScroll);
 			this.giveBasicLore(NostrumItems.reagentMandrakeRoot);
+			
+			if (this.entity != null && this.entity instanceof ServerPlayer player) {
+				NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.Tutorial.CAST_SPELL), player);
+			}
 		}
 	}
 

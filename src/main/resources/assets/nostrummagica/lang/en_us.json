@@ -2171,6 +2171,17 @@
 	"research.sword_ender.desc": "Great balls of Ender!",
 	"research.sword_ender.info": "By enhancing a mage blade enchanted with ender, you've created a magic rod. When charged up, the rod can create a point of ender energy at a distant location. Striking an enemy or right-clicking on an entity aftere doing so will teleport them to the ball of ender energy!|  You suspect the tool could be even more useful with a set of Ender armor...",
 	
+	"tutorial.nostrummagica.firstcast": "Cast A Spell",
+	"tutorial.nostrummagica.firstcast.text1": "Press %1$s to start casting",
+	"tutorial.nostrummagica.firstcast.text2": "Stand still while charging",
+	
+	"tutorial.nostrummagica.form_incant": "Incantations",
+	"tutorial.nostrummagica.form_incant.text1": "Hold down %1$s",
+	"tutorial.nostrummagica.form_incant.text2": "Select spell components",
+	
+	"tutorial.nostrummagica.quick_incant": "Quick Recast",
+	"tutorial.nostrummagica.quick_incant.text": "Quick-tap the %1$s key",
+	
 	"spelllog.damage.name": "Damage Entity",
 	"spelllog.damage.desc": "Damaged for %2$s %3$sdamage (%1$s base)",
 	"spelllog.heal.name": "Heal Entity",

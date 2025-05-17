@@ -143,6 +143,7 @@ public class ClientPlayerListener extends PlayerListener {
 	private final SelectionRenderer selectionRenderer;
 	private final ClientChargeManager chargeManager;
 	private final ClientTargetManager targetManager;
+	private final NostrumTutorial tutorial;
 	
 	public ClientPlayerListener() {
 		super();
@@ -154,6 +155,7 @@ public class ClientPlayerListener extends PlayerListener {
 		this.selectionRenderer = new SelectionRenderer();
 		this.chargeManager = new ClientChargeManager();
 		this.targetManager = new ClientTargetManager();
+		this.tutorial = new NostrumTutorial();
 		
 		bindingCast1 = new KeyMapping("key.cast1.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, "key.nostrummagica.desc");
 		bindingCast2 = new KeyMapping("key.cast2.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X, "key.nostrummagica.desc");
@@ -232,6 +234,10 @@ public class ClientPlayerListener extends PlayerListener {
 	
 	public ClientTargetManager getTargetManager() {
 		return targetManager;
+	}
+	
+	public NostrumTutorial getTutorial() {
+		return this.tutorial;
 	}
 	
 	@SubscribeEvent
@@ -518,9 +524,10 @@ public class ClientPlayerListener extends PlayerListener {
 								EMagicElement.PHYSICAL, // hardcoding that physical is first element
 								null
 								));
+						this.tutorial.onStarterIncantationCast();
 					} else {
 						this.overlayRenderer.enableIncantationSelection();
-					}
+						this.tutorial.onIncantationFormStarted();					}
 				} else {
 					player.sendMessage(new TranslatableComponent("info.incant.nohands"), Util.NIL_UUID);
 				}
@@ -553,6 +560,8 @@ public class ClientPlayerListener extends PlayerListener {
 		
 		NetworkHandler.sendToServer(new ClientCastAdhocMessage(charge.charge.spell(), targetHint));
 		player.swing(InteractionHand.MAIN_HAND);
+		
+		this.tutorial.onIncantationCastFinished();
 	}
 	
 	protected void finishChargeCast(ClientSpellCharge charge) {
@@ -575,6 +584,8 @@ public class ClientPlayerListener extends PlayerListener {
 		
 //		final UUID id = UUID.fromString("637ec07c-9931-45ca-bd8e-e47c7f9b50a6");
 //		NostrumMagica.instance.proxy.getPlayer().getAttributes().getInstance(Attributes.MOVEMENT_SPEED).removeModifier(id);
+		
+		this.tutorial.onChargeCancel();
 	}
 	
 	protected void spellChargeTick() {

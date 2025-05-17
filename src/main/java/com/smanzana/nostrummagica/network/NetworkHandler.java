@@ -42,6 +42,7 @@ import com.smanzana.nostrummagica.network.message.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.network.message.SpellTomeSlotModifyMessage;
 import com.smanzana.nostrummagica.network.message.StatRequestMessage;
 import com.smanzana.nostrummagica.network.message.StatSyncMessage;
+import com.smanzana.nostrummagica.network.message.TutorialMessage;
 import com.smanzana.nostrummagica.network.message.VanillaEffectSyncMessage;
 import com.smanzana.nostrummagica.network.message.WorldPortalTeleportRequestMessage;
 
@@ -132,6 +133,7 @@ public class NetworkHandler {
 		syncChannel.registerMessage(discriminator++, SpellChargeServerUpdateMessage.class, SpellChargeServerUpdateMessage::encode, SpellChargeServerUpdateMessage::decode, SpellChargeServerUpdateMessage::handle);
 		syncChannel.registerMessage(discriminator++, SpellChargeClientUpdateMessage.class, SpellChargeClientUpdateMessage::encode, SpellChargeClientUpdateMessage::decode, SpellChargeClientUpdateMessage::handle);
 		syncChannel.registerMessage(discriminator++, ClientCastAdhocMessage.class, ClientCastAdhocMessage::encode, ClientCastAdhocMessage::decode, ClientCastAdhocMessage::handle);
+		syncChannel.registerMessage(discriminator++, TutorialMessage.class, TutorialMessage::encode, TutorialMessage::decode, TutorialMessage::handle);
 	}
 	
 	//NetworkHandler.sendTo(new ClientCastReplyMessage(false, att.getMana(), 0, null),
