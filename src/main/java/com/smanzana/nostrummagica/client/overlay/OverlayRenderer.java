@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Multimap;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -45,12 +46,15 @@ import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCasting;
+import com.smanzana.nostrummagica.spell.SpellCooldownTracker;
+import com.smanzana.nostrummagica.spell.SpellCooldownTracker.Cooldowns;
 import com.smanzana.nostrummagica.spell.SpellCooldownTracker.SpellCooldown;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.RayTrace;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.AttackIndicatorStatus;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -108,6 +112,11 @@ public class OverlayRenderer extends GuiComponent {
 	private static final int GUI_CONTINGENCY_ICON_LENGTH = 18;
 	private static final int GUI_CAST_SWIRL_WIDTH = 48;
 	private static final int GUI_CAST_SWIRL_HEIGHT = 48;
+	private static final int GUI_SPELLCOOLDOWN_ICON_HOFFSET = 11;
+	private static final int GUI_SPELLCOOLDOWN_ICON_VOFFSET = 57;
+	private static final int GUI_SPELLCOOLDOWN_ICON_WIDTH = 16;
+	private static final int GUI_SPELLCOOLDOWN_ICON_HEIGHT = 4;
+	
 	
 	protected IIngameOverlay hookshotOverlay;
 	protected IIngameOverlay cursedFireOverlay;
@@ -122,6 +131,7 @@ public class OverlayRenderer extends GuiComponent {
 	protected IIngameOverlay mysticAirOverlay;
 	protected IIngameOverlay spellChargeOverlay;
 	protected IncantSelectionOverlay incantationSelectOverlay;
+	protected IIngameOverlay spellCooldownOverlay;
 	
 	private int wiggleIndex; // set to multiples of 12 for each wiggle
 	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
@@ -157,6 +167,7 @@ public class OverlayRenderer extends GuiComponent {
 		mysticAirOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.VIGNETTE_ELEMENT, "NostrumMagica::mysticAirOverlay", this::renderMysticAirOverlay);
 		spellChargeOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.CROSSHAIR_ELEMENT, "NostrumMagica::spellChargeOverlay", this::renderSpellChargeOverlay);
 		incantationSelectOverlay = new IncantSelectionOverlay(); OverlayRegistry.registerOverlayTop("NostrumMagica::incantationSelectOverlay", incantationSelectOverlay);
+		spellCooldownOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.CROSSHAIR_ELEMENT, "NostrumMagica::spellCooldownOverlay", this::renderSpellCooldownOverlay);
 	}
 	
 	private void renderMysticAirOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
@@ -1156,17 +1167,24 @@ public class OverlayRenderer extends GuiComponent {
 			final float progress = listener.getChargeManager().getChargePercent();
 			final float[] colorBase = ColorUtil.ARGBToColor(charge.charge.spell().getPrimaryElement().getColor());
 			
+			final int iconwidth = 16;
+			final int iconheight = 16; 
+			
 			RenderSystem.enableBlend();
 			RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 			RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
-			RenderSystem.setShaderTexture(0, GUI_CAST_CENTER);
-			
-			final int iconwidth = 16;
-			final int iconheight = 16; 
 			
 			matrixStackIn.pushPose();
 			matrixStackIn.translate(width/2, (height/2) + 12, 0);
 			
+			RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+			RenderSystem.setShaderTexture(0, NostrumMagica.Loc("textures/gui/cast_swirl_background.png"));
+			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, -iconwidth/2, -iconheight/2,
+					0, 0, GUI_CAST_SWIRL_WIDTH, GUI_CAST_SWIRL_HEIGHT, iconwidth, iconheight, GUI_CAST_SWIRL_WIDTH, GUI_CAST_SWIRL_HEIGHT,
+					.8f, .8f, .8f, .5f);
+			
+			RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+			RenderSystem.setShaderTexture(0, GUI_CAST_CENTER);
 			RenderFuncs.drawScaledCustomSizeModalRectImmediate(matrixStackIn, -iconwidth/2, -iconheight/2,
 					0, 0, GUI_CAST_SWIRL_WIDTH, GUI_CAST_SWIRL_HEIGHT, iconwidth, iconheight, GUI_CAST_SWIRL_WIDTH, GUI_CAST_SWIRL_HEIGHT,
 					colorBase[0] * .5f, colorBase[1] * .5f, colorBase[2] * .5f, 1f);
@@ -1178,7 +1196,7 @@ public class OverlayRenderer extends GuiComponent {
 			
 			Function<Float, float[]> color = (f) -> {
 				final float thisProg = (f - glowProg) % 1f;
-				final float glow = .25f + .25f * Mth.sin(thisProg * 2 * Mth.PI);
+				final float glow = .4f + .4f * Mth.sin(thisProg * 2 * Mth.PI);
 				return new float[] {colorBase[0] * glow, colorBase[1] * glow, colorBase[2] * glow, 1f};
 			};
 			RenderFuncs.drawRadialProgressQuadImmediate(matrixStackIn, -iconwidth/2, -iconheight/2, 0, iconwidth, iconheight, 0, 1, 0, 1, progress, color);
@@ -1222,6 +1240,33 @@ public class OverlayRenderer extends GuiComponent {
 			}
 			
 			matrixStackIn.popPose();
+		}
+	}
+	
+	private void renderSpellCooldownOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
+		final Player player = NostrumMagica.instance.proxy.getPlayer();
+		final SpellCooldownTracker tracker = NostrumMagica.instance.getSpellCooldownTracker(player.getLevel());
+		final Cooldowns cooldowns = tracker.getCooldowns(player);
+		if (cooldowns != null && cooldowns.getGlobalCooldown().endTicks > player.tickCount) {
+			final int totalCooldownTicks = cooldowns.getGlobalCooldown().endTicks - cooldowns.getGlobalCooldown().startTicks;
+			final int ticksElapsed = player.tickCount - cooldowns.getGlobalCooldown().startTicks;
+			final float cooldownProg = (float) ticksElapsed / (float) totalCooldownTicks;
+			final Minecraft mc = Minecraft.getInstance();
+			
+			final boolean hasAttackCooldown = mc.options.attackIndicator == AttackIndicatorStatus.CROSSHAIR && player.getAttackStrengthScale(0.0F) < 1f;
+			final int y = (height / 2 - 7 + 16) + (hasAttackCooldown ? 8 : 0);
+			final int x = width / 2 - 8;
+			
+			final int w = Math.round((float)GUI_SPELLCOOLDOWN_ICON_WIDTH * cooldownProg);
+			
+			RenderSystem.enableBlend();
+			RenderSystem.setShaderTexture(0, GUI_ICONS);
+			RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.ONE_MINUS_DST_COLOR, GlStateManager.DestFactor.ONE_MINUS_SRC_COLOR, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+			
+			RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+			this.blit(matrixStackIn, x, y, GUI_SPELLCOOLDOWN_ICON_HOFFSET, GUI_SPELLCOOLDOWN_ICON_VOFFSET, GUI_SPELLCOOLDOWN_ICON_WIDTH, GUI_SPELLCOOLDOWN_ICON_HEIGHT);
+			this.blit(matrixStackIn, x, y, GUI_SPELLCOOLDOWN_ICON_HOFFSET + GUI_SPELLCOOLDOWN_ICON_WIDTH, GUI_SPELLCOOLDOWN_ICON_VOFFSET, w, GUI_SPELLCOOLDOWN_ICON_HEIGHT);
+			RenderSystem.defaultBlendFunc();
 		}
 	}
 	
