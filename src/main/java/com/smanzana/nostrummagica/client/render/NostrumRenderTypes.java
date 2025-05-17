@@ -193,13 +193,13 @@ public class NostrumRenderTypes extends RenderType {
 		
 		glState = RenderType.CompositeState.builder()
 				.setTextureState(new RenderStateShard.TextureStateShard(ModelSwitchTrigger.TEXT, false, true))
-				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+				.setTransparencyState(NO_TRANSPARENCY)
 				.setLightmapState(NO_LIGHTING)
-				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
-				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+				//.setLayeringState(VIEW_OFFSET_Z_LAYERING)
+				//.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
 				.setShaderState(POSITION_COLOR_TEX_SHADER)
 			.createCompositeState(true);
-		SWITCH_TRIGGER_BASE = RenderType.create(Name("switch_trigger_base"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.TRIANGLES, 64, false, false, glState);
+		SWITCH_TRIGGER_BASE = RenderType.create(Name("switch_trigger_base"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 64, false, false, glState);
 		
 		glState = RenderType.CompositeState.builder()
 				.setTextureState(new RenderStateShard.TextureStateShard(ModelSwitchTrigger.CAGE_TEXT, false, true))
@@ -210,7 +210,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
 				.setShaderState(POSITION_COLOR_TEX_SHADER)
 			.createCompositeState(false);
-		SWITCH_TRIGGER_CAGE = RenderType.create(Name("switch_trigger_cage"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.TRIANGLES, 64, false, false, glState);
+		SWITCH_TRIGGER_CAGE = RenderType.create(Name("switch_trigger_cage"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 64, false, false, glState);
 		
 		glState = RenderType.CompositeState.builder()
 				.setTextureState(new RenderStateShard.TextureStateShard(TileEntityPortalRenderer.TEX_LOC, false, true))

@@ -789,17 +789,19 @@ public final class RenderFuncs {
 			bufferIn.vertex(transform, 0, 0, -width).color(red, green, blue, alpha).uv(.5f, .5f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n1.x(), n1.y(), n1.z()).endVertex();
 			bufferIn.vertex(transform, vx2, vy2, 0).color(red, green, blue, alpha).uv(u2, v2).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n1.x(), n1.y(), n1.z()).endVertex();
 			bufferIn.vertex(transform, vx1, vy1, 0).color(red, green, blue, alpha).uv(u1, v1).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n1.x(), n1.y(), n1.z()).endVertex();
+			bufferIn.vertex(transform, 0, 0, -width).color(red, green, blue, alpha).uv(.5f, .5f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n1.x(), n1.y(), n1.z()).endVertex();
 			
 			// for zpositive, add in ZP, LOW ANGLE, HIGH ANGLE
 			bufferIn.vertex(transform, 0, 0, width).color(red, green, blue, alpha).uv(.5f, .5f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n2.x(), n2.y(), n2.z()).endVertex();
 			bufferIn.vertex(transform, vx1, vy1, 0).color(red, green, blue, alpha).uv(u1, v1).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n2.x(), n2.y(), n2.z()).endVertex();
 			bufferIn.vertex(transform, vx2, vy2, 0).color(red, green, blue, alpha).uv(u2, v2).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n2.x(), n2.y(), n2.z()).endVertex();
+			bufferIn.vertex(transform, 0, 0, width).color(red, green, blue, alpha).uv(.5f, .5f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n2.x(), n2.y(), n2.z()).endVertex();
 		}
 	}
 	
 	public static final int ARGBFade(int ARGB, float alphaMultiplier) {
 		int rawAlpha = (ARGB >> 24) & 0xFF;
-		rawAlpha = Mth.clamp((int) (rawAlpha * alphaMultiplier), 0, 255);
+		rawAlpha = Mth.clamp((int) (rawAlpha * alphaMultiplier), 4, 255); // note: lower end is 4 because font renderer converts 0-3 alpha to 255 :(
 		return ((rawAlpha << 24) & 0xFF000000) | (ARGB & 0x00FFFFFF);
 	}
 	

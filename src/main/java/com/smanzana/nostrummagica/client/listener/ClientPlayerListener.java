@@ -67,6 +67,7 @@ import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
 import com.smanzana.nostrummagica.spell.SpellChargeTracker.ChargeType;
 import com.smanzana.nostrummagica.spell.SpellChargeTracker.SpellCharge;
+import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.Util;
@@ -297,36 +298,8 @@ public class ClientPlayerListener extends PlayerListener {
 		} else if (bindingShapeHelp.consumeClick()) {
 			this.spellshapeRenderer.toggle();
 		} else if (bindingCastSlow.consumeClick()) {
-			if (chargeManager.getCurrentCharge() == null && NostrumMagica.instance.getSpellCooldownTracker(mc.player.level).getCooldowns(mc.player).getGlobalCooldown().endTicks < mc.player.tickCount) {
-				Player player = mc.player;
-				INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-				if (attr != null && attr.isUnlocked()) {
-					if (hasIncantHand(player)) {
-						this.overlayRenderer.enableIncantationSelection();
-					} else {
-						player.sendMessage(new TranslatableComponent("info.incant.nohands"), Util.NIL_UUID);
-					}
-				}
-			}
+			this.startIncantHold(mc.player);
 		}
-	}
-	
-	protected boolean hasIncantHand(Player player) {
-		for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND}) {
-			if (SpellCasting.ItemAllowsCasting(player.getItemBySlot(slot), slot)) {
-				return true;
-			}
-		}
-		
-		// Check tome slot
-		@Nullable IInventorySlotKey<LivingEntity> key = NostrumMagica.instance.curios.getTomeSlotKey(player);
-		if (key != null) {
-			if (SpellCasting.ItemAllowsCasting(key.getHeldStack(player), null)) {
-				return true;
-			}
-		}
-		
-		return false;
 	}
 	
 	@SubscribeEvent
@@ -513,6 +486,47 @@ public class ClientPlayerListener extends PlayerListener {
 				}
 			}
 		}
+	}
+	
+	protected boolean hasIncantHand(Player player) {
+		for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND}) {
+			if (SpellCasting.ItemAllowsCasting(player.getItemBySlot(slot), slot)) {
+				return true;
+			}
+		}
+		
+		// Check tome slot
+		@Nullable IInventorySlotKey<LivingEntity> key = NostrumMagica.instance.curios.getTomeSlotKey(player);
+		if (key != null) {
+			if (SpellCasting.ItemAllowsCasting(key.getHeldStack(player), null)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	protected boolean startIncantHold(Player player) {
+		if (chargeManager.getCurrentCharge() == null && NostrumMagica.instance.getSpellCooldownTracker(player.level).getCooldowns(player).getGlobalCooldown().endTicks < player.tickCount) {
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+			if (attr != null && attr.isUnlocked()) {
+				if (hasIncantHand(player)) {
+					// Either enable selection, or just cast baby incantation if nothing else is unlocked
+					if (attr.getShapes() == null || attr.getShapes().size() < 2) {
+						startIncantationCast(new Incantation(
+								attr.getShapes() == null || attr.getShapes().isEmpty() ? NostrumSpellShapes.Touch : attr.getShapes().get(0),
+								EMagicElement.PHYSICAL, // hardcoding that physical is first element
+								null
+								));
+					} else {
+						this.overlayRenderer.enableIncantationSelection();
+					}
+				} else {
+					player.sendMessage(new TranslatableComponent("info.incant.nohands"), Util.NIL_UUID);
+				}
+			}
+		}
+		return false;
 	}
 	
 	protected void finishSpellCast(Player player, ClientTomeCharge charge) {

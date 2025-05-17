@@ -142,7 +142,7 @@ public class OutlineRenderer {
 	
 	@SubscribeEvent
 	public final void onRenderLast(RenderLevelStageEvent event) {
-		if (event.getStage() != Stage.AFTER_PARTICLES) {
+		if (event.getStage() != Stage.AFTER_TRIPWIRE_BLOCKS) {
 			return;
 		}
 		

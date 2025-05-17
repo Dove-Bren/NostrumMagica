@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector3f;
@@ -15,14 +16,14 @@ import com.smanzana.nostrummagica.tile.SwitchBlockTileEntity.SwitchTriggerType;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
-public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
+public class RenderSwitchTrigger extends LivingEntityRenderer<SwitchTriggerEntity, ModelSwitchTrigger> {
 
 	private static final double spinIdle = 3.0; // seconds per turn
 	private static final double spinActivated = 1.0;
@@ -32,7 +33,7 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 	private ModelSwitchTrigger modelRepeatable;
 	
 	public RenderSwitchTrigger(EntityRendererProvider.Context renderManagerIn) {
-		super(renderManagerIn);
+		super(renderManagerIn, null, .1f);
 		this.modelOneTime = new ModelSwitchTrigger();
 		this.modelTimed = new ModelTimedSwitchTrigger();
 		this.modelRepeatable = new ModelRepeatSwitchTrigger();
@@ -110,7 +111,8 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 	@Override
 	public void render(SwitchTriggerEntity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
 		if (shouldRenderSwitch(entityIn)) {
-			final ModelSwitchTrigger model = getEntityModel(entityIn);
+			if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderLivingEvent.Pre<>(entityIn, this, partialTicks, matrixStackIn, bufferIn, packedLightIn))) return;
+			this.model = getEntityModel(entityIn);
 			final SwitchBlockTileEntity te = entityIn.getLinkedTileEntity();
 			final boolean magic = te == null ? false : te.getSwitchHitType() == SwitchHitType.MAGIC;
 			final boolean triggered = te != null && te.isTriggered();
@@ -178,8 +180,17 @@ public class RenderSwitchTrigger extends EntityRenderer<SwitchTriggerEntity> {
 			VertexConsumer cageBuffer = bufferIn.getBuffer(NostrumRenderTypes.SWITCH_TRIGGER_CAGE);
 			model.renderToBuffer(matrixStackIn, cageBuffer, packedLightIn, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1f);
 			matrixStackIn.popPose();
+			if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.RenderLivingEvent.Post<>(entityIn, this, partialTicks, matrixStackIn, bufferIn, packedLightIn))) return;
 		}
-		super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn); // Nameplate
+		
+		//super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn); // Nameplate
+		{
+			net.minecraftforge.client.event.RenderNameplateEvent renderNameplateEvent = new net.minecraftforge.client.event.RenderNameplateEvent(entityIn, entityIn.getDisplayName(), this, matrixStackIn, bufferIn, packedLightIn, partialTicks);
+			net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(renderNameplateEvent);
+			if (renderNameplateEvent.getResult() != net.minecraftforge.eventbus.api.Event.Result.DENY && (renderNameplateEvent.getResult() == net.minecraftforge.eventbus.api.Event.Result.ALLOW || this.shouldShowName(entityIn))) {
+				this.renderNameTag(entityIn, renderNameplateEvent.getContent(), matrixStackIn, bufferIn, packedLightIn);
+			}
+		}
 	}
 	
 }

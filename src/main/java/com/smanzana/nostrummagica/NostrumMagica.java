@@ -74,6 +74,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -751,8 +752,9 @@ public class NostrumMagica {
 				&& attr.setElementalMastery(element, mastery)) {
 			if (mastery != EElementalMastery.UNKNOWN) {
 				if (entity != null && !entity.level.isClientSide
-						&& entity instanceof Player player) {
-					player.sendMessage(new TranslatableComponent("info.element_mastery." + mastery.getTranslationKey(), element.getDisplayName()), Util.NIL_UUID);
+						&& entity instanceof ServerPlayer player) {
+					final Component msg = new TranslatableComponent("info.element_mastery." + mastery.getTranslationKey(), element.getDisplayName());
+					player.sendMessage(msg, Util.NIL_UUID);
 				}
 			}
 			return true;

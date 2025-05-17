@@ -16,7 +16,11 @@ import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -179,6 +183,12 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 				final int color = 0x80000000 | (0x00FFFFFF & element.getColor());
 				DoEffect(worldPosition, player, color);
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
+				
+				final EElementalMastery mastery = attr.getElementalMastery(element);
+				final Component msg = new TranslatableComponent("info.element_mastery." + mastery.getTranslationKey(), element.getDisplayName().copy().withStyle(element.getChatColor()));
+				
+				((ServerPlayer)player).connection.send(new ClientboundSetSubtitleTextPacket(msg));
+				((ServerPlayer)player).connection.send(new ClientboundSetTitleTextPacket(TextComponent.EMPTY));
 			} else {
 				player.sendMessage(new TranslatableComponent("info.shrine.seektrial"), Util.NIL_UUID);
 			}
@@ -249,8 +259,13 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 			if (!attr.getAlterations().getOrDefault(alteration, false)) {
 				attr.unlockAlteration(alteration);
 				DoEffect(worldPosition, player, 0x80808ABF);
-				player.sendMessage(new TranslatableComponent("info.shrine.alteration", alteration.getDisplayName()), Util.NIL_UUID);
+				
+				final Component msg = new TranslatableComponent("info.shrine.alteration", alteration.getDisplayName());
+				player.sendMessage(msg, Util.NIL_UUID);
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
+				
+				((ServerPlayer)player).connection.send(new ClientboundSetSubtitleTextPacket(msg));
+				((ServerPlayer)player).connection.send(new ClientboundSetTitleTextPacket(TextComponent.EMPTY));
 			}
 		}
 
@@ -324,8 +339,12 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 			if (!attr.getShapes().contains(shape)) {
 				attr.addShape(shape);
 				DoEffect(worldPosition, player, 0x8080C0A0);
-				player.sendMessage(new TranslatableComponent("info.shrine.shape", new Object[] {shape.getDisplayName()}), Util.NIL_UUID);
+				final Component msg = new TranslatableComponent("info.shrine.shape", new Object[] {shape.getDisplayName()});
+				player.sendMessage(msg, Util.NIL_UUID);
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
+				
+				((ServerPlayer)player).connection.send(new ClientboundSetSubtitleTextPacket(msg));
+				((ServerPlayer)player).connection.send(new ClientboundSetTitleTextPacket(TextComponent.EMPTY));
 			}
 		}
 
@@ -391,8 +410,12 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 			if (!attr.getTier().isGreaterOrEqual(tier)) {
 				attr.setTier(tier);
 				DoEffect(worldPosition, player, 0x80666666);
-				player.sendMessage(new TranslatableComponent("info.shrine.tier", tier.getName()), Util.NIL_UUID);
+				final Component msg = new TranslatableComponent("info.shrine.tier", tier.getName());
+				player.sendMessage(msg, Util.NIL_UUID);
 				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
+				
+				((ServerPlayer)player).connection.send(new ClientboundSetSubtitleTextPacket(msg));
+				((ServerPlayer)player).connection.send(new ClientboundSetTitleTextPacket(TextComponent.EMPTY));
 			}
 		}
 

@@ -58,18 +58,22 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
  */
 public class IncantSelectionOverlay implements IIngameOverlay {
 	
-	private static final double FADE_MS = 250;
+	private static final double FADE_MS = 300 - 200;//QUICKPRESS_MS;
+	private static final double QUICKPRESS_MS = 200;
 	
 	private static final Component noneTitle = new TextComponent("None");
 	private static final ITooltip noneTooltip = Tooltip.create(new TextComponent("Do not use an alteration"));
 	
 	protected boolean enabled;
-	protected long showTime; // for animating
+	protected long showTime; // For behavior like quick-press
+	protected long fadeTime; // for animating
 	
 	// Selection variables
 	private @Nullable EMagicElement element;
 	private @Nullable SpellShape shape;
 	private @Nullable EAlteration alteration;
+	
+	private @Nullable Incantation lastIncantation;
 	
 	private WheelSlice<?>[] elementSlices;
 	private WheelSlice<?>[][] shapeSlices;
@@ -94,6 +98,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	protected void onEnable() {
 		initSlices();
 		
+		this.showTime = System.currentTimeMillis();
 		resetFadeTimer();
 		mc.mouseHandler.releaseMouse();
 	}
@@ -102,6 +107,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		resetFadeTimer();
 //		resetSelection(); dont reset here; wait for fade out
 		mc.mouseHandler.grabMouse();
+		this.showTime = 0;
 	}
 	
 	public void enableSelection(boolean enabled) {
@@ -117,13 +123,17 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		}
 	}
 	
+	protected boolean isQuickPressTime() {
+		return System.currentTimeMillis() - this.showTime < QUICKPRESS_MS;
+	}
+	
 	protected void resetFadeTimer() {
 		// Use any previous in-progress fade to smooth this out
-		final long diff = System.currentTimeMillis() - showTime;
+		final long diff = System.currentTimeMillis() - fadeTime;
 		if (diff < FADE_MS) {
-			showTime = System.currentTimeMillis() - (long)(FADE_MS - diff);
+			fadeTime = System.currentTimeMillis() - (long)(FADE_MS - diff);
 		} else {
-			showTime = System.currentTimeMillis();
+			fadeTime = System.currentTimeMillis() + (long)QUICKPRESS_MS;
 		}
 	}
 	
@@ -135,7 +145,18 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	
 	protected void submitSelection() {
 		ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
-		listener.startIncantationCast(new Incantation(this.shape, this.element, this.alteration));
+		this.lastIncantation = new Incantation(this.shape, this.element, this.alteration);
+		listener.startIncantationCast(this.lastIncantation);
+		this.enableSelection(false);
+	}
+	
+	protected void onKeyRelease() {
+		if (isQuickPressTime() && this.lastIncantation != null) {
+			// Recast previous incantation
+			ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
+			listener.startIncantationCast(this.lastIncantation);
+		}
+		
 		this.enableSelection(false);
 	}
 	
@@ -391,7 +412,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	}
 	
 	protected float getFadeProgress() {
-		final long diff = System.currentTimeMillis() - showTime;
+		final long diff = Math.max(0, System.currentTimeMillis() - fadeTime);
 		final float progRaw = (float)((double) diff / FADE_MS);
 		final float prog = (isEnabled() ? progRaw : 1f - progRaw);
 		return Mth.clamp(prog, 0f, 1f);
@@ -428,7 +449,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 
 	public void render(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
 		ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
-		if (this.isEnabled() || this.getFadeProgress() > 0f) {
+		if (/*this.isEnabled() || */this.getFadeProgress() > 0f) {
 			final float fade = this.getFadeProgress();
 			Player player = NostrumMagica.instance.proxy.getPlayer();
 			final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
@@ -458,7 +479,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		
 		// This will also be what turns itself off
 		if (this.isEnabled() && !listener.getBindingIncant().isDown()) {
-			this.enableSelection(false);
+			onKeyRelease();
 		}
 		
 		if (!this.isEnabled() && this.getFadeProgress() <= 0f) {
@@ -665,6 +686,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 				matrixStackIn.translate(0, 10, 0);
 				matrixStackIn.scale(.5f, .5f, .5f);
 				{
+					RenderSystem.enableBlend();
 					final int len = mc.font.width(slice.name());
 					mc.font.draw(matrixStackIn, slice.name(), -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
 //					int y = 0;
