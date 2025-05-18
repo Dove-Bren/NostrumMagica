@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.smanzana.nostrummagica.client.model.ModelCastingPlayer;
+import com.smanzana.nostrummagica.client.model.CastingPlayerModel;
 
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
@@ -21,7 +21,7 @@ public abstract class PlayerModelMixin<T extends LivingEntity> extends HumanoidM
 	
 	@Inject(method = "setupAnim", at=@At(value = "RETURN"))
 	private void onSetupAnim(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
-		ModelCastingPlayer.setupAnim(this, entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+		CastingPlayerModel.setupAnim(this, entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 	}
 
 }

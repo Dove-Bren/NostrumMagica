@@ -8,7 +8,7 @@ import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.client.model.ModelWitchHat;
+import com.smanzana.nostrummagica.client.model.WitchHatModel;
 import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.item.NostrumItems;
@@ -156,7 +156,7 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 		return String.format("%s:textures/models/armor/mage_layer_%d%s.png", NostrumMagica.MODID, (isLegSlot ? 2 : 1), type == null ? "" : String.format("_%s", type));
 	}
 
-	private static ModelWitchHat<?> model;
+	private static WitchHatModel<?> model;
 	
 	@Override
 	public void initializeClient(Consumer<IItemRenderProperties> props) {
@@ -166,7 +166,7 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 			public HumanoidModel<?> getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlot armorSlot, HumanoidModel<?> _default) {
 				if (armorSlot == EquipmentSlot.HEAD && MageArmor.this.slot == armorSlot) {
 					if (model == null) {
-						model = new ModelWitchHat<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.WitchHat));
+						model = new WitchHatModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.WitchHat));
 					}
 					return model;
 				}

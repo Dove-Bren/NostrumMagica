@@ -40,22 +40,22 @@ public class NostrumModelLayers {
 	
 	@SubscribeEvent
 	public static void registerModelLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
-		event.registerLayerDefinition(Lux, ModelLux::createLayer);
-		event.registerLayerDefinition(DragonEgg, ModelDragonEgg::createLayer);
-		event.registerLayerDefinition(FlightWings, ModelDragonFlightWings::createLayer);
-		event.registerLayerDefinition(Golem, ModelGolem::createLayer);
-		event.registerLayerDefinition(HookshotAnchor, ModelHookShot::createLayer);
-		event.registerLayerDefinition(Plantboss, ModelPlantBoss::createLayer);
-		event.registerLayerDefinition(PlantbossBramble, ModelPlantBossBramble::createLayer);
-		event.registerLayerDefinition(PlantbossLeaf, ModelPlantBossLeaf::createLayer);
-		event.registerLayerDefinition(Willo, ModelWillo::createLayer);
-		event.registerLayerDefinition(WitchHat, ModelWitchHat::createLayer);
-		event.registerLayerDefinition(ArcaneWolf, ModelArcaneWolf::createLayer);
+		event.registerLayerDefinition(Lux, LuxModel::createLayer);
+		event.registerLayerDefinition(DragonEgg, DragonEggModel::createLayer);
+		event.registerLayerDefinition(FlightWings, DragonFlightWingsModel::createLayer);
+		event.registerLayerDefinition(Golem, GolemModel::createLayer);
+		event.registerLayerDefinition(HookshotAnchor, HookShotModel::createLayer);
+		event.registerLayerDefinition(Plantboss, PlantBossModel::createLayer);
+		event.registerLayerDefinition(PlantbossBramble, PlantBossBrambleModel::createLayer);
+		event.registerLayerDefinition(PlantbossLeaf, PlantBossLeafModel::createLayer);
+		event.registerLayerDefinition(Willo, WilloModel::createLayer);
+		event.registerLayerDefinition(WitchHat, WitchHatModel::createLayer);
+		event.registerLayerDefinition(ArcaneWolf, ArcaneWolfModel::createLayer);
 
-		event.registerLayerDefinition(ElemArmor_0, () -> ModelEnchantedArmorBase.createLayer(0));
-		event.registerLayerDefinition(ElemArmor_1, () -> ModelEnchantedArmorBase.createLayer(1));
-		event.registerLayerDefinition(ElemArmor_2, () -> ModelEnchantedArmorBase.createLayer(2));
-		event.registerLayerDefinition(ElemArmor_3, () -> ModelEnchantedArmorBase.createLayer(3));
-		event.registerLayerDefinition(ElemArmor_4, () -> ModelEnchantedArmorBase.createLayer(4));
+		event.registerLayerDefinition(ElemArmor_0, () -> EnchantedArmorBaseModel.createLayer(0));
+		event.registerLayerDefinition(ElemArmor_1, () -> EnchantedArmorBaseModel.createLayer(1));
+		event.registerLayerDefinition(ElemArmor_2, () -> EnchantedArmorBaseModel.createLayer(2));
+		event.registerLayerDefinition(ElemArmor_3, () -> EnchantedArmorBaseModel.createLayer(3));
+		event.registerLayerDefinition(ElemArmor_4, () -> EnchantedArmorBaseModel.createLayer(4));
 	}
 }

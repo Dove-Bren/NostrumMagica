@@ -25,11 +25,11 @@ import net.minecraftforge.network.PacketDistributor.TargetPoint;
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum NostrumParticles {
 
-	GLOW_ORB(new NostrumParticleType("glow_orb"), ParticleGlowOrb::MakeParticle),
-	LIGHTNING_STATIC(new NostrumParticleType("lightning_static"), ParticleLightningStatic::MakeParticle),
-	FILLED_ORB(new NostrumParticleType("filled_orb"), ParticleFilledOrb::MakeParticle),
-	WARD(new NostrumParticleType("ward"), ParticleWard::MakeParticle),
-	LIGHT_EXPLOSION(new NostrumParticleType("light_explosion"), ParticleLightExplosion::MakeParticle),
+	GLOW_ORB(new NostrumParticleType("glow_orb"), GlowOrbParticle::MakeParticle),
+	LIGHTNING_STATIC(new NostrumParticleType("lightning_static"), LightningStaticParticle::MakeParticle),
+	FILLED_ORB(new NostrumParticleType("filled_orb"), FilledOrbParticle::MakeParticle),
+	WARD(new NostrumParticleType("ward"), WardParticle::MakeParticle),
+	LIGHT_EXPLOSION(new NostrumParticleType("light_explosion"), LightExplosionParticle::MakeParticle),
 	;
 	
 	@SubscribeEvent

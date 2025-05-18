@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
+import com.smanzana.nostrummagica.client.render.layer.AetherCloakLayer;
 import com.smanzana.nostrummagica.item.armor.ICapeProvider;
 
 import net.minecraft.world.entity.LivingEntity;
@@ -84,7 +84,7 @@ public class NostrumElytraWrapper {
 		// Cancel if a cape is specifically suppressing it
 		final LivingEntity entity = event.getEntityLiving();
 		final boolean flying = entity.isFallFlying();
-		ItemStack cape = LayerAetherCloak.ShouldRender(entity);
+		ItemStack cape = AetherCloakLayer.ShouldRender(entity);
 		if (!flying && !cape.isEmpty() && ((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(entity, cape)) {
 			event.setCanceled(true);
 			return;

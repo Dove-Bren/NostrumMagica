@@ -10,12 +10,12 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Matrix4f;
 import com.smanzana.nostrummagica.client.effects.ClientEffectBeam;
-import com.smanzana.nostrummagica.client.model.ModelSwitchTrigger;
-import com.smanzana.nostrummagica.client.render.entity.RenderHookShot;
-import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
-import com.smanzana.nostrummagica.client.render.tile.TileEntityLockedChestRenderer;
-import com.smanzana.nostrummagica.client.render.tile.TileEntityPortalRenderer;
-import com.smanzana.nostrummagica.client.render.tile.TileEntityProgressionDoorRenderer;
+import com.smanzana.nostrummagica.client.model.SwitchTriggerModel;
+import com.smanzana.nostrummagica.client.render.entity.HookShotRenderer;
+import com.smanzana.nostrummagica.client.render.layer.ManaArmorLayer;
+import com.smanzana.nostrummagica.client.render.tile.LockedChestBlockEntityRenderer;
+import com.smanzana.nostrummagica.client.render.tile.PortalBlockEntityRenderer;
+import com.smanzana.nostrummagica.client.render.tile.ProgressionDoorBlockEntityRenderer;
 
 import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderStateShard;
@@ -117,7 +117,7 @@ public class NostrumRenderTypes extends RenderType {
 		RenderType.CompositeState glState;
 		
 		glState = RenderType.CompositeState.builder()
-				.setTextureState(new RenderStateShard.TextureStateShard(RenderHookShot.CHAIN_TEXTURE, false, true))
+				.setTextureState(new RenderStateShard.TextureStateShard(HookShotRenderer.CHAIN_TEXTURE, false, true))
 				.setCullState(NO_CULL)
 				.setLightmapState(NO_LIGHTING)
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
@@ -127,7 +127,7 @@ public class NostrumRenderTypes extends RenderType {
 		HOOKSHOT_CHAIN = RenderType.create(Name("hookshot_chain"), DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS, 128, false, false, glState);
 		
 		glState = RenderType.CompositeState.builder()
-				.setTextureState(new RenderStateShard.TextureStateShard(LayerManaArmor.TEXTURE_ARMOR, true, false))
+				.setTextureState(new RenderStateShard.TextureStateShard(ManaArmorLayer.TEXTURE_ARMOR, true, false))
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
 				.setLightmapState(NO_LIGHTING)
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
@@ -192,7 +192,7 @@ public class NostrumRenderTypes extends RenderType {
 		SPELLSHAPE_LINES_THICK = RenderType.create(Name("spellshape_lines_thick"), DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.LINES, 32, false, false, glState);
 		
 		glState = RenderType.CompositeState.builder()
-				.setTextureState(new RenderStateShard.TextureStateShard(ModelSwitchTrigger.TEXT, false, true))
+				.setTextureState(new RenderStateShard.TextureStateShard(SwitchTriggerModel.TEXT, false, true))
 				.setTransparencyState(NO_TRANSPARENCY)
 				.setLightmapState(NO_LIGHTING)
 				//.setLayeringState(VIEW_OFFSET_Z_LAYERING)
@@ -202,7 +202,7 @@ public class NostrumRenderTypes extends RenderType {
 		SWITCH_TRIGGER_BASE = RenderType.create(Name("switch_trigger_base"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 64, false, false, glState);
 		
 		glState = RenderType.CompositeState.builder()
-				.setTextureState(new RenderStateShard.TextureStateShard(ModelSwitchTrigger.CAGE_TEXT, false, true))
+				.setTextureState(new RenderStateShard.TextureStateShard(SwitchTriggerModel.CAGE_TEXT, false, true))
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
 				.setLightmapState(NO_LIGHTING)
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
@@ -213,7 +213,7 @@ public class NostrumRenderTypes extends RenderType {
 		SWITCH_TRIGGER_CAGE = RenderType.create(Name("switch_trigger_cage"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 64, false, false, glState);
 		
 		glState = RenderType.CompositeState.builder()
-				.setTextureState(new RenderStateShard.TextureStateShard(TileEntityPortalRenderer.TEX_LOC, false, true))
+				.setTextureState(new RenderStateShard.TextureStateShard(PortalBlockEntityRenderer.TEX_LOC, false, true))
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
 				.setLightmapState(NO_LIGHTING)
 				.setCullState(NO_CULL)
@@ -222,7 +222,7 @@ public class NostrumRenderTypes extends RenderType {
 		NOSTRUM_PORTAL = RenderType.create(Name("nostrum_portal"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.TRIANGLES, 64, false, false, glState);
 		
 		glState = RenderType.CompositeState.builder()
-				.setTextureState(new RenderStateShard.TextureStateShard(TileEntityProgressionDoorRenderer.TEX_GEM_LOC, false, true))
+				.setTextureState(new RenderStateShard.TextureStateShard(ProgressionDoorBlockEntityRenderer.TEX_GEM_LOC, false, true))
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
 				.setLightmapState(LIGHTMAP_ENABLED)
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
@@ -233,7 +233,7 @@ public class NostrumRenderTypes extends RenderType {
 		
 		
 		glState = RenderType.CompositeState.builder()
-				.setTextureState(new RenderStateShard.TextureStateShard(TileEntityLockedChestRenderer.TEXT_LOCK_LOC, false, true))
+				.setTextureState(new RenderStateShard.TextureStateShard(LockedChestBlockEntityRenderer.TEXT_LOCK_LOC, false, true))
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
 				.setLightmapState(LIGHTMAP_ENABLED)
 				.setCullState(NO_CULL)
@@ -242,7 +242,7 @@ public class NostrumRenderTypes extends RenderType {
 		LOCKEDCHEST_LOCK = RenderType.create(Name("lockedchest_lock"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.QUADS, 32, false, false, glState);
 		
 		glState = RenderType.CompositeState.builder()
-				.setTextureState(new RenderStateShard.TextureStateShard(TileEntityLockedChestRenderer.TEXT_CHAINLINK_LOC, false, true))
+				.setTextureState(new RenderStateShard.TextureStateShard(LockedChestBlockEntityRenderer.TEXT_CHAINLINK_LOC, false, true))
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
 				.setLightmapState(LIGHTMAP_ENABLED)
 				.setCullState(NO_CULL)

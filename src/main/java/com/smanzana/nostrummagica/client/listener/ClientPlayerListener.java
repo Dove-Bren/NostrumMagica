@@ -36,11 +36,11 @@ import com.smanzana.nostrummagica.client.render.OutlineRenderer.Outline;
 import com.smanzana.nostrummagica.client.render.SelectionRenderer;
 import com.smanzana.nostrummagica.client.render.SpellShapeRenderer;
 import com.smanzana.nostrummagica.client.render.layer.EntityEffectLayer;
-import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
-import com.smanzana.nostrummagica.client.render.layer.LayerArmorElytra;
-import com.smanzana.nostrummagica.client.render.layer.LayerDragonFlightWings;
-import com.smanzana.nostrummagica.client.render.layer.LayerKoidHelm;
-import com.smanzana.nostrummagica.client.render.layer.LayerManaArmor;
+import com.smanzana.nostrummagica.client.render.layer.AetherCloakLayer;
+import com.smanzana.nostrummagica.client.render.layer.ArmorElytraLayer;
+import com.smanzana.nostrummagica.client.render.layer.DragonFlightWingsLayer;
+import com.smanzana.nostrummagica.client.render.layer.KoidHelmLayer;
+import com.smanzana.nostrummagica.client.render.layer.ManaArmorLayer;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
@@ -800,7 +800,7 @@ public class ClientPlayerListener extends PlayerListener {
 			}
 		}
 		
-		if (LayerKoidHelm.ShouldRender(player)) {
+		if (KoidHelmLayer.ShouldRender(player)) {
 			event.getRenderer().getModel().head.visible = false;
 			event.getRenderer().getModel().jacket.visible = false;
 		}
@@ -814,11 +814,11 @@ public class ClientPlayerListener extends PlayerListener {
 			InjectedSet.put(event.getRenderer(), true);
 			
 			// Instead, we just inject a layer for our custom elytras, and another for dragon-flight wings
-			event.getRenderer().addLayer(new LayerDragonFlightWings(event.getRenderer()));
-			event.getRenderer().addLayer(new LayerAetherCloak(event.getRenderer()));
-			event.getRenderer().addLayer(new LayerManaArmor(event.getRenderer()));
-			event.getRenderer().addLayer(new LayerKoidHelm(event.getRenderer()));
-			event.getRenderer().addLayer(new LayerArmorElytra<>(event.getRenderer(), Minecraft.getInstance().getEntityModels()));
+			event.getRenderer().addLayer(new DragonFlightWingsLayer(event.getRenderer()));
+			event.getRenderer().addLayer(new AetherCloakLayer(event.getRenderer()));
+			event.getRenderer().addLayer(new ManaArmorLayer(event.getRenderer()));
+			event.getRenderer().addLayer(new KoidHelmLayer(event.getRenderer()));
+			event.getRenderer().addLayer(new ArmorElytraLayer<>(event.getRenderer(), Minecraft.getInstance().getEntityModels()));
 		}
 
 		Minecraft mc = Minecraft.getInstance();

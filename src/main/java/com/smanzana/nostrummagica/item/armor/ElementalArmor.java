@@ -23,11 +23,11 @@ import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.model.ModelEnchantedArmorBase;
+import com.smanzana.nostrummagica.client.model.EnchantedArmorBaseModel;
 import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.client.render.layer.LayerAetherCloak;
+import com.smanzana.nostrummagica.client.render.layer.AetherCloakLayer;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.AreaEffectEntity;
@@ -509,7 +509,7 @@ public class ElementalArmor extends ArmorItem
 
 	// TODO: move?
 	@OnlyIn(Dist.CLIENT)
-	private static List<ModelEnchantedArmorBase<LivingEntity>> armorModels;
+	private static List<EnchantedArmorBaseModel<LivingEntity>> armorModels;
 
 	public ElementalArmor(EMagicElement element, EquipmentSlot slot, Type type, Item.Properties builder) {
 		super(ArmorMaterials.IRON, slot, builder.durability(calcArmorDurability(slot, element, type)));
@@ -1056,17 +1056,17 @@ public class ElementalArmor extends ArmorItem
 			public HumanoidModel getArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot,
 					HumanoidModel defaultModel) {
 				if (armorModels == null) {
-					armorModels = new ArrayList<ModelEnchantedArmorBase<LivingEntity>>(5);
-					armorModels.add(0, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_0)));
-					armorModels.add(1, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_1)));
-					armorModels.add(2, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_2)));
-					armorModels.add(3, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_3)));
-					armorModels.add(4, new ModelEnchantedArmorBase<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_4)));
+					armorModels = new ArrayList<EnchantedArmorBaseModel<LivingEntity>>(5);
+					armorModels.add(0, new EnchantedArmorBaseModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_0)));
+					armorModels.add(1, new EnchantedArmorBaseModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_1)));
+					armorModels.add(2, new EnchantedArmorBaseModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_2)));
+					armorModels.add(3, new EnchantedArmorBaseModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_3)));
+					armorModels.add(4, new EnchantedArmorBaseModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(NostrumModelLayers.ElemArmor_4)));
 				}
 				
 				final int setCount = getSetPieces(entity);
 				final int index = (setCount - 1) + (type == Type.MASTER ? 1 : 0); // Boost 1 if ultimate armor
-				ModelEnchantedArmorBase<LivingEntity> model = armorModels.get(index % armorModels.size());
+				EnchantedArmorBaseModel<LivingEntity> model = armorModels.get(index % armorModels.size());
 				model.setVisibleFrom(slot);
 
 				return model;
@@ -2250,7 +2250,7 @@ public class ElementalArmor extends ArmorItem
 				return true;
 			}
 
-			ItemStack cape = LayerAetherCloak.ShouldRender(player);
+			ItemStack cape = AetherCloakLayer.ShouldRender(player);
 			return cape.isEmpty() || !((ICapeProvider) cape.getItem()).shouldPreventOtherRenders(player, cape);
 		}
 		return false;
