@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.ISpellTargetBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.criteria.CastSpellCriteriaTrigger;
 import com.smanzana.nostrummagica.effect.ElementalSpellBoostEffect;
@@ -57,6 +58,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -361,6 +363,17 @@ public class Spell {
 				} else if (locations != null && !locations.isEmpty()) {
 					// use locations
 					for (SpellLocation pos : locations) {
+						// Possibly interact with spell aware blocks
+						BlockState state = pos.world.getBlockState(pos.selectedBlockPos);
+						if (state.getBlock() instanceof ISpellTargetBlock target) {
+							if (target.processSpellEffect(pos.world, state, pos.selectedBlockPos, caster, pos, spell, action)) {
+								// Block consumed this effect
+								anySuccess = true;
+								totalAffectedLocations.add(pos);
+								continue;
+							}
+						}
+						
 						log.effect(pos);
 						SpellActionResult result = action.apply(caster, pos, efficiency, log); 
 						if (result.applied) {

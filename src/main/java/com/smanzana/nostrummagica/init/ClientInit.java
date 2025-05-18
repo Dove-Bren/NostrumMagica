@@ -102,6 +102,7 @@ import com.smanzana.nostrummagica.client.render.tile.TileEntityManaArmorerRender
 import com.smanzana.nostrummagica.client.render.tile.TileEntityObeliskRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityPortalRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityProgressionDoorRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TileEntityPushBlockRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TileEntityTrialRenderer;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
@@ -401,6 +402,7 @@ public class ClientInit {
 		event.registerBlockEntityRenderer(NostrumTileEntities.LockedDoorType, TileEntityLockedDoorRenderer::new);
 		event.registerBlockEntityRenderer(NostrumTileEntities.DungeonKeyChestTileEntityType, TileEntityDungeonKeyChestRenderer::new);
 		event.registerBlockEntityRenderer(NostrumTileEntities.DungeonDoorTileEntityType, TileEntityDungeonDoorRenderer::new);
+		event.registerBlockEntityRenderer(NostrumTileEntities.PushBlockTileEntityType, TileEntityPushBlockRenderer::new);
 	}
 	
 	@SubscribeEvent
@@ -472,6 +474,7 @@ public class ClientInit {
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.largeDungeonKeyChest, RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.smallDungeonDoor, RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.largeDungeonDoor, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.pushBlock, RenderType.solid());
 	}
 	
 	private static final void registerItemModelProperties() {

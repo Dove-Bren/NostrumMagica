@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.block.dungeon.MatchSpawnerBlock;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.block.dungeon.TriggeredMatchSpawnerBlock;
 import com.smanzana.nostrummagica.block.dungeon.ProgressionDoorBlock;
+import com.smanzana.nostrummagica.block.dungeon.PushBlock;
 import com.smanzana.nostrummagica.block.dungeon.RedstoneTriggerBlock;
 import com.smanzana.nostrummagica.block.dungeon.ShrineBlock;
 import com.smanzana.nostrummagica.block.dungeon.SwitchBlock;
@@ -125,7 +126,8 @@ public class NostrumBlocks {
 	@ObjectHolder(DungeonKeyChestBlock.Small.ID) public static DungeonKeyChestBlock.Small smallDungeonKeyChest;
 	@ObjectHolder(DungeonKeyChestBlock.Large.ID) public static DungeonKeyChestBlock.Large largeDungeonKeyChest;
 	@ObjectHolder(DungeonDoorBlock.Small.ID) public static DungeonDoorBlock.Small smallDungeonDoor;
-	@ObjectHolder(DungeonDoorBlock.Large.ID) public static DungeonDoorBlock.Large largeDungeonDoor; 
+	@ObjectHolder(DungeonDoorBlock.Large.ID) public static DungeonDoorBlock.Large largeDungeonDoor;
+	@ObjectHolder(PushBlock.ID) public static PushBlock pushBlock;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -210,6 +212,7 @@ public class NostrumBlocks {
     	registerBlockItem(largeDungeonKeyChest, largeDungeonKeyChest.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(smallDungeonDoor, smallDungeonDoor.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(largeDungeonDoor, largeDungeonDoor.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(pushBlock, pushBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -312,6 +315,7 @@ public class NostrumBlocks {
     	
     	registerBlock(new DungeonDoorBlock.Small(), DungeonDoorBlock.Small.ID, registry);
     	registerBlock(new DungeonDoorBlock.Large(), DungeonDoorBlock.Large.ID, registry);
+    	registerBlock(new PushBlock(), PushBlock.ID, registry);
     }
     
 }

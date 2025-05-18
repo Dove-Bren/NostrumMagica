@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.Blocks;
 
 public class RenderCursedGlassTrigger extends RenderSwitchTrigger {
 	
-	private /*final*/ ModelCursedGlass model;
+	private final ModelCursedGlass model;
 	
 	public RenderCursedGlassTrigger(EntityRendererProvider.Context renderManagerIn) {
 		super(renderManagerIn);

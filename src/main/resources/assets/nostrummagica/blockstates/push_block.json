@@ -1,0 +1,5 @@
+{
+    "variants": {
+        "": { "model": "nostrummagica:block/push_block" }
+    }
+}

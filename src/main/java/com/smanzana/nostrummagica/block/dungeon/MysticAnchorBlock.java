@@ -3,8 +3,12 @@ package com.smanzana.nostrummagica.block.dungeon;
 import java.util.Random;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.ISpellTargetBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellLocation;
+import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Projectiles;
 
@@ -36,7 +40,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  * @author Skyler
  *
  */
-public class MysticAnchorBlock extends Block {
+public class MysticAnchorBlock extends Block implements ISpellTargetBlock {
 	
 	public static final String ID = "mystic_anchor";
 	
@@ -133,5 +137,15 @@ public class MysticAnchorBlock extends Block {
 		}
 		
 		return InteractionResult.SUCCESS;
+	}
+
+	@Override
+	public boolean processSpellEffect(Level level, BlockState state, BlockPos pos, LivingEntity caster, SpellLocation hitLocation, Spell spell, SpellAction action) {
+		if (!level.isClientSide()) {
+			teleportEntity(level, pos, caster);
+			return true;
+		}
+		
+		return false;
 	}
 }
