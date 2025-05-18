@@ -33,7 +33,7 @@ public class DungeonKeyChestTileEntity extends BlockEntity implements IWorldKeyH
 	private long openTicks = -1;
 	
 	public DungeonKeyChestTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.DungeonKeyChestTileEntityType, pos, state);
+		super(NostrumBlockEntities.DungeonKeyChest, pos, state);
 		key = new WorldKey();
 		triggered = false;
 	}

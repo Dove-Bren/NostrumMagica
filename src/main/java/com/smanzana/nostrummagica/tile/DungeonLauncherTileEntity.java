@@ -49,7 +49,7 @@ public class DungeonLauncherTileEntity extends BlockEntity implements TickableBl
 	private int ticksExisted;
 	
 	public DungeonLauncherTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.DungeonLauncherTileType, pos, state);
+		super(NostrumBlockEntities.DungeonLauncher, pos, state);
 		this.inventory = new SimpleContainer(9) {
 			@Override
 			public void setChanged() {

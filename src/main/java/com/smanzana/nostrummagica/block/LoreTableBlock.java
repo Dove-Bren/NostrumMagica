@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.block;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.LoreTableGui;
 import com.smanzana.nostrummagica.tile.LoreTableTileEntity;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
 import net.minecraft.core.BlockPos;
@@ -59,7 +59,7 @@ public class LoreTableBlock extends BaseEntityBlock {
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.LoreTableEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.LoreTable);
 	}
 	
 	@Override

@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import com.smanzana.nostrummagica.item.WorldKeyItem;
 import com.smanzana.nostrummagica.tile.LockedDoorTileEntity;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
 import net.minecraft.core.BlockPos;
@@ -49,7 +49,7 @@ public class LockedDoorBlock extends MagicDoorBlock implements EntityBlock {
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.LockedDoorType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.LockedDoor);
 	}
 	
 	@Override

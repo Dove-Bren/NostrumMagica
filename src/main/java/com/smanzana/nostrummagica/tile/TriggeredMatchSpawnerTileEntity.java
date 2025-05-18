@@ -11,7 +11,7 @@ public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
 	protected boolean triggered;
 	
 	public TriggeredMatchSpawnerTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.TriggeredMatchSpawnerTileEntityType, pos, state);
+		super(NostrumBlockEntities.TriggeredMatchSpawner, pos, state);
 	}
 	
 	public boolean isTriggered() {

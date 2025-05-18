@@ -39,7 +39,7 @@ public class SpellTableTileEntity extends BlockEntity implements ISpellCraftingI
 	private @Nonnull ItemStack slots[];
 	
 	public SpellTableTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.SpellTableEntityType, pos, state);
+		super(NostrumBlockEntities.SpellTable, pos, state);
 		slots = new ItemStack[getContainerSize()];
 		for (int i = 0; i < slots.length; i++)
 			slots[i] = ItemStack.EMPTY;

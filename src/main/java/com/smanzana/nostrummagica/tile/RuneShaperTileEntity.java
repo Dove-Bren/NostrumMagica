@@ -27,7 +27,7 @@ public class RuneShaperTileEntity extends BlockEntity implements Container {
 	private @Nonnull ItemStack slots[];
 	
 	public RuneShaperTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.RuneShaperEntityType, pos, state);
+		super(NostrumBlockEntities.RuneShaper, pos, state);
 		slots = new ItemStack[getContainerSize()];
 		for (int i = 0; i < slots.length; i++) {
 			slots[i] = ItemStack.EMPTY;

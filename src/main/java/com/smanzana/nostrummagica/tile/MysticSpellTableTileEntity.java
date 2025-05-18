@@ -28,7 +28,7 @@ public class MysticSpellTableTileEntity extends BasicSpellTableTileEntity {
 	private @Nonnull ItemStack slots[];
 	
 	public MysticSpellTableTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.MysticSpellTableType, pos, state);
+		super(NostrumBlockEntities.MysticSpellTable, pos, state);
 	}
 	
 	@Override

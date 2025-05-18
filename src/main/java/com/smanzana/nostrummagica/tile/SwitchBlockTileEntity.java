@@ -51,7 +51,7 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	}
 	
 	public SwitchBlockTileEntity(BlockPos pos, BlockState state) {
-		this(NostrumTileEntities.SwitchBlockTileEntityType, pos, state);
+		this(NostrumBlockEntities.SwitchBlock, pos, state);
 	}
 	
 	public SwitchBlockTileEntity( BlockPos blockEntPos, BlockState state, SwitchBlockTileEntity.SwitchHitType type,BlockPos pos) {

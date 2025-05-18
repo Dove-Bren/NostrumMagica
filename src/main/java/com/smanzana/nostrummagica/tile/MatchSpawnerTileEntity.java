@@ -41,7 +41,7 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	}
 	
 	public MatchSpawnerTileEntity(BlockPos pos, BlockState state) {
-		this(NostrumTileEntities.MatchSpawnerTileEntityType, pos, state);
+		this(NostrumBlockEntities.MatchSpawner, pos, state);
 	}
 	
 	public void setTriggerOffset(BlockPos offset) {

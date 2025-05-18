@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.MatchSpawnerTileEntity;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
@@ -76,7 +76,7 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.MatchSpawnerTileEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.MatchSpawner);
 	}
 	
 	@Override

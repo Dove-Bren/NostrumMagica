@@ -27,7 +27,7 @@ public class CandleTileEntity extends BlockEntity implements TickableBlockEntity
 	}
 	
 	public CandleTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.CandleTileEntityType, pos, state);
+		super(NostrumBlockEntities.Candle, pos, state);
 		this.lifeTicks = (20 * 15) + CandleTileEntity.rand.nextInt(20*30);
 	}
 	

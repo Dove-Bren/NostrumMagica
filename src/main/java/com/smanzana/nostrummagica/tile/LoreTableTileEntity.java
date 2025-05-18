@@ -27,7 +27,7 @@ public class LoreTableTileEntity extends BlockEntity implements TickableBlockEnt
 	private int ticksExisted;
 	
 	public LoreTableTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.LoreTableEntityType, pos, state);
+		super(NostrumBlockEntities.LoreTable, pos, state);
 		progress = 0f;
 		lorekey = null;
 		inventory = new SimpleContainer(1);

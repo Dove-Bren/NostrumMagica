@@ -32,7 +32,7 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	}
 	
 	public TeleportationPortalTileEntity(BlockPos pos, BlockState state) {
-		this(NostrumTileEntities.TeleportationPortalTileEntityType, pos, state);
+		this(NostrumBlockEntities.TeleportationPortal, pos, state);
 	}
 	
 	protected TeleportationPortalTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, Location target) {
@@ -41,7 +41,7 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	}
 	
 	public TeleportationPortalTileEntity(BlockPos pos, BlockState state, Location target) {
-		this(NostrumTileEntities.TeleportationPortalTileEntityType, pos, state, target);
+		this(NostrumBlockEntities.TeleportationPortal, pos, state, target);
 	}
 	
 	public @Nullable Location getTarget() {

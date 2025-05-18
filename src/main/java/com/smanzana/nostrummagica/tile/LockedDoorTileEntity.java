@@ -42,7 +42,7 @@ public class LockedDoorTileEntity extends BlockEntity implements TickableBlockEn
 	}
 	
 	public LockedDoorTileEntity(BlockPos pos, BlockState state) {
-		this(NostrumTileEntities.LockedDoorType, pos, state);
+		this(NostrumBlockEntities.LockedDoor, pos, state);
 	}
 	
 	private void dirty() {

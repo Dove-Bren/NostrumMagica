@@ -24,7 +24,7 @@ public class AdvancedSpellTableTileEntity extends BasicSpellTableTileEntity {
 	private @Nonnull ItemStack slots[];
 	
 	public AdvancedSpellTableTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.AdvancedSpellTableType, pos, state);
+		super(NostrumBlockEntities.AdvancedSpellTable, pos, state);
 	}
 	
 	@Override

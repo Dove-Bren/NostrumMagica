@@ -10,7 +10,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.ParadoxMirrorTileEntity;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
@@ -202,7 +202,7 @@ public class ParadoxMirrorBlock extends BaseEntityBlock implements ILoreTagged {
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.ParadoxMirrorTileEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.ParadoxMirror);
 	}
 	
 	@Override

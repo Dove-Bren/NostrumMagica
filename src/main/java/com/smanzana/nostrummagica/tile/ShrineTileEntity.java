@@ -135,7 +135,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		private EMagicElement element;
 		
 		public Element(BlockPos pos, BlockState state) {
-			super(NostrumTileEntities.ElementShrineTileType, pos, state);
+			super(NostrumBlockEntities.ElementShrine, pos, state);
 			this.element = EMagicElement.PHYSICAL;
 		}
 		
@@ -215,7 +215,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		private EAlteration alteration;
 		
 		public Alteration(BlockPos pos, BlockState state) {
-			super(NostrumTileEntities.AlterationShrineTileType, pos, state);
+			super(NostrumBlockEntities.AlterationShrine, pos, state);
 			this.alteration = EAlteration.INFLICT;
 		}
 		
@@ -290,7 +290,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		private SpellShape shape;
 		
 		public Shape(BlockPos pos, BlockState state) {
-			super(NostrumTileEntities.ShapeShrineTileType, pos, state);
+			super(NostrumBlockEntities.ShapeShrine, pos, state);
 			this.shape = null;
 		}
 		
@@ -373,7 +373,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		private EMagicTier tier;
 		
 		public Tier(BlockPos pos, BlockState state) {
-			super(NostrumTileEntities.TierShrineTileType, pos, state);
+			super(NostrumBlockEntities.TierShrine, pos, state);
 			this.tier = EMagicTier.LOCKED;
 		}
 		

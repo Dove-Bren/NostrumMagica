@@ -43,7 +43,7 @@ public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBloc
 	private int cooldownTicks;
 	
 	public ParadoxMirrorTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.ParadoxMirrorTileEntityType, pos, state);
+		super(NostrumBlockEntities.ParadoxMirror, pos, state);
 		cooldownTicks = 0;
 		receivedEntities = new ArrayList<>();
 	}

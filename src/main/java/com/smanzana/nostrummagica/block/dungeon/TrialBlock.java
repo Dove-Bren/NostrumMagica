@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.item.MasteryOrb;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 import com.smanzana.nostrummagica.tile.TrialBlockTileEntity;
 import com.smanzana.nostrummagica.trial.WorldTrial;
@@ -68,7 +68,7 @@ public class TrialBlock extends BaseEntityBlock {
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.TrialBlockEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.TrialBlock);
 	}
 	
 	@Override

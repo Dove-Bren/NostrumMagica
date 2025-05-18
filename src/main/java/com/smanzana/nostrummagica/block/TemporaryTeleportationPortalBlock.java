@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TemporaryPortalTileEntity;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 import com.smanzana.nostrummagica.util.Location;
@@ -47,7 +47,7 @@ public class TemporaryTeleportationPortalBlock extends TeleportationPortalBlock 
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.TemporaryPortalTileEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.TemporaryPortal);
 	}
 	
 	protected static void spawnPortal(Level worldIn, BlockPos portalMaster, BlockState portalState, Location target, int duration) {

@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 import com.smanzana.autodungeons.block.IDirectionalBlock;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.DelayLoadedMimicBlockTileEntity;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
 import net.minecraft.core.BlockPos;
@@ -312,6 +312,6 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.DelayedMimicBlockTileEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.DelayedMimicBlock);
 	}
 }

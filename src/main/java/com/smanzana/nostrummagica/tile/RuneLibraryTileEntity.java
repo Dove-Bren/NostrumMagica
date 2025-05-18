@@ -24,7 +24,7 @@ public class RuneLibraryTileEntity extends BlockEntity {
 	private final SimpleContainer inventory;
 	
 	public RuneLibraryTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.RuneLibraryType, pos, state);
+		super(NostrumBlockEntities.RuneLibrary, pos, state);
 		this.inventory = new SimpleContainer(27) {
 			@Override
 			public boolean canPlaceItem(int index, ItemStack stack) {

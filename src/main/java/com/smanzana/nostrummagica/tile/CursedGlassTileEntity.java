@@ -48,7 +48,7 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	}
 	
 	public CursedGlassTileEntity(BlockPos pos, BlockState state) {
-		this(NostrumTileEntities.CursedGlassType, pos, state);
+		this(NostrumBlockEntities.CursedGlass, pos, state);
 	}
 	
 	private static final String NBT_REQUIRED_DAMAGE = "required_damage";

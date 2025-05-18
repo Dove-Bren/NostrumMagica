@@ -26,7 +26,7 @@ public class AltarTileEntity extends BlockEntity implements WorldlyContainer, IA
 	private boolean hideItem;
 	
 	public AltarTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.AltarTileEntityType, pos, state);
+		super(NostrumBlockEntities.Altar, pos, state);
 	}
 	
 	public @Nonnull ItemStack getItem() {

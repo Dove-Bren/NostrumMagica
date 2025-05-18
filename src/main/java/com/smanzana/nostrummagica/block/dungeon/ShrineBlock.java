@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.AlterationSpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.ElementSpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.ShapeSpellRune;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.ShrineTileEntity;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
@@ -106,7 +106,7 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends BaseEnt
 		
 		@Override
 		public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-			return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.ElementShrineTileType);
+			return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.ElementShrine);
 		}
 
 		@Override
@@ -139,7 +139,7 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends BaseEnt
 		
 		@Override
 		public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-			return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.ShapeShrineTileType);
+			return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.ShapeShrine);
 		}
 
 		@Override
@@ -172,7 +172,7 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends BaseEnt
 		
 		@Override
 		public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-			return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.AlterationShrineTileType);
+			return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.AlterationShrine);
 		}
 
 		@Override
@@ -205,7 +205,7 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends BaseEnt
 		
 		@Override
 		public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-			return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.TierShrineTileType);
+			return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.TierShrine);
 		}
 
 		@Override

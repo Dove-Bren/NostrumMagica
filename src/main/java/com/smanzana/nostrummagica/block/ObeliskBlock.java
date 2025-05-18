@@ -5,7 +5,7 @@ import java.util.Random;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity.Corner;
@@ -209,7 +209,7 @@ public class ObeliskBlock extends Block implements EntityBlock {
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.NostrumObeliskEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.NostrumObelisk);
 	}
 	
 	@Override

@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 import com.smanzana.nostrummagica.tile.TriggeredMatchSpawnerTileEntity;
 
@@ -32,7 +32,7 @@ public class TriggeredMatchSpawnerBlock extends MatchSpawnerBlock implements ITr
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.TriggeredMatchSpawnerTileEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.TriggeredMatchSpawner);
 	}
 
 	@Override

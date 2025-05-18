@@ -16,7 +16,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ObeliskPortalTileEntity extends TeleportationPortalTileEntity {
 	
 	public ObeliskPortalTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.ObeliskPortalTileEntityType, pos, state);
+		super(NostrumBlockEntities.ObeliskPortal, pos, state);
 	}
 	
 	@Override

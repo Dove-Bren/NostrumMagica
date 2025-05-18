@@ -22,7 +22,7 @@ public class DelayLoadedMimicBlockTileEntity extends MimicBlockTileEntity implem
 	}
 	
 	public DelayLoadedMimicBlockTileEntity(BlockPos pos, BlockState state) {
-		this(NostrumTileEntities.DelayedMimicBlockTileEntityType, pos, state);
+		this(NostrumBlockEntities.DelayedMimicBlock, pos, state);
 		this.loading = true;
 	}
 	

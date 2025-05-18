@@ -14,7 +14,7 @@ import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
 import com.smanzana.nostrummagica.item.EssenceItem;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.SingleSpawnerTileEntity;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
@@ -171,7 +171,7 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.SingleSpawnerTileEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.SingleSpawner);
 	}
 	
 //	@Override

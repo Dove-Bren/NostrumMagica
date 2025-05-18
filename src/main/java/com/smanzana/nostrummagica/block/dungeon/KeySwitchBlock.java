@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
 import com.smanzana.nostrummagica.tile.KeySwitchBlockTileEntity;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
 import net.minecraft.core.BlockPos;
@@ -40,7 +40,7 @@ public class KeySwitchBlock extends SwitchBlock {
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.KeySwitchTileEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.KeySwitch);
 	}
 	
 	@Override

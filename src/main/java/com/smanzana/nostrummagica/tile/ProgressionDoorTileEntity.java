@@ -31,7 +31,7 @@ public class ProgressionDoorTileEntity extends BlockEntity {
 	private EMagicTier requiredTier;
 	
 	public ProgressionDoorTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.ProgressionDoorTileEntityType, pos, state);
+		super(NostrumBlockEntities.ProgressionDoor, pos, state);
 		
 		requiredComponents = new HashSet<>();
 		requiredLevel = 0;

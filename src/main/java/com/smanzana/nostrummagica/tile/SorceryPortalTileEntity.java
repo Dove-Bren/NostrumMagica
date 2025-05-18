@@ -12,7 +12,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class SorceryPortalTileEntity extends PortalBlock.NostrumPortalTileEntityBase  {
 	
 	public SorceryPortalTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.SorceryPortalTileEntityType, pos, state);
+		super(NostrumBlockEntities.SorceryPortal, pos, state);
 	}
 
 	@OnlyIn(Dist.CLIENT)

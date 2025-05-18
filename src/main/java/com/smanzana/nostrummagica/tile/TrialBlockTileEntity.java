@@ -41,7 +41,7 @@ public class TrialBlockTileEntity extends BlockEntity implements TickableBlockEn
 	private int trialTicks;
 	
 	public TrialBlockTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.TrialBlockEntityType, pos, state);
+		super(NostrumBlockEntities.TrialBlock, pos, state);
 		setScale(1f);
 		
 		activeTrial = null;

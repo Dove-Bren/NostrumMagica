@@ -10,7 +10,7 @@ import com.smanzana.autodungeons.world.dungeon.DungeonRecord;
 import com.smanzana.autodungeons.world.dungeon.DungeonRoomInstance;
 import com.smanzana.nostrummagica.tile.DungeonDoorTileEntity;
 import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
@@ -52,7 +52,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.DungeonDoorTileEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.DungeonDoor);
 	}
 	
 	@Override

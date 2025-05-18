@@ -34,7 +34,7 @@ public class ModificationTableTileEntity extends BlockEntity implements Containe
 	private @Nonnull ItemStack slots[];
 	
 	public ModificationTableTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.ModificationTableEntityType, pos, state);
+		super(NostrumBlockEntities.ModificationTable, pos, state);
 		slots = new ItemStack[getContainerSize()];
 		for (int i = 0; i < slots.length; i++) {
 			slots[i] = ItemStack.EMPTY;

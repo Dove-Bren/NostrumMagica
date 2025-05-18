@@ -42,7 +42,7 @@ public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTile
 	private BlockPos teleOffset = null;
 	
 	public TeleportRuneTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.TeleportRuneTileEntityType, pos, state);
+		super(NostrumBlockEntities.TeleportRune, pos, state);
 	}
 	
 	/**

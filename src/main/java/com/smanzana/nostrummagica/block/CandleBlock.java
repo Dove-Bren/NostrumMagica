@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.CandleIgniteMessage;
 import com.smanzana.nostrummagica.tile.CandleTileEntity;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
@@ -188,7 +188,7 @@ public class CandleBlock extends BaseEntityBlock {
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.CandleTileEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.Candle);
 	}
 	
 //	@Override

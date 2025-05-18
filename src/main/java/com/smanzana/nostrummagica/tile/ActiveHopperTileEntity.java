@@ -38,7 +38,7 @@ public class ActiveHopperTileEntity extends BlockEntity implements Hopper, World
 	private int transferCooldown = -1;
 	
 	public ActiveHopperTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.ActiveHopperTileEntityType, pos, state);
+		super(NostrumBlockEntities.ActiveHopper, pos, state);
 	}
 	
 	@Override

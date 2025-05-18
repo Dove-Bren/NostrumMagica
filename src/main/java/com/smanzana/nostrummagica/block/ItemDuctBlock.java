@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.block;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.tile.ItemDuctTileEntity;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
 import net.minecraft.core.BlockPos;
@@ -200,7 +200,7 @@ public class ItemDuctBlock extends PipeBlock implements SimpleWaterloggedBlock, 
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.ItemDuctTileEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.ItemDuct);
 	}
 	
 	@Override

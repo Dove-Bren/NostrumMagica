@@ -24,7 +24,7 @@ import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -394,10 +394,10 @@ public class PortingUtil {
 		}
 		
 		// Altars, Shrines, and progression doors do, too
-		if (id.equalsIgnoreCase(NostrumTileEntities.AltarTileEntityType.getRegistryName().toString())) {
+		if (id.equalsIgnoreCase(NostrumBlockEntities.Altar.getRegistryName().toString())) {
 			return fixupAltar1_12_2(teTag);
 		}
-		if (id.equalsIgnoreCase(NostrumTileEntities.ProgressionDoorTileEntityType.getRegistryName().toString())) {
+		if (id.equalsIgnoreCase(NostrumBlockEntities.ProgressionDoor.getRegistryName().toString())) {
 			return fixupProgDoor1_12_2(teTag);
 		}
 //		if (id.equalsIgnoreCase(NostrumTileEntities.SymbolTileEntityType.getRegistryName().toString())) {

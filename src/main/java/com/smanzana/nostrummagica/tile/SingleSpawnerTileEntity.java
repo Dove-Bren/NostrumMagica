@@ -15,7 +15,7 @@ public class SingleSpawnerTileEntity extends BlockEntity implements TickableBloc
 	protected int ticksExisted;
 	
 	public SingleSpawnerTileEntity(BlockPos pos, BlockState state) {
-		this(NostrumTileEntities.SingleSpawnerTileEntityType, pos, state);
+		this(NostrumBlockEntities.SingleSpawner, pos, state);
 	}
 	
 	protected SingleSpawnerTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {

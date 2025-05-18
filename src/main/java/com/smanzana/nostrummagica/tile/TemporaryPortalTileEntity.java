@@ -16,11 +16,11 @@ public class TemporaryPortalTileEntity extends TeleportationPortalTileEntity imp
 	private long endticks;
 	
 	public TemporaryPortalTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.TemporaryPortalTileEntityType, pos, state);
+		super(NostrumBlockEntities.TemporaryPortal, pos, state);
 	}
 	
 	public TemporaryPortalTileEntity(BlockPos pos, BlockState state, Location target, long endticks) {
-		super(NostrumTileEntities.TemporaryPortalTileEntityType, pos, state, target);
+		super(NostrumBlockEntities.TemporaryPortal, pos, state, target);
 		this.endticks = endticks;
 		this.setChanged();
 	}

@@ -144,7 +144,7 @@ public class ItemDuctTileEntity extends BlockEntity implements /* IInventory, */
 	private final LazyOptional<ItemDuctTileEntity.SidedItemHandler> handlerEast;
 	
 	public ItemDuctTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.ItemDuctTileEntityType, pos, state);
+		super(NostrumBlockEntities.ItemDuct, pos, state);
 		itemQueue = new LinkedList<>();
 		ticks = 0;
 		handlerDown = LazyOptional.of(() -> new SidedItemHandler(this, Direction.DOWN));

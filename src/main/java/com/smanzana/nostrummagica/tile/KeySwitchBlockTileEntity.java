@@ -33,7 +33,7 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	private boolean triggered;
 	
 	public KeySwitchBlockTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.KeySwitchTileEntityType, pos, state);
+		super(NostrumBlockEntities.KeySwitch, pos, state);
 		key = new WorldKey();
 		color = DyeColor.RED;
 		triggered = false;

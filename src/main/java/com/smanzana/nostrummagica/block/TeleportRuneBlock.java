@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TeleportRuneTileEntity;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
@@ -206,7 +206,7 @@ public class TeleportRuneBlock extends BaseEntityBlock  {
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.TeleportRuneTileEntityType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.TeleportRune);
 	}
 	
 	@Override

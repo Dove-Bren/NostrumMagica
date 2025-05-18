@@ -38,7 +38,7 @@ public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedT
 	}
 	
 	public TriggerRepeaterTileEntity(BlockPos pos, BlockState state) {
-		this(NostrumTileEntities.TriggerRepeaterTileEntityType, pos, state);
+		this(NostrumBlockEntities.TriggerRepeater, pos, state);
 	}
 	
 	// Calculates the offset to the given pos and saves it

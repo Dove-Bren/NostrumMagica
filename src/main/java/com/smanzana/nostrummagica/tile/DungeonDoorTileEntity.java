@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class DungeonDoorTileEntity extends LockedDoorTileEntity {
 
 	public DungeonDoorTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.DungeonDoorTileEntityType, pos, state);
+		super(NostrumBlockEntities.DungeonDoor, pos, state);
 	}
 	
 	@Override

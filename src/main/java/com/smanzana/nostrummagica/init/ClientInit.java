@@ -148,7 +148,7 @@ import com.smanzana.nostrummagica.spell.component.shapes.BeamShape;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.spellcraft.pattern.NostrumSpellCraftPatterns;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.util.Curves;
 import com.smanzana.nostrummagica.util.Curves.ICurve3d;
 import com.smanzana.nostrummagica.util.RenderFuncs;
@@ -388,21 +388,21 @@ public class ClientInit {
 	@SubscribeEvent
 	public static final void registerTileEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
 		//event.registerBlockEntityRenderer(NostrumTileEntities.SymbolTileEntityType, TileEntitySymbolRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.TrialBlockEntityType, TileEntityTrialRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.CandleTileEntityType, TileEntityCandleRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.AltarTileEntityType, TileEntityAltarRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.NostrumObeliskEntityType, TileEntityObeliskRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.TeleportationPortalTileEntityType, TileEntityPortalRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.ObeliskPortalTileEntityType, TileEntityPortalRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.SorceryPortalTileEntityType, TileEntityPortalRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.TemporaryPortalTileEntityType, TileEntityPortalRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.ProgressionDoorTileEntityType, TileEntityProgressionDoorRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.ManaArmorerTileEntityType, TileEntityManaArmorerRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.LockedChestEntityType, TileEntityLockedChestRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.LockedDoorType, TileEntityLockedDoorRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.DungeonKeyChestTileEntityType, TileEntityDungeonKeyChestRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.DungeonDoorTileEntityType, TileEntityDungeonDoorRenderer::new);
-		event.registerBlockEntityRenderer(NostrumTileEntities.PushBlockTileEntityType, TileEntityPushBlockRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.TrialBlock, TileEntityTrialRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.Candle, TileEntityCandleRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.Altar, TileEntityAltarRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.NostrumObelisk, TileEntityObeliskRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.TeleportationPortal, TileEntityPortalRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.ObeliskPortal, TileEntityPortalRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.SorceryPortal, TileEntityPortalRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.TemporaryPortal, TileEntityPortalRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.ProgressionDoor, TileEntityProgressionDoorRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.ManaArmorer, TileEntityManaArmorerRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.LockedChest, TileEntityLockedChestRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.LockedDoor, TileEntityLockedDoorRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.DungeonKeyChest, TileEntityDungeonKeyChestRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.DungeonDoor, TileEntityDungeonDoorRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.PushBlock, TileEntityPushBlockRenderer::new);
 	}
 	
 	@SubscribeEvent

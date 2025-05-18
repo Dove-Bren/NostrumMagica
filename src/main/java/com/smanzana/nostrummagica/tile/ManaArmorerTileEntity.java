@@ -49,7 +49,7 @@ public class ManaArmorerTileEntity extends BlockEntity implements TickableBlockE
 	protected float rotationProg;
 	
 	public ManaArmorerTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.ManaArmorerTileEntityType, pos, state);
+		super(NostrumBlockEntities.ManaArmorer, pos, state);
 		this.activeCrystals = new ArrayList<>(MAX_CRYSTALS);
 		this.ticksExisted = 0;
 		this.rotationProg = 0;

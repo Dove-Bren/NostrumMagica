@@ -46,7 +46,7 @@ public class LockedChestTileEntity extends BlockEntity implements TickableBlockE
 	private int ticksExisted;
 	
 	public LockedChestTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.LockedChestEntityType, pos, state);
+		super(NostrumBlockEntities.LockedChest, pos, state);
 		inventory = new SimpleContainer(27);
 		lockKey = new WorldKey();
 		color = DyeColor.RED;

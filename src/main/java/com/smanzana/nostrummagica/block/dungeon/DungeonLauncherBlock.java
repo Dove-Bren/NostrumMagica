@@ -4,7 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.client.gui.container.LauncherBlockGui;
 import com.smanzana.nostrummagica.tile.DungeonLauncherTileEntity;
-import com.smanzana.nostrummagica.tile.NostrumTileEntities;
+import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
 import net.minecraft.core.BlockPos;
@@ -68,7 +68,7 @@ public class DungeonLauncherBlock extends DirectionalBlock implements ITriggered
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumTileEntities.DungeonLauncherTileType);
+		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.DungeonLauncher);
 	}
 	
 	@Override

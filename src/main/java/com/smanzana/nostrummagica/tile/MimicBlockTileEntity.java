@@ -32,7 +32,7 @@ public class MimicBlockTileEntity extends BlockEntity {
 	}
 	
 	public MimicBlockTileEntity(BlockPos pos, BlockState state) {
-		this(NostrumTileEntities.MimicBlockTileEntityType, pos, state);
+		this(NostrumBlockEntities.MimicBlock, pos, state);
 	}
 
 	public MimicBlock.MimicBlockData getData() {

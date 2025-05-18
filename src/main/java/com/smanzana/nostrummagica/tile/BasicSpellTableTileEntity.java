@@ -39,7 +39,7 @@ public class BasicSpellTableTileEntity extends BlockEntity implements ISpellCraf
 	private @Nonnull ItemStack slots[];
 	
 	public BasicSpellTableTileEntity(BlockPos pos, BlockState state) {
-		this(NostrumTileEntities.BasicSpellTableType, pos, state);
+		this(NostrumBlockEntities.BasicSpellTable, pos, state);
 	}
 	
 	protected BasicSpellTableTileEntity(BlockEntityType<? extends BasicSpellTableTileEntity> type, BlockPos pos, BlockState state) {

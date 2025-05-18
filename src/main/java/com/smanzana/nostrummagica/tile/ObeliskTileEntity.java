@@ -151,7 +151,7 @@ public class ObeliskTileEntity extends BlockEntity implements TickableBlockEntit
 	private boolean isDestructing;
 	
 	public ObeliskTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.NostrumObeliskEntityType, pos, state); //, 0, 2000);
+		super(NostrumBlockEntities.NostrumObelisk, pos, state); //, 0, 2000);
 		master = false;
 		isDestructing = false;
 		targets = new LinkedList<>();

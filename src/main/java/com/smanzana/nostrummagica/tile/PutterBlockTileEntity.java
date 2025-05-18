@@ -33,7 +33,7 @@ public class PutterBlockTileEntity extends BlockEntity implements TickableBlockE
 	private int ticksExisted;
 	
 	public PutterBlockTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.PutterBlockTileEntityType, pos, state);
+		super(NostrumBlockEntities.PutterBlock, pos, state);
 		final PutterBlockTileEntity putter = this;
 		this.inventory = new SimpleContainer(9) {
 			@Override

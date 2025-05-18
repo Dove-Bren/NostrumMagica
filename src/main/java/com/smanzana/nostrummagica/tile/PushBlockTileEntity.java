@@ -40,7 +40,7 @@ public class PushBlockTileEntity extends BlockEntity {
 	private @Nullable Direction oldDirection;
 	
 	public PushBlockTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumTileEntities.PushBlockTileEntityType, pos, state);
+		super(NostrumBlockEntities.PushBlock, pos, state);
 		element = null;
 	}
 	
