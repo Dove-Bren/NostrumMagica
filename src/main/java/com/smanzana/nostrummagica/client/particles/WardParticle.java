@@ -178,7 +178,7 @@ public class WardParticle extends TextureSheetParticle {
 			if (params.gravityStrength != 0f) {
 				particle.setGravityStrength(params.gravityStrength);
 			}
-			particle.dieOnTarget(params.dieOnTarget);
+			particle.dieOnTarget(params.dieWithTarget);
 			particle.setEntityBehavior(params.targetBehavior);
 			Minecraft mc = Minecraft.getInstance();
 			mc.particleEngine.add(particle);

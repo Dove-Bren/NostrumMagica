@@ -75,7 +75,7 @@ public abstract class CombatTrial {
 				10, center.getX() + .5, center.getY() + 1.25, center.getZ() + .5, .25,
 				60, 10,
 				entity.getId()
-				).dieOnTarget(true));
+				).dieWithTarget(true));
 	}
 	
 	public static final CombatTrial CreateForElement(EMagicElement element, ServerLevel world, BlockPos center, @Nullable Player focusedPlayer) {

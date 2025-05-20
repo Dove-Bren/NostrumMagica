@@ -106,7 +106,7 @@ public class FrostbiteEffect extends MobEffect {
 									10, ent.getX(), ent.getY() + ent.getBbHeight()/2, ent.getZ(), 4,
 									30, 10,
 									ent.getId()
-									).color(this.getColor()).dieOnTarget(true));
+									).color(this.getColor()).dieWithTarget(true));
 						} else if (ent instanceof LivingEntity) {
 							((LivingEntity) ent).addEffect(new MobEffectInstance(NostrumEffects.frostbite, 20 * 3, 2));
 						}

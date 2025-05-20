@@ -51,7 +51,7 @@ public class SpellMortarEntity extends SpellProjectileEntity {
 			
 			// Gravity!
 			this.setDeltaMovement(this.getDeltaMovement().add(0, -gravity, 0));
-		} 
+		}
 //		else {
 //			int color = getElement().getColor();
 //			color = (0x19000000) | (color & 0x00FFFFFF);

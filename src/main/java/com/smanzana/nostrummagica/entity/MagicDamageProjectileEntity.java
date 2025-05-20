@@ -5,10 +5,12 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.serializer.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
@@ -103,6 +105,13 @@ public class MagicDamageProjectileEntity extends AbstractHurtingProjectile {
 	
 	@Override
 	public void tick() {
+		if (level.isClientSide()) {
+			if (firstTick) {
+				NostrumParticles.COLOR_TRAIL.spawn(level, new SpawnParams(1, getX(), getY() + this.getBbHeight() / 2, getZ(), 0, 300, 0,
+						this.getId()).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(this.getElement().getColor(), .7f)));
+			}
+		}
+		
 		super.tick();
 		
 		if (level.isClientSide()) {

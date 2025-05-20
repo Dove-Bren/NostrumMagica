@@ -7,9 +7,11 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.block.dungeon.MysticAnchorBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.serializer.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
@@ -193,6 +195,11 @@ public class SpellProjectileEntity extends AbstractHurtingProjectile {
 			}
 		} else {
 			doClientEffect();
+			
+			if (this.tickCount == 1) {
+				NostrumParticles.SMOKE_TRAIL.spawn(level, new SpawnParams(1, getX(), getY(), getZ(), 0, 300, 0,
+						this.getId()).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(this.getElement().getColor(), .7f)));
+			}
 		}
 	}
 

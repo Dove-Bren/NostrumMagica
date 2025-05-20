@@ -141,7 +141,7 @@ public class LightningStaticParticle extends TextureSheetParticle {
 			if (params.gravityStrength != 0f) {
 				particle.setGravityStrength(params.gravityStrength);
 			}
-			particle.dieOnTarget(params.dieOnTarget);
+			particle.dieOnTarget(params.dieWithTarget);
 			Minecraft mc = Minecraft.getInstance();
 			mc.particleEngine.add(particle);
 		}

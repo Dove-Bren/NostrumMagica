@@ -219,7 +219,7 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 				NostrumParticles.GLOW_ORB.spawn(attacker.level, new SpawnParams(
 						30, target.getX(), target.getY() + target.getBbHeight(), target.getZ(), .5, 60, 20,
 						new Vec3(0, .05, 0), new Vec3(.1, 0, .1)
-						).color(.6f, .6f, 0f, 0f).dieOnTarget(true).gravity(.1f));
+						).color(.6f, .6f, 0f, 0f).dieWithTarget(true).gravity(.1f));
 			}
 			
 			// Mana:
@@ -248,7 +248,7 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 					NostrumParticles.FILLED_ORB.spawn(attacker.level, new SpawnParams(
 							50, target.getX(), target.getY() + target.getBbHeight(), target.getZ(), .5, 60, 0,
 							attacker.getId()
-							).color(1f, .4f, .8f, 1f).dieOnTarget(true));
+							).color(1f, .4f, .8f, 1f).dieWithTarget(true));
 				}
 			}
 			

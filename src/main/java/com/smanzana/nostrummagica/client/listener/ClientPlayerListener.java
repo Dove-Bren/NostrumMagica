@@ -31,6 +31,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer.Outline;
 import com.smanzana.nostrummagica.client.render.SelectionRenderer;
@@ -301,6 +302,25 @@ public class ClientPlayerListener extends PlayerListener {
 			
 		} else if (bindingHUD.consumeClick()) {
 			this.overlayRenderer.toggleHUD();
+			
+			int unused;
+			Player player = mc.player;
+//			NostrumParticles.COLOR_TRAIL.spawn(mc.level, new SpawnParams(1, player.getX(), player.getY() - 2, player.getZ(), 0, 180, 0,
+//					new Vec3(.1, 0, 0), Vec3.ZERO).gravity(false).color(1f, .8f, .3f, .4f));
+			
+//			NostrumParticles.COLOR_TRAIL.spawn(mc.level, new SpawnParams(50, player.getX(), player.getY() - 2, player.getZ(), 0, 180, 0,
+//					new Vec3(0, .25, 0), new Vec3(.25, .05, .25)).gravity(true).color(1f, .8f, .3f, .4f));
+			
+//			NostrumParticles.COLOR_TRAIL.spawn(mc.level, new SpawnParams(1, player.getX(), player.getY() + 1, player.getZ() - 1, 0, 600, 0,
+//					player.getId()).setTargetBehavior(TargetBehavior.ATTACH).color(1f, .8f, .3f, .4f));
+			
+			NostrumParticles.COLOR_TRAIL.spawn(mc.level, new SpawnParams(1, player.getX(), player.getY() + 1, player.getZ() - 1, 0, 600, 0,
+					player.getId()).setTargetBehavior(TargetBehavior.ORBIT).setOrbitRadius(2f).color(1f, .8f, .3f, .4f));
+			
+			/*
+			 * int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
+				Vec3 velocity, Vec3 velocityJitter
+			 */
 		} else if (bindingShapeHelp.consumeClick()) {
 			this.spellshapeRenderer.toggle();
 		} else if (bindingCastSlow.consumeClick()) {

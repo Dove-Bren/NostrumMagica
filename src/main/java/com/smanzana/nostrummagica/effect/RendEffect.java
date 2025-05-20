@@ -54,7 +54,7 @@ public class RendEffect extends MobEffect {
 									10, target.getX(), target.getY() + target.getBbHeight()/2, target.getZ(), 0,
 									40, 10,
 									ent.getId()
-									).color(0xFFC7B5BE).dieOnTarget(true));
+									).color(0xFFC7B5BE).dieWithTarget(true));
 						}
 						
 						NostrumParticles.FILLED_ORB.spawn(target.level, new SpawnParams(

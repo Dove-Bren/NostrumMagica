@@ -575,7 +575,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 						10, ent.getX(), ent.getY() + ent.getBbHeight()/2, ent.getZ(), 4,
 						30, 10,
 						ent.getId()
-						).color(NostrumEffects.frostbite.getColor()).dieOnTarget(true));
+						).color(NostrumEffects.frostbite.getColor()).dieWithTarget(true));
 			} else if (ent instanceof LivingEntity) {
 				((LivingEntity) ent).addEffect(new MobEffectInstance(NostrumEffects.frostbite, 20 * 10));
 			}
@@ -738,7 +738,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 						10, entity.getX(), entity.getY() + entity.getBbHeight()/2, entity.getZ(), 0,
 						40, 10,
 						ent.getId()
-						).color(NostrumEffects.magicRend.getColor()).dieOnTarget(true));
+						).color(NostrumEffects.magicRend.getColor()).dieWithTarget(true));
 			}
 			
 			NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
@@ -836,7 +836,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 					//.gravity(.65f)
 					.gravity(gravity)
 					.color(color)
-					.dieOnTarget(false)
+					.dieWithTarget(false)
 					.setTargetBehavior(TargetBehavior.ORBIT)
 			);
 	}

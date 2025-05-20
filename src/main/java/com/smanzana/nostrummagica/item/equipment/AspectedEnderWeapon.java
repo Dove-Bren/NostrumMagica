@@ -143,7 +143,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 					1,
 					pos.x, pos.y, pos.z, 0, 30, 5,
 					target.getId()
-					).color(EMagicElement.ENDER.getColor()).dieOnTarget(true));
+					).color(EMagicElement.ENDER.getColor()).dieWithTarget(true));
 		}
 	}
 	

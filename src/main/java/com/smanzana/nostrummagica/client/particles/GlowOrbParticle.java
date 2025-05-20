@@ -261,7 +261,7 @@ public class GlowOrbParticle extends TextureSheetParticle {
 			if (params.gravityStrength != 0f) {
 				particle.setGravityStrength(params.gravityStrength);
 			}
-			particle.dieOnTarget(params.dieOnTarget);
+			particle.dieOnTarget(params.dieWithTarget);
 			particle.setEntityBehavior(params.targetBehavior);
 			particle.setOrbitRadius(params.orbitRadius);
 			Minecraft mc = Minecraft.getInstance();

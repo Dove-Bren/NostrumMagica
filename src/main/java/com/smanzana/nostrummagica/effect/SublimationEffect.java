@@ -90,7 +90,7 @@ public class SublimationEffect extends MobEffect {
 						10, target.getX(), target.getY() + target.getBbHeight()/2, target.getZ(), 0,
 						40, 10,
 						ent.getId()
-						).color(0xFFEC6D8E).dieOnTarget(true));
+						).color(0xFFEC6D8E).dieWithTarget(true));
 			}
 			
 			NostrumParticles.FILLED_ORB.spawn(target.level, new SpawnParams(

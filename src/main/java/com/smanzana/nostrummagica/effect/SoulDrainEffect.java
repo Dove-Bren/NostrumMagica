@@ -39,7 +39,7 @@ public class SoulDrainEffect extends MobEffect {
 				5, source.getX(), source.getY() + .75, source.getZ(), 0,
 				40, 0,
 				dest.getId()
-				).color(0xFFE2346B).dieOnTarget(true));
+				).color(0xFFE2346B).dieWithTarget(true));
 	}
 	
 	protected void playDamageEffect(LivingEntity source, float amt) {

@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.petcommand.util.RayTrace;
+import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.LivingEntity;

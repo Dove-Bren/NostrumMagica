@@ -30,6 +30,8 @@ public enum NostrumParticles {
 	FILLED_ORB(new NostrumParticleType("filled_orb"), FilledOrbParticle::MakeParticle),
 	WARD(new NostrumParticleType("ward"), WardParticle::MakeParticle),
 	LIGHT_EXPLOSION(new NostrumParticleType("light_explosion"), LightExplosionParticle::MakeParticle),
+	COLOR_TRAIL(new NostrumParticleType("glow_trail"), GlowRibbonParticle::MakeParticle),
+	SMOKE_TRAIL(new NostrumParticleType("smoke_trail"), SmokeStreamRibbonParticle::MakeParticle),
 	;
 	
 	@SubscribeEvent
@@ -101,7 +103,7 @@ public enum NostrumParticles {
 				NetUtils.CODEC_VECTOR3D.fieldOf("velocityJitter").forGetter((p) -> p.velocityJitter),
 				Codec.INT.fieldOf("targetEntID").forGetter((p) -> p.targetEntID),
 				Codec.INT.optionalFieldOf("color", 0xFFFFFFFF).forGetter((p) -> p.color),
-				Codec.BOOL.fieldOf("dieOnTarget").forGetter((p) -> p.dieOnTarget),
+				Codec.BOOL.fieldOf("dieOnTarget").forGetter((p) -> p.dieWithTarget),
 				Codec.FLOAT.fieldOf("gravityStrength").forGetter((p) -> p.gravityStrength),
 				Codec.STRING.xmap(s -> TargetBehavior.valueOf(s.toUpperCase()), e -> e.name()).fieldOf("").forGetter((p) -> p.targetBehavior),
 				Codec.FLOAT.fieldOf("orbitRadius").forGetter((p) -> p.orbitRadius)
@@ -126,7 +128,7 @@ public enum NostrumParticles {
 		
 		// Rest is completely optional and may or may not be used
 		public @Nullable Integer color; // ARGB
-		public boolean dieOnTarget;
+		public boolean dieWithTarget;
 		public float gravityStrength;
 		public TargetBehavior targetBehavior;
 		public float orbitRadius;
@@ -145,7 +147,7 @@ public enum NostrumParticles {
 			this.velocityJitter = velocityJitter;
 			this.targetPos = null;
 			this.targetEntID = null;
-			this.dieOnTarget = false;
+			this.dieWithTarget = false;
 			this.gravityStrength = 0f;
 			this.orbitRadius = 0f;
 			this.targetBehavior = TargetBehavior.JOIN;
@@ -165,7 +167,7 @@ public enum NostrumParticles {
 			this.targetPos = targetPos;
 			this.targetEntID = null;
 			this.velocityJitter = null;
-			this.dieOnTarget = false;
+			this.dieWithTarget = false;
 			this.gravityStrength = 0f;
 			this.orbitRadius = 0f;
 			this.targetBehavior = TargetBehavior.JOIN;
@@ -185,7 +187,7 @@ public enum NostrumParticles {
 			this.targetPos = null;
 			this.targetEntID = targetEntID;
 			this.velocityJitter = null;
-			this.dieOnTarget = false;
+			this.dieWithTarget = false;
 			this.gravityStrength = 0f;
 			this.orbitRadius = 0f;
 			this.targetBehavior = TargetBehavior.JOIN;
@@ -209,7 +211,7 @@ public enum NostrumParticles {
 			}
 			
 			params.color = color;
-			params.dieOnTarget = dieOnTarget;
+			params.dieWithTarget = dieOnTarget;
 			params.gravityStrength = gravityStrength;
 			params.targetBehavior = targetBehavior;
 			params.orbitRadius = orbitRadius;
@@ -226,13 +228,13 @@ public enum NostrumParticles {
 			return color(ColorUtil.colorToARGB(red, green, blue, alpha));
 		}
 		
-		public SpawnParams dieOnTarget(boolean die) {
-			this.dieOnTarget = die;
+		public SpawnParams dieWithTarget(boolean die) {
+			this.dieWithTarget = die;
 			return this;
 		}
 		
 		public SpawnParams gravity(boolean gravity) {
-			return this.gravity(.2f);
+			return this.gravity(gravity ? .2f : 0);
 		}
 		
 		public SpawnParams gravity(float gravityStrength) {
@@ -278,7 +280,7 @@ public enum NostrumParticles {
 			tag.putDouble(NBT_SPAWN_JITTER, params.spawnJitterRadius);
 			tag.putInt(NBT_LIFETIME, params.lifetime);
 			tag.putInt(NBT_LIFETIME_JITTER, params.lifetimeJitter);
-			tag.putBoolean(NBT_DIE_ON_TARGET, params.dieOnTarget);
+			tag.putBoolean(NBT_DIE_ON_TARGET, params.dieWithTarget);
 			tag.putInt(NBT_TARGET_BEHAVIOR, params.targetBehavior.ordinal());
 			tag.putFloat(NBT_ORBIT_RADIUS, params.orbitRadius);
 			
@@ -390,7 +392,7 @@ public enum NostrumParticles {
 				params.color(tag.getInt("color"));
 			}
 			if (tag.contains(NBT_DIE_ON_TARGET, Tag.TAG_BYTE)) {
-				params.dieOnTarget(tag.getBoolean(NBT_DIE_ON_TARGET));
+				params.dieWithTarget(tag.getBoolean(NBT_DIE_ON_TARGET));
 			}
 			
 			if (tag.contains(NBT_GRAVITY_STRENGTH, Tag.TAG_FLOAT)) {

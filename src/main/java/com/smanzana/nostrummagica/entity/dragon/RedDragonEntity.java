@@ -498,7 +498,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 					30, 5,
 					this.getId())
 					.color(0xFFAA0022)
-					.dieOnTarget(true));
+					.dieWithTarget(true));
 		}
 	}
 	
