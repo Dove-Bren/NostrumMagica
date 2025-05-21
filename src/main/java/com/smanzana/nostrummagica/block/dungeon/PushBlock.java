@@ -56,42 +56,37 @@ public class PushBlock extends BaseEntityBlock implements ISpellTargetBlock {
 		return Shapes.empty();
 	}
 	
+	@SuppressWarnings("deprecation")
+	@Override
+	public VoxelShape getInteractionShape(BlockState state, BlockGetter level, BlockPos pos) {
+//		// Doesn't work like I thought :(
+		return super.getInteractionShape(state, level, pos);
+	}
+	
 	@Override
 	public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-		// Visually looks good but you end up running through it :(
-//		BlockEntity te = level.getBlockEntity(pos);
-//		if (te != null && te instanceof PushBlockTileEntity pushEntity && pushEntity.isAnimating()) {
-//			final float prog = pushEntity.getAnimationProgress(1f);
-//			if (prog < 1f) {
-//				final Direction direction = pushEntity.getAnimDirection();
-//				return RECESSED_BLOCK.move(
-//						direction.getStepX() * (1f-prog),
-//						direction.getStepY() * (1f-prog),
-//						direction.getStepZ() * (1f-prog)
-//						);
-//			}
-//		}
-		
 		return RECESSED_BLOCK;
 	}
 	
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+		// Visually looks good but you end up running through it :(
+		if (context != null) {
+			BlockEntity te = level.getBlockEntity(pos);
+			if (te != null && te instanceof PushBlockTileEntity pushEntity && pushEntity.isAnimating()) {
+				final float prog = pushEntity.getAnimationProgress(1f);
+				if (prog < 1f) {
+					final Direction direction = pushEntity.getAnimDirection();
+					return RECESSED_BLOCK.move(
+							direction.getStepX() * (1f-prog),
+							direction.getStepY() * (1f-prog),
+							direction.getStepZ() * (1f-prog)
+							);
+				}
+			}
+		}
+		
 		return Shapes.block();
-//		BlockEntity te = level.getBlockEntity(pos);
-//		if (te != null && te instanceof PushBlockTileEntity pushEntity && pushEntity.isAnimating()) {
-//			final float prog = pushEntity.getAnimationProgress(1f);
-//			if (prog < 1f) {
-//				final Direction direction = pushEntity.getAnimDirection();
-//				return RECESSED_BLOCK.move(
-//						direction.getStepX() * (1f-prog),
-//						direction.getStepY() * (1f-prog),
-//						direction.getStepZ() * (1f-prog)
-//						);
-//			}
-//		}
-//		
-//		return RECESSED_BLOCK;
 	}
 	
 	@Override
