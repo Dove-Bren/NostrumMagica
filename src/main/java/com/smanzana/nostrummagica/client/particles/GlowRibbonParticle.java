@@ -8,7 +8,9 @@ import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetMotion.MotionUpdate;
-import com.smanzana.nostrummagica.client.particles.ribbon.RibbonParticle;
+import com.smanzana.nostrummagica.client.particles.ribbon.RibbonEmitter.EmitterData;
+import com.smanzana.nostrummagica.client.particles.ribbon.RibbonEmitter.ISegment;
+import com.smanzana.nostrummagica.client.particles.ribbon.RibbonEmitter.SegmentData;
 import com.smanzana.nostrummagica.client.particles.ribbon.RibbonRenderTypes.LitColorRibbonRenderType;
 import com.smanzana.nostrummagica.client.particles.ribbon.RibbonSegmentTypes.CameraFacingSegmentMixin;
 import com.smanzana.nostrummagica.client.particles.ribbon.RibbonSegmentTypes.FadingSegmentMixin;
@@ -48,7 +50,7 @@ public class GlowRibbonParticle extends RibbonParticle implements IMotionParticl
 			}
 		}
 		
-		return new GlowRibbonSegment(worldPos, emitter.emitterColor, .125f, 0, age, emitter.partialTicks, 20, emitter.emitterLifetime);
+		return new GlowRibbonSegment(worldPos, emitter.emitterColor, .125f, 0, emitter.emitterAge, emitter.partialTicks, 20, emitter.emitterLifetime);
 	}
 	
 	@Override
@@ -58,7 +60,6 @@ public class GlowRibbonParticle extends RibbonParticle implements IMotionParticl
 	
 	@Override
 	public void tick() {
-		super.tick();
 		
 		if (this.getMotion().shouldUpdate()) {
 			final @Nullable MotionUpdate update = this.getMotion().update(new Vec3(x, y, z), new Vec3(xd, yd, zd));
@@ -69,6 +70,7 @@ public class GlowRibbonParticle extends RibbonParticle implements IMotionParticl
 			}
 		}
 		// else let super.tick do normal particle motion
+		super.tick();
 	}
 	
 	protected static final class GlowRibbonSegment extends LifetimeSegment implements CameraFacingSegmentMixin, FadingSegmentMixin {

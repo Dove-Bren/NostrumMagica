@@ -1,9 +1,9 @@
 package com.smanzana.nostrummagica.client.particles.ribbon;
 
 import com.mojang.math.Vector3f;
-import com.smanzana.nostrummagica.client.particles.ribbon.RibbonParticle.EmitterData;
-import com.smanzana.nostrummagica.client.particles.ribbon.RibbonParticle.ISegment;
-import com.smanzana.nostrummagica.client.particles.ribbon.RibbonParticle.SegmentData;
+import com.smanzana.nostrummagica.client.particles.ribbon.RibbonEmitter.EmitterData;
+import com.smanzana.nostrummagica.client.particles.ribbon.RibbonEmitter.ISegment;
+import com.smanzana.nostrummagica.client.particles.ribbon.RibbonEmitter.SegmentData;
 import com.smanzana.nostrummagica.util.Color;
 
 import net.minecraft.client.Camera;

@@ -179,6 +179,13 @@ public class SpellProjectileEntity extends AbstractHurtingProjectile {
 	
 	@Override
 	public void tick() {
+		if (level.isClientSide()) {
+			if (firstTick) {
+				NostrumParticles.COLOR_TRAIL.spawn(level, new SpawnParams(1, getX(), getY(), getZ(), 0, 300, 0,
+						this.getId()).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(this.getElement().getColor(), .7f)));
+			}
+		}
+		
 		super.tick();
 		
 		if (!level.isClientSide()) {
@@ -195,11 +202,6 @@ public class SpellProjectileEntity extends AbstractHurtingProjectile {
 			}
 		} else {
 			doClientEffect();
-			
-			if (this.tickCount == 1) {
-				NostrumParticles.SMOKE_TRAIL.spawn(level, new SpawnParams(1, getX(), getY(), getZ(), 0, 300, 0,
-						this.getId()).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(this.getElement().getColor(), .7f)));
-			}
 		}
 	}
 

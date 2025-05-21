@@ -16,17 +16,16 @@ import com.smanzana.nostrummagica.util.Color;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
-// Particle that creates segments as it lives and draws quads between them, forming a ribbon.
-public abstract class RibbonParticle extends Particle {
+// Emitter that creates segments as it lives and draws quads between them, forming a ribbon.
+public class RibbonEmitter<T> {
 	
-	protected static final class EmitterData {
+	public static final class EmitterData {
 		public Vec3 emitterPos;
 		public float emitterAgeProgress; // 0-1f
 		public int emitterAge; // Ticks alive
@@ -42,14 +41,14 @@ public abstract class RibbonParticle extends Particle {
 		public double ribbonVisibleLength; // Total length of all segments still visible in the ribbon 
 	}
 	
-	protected static final class SegmentData {
+	public static final class SegmentData {
 		public Vector3f segmentLength; // Vector span of this segment. Also works as 'distance to next segment'
 		public int segmentIdxFromTail; // Index relative to the tail of the ribbon. The last in the ribbon is idx 0 and head is [segmentAliveCount-1]
 		
 		public double ribbonLengthFromHead; // 'Length' in block units of the ribbon from the emitter to this segment
 	}
 	
-	protected static interface ISegment {
+	public static interface ISegment {
 		public Vec3 getPosition(Camera camera, EmitterData emitter);
 		public Vector3f getSpanDirection(Camera camera, EmitterData emitter, SegmentData ribbonData);
 		public Color getColor(Camera camera, EmitterData emitter, SegmentData ribbonData);
@@ -60,34 +59,56 @@ public abstract class RibbonParticle extends Particle {
 	}
 	
 	@FunctionalInterface
-	protected static interface ISegmentSpawner {
-		public @Nullable ISegment makeSegment(RibbonParticle particle, ClientLevel worldIn, Vec3 spawnPos, EmitterData emitter, double distanceFromLast, float ticksFromLast);
+	public static interface ISegmentSpawner<T> {
+		public @Nullable ISegment makeSegment(T particle, ClientLevel worldIn, Vec3 spawnPos, EmitterData emitter, double distanceFromLast, float ticksFromLast);
 	}
 
 	protected final int fixedRandom;
 	
-	protected final ISegmentSpawner spawner;
+	protected final T spawnerData;
+	protected final ISegmentSpawner<T> spawner;
 	protected final List<ISegment> segments;
 	protected Vec3 lastSegmentPos;
 	protected int lastSegmentTicks;
 	protected float totalSegmentLength;
 
+	protected final int lifetime;
+	protected int age;
+	protected final ClientLevel level;
+	protected double x, xo;
+	protected double y, yo;
+	protected double z, zo;
+	
+	protected boolean active;
+
 	// Stashing on one object instead of constantly calling new
 	protected final EmitterData dataStorage;
 	protected final SegmentData segmentStorage;
 	
-	public RibbonParticle(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime, ISegmentSpawner spawner) {
-		super(worldIn, x, y, z, 0, 0, 0);
-		
+	public RibbonEmitter(ClientLevel level, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime, final int fixedRandom, ISegmentSpawner<T> spawner, T spawnerData) {
 		this.spawner = spawner;
+		this.spawnerData = spawnerData;
 		this.lifetime = lifetime;
-		this.fixedRandom = NostrumMagica.rand.nextInt();
 		this.segments = new ArrayList<>();
 		this.lastSegmentPos = new Vec3(x, y, z);
 		this.lastSegmentTicks = 0;
 		this.dataStorage = new EmitterData();
 		this.dataStorage.emitterColor = new Color(red, green, blue, alpha);
 		this.segmentStorage = new SegmentData();
+		this.fixedRandom = fixedRandom;
+		this.x = this.xo = x;
+		this.y = this.yo = y;
+		this.z = this.zo = z;
+		this.level = level;
+		this.active = true;
+	}
+	
+	public RibbonEmitter(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime, ISegmentSpawner<T> spawner, T spawnerData) {
+		this(worldIn, x, y, z, red, green, blue, alpha, lifetime, NostrumMagica.rand.nextInt(), spawner, spawnerData);
+	}
+	
+	public void disable() {
+		this.active = false;
 	}
 	
 	protected void updateEmitterTickData() {
@@ -110,22 +131,26 @@ public abstract class RibbonParticle extends Particle {
 		this.dataStorage.partialTicks = partialTicks;
 	}
 	
-	@Override
-	public void tick() {
-		super.tick();
+	public void tick(double x, double y, double z, double oldX, double oldY, double oldZ) {
+		age++;
+		
+		this.xo = oldX;
+		this.x = x;
+		this.yo = oldY;
+		this.y = y;
+		this.zo = oldZ;
+		this.z = z;
 		
 		updateEmitterTickData();
 		cleanSegments();
 	}
 	
-	@Override
-	public boolean isAlive() {
-		return super.isAlive() || !this.segments.isEmpty();
+	public void tick() {
+		tick(x, y, z, xo, yo, zo);
 	}
 	
-	@Override
-	public boolean shouldCull() {
-		return false;
+	public boolean isAlive() {
+		return !this.segments.isEmpty();
 	}
 	
 	protected void cleanSegments() {
@@ -147,13 +172,12 @@ public abstract class RibbonParticle extends Particle {
 	}
 	
 	protected void attemptNewSegment(float partialTicks) {
-		updateEmitterSubtickData(partialTicks);
 		final float renderAge = (this.age + partialTicks);
 		final Vec3 pos = new Vec3(Mth.lerp(partialTicks, this.xo, this.x),
 				Mth.lerp(partialTicks, this.yo, this.y),
 				Mth.lerp(partialTicks, this.zo, this.z)
 				);
-		ISegment seg = spawner.makeSegment(this, level, pos, dataStorage, pos.distanceTo(lastSegmentPos), renderAge - lastSegmentTicks);
+		ISegment seg = spawner.makeSegment(this.spawnerData, level, pos, dataStorage, pos.distanceTo(lastSegmentPos), renderAge - lastSegmentTicks);
 		if (seg != null) {
 			this.segments.add(seg);
 			this.totalSegmentLength += pos.distanceTo(lastSegmentPos);
@@ -164,9 +188,9 @@ public abstract class RibbonParticle extends Particle {
 		}
 	}
 	
-	@Override
 	public void render(VertexConsumer buffer, Camera camera, float partialTicks) {
-		if (!this.removed) {
+		updateEmitterSubtickData(partialTicks);
+		if (this.active) {
 			// Adding in render so it's faster than 1/20th a second
 			attemptNewSegment(partialTicks);
 		}
@@ -184,10 +208,7 @@ public abstract class RibbonParticle extends Particle {
 	
 	protected void renderSegments(ClientLevel level, PoseStack matrixStack, VertexConsumer buffer, Camera camera, float partialTicks) {
 		if (this.segments.size() > 1) {
-			Vec3 lastPos = new Vec3(Mth.lerp(partialTicks, this.xo, this.x),
-					Mth.lerp(partialTicks, this.yo, this.y),
-					Mth.lerp(partialTicks, this.zo, this.z)
-					);
+			Vec3 lastPos = dataStorage.emitterPos;
 			double visibleLength = 0; // Calculate, then set to avoid giving partial info to render calls
 			
 			for (int i = segments.size() - 1; i >= 0; i--) {
@@ -231,6 +252,16 @@ public abstract class RibbonParticle extends Particle {
 		
 		// For checkerboard testing, replace color with
 		// ribbonData.segmentIdxFromTail % 2 == 0 ? new Color(1f, 1f, 1f, 1f) : new Color(0f, 0f, 0f, 1f) (or %2 == 1 for start)
+		//
+//		matrixStack.pushPose();
+//		//matrixStack.mulPose(rotation);
+//		if (end)
+//			renderSegmentRaw(matrixStack, buffer, ribbonData.segmentIdxFromTail % 2 == 0 ? new Color(1f, 1f, 1f, 1f) : new Color(0f, 0f, 0f, 1f), lowU, highU, v, OverlayTexture.NO_OVERLAY, light, bandVec, normalVec, width, false);
+//		if (start)
+//			renderSegmentRaw(matrixStack, buffer, ribbonData.segmentIdxFromTail % 2 == 1 ? new Color(1f, 1f, 1f, 1f) : new Color(0f, 0f, 0f, 1f), lowU, highU, v, OverlayTexture.NO_OVERLAY, light, bandVec, normalVec, width, true);
+//		
+//		
+//		matrixStack.popPose();
 		
 		matrixStack.pushPose();
 		//matrixStack.mulPose(rotation);
