@@ -24,6 +24,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.mirror.MirrorResearchSubscreen;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.enchantment.ManaRecoveryEnchantment;
@@ -739,7 +740,7 @@ public class PlayerListener {
 							5, source.getX(), source.getY() + .75, source.getZ(), 0,
 							40, 0,
 							e.getId()
-							).color(1f, .4f, .8f, 1f).dieWithTarget(true));
+							).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(1f, .4f, .8f, 1f).dieWithTarget(true));
 				}
 			}
 		}
@@ -1274,7 +1275,7 @@ public class PlayerListener {
 								5, source.getX(), source.getY() + .75, source.getZ(), 0,
 								40, 0,
 								ent.getId()
-								).color(1f, .4f, .8f, 1f).dieWithTarget(true));
+								).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(1f, .4f, .8f, 1f).dieWithTarget(true));
 					}
 				}
 			}
@@ -1445,7 +1446,7 @@ public class PlayerListener {
 							5, ent.getX(), ent.getY() + .75, ent.getZ(), 0,
 							40, 0,
 							causingEntity.getId()
-							).color(1f, .4f, .8f, 1f).dieWithTarget(true));
+							).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(1f, .4f, .8f, 1f).dieWithTarget(true));
 				}
 			}
 		}

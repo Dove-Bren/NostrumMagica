@@ -30,7 +30,7 @@ public enum NostrumParticles {
 	FILLED_ORB(new NostrumParticleType("filled_orb"), FilledOrbParticle::MakeParticle),
 	WARD(new NostrumParticleType("ward"), WardParticle::MakeParticle),
 	LIGHT_EXPLOSION(new NostrumParticleType("light_explosion"), LightExplosionParticle::MakeParticle),
-	COLOR_TRAIL(new NostrumParticleType("glow_trail"), GlowRibbonParticle::MakeParticle),
+	GLOW_TRAIL(new NostrumParticleType("glow_trail"), GlowRibbonParticle::MakeParticle),
 	SMOKE_TRAIL(new NostrumParticleType("smoke_trail"), SmokeStreamRibbonParticle::MakeParticle),
 	;
 	

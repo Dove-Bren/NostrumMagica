@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.client.effects.ClientPredefinedEffect.Predefin
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
@@ -248,7 +249,7 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 					NostrumParticles.FILLED_ORB.spawn(attacker.level, new SpawnParams(
 							50, target.getX(), target.getY() + target.getBbHeight(), target.getZ(), .5, 60, 0,
 							attacker.getId()
-							).color(1f, .4f, .8f, 1f).dieWithTarget(true));
+							).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(1f, .4f, .8f, 1f).dieWithTarget(true));
 				}
 			}
 			

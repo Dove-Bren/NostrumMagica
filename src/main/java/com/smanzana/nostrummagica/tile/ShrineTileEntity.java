@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.listener.NostrumTutorial;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.ShrineTriggerEntity;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -125,7 +126,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 			50,
 			shrinePos.getX() + .5, shrinePos.getY() + 1.75, shrinePos.getZ() + .5, 1, 40, 10,
 			entity.getId()
-			).color(color));
+			).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(color));
 	}
 	
 	public static class Element extends ShrineTileEntity<ShrineTriggerEntity.Element> {

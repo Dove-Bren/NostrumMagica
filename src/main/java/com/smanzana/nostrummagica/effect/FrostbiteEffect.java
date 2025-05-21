@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.entity.AreaEffectEntity;
 import com.smanzana.nostrummagica.entity.AreaEffectEntity.IAreaLocationEffect;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
@@ -106,7 +107,7 @@ public class FrostbiteEffect extends MobEffect {
 									10, ent.getX(), ent.getY() + ent.getBbHeight()/2, ent.getZ(), 4,
 									30, 10,
 									ent.getId()
-									).color(this.getColor()).dieWithTarget(true));
+									).color(this.getColor()).setTargetBehavior(TargetBehavior.ORBIT_LAZY).dieWithTarget(true));
 						} else if (ent instanceof LivingEntity) {
 							((LivingEntity) ent).addEffect(new MobEffectInstance(NostrumEffects.frostbite, 20 * 3, 2));
 						}

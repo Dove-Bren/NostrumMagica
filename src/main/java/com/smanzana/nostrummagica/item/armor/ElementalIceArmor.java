@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
@@ -113,7 +114,7 @@ public class ElementalIceArmor extends ElementalArmor {
 							10, entity.getX(), entity.getY() + entity.getBbHeight()/2, entity.getZ(), 1,
 							40, 10,
 							entity.getId()
-							).gravity(true).color(EMagicElement.ICE.getColor()));
+							).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(EMagicElement.ICE.getColor()));
 				} else {
 					SpellDamage.DamageEntity(entity, EMagicElement.ICE, 1f, thrower);
 					entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20 * 15, 3));

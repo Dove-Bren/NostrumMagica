@@ -60,7 +60,7 @@ public class GlowRibbonParticle extends RibbonParticle implements IMotionParticl
 	
 	@Override
 	public void tick() {
-		
+		super.tick();
 		if (this.getMotion().shouldUpdate()) {
 			final @Nullable MotionUpdate update = this.getMotion().update(new Vec3(x, y, z), new Vec3(xd, yd, zd));
 			if (update == null) {
@@ -70,7 +70,6 @@ public class GlowRibbonParticle extends RibbonParticle implements IMotionParticl
 			}
 		}
 		// else let super.tick do normal particle motion
-		super.tick();
 	}
 	
 	protected static final class GlowRibbonSegment extends LifetimeSegment implements CameraFacingSegmentMixin, FadingSegmentMixin {

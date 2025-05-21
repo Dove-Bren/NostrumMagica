@@ -5,6 +5,7 @@ import java.util.function.Function;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -21,13 +22,8 @@ public interface IMotionParticle<T extends IMotionParticle<?>> {
 		return (T) self;
 	}
 	
-	public default T setTarget(Entity ent) {
-		getMotion().setTarget(ent);
-		return Self(this);
-	}
-	
-	public default T setTarget(Vec3 targetPos) {
-		getMotion().setTarget(targetPos);
+	public default T setTarget(TargetLocation target) {
+		getMotion().setTarget(target);
 		return Self(this);
 	}
 	
@@ -36,8 +32,8 @@ public interface IMotionParticle<T extends IMotionParticle<?>> {
 		return Self(this);
 	}
 	
-	public default T setRandomTargetOffset(Entity ent) {
-		getMotion().setRandomTargetOffset(ent);
+	public default T setRandomTargetOffset() {
+		getMotion().setRandomTargetOffset();
 		return Self(this);
 	}
 	
@@ -98,10 +94,10 @@ public interface IMotionParticle<T extends IMotionParticle<?>> {
 	
 	public default T setFromParams(SpawnParams params, Function<Integer, Entity> entityLookup) {
 		if (params.targetEntID != null) {
-			this.setTarget(entityLookup.apply(params.targetEntID));
+			this.setTarget(new TargetLocation(entityLookup.apply(params.targetEntID), true));
 		}
-		if (params.targetPos != null) {
-			this.setTarget(params.targetPos);
+		else if (params.targetPos != null) {
+			this.setTarget(new TargetLocation(params.targetPos));
 		}
 		if (params.velocity != null) {
 			this.setMotion(params.velocity, params.velocityJitter == null ? Vec3.ZERO : params.velocityJitter);

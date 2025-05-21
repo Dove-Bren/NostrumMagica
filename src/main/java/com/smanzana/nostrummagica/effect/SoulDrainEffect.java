@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.util.Entities;
 
 import net.minecraft.server.level.ServerLevel;
@@ -39,7 +40,7 @@ public class SoulDrainEffect extends MobEffect {
 				5, source.getX(), source.getY() + .75, source.getZ(), 0,
 				40, 0,
 				dest.getId()
-				).color(0xFFE2346B).dieWithTarget(true));
+				).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(0xFFE2346B).dieWithTarget(true));
 	}
 	
 	protected void playDamageEffect(LivingEntity source, float amt) {

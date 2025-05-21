@@ -1,7 +1,11 @@
 package com.smanzana.nostrummagica.client.particles;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetMotion.MotionUpdate;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.Minecraft;
@@ -9,16 +13,12 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.TextureSheetParticle;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
-public class FilledOrbParticle extends TextureSheetParticle {
+public class FilledOrbParticle extends TextureSheetParticle implements IMotionParticle<FilledOrbParticle> {
 	
-	
+	protected final ParticleTargetMotion motion;
 	protected final float maxAlpha;
-	protected Vec3 targetPos; // Absolute position to move to (if targetEntity == null) or offset from entity to go to
-	protected Entity targetEntity;
-	protected boolean dieOnTarget;
 	protected final SpriteSet sprite;
 	
 	public FilledOrbParticle(ClientLevel worldIn, double x, double y, double z, float red, float green, float blue, float alpha, int lifetime, SpriteSet sprite) {
@@ -33,58 +33,40 @@ public class FilledOrbParticle extends TextureSheetParticle {
 		this.sprite = sprite;
 		
 		this.quadSize = 0.05f;
+		this.motion = new ParticleTargetMotion(NostrumMagica.rand.nextFloat(), .2f);
 		
 		this.setSpriteFromAge(sprite);
 	}
 	
-	public FilledOrbParticle setGravity(boolean gravity) {
-		return setGravityStrength(gravity ? .01f : 0);
-	}
-	
+	@Override
 	public FilledOrbParticle setGravityStrength(float strength) {
 		gravity = strength;
 		return this;
 	}
-	
-	public FilledOrbParticle setMotion(Vec3 motion) {
-		return this.setMotion(motion.x, motion.y, motion.z);
-	}
-	
+
+	@Override
 	public FilledOrbParticle setMotion(double xVelocity, double yVelocity, double zVelocity) {
-		return this.setMotion(xVelocity, yVelocity, zVelocity, 0, 0, 0);
-	}
-	
-	public FilledOrbParticle setMotion(Vec3 motion, Vec3 jitter) {
-		return this.setMotion(motion.x, motion.y, motion.z, jitter.x, jitter.y, jitter.z);
-	}
-	
-	public FilledOrbParticle setMotion(double xVelocity, double yVelocity, double zVelocity,
-			double xJitter, double yJitter, double zJitter) {
-		this.xd = xVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter; // +- jitter
-		this.yd = yVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter;
-		this.zd = zVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter;
+		this.xd = xVelocity;
+		this.yd = yVelocity;
+		this.zd = zVelocity;
 		return this;
 	}
 	
-	public FilledOrbParticle setTarget(Entity ent) {
-		targetEntity = ent;
-		if (this.targetPos == null && ent != null) {
-			final double wRad = ent.getBbWidth() * 2; // double width
-			final double hRad = ent.getBbHeight();
-			this.targetPos = new Vec3(wRad * (NostrumMagica.rand.nextDouble() - .5),
-					hRad * (NostrumMagica.rand.nextDouble() - .5),
-					wRad * (NostrumMagica.rand.nextDouble() - .5));
-		}
-		return this;
+
+	@Override
+	public ParticleRenderType getRenderType() {
+		return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
 	}
 	
-	public FilledOrbParticle setTarget(Vec3 targetPos) {
-		this.targetPos = targetPos;
-		return this;
+	@Override
+	public ParticleTargetMotion getMotion() {
+		return motion;
 	}
 	
-	public void dieOnTarget(boolean die) {
-		this.dieOnTarget = die;
+	@Override
+	public FilledOrbParticle setPosition(double x, double y, double z) {
+		this.setPos(x, y, z);
+		return this;
 	}
 	
 	@Override
@@ -110,29 +92,25 @@ public class FilledOrbParticle extends TextureSheetParticle {
 		
 		this.alpha *= maxAlpha;
 		
-		if (targetEntity != null) {
-			if (targetEntity.isAlive()) {
-				final float period = 20f;
-				Vec3 offset = targetPos == null ? new Vec3(0,0,0) : targetPos.yRot((float) (Math.PI * 2 * ((float) age % period) / period));
-				Vec3 curVelocity = new Vec3(xd, yd, zd);
-				Vec3 posDelta = targetEntity.position()
-						.add(offset.x, offset.y + targetEntity.getBbHeight()/2, offset.z)
-						.subtract(x, y, z);
-				Vec3 idealVelocity = posDelta.normalize().scale(.3);
-				this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
+		if (this.getMotion().shouldUpdate()) {
+			final @Nullable MotionUpdate update = this.getMotion().update(new Vec3(x, y, z), new Vec3(xd, yd, zd));
+			if (update == null) {
+				this.remove();
+			} else {
+				ParticleTargetMotion.ApplyUpdate(update, this);
 			}
-			// Else just do nothing
-		} else if (targetPos != null) {
-			Vec3 curVelocity = new Vec3(xd, yd, zd);
-			Vec3 posDelta = targetPos.subtract(x, y, z);
-			Vec3 idealVelocity = posDelta.normalize().scale(.3);
-			this.setMotion(curVelocity.scale(.8).add(idealVelocity.scale(.2)));
 		}
+		// else let super.tick do normal particle motion
 	}
 	
 	public static final FilledOrbParticle MakeParticle(ClientLevel world, SpriteSet sprites, SpawnParams params) {
 		FilledOrbParticle particle = null;
 		for (int i = 0; i < params.count; i++) {
+			if (particle != null) {
+				Minecraft mc = Minecraft.getInstance();
+				mc.particleEngine.add(particle);
+			}
+			
 			final double spawnX = params.spawnX + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
 			final double spawnY = params.spawnY + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
 			final double spawnZ = params.spawnZ + (NostrumMagica.rand.nextDouble() * 2 - 1) * params.spawnJitterRadius;
@@ -142,29 +120,14 @@ public class FilledOrbParticle extends TextureSheetParticle {
 			final int lifetime = params.lifetime + (params.lifetimeJitter > 0 ? NostrumMagica.rand.nextInt(params.lifetimeJitter) : 0);
 			particle = new FilledOrbParticle(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime, sprites);
 			
-			if (params.targetEntID != null) {
-				particle.setTarget(world.getEntity(params.targetEntID));
+			particle.setFromParams(params, world::getEntity);
+			
+			if (params.targetBehavior == TargetBehavior.ORBIT || params.targetBehavior == TargetBehavior.ORBIT_LAZY) {
+				particle.setRandomTargetOffset();
 			}
-			if (params.targetPos != null) {
-				particle.setTarget(params.targetPos);
-			}
-			if (params.velocity != null) {
-				particle.setMotion(params.velocity, params.velocityJitter == null ? Vec3.ZERO : params.velocityJitter);
-			}
-			if (params.gravityStrength != 0f) {
-				particle.setGravityStrength(params.gravityStrength);
-			}
-			particle.dieOnTarget(params.dieWithTarget);
-			Minecraft mc = Minecraft.getInstance();
-			mc.particleEngine.add(particle);
+			
 		}
 		return particle;
-	}
-		
-
-	@Override
-	public ParticleRenderType getRenderType() {
-		return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
 	}
 	
 }

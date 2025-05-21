@@ -9,6 +9,7 @@ import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.entity.IElementalEntity;
 import com.smanzana.nostrummagica.entity.IMultiPartEntity;
 import com.smanzana.nostrummagica.entity.IMultiPartEntityPart;
@@ -498,6 +499,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 					30, 5,
 					this.getId())
 					.color(0xFFAA0022)
+					.setTargetBehavior(TargetBehavior.ORBIT_LAZY)
 					.dieWithTarget(true));
 		}
 	}

@@ -5,6 +5,7 @@ import java.util.List;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.ArcaneWolfElementalType;
@@ -117,7 +118,7 @@ public class ArcaneWolfBarrierGoal extends Goal {
 				applied = true;
 				NostrumParticles.FILLED_ORB.spawn(wolf.level, new SpawnParams(
 						1, wolf.getX(), wolf.getY() + wolf.getBbHeight()/2, wolf.getZ(), 0, 40, 0, target.getId()
-						).color(ArcaneWolfElementalType.BARRIER.getColor()));
+						).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(ArcaneWolfElementalType.BARRIER.getColor()));
 			}
 		}
 		

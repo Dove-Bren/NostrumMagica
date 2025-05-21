@@ -22,6 +22,7 @@ import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfInvento
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfTrainingSheet;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.tasks.FollowOwnerGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.SpellAttackGoal;
@@ -1832,7 +1833,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 			this.playSound(SoundEvents.WOLF_HOWL, 1f, 1f);
 			NostrumParticles.FILLED_ORB.spawn(this.level, new SpawnParams(
 					100, this.getX(), this.getY(), this.getZ(), 3.0, 60, 20, this.getId()
-					).color(element.getColor()));
+					).color(element.getColor()).setTargetBehavior(TargetBehavior.ORBIT_LAZY));
 		}
 	}
 	

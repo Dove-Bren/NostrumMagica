@@ -314,7 +314,7 @@ public class ClientPlayerListener extends PlayerListener {
 //			NostrumParticles.COLOR_TRAIL.spawn(mc.level, new SpawnParams(1, player.getX(), player.getY() + 1, player.getZ() - 1, 0, 600, 0,
 //					player.getId()).setTargetBehavior(TargetBehavior.ATTACH).color(1f, .8f, .3f, .4f));
 			
-			NostrumParticles.COLOR_TRAIL.spawn(mc.level, new SpawnParams(1, player.getX(), player.getY() + 1, player.getZ() - 1, 0, 600, 0,
+			NostrumParticles.GLOW_TRAIL.spawn(mc.level, new SpawnParams(1, player.getX(), player.getY() + 1, player.getZ() - 1, 0, 600, 0,
 					player.getId()).setTargetBehavior(TargetBehavior.ORBIT).setOrbitRadius(2f).color(1f, .8f, .3f, .4f));
 			
 			/*

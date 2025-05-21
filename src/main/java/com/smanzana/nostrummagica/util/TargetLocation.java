@@ -34,5 +34,17 @@ public class TargetLocation {
 			return targetEntity.position().add(targetPos);
 		}
 	}
+
+	public float getTargetWidth() {
+		return targetEntity == null ? 1 : targetEntity.getBbWidth();
+	}
+
+	public double getTargetHeight() {
+		return targetEntity == null ? 1 : targetEntity.getBbHeight();
+	}
+
+	public boolean isValid() {
+		return targetEntity == null || targetEntity.isAlive();
+	}
 	
 }

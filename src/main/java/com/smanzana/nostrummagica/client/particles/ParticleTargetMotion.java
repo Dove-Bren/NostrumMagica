@@ -1,23 +1,24 @@
 package com.smanzana.nostrummagica.client.particles;
 
+import java.util.Random;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
 public class ParticleTargetMotion {
-	protected Vec3 targetPos;
-	protected Entity targetEntity;
+	protected TargetLocation target;
 	protected final ParticleTargetBehavior targetBehavior;
 	
 	protected final float fixedRandom;
 	protected float impulse;
 	protected Vec3 offsetPos;
+	protected boolean autoRandomOffset;
 	
 	protected int age;
 	
@@ -29,22 +30,16 @@ public class ParticleTargetMotion {
 		this.impulse = impulse;
 	}
 	
-	public ParticleTargetMotion setTarget(Entity ent) {
-		this.targetEntity = ent;
-		this.targetPos = null;
-		if (this.targetPos == null && ent != null) {
-			final double wRad = ent.getBbWidth() * 2; // double width
-			final double hRad = ent.getBbHeight();
-			this.targetPos = new Vec3(wRad * (NostrumMagica.rand.nextDouble() - .5),
-					hRad * (NostrumMagica.rand.nextDouble() - .5),
-					wRad * (NostrumMagica.rand.nextDouble() - .5));
-		}
+	public ParticleTargetMotion setAutoRandomOffset() {
+		this.autoRandomOffset = true;
 		return this;
 	}
 	
-	public ParticleTargetMotion setTarget(Vec3 targetPos) {
-		this.targetEntity = null;
-		this.targetPos = targetPos;
+	public ParticleTargetMotion setTarget(TargetLocation target) {
+		this.target = target;
+		if (autoRandomOffset && target != null) {
+			this.setRandomTargetOffset();
+		}
 		return this;
 	}
 	
@@ -53,13 +48,14 @@ public class ParticleTargetMotion {
 		return this;
 	}
 	
-	public ParticleTargetMotion setRandomTargetOffset(Entity ent) {
-		final double wRad = ent.getBbWidth() * 2; // double width
-		final double hRad = ent.getBbHeight();
+	public ParticleTargetMotion setRandomTargetOffset() {
+		final double wRad = target.getTargetWidth() * 2; // double width
+		final double hRad = target.getTargetHeight();
+		final Random rand = new Random((int) (this.fixedRandom * 16777216));
 		return this.setTargetOffset(new Vec3(
-				wRad * (NostrumMagica.rand.nextDouble() - .5),
-				hRad * (NostrumMagica.rand.nextDouble() - .5),
-				wRad * (NostrumMagica.rand.nextDouble() - .5)
+				wRad * (rand.nextDouble() - .5),
+				hRad * (rand.nextDouble() - .5),
+				wRad * (rand.nextDouble() - .5)
 				));
 	}
 	
@@ -80,8 +76,8 @@ public class ParticleTargetMotion {
 	}
 	
 	public ParticleTargetMotion orbitMode(boolean lazy) {
-		if (this.targetEntity != null) {
-			return orbitMode(targetEntity.getBbWidth() * 2);
+		if (this.target != null) {
+			return orbitMode(target.getTargetWidth() * 2);
 		}
 		return orbitMode(1f, lazy);
 	}
@@ -128,20 +124,14 @@ public class ParticleTargetMotion {
 	}
 	
 	protected @Nullable MotionUpdate updateAttach(Vec3 baseTarget, Vec3 particlePosition, Vec3 particleMotion) {
-		if (this.targetBehavior.dieWithTarget && this.targetEntity != null && !this.targetEntity.isAlive()) {
+		if (this.targetBehavior.dieWithTarget && !this.target.isValid()) {
 			return null;
 		}
 		return new MotionUpdate(baseTarget, Vec3.ZERO);
 	}
 	
 	protected @Nullable MotionUpdate updatePosition(Vec3 particlePosition, Vec3 particleMotion) {
-		Vec3 baseTarget = null;
-		if (this.targetEntity != null) {
-			// Could check if they're alive but I don't think it matters. They have a position!
-			baseTarget = this.targetEntity.position().add(0, this.targetEntity.getBbHeight() / 2, 0);
-		} else if (this.targetPos != null) {
-			baseTarget = targetPos;
-		}
+		Vec3 baseTarget = this.target == null ? null : this.target.getLocation();
 		
 		if (baseTarget == null) {
 			return null; // Don't bother continuing
@@ -174,7 +164,7 @@ public class ParticleTargetMotion {
 	}
 	
 	public boolean shouldUpdate() {
-		return this.targetPos != null || this.targetEntity != null;
+		return this.target != null;
 	}
 	
 	public static final <T extends IMotionParticle<?>> void ApplyUpdate(@Nonnull MotionUpdate update, IMotionParticle<T> particle) {

@@ -80,7 +80,7 @@ public class MagicDamageProjectileEntity extends AbstractHurtingProjectile {
 	
 	@Override
 	protected ParticleOptions getTrailParticle() {
-		return new NostrumParticleData(NostrumParticles.WARD.getType(), new SpawnParams(1, 0, 0, 0, 0, 1, 0, Vec3.ZERO));
+		return new NostrumParticleData(NostrumParticles.WARD.getType(), new SpawnParams(1, getX(), getY() + this.getBbHeight() / 2f, getZ(), 0, 10, 5, this.getDeltaMovement().scale(-.05f), Vec3.ZERO));
 	}
 	
 	@Override
@@ -107,7 +107,7 @@ public class MagicDamageProjectileEntity extends AbstractHurtingProjectile {
 	public void tick() {
 		if (level.isClientSide()) {
 			if (firstTick) {
-				NostrumParticles.COLOR_TRAIL.spawn(level, new SpawnParams(1, getX(), getY() + this.getBbHeight() / 2, getZ(), 0, 300, 0,
+				NostrumParticles.GLOW_TRAIL.spawn(level, new SpawnParams(1, getX(), getY() + this.getBbHeight() / 2, getZ(), 0, 300, 0,
 						this.getId()).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(this.getElement().getColor(), .7f)));
 			}
 		}

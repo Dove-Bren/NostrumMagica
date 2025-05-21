@@ -4,6 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.item.MasteryOrb;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
@@ -163,6 +164,6 @@ public class TrialBlock extends BaseEntityBlock {
 			50,
 			shrinePos.getX() + .5, shrinePos.getY() + 1.75, shrinePos.getZ() + .5, 1, 40, 10,
 			entity.getId()
-			).color(color));
+			).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(color));
 	}
 }
