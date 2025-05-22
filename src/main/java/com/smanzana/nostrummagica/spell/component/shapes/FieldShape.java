@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -76,7 +77,7 @@ public class FieldShape extends AreaShape {
 						origin.z,
 						0,
 						60, 10, // lifetime + jitter
-						origin
+						new TargetLocation(origin)
 						).color(characteristics.getElement().getColor())
 						.setTargetBehavior(TargetBehavior.ORBIT)
 						.setOrbitRadius(((NostrumMagica.rand.nextFloat() * .5f) + .5f) * radius));
@@ -90,7 +91,7 @@ public class FieldShape extends AreaShape {
 					origin.z,
 					0,
 					60, 10, // lifetime + jitter
-					origin
+					new TargetLocation(origin)
 					).color(characteristics.getElement().getColor())
 					.setTargetBehavior(TargetBehavior.ORBIT)
 					.setOrbitRadius(radius));

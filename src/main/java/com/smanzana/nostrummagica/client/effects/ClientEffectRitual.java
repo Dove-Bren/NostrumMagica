@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -281,7 +282,7 @@ public class ClientEffectRitual extends ClientEffect {
 					final double yDiff = .35 + .5;
 					NostrumParticles.FILLED_ORB.spawn(mc.player.level, (new SpawnParams(
 							4, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, range, 20, 0,
-							origin.add(0, yDiff, 0)
+							new TargetLocation(origin.add(0, yDiff, 0))
 							)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)).dieWithTarget(true));
 				}
 				
@@ -332,7 +333,7 @@ public class ClientEffectRitual extends ClientEffect {
 				final Vec3 pos = Vec3.ZERO;
 				NostrumParticles.FILLED_ORB.spawn(mc.player.level, (new SpawnParams(
 						4, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, range, 30, 20,
-						origin.add(0, .35, 0)
+						new TargetLocation(origin.add(0, .35, 0))
 						)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)));
 			}
 		}

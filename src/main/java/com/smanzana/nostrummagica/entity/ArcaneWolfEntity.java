@@ -48,6 +48,7 @@ import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.component.shapes.TouchShape;
 import com.smanzana.nostrummagica.util.ArrayUtil;
 import com.smanzana.nostrummagica.util.Inventories;
+import com.smanzana.nostrummagica.util.TargetLocation;
 import com.smanzana.petcommand.api.PetCommandAPI;
 import com.smanzana.petcommand.api.PetFuncs;
 import com.smanzana.petcommand.api.client.petgui.IPetGUISheet;
@@ -1809,7 +1810,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		if (!this.level.isClientSide) {
 			this.playSound(SoundEvents.WOLF_PANT, 1f, 1f);
 			NostrumParticles.GLOW_ORB.spawn(this.level, new SpawnParams(
-					50, this.getX(), this.getY(), this.getZ(), 3.0, 30, 10, this.getId()
+					50, this.getX(), this.getY(), this.getZ(), 3.0, 30, 10, new TargetLocation(this, true)
 					).color(element.getColor()).dieWithTarget(true));
 		}
 	}
@@ -1832,7 +1833,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		if (!level.isClientSide) {
 			this.playSound(SoundEvents.WOLF_HOWL, 1f, 1f);
 			NostrumParticles.FILLED_ORB.spawn(this.level, new SpawnParams(
-					100, this.getX(), this.getY(), this.getZ(), 3.0, 60, 20, this.getId()
+					100, this.getX(), this.getY(), this.getZ(), 3.0, 60, 20, new TargetLocation(this, true)
 					).color(element.getColor()).setTargetBehavior(TargetBehavior.ORBIT_LAZY));
 		}
 	}

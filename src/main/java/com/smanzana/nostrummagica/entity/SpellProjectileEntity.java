@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.serializer.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.util.RenderFuncs;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
@@ -182,7 +183,7 @@ public class SpellProjectileEntity extends AbstractHurtingProjectile {
 		if (level.isClientSide()) {
 			if (firstTick) {
 				NostrumParticles.GLOW_TRAIL.spawn(level, new SpawnParams(1, getX(), getY(), getZ(), 0, 300, 0,
-						this.getId()).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(this.getElement().getColor(), .7f)));
+						new TargetLocation(this, true)).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(this.getElement().getColor(), .7f)));
 			}
 		}
 		

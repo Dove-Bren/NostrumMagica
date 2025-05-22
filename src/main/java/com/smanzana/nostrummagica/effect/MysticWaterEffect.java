@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -54,7 +55,7 @@ public class MysticWaterEffect extends MobEffect {
 			NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
 					5, entity.getX(), entity.getY() + .75, entity.getZ(), 1,
 					40, 0,
-					entity.getId()
+					new TargetLocation(entity, true)
 					).color(EMagicElement.ICE.getColor()).setTargetBehavior(TargetBehavior.ORBIT));
 			entity.level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.BREWING_STAND_BREW, SoundSource.PLAYERS, 1f, 1.75f);
 		}

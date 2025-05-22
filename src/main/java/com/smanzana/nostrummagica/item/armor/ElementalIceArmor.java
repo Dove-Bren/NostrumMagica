@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -113,7 +114,7 @@ public class ElementalIceArmor extends ElementalArmor {
 					NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
 							10, entity.getX(), entity.getY() + entity.getBbHeight()/2, entity.getZ(), 1,
 							40, 10,
-							entity.getId()
+							new TargetLocation(entity, true)
 							).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(EMagicElement.ICE.getColor()));
 				} else {
 					SpellDamage.DamageEntity(entity, EMagicElement.ICE, 1f, thrower);

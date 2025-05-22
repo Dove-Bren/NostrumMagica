@@ -28,6 +28,7 @@ import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RayTrace;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.Entity;
@@ -142,7 +143,7 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 			NostrumParticles.GLOW_ORB.spawn(target.level, new SpawnParams(
 					1,
 					pos.x, pos.y, pos.z, 0, 30, 5,
-					target.getId()
+					new TargetLocation(target, true)
 					).color(EMagicElement.ENDER.getColor()).dieWithTarget(true));
 		}
 	}

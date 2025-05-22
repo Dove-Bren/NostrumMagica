@@ -21,7 +21,6 @@ import com.smanzana.nostrummagica.client.particles.ribbon.RibbonSegmentTypes.Lif
 import com.smanzana.nostrummagica.client.particles.ribbon.RibbonSegmentTypes.StaticSegment;
 import com.smanzana.nostrummagica.util.Color;
 import com.smanzana.nostrummagica.util.ColorUtil;
-import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -266,9 +265,10 @@ public class RisingGlowRibbonParticle extends Particle implements IMotionParticl
 		particle = new RisingGlowRibbonParticle(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime, params.count, 1.25f, lifetime);
 		particle.setFromParams(params, world::getEntity);
 		
-		if (params.targetEntID != null) {
-			particle.setTarget(new TargetLocation(world.getEntity(params.targetEntID), false));
-		}
+		int unused; // is caller-determined now
+//		if (params.targetEntID != null) {
+//			particle.setTarget(new TargetLocation(world.getEntity(params.targetEntID), false));
+//		}
 		
 		return particle;
 	}

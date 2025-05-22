@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.ArcaneWolfElementalType;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
+import com.smanzana.nostrummagica.util.TargetLocation;
 import com.smanzana.petcommand.api.PetFuncs;
 
 import net.minecraft.world.effect.MobEffectInstance;
@@ -117,7 +118,7 @@ public class ArcaneWolfBarrierGoal extends Goal {
 			if (applyTo(wolf, target)) {
 				applied = true;
 				NostrumParticles.FILLED_ORB.spawn(wolf.level, new SpawnParams(
-						1, wolf.getX(), wolf.getY() + wolf.getBbHeight()/2, wolf.getZ(), 0, 40, 0, target.getId()
+						1, wolf.getX(), wolf.getY() + wolf.getBbHeight()/2, wolf.getZ(), 0, 40, 0, new TargetLocation(target, true)
 						).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(ArcaneWolfElementalType.BARRIER.getColor()));
 			}
 		}

@@ -9,7 +9,9 @@ import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.Target
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpawnNostrumParticleMessage;
 import com.smanzana.nostrummagica.util.ColorUtil;
+import com.smanzana.nostrummagica.util.NetTargetLocation;
 import com.smanzana.nostrummagica.util.NetUtils;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleType;
@@ -100,9 +102,9 @@ public enum NostrumParticles {
 				Codec.INT.fieldOf("lifetime").forGetter((p) -> p.lifetime),
 				Codec.INT.fieldOf("lifetimeJitter").forGetter((p) -> p.lifetimeJitter),
 				NetUtils.CODEC_VECTOR3D.fieldOf("velocity").forGetter((p) -> p.velocity),
-				NetUtils.CODEC_VECTOR3D.fieldOf("targetPos").forGetter((p) -> p.targetPos),
 				NetUtils.CODEC_VECTOR3D.fieldOf("velocityJitter").forGetter((p) -> p.velocityJitter),
-				Codec.INT.fieldOf("targetEntID").forGetter((p) -> p.targetEntID),
+				NetTargetLocation.CODEC.fieldOf("target").forGetter((p) -> p.target),
+				//Codec.INT.fieldOf("targetEntID").forGetter((p) -> p.targetEntID),
 				Codec.INT.optionalFieldOf("color", 0xFFFFFFFF).forGetter((p) -> p.color),
 				Codec.BOOL.fieldOf("dieOnTarget").forGetter((p) -> p.dieWithTarget),
 				Codec.FLOAT.fieldOf("gravityStrength").forGetter((p) -> p.gravityStrength),
@@ -119,11 +121,12 @@ public enum NostrumParticles {
 		public final double spawnJitterRadius;
 		public final int lifetime;
 		public final int lifetimeJitter;
-		
-		// One of the below is required
 		public final @Nullable Vec3 velocity;
-		public final @Nullable Vec3 targetPos;
-		public final @Nullable Integer targetEntID;
+		
+//		// One of the below is required
+//		public final @Nullable Vec3 targetPos;
+//		public final @Nullable Integer targetEntID;
+		public final NetTargetLocation target;
 		
 		public final @Nullable Vec3 velocityJitter; // 0-1 where 1 is completely random
 		
@@ -146,16 +149,14 @@ public enum NostrumParticles {
 			this.lifetimeJitter = lifetimeJitter;
 			this.velocity = velocity;
 			this.velocityJitter = velocityJitter;
-			this.targetPos = null;
-			this.targetEntID = null;
+			this.target = null;
 			this.dieWithTarget = false;
 			this.gravityStrength = 0f;
 			this.orbitRadius = 0f;
 			this.targetBehavior = TargetBehavior.JOIN;
 		}
 		
-		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
-				Vec3 targetPos) {
+		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, NetTargetLocation target) {
 			super();
 			this.count = count;
 			this.spawnX = spawnX;
@@ -165,8 +166,7 @@ public enum NostrumParticles {
 			this.lifetime = lifetime;
 			this.lifetimeJitter = lifetimeJitter;
 			this.velocity = null;
-			this.targetPos = targetPos;
-			this.targetEntID = null;
+			this.target = target;
 			this.velocityJitter = null;
 			this.dieWithTarget = false;
 			this.gravityStrength = 0f;
@@ -174,28 +174,33 @@ public enum NostrumParticles {
 			this.targetBehavior = TargetBehavior.JOIN;
 		}
 		
-		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
-				int targetEntID) {
-			super();
-			this.count = count;
-			this.spawnX = spawnX;
-			this.spawnY = spawnY;
-			this.spawnZ = spawnZ;
-			this.spawnJitterRadius = spawnJitterRadius;
-			this.lifetime = lifetime;
-			this.lifetimeJitter = lifetimeJitter;
-			this.velocity = null;
-			this.targetPos = null;
-			this.targetEntID = targetEntID;
-			this.velocityJitter = null;
-			this.dieWithTarget = false;
-			this.gravityStrength = 0f;
-			this.orbitRadius = 0f;
-			this.targetBehavior = TargetBehavior.JOIN;
+		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, TargetLocation target) {
+			this(count, spawnX, spawnY, spawnZ, spawnJitterRadius, lifetime, lifetimeJitter, new NetTargetLocation(target));
 		}
+		
+//		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
+//				int targetEntID) {
+//			this(count, spawnX, spawnY, spawnZ, spawnJitterRadius, lifetime, lifetimeJitter,)
+//			super();
+//			this.count = count;
+//			this.spawnX = spawnX;
+//			this.spawnY = spawnY;
+//			this.spawnZ = spawnZ;
+//			this.spawnJitterRadius = spawnJitterRadius;
+//			this.lifetime = lifetime;
+//			this.lifetimeJitter = lifetimeJitter;
+//			this.velocity = null;
+//			this.targetPos = null;
+//			this.targetEntID = targetEntID;
+//			this.velocityJitter = null;
+//			this.dieWithTarget = false;
+//			this.gravityStrength = 0f;
+//			this.orbitRadius = 0f;
+//			this.targetBehavior = TargetBehavior.JOIN;
+//		}
 		
 		protected static SpawnParams UnpackSpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
-				@Nullable Vec3 velocity, @Nullable Vec3 velocityJitter, @Nullable Vec3 targetPos, int targetEntID,
+				@Nullable Vec3 velocity, @Nullable Vec3 velocityJitter, @Nullable NetTargetLocation target,
 				@Nullable Integer color, boolean dieOnTarget, float gravityStrength, TargetBehavior targetBehavior, float orbitRadius
 				) {
 			final SpawnParams params;
@@ -203,12 +208,8 @@ public enum NostrumParticles {
 			if (velocity != null) {
 				params = new SpawnParams(count, spawnX, spawnY, spawnZ, spawnJitterRadius, lifetime, lifetimeJitter,
 						velocity, velocityJitter);
-			} else if (targetPos != null) {
-				params = new SpawnParams(count, spawnX, spawnY, spawnZ, spawnJitterRadius, lifetime, lifetimeJitter,
-						targetPos);
 			} else {
-				params = new SpawnParams(count, spawnX, spawnY, spawnZ, spawnJitterRadius, lifetime, lifetimeJitter,
-						targetEntID);
+				params = new SpawnParams(count, spawnX, spawnY, spawnZ, spawnJitterRadius, lifetime, lifetimeJitter, target);
 			}
 			
 			params.color = color;
@@ -262,8 +263,7 @@ public enum NostrumParticles {
 		private static final String NBT_LIFETIME_JITTER = "lifetime_jitter";
 		private static final String NBT_VELOCITY = "velocity";
 		private static final String NBT_VELOCITY_JITTER = "velocity_jitter";
-		private static final String NBT_TARGET_POS = "target_pos";
-		private static final String NBT_TARGET_ENT_ID = "target_ent_id";
+		private static final String NBT_TARGET = "target";
 		private static final String NBT_DIE_ON_TARGET = "die_on_target";
 		private static final String NBT_GRAVITY_STRENGTH = "gravity_strength";
 		private static final String NBT_TARGET_BEHAVIOR = "target_behavior";
@@ -301,16 +301,9 @@ public enum NostrumParticles {
 				tag.put(NBT_VELOCITY_JITTER, subtag);
 			}
 			
-			if (params.targetPos != null) {
-				CompoundTag subtag = new CompoundTag();
-				subtag.putDouble("x", params.targetPos.x);
-				subtag.putDouble("y", params.targetPos.y);
-				subtag.putDouble("z", params.targetPos.z);
-				tag.put(NBT_TARGET_POS, subtag);
-			}
-			
-			if (params.targetEntID != null) {
-				tag.putInt(NBT_TARGET_ENT_ID, params.targetEntID);
+			if (params.target != null) {
+				CompoundTag subtag = params.target.toNBT();
+				tag.put(NBT_TARGET, subtag);
 			}
 			
 			if (params.color != null) {
@@ -360,24 +353,13 @@ public enum NostrumParticles {
 						new Vec3(velocityX, velocityY, velocityZ),
 						velocityJitter
 						);
-			} else if (tag.contains(NBT_TARGET_POS, Tag.TAG_COMPOUND)) {
-				CompoundTag subtag = tag.getCompound(NBT_TARGET_POS);
-				final double targetX = subtag.getDouble("x");
-				final double targetY = subtag.getDouble("y");
-				final double targetZ = subtag.getDouble("z");
+			} else if (tag.contains(NBT_TARGET, Tag.TAG_COMPOUND)) {
 				params = new SpawnParams(
 						count,
 						spawnX, spawnY, spawnZ, spawnJitter,
 						lifetime, lifetimeJitter,
-						new Vec3(targetX, targetY, targetZ)
+						NetTargetLocation.FromNBT(tag.getCompound(NBT_TARGET))
 						);
-			} else if (tag.contains(NBT_TARGET_ENT_ID, Tag.TAG_INT)) {
-				final int ID = tag.getInt(NBT_TARGET_ENT_ID);
-				params = new SpawnParams(
-						count,
-						spawnX, spawnY, spawnZ, spawnJitter,
-						lifetime, lifetimeJitter,
-						ID);
 			} else {
 				// Just default to moving up?
 				params = new SpawnParams(

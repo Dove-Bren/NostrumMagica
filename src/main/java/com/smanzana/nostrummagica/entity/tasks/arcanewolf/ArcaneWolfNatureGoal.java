@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.Target
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.ArcaneWolfElementalType;
+import com.smanzana.nostrummagica.util.TargetLocation;
 import com.smanzana.petcommand.api.PetFuncs;
 
 import net.minecraft.world.effect.MobEffectInstance;
@@ -65,7 +66,7 @@ public class ArcaneWolfNatureGoal extends Goal {
 			if (applyTo(wolf, target)) {
 				wolf.addMana(-manaCost);
 				NostrumParticles.FILLED_ORB.spawn(wolf.level, new SpawnParams(
-						1, wolf.getX(), wolf.getY() + wolf.getBbHeight()/2, wolf.getZ(), 0, 20, 0, target.getId()
+						1, wolf.getX(), wolf.getY() + wolf.getBbHeight()/2, wolf.getZ(), 0, 20, 0, new TargetLocation(target, true)
 						).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(ArcaneWolfElementalType.NATURE.getColor()));
 			}
 		}

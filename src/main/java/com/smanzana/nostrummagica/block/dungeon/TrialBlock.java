@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 import com.smanzana.nostrummagica.tile.TrialBlockTileEntity;
 import com.smanzana.nostrummagica.trial.WorldTrial;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -163,7 +164,7 @@ public class TrialBlock extends BaseEntityBlock {
 		NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
 			50,
 			shrinePos.getX() + .5, shrinePos.getY() + 1.75, shrinePos.getZ() + .5, 1, 40, 10,
-			entity.getId()
+			new TargetLocation(entity, true)
 			).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(color));
 	}
 }

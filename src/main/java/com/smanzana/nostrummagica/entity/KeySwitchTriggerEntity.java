@@ -4,6 +4,7 @@ package com.smanzana.nostrummagica.entity;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.tile.KeySwitchBlockTileEntity;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder;
@@ -27,7 +28,7 @@ public class KeySwitchTriggerEntity extends TileProxyTriggerEntity<KeySwitchBloc
 				NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
 						4, this.getX(), getY() + 1.25, getZ(), 1.25,
 						20, 0,
-						this.position().add(0, 1, 0)
+						new TargetLocation(this.position().add(0, 1, 0))
 						).gravity(-.025f).color(keyEnt.getColor().getTextColor() | 0xAA000000));
 			}
 		}

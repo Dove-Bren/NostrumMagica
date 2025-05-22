@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -54,7 +55,7 @@ public class RendEffect extends MobEffect {
 							NostrumParticles.FILLED_ORB.spawn(target.level, new SpawnParams(
 									10, target.getX(), target.getY() + target.getBbHeight()/2, target.getZ(), 0,
 									40, 10,
-									ent.getId()
+									new TargetLocation(ent, true)
 									).color(0xFFC7B5BE).setTargetBehavior(TargetBehavior.ORBIT_LAZY).dieWithTarget(true));
 						}
 						

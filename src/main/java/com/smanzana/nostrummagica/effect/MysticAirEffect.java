@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -55,7 +56,7 @@ public class MysticAirEffect extends MobEffect {
 			NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
 					5, entity.getX(), entity.getY() + .75, entity.getZ(), 1,
 					40, 0,
-					entity.getId()
+					new TargetLocation(entity, true)
 					).color(EMagicElement.WIND.getColor()).setTargetBehavior(TargetBehavior.ORBIT));
 			entity.level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.PLAYER_BREATH, SoundSource.PLAYERS, 1f, 1f);
 		}

@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.SpellLocation;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
@@ -146,7 +147,7 @@ public class SpellBubbleEntity extends SpellProjectileEntity {
 	
 	@Override
 	protected ParticleOptions getTrailParticle() {
-		return new NostrumParticleData(NostrumParticles.WARD.getType(), new SpawnParams(1, 0, 0, 0, 0, 1, 0, Vec3.ZERO));
+		return new NostrumParticleData(NostrumParticles.WARD.getType(), new SpawnParams(1, 0, 0, 0, 0, 1, 0, new TargetLocation(Vec3.ZERO)));
 	}
 	
 	@Override

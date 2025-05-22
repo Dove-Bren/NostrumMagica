@@ -46,5 +46,4 @@ public class TargetLocation {
 	public boolean isValid() {
 		return targetEntity == null || targetEntity.isAlive();
 	}
-	
 }

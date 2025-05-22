@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -236,7 +237,7 @@ public class ManaArmorerTileEntity extends BlockEntity implements TickableBlockE
 				1,
 				entity.getX(), entity.getY() + entity.getEyeHeight() / 2f, entity.getZ(), .25,
 				40, 0,
-				new Vec3(worldPosition.getX() + .5, worldPosition.getY() + .75, worldPosition.getZ() + .5)
+				new TargetLocation(new Vec3(worldPosition.getX() + .5, worldPosition.getY() + .75, worldPosition.getZ() + .5))
 				).color(0xFF5511FF));
 	}
 	
@@ -249,14 +250,14 @@ public class ManaArmorerTileEntity extends BlockEntity implements TickableBlockE
 				1,
 				entity.getX(), entity.getY() + entity.getEyeHeight() / 2f, entity.getZ(), .25,
 				40, 0,
-				crystalPos
+				new TargetLocation(crystalPos)
 				).color(0x805511FF));
 		
 		NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
 				1,
 				crystalPos.x, crystalPos.y, crystalPos.z, 0,
 				40, 0,
-				new Vec3(worldPosition.getX() + .5, worldPosition.getY() + .75, worldPosition.getZ() + .5)
+				new TargetLocation(new Vec3(worldPosition.getX() + .5, worldPosition.getY() + .75, worldPosition.getZ() + .5))
 				).color(0xFF5511FF));
 	}
 	
@@ -267,7 +268,7 @@ public class ManaArmorerTileEntity extends BlockEntity implements TickableBlockE
 				100,
 				worldPosition.getX() + .5, worldPosition.getY() + .75, worldPosition.getZ() + .5, 0,
 				40, 20,
-				entity.getId()
+				new TargetLocation(entity, true)
 				).color(0xFF5511FF)
 				.setTargetBehavior(TargetBehavior.JOIN));
 		

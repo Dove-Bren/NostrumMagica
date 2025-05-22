@@ -75,6 +75,23 @@ public class NetUtils {
 				);
 	}
 	
+	public static final CompoundTag ToNBT(@Nullable Vec3 vec) {
+		CompoundTag tag = new CompoundTag();
+		if (vec != null) {
+			tag.putDouble("x", vec.x);
+			tag.putDouble("y", vec.y);
+			tag.putDouble("z", vec.z);
+		}
+		return tag;
+	}
+	
+	public static final @Nullable Vec3 VecFromNBT(CompoundTag tag) {
+		if (tag.contains("x")) {
+			return new Vec3(tag.getDouble("x"), tag.getDouble("y"), tag.getDouble("z"));
+		}
+		return null;
+	}
+	
 	public static <E extends Enum<E>, T> CompoundTag ToNBT(Map<E, T> map, Function<T, Tag> writer) {
 		return ToNBT(map, (E key) -> key.name().toLowerCase(), writer);
 	}

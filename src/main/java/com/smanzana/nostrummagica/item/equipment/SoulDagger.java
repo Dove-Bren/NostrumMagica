@@ -28,6 +28,7 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RayTrace;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -248,7 +249,7 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 					
 					NostrumParticles.FILLED_ORB.spawn(attacker.level, new SpawnParams(
 							50, target.getX(), target.getY() + target.getBbHeight(), target.getZ(), .5, 60, 0,
-							attacker.getId()
+							new TargetLocation(attacker, true)
 							).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(1f, .4f, .8f, 1f).dieWithTarget(true));
 				}
 			}

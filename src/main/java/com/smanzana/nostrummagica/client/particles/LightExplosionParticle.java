@@ -231,12 +231,13 @@ public class LightExplosionParticle extends Particle {
 		final int lifetime = params.lifetime + (params.lifetimeJitter > 0 ? NostrumMagica.rand.nextInt(params.lifetimeJitter) : 0);
 		
 		LightExplosionParticle particle = new LightExplosionParticle(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime, params.count);
-		if (params.targetEntID != null) {
-			particle.setTarget(world.getEntity(params.targetEntID));
-		}
-		if (params.targetPos != null) {
-			particle.setTarget(params.targetPos);
-		}
+//		if (params.targetEntID != null) {
+//			particle.setTarget(world.getEntity(params.targetEntID));
+//		}
+//		if (params.targetPos != null) {
+//			particle.setTarget(params.targetPos);
+//		}
+		int unused; // convert to motion particle
 		if (params.velocity != null) {
 			particle.setMotion(params.velocity, params.velocityJitter == null ? Vec3.ZERO : params.velocityJitter);
 		}

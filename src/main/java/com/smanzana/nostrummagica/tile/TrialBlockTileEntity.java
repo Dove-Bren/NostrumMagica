@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.trial.CombatTrial;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -202,7 +203,7 @@ public class TrialBlockTileEntity extends BlockEntity implements TickableBlockEn
 				(60 - this.trialTicks) / 10,
 				worldPosition.getX() + .5, worldPosition.getY() + 1.25, worldPosition.getZ() + .5, 5,
 				40, 10,
-				new Vec3(worldPosition.getX() + .5, worldPosition.getY() + 1.25, worldPosition.getZ() + .5)
+				new TargetLocation(new Vec3(worldPosition.getX() + .5, worldPosition.getY() + 1.25, worldPosition.getZ() + .5))
 				).color(this.getElement().getColor()));
 	}
 	

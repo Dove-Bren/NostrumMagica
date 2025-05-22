@@ -57,6 +57,7 @@ import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.tile.TeleportRuneTileEntity;
 import com.smanzana.nostrummagica.util.Projectiles;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -739,7 +740,7 @@ public class PlayerListener {
 					NostrumParticles.FILLED_ORB.spawn(e.level, new SpawnParams(
 							5, source.getX(), source.getY() + .75, source.getZ(), 0,
 							40, 0,
-							e.getId()
+							new TargetLocation(e, true)
 							).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(1f, .4f, .8f, 1f).dieWithTarget(true));
 				}
 			}
@@ -1274,7 +1275,7 @@ public class PlayerListener {
 						NostrumParticles.FILLED_ORB.spawn(ent.level, new SpawnParams(
 								5, source.getX(), source.getY() + .75, source.getZ(), 0,
 								40, 0,
-								ent.getId()
+								new TargetLocation(ent, true)
 								).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(1f, .4f, .8f, 1f).dieWithTarget(true));
 					}
 				}
@@ -1445,7 +1446,7 @@ public class PlayerListener {
 					NostrumParticles.FILLED_ORB.spawn(ent.level, new SpawnParams(
 							5, ent.getX(), ent.getY() + .75, ent.getZ(), 0,
 							40, 0,
-							causingEntity.getId()
+							new TargetLocation(causingEntity, true)
 							).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(1f, .4f, .8f, 1f).dieWithTarget(true));
 				}
 			}

@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.util.RenderFuncs;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
@@ -80,7 +81,7 @@ public class MagicDamageProjectileEntity extends AbstractHurtingProjectile {
 	
 	@Override
 	protected ParticleOptions getTrailParticle() {
-		return new NostrumParticleData(NostrumParticles.WARD.getType(), new SpawnParams(1, getX(), getY() + this.getBbHeight() / 2f, getZ(), 0, 10, 5, this.getDeltaMovement().scale(-.05f), Vec3.ZERO));
+		return new NostrumParticleData(NostrumParticles.WARD.getType(), new SpawnParams(1, 0, 0, 0, 0, 10, 5, new TargetLocation(Vec3.ZERO)));
 	}
 	
 	@Override
@@ -108,7 +109,7 @@ public class MagicDamageProjectileEntity extends AbstractHurtingProjectile {
 		if (level.isClientSide()) {
 			if (firstTick) {
 				NostrumParticles.GLOW_TRAIL.spawn(level, new SpawnParams(1, getX(), getY() + this.getBbHeight() / 2, getZ(), 0, 300, 0,
-						this.getId()).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(this.getElement().getColor(), .7f)));
+						new TargetLocation(this, true)).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(this.getElement().getColor(), .7f)));
 			}
 		}
 		

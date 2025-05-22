@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.util.Entities;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -39,7 +40,7 @@ public class SoulDrainEffect extends MobEffect {
 		NostrumParticles.FILLED_ORB.spawn(source.level, new SpawnParams(
 				5, source.getX(), source.getY() + .75, source.getZ(), 0,
 				40, 0,
-				dest.getId()
+				new TargetLocation(dest, true)
 				).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(0xFFE2346B).dieWithTarget(true));
 	}
 	

@@ -35,6 +35,7 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.util.SpellUtils;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -497,7 +498,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 					getX(), getY() + this.getBbHeight() / 2, getZ(),
 					5,
 					30, 5,
-					this.getId())
+					new TargetLocation(this, true))
 					.color(0xFFAA0022)
 					.setTargetBehavior(TargetBehavior.ORBIT_LAZY)
 					.dieWithTarget(true));

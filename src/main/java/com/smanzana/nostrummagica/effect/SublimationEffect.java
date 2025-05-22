@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.SpellDamage;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
@@ -90,7 +91,7 @@ public class SublimationEffect extends MobEffect {
 				NostrumParticles.FILLED_ORB.spawn(target.level, new SpawnParams(
 						10, target.getX(), target.getY() + target.getBbHeight()/2, target.getZ(), 0,
 						40, 10,
-						ent.getId()
+						new TargetLocation(ent, true)
 						).color(0xFFEC6D8E).setTargetBehavior(TargetBehavior.ORBIT_LAZY).dieWithTarget(true));
 			}
 			

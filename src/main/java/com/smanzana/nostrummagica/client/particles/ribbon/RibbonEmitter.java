@@ -171,7 +171,12 @@ public class RibbonEmitter<T> {
 		return level.hasChunkAt(blockpos) ? LevelRenderer.getLightColor(level, blockpos) : 0;
 	}
 	
-	protected void attemptNewSegment(float partialTicks) {
+	/**
+	 * Called automatically during rendering, but can be called manually as well. Calls the provided spawner to attempt to make
+	 * a segment, and then adds it to the ribbon if one is spawned.
+	 * @param partialTicks
+	 */
+	public void attemptNewSegment(float partialTicks) {
 		final float renderAge = (this.age + partialTicks);
 		final Vec3 pos = new Vec3(Mth.lerp(partialTicks, this.xo, this.x),
 				Mth.lerp(partialTicks, this.yo, this.y),

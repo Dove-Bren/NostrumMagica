@@ -93,11 +93,8 @@ public interface IMotionParticle<T extends IMotionParticle<?>> {
 	}
 	
 	public default T setFromParams(SpawnParams params, Function<Integer, Entity> entityLookup) {
-		if (params.targetEntID != null) {
-			this.setTarget(new TargetLocation(entityLookup.apply(params.targetEntID), true));
-		}
-		else if (params.targetPos != null) {
-			this.setTarget(new TargetLocation(params.targetPos));
+		if (params.target != null) {
+			this.setTarget(params.target.apply(entityLookup));
 		}
 		if (params.velocity != null) {
 			this.setMotion(params.velocity, params.velocityJitter == null ? Vec3.ZERO : params.velocityJitter);

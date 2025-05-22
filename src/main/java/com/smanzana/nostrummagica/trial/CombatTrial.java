@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -74,7 +75,7 @@ public abstract class CombatTrial {
 		NostrumParticles.GLOW_ORB.spawn(entity.level, new SpawnParams(
 				10, center.getX() + .5, center.getY() + 1.25, center.getZ() + .5, .25,
 				60, 10,
-				entity.getId()
+				new TargetLocation(entity, true)
 				).dieWithTarget(true));
 	}
 	

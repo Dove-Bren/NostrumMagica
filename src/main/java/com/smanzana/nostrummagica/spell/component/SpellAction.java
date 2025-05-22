@@ -56,6 +56,7 @@ import com.smanzana.nostrummagica.util.HarvestUtil;
 import com.smanzana.nostrummagica.util.HarvestUtil.ITreeWalker;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RenderFuncs;
+import com.smanzana.nostrummagica.util.TargetLocation;
 import com.smanzana.petcommand.api.PetFuncs;
 
 import net.minecraft.core.BlockPos;
@@ -318,7 +319,7 @@ public class SpellAction {
 				}
 				
 				NostrumParticles.RISING_GLOW.spawn(entity.level, new SpawnParams(3, entity.getX(), entity.getY(), entity.getZ(), 0, 20, 0,
-						entity.getId()).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(EMagicElement.ICE.getColor(), .6f)));
+						new TargetLocation(entity, false)).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(EMagicElement.ICE.getColor(), .6f)));
 			}
 			
 			NostrumMagicaSounds.STATUS_BUFF2.play(entity);

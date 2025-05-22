@@ -30,6 +30,7 @@ import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RayTrace;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -574,7 +575,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				NostrumParticles.FILLED_ORB.spawn(ent.level, new SpawnParams(
 						10, ent.getX(), ent.getY() + ent.getBbHeight()/2, ent.getZ(), 4,
 						30, 10,
-						ent.getId()
+						new TargetLocation(ent, true)
 						).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(NostrumEffects.frostbite.getColor()).dieWithTarget(true));
 			} else if (ent instanceof LivingEntity) {
 				((LivingEntity) ent).addEffect(new MobEffectInstance(NostrumEffects.frostbite, 20 * 10));
@@ -645,7 +646,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 							 10,
 							 living.getX(), entity.getY() + entity.getBbHeight()/2f, entity.getZ(), entity.getBbWidth() * 2,
 							 10, 5,
-							 living.getId())
+							 new TargetLocation(living, true))
 							 .color(EMagicElement.WIND.getColor()));
 				}
 			}
@@ -737,7 +738,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
 						10, entity.getX(), entity.getY() + entity.getBbHeight()/2, entity.getZ(), 0,
 						40, 10,
-						ent.getId()
+						new TargetLocation(ent, true)
 						).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(NostrumEffects.magicRend.getColor()).dieWithTarget(true));
 			}
 			
@@ -831,7 +832,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		NostrumParticles.GLOW_ORB.spawn(world, new NostrumParticles.SpawnParams(count, pos.x, pos.y, pos.z,
 				cloud.getRadius(),
 				cloud.getRemainingTicks() / 4, 20,
-				cloud.getId())
+				new TargetLocation(cloud, true))
 					//.gravity(-.1f)
 					//.gravity(.65f)
 					.gravity(gravity)

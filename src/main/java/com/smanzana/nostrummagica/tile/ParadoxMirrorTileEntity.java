@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.block.ParadoxMirrorBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.util.TargetLocation;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
 import net.minecraft.core.BlockPos;
@@ -302,7 +303,7 @@ public class ParadoxMirrorTileEntity extends BlockEntity implements TickableBloc
 				spawnPos.x, spawnPos.y, spawnPos.z, // spawn position (center)
 				.2, // spawn position jitter
 				40, 20, // lifetime (base + jitter)
-				entity.getId() // entity id to follow
+				new TargetLocation(entity, true) // entity id to follow
 				).color(EMagicElement.ENDER.getColor()));
 		
 //		NostrumParticles.GLOW_ORB.spawn(getWorld(), new SpawnParams(

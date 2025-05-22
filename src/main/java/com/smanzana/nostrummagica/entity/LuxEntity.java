@@ -28,6 +28,7 @@ import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -297,7 +298,7 @@ public class LuxEntity extends Animal implements ILoreSupplier/*, ITameableEntit
 							1,
 							getX(), getY() + getBbHeight()/2, getZ(),
 							1, 15, 0,
-							this.getId()
+							new TargetLocation(this, true)
 							).color(.4f, .2f - darken, 1f - darken, .4f - darken));
 				}
 			}

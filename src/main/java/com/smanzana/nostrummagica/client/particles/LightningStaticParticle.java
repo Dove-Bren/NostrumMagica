@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.client.particles;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.util.ColorUtil;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -129,12 +130,15 @@ public class LightningStaticParticle extends TextureSheetParticle {
 			final int lifetime = params.lifetime + (params.lifetimeJitter > 0 ? NostrumMagica.rand.nextInt(params.lifetimeJitter) : 0);
 			particle = new LightningStaticParticle(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime, sprites);
 			
-			if (params.targetEntID != null) {
-				particle.setTarget(world.getEntity(params.targetEntID));
-			}
-			if (params.targetPos != null) {
-				particle.setTarget(params.targetPos);
-			}
+//			if (params.target != null) {
+//				TargetLocation target = params.target.apply(world::getEntity);
+//				if (target.)
+//				particle.setTarget(world.getEntity(params.targetEntID));
+//			}
+//			if (params.targetPos != null) {
+//				particle.setTarget(params.targetPos);
+//			}
+			int unused; // convert to motion particle
 			if (params.velocity != null) {
 				particle.setMotion(params.velocity, params.velocityJitter == null ? Vec3.ZERO : params.velocityJitter);
 			}

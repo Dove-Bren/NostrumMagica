@@ -27,6 +27,7 @@ import com.smanzana.nostrummagica.spell.component.shapes.SeekingBulletShape;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.util.ItemStacks;
 import com.smanzana.nostrummagica.util.RayTrace;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.Entity;
@@ -129,7 +130,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 			NostrumParticles.GLOW_ORB.spawn(caster.level, new SpawnParams(
 					1,
 					pos.x, pos.y, pos.z, 0, 30, 5,
-					target.getId()
+					new TargetLocation(target, true)
 					).color(0xFFFF0000).dieWithTarget(true));
 		}
 	}

@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellDamage;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -106,7 +107,7 @@ public class FrostbiteEffect extends MobEffect {
 							NostrumParticles.FILLED_ORB.spawn(ent.level, new SpawnParams(
 									10, ent.getX(), ent.getY() + ent.getBbHeight()/2, ent.getZ(), 4,
 									30, 10,
-									ent.getId()
+									new TargetLocation(ent, true)
 									).color(this.getColor()).setTargetBehavior(TargetBehavior.ORBIT_LAZY).dieWithTarget(true));
 						} else if (ent instanceof LivingEntity) {
 							((LivingEntity) ent).addEffect(new MobEffectInstance(NostrumEffects.frostbite, 20 * 3, 2));

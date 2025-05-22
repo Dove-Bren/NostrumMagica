@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -179,7 +180,7 @@ public class DragonSoulItem extends PetSoulItem {
 				// Need to adjust while watching to go to hand
 				NostrumParticles.FILLED_ORB.spawn(player.level, new SpawnParams(
 						1, offset.x, offset.y, offset.z, 1.0, 20, 0,
-						offset
+						new TargetLocation(offset)
 						).color(1f, .4f, .8f, 1f).dieWithTarget(true));
 			}
 		}
