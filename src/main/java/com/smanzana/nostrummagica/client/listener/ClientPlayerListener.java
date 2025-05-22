@@ -31,15 +31,14 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer.Outline;
 import com.smanzana.nostrummagica.client.render.SelectionRenderer;
 import com.smanzana.nostrummagica.client.render.SpellShapeRenderer;
-import com.smanzana.nostrummagica.client.render.layer.EntityEffectLayer;
 import com.smanzana.nostrummagica.client.render.layer.AetherCloakLayer;
 import com.smanzana.nostrummagica.client.render.layer.ArmorElytraLayer;
 import com.smanzana.nostrummagica.client.render.layer.DragonFlightWingsLayer;
+import com.smanzana.nostrummagica.client.render.layer.EntityEffectLayer;
 import com.smanzana.nostrummagica.client.render.layer.KoidHelmLayer;
 import com.smanzana.nostrummagica.client.render.layer.ManaArmorLayer;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
@@ -303,8 +302,8 @@ public class ClientPlayerListener extends PlayerListener {
 		} else if (bindingHUD.consumeClick()) {
 			this.overlayRenderer.toggleHUD();
 			
-			int unused;
-			Player player = mc.player;
+//			int unused;
+//			Player player = mc.player;
 //			NostrumParticles.COLOR_TRAIL.spawn(mc.level, new SpawnParams(1, player.getX(), player.getY() - 2, player.getZ(), 0, 180, 0,
 //					new Vec3(.1, 0, 0), Vec3.ZERO).gravity(false).color(1f, .8f, .3f, .4f));
 			
@@ -314,8 +313,11 @@ public class ClientPlayerListener extends PlayerListener {
 //			NostrumParticles.COLOR_TRAIL.spawn(mc.level, new SpawnParams(1, player.getX(), player.getY() + 1, player.getZ() - 1, 0, 600, 0,
 //					player.getId()).setTargetBehavior(TargetBehavior.ATTACH).color(1f, .8f, .3f, .4f));
 			
-			NostrumParticles.GLOW_TRAIL.spawn(mc.level, new SpawnParams(1, player.getX(), player.getY() + 1, player.getZ() - 1, 0, 600, 0,
-					player.getId()).setTargetBehavior(TargetBehavior.ORBIT).setOrbitRadius(2f).color(1f, .8f, .3f, .4f));
+//			NostrumParticles.GLOW_TRAIL.spawn(mc.level, new SpawnParams(1, player.getX(), player.getY() + 1, player.getZ() - 1, 0, 600, 0,
+//					player.getId()).setTargetBehavior(TargetBehavior.ORBIT).setOrbitRadius(2f).color(1f, .8f, .3f, .4f));
+			
+//			NostrumParticles.RISING_GLOW.spawn(mc.level, new SpawnParams(3, player.getX(), player.getY(), player.getZ(), 0, 20, 0,
+//					player.getId()).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(EMagicElement.ICE.getColor(), .6f)));
 			
 			/*
 			 * int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 

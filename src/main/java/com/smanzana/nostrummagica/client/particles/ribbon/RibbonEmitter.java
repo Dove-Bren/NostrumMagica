@@ -188,22 +188,28 @@ public class RibbonEmitter<T> {
 		}
 	}
 	
-	public void render(VertexConsumer buffer, Camera camera, float partialTicks) {
+	public void render(@Nullable PoseStack matrixStack, VertexConsumer buffer, Camera camera, float partialTicks) {
 		updateEmitterSubtickData(partialTicks);
 		if (this.active) {
 			// Adding in render so it's faster than 1/20th a second
 			attemptNewSegment(partialTicks);
 		}
 		
-		Vec3 cameraPos = camera.getPosition();
+		// Allow matrix stack to be passed in, OR take care of the entire particle rendering offset here
+		if (matrixStack == null) {
+			matrixStack = new PoseStack();
+			
+			Vec3 cameraPos = camera.getPosition();
+			
+			double offX = (float) -cameraPos.x();
+			double offY = (float) -cameraPos.y();
+			double offZ = (float) -cameraPos.z();
+			matrixStack.translate(offX, offY, offZ);
+		}
 		
-		double offX = (float) -cameraPos.x();
-		double offY = (float) -cameraPos.y();
-		double offZ = (float) -cameraPos.z();
-		
-		PoseStack stack = new PoseStack();
-		stack.translate(offX, offY, offZ);
-		renderSegments(level, stack, buffer, camera, partialTicks);
+		matrixStack.pushPose();
+		renderSegments(level, matrixStack, buffer, camera, partialTicks);
+		matrixStack.popPose();
 	}
 	
 	protected void renderSegments(ClientLevel level, PoseStack matrixStack, VertexConsumer buffer, Camera camera, float partialTicks) {

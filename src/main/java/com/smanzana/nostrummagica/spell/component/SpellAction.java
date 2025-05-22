@@ -19,6 +19,9 @@ import com.smanzana.nostrummagica.block.MagicWallBlock;
 import com.smanzana.nostrummagica.block.MysticWaterBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.effect.ElementalEnchantEffect;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
@@ -52,6 +55,7 @@ import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.HarvestUtil;
 import com.smanzana.nostrummagica.util.HarvestUtil.ITreeWalker;
 import com.smanzana.nostrummagica.util.ItemStacks;
+import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.petcommand.api.PetFuncs;
 
 import net.minecraft.core.BlockPos;
@@ -312,6 +316,9 @@ public class SpellAction {
 						entity.addEffect(new MobEffectInstance(NostrumEffects.magicShield, (int)((20 * 15) * efficiency), 0));
 					}
 				}
+				
+				NostrumParticles.RISING_GLOW.spawn(entity.level, new SpawnParams(3, entity.getX(), entity.getY(), entity.getZ(), 0, 20, 0,
+						entity.getId()).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(EMagicElement.ICE.getColor(), .6f)));
 			}
 			
 			NostrumMagicaSounds.STATUS_BUFF2.play(entity);

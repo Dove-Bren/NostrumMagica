@@ -32,6 +32,7 @@ public enum NostrumParticles {
 	LIGHT_EXPLOSION(new NostrumParticleType("light_explosion"), LightExplosionParticle::MakeParticle),
 	GLOW_TRAIL(new NostrumParticleType("glow_trail"), GlowRibbonParticle::MakeParticle),
 	SMOKE_TRAIL(new NostrumParticleType("smoke_trail"), SmokeStreamRibbonParticle::MakeParticle),
+	RISING_GLOW(new NostrumParticleType("rising_glow"), RisingGlowRibbonParticle::MakeParticle),
 	;
 	
 	@SubscribeEvent

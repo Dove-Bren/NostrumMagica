@@ -49,6 +49,6 @@ public abstract class RibbonParticle extends Particle {
 	
 	@Override
 	public void render(VertexConsumer buffer, Camera camera, float partialTicks) {
-		this.emitter.render(buffer, camera, partialTicks);
+		this.emitter.render(null, buffer, camera, partialTicks);
 	}
 }
