@@ -283,7 +283,7 @@ public class ClientEffectRitual extends ClientEffect {
 					NostrumParticles.FILLED_ORB.spawn(mc.player.level, (new SpawnParams(
 							4, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, range, 20, 0,
 							new TargetLocation(origin.add(0, yDiff, 0))
-							)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)).dieWithTarget(true));
+							)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)));
 				}
 				
 			}

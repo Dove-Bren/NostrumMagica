@@ -9,7 +9,7 @@ import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
-import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior;
 import com.smanzana.nostrummagica.entity.IElementalEntity;
 import com.smanzana.nostrummagica.entity.IMultiPartEntity;
 import com.smanzana.nostrummagica.entity.IMultiPartEntityPart;
@@ -37,35 +37,35 @@ import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.util.SpellUtils;
 import com.smanzana.nostrummagica.util.TargetLocation;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerBossEvent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.BossEvent;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.monster.Giant;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.animal.PolarBear;
 import net.minecraft.world.entity.animal.Sheep;
 import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.entity.monster.Giant;
+import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
-import net.minecraft.world.BossEvent;
-import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerBossEvent;
-import net.minecraft.nbt.Tag;
 
 public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEntity, IElementalEntity, ILoreSupplier {
 
@@ -500,8 +500,10 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 					30, 5,
 					new TargetLocation(this, true))
 					.color(0xFFAA0022)
-					.setTargetBehavior(TargetBehavior.ORBIT_LAZY)
-					.dieWithTarget(true));
+					.setTargetBehavior(new ParticleTargetBehavior().orbitMode(true).dieWithTarget()));
+			
+			// places that do "setTargetBehavior" to lazy and then do "dieWithTarget" can be replaced with
+			// .setTargetBehavior(new ParticleTargetBehavior().orbitMode(true).dieWithTarget())
 		}
 	}
 	

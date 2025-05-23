@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.client.particles;
 
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -15,8 +17,8 @@ import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetMotion.MotionUpdate;
 import com.smanzana.nostrummagica.util.ColorUtil;
-import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -26,15 +28,13 @@ import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 
 // Like what the ender dragon does when it dies but in a particle
-public class LightExplosionParticle extends Particle {
+public class LightExplosionParticle extends Particle implements IMotionParticle<LightExplosionParticle> {
 
 	protected final int beamCount;
-	protected TargetLocation target;
-	protected Vec3 targetOffset;
+	protected ParticleTargetMotion motion;
 	
 	protected final int fixedRandom;
 	protected float maxAlpha;
@@ -51,60 +51,35 @@ public class LightExplosionParticle extends Particle {
 		this.maxAlpha = alpha;
 		this.lifetime = lifetime;
 		this.fixedRandom = NostrumMagica.rand.nextInt();
+		this.motion = new ParticleTargetMotion(fixedRandom, .2f);
 		
 		this.size = 2f;
 		
 		this.hasPhysics = false;
 	}
 	
-	public LightExplosionParticle setGravity(boolean gravity) {
-		return setGravityStrength(gravity ? .01f : 0);
+	@Override
+	public ParticleTargetMotion getMotion() {
+		return this.motion;
 	}
 	
+	@Override
+	public LightExplosionParticle setPosition(double x, double y, double z) {
+		this.setPos(x, y, z);
+		return this;
+	}
+	
+	@Override
 	public LightExplosionParticle setGravityStrength(float strength) {
 		gravity = strength;
 		return this;
 	}
 	
-	public LightExplosionParticle setMotion(Vec3 motion) {
-		return this.setMotion(motion.x, motion.y, motion.z);
-	}
-	
+	@Override
 	public LightExplosionParticle setMotion(double xVelocity, double yVelocity, double zVelocity) {
-		return this.setMotion(xVelocity, yVelocity, zVelocity, 0, 0, 0);
-	}
-	
-	public LightExplosionParticle setMotion(Vec3 motion, Vec3 jitter) {
-		return this.setMotion(motion.x, motion.y, motion.z, jitter.x, jitter.y, jitter.z);
-	}
-	
-	public LightExplosionParticle setMotion(double xVelocity, double yVelocity, double zVelocity,
-			double xJitter, double yJitter, double zJitter) {
-		this.xd = xVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * xJitter; // +- jitter
-		this.yd = yVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * yJitter;
-		this.zd = zVelocity + (NostrumMagica.rand.nextDouble() * 2 - 1) * zJitter;
-		return this;
-	}
-	
-	public LightExplosionParticle setTarget(Entity ent) {
-		this.target = new TargetLocation(ent, true);
-		if (this.targetOffset == null && ent != null) {
-			final double wRad = ent.getBbWidth() * 2; // double width
-			final double hRad = ent.getBbHeight();
-			this.targetOffset = new Vec3(wRad * (NostrumMagica.rand.nextDouble() - .5),
-					hRad * (NostrumMagica.rand.nextDouble() - .5),
-					wRad * (NostrumMagica.rand.nextDouble() - .5));
-		}
-		return this;
-	}
-	
-	public LightExplosionParticle setTarget(Vec3 targetPos) {
-		this.target = new TargetLocation(targetPos);
-		return this;
-	}
-	
-	public LightExplosionParticle setTargetOffset(Vec3 offset) {
-		this.targetOffset = offset;
+		this.xd = xVelocity;
+		this.yd = yVelocity;
+		this.zd = zVelocity;
 		return this;
 	}
 	
@@ -131,6 +106,16 @@ public class LightExplosionParticle extends Particle {
 		super.tick();
 		
 		this.alpha = getAlpha();
+		
+		if (this.getMotion().shouldUpdate()) {
+			final @Nullable MotionUpdate update = this.getMotion().update(new Vec3(x, y, z), new Vec3(xd, yd, zd));
+			if (update == null) {
+				this.remove();
+			} else {
+				ParticleTargetMotion.ApplyUpdate(update, this);
+			}
+		}
+		// else let super.tick do normal particle motion
 	}
 	
 	@Override
@@ -231,19 +216,7 @@ public class LightExplosionParticle extends Particle {
 		final int lifetime = params.lifetime + (params.lifetimeJitter > 0 ? NostrumMagica.rand.nextInt(params.lifetimeJitter) : 0);
 		
 		LightExplosionParticle particle = new LightExplosionParticle(world, spawnX, spawnY, spawnZ, colors[0], colors[1], colors[2], colors[3], lifetime, params.count);
-//		if (params.targetEntID != null) {
-//			particle.setTarget(world.getEntity(params.targetEntID));
-//		}
-//		if (params.targetPos != null) {
-//			particle.setTarget(params.targetPos);
-//		}
-		int unused; // convert to motion particle
-		if (params.velocity != null) {
-			particle.setMotion(params.velocity, params.velocityJitter == null ? Vec3.ZERO : params.velocityJitter);
-		}
-		if (params.gravityStrength != 0f) {
-			particle.setGravityStrength(params.gravityStrength);
-		}
+		particle.setFromParams(params, world::getEntity);
 		
 		return particle;
 	}

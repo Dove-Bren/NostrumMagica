@@ -15,6 +15,7 @@ import com.mojang.serialization.DataResult;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
@@ -136,6 +137,14 @@ public class NetUtils {
 			listToFill.add(reader.apply(tag));
 		}
 		return listToFill;
+	}
+	
+	public static <T extends Enum<T>> Tag ToNBT(T value) {
+		return StringTag.valueOf(value.name());
+	}
+	
+	public static <T extends Enum<T>> T FromNBT(Class<T> clazz, Tag tag) {
+		return Enum.valueOf(clazz, ((StringTag) tag).getAsString());
 	}
 	
 	public static final UUID CombineUUIDs(UUID left, UUID right) {

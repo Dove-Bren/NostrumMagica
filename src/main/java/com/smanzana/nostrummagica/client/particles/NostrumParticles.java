@@ -5,7 +5,6 @@ import javax.annotation.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpawnNostrumParticleMessage;
 import com.smanzana.nostrummagica.util.ColorUtil;
@@ -106,10 +105,11 @@ public enum NostrumParticles {
 				NetTargetLocation.CODEC.fieldOf("target").forGetter((p) -> p.target),
 				//Codec.INT.fieldOf("targetEntID").forGetter((p) -> p.targetEntID),
 				Codec.INT.optionalFieldOf("color", 0xFFFFFFFF).forGetter((p) -> p.color),
-				Codec.BOOL.fieldOf("dieOnTarget").forGetter((p) -> p.dieWithTarget),
+				//Codec.BOOL.fieldOf("dieOnTarget").forGetter((p) -> p.dieWithTarget),
 				Codec.FLOAT.fieldOf("gravityStrength").forGetter((p) -> p.gravityStrength),
-				Codec.STRING.xmap(s -> TargetBehavior.valueOf(s.toUpperCase()), e -> e.name()).fieldOf("").forGetter((p) -> p.targetBehavior),
-				Codec.FLOAT.fieldOf("orbitRadius").forGetter((p) -> p.orbitRadius)
+				ParticleTargetBehavior.CODEC.fieldOf("targetBehavior").forGetter((p) -> p.targetBehavior)
+				//Codec.STRING.xmap(s -> TargetBehavior.valueOf(s.toUpperCase()), e -> e.name()).fieldOf("").forGetter((p) -> p.targetBehavior),
+				//Codec.FLOAT.fieldOf("orbitRadius").forGetter((p) -> p.orbitRadius)
 			).apply(instance, SpawnParams::UnpackSpawnParams));
 		
 		
@@ -132,10 +132,11 @@ public enum NostrumParticles {
 		
 		// Rest is completely optional and may or may not be used
 		public @Nullable Integer color; // ARGB
-		public boolean dieWithTarget;
+		public @Nullable ParticleTargetBehavior targetBehavior;
 		public float gravityStrength;
-		public TargetBehavior targetBehavior;
-		public float orbitRadius;
+//		boolean dieWithTarget;
+//		public TargetBehavior targetBehavior;
+//		public float orbitRadius;
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
 				Vec3 velocity, Vec3 velocityJitter) {
@@ -150,10 +151,7 @@ public enum NostrumParticles {
 			this.velocity = velocity;
 			this.velocityJitter = velocityJitter;
 			this.target = null;
-			this.dieWithTarget = false;
-			this.gravityStrength = 0f;
-			this.orbitRadius = 0f;
-			this.targetBehavior = TargetBehavior.JOIN;
+			this.targetBehavior = null;
 		}
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, NetTargetLocation target) {
@@ -168,10 +166,7 @@ public enum NostrumParticles {
 			this.velocity = null;
 			this.target = target;
 			this.velocityJitter = null;
-			this.dieWithTarget = false;
-			this.gravityStrength = 0f;
-			this.orbitRadius = 0f;
-			this.targetBehavior = TargetBehavior.JOIN;
+			this.targetBehavior = null;
 		}
 		
 		public SpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, TargetLocation target) {
@@ -201,7 +196,7 @@ public enum NostrumParticles {
 		
 		protected static SpawnParams UnpackSpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
 				@Nullable Vec3 velocity, @Nullable Vec3 velocityJitter, @Nullable NetTargetLocation target,
-				@Nullable Integer color, boolean dieOnTarget, float gravityStrength, TargetBehavior targetBehavior, float orbitRadius
+				@Nullable Integer color, float gravityStrength, ParticleTargetBehavior targetBehavior
 				) {
 			final SpawnParams params;
 			// For CODEC, prefer velocity, then targetPos, then targetEntID
@@ -213,10 +208,8 @@ public enum NostrumParticles {
 			}
 			
 			params.color = color;
-			params.dieWithTarget = dieOnTarget;
 			params.gravityStrength = gravityStrength;
 			params.targetBehavior = targetBehavior;
-			params.orbitRadius = orbitRadius;
 			
 			return params;
 		}
@@ -230,11 +223,6 @@ public enum NostrumParticles {
 			return color(ColorUtil.colorToARGB(red, green, blue, alpha));
 		}
 		
-		public SpawnParams dieWithTarget(boolean die) {
-			this.dieWithTarget = die;
-			return this;
-		}
-		
 		public SpawnParams gravity(boolean gravity) {
 			return this.gravity(gravity ? .2f : 0);
 		}
@@ -244,14 +232,15 @@ public enum NostrumParticles {
 			return this;
 		}
 		
-		public SpawnParams setTargetBehavior(TargetBehavior behavior) {
+		public SpawnParams setTargetBehavior(ParticleTargetBehavior behavior) {
 			this.targetBehavior = behavior;
 			return this;
 		}
 		
-		public SpawnParams setOrbitRadius(float radius) {
-			this.orbitRadius = radius;
-			return this;
+		public SpawnParams setTargetBehavior(ParticleTargetBehavior.TargetBehavior type) { // really shouldn't exist...
+			final ParticleTargetBehavior base = new ParticleTargetBehavior();
+			base.entityBehavior = type;
+			return this.setTargetBehavior(base);
 		}
 		
 		private static final String NBT_COUNT = "count";
@@ -264,10 +253,8 @@ public enum NostrumParticles {
 		private static final String NBT_VELOCITY = "velocity";
 		private static final String NBT_VELOCITY_JITTER = "velocity_jitter";
 		private static final String NBT_TARGET = "target";
-		private static final String NBT_DIE_ON_TARGET = "die_on_target";
 		private static final String NBT_GRAVITY_STRENGTH = "gravity_strength";
 		private static final String NBT_TARGET_BEHAVIOR = "target_behavior";
-		private static final String NBT_ORBIT_RADIUS = "orbit_radius";
 		
 		public static CompoundTag WriteNBT(SpawnParams params, @Nullable CompoundTag tag) {
 			if (tag == null) {
@@ -281,9 +268,9 @@ public enum NostrumParticles {
 			tag.putDouble(NBT_SPAWN_JITTER, params.spawnJitterRadius);
 			tag.putInt(NBT_LIFETIME, params.lifetime);
 			tag.putInt(NBT_LIFETIME_JITTER, params.lifetimeJitter);
-			tag.putBoolean(NBT_DIE_ON_TARGET, params.dieWithTarget);
-			tag.putInt(NBT_TARGET_BEHAVIOR, params.targetBehavior.ordinal());
-			tag.putFloat(NBT_ORBIT_RADIUS, params.orbitRadius);
+			if (params.targetBehavior != null) {
+				tag.put(NBT_TARGET_BEHAVIOR, params.targetBehavior.toNBT());
+			}
 			
 			if (params.velocity != null) {
 				CompoundTag subtag = new CompoundTag();
@@ -374,23 +361,14 @@ public enum NostrumParticles {
 			if (tag.contains("color", Tag.TAG_INT)) {
 				params.color(tag.getInt("color"));
 			}
-			if (tag.contains(NBT_DIE_ON_TARGET, Tag.TAG_BYTE)) {
-				params.dieWithTarget(tag.getBoolean(NBT_DIE_ON_TARGET));
-			}
 			
 			if (tag.contains(NBT_GRAVITY_STRENGTH, Tag.TAG_FLOAT)) {
 				params.gravity(tag.getFloat(NBT_GRAVITY_STRENGTH));
 			}
 			
-			if (tag.contains(NBT_TARGET_BEHAVIOR, Tag.TAG_INT)) {
-				final int ord = tag.getInt(NBT_TARGET_BEHAVIOR);
-				if (ord < TargetBehavior.values().length) {
-					params.targetBehavior = TargetBehavior.values()[ord];
-				} else {
-					params.targetBehavior = TargetBehavior.JOIN;
-				}
+			if (tag.contains(NBT_TARGET_BEHAVIOR)) {
+				params.targetBehavior = ParticleTargetBehavior.FromNBT(tag.getCompound(NBT_TARGET_BEHAVIOR));
 			}
-			params.orbitRadius = tag.getFloat(NBT_ORBIT_RADIUS);
 			
 			return params;
 		}

@@ -181,7 +181,7 @@ public class DragonSoulItem extends PetSoulItem {
 				NostrumParticles.FILLED_ORB.spawn(player.level, new SpawnParams(
 						1, offset.x, offset.y, offset.z, 1.0, 20, 0,
 						new TargetLocation(offset)
-						).color(1f, .4f, .8f, 1f).dieWithTarget(true));
+						).color(1f, .4f, .8f, 1f));
 			}
 		}
 	}

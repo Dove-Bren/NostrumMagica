@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.AreaEffectEntity;
 import com.smanzana.nostrummagica.entity.AreaEffectEntity.IAreaEntityEffect;
@@ -576,7 +576,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 						10, ent.getX(), ent.getY() + ent.getBbHeight()/2, ent.getZ(), 4,
 						30, 10,
 						new TargetLocation(ent, true)
-						).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(NostrumEffects.frostbite.getColor()).dieWithTarget(true));
+						).setTargetBehavior(new ParticleTargetBehavior().orbitMode(true).dieWithTarget()).color(NostrumEffects.frostbite.getColor()));
 			} else if (ent instanceof LivingEntity) {
 				((LivingEntity) ent).addEffect(new MobEffectInstance(NostrumEffects.frostbite, 20 * 10));
 			}
@@ -739,7 +739,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 						10, entity.getX(), entity.getY() + entity.getBbHeight()/2, entity.getZ(), 0,
 						40, 10,
 						new TargetLocation(ent, true)
-						).setTargetBehavior(TargetBehavior.ORBIT_LAZY).color(NostrumEffects.magicRend.getColor()).dieWithTarget(true));
+						).setTargetBehavior(new ParticleTargetBehavior().orbitMode(true).dieWithTarget()).color(NostrumEffects.magicRend.getColor()));
 			}
 			
 			NostrumParticles.FILLED_ORB.spawn(entity.level, new SpawnParams(
@@ -837,8 +837,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 					//.gravity(.65f)
 					.gravity(gravity)
 					.color(color)
-					.dieWithTarget(false)
-					.setTargetBehavior(TargetBehavior.ORBIT)
+					.setTargetBehavior(new ParticleTargetBehavior().orbitMode(true).dieWithTarget())
 			);
 	}
 	

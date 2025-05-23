@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -92,7 +92,7 @@ public class SublimationEffect extends MobEffect {
 						10, target.getX(), target.getY() + target.getBbHeight()/2, target.getZ(), 0,
 						40, 10,
 						new TargetLocation(ent, true)
-						).color(0xFFEC6D8E).setTargetBehavior(TargetBehavior.ORBIT_LAZY).dieWithTarget(true));
+						).color(0xFFEC6D8E).setTargetBehavior(new ParticleTargetBehavior().orbitMode(true).dieWithTarget()));
 			}
 			
 			NostrumParticles.FILLED_ORB.spawn(target.level, new SpawnParams(

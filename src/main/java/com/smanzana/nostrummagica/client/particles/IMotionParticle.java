@@ -4,7 +4,6 @@ import java.util.function.Function;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.world.entity.Entity;
@@ -37,33 +36,8 @@ public interface IMotionParticle<T extends IMotionParticle<?>> {
 		return Self(this);
 	}
 	
-	public default T joinMode(boolean dieOnTarget) {
-		getMotion().joinMode(dieOnTarget);
-		return Self(this);
-	}
-	
-	public default T orbitMode(float radius, boolean lazy) {
-		getMotion().orbitMode(radius, lazy);
-		return Self(this);
-	}
-	
-	public default T orbitMode(float radius) {
-		getMotion().orbitMode(radius);
-		return Self(this);
-	}
-	
-	public default T orbitMode(boolean lazy) {
-		getMotion().orbitMode(lazy);
-		return Self(this);
-	}
-	
-	public default T orbitMode() {
-		getMotion().orbitMode();
-		return Self(this);
-	}
-	
-	public default T attachMode() {
-		getMotion().attachMode();
+	public default T setBehavior(ParticleTargetBehavior behavior) {
+		getMotion().setBehavior(behavior);
 		return Self(this);
 	}
 	
@@ -103,22 +77,23 @@ public interface IMotionParticle<T extends IMotionParticle<?>> {
 			this.setGravityStrength(params.gravityStrength);
 		}
 		if (params.targetBehavior != null) {
-			switch (params.targetBehavior) {
-			case JOIN:
-				this.joinMode(params.dieWithTarget);
-				break;
-			case ORBIT:
-			case ORBIT_LAZY:
-				if (params.orbitRadius > 0) {
-					this.orbitMode(params.orbitRadius, params.targetBehavior == TargetBehavior.ORBIT_LAZY);
-				} else {
-					this.orbitMode(params.targetBehavior == TargetBehavior.ORBIT_LAZY);
-				}
-				break;
-			case ATTACH:
-				this.attachMode();
-				break;
-			}
+//			switch (params.targetBehavior) {
+//			case JOIN:
+//				this.joinMode(params.dieWithTarget);
+//				break;
+//			case ORBIT:
+//			case ORBIT_LAZY:
+//				if (params.orbitRadius > 0) {
+//					this.orbitMode(params.orbitRadius, params.targetBehavior == TargetBehavior.ORBIT_LAZY);
+//				} else {
+//					this.orbitMode(params.targetBehavior == TargetBehavior.ORBIT_LAZY);
+//				}
+//				break;
+//			case ATTACH:
+//				this.attachMode();
+//				break;
+//			}
+			this.setBehavior(params.targetBehavior);
 		}
 		
 		return Self(this);

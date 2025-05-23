@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.spell.component.shapes;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
@@ -73,14 +73,14 @@ public class FieldShape extends AreaShape {
 				NostrumParticles.GLOW_ORB.spawn(world, new SpawnParams(
 						1,
 						origin.x,
-						origin.y + .5,
+						origin.y,
 						origin.z,
 						0,
 						60, 10, // lifetime + jitter
-						new TargetLocation(origin)
+						new TargetLocation(origin.add(0, NostrumMagica.rand.nextFloat() * .5, 0))
 						).color(characteristics.getElement().getColor())
-						.setTargetBehavior(TargetBehavior.ORBIT)
-						.setOrbitRadius(((NostrumMagica.rand.nextFloat() * .5f) + .5f) * radius));
+							.setTargetBehavior(new ParticleTargetBehavior().orbitMode(((NostrumMagica.rand.nextFloat() * .75f) + .25f) * radius, 60f, false))
+						);
 			}
 			
 			// Spawn a border one
@@ -93,8 +93,8 @@ public class FieldShape extends AreaShape {
 					60, 10, // lifetime + jitter
 					new TargetLocation(origin)
 					).color(characteristics.getElement().getColor())
-					.setTargetBehavior(TargetBehavior.ORBIT)
-					.setOrbitRadius(radius));
+						.setTargetBehavior(new ParticleTargetBehavior().orbitMode(radius, 40f, false))
+					);
 			
 			
 			// Looks very cool

@@ -131,7 +131,7 @@ public class AspectedFireWeapon extends ChargingSwordItem implements ILoreTagged
 					1,
 					pos.x, pos.y, pos.z, 0, 30, 5,
 					new TargetLocation(target, true)
-					).color(0xFFFF0000).dieWithTarget(true));
+					).color(0xFFFF0000));
 		}
 	}
 	

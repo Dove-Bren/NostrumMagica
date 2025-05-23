@@ -1811,7 +1811,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 			this.playSound(SoundEvents.WOLF_PANT, 1f, 1f);
 			NostrumParticles.GLOW_ORB.spawn(this.level, new SpawnParams(
 					50, this.getX(), this.getY(), this.getZ(), 3.0, 30, 10, new TargetLocation(this, true)
-					).color(element.getColor()).dieWithTarget(true));
+					).color(element.getColor()));
 		}
 	}
 	

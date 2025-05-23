@@ -59,35 +59,13 @@ public class ParticleTargetMotion {
 				));
 	}
 	
-	public ParticleTargetMotion joinMode(boolean dieOnTarget) {
-		this.targetBehavior.entityBehavior = TargetBehavior.JOIN;
-		this.targetBehavior.dieWithTarget = dieOnTarget;
-		return this;
-	}
-	
-	public ParticleTargetMotion orbitMode(float radius, boolean lazy) {
-		this.targetBehavior.entityBehavior = lazy ? TargetBehavior.ORBIT_LAZY : TargetBehavior.ORBIT;
-		this.targetBehavior.orbitRadius = radius;
-		return this;
-	}
-	
-	public ParticleTargetMotion orbitMode(float radius) {
-		return orbitMode(radius, true);
-	}
-	
-	public ParticleTargetMotion orbitMode(boolean lazy) {
-		if (this.target != null) {
-			return orbitMode(target.getTargetWidth() * 2);
+	public ParticleTargetMotion setBehavior(ParticleTargetBehavior behavior) {
+		this.targetBehavior.copyFrom(behavior);
+		if (this.target != null && this.targetBehavior.entityBehavior == TargetBehavior.ORBIT_LAZY || this.targetBehavior.entityBehavior == TargetBehavior.ORBIT) {
+			// Overwrite
+			setRandomTargetOffset();
+			//return orbitMode(target.getTargetWidth() * 2);
 		}
-		return orbitMode(1f, lazy);
-	}
-	
-	public ParticleTargetMotion orbitMode() {
-		return orbitMode(true);
-	}
-	
-	public ParticleTargetMotion attachMode() {
-		this.targetBehavior.entityBehavior = TargetBehavior.ATTACH;
 		return this;
 	}
 	
