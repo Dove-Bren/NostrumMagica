@@ -6,9 +6,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
@@ -21,22 +24,23 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
+import com.smanzana.nostrummagica.util.TargetLocation;
 import com.smanzana.nostrummagica.util.WorldUtil;
 import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
 
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.core.NonNullList;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class ChainShape extends InstantShape implements ISelectableShape {
 
@@ -236,6 +240,21 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 		}
 		if (this.affectsBlocks(params)) {
 			this.getBlockLinks(locsAffected, blockLinks, location, radius, arc);
+		}
+		
+		if (!state.isPreview()) {
+			if (!entLinks.isEmpty()) {
+				Set<LivingEntity> seen = new HashSet<>();
+				for (Entry<LivingEntity, List<LivingEntity>> row : entLinks.entrySet()) {
+					final LivingEntity ent1 = row.getKey();
+					for (LivingEntity other : row.getValue()) {
+						if (seen.add(other)) {
+							NostrumParticles.LIGHTNING_CHAIN.spawn(world, new SpawnParams(16, location.hitPosition.x, location.hitPosition.y, location.hitPosition.z, 0, 20, 0,
+								new TargetLocation(ent1, true)).setExtraTarget(new TargetLocation(other, true)).gravity(false).color(characteristics.element.getColor()));
+						}
+					}
+				}
+			}
 		}
 		
 		return new ChainTriggerData(entsAffected, world, locsAffected, entLinks, blockLinks);

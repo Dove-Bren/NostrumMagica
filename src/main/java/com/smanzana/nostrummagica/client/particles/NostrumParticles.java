@@ -34,6 +34,7 @@ public enum NostrumParticles {
 	GLOW_TRAIL(new NostrumParticleType("glow_trail"), GlowRibbonParticle::MakeParticle),
 	SMOKE_TRAIL(new NostrumParticleType("smoke_trail"), SmokeStreamRibbonParticle::MakeParticle),
 	RISING_GLOW(new NostrumParticleType("rising_glow"), RisingGlowRibbonParticle::MakeParticle),
+	LIGHTNING_CHAIN(new NostrumParticleType("lightning_chain"), LightningChainParticle::MakeParticle),
 	;
 	
 	@SubscribeEvent
@@ -103,6 +104,7 @@ public enum NostrumParticles {
 				NetUtils.CODEC_VECTOR3D.fieldOf("velocity").forGetter((p) -> p.velocity),
 				NetUtils.CODEC_VECTOR3D.fieldOf("velocityJitter").forGetter((p) -> p.velocityJitter),
 				NetTargetLocation.CODEC.fieldOf("target").forGetter((p) -> p.target),
+				NetTargetLocation.CODEC.fieldOf("extra_target").forGetter((p) -> p.target),
 				//Codec.INT.fieldOf("targetEntID").forGetter((p) -> p.targetEntID),
 				Codec.INT.optionalFieldOf("color", 0xFFFFFFFF).forGetter((p) -> p.color),
 				//Codec.BOOL.fieldOf("dieOnTarget").forGetter((p) -> p.dieWithTarget),
@@ -126,7 +128,8 @@ public enum NostrumParticles {
 //		// One of the below is required
 //		public final @Nullable Vec3 targetPos;
 //		public final @Nullable Integer targetEntID;
-		public final NetTargetLocation target;
+		public final @Nullable NetTargetLocation target;
+		public @Nullable NetTargetLocation extraTarget;
 		
 		public final @Nullable Vec3 velocityJitter; // 0-1 where 1 is completely random
 		
@@ -195,7 +198,7 @@ public enum NostrumParticles {
 //		}
 		
 		protected static SpawnParams UnpackSpawnParams(int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter,
-				@Nullable Vec3 velocity, @Nullable Vec3 velocityJitter, @Nullable NetTargetLocation target,
+				@Nullable Vec3 velocity, @Nullable Vec3 velocityJitter, @Nullable NetTargetLocation target, @Nullable NetTargetLocation extraTarget,
 				@Nullable Integer color, float gravityStrength, ParticleTargetBehavior targetBehavior
 				) {
 			final SpawnParams params;
@@ -210,6 +213,7 @@ public enum NostrumParticles {
 			params.color = color;
 			params.gravityStrength = gravityStrength;
 			params.targetBehavior = targetBehavior;
+			params.extraTarget = extraTarget;
 			
 			return params;
 		}
@@ -243,6 +247,15 @@ public enum NostrumParticles {
 			return this.setTargetBehavior(base);
 		}
 		
+		public SpawnParams setExtraTarget(TargetLocation extraTarget) {
+			return setExtraTarget(new NetTargetLocation((extraTarget)));
+		}
+		
+		public SpawnParams setExtraTarget(NetTargetLocation extraTarget) {
+			this.extraTarget = extraTarget;
+			return this;
+		}
+		
 		private static final String NBT_COUNT = "count";
 		private static final String NBT_SPAWN_X = "spawn_x";
 		private static final String NBT_SPAWN_Y = "spawn_y";
@@ -253,6 +266,7 @@ public enum NostrumParticles {
 		private static final String NBT_VELOCITY = "velocity";
 		private static final String NBT_VELOCITY_JITTER = "velocity_jitter";
 		private static final String NBT_TARGET = "target";
+		private static final String NBT_EXTRA_TARGET = "extra_target";
 		private static final String NBT_GRAVITY_STRENGTH = "gravity_strength";
 		private static final String NBT_TARGET_BEHAVIOR = "target_behavior";
 		
@@ -291,6 +305,11 @@ public enum NostrumParticles {
 			if (params.target != null) {
 				CompoundTag subtag = params.target.toNBT();
 				tag.put(NBT_TARGET, subtag);
+			}
+			
+			if (params.extraTarget != null) {
+				CompoundTag subtag = params.extraTarget.toNBT();
+				tag.put(NBT_EXTRA_TARGET, subtag);
 			}
 			
 			if (params.color != null) {
@@ -368,6 +387,10 @@ public enum NostrumParticles {
 			
 			if (tag.contains(NBT_TARGET_BEHAVIOR)) {
 				params.targetBehavior = ParticleTargetBehavior.FromNBT(tag.getCompound(NBT_TARGET_BEHAVIOR));
+			}
+			
+			if (tag.contains(NBT_EXTRA_TARGET)) {
+				params.extraTarget = NetTargetLocation.FromNBT(tag.getCompound(NBT_EXTRA_TARGET));
 			}
 			
 			return params;

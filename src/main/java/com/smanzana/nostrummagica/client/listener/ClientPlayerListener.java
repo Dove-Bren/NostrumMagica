@@ -304,8 +304,10 @@ public class ClientPlayerListener extends PlayerListener {
 			
 //			int unused;
 //			Player player = mc.player;
-//			NostrumParticles.COLOR_TRAIL.spawn(mc.level, new SpawnParams(1, player.getX(), player.getY() - 2, player.getZ(), 0, 180, 0,
-//					new Vec3(.1, 0, 0), Vec3.ZERO).gravity(false).color(1f, .8f, .3f, .4f));
+//			final Vec3 pos1 = new Vec3(player.getX()-2, player.getY(), player.getZ() - 2);
+//			final Vec3 pos2 = new Vec3(player.getX()+2, player.getY(), player.getZ() - 2);
+//			NostrumParticles.LIGHTNING_CHAIN.spawn(mc.level, new SpawnParams(32, player.getX(), player.getY(), player.getZ() - 2, 0, 180, 0,
+//					new TargetLocation(pos1)).setExtraTarget(new TargetLocation(pos2)).gravity(false).color(EMagicElement.LIGHTNING.getColor()));
 			
 //			NostrumParticles.COLOR_TRAIL.spawn(mc.level, new SpawnParams(50, player.getX(), player.getY() - 2, player.getZ(), 0, 180, 0,
 //					new Vec3(0, .25, 0), new Vec3(.25, .05, .25)).gravity(true).color(1f, .8f, .3f, .4f));

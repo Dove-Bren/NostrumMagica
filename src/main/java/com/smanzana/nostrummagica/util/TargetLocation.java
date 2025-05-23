@@ -28,10 +28,14 @@ public class TargetLocation {
 	}
 	
 	public Vec3 getLocation() {
+		return getLocation(1f);
+	}
+	
+	public Vec3 getLocation(float partialTicks) {
 		if (targetEntity == null) {
 			return targetPos;
 		} else {
-			return targetEntity.position().add(targetPos);
+			return targetEntity.getPosition(partialTicks).add(targetPos);
 		}
 	}
 

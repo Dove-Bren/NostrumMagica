@@ -111,6 +111,11 @@ public class RibbonEmitter<T> {
 		this.active = false;
 	}
 	
+	public void clearSegments() {
+		this.segments.clear();
+		this.dataStorage.segmentAliveCount = 0;
+	}
+	
 	protected void updateEmitterTickData() {
 		updateEmitterSubtickData(0f);
 	}
