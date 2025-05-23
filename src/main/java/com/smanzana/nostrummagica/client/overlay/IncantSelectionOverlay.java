@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
@@ -62,23 +62,32 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	private static final double QUICKPRESS_MS = 200;
 	
 	private static final Component noneTitle = new TextComponent("None");
+	private static final Component nextTitle = new TextComponent("Next");
+	private static final ITooltip nextTooltip = Tooltip.create(new TextComponent("View the next page of shapes"));
+	
+	private static final Component prevTitle = new TextComponent("Previous");
+	private static final ITooltip prevTooltip = Tooltip.create(new TextComponent("View the previous page of shapes"));
 	private static final ITooltip noneTooltip = Tooltip.create(new TextComponent("Do not use an alteration"));
+	private static final Component terminalText = new TextComponent("Terminal").withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_PURPLE);
 	
 	protected boolean enabled;
 	protected long showTime; // For behavior like quick-press
 	protected long fadeTime; // for animating
 	
 	// Selection variables
-	private @Nullable EMagicElement element;
 	private @Nullable SpellShape shape;
+	private @Nullable SpellShape shape2;
+	private @Nullable EMagicElement element;
 	private @Nullable EAlteration alteration;
 	
 	private @Nullable Incantation lastIncantation;
 	
-	private WheelSlice<?>[] elementSlices;
-	private WheelSlice<?>[][] shapeSlices;
-	private WheelSlice<?>[] alterationSlices;
-	private int shapePage;
+	private final SelectionStage elementStage;
+	private final SelectionStage shapeStage1;
+	private final SelectionStage shapeStage2;
+	private final SelectionStage alterationStage;
+	
+	private @Nullable SelectionStage currentStage;
 	
 	// Tooltip stuff
 	private @Nullable WheelSlice<?> hovered;
@@ -89,6 +98,11 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	public IncantSelectionOverlay() {
 		MinecraftForge.EVENT_BUS.register(this);
 		this.mc = Minecraft.getInstance();
+		
+		this.elementStage = new SelectionStage();
+		this.shapeStage1 = new SelectionStage();
+		this.shapeStage2 = new SelectionStage();
+		this.alterationStage = new SelectionStage();
 	}
 	
 	protected boolean isEnabled() {
@@ -140,12 +154,13 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	protected void resetSelection() {
 		element = null;
 		shape = null;
+		shape2 = null;
 		alteration = null;
 	}
 	
 	protected void submitSelection() {
 		ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
-		this.lastIncantation = new Incantation(this.shape, this.element, this.alteration);
+		this.lastIncantation = new Incantation(this.shape, this.shape2, this.element, this.alteration);
 		listener.startIncantationCast(this.lastIncantation);
 		this.enableSelection(false);
 		listener.getTutorial().onIncantationFormed();
@@ -164,14 +179,27 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		this.enableSelection(false);
 	}
 	
-	protected @Nullable WheelSlice<?>[] getCurrentStage() {
-		if (this.shape == null) {
-			return this.shapeSlices[shapePage];
-		} else if (this.element == null) {
-			return this.elementSlices;
-		} else {
-			return this.alterationSlices;
+	protected @Nullable SelectionStage getCurrentStage() {
+//		if (this.shape == null) {
+//			return this.shapeStage1;
+//		} else if (this.element == null) {
+//			return this.elementStage;
+//		} else {
+//			return this.alterationStage;
+//		}
+		return this.currentStage;
+	}
+	
+	protected @Nullable SelectionStagePage getCurrentPage() {
+		SelectionStage stage = getCurrentStage();
+		if (stage != null) {
+			return stage.pages[stage.pageIdx];
 		}
+		return null;
+	}
+	
+	protected void setStage(SelectionStage stage) {
+		this.currentStage = stage;
 	}
 	
 	protected @Nullable WheelSlice<?> getSelection(int width, int height, int mouseX, int mouseY) {
@@ -179,7 +207,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 			return null;
 		}
 		
-		@Nullable WheelSlice<?>[] stage = this.getCurrentStage();
+		@Nullable SelectionStagePage stage = this.getCurrentPage();
 		if (stage == null) {
 			return null;
 		}
@@ -195,7 +223,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 			return null;
 		}
 		
-		for (WheelSlice<?> slice : stage) {
+		for (WheelSlice<?> slice : stage.slices) {
 			if (slice == null) {
 				continue;
 			}
@@ -209,168 +237,198 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		return null; // can this happen? Should return last slice?
 	}
 	
+	protected SelectionStagePage[] makeElementPages(Player player, @Nullable INostrumMagic attr) {
+		// elements are even split of the circle
+		final int count = EMagicElement.values().length;
+		WheelSlice<?>[] elementSlices = new WheelSlice[count];
+		
+		final float perSlice = (1f / (float) count);
+		for (int i = 0; i < count; i++) {
+			final float prog = (.75f + (i * perSlice)) % 1; // start at 75% around which is up
+			final EMagicElement elem = EMagicElement.values()[i];
+			
+			if (attr == null || !attr.isUnlocked() || !attr.getElementalMastery(elem).isGreaterOrEqual(EElementalMastery.NOVICE)) {
+				elementSlices[i] = WheelSlice.Hidden(prog, perSlice/2f);
+			} else {
+				elementSlices[i] = new WheelSlice<>(elem, SpellComponentIcon.get(elem), elem.getDisplayName(), () -> this.getElementTooltip(elem), prog, perSlice/2f, this::setElement, false);
+			}
+		}
+		return new SelectionStagePage[] {new SelectionStagePage(elementSlices)};
+	}
+	
+	protected SelectionStagePage[] makeAlterationPages(Player player, @Nullable INostrumMagic attr) {
+		// Alterations are even, with "NO ALTERATION" being on top
+		
+		final int count = EAlteration.values().length + 1;
+		WheelSlice<?>[] alterationSlices = new WheelSlice[count];
+		final Predicate<EAlteration> check = (a) -> attr != null && attr.isUnlocked() && (a == null || attr.getAlterations().getOrDefault(a, Boolean.FALSE));
+		
+		final float perSlice = (1f / (float) count);
+		for (int i = 0; i < count; i++) {
+			final float prog = (.75f + (i * perSlice)) % 1; // start at 75% around which is up
+			final EAlteration alter = i == 0 ? null : EAlteration.values()[i-1];
+			
+			if (!check.test(alter)) {
+				alterationSlices[i] = WheelSlice.Hidden(prog, perSlice/2f);
+			} else {
+				alterationSlices[i] = new WheelSlice<>(alter, alter == null ? null : SpellComponentIcon.get(alter),
+						alter == null ? noneTitle : alter.getDisplayName(),
+						() -> getAlterationTooltip(alter),		
+						prog, perSlice/2f, this::setAlteration, false);
+			}
+		}
+		
+		return new SelectionStagePage[] {new SelectionStagePage(alterationSlices)};
+	}
+	
+	protected SelectionStagePage[] makeShapePages(Player player, @Nullable INostrumMagic attr, boolean isSecondStage) {
+		// Shapes are mostly even, with a few called out specifically.
+		final SpellShape[] specials = {NostrumSpellShapes.Projectile, NostrumSpellShapes.Touch, NostrumSpellShapes.Self};
+		
+		// Specials are bigger than the others
+		final float specialWidth = .1125f;
+		
+		// TODO fix holding down R. Require a key-up to re-show menu.
+		
+		Comparator<SpellShape> compare = (a, b) -> {
+			final int aIdx = (a.getWeight(a.getDefaultProperties())) * 100
+					//+ (a.getManaCost(a.getDefaultProperties())) * 10
+					;
+			final int bIdx = (b.getWeight(a.getDefaultProperties())) * 100
+					//+ (b.getManaCost(a.getDefaultProperties())) * 10
+					;
+			
+			if (aIdx != bIdx) {
+				return aIdx - bIdx;
+			}
+			
+			// If all equal, sort by name?
+			return a.getShapeKey().compareToIgnoreCase(b.getShapeKey());
+		};
+		
+		List<SpellShape> shapes = Lists.newArrayList(specials);
+		Set<SpellShape> seen = Sets.newHashSet(specials);
+		SpellShape.getAllShapes().stream().filter(SpellShape::canIncant).filter(seen::add).sorted(compare).forEach(shapes::add);
+		Set<SpellShape> known = (attr != null && attr.isUnlocked()) ? Set.copyOf(attr.getShapes()) : new HashSet<>();
+		
+		final int countPerPage = 11;
+		final int count = shapes.size();
+		final int specialPerPage = specials.length + 2;
+		final int standardPerPage = countPerPage - specialPerPage;
+		final int numPages = (((count-specials.length) + standardPerPage-1) / standardPerPage);
+		SelectionStagePage[] shapePages = new SelectionStagePage[numPages];
+		
+		final float standardWidth = ((1f - (specialWidth * specials.length)) / (float) (countPerPage-specials.length));
+		
+		final int buttonsIdx = (((countPerPage - specials.length)-1) / 2) + specials.length;
+		
+		for (int page = 0; page < numPages; page++) {
+			WheelSlice<?>[] curSlices = new WheelSlice[countPerPage];
+			for (int i = 0; i < countPerPage; i++) {
+				final SpellShape shape;
+				final float prog;
+				final float sliceWidth;
+				// note that 75% around is up
+				if (i < specials.length) {
+					final float progStart = (.75f + (-specialWidth * ((specials.length-1)/2f)));
+					prog = (progStart + (i * specialWidth)) % 1;
+					sliceWidth = specialWidth;
+					shape = shapes.get(i);
+				} else {
+					final int subi = (i-specials.length);
+					final float progStart = (.75f + (specialWidth*specials.length) / 2f) + (standardWidth / 2); 
+					prog = (progStart + (subi * standardWidth)) % 1;
+					sliceWidth = standardWidth;
+					
+					if (i < buttonsIdx || i > buttonsIdx + 1) {
+						int shapeIdx = specials.length + (standardPerPage)*page + subi;
+						if (i > buttonsIdx) {
+							shapeIdx -= 2;
+						}
+						shape = shapeIdx < shapes.size() ? shapes.get(shapeIdx) : null;
+					} else {
+						shape = null;
+					}
+				}
+				
+				if (i == buttonsIdx && page < numPages - 1) {
+					// next button
+					curSlices[i] = new WheelSlice<>(Boolean.TRUE, null, nextTitle, nextTooltip, prog, sliceWidth/2f, this::movePage, true);
+				} else if (i == buttonsIdx + 1 && page > 0) {
+					// prev button
+					curSlices[i] = new WheelSlice<>(Boolean.FALSE, null, prevTitle, prevTooltip, prog, sliceWidth/2f, this::movePage, true);
+				} else if (shape == null) {
+					curSlices[i] = null; // no slice
+				} else if (!known.contains(shape)) {
+					curSlices[i] = WheelSlice.Hidden(prog, sliceWidth/2f);
+				} else {
+					curSlices[i] = new WheelSlice<>(shape, SpellComponentIcon.get(shape), shape.getDisplayName(), () -> this.getShapeTooltip(shape), prog, sliceWidth/2f, this::setShape, i < specials.length);
+				}
+			}
+			shapePages[page] = new SelectionStagePage(curSlices);
+		}
+		return shapePages;
+	}
+	
 	protected void initSlices() {
 		// Remake slices each time to allow attr to change
 		Player player = NostrumMagica.instance.proxy.getPlayer();
 		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
 		// elements
-		{
-			// elements are even split of the circle
-			final int count = EMagicElement.values().length;
-			elementSlices = new WheelSlice[count];
-			
-			final float perSlice = (1f / (float) count);
-			for (int i = 0; i < count; i++) {
-				final float prog = (.75f + (i * perSlice)) % 1; // start at 75% around which is up
-				final EMagicElement elem = EMagicElement.values()[i];
-				
-				if (attr == null || !attr.isUnlocked() || !attr.getElementalMastery(elem).isGreaterOrEqual(EElementalMastery.NOVICE)) {
-					elementSlices[i] = WheelSlice.Hidden(prog, perSlice/2f);
-				} else {
-					elementSlices[i] = new WheelSlice<>(elem, SpellComponentIcon.get(elem), elem.getDisplayName(), () -> this.getElementTooltip(elem), prog, perSlice/2f, this::setElement, false);
-				}
-			}
-		}
+		this.elementStage.setPages(this.makeElementPages(player, attr));
 		
 		// Shapes
-		{
-			final Component nextTitle = new TextComponent("Next");
-			final ITooltip nextTooltip = Tooltip.create(new TextComponent("View the next page of shapes"));
-			
-			final Component prevTitle = new TextComponent("Previous");
-			final ITooltip prevTooltip = Tooltip.create(new TextComponent("View the previous page of shapes"));
-			
-			// Shapes are mostly even, with a few called out specifically.
-			final SpellShape[] specials = {NostrumSpellShapes.Projectile, NostrumSpellShapes.Touch, NostrumSpellShapes.Self};
-			
-			// Specials are bigger than the others
-			final float specialWidth = .1125f;
-			
-			// TODO fix holding down R. Require a key-up to re-show menu.
-			
-			Comparator<SpellShape> compare = (a, b) -> {
-				final int aIdx = (a.getWeight(a.getDefaultProperties())) * 100
-						//+ (a.getManaCost(a.getDefaultProperties())) * 10
-						;
-				final int bIdx = (b.getWeight(a.getDefaultProperties())) * 100
-						//+ (b.getManaCost(a.getDefaultProperties())) * 10
-						;
-				
-				if (aIdx != bIdx) {
-					return aIdx - bIdx;
-				}
-				
-				// If all equal, sort by name?
-				return a.getShapeKey().compareToIgnoreCase(b.getShapeKey());
-			};
-			
-			List<SpellShape> shapes = Lists.newArrayList(specials);
-			Set<SpellShape> seen = Sets.newHashSet(specials);
-			SpellShape.getAllShapes().stream().filter(SpellShape::canIncant).filter(seen::add).sorted(compare).forEach(shapes::add);
-			Set<SpellShape> known = (attr != null && attr.isUnlocked()) ? Set.copyOf(attr.getShapes()) : new HashSet<>();
-			
-			final int countPerPage = 11;
-			final int count = shapes.size();
-			final int specialPerPage = specials.length + 2;
-			final int standardPerPage = countPerPage - specialPerPage;
-			final int numPages = (((count-specials.length) + standardPerPage-1) / standardPerPage);
-			shapeSlices = new WheelSlice[numPages][];
-			
-			final float standardWidth = ((1f - (specialWidth * specials.length)) / (float) (countPerPage-specials.length));
-			
-			final int buttonsIdx = (((countPerPage - specials.length)-1) / 2) + specials.length;
-			
-			for (int page = 0; page < numPages; page++) {
-				shapeSlices[page] = new WheelSlice[countPerPage];
-				WheelSlice<?>[] curSlices = shapeSlices[page];
-				for (int i = 0; i < countPerPage; i++) {
-					final SpellShape shape;
-					final float prog;
-					final float sliceWidth;
-					// note that 75% around is up
-					if (i < specials.length) {
-						final float progStart = (.75f + (-specialWidth * ((specials.length-1)/2f)));
-						prog = (progStart + (i * specialWidth)) % 1;
-						sliceWidth = specialWidth;
-						shape = shapes.get(i);
-					} else {
-						final int subi = (i-specials.length);
-						final float progStart = (.75f + (specialWidth*specials.length) / 2f) + (standardWidth / 2); 
-						prog = (progStart + (subi * standardWidth)) % 1;
-						sliceWidth = standardWidth;
-						
-						if (i < buttonsIdx || i > buttonsIdx + 1) {
-							int shapeIdx = specials.length + (standardPerPage)*page + subi;
-							if (i > buttonsIdx) {
-								shapeIdx -= 2;
-							}
-							shape = shapeIdx < shapes.size() ? shapes.get(shapeIdx) : null;
-						} else {
-							shape = null;
-						}
-					}
-					
-					if (i == buttonsIdx && page < numPages - 1) {
-						// next button
-						curSlices[i] = new WheelSlice<>(Boolean.TRUE, null, nextTitle, nextTooltip, prog, sliceWidth/2f, this::moveShapePage, true);
-					} else if (i == buttonsIdx + 1 && page > 0) {
-						// prev button
-						curSlices[i] = new WheelSlice<>(Boolean.FALSE, null, prevTitle, prevTooltip, prog, sliceWidth/2f, this::moveShapePage, true);
-					} else if (shape == null) {
-						curSlices[i] = null; // no slice
-					} else if (!known.contains(shape)) {
-						curSlices[i] = WheelSlice.Hidden(prog, sliceWidth/2f);
-					} else {
-						curSlices[i] = new WheelSlice<>(shape, SpellComponentIcon.get(shape), shape.getDisplayName(), () -> this.getShapeTooltip(shape), prog, sliceWidth/2f, this::setShape, i < specials.length);
-					}
-				}
-			}
-		}
+		this.shapeStage1.setPages(this.makeShapePages(player, attr, false));
+		this.shapeStage2.setPages(this.makeShapePages(player, attr, true));
 		
 		// Alterations
-		{
-			// Alterations are even, with "NO ALTERATION" being on top
-			
-			final int count = EAlteration.values().length + 1;
-			alterationSlices = new WheelSlice[count];
-			final Predicate<EAlteration> check = (a) -> attr != null && attr.isUnlocked() && (a == null || attr.getAlterations().getOrDefault(a, Boolean.FALSE));
-			
-			final float perSlice = (1f / (float) count);
-			for (int i = 0; i < count; i++) {
-				final float prog = (.75f + (i * perSlice)) % 1; // start at 75% around which is up
-				final EAlteration alter = i == 0 ? null : EAlteration.values()[i-1];
-				
-				if (!check.test(alter)) {
-					alterationSlices[i] = WheelSlice.Hidden(prog, perSlice/2f);
-				} else {
-					alterationSlices[i] = new WheelSlice<>(alter, alter == null ? null : SpellComponentIcon.get(alter),
-							alter == null ? noneTitle : alter.getDisplayName(),
-							() -> getAlterationTooltip(alter),		
-							prog, perSlice/2f, this::setAlteration, false);
-				}
-			}
-		}
+		this.alterationStage.setPages(this.makeAlterationPages(player, attr));
+		
+		this.setStage(this.shapeStage1);
 	}
 	
-	protected void setElement(EMagicElement element) {
+	protected void setElement(EMagicElement element, boolean isRight) {
 		this.element = element;
 		
 		// If no alterations are discovered, submit now
 		Player player = NostrumMagica.instance.proxy.getPlayer();
 		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-		if (attr == null || !attr.getAlterations().values().stream().filter(Objects::nonNull).anyMatch(Boolean::booleanValue)) {
+		final boolean alterPickAllowed = attr != null
+				&& attr.getAlterations().values().stream().filter(Objects::nonNull).anyMatch(Boolean::booleanValue)
+				// TODO and tier/skill check
+				;
+		if (isRight || !alterPickAllowed) {
 			this.submitSelection();
+		} else {
+			this.setStage(alterationStage);
 		}
 	}
 	
-	protected void setAlteration(EAlteration alteration) {
+	protected void setAlteration(EAlteration alteration, boolean isRight) {
 		this.alteration = alteration;
 		this.submitSelection();
 	}
 	
-	protected void setShape(SpellShape shape) {
-		this.shape = shape;
+	protected void setShape(SpellShape shape, boolean isRight) {
+		final boolean isFirst = this.getCurrentStage() == this.shapeStage1;
+		boolean secondPickAllowed = !shape.getAttributes(shape.getDefaultProperties()).terminal; // AND tier check?
+		if (this.getCurrentStage() == this.shapeStage1) {
+			this.shape = shape;
+			if (isRight) {
+				// Skip second shape selection
+				secondPickAllowed = false;
+			}
+		} else {
+			this.shape2 = shape;
+			secondPickAllowed = false;
+		}
+		
+		if (secondPickAllowed && isFirst) {
+			this.setStage(shapeStage2);
+		} else {
+			this.setStage(elementStage);
+		}
 	}
 	
 	protected List<Component> getShapeTooltip(SpellShape shape) {
@@ -379,6 +437,9 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		
 		List<Component> tooltip = new ArrayList<>(shape.getTooltip());
 		tooltip.add(new TextComponent(" "));
+		if (shape.getAttributes(shape.getDefaultProperties()).terminal) {
+			tooltip.add(terminalText);
+		}
 		tooltip.add(makeManaLine(mana));
 		tooltip.add(makeWeightLine(weight));
 		return tooltip;
@@ -411,8 +472,11 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		return new TextComponent(weight + "").append(new TextComponent(" Weight").withStyle(ChatFormatting.LIGHT_PURPLE, ChatFormatting.BOLD));
 	}
 	
-	protected void moveShapePage(Boolean isNext) {
-		this.shapePage = Mth.clamp(this.shapePage + (isNext ? 1 : -1), 0, this.shapeSlices.length);
+	protected void movePage(Boolean isNext, Boolean isRight) {
+		final @Nullable SelectionStage stage = this.getCurrentStage();
+		if (stage != null) {
+			stage.movePage(isNext);
+		}
 	}
 	
 	protected float getFadeProgress() {
@@ -439,12 +503,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 				
 				final @Nullable WheelSlice<?> current = this.getSelection(width, height, mouseX, mouseY);
 				if (current != null) {
-					current.click();
-
-					// Special handling for right-clicking an element to skip alteration
-					if (this.element != null && this.shape != null && isRight) {
-						this.submitSelection();
-					}
+					current.click(isRight);
 				}
 				
 			}
@@ -494,10 +553,10 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	protected void renderWheel(PoseStack matrixStackIn, float partialTicks, float radius, float fadeAlpha, int screenwidth, int screenheight, int mouseX, int mouseY) {
 		renderWheelBackground(matrixStackIn, partialTicks, radius, fadeAlpha);
 		
-		WheelSlice<?>[] stage = this.getCurrentStage();
+		SelectionStagePage stage = this.getCurrentPage();
 		final WheelSlice<?> selected = this.getSelection(screenwidth, screenheight, mouseX, mouseY);
 		if (stage != null) {
-			for (WheelSlice<?> slice : stage) {
+			for (WheelSlice<?> slice : stage.slices) {
 				if (slice == null) {
 					continue;
 				}
@@ -538,9 +597,14 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		
 		Tesselator.getInstance().end();
 		
+		final boolean twoShapes = (this.shape != null && this.shape2 != null);
 		if (this.shape != null) {
 			matrixStackIn.pushPose();
-			matrixStackIn.translate(-12, -3, 0);
+			if (twoShapes) {
+				matrixStackIn.translate(-12, -12, 0);
+			} else {
+				matrixStackIn.translate(-12, -3, 0);
+			}
 			SpellComponentIcon.get(this.shape).draw(matrixStackIn, -6, -6, 12, 12, 1f, 1f, 1f, fadeAlpha);
 			matrixStackIn.translate(0, 7, 0);
 			matrixStackIn.scale(.5f, .5f, 1f);
@@ -549,9 +613,24 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 			matrixStackIn.popPose();
 		}
 		
+		if (this.shape2 != null) {
+			matrixStackIn.pushPose();
+			matrixStackIn.translate(12, -12, 0);
+			SpellComponentIcon.get(this.shape2).draw(matrixStackIn, -6, -6, 12, 12, 1f, 1f, 1f, fadeAlpha);
+			matrixStackIn.translate(0, 7, 0);
+			matrixStackIn.scale(.5f, .5f, 1f);
+			final int len = mc.font.width(this.shape2.getDisplayName());
+			mc.font.draw(matrixStackIn, this.shape2.getDisplayName(), -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
+			matrixStackIn.popPose();
+		}
+		
 		if (this.element != null) {
 			matrixStackIn.pushPose();
-			matrixStackIn.translate(12, -3, 0);
+			if (twoShapes) {
+				matrixStackIn.translate(0, 12, 0);
+			} else {
+				matrixStackIn.translate(12, -3, 0);
+			}
 			SpellComponentIcon.get(this.element).draw(matrixStackIn, -6, -6, 12, 12, 1f, 1f, 1f, fadeAlpha);
 			matrixStackIn.translate(0, 7, 0);
 			matrixStackIn.scale(.5f, .5f, 1f);
@@ -729,7 +808,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		}
 	}
 	
-	private static final record WheelSlice<T>(T val, @Nullable SpellComponentIcon icon, Component name, ITooltip tooltip, float rotationPerc, float width, Consumer<T> onClick, boolean decorate) {
+	private static final record WheelSlice<T>(T val, @Nullable SpellComponentIcon icon, Component name, ITooltip tooltip, float rotationPerc, float width, BiConsumer<T, Boolean> onClick, boolean decorate) {
 		private static final Component HiddenName = new TextComponent("?");
 		private static final ITooltip HiddenTooltip = Tooltip.create(new TextComponent("An undiscovered component"));
 		
@@ -738,9 +817,9 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 			return new WheelSlice<>(null, null, HiddenName, HiddenTooltip, rotationPerc, width, null, false);
 		}
 		
-		public void click() {
+		public void click(boolean isRight) {
 			if (this.onClick != null) {
-				this.onClick().accept(val);
+				this.onClick().accept(val, isRight);
 			}
 		}
 
@@ -748,6 +827,38 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 			return this.icon == null && onClick == null;
 		}
 		
+	}
+	
+	private static final class SelectionStage {
+		public SelectionStagePage[] pages;
+		public int pageIdx = 0;
+		
+		public SelectionStage() {
+			
+		}
+		
+		public void setPages(SelectionStagePage ...pages) {
+			this.pages = pages;
+			if (this.pageIdx >= pages.length) {
+				pageIdx = pages.length - 1;
+			}
+		}
+		
+		public void movePage(Boolean isNext) {
+			this.pageIdx = Mth.clamp(this.pageIdx + (isNext ? 1 : -1), 0, getPageCount());
+		}
+
+		public int getPageCount() {
+			return pages.length;
+		}
+	}
+	
+	private static final class SelectionStagePage {
+		public final WheelSlice<?>[] slices;
+		
+		public SelectionStagePage(WheelSlice<?> ...slices) {
+			this.slices = slices;
+		}
 	}
 	
 }
