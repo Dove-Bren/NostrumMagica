@@ -12,33 +12,34 @@ import com.smanzana.nostrummagica.block.dungeon.KeySwitchBlock;
 import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
 import com.smanzana.nostrummagica.block.dungeon.LockedDoorBlock;
 import com.smanzana.nostrummagica.block.dungeon.LogicDoorBlock;
+import com.smanzana.nostrummagica.block.dungeon.MagicBreakableBlock;
+import com.smanzana.nostrummagica.block.dungeon.MatchSpawnerBlock;
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
 import com.smanzana.nostrummagica.block.dungeon.MimicOnesidedBlock;
 import com.smanzana.nostrummagica.block.dungeon.MysticAnchorBlock;
-import com.smanzana.nostrummagica.block.dungeon.MatchSpawnerBlock;
-import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
-import com.smanzana.nostrummagica.block.dungeon.TriggeredMatchSpawnerBlock;
 import com.smanzana.nostrummagica.block.dungeon.ProgressionDoorBlock;
 import com.smanzana.nostrummagica.block.dungeon.PushBlock;
 import com.smanzana.nostrummagica.block.dungeon.RedstoneTriggerBlock;
 import com.smanzana.nostrummagica.block.dungeon.ShrineBlock;
+import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.block.dungeon.SwitchBlock;
 import com.smanzana.nostrummagica.block.dungeon.ToggleLogicDoor;
 import com.smanzana.nostrummagica.block.dungeon.TogglePlatformBlock;
 import com.smanzana.nostrummagica.block.dungeon.TrialBlock;
 import com.smanzana.nostrummagica.block.dungeon.TriggerRepeaterBlock;
+import com.smanzana.nostrummagica.block.dungeon.TriggeredMatchSpawnerBlock;
 import com.smanzana.nostrummagica.fluid.NostrumFluids;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -128,6 +129,7 @@ public class NostrumBlocks {
 	@ObjectHolder(DungeonDoorBlock.Small.ID) public static DungeonDoorBlock.Small smallDungeonDoor;
 	@ObjectHolder(DungeonDoorBlock.Large.ID) public static DungeonDoorBlock.Large largeDungeonDoor;
 	@ObjectHolder(PushBlock.ID) public static PushBlock pushBlock;
+	@ObjectHolder(MagicBreakableBlock.ID) public static MagicBreakableBlock breakBlock; 
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -213,6 +215,7 @@ public class NostrumBlocks {
     	registerBlockItem(smallDungeonDoor, smallDungeonDoor.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(largeDungeonDoor, largeDungeonDoor.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(pushBlock, pushBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(breakBlock, breakBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -316,6 +319,7 @@ public class NostrumBlocks {
     	registerBlock(new DungeonDoorBlock.Small(), DungeonDoorBlock.Small.ID, registry);
     	registerBlock(new DungeonDoorBlock.Large(), DungeonDoorBlock.Large.ID, registry);
     	registerBlock(new PushBlock(), PushBlock.ID, registry);
+    	registerBlock(new MagicBreakableBlock(), MagicBreakableBlock.ID, registry);
     }
     
 }

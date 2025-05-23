@@ -10,10 +10,11 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.StringRepresentable;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public enum EMagicElement {
+public enum EMagicElement implements StringRepresentable {
 
 	PHYSICAL(0xFF223344),
 	FIRE(0xFFC21C00),
@@ -160,5 +161,15 @@ public enum EMagicElement {
 
 	public List<Component> getTooltip() {
 		return tooltip;
+	}
+
+	@Override
+	public String getSerializedName() {
+		return this.name().toLowerCase();
+	}
+	
+	@Override
+	public String toString() {
+		return this.getSerializedName();
 	}
 }

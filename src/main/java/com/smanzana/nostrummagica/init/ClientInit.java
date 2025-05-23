@@ -9,6 +9,7 @@ import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ModificationTableBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.block.dungeon.MagicBreakableBlock;
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
 import com.smanzana.nostrummagica.block.dungeon.TogglePlatformBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -53,8 +54,8 @@ import com.smanzana.nostrummagica.client.gui.tooltip.LoreHintTooltipComponent;
 import com.smanzana.nostrummagica.client.gui.tooltip.TransmutableHintTooltipComponent;
 import com.smanzana.nostrummagica.client.gui.widget.QuickMoveBagButton;
 import com.smanzana.nostrummagica.client.listener.ClientPlayerListener;
-import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.model.DragonRedModel;
+import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
 import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.render.IEffectRenderer;
@@ -66,8 +67,8 @@ import com.smanzana.nostrummagica.client.render.effect.EffectGemRenderer;
 import com.smanzana.nostrummagica.client.render.entity.ArcaneWolfRenderer;
 import com.smanzana.nostrummagica.client.render.entity.CursedGlassTriggerRenderer;
 import com.smanzana.nostrummagica.client.render.entity.DragonEggRenderer;
-import com.smanzana.nostrummagica.client.render.entity.DragonRedRenderer;
 import com.smanzana.nostrummagica.client.render.entity.DragonRedPartRenderer;
+import com.smanzana.nostrummagica.client.render.entity.DragonRedRenderer;
 import com.smanzana.nostrummagica.client.render.entity.EnderRodBallRenderer;
 import com.smanzana.nostrummagica.client.render.entity.GolemRenderer;
 import com.smanzana.nostrummagica.client.render.entity.HookShotRenderer;
@@ -76,10 +77,10 @@ import com.smanzana.nostrummagica.client.render.entity.KoidRenderer;
 import com.smanzana.nostrummagica.client.render.entity.LuxRenderer;
 import com.smanzana.nostrummagica.client.render.entity.MagicProjectileRenderer;
 import com.smanzana.nostrummagica.client.render.entity.MagicSaucerRenderer;
-import com.smanzana.nostrummagica.client.render.entity.PlantBossRenderer;
 import com.smanzana.nostrummagica.client.render.entity.PlantBossBodyRenderer;
 import com.smanzana.nostrummagica.client.render.entity.PlantBossBrambleRenderer;
 import com.smanzana.nostrummagica.client.render.entity.PlantBossLeafRenderer;
+import com.smanzana.nostrummagica.client.render.entity.PlantBossRenderer;
 import com.smanzana.nostrummagica.client.render.entity.ShadowDragonRedRenderer;
 import com.smanzana.nostrummagica.client.render.entity.ShrineTriggerRenderer;
 import com.smanzana.nostrummagica.client.render.entity.SpellBubbleRenderer;
@@ -339,6 +340,7 @@ public class ClientInit {
 				NostrumBlocks.mimicFacadeUnbreakable);
 		
 		event.getBlockColors().register(TogglePlatformBlock::MakePlatformColor, NostrumBlocks.togglePlatform);
+		event.getBlockColors().register(MagicBreakableBlock::MakeBlockColor, NostrumBlocks.breakBlock);
 	}
 	
 	@SubscribeEvent
@@ -475,6 +477,7 @@ public class ClientInit {
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.smallDungeonDoor, RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.largeDungeonDoor, RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.pushBlock, RenderType.solid());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.breakBlock, RenderType.translucent());
 	}
 	
 	private static final void registerItemModelProperties() {

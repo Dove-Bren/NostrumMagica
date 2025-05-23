@@ -122,8 +122,10 @@ public class FilledOrbParticle extends TextureSheetParticle implements IMotionPa
 			
 			particle.setFromParams(params, world::getEntity);
 			
-			if (params.targetBehavior.entityBehavior == TargetBehavior.ORBIT || params.targetBehavior.entityBehavior == TargetBehavior.ORBIT_LAZY) {
-				particle.setRandomTargetOffset();
+			if (params.targetBehavior != null) {
+				if (params.targetBehavior.entityBehavior == TargetBehavior.ORBIT || params.targetBehavior.entityBehavior == TargetBehavior.ORBIT_LAZY) {
+					particle.setRandomTargetOffset();
+				}
 			}
 			
 		}
