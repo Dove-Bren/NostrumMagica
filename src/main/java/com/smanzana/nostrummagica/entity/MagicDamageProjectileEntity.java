@@ -117,6 +117,9 @@ public class MagicDamageProjectileEntity extends AbstractHurtingProjectile {
 		
 		if (level.isClientSide()) {
 			doClientEffect();
+		} else if (this.getDeltaMovement().lengthSqr() < .025) {
+			// Stalled out. Gravity?
+			this.setDeltaMovement(0, -.12, 0);
 		}
 	}
 	

@@ -2,9 +2,12 @@ package com.smanzana.nostrummagica.tile;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.autodungeons.tile.IOrientedTileEntity;
+import com.smanzana.autodungeons.world.blueprints.BlueprintBlock;
 import com.smanzana.nostrummagica.block.dungeon.ConjureGhostBlock;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.Connection;
@@ -16,15 +19,17 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class ConjureGhostBlockEntity extends BlockEntity {
+public class ConjureGhostBlockEntity extends BlockEntity implements IOrientedTileEntity {
 	
 	protected BlockState mimicState;
 	protected @Nullable CompoundTag tileEntityData;
+	protected @Nullable Direction facingOffset;
 	
 	protected ConjureGhostBlockEntity(BlockEntityType<? extends ConjureGhostBlockEntity> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 		mimicState = Blocks.STONE.defaultBlockState();
 		tileEntityData = null;
+		facingOffset = null;
 	}
 	
 	public ConjureGhostBlockEntity(BlockPos pos, BlockState state) {
@@ -55,20 +60,33 @@ public class ConjureGhostBlockEntity extends BlockEntity {
 		if (this.tileEntityData != null) {
 			nbt.put("wrapped_te_data", this.tileEntityData);
 		}
+		if (this.facingOffset != null) {
+			nbt.putString("facing_offset", this.facingOffset.getName());
+		}
 	}
 	
 	@Override
 	public void load(CompoundTag nbt) {
 		super.load(nbt);
 		
-		if (nbt != null && nbt.contains("wrapped_state")) {
+		if (nbt == null) {
+			return;
+		}
+		
+		if (nbt.contains("wrapped_state")) {
 			mimicState = NbtUtils.readBlockState(nbt.getCompound("wrapped_state"));
 		}
-		if (nbt != null && nbt.contains("wrapped_te_data")) {
-			// only bother if we have a state. Otherwise clean out here
-			if (mimicState != null) {
+		if (mimicState != null) {
+			if (nbt.contains("wrapped_te_data")) {
+				// only bother if we have a state. Otherwise clean out here
 				this.tileEntityData = nbt.getCompound("wrapped_te_data");
 			}
+			if (nbt.contains("facing_offset")) {
+				this.facingOffset = Direction.byName(nbt.getString("facing_offset"));
+			}
+		} else {
+			this.tileEntityData = null;
+			this.facingOffset = null;
 		}
 	}
 	
@@ -101,6 +119,9 @@ public class ConjureGhostBlockEntity extends BlockEntity {
 			BlockEntity ent = BlockEntity.loadStatic(worldPosition, stateToSet, tileEntityData);
 			if (ent != null) {
 				level.setBlockEntity(ent);
+				if (this.facingOffset != null && ent instanceof IOrientedTileEntity oriented) {
+					oriented.setSpawnedFromRotation(facingOffset, false);
+				}
 			}
 		}
 	}
@@ -121,6 +142,20 @@ public class ConjureGhostBlockEntity extends BlockEntity {
 			return nearest != null;
 		}
 		return false;
+	}
+
+	@Override
+	public void setSpawnedFromRotation(Direction rotation, boolean isWorldGen) {
+		// Capture rotation and use it later when we spawn our te
+		this.facingOffset = rotation;
+		
+		// Transform block state for model update
+		BlueprintBlock b = BlueprintBlock.getBlueprintBlock(getGhostState(), null);
+		this.mimicState = b.getSpawnState(rotation);
+		
+		if (!isWorldGen) {
+			this.setChanged();
+		}
 	}
 	
 }
