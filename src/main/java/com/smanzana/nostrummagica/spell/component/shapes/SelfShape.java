@@ -68,7 +68,7 @@ public class SelfShape extends InstantShape {
 	
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
-		return new SpellShapeAttributes(false, true, false);
+		return new SpellShapeAttributes(true, true, false);
 	}
 
 	@Override

@@ -406,8 +406,11 @@ public class PlayerListener {
 	
 	@SubscribeEvent
 	public void onLivingUpdate(LivingUpdateEvent event) {
-		
 		LivingEntity ent = event.getEntityLiving(); // convenience
+		if (ent.getLevel().isClientSide()) {
+			return;
+		}
+		
 		if (Math.abs(ent.getDeltaMovement().x) >= 0.01f
 				|| Math.abs(ent.getDeltaMovement().y) >= 0.01f
 				|| Math.abs(ent.getDeltaMovement().z) >= 0.01f) {
@@ -542,13 +545,22 @@ public class PlayerListener {
 
 	@SubscribeEvent
 	public void onHeal(LivingHealEvent event) {
-		onHealth(event.getEntityLiving());
+		LivingEntity ent = event.getEntityLiving(); // convenience
+		if (ent.getLevel().isClientSide()) {
+			return;
+		}
+		
+		onHealth(ent);
 	}
 	
 	@SubscribeEvent
 	public void onAttack(LivingAttackEvent event) {
 		if (event.isCanceled())
 			return;
+		
+		if (event.getEntityLiving().getLevel().isClientSide()) {
+			return;
+		}
 		
 		final LivingEntity living = event.getEntityLiving();
 		
@@ -672,6 +684,10 @@ public class PlayerListener {
 			return;
 		}
 		
+		if (event.getEntityLiving().getLevel().isClientSide()) {
+			return;
+		}
+		
 		// Make hookshots not damage someone if you reach the wall
 		if (event.getSource() == DamageSource.FLY_INTO_WALL) {
 			LivingEntity ent = event.getEntityLiving();
@@ -752,6 +768,10 @@ public class PlayerListener {
 		if (event.isCanceled())
 			return;
 		
+		if (event.getPlayer().getLevel().isClientSide()) {
+			return;
+		}
+		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getPlayer());
 		
 		if (attr != null && attr.isUnlocked()) {
@@ -767,6 +787,10 @@ public class PlayerListener {
 	public void onDeath(LivingDeathEvent event) {
 		if (event.isCanceled())
 			return;
+		
+		if (event.getEntityLiving().getLevel().isClientSide()) {
+			return;
+		}
 
 		if (event.getSource() != null && event.getSource().getEntity() != null && event.getSource().getEntity() instanceof Player) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(event.getSource().getEntity());
@@ -798,6 +822,10 @@ public class PlayerListener {
 			return;
 		}
 		
+		if (event.getEntityLiving().getLevel().isClientSide()) {
+			return;
+		}
+		
 		// Could do the math, and then update every cooldown...
 //		final int oldExisted = event.getOriginal().ticksExisted;
 //		final int newExisted = event.getPlayer().ticksExisted;
@@ -812,12 +840,20 @@ public class PlayerListener {
 			return;
 		}
 		
+		if (event.getEntityLiving().getLevel().isClientSide()) {
+			return;
+		}
+		
 		NostrumMagica.instance.getSpellCooldownTracker(event.getPlayer().level)
 			.clearCooldowns(event.getPlayer());
 	}
 	
 	@SubscribeEvent
 	public void onMobDrop(LivingDropsEvent event) {
+		if (event.getEntityLiving().getLevel().isClientSide()) {
+			return;
+		}
+		
 		if (event.getEntityLiving().isInvertedHealAndHarm()) {
 			for (int i = 0; i <= event.getLootingLevel(); i++) {
 				if (NostrumMagica.rand.nextFloat() <= 0.3f) {
@@ -850,6 +886,10 @@ public class PlayerListener {
 		if (e.isCanceled())
 			return;
 		
+		if (e.getEntityLiving().getLevel().isClientSide()) {
+			return;
+		}
+		
 		Player player = e.getPlayer();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
@@ -865,6 +905,10 @@ public class PlayerListener {
 	
 	@SubscribeEvent
 	public void onTame(AnimalTameEvent e) {
+		if (e.getEntityLiving().getLevel().isClientSide()) {
+			return;
+		}
+		
 		if (e.getAnimal() instanceof Wolf) {
 			Player player = e.getTamer();
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
@@ -876,6 +920,10 @@ public class PlayerListener {
 	
 	@SubscribeEvent
 	public void onEntityVisibilityCheck(LivingVisibilityEvent event) {
+		if (event.getEntityLiving().getLevel().isClientSide()) {
+			return;
+		}
+		
 		if (event.getLookingEntity() != null && event.getLookingEntity() instanceof LivingEntity) {
 			final MobEffectInstance instance = ((LivingEntity) event.getLookingEntity()).getEffect(NostrumEffects.mobBlindness);
 			if (instance != null && instance.getDuration() > 0) {
@@ -893,6 +941,10 @@ public class PlayerListener {
 	public void onPickup(EntityItemPickupEvent e) {
 		if (e.isCanceled())
 			return;
+		
+		if (e.getEntityLiving().getLevel().isClientSide()) {
+			return;
+		}
 		
 		if (!(e.getEntityLiving() instanceof Player))
 			return; // It SAYS EntityItemPickup, so just in case...
@@ -1170,6 +1222,10 @@ public class PlayerListener {
 	
 	@SubscribeEvent
 	public void onXPPickup(PlayerXpEvent.PickupXp event) {
+		if (event.getEntityLiving().getLevel().isClientSide()) {
+			return;
+		}
+		
 		Player player = event.getPlayer();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		int xp = event.getOrb().value;

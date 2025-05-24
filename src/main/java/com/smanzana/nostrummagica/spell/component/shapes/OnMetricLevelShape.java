@@ -70,7 +70,7 @@ public abstract class OnMetricLevelShape extends SpellShape {
 
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
-		return new SpellShapeAttributes(false, true, false);
+		return new SpellShapeAttributes(true, true, false);
 	}
 
 	@Override
