@@ -14,8 +14,6 @@ import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -92,7 +90,7 @@ public class MagicBreakableBlock extends Block implements ISpellTargetBlock {
 		}
 		
 		final ItemStack heldItem = playerIn.getItemInHand(hand);
-		if (playerIn.isCreative() && !heldItem.isEmpty() && heldItem.getItem() instanceof InfusedGemItem gem) {
+		if (!heldItem.isEmpty() && heldItem.getItem() instanceof InfusedGemItem gem) {
 			final EMagicElement element = gem.getElement();
 			worldIn.setBlockAndUpdate(pos, setElement(state, element));
 			return InteractionResult.SUCCESS;
@@ -125,7 +123,6 @@ public class MagicBreakableBlock extends Block implements ISpellTargetBlock {
 	protected void triggerInternal(Level world, BlockPos blockPos, BlockState state) {
 		// Remove ourselves when triggered
 		world.destroyBlock(blockPos, false);
-		((ServerLevel)world).addParticle(ParticleTypes.LAVA, blockPos.getX() + .5, blockPos.getY() + .5, blockPos.getZ() + .5, .01, 0, .01);
 	}
 
 	@Override

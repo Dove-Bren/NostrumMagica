@@ -1,0 +1,11 @@
+{
+    "variants": {
+        "element=physical": { "model": "nostrummagica:block/mechblock_break" },
+		"element=fire": { "model": "nostrummagica:block/mechblock_break" },
+		"element=ice": { "model": "nostrummagica:block/mechblock_break" },
+		"element=wind": { "model": "nostrummagica:block/mechblock_break" },
+		"element=earth": { "model": "nostrummagica:block/mechblock_break" },
+		"element=lightning": { "model": "nostrummagica:block/mechblock_break" },
+		"element=ender": { "model": "nostrummagica:block/mechblock_break" }
+    }
+}

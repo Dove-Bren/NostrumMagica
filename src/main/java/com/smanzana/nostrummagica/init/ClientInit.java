@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ModificationTableBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.MagicBreakableBlock;
+import com.smanzana.nostrummagica.block.dungeon.MagicBreakableContainerBlock;
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
 import com.smanzana.nostrummagica.block.dungeon.TogglePlatformBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -94,6 +95,7 @@ import com.smanzana.nostrummagica.client.render.entity.WilloRenderer;
 import com.smanzana.nostrummagica.client.render.entity.WispRenderer;
 import com.smanzana.nostrummagica.client.render.item.NostrumItemSpecialRenderer;
 import com.smanzana.nostrummagica.client.render.tile.AltarBlockEntityRenderer;
+import com.smanzana.nostrummagica.client.render.tile.BreakContainerBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.CandleBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.DungeonDoorBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.DungeonKeyChestBlockEntityRenderer;
@@ -341,6 +343,7 @@ public class ClientInit {
 		
 		event.getBlockColors().register(TogglePlatformBlock::MakePlatformColor, NostrumBlocks.togglePlatform);
 		event.getBlockColors().register(MagicBreakableBlock::MakeBlockColor, NostrumBlocks.breakBlock);
+		event.getBlockColors().register(MagicBreakableContainerBlock::MakeBlockColor, NostrumBlocks.breakContainerBlock);
 	}
 	
 	@SubscribeEvent
@@ -405,6 +408,7 @@ public class ClientInit {
 		event.registerBlockEntityRenderer(NostrumBlockEntities.DungeonKeyChest, DungeonKeyChestBlockEntityRenderer::new);
 		event.registerBlockEntityRenderer(NostrumBlockEntities.DungeonDoor, DungeonDoorBlockEntityRenderer::new);
 		event.registerBlockEntityRenderer(NostrumBlockEntities.PushBlock, PushBlockBlockEntityRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.BreakContainer, BreakContainerBlockEntityRenderer::new);
 	}
 	
 	@SubscribeEvent
@@ -478,6 +482,7 @@ public class ClientInit {
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.largeDungeonDoor, RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.pushBlock, RenderType.solid());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.breakBlock, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.breakContainerBlock, RenderType.translucent());
 	}
 	
 	private static final void registerItemModelProperties() {

@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
 import com.smanzana.nostrummagica.block.dungeon.LockedDoorBlock;
 import com.smanzana.nostrummagica.block.dungeon.LogicDoorBlock;
 import com.smanzana.nostrummagica.block.dungeon.MagicBreakableBlock;
+import com.smanzana.nostrummagica.block.dungeon.MagicBreakableContainerBlock;
 import com.smanzana.nostrummagica.block.dungeon.MatchSpawnerBlock;
 import com.smanzana.nostrummagica.block.dungeon.MimicBlock;
 import com.smanzana.nostrummagica.block.dungeon.MimicOnesidedBlock;
@@ -29,6 +30,7 @@ import com.smanzana.nostrummagica.block.dungeon.TrialBlock;
 import com.smanzana.nostrummagica.block.dungeon.TriggerRepeaterBlock;
 import com.smanzana.nostrummagica.block.dungeon.TriggeredMatchSpawnerBlock;
 import com.smanzana.nostrummagica.fluid.NostrumFluids;
+import com.smanzana.nostrummagica.item.BreakBlockContainerItem;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
@@ -129,7 +131,8 @@ public class NostrumBlocks {
 	@ObjectHolder(DungeonDoorBlock.Small.ID) public static DungeonDoorBlock.Small smallDungeonDoor;
 	@ObjectHolder(DungeonDoorBlock.Large.ID) public static DungeonDoorBlock.Large largeDungeonDoor;
 	@ObjectHolder(PushBlock.ID) public static PushBlock pushBlock;
-	@ObjectHolder(MagicBreakableBlock.ID) public static MagicBreakableBlock breakBlock; 
+	@ObjectHolder(MagicBreakableBlock.ID) public static MagicBreakableBlock breakBlock;
+	@ObjectHolder(MagicBreakableContainerBlock.ID) public static MagicBreakableContainerBlock breakContainerBlock;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -216,6 +219,8 @@ public class NostrumBlocks {
     	registerBlockItem(largeDungeonDoor, largeDungeonDoor.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(pushBlock, pushBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(breakBlock, breakBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	//registerBlockItem(breakContainerBlock, breakContainerBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registry.register(new BreakBlockContainerItem(breakContainerBlock, NostrumItems.PropDungeonBase()).setRegistryName(breakContainerBlock.getRegistryName()));
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -320,6 +325,7 @@ public class NostrumBlocks {
     	registerBlock(new DungeonDoorBlock.Large(), DungeonDoorBlock.Large.ID, registry);
     	registerBlock(new PushBlock(), PushBlock.ID, registry);
     	registerBlock(new MagicBreakableBlock(), MagicBreakableBlock.ID, registry);
+    	registerBlock(new MagicBreakableContainerBlock(), MagicBreakableContainerBlock.ID, registry);
     }
     
 }

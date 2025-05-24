@@ -56,6 +56,7 @@ public class NostrumBlockEntities {
 	private static final String ID_DungeonKeyChest = "dungeon_key_chest_te";
 	private static final String ID_DungeonDoor = "dungeon_door_te";
 	private static final String ID_PushBlock = "push_block_te";
+	private static final String ID_BreakContainer = "break_container_te";
 	
 
 	@ObjectHolder(ID_SpellTable) public static BlockEntityType<SpellTableTileEntity> SpellTable;
@@ -100,6 +101,7 @@ public class NostrumBlockEntities {
 	@ObjectHolder(ID_DungeonKeyChest) public static BlockEntityType<DungeonKeyChestTileEntity> DungeonKeyChest;
 	@ObjectHolder(ID_DungeonDoor) public static BlockEntityType<DungeonDoorTileEntity> DungeonDoor;
 	@ObjectHolder(ID_PushBlock) public static BlockEntityType<PushBlockTileEntity> PushBlock;
+	@ObjectHolder(ID_BreakContainer) public static BlockEntityType<BreakContainerTileEntity> BreakContainer;
 	
 	private static void register(IForgeRegistry<BlockEntityType<?>> registry, BlockEntityType<?> type, String ID) {
 		registry.register(type.setRegistryName(ID));
@@ -151,5 +153,6 @@ public class NostrumBlockEntities {
 		register(registry, BlockEntityType.Builder.of(DungeonKeyChestTileEntity::new, NostrumBlocks.smallDungeonKeyChest, NostrumBlocks.largeDungeonKeyChest).build(null), ID_DungeonKeyChest);
 		register(registry, BlockEntityType.Builder.of(DungeonDoorTileEntity::new, NostrumBlocks.smallDungeonDoor, NostrumBlocks.largeDungeonDoor).build(null), ID_DungeonDoor);
 		register(registry, BlockEntityType.Builder.of(PushBlockTileEntity::new, NostrumBlocks.pushBlock).build(null), ID_PushBlock);
+		register(registry, BlockEntityType.Builder.of(BreakContainerTileEntity::new, NostrumBlocks.breakContainerBlock).build(null), ID_BreakContainer);
     }
 }
