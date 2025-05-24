@@ -451,7 +451,7 @@ public class ClientInit {
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.triggeredMatchSpawner, RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.paradoxMirror, RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.spellTable, RenderType.cutout());
-		//RenderTypeLookup.setRenderLayer(NostrumBlocks.switchBlock, RenderType.getTranslucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.switchBlock, RenderType.cutout());
 		//RenderTypeLookup.setRenderLayer(NostrumBlocks.keySwitch, RenderType.getTranslucent());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.teleportRune, RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.triggerRepeater, RenderType.translucent());

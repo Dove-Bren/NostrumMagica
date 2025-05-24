@@ -200,10 +200,11 @@ public class ConjureGhostBlock extends BaseEntityBlock implements ISpellTargetBl
 	
 	public static boolean WrapBlock(Level world, BlockPos pos) {
 		BlockState state = world.getBlockState(pos);
+		BlockEntity ent = world.getBlockEntity(pos);
 		world.setBlock(pos, NostrumBlocks.conjureGhostBlock.defaultBlockState(), 3);
 			
 		ConjureGhostBlockEntity container = (ConjureGhostBlockEntity) world.getBlockEntity(pos);
-		container.setContainedState(state);
+		container.setContainedState(state, ent);
 		return true;
 	}
 }

@@ -72,15 +72,21 @@ public class ConjureGhostBlockEntityRenderer extends BlockEntityRendererBase<Con
 		final float scale = 1f;
 		
 		matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
-		matrixStackIn.scale(.75f, .75f, 1f);
+		matrixStackIn.pushPose();
+		matrixStackIn.scale(.5f, .5f, .5f);
 		matrixStackIn.scale(scale, scale, 1f);
 		matrixStackIn.translate(-.5, -.5, 0);
 		SpellComponentIcon icon = SpellComponentIcon.get(((ConjureGhostBlock) tileEntityIn.getBlockState().getBlock()).getElement(tileEntityIn.getBlockState()));
 		icon.draw(matrixStackIn, bufferIn, combinedLightIn, 1, 1, false, 1f, 1f, 1f, Math.max(.01f, alpha));
+		matrixStackIn.popPose();
 		
+		matrixStackIn.pushPose();
+		matrixStackIn.scale(.35f, .35f, .35f);
+		matrixStackIn.scale(scale, scale, 1f);
+		matrixStackIn.translate(-.5, -.5, 0);
 		icon = SpellComponentIcon.get(EAlteration.CONJURE);
 		icon.draw(matrixStackIn, bufferIn, combinedLightIn, 1, 1, false, 0f, 0f, 0f, Math.max(.01f, alpha));
 		icon.draw(matrixStackIn, bufferIn, combinedLightIn, 1, 1, false, 1f, 1f, 1f, Math.max(.01f, alpha));
-		//RenderFuncs.RenderWorldItem(stack, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
+		matrixStackIn.popPose();
 	}
 }

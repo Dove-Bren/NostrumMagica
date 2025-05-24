@@ -19,10 +19,12 @@ import net.minecraft.world.level.block.state.BlockState;
 public class ConjureGhostBlockEntity extends BlockEntity {
 	
 	protected BlockState mimicState;
+	protected @Nullable CompoundTag tileEntityData;
 	
 	protected ConjureGhostBlockEntity(BlockEntityType<? extends ConjureGhostBlockEntity> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 		mimicState = Blocks.STONE.defaultBlockState();
+		tileEntityData = null;
 	}
 	
 	public ConjureGhostBlockEntity(BlockPos pos, BlockState state) {
@@ -32,7 +34,7 @@ public class ConjureGhostBlockEntity extends BlockEntity {
 	public BlockState getGhostState() {
 		return mimicState;
 	}
-
+	
 	@Override
 	public CompoundTag getUpdateTag() {
 		CompoundTag tag = super.getUpdateTag();
@@ -50,6 +52,9 @@ public class ConjureGhostBlockEntity extends BlockEntity {
 		if (this.mimicState != null) {
 			nbt.put("wrapped_state", NbtUtils.writeBlockState(mimicState));
 		}
+		if (this.tileEntityData != null) {
+			nbt.put("wrapped_te_data", this.tileEntityData);
+		}
 	}
 	
 	@Override
@@ -58,6 +63,12 @@ public class ConjureGhostBlockEntity extends BlockEntity {
 		
 		if (nbt != null && nbt.contains("wrapped_state")) {
 			mimicState = NbtUtils.readBlockState(nbt.getCompound("wrapped_state"));
+		}
+		if (nbt != null && nbt.contains("wrapped_te_data")) {
+			// only bother if we have a state. Otherwise clean out here
+			if (mimicState != null) {
+				this.tileEntityData = nbt.getCompound("wrapped_te_data");
+			}
 		}
 	}
 	
@@ -84,12 +95,25 @@ public class ConjureGhostBlockEntity extends BlockEntity {
 		}
 		
 		this.getLevel().setBlock(worldPosition, stateToSet, Block.UPDATE_ALL);
+		
+		
+		if (this.tileEntityData != null) {
+			BlockEntity ent = BlockEntity.loadStatic(worldPosition, stateToSet, tileEntityData);
+			if (ent != null) {
+				level.setBlockEntity(ent);
+			}
+		}
 	}
 
-	public void setContainedState(BlockState state) {
+	public void setContainedState(BlockState state, @Nullable BlockEntity entity) {
+		this.setContainedState(state, entity == null ? null : entity.saveWithId());
+	}
+
+	public void setContainedState(BlockState state, @Nullable CompoundTag entityData) {
 		this.mimicState = state;
+		this.tileEntityData = state == null ? null : entityData; // force null if no blockstate
 	}
-
+	
 	public boolean shouldShowHint() {
 		// Show hint if no (conjure) blocks are below this one and a player is close enough
 		if (this.hasLevel() && !(this.getLevel().getBlockState(worldPosition.below()).getBlock() instanceof ConjureGhostBlock)) {
