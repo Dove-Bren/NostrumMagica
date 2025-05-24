@@ -27,6 +27,7 @@ import com.smanzana.nostrummagica.command.CommandGiveSkillpoint;
 import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
 import com.smanzana.nostrummagica.command.CommandRandomSpell;
 import com.smanzana.nostrummagica.command.CommandReloadQuests;
+import com.smanzana.nostrummagica.command.CommandReloadRenderTypes;
 import com.smanzana.nostrummagica.command.CommandReloadResearch;
 import com.smanzana.nostrummagica.command.CommandReloadSkills;
 import com.smanzana.nostrummagica.command.CommandSetDimension;
@@ -2124,6 +2125,7 @@ public class ModInit {
 		
 		// These are client-only, but need to be registered as server ones to work at all.
 		CommandInfoScreenGoto.register(dispatcher);
+		CommandReloadRenderTypes.register(dispatcher);
 	}
 	
 	public static final void onTagsUpdated(TagsUpdatedEvent event) {

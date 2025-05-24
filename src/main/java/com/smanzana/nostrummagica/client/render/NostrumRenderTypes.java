@@ -25,22 +25,22 @@ import net.minecraft.resources.ResourceLocation;
 public class NostrumRenderTypes extends RenderType {
 
 	
-	public static final RenderType HOOKSHOT_CHAIN;
-	public static final RenderType MANA_ARMOR;
-	public static final RenderType SWITCH_TRIGGER_BASE;
-	public static final RenderType SWITCH_TRIGGER_CAGE;
-	public static final RenderType NOSTRUM_PORTAL;
-	public static final RenderType PROGRESSION_DOOR_LOCK;
-	public static final RenderType LOCKEDCHEST_LOCK;
-	public static final RenderType LOCKEDCHEST_CHAIN;
-	public static final RenderType SPELLSHAPE_QUADS;
-	public static final RenderType SPELLSHAPE_ORB_CHAIN;
-	public static final RenderType SPELLSHAPE_LINES;
-	public static final RenderType SPELLSHAPE_LINES_THICK;
-	public static final RenderType WORLD_SELECT_HIGHLIGHT;
-	public static final RenderType WORLD_SELECT_HIGHLIGHT_CULL;
-	public static final RenderType SPELL_BEAM_SOLID;
-	public static final RenderType SPELL_BEAM_TRANSLUCENT;
+	public static RenderType HOOKSHOT_CHAIN;
+	public static RenderType MANA_ARMOR;
+	public static RenderType SWITCH_TRIGGER_BASE;
+	public static RenderType SWITCH_TRIGGER_CAGE;
+	public static RenderType NOSTRUM_PORTAL;
+	public static RenderType PROGRESSION_DOOR_LOCK;
+	public static RenderType LOCKEDCHEST_LOCK;
+	public static RenderType LOCKEDCHEST_CHAIN;
+	public static RenderType SPELLSHAPE_QUADS;
+	public static RenderType SPELLSHAPE_ORB_CHAIN;
+	public static RenderType SPELLSHAPE_LINES;
+	public static RenderType SPELLSHAPE_LINES_THICK;
+	public static RenderType WORLD_SELECT_HIGHLIGHT;
+	public static RenderType WORLD_SELECT_HIGHLIGHT_CULL;
+	public static RenderType SPELL_BEAM_SOLID;
+	public static RenderType SPELL_BEAM_TRANSLUCENT;
 	
 	private static final String Name(String suffix) {
 		return "nostrumrender_" + suffix;
@@ -112,7 +112,7 @@ public class NostrumRenderTypes extends RenderType {
     });
 		
 
-	static {
+	public static void InitRenderStates() {
 	    // Define render types
 		RenderType.CompositeState glState;
 		
@@ -285,6 +285,10 @@ public class NostrumRenderTypes extends RenderType {
 				.createCompositeState(false);
 			SPELL_BEAM_TRANSLUCENT = RenderType.create(Name("SpellBeam_Trans"), DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 32, false, true, glState);
 		}
+	}
+	
+	static {
+		InitRenderStates();
 	}
 	
 	private NostrumRenderTypes(String string, VertexFormat vertexFormat, VertexFormat.Mode mode, int i, boolean bl, boolean bl2, Runnable runnable, Runnable runnable2) {
