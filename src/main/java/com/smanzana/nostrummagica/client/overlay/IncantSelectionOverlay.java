@@ -68,6 +68,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	private static final Component prevTitle = new TextComponent("Previous");
 	private static final ITooltip prevTooltip = Tooltip.create(new TextComponent("View the previous page of shapes"));
 	private static final ITooltip noneTooltip = Tooltip.create(new TextComponent("Do not use an alteration"));
+	private static final ITooltip noneShapeTooltip = Tooltip.create(new TextComponent("Do not use a second shape"));
 	private static final Component terminalText = new TextComponent("Terminal").withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_PURPLE);
 	
 	protected boolean enabled;
@@ -361,6 +362,8 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 					curSlices[i] = null; // no slice
 				} else if (!known.contains(shape)) {
 					curSlices[i] = WheelSlice.Hidden(prog, sliceWidth/2f);
+				} else if (isSecondStage && shape == this.shape) { // shape selected in first stage
+					curSlices[i] = new WheelSlice<>((SpellShape) shape, null, noneTitle, noneShapeTooltip, prog, sliceWidth/2f, this::setShape, true);
 				} else {
 					curSlices[i] = new WheelSlice<>(shape, SpellComponentIcon.get(shape), shape.getDisplayName(), () -> this.getShapeTooltip(shape), prog, sliceWidth/2f, this::setShape, i < specials.length);
 				}
@@ -412,7 +415,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	
 	protected void setShape(SpellShape shape, boolean isRight) {
 		final boolean isFirst = this.getCurrentStage() == this.shapeStage1;
-		boolean secondPickAllowed = !shape.getAttributes(shape.getDefaultProperties()).terminal; // AND tier check?
+		boolean secondPickAllowed = shape != null && !shape.getAttributes(shape.getDefaultProperties()).terminal; // AND tier check?
 		if (this.getCurrentStage() == this.shapeStage1) {
 			this.shape = shape;
 			if (isRight) {
@@ -425,6 +428,20 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		}
 		
 		if (secondPickAllowed && isFirst) {
+			// fix up second stage to replace what we picked with the 'none' option
+			{
+				for (int i = 0; i < shapeStage2.getPageCount(); i++) {
+					final SelectionStagePage page = shapeStage2.pages[i];
+					for (int j = 0; j < page.slices.length; j++) {
+						WheelSlice<?> slice = page.slices[j];
+						if (slice != null && slice.val() == this.shape) {
+							page.slices[j] = new WheelSlice<>((SpellShape) null, null, noneTitle, noneShapeTooltip, slice.rotationPerc, slice.width, this::setShape, true);
+							// don't break, because may be on multiple pages
+						}
+					}
+				}
+			}
+			
 			this.setStage(shapeStage2);
 		} else {
 			this.setStage(elementStage);
