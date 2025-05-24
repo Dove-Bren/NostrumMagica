@@ -99,6 +99,7 @@ public class MimicBlockBakedModel implements BakedModel {
 		if (nested == null || nested.isAir()) {
 			return this.undisguisedModel.getQuads(state, side, rand, extraData);
 		}else if (ItemBlockRenderTypes.canRenderInLayer(state, MinecraftForgeClient.getRenderType())) {
+			// this is where we'd overwrite the tint index :(
 			return getModelToRender(nested).getQuads(nested, side, rand, extraData);
 		} else {
 			return EmptyQuads;

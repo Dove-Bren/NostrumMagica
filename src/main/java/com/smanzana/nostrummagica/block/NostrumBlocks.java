@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.block;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.dungeon.ConjureGhostBlock;
 import com.smanzana.nostrummagica.block.dungeon.CursedGlass;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonBarsBlock;
@@ -31,6 +32,7 @@ import com.smanzana.nostrummagica.block.dungeon.TriggerRepeaterBlock;
 import com.smanzana.nostrummagica.block.dungeon.TriggeredMatchSpawnerBlock;
 import com.smanzana.nostrummagica.fluid.NostrumFluids;
 import com.smanzana.nostrummagica.item.BreakBlockContainerItem;
+import com.smanzana.nostrummagica.item.ConjureGhostBlockItem;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
@@ -133,6 +135,7 @@ public class NostrumBlocks {
 	@ObjectHolder(PushBlock.ID) public static PushBlock pushBlock;
 	@ObjectHolder(MagicBreakableBlock.ID) public static MagicBreakableBlock breakBlock;
 	@ObjectHolder(MagicBreakableContainerBlock.ID) public static MagicBreakableContainerBlock breakContainerBlock;
+	@ObjectHolder(ConjureGhostBlock.ID) public static ConjureGhostBlock conjureGhostBlock;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -221,6 +224,7 @@ public class NostrumBlocks {
     	registerBlockItem(breakBlock, breakBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	//registerBlockItem(breakContainerBlock, breakContainerBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registry.register(new BreakBlockContainerItem(breakContainerBlock, NostrumItems.PropDungeonBase()).setRegistryName(breakContainerBlock.getRegistryName()));
+    	registry.register(new ConjureGhostBlockItem(conjureGhostBlock, NostrumItems.PropDungeonBase()).setRegistryName(conjureGhostBlock.getRegistryName()));
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -326,6 +330,7 @@ public class NostrumBlocks {
     	registerBlock(new PushBlock(), PushBlock.ID, registry);
     	registerBlock(new MagicBreakableBlock(), MagicBreakableBlock.ID, registry);
     	registerBlock(new MagicBreakableContainerBlock(), MagicBreakableContainerBlock.ID, registry);
+    	registerBlock(new ConjureGhostBlock(), ConjureGhostBlock.ID, registry);
     }
     
 }

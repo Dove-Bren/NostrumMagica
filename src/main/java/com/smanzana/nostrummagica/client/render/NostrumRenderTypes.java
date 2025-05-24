@@ -41,6 +41,7 @@ public class NostrumRenderTypes extends RenderType {
 	public static RenderType WORLD_SELECT_HIGHLIGHT_CULL;
 	public static RenderType SPELL_BEAM_SOLID;
 	public static RenderType SPELL_BEAM_TRANSLUCENT;
+	public static RenderType COLORED_GHOSTBLOCK;
 	
 	private static final String Name(String suffix) {
 		return "nostrumrender_" + suffix;
@@ -76,8 +77,8 @@ public class NostrumRenderTypes extends RenderType {
 	private static final RenderStateShard.LineStateShard LINE_3 = new RenderStateShard.LineStateShard(OptionalDouble.of(3f));
 	private static final RenderStateShard.LineStateShard LINE_10 = new RenderStateShard.LineStateShard(OptionalDouble.of(10f));
 	
-    private static final RenderStateShard.TexturingStateShard MANAARMOR_GLINT = new RenderStateShard.TexturingStateShard("nostrum_manaarmor_glint", () -> {
-    	//setupGlintTexturing(0.16F);
+	private static final RenderStateShard.TexturingStateShard MANAARMOR_GLINT = new RenderStateShard.TexturingStateShard("nostrum_manaarmor_glint", () -> {
+		//setupGlintTexturing(0.16F);
 		final long ms = Util.getMillis();
 		final long ticks = ms / (1000/20); // whole ticks
 		final long remain = ms % (1000/20); // partial ticks in ms
@@ -91,12 +92,12 @@ public class NostrumRenderTypes extends RenderType {
 		RenderSystem.setTextureMatrix(matrix);
 		
 		
-    }, () -> {
-    	RenderSystem.resetTextureMatrix();
-    });
-    
-    private static final RenderStateShard.TexturingStateShard SPELLSHAPE_TEXTURING = new RenderStateShard.TexturingStateShard("spellshape_glint", () -> {
-    	//setupGlintTexturing(0.16F);
+	}, () -> {
+		RenderSystem.resetTextureMatrix();
+	});
+
+	private static final RenderStateShard.TexturingStateShard SPELLSHAPE_TEXTURING = new RenderStateShard.TexturingStateShard("spellshape_glint", () -> {
+		//setupGlintTexturing(0.16F);
 		final long ms = Util.getMillis();
 		final long ticks = ms / (1000/20); // whole ticks
 		final long remain = ms % (1000/20); // partial ticks in ms
@@ -107,9 +108,9 @@ public class NostrumRenderTypes extends RenderType {
 		final float offset = (.001f * ticks) + (.000001f * remain);
 		Matrix4f matrix = Matrix4f.createTranslateMatrix(offset, 0, 0);
 		RenderSystem.setTextureMatrix(matrix);
-    }, () -> {
-    	RenderSystem.resetTextureMatrix();
-    });
+	}, () -> {
+		RenderSystem.resetTextureMatrix();
+	});
 		
 
 	public static void InitRenderStates() {
@@ -285,6 +286,18 @@ public class NostrumRenderTypes extends RenderType {
 				.createCompositeState(false);
 			SPELL_BEAM_TRANSLUCENT = RenderType.create(Name("SpellBeam_Trans"), DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 32, false, true, glState);
 		}
+		
+		glState = RenderType.CompositeState.builder()
+				.setLightmapState(LIGHTMAP)
+				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)//GHOSTBLOCK_TRANSPARENCYZ)
+				.setTextureState(BLOCK_SHEET)
+				//.setLayeringState(VIEW_OFFSET_Z_LAYERING)
+				//.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
+				//.setTexturingState(SPELLSHAPE_TEXTURING)
+				.setShaderState(RENDERTYPE_TRANSLUCENT_SHADER) // I am surprised by this
+				// depth test?
+			.createCompositeState(false);
+		COLORED_GHOSTBLOCK = RenderType.create(Name("Colored_GhostBlock"), DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 4096, true, false, glState);
 	}
 	
 	static {
