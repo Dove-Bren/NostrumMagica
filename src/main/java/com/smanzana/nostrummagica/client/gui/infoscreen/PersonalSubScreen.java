@@ -17,7 +17,7 @@ import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellEffects;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.RenderFuncs;
@@ -613,7 +613,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			SpellAction action = map.get(element);
 			if (action == null) {
-				action = Spell.solveAction(alteration, element, 1);
+				action = SpellEffects.solveAction(alteration, element, 1);
 				map.put(element, action);
 			}
 			

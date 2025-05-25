@@ -50,7 +50,7 @@ public class SpellCasting {
 		}
 		
 		protected static final SpellCastResult fail(Spell spell, LivingEntity caster) {
-			return fail(spell, caster, new SpellCastSummary(spell.getManaCost(), spell.getXP(true), spell.getCastTicks()));
+			return fail(spell, caster, new SpellCastSummary(spell.getManaCost(), spell.getXP(true), CalculateBaseCastingTicks(spell)));
 		}
 		
 		protected static final SpellCastResult fail(Spell spell, LivingEntity caster, SpellCastSummary summary) {
@@ -116,7 +116,7 @@ public class SpellCasting {
 		
 		// Cast it!
 		boolean seen = att.wasSpellDone(spell);
-		SpellCastSummary summary = new SpellCastSummary(spell.getManaCost(), spell.getXP(seen), spell.getCastTicks());
+		SpellCastSummary summary = new SpellCastSummary(spell.getManaCost(), spell.getXP(seen), CalculateBaseCastingTicks(spell));
 		
 		// Add player's base magic potency
 		summary.addEfficiency((float) entity.getAttribute(NostrumAttributes.magicPotency).getValue() / 100f);
@@ -346,6 +346,18 @@ public class SpellCasting {
 	
 	public static final int CalculateGlobalSpellCooldown(SpellCastResult result) {
 		return CalculateGlobalSpellCooldown(result.spell, result.caster, result.summary);
+	}
+	
+	public static final int CalculateBaseCastingTicks(Spell spell) {
+		final int weight = spell.getWeight();
+		//final SpellType type = spell.getType();
+		int base = 0;//type.getBaseCastTime();
+//		if (caster != null && NostrumMagica.getMagicWrapper(caster) != null) {
+//			if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Spellcasting_CooldownReduc)) {
+//				base = 10;
+//			}
+//		}
+		return base + (20 * Math.max(0, weight)); 
 	}
 	
 	public static final boolean CalculateSpellReagentFree(Spell spell, @Nullable LivingEntity caster, SpellCastSummary summary) {

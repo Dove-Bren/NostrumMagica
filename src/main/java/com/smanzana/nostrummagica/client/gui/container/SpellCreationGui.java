@@ -28,6 +28,7 @@ import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellEffects;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellAction.SpellActionProperties;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
@@ -1230,7 +1231,7 @@ public class SpellCreationGui {
 			
 			SpellAction action = map.get(part.getElement());
 			if (action == null) {
-				action = Spell.solveAction(part.getAlteration(), part.getElement(), 1);
+				action = SpellEffects.solveAction(part.getAlteration(), part.getElement(), 1);
 				map.put(part.getElement(), action);
 			}
 			

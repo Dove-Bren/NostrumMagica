@@ -9,13 +9,13 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellEffects;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Player;
 
 public class SpellKnowledgeRequirement implements IRequirement{
 
@@ -40,7 +40,7 @@ public class SpellKnowledgeRequirement implements IRequirement{
 
 	@Override
 	public List<Component> getDescription(Player player) {
-		SpellAction action = Spell.solveAction(alteration, element, 1);
+		SpellAction action = SpellEffects.solveAction(alteration, element, 1);
 		return Lists.newArrayList(new TranslatableComponent("info.requirement.spellknowledge", 
 				action.getName().withStyle(ChatFormatting.DARK_PURPLE)));
 	}

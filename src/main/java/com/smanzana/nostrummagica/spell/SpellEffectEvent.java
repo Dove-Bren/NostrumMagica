@@ -2,7 +2,6 @@ package com.smanzana.nostrummagica.spell;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.spell.Spell.SpellResult;
 import com.smanzana.nostrummagica.spell.component.SpellAction.SpellActionResult;
 
 import net.minecraft.world.entity.LivingEntity;
