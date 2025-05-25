@@ -1,0 +1,17 @@
+{
+    "variants": {
+        "enabled=false,facing=down":  { "model": "nostrummagica:block/mechblock_laser", "x": 180 },
+        "enabled=false,facing=up":    { "model": "nostrummagica:block/mechblock_laser" },
+        "enabled=false,facing=north": { "model": "nostrummagica:block/mechblock_laser", "x": 90 },
+        "enabled=false,facing=south": { "model": "nostrummagica:block/mechblock_laser", "x": 90, "y": 180 },
+        "enabled=false,facing=west":  { "model": "nostrummagica:block/mechblock_laser", "x": 90, "y": 270 },
+        "enabled=false,facing=east":  { "model": "nostrummagica:block/mechblock_laser", "x": 90, "y": 90 },
+		
+        "enabled=true,facing=down":  { "model": "nostrummagica:block/mechblock_laser", "x": 180 },
+        "enabled=true,facing=up":    { "model": "nostrummagica:block/mechblock_laser" },
+        "enabled=true,facing=north": { "model": "nostrummagica:block/mechblock_laser", "x": 90 },
+        "enabled=true,facing=south": { "model": "nostrummagica:block/mechblock_laser", "x": 90, "y": 180 },
+        "enabled=true,facing=west":  { "model": "nostrummagica:block/mechblock_laser", "x": 90, "y": 270 },
+        "enabled=true,facing=east":  { "model": "nostrummagica:block/mechblock_laser", "x": 90, "y": 90 }
+    }
+}

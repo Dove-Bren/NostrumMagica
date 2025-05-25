@@ -100,6 +100,7 @@ import com.smanzana.nostrummagica.client.render.tile.CandleBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.ConjureGhostBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.DungeonDoorBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.DungeonKeyChestBlockEntityRenderer;
+import com.smanzana.nostrummagica.client.render.tile.LaserBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.LockedChestBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.LockedDoorBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.ManaArmorerBlockEntityRenderer;
@@ -411,6 +412,7 @@ public class ClientInit {
 		event.registerBlockEntityRenderer(NostrumBlockEntities.PushBlock, PushBlockBlockEntityRenderer::new);
 		event.registerBlockEntityRenderer(NostrumBlockEntities.BreakContainer, BreakContainerBlockEntityRenderer::new);
 		event.registerBlockEntityRenderer(NostrumBlockEntities.ConjureGhostBlock, ConjureGhostBlockEntityRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.Laser, LaserBlockEntityRenderer::new);
 	}
 	
 	@SubscribeEvent
@@ -486,6 +488,7 @@ public class ClientInit {
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.breakBlock, RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.breakContainerBlock, RenderType.translucent());
 		//ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.conjureGhostBlock, NostrumRenderTypes.COLORED_GHOSTBLOCK); // doens't actually render and we need tile entity
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.laser, RenderType.solid());
 	}
 	
 	private static final void registerItemModelProperties() {

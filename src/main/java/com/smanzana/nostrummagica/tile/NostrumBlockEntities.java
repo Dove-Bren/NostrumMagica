@@ -58,6 +58,7 @@ public class NostrumBlockEntities {
 	private static final String ID_PushBlock = "push_block_te";
 	private static final String ID_BreakContainer = "break_container_te";
 	private static final String ID_ConjureGhostBlock = "conjure_ghost_block_te";
+	private static final String ID_LaserBlock = "laser_block_ent"; 
 	
 
 	@ObjectHolder(ID_SpellTable) public static BlockEntityType<SpellTableTileEntity> SpellTable;
@@ -104,6 +105,7 @@ public class NostrumBlockEntities {
 	@ObjectHolder(ID_PushBlock) public static BlockEntityType<PushBlockTileEntity> PushBlock;
 	@ObjectHolder(ID_BreakContainer) public static BlockEntityType<BreakContainerTileEntity> BreakContainer;
 	@ObjectHolder(ID_ConjureGhostBlock) public static BlockEntityType<ConjureGhostBlockEntity> ConjureGhostBlock;
+	@ObjectHolder(ID_LaserBlock) public static BlockEntityType<LaserBlockEntity> Laser;
 	
 	private static void register(IForgeRegistry<BlockEntityType<?>> registry, BlockEntityType<?> type, String ID) {
 		registry.register(type.setRegistryName(ID));
@@ -157,5 +159,6 @@ public class NostrumBlockEntities {
 		register(registry, BlockEntityType.Builder.of(PushBlockTileEntity::new, NostrumBlocks.pushBlock).build(null), ID_PushBlock);
 		register(registry, BlockEntityType.Builder.of(BreakContainerTileEntity::new, NostrumBlocks.breakContainerBlock).build(null), ID_BreakContainer);
 		register(registry, BlockEntityType.Builder.of(ConjureGhostBlockEntity::new, NostrumBlocks.conjureGhostBlock).build(null), ID_ConjureGhostBlock);
+		register(registry, BlockEntityType.Builder.of(LaserBlockEntity::new, NostrumBlocks.laser).build(null), ID_LaserBlock);
     }
 }

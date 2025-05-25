@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.block.dungeon.DungeonDoorBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonKeyChestBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonLauncherBlock;
 import com.smanzana.nostrummagica.block.dungeon.KeySwitchBlock;
+import com.smanzana.nostrummagica.block.dungeon.LaserBlock;
 import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
 import com.smanzana.nostrummagica.block.dungeon.LockedDoorBlock;
 import com.smanzana.nostrummagica.block.dungeon.LogicDoorBlock;
@@ -136,6 +137,7 @@ public class NostrumBlocks {
 	@ObjectHolder(MagicBreakableBlock.ID) public static MagicBreakableBlock breakBlock;
 	@ObjectHolder(MagicBreakableContainerBlock.ID) public static MagicBreakableContainerBlock breakContainerBlock;
 	@ObjectHolder(ConjureGhostBlock.ID) public static ConjureGhostBlock conjureGhostBlock;
+	@ObjectHolder(LaserBlock.ID) public static LaserBlock laser; 
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -225,6 +227,7 @@ public class NostrumBlocks {
     	//registerBlockItem(breakContainerBlock, breakContainerBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registry.register(new BreakBlockContainerItem(breakContainerBlock, NostrumItems.PropDungeonBase()).setRegistryName(breakContainerBlock.getRegistryName()));
     	registry.register(new ConjureGhostBlockItem(conjureGhostBlock, NostrumItems.PropDungeonBase()).setRegistryName(conjureGhostBlock.getRegistryName()));
+    	registerBlockItem(laser, laser.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -331,6 +334,7 @@ public class NostrumBlocks {
     	registerBlock(new MagicBreakableBlock(), MagicBreakableBlock.ID, registry);
     	registerBlock(new MagicBreakableContainerBlock(), MagicBreakableContainerBlock.ID, registry);
     	registerBlock(new ConjureGhostBlock(), ConjureGhostBlock.ID, registry);
+    	registerBlock(new LaserBlock(), LaserBlock.ID, registry);
     }
     
 }

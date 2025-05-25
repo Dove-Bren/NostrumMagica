@@ -26,6 +26,7 @@ public class CapabilityHandler {
 	public static final Capability<IBonusJumpCapability> CAPABILITY_BONUSJUMP = CapabilityManager.get(new CapabilityToken<>(){});
 	public static final Capability<INostrumMana> CAPABILITY_MANA = CapabilityManager.get(new CapabilityToken<>(){});
 	public static final Capability<IIncantationHolder> CAPABILITY_INCANTATION_HOLDER = CapabilityManager.get(new CapabilityToken<>(){});
+	public static final Capability<ILaserReactive> CAPABILITY_LASER_REACTIVE = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	public CapabilityHandler() {
 		MinecraftForge.EVENT_BUS.register(this);
