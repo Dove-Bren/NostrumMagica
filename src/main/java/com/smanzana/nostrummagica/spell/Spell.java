@@ -26,6 +26,7 @@ import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.stat.PlayerStat;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
+import com.smanzana.nostrummagica.util.NetUtils;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -59,61 +60,67 @@ public class Spell {
 	}
 	
 	private final String name;
+	private final SpellType type;
 	private final int manaCost;
 	private final int weight;
 	private final List<SpellShapePart> shapes;
 	private final List<SpellEffectPart> parts;
 
-	private int registryID;
 	private @Nonnull SpellCharacteristics characteristics;
 	private int iconIndex; // Basically useless on server, selects which icon to show on the client
 	
-	private Spell(String name, int manaCost, int weight, boolean dummy) {
+	public Spell(String name, SpellType type, int manaCost, int weight) {
 		this.shapes = new ArrayList<>();
 		this.parts = new ArrayList<>();
 		this.manaCost = manaCost;
 		this.weight = weight;
 		this.name = name;
+		this.type = type;
 		
 		iconIndex = 0;
 		determineCharacteristics();
 	}
+	
+	protected Spell(CompoundTag nbt) {
+		this(
+				nbt.getString(NBT_SPELL_NAME),
+				nbt.contains(NBT_TYPE) ? NetUtils.FromNBT(SpellType.class, nbt.get(NBT_TYPE)) : SpellType.Crafted,
+				nbt.getInt(NBT_MANA_COST),
+				nbt.getInt(NBT_WEIGHT)	
+				);
+		iconIndex = nbt.getInt(NBT_ICON_INDEX);
+		
+		ListTag list = nbt.getList(NBT_SHAPE_LIST, Tag.TAG_COMPOUND);
+		for (int i = 0; i < list.size(); i++) {
+			CompoundTag tag = list.getCompound(i);
+			addPart(SpellShapePart.FromNBT(tag));
+		}
+		
+		list = nbt.getList(NBT_EFFECT_LIST, Tag.TAG_COMPOUND);
+		for (int i = 0; i < list.size(); i++) {
+			CompoundTag tag = list.getCompound(i);
+			addPart(SpellEffectPart.FromNBT(tag));
+		}
+	}
 
-	/**
-	 * Creates a new spell and registers it in the registry.
-	 * @param name
-	 */
-	public Spell(String name, int manaCost, int weight) {
-		this(name, false, manaCost, weight);
-	}
-	
-	public Spell(String name, boolean trans, int manaCost, int weight) {
-		this(name, manaCost, weight, false);
-		
-		if (trans)
-			registryID = NostrumMagica.instance.getSpellRegistry().registerTransient(this);
-		else
-			registryID = NostrumMagica.instance.getSpellRegistry().register(this);
-	}
-	
-	public static Spell CreateFake(String name, int id) {
-		Spell s = new Spell(name, 0, 0);
-		s.registryID = id;
-		
-		NostrumMagica.instance.getSpellRegistry().override(id, s);
-		return s;
-	}
+//	public static Spell CreateFake(String name, int id) {
+//		Spell s = new Spell(name, 0, 0);
+//		s.registryID = id;
+//		
+//		NostrumMagica.instance.getSpellRegistry().override(id, s);
+//		return s;
+//	}
 	
 	public static Spell CreateAISpell(String name) {
-		return new Spell(name, true, 50, 10);
+		return new Spell(name, SpellType.AI, 50, 10);
 	}
 	
-	/**
-	 * Takes a transient spell and makes it an official, non-transient spell
-	 */
-	public void promoteFromTrans() {
-		NostrumMagica.instance.getSpellRegistry().removeTransientStatus(this);
-	}
+//	/**
+//	 * Takes a transient spell and makes it an official, non-transient spell
+//	 */
+//	public void promoteFromTrans() {
+//		NostrumMagica.instance.getSpellRegistry().removeTransientStatus(this);
+//	}
 	
 	protected void determineCharacteristics() {
 		boolean harmful = false;
@@ -153,8 +160,8 @@ public class Spell {
 		return name;
 	}
 	
-	public int getRegistryID() {
-		return registryID;
+	public SpellType getType() {
+		return this.type;
 	}
 	
 	public int getIconIndex() {
@@ -272,6 +279,7 @@ public class Spell {
 	}
 	
 	private static final String NBT_SPELL_NAME = "name";
+	private static final String NBT_TYPE = "spelltype";
 	private static final String NBT_MANA_COST = "mana_cost";
 	private static final String NBT_WEIGHT = "spell_weight";
 	private static final String NBT_SHAPE_LIST = "shapes";
@@ -281,6 +289,7 @@ public class Spell {
 	public CompoundTag toNBT() {
 		CompoundTag compound = new CompoundTag();
 		compound.putString(NBT_SPELL_NAME, name);
+		if (this.type != null) compound.put(NBT_TYPE, NetUtils.ToNBT(this.type));
 		compound.putInt(NBT_ICON_INDEX, iconIndex);
 		compound.putInt(NBT_MANA_COST, manaCost);
 		compound.putInt(NBT_WEIGHT, weight);
@@ -302,50 +311,11 @@ public class Spell {
 		return compound;
 	}
 	
-	/**
-	 * Deserializes a spell from Tag.
-	 * Does not register it in the registry
-	 * @param nbt
-	 * @param id
-	 * @return
-	 */
-	public static Spell fromNBT(CompoundTag nbt, int id) {
-		Spell spell = fromNBT(nbt); 
-		spell.registryID = id;
-		return spell;
-	}
-	
-	public static Spell transientFromNBT(CompoundTag nbt) {
-		Spell spell = fromNBT(nbt);
-		spell.registryID = NostrumMagica.instance.getSpellRegistry().registerTransient(spell);
-		return spell;
-	}
-	
-	protected static Spell fromNBT(CompoundTag nbt) {
+	public static Spell FromNBT(CompoundTag nbt) {
 		if (nbt == null)
 			return null;
 		
-		String name = nbt.getString(NBT_SPELL_NAME); 
-		int index = nbt.getInt(NBT_ICON_INDEX);
-		int manaCost = nbt.getInt(NBT_MANA_COST);
-		int weight = nbt.getInt(NBT_WEIGHT);
-		
-		Spell spell = new Spell(name, manaCost, weight, false);
-		spell.iconIndex = index;
-		
-		ListTag list = nbt.getList(NBT_SHAPE_LIST, Tag.TAG_COMPOUND);
-		for (int i = 0; i < list.size(); i++) {
-			CompoundTag tag = list.getCompound(i);
-			spell.addPart(SpellShapePart.FromNBT(tag));
-		}
-		
-		list = nbt.getList(NBT_EFFECT_LIST, Tag.TAG_COMPOUND);
-		for (int i = 0; i < list.size(); i++) {
-			CompoundTag tag = list.getCompound(i);
-			spell.addPart(SpellEffectPart.FromNBT(tag));
-		}
-		
-		return spell;
+		return new Spell(nbt);
 	}
 	
 	public SpellCharacteristics getCharacteristics() {

@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.SpellTomePage;
 import com.smanzana.nostrummagica.item.equipment.CasterWandItem;
 import com.smanzana.nostrummagica.item.equipment.WarlockSword;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
 import net.minecraft.core.BlockPos;
@@ -198,7 +198,7 @@ public class ModificationTableTileEntity extends BlockEntity implements Containe
 				this.setItem(1, ItemStack.EMPTY);
 			}
 		} else if (stack.getItem() instanceof SpellScroll) {
-			Spell spell = SpellScroll.GetSpell(stack);
+			RegisteredSpell spell = SpellScroll.GetSpell(stack);
 			if (spell != null) {
 				spell.setIcon((int) valF);
 				this.setItem(1, ItemStack.EMPTY);
@@ -207,7 +207,7 @@ public class ModificationTableTileEntity extends BlockEntity implements Containe
 			this.setItem(1, ItemStack.EMPTY);
 			WarlockSword.addCapacity(stack, 2);
 		} else if (stack.getItem() instanceof CasterWandItem) {
-			final Spell currentSpell = CasterWandItem.GetSpell(stack);
+			final RegisteredSpell currentSpell = CasterWandItem.GetSpell(stack);
 			
 			// Make sure if we're going to try and put a spell in that it's not empty
 			if (!this.getInputSlot().isEmpty()) {
@@ -216,7 +216,7 @@ public class ModificationTableTileEntity extends BlockEntity implements Containe
 				}
 			}
 			
-			final Spell scrollSpell;
+			final RegisteredSpell scrollSpell;
 			if (this.getInputSlot().isEmpty()) {
 				scrollSpell = null;
 			} else {

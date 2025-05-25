@@ -109,7 +109,7 @@ public class SpellCasting {
 			}
 		}
 		
-		if (NostrumMagica.instance.getSpellCooldownTracker(entity.level).hasCooldown(playerCast, spell)) {
+		if (spell instanceof RegisteredSpell registered && NostrumMagica.instance.getSpellCooldownTracker(entity.level).hasCooldown(playerCast, registered)) {
 			NostrumMagica.logger.warn("Received spell cast while spell in cooldown: " + entity);
 			return EmitCastPostEvent(SpellCastResult.fail(spell, entity), checking);
 		}
@@ -350,8 +350,8 @@ public class SpellCasting {
 	
 	public static final int CalculateBaseCastingTicks(Spell spell) {
 		final int weight = spell.getWeight();
-		//final SpellType type = spell.getType();
-		int base = 0;//type.getBaseCastTime();
+		final SpellType type = spell.getType();
+		int base = type.getBaseCastTicks();
 //		if (caster != null && NostrumMagica.getMagicWrapper(caster) != null) {
 //			if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Spellcasting_CooldownReduc)) {
 //				base = 10;
@@ -361,8 +361,11 @@ public class SpellCasting {
 	}
 	
 	public static final boolean CalculateSpellReagentFree(Spell spell, @Nullable LivingEntity caster, SpellCastSummary summary) {
-		int spellWeight = CalculateEffectiveSpellWeight(spell, caster, summary);
-		return spellWeight <= 0;
+		if (spell.getType().canFreeCast()) {
+			int spellWeight = CalculateEffectiveSpellWeight(spell, caster, summary);
+			return spellWeight <= 0;
+		}
+		return false;
 	}
 	
 	private static final Map<ReagentType, Integer> NoReagentCost;

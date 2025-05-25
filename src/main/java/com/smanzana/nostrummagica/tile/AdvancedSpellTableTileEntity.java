@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
 import net.minecraft.core.BlockPos;
@@ -61,7 +61,7 @@ public class AdvancedSpellTableTileEntity extends BasicSpellTableTileEntity {
 	}
 	
 	@Override
-	public Spell craft(Player crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
+	public RegisteredSpell craft(Player crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
 		return super.craft(crafter, inventory, name, iconIndex, pattern);
 	}
 }

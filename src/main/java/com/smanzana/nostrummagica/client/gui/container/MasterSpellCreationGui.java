@@ -17,7 +17,6 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellRune;
-import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpellCraftMessage;
@@ -731,7 +730,7 @@ public class MasterSpellCreationGui {
 									// But in the mean, might as well do it here for the
 									// smoothest feel
 									ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
-									SpellScroll.setSpell(scroll, spell);
+									//SpellScroll.setSpell(scroll, spell);
 									container.setScroll(scroll);
 									//NostrumMagicaSounds.AMBIENT_WOOSH.play(Minecraft.getInstance().thePlayer);
 									

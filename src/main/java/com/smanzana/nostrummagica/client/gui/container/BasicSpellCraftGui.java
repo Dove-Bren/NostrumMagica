@@ -13,7 +13,6 @@ import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellCre
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellGui;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.item.NostrumItems;
-import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpellCraftMessage;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
@@ -341,7 +340,7 @@ public class BasicSpellCraftGui {
 					// But in the mean, might as well do it here for the
 					// smoothest feel
 					ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
-					SpellScroll.setSpell(scroll, spell);
+					//SpellScroll.setSpell(scroll, spell);
 					//getContainer().setScroll(scroll);
 					getMenu().inventory.setScrollSlotContents(scroll);
 					//NostrumMagicaSounds.AMBIENT_WOOSH.play(Minecraft.getInstance().thePlayer);

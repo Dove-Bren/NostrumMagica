@@ -55,6 +55,7 @@ import com.smanzana.nostrummagica.proxy.CommonProxy;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellChargeTracker;
 import com.smanzana.nostrummagica.spell.SpellCooldownTracker;
@@ -318,9 +319,9 @@ public class NostrumMagica {
 		return tome;
 	}
 
-	public static @Nonnull Spell[] getCurrentSpellLoadout(Player player) {
+	public static @Nonnull RegisteredSpell[] getCurrentSpellLoadout(Player player) {
 		if (player == null) {
-			return new Spell[0];
+			return new RegisteredSpell[0];
 		}
 		
 		// We just return the spells from the curernt tome.
@@ -329,7 +330,7 @@ public class NostrumMagica {
 		if (tome.isEmpty())
 			return null;
 		
-		Spell[] spells = SpellTome.getSpellsInCurrentPage(tome);
+		RegisteredSpell[] spells = SpellTome.getSpellsInCurrentPage(tome);
 		return spells;
 	}
 

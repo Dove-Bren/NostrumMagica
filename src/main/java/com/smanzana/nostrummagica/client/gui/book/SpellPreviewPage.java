@@ -17,7 +17,7 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.ClientTomeDropSpellMessage;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.ChatFormatting;
@@ -30,12 +30,12 @@ import net.minecraft.world.item.ItemStack;
 
 public class SpellPreviewPage implements IClickableBookPage {
 
-	private Spell spell;
+	private RegisteredSpell spell;
 	private String description;
 	private List<Component> tooltip;
 	private final ItemStack tome;
 	
-	public SpellPreviewPage(ItemStack tome, Spell spell) {
+	public SpellPreviewPage(ItemStack tome, RegisteredSpell spell) {
 		this.spell = spell;
 		tooltip = new ArrayList<>();
 		Map<ReagentType, Integer> reagents = spell.getRequiredReagents();

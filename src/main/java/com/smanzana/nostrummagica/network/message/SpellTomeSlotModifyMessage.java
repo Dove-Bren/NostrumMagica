@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.SpellTome;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,7 +46,7 @@ public class SpellTomeSlotModifyMessage {
 			}
 			
 			// Find spell
-			@Nullable Spell spell;
+			@Nullable RegisteredSpell spell;
 			if (message.spellID == -1) {
 				spell = null;
 			} else {

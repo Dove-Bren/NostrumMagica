@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 import com.smanzana.nostrummagica.tile.ISpellCraftingTileEntity;
 
@@ -50,7 +50,7 @@ public class SpellCraftMessage {
 			
 			ISpellCraftingTileEntity entity = (ISpellCraftingTileEntity) TE;
 			
-			Spell spell = entity.craft(sp, entity.getSpellCraftingInventory(), message.name, message.iconIndex, message.craftPattern);
+			RegisteredSpell spell = entity.craft(sp, entity.getSpellCraftingInventory(), message.name, message.iconIndex, message.craftPattern);
 			if (spell != null) {
 				NostrumMagicaSounds.UI_RESEARCH.play(TE.getLevel(), 
 						message.pos.getX(), message.pos.getY(), message.pos.getZ());

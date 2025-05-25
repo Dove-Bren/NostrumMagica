@@ -44,7 +44,7 @@ import com.smanzana.nostrummagica.item.set.EquipmentSet;
 import com.smanzana.nostrummagica.listener.ClientChargeManager.ClientSpellCharge;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.EffectData;
 import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.SpellCooldownTracker;
 import com.smanzana.nostrummagica.spell.SpellCooldownTracker.Cooldowns;
@@ -538,7 +538,7 @@ public class OverlayRenderer extends GuiComponent {
 		}
 	}
 	
-	private void renderSpellLoadoutSlot(PoseStack matrixStackIn, @Nullable Spell spell, String binding, int width, int height) {
+	private void renderSpellLoadoutSlot(PoseStack matrixStackIn, @Nullable RegisteredSpell spell, String binding, int width, int height) {
 		// Probably going to draw icon, and spell name real small on top of it?
 		RenderFuncs.drawRect(matrixStackIn, 0, 0, width, height, 0xFF000000);
 		RenderFuncs.drawRect(matrixStackIn, 1, 1, width-1, height-1, 0x80404040);
@@ -617,7 +617,7 @@ public class OverlayRenderer extends GuiComponent {
 		if (attr != null && attr.isUnlocked()) {
 			// Bottom left spell slide
 			// Spell name
-			Spell[] current = NostrumMagica.getCurrentSpellLoadout(mc.player);
+			RegisteredSpell[] current = NostrumMagica.getCurrentSpellLoadout(mc.player);
 			if (current != null && current.length != 0) {
 				final int slotSize = 16;
 				int slideHeight = slotSize + (4);

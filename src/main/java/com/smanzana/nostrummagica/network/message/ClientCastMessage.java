@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.SpellTome;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 
 import net.minecraft.network.FriendlyByteBuf;
@@ -31,7 +31,7 @@ public class ClientCastMessage {
 		final ServerPlayer sp = ctx.get().getSender();
 		
 		// What spell?
-		Spell spell = NostrumMagica.instance.getSpellRegistry().lookup(
+		RegisteredSpell spell = NostrumMagica.instance.getSpellRegistry().lookup(
 				message.id
 				);
 		
@@ -91,7 +91,7 @@ public class ClientCastMessage {
 	private final boolean isScroll;
 	private final int entityHintId;
 	
-	public ClientCastMessage(Spell spell, boolean scroll, int tomeID, @Nullable Entity entityHint) {
+	public ClientCastMessage(RegisteredSpell spell, boolean scroll, int tomeID, @Nullable Entity entityHint) {
 		this(spell.getRegistryID(), scroll, tomeID, entityHint == null ? -1 : entityHint.getId());
 	}
 	

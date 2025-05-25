@@ -24,6 +24,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpellRequestMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
@@ -245,7 +246,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
     }
 	
-	public static void addSpell(ItemStack itemStack, Spell spell) {
+	public static void addSpell(ItemStack itemStack, RegisteredSpell spell) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return;
 		
@@ -657,11 +658,11 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	 * @param itemStack
 	 * @return
 	 */
-	public static List<Spell> getSpellLibrary(ItemStack itemStack) {
+	public static List<RegisteredSpell> getSpellLibrary(ItemStack itemStack) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
 			return null;
 
-		List<Spell> list = new LinkedList<>();
+		List<RegisteredSpell> list = new LinkedList<>();
 		int[] ids = getSpellIDs(itemStack);
 		if (ids == null || ids.length == 0)
 			return list;
@@ -672,7 +673,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		for (int i = 0; i < ids.length; i++) {
 			int id = ids[i];
-			Spell spell = NostrumMagica.instance.getSpellRegistry().lookup(id);
+			RegisteredSpell spell = NostrumMagica.instance.getSpellRegistry().lookup(id);
 			if (spell != null)
 				list.add(spell);
 		}
@@ -680,22 +681,22 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		return list;
 	}
 	
-	public static @Nonnull Spell[] getSpellsInCurrentPage(ItemStack itemStack) {
+	public static @Nonnull RegisteredSpell[] getSpellsInCurrentPage(ItemStack itemStack) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellTome))
-			return new Spell[0];
+			return new RegisteredSpell[0];
 		
 		final int slots = getSlots(itemStack);
 		final int pageIdx = getPageIndex(itemStack);
-		Spell[] spells = new Spell[slots];
+		RegisteredSpell[] spells = new RegisteredSpell[slots];
 		for (int i = 0; i < slots; i++) {
 			spells[i] = getSpellInSlot(itemStack, pageIdx, i);
 		}
 		return spells;
 	}
 	
-	public static @Nullable Spell getSpellInSlot(ItemStack itemStack, int pageIdx, int slot) {
+	public static @Nullable RegisteredSpell getSpellInSlot(ItemStack itemStack, int pageIdx, int slot) {
 		final int spellID = getPageSpellID(itemStack, pageIdx, slot);
-		final @Nullable Spell spell;
+		final @Nullable RegisteredSpell spell;
 		if (spellID == -1) {
 			spell = null;
 		} else {
@@ -704,7 +705,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		return spell;
 	}
 	
-	public static void setSpellInSlot(ItemStack itemStack, int pageIdx, int slot, @Nullable Spell spell) {
+	public static void setSpellInSlot(ItemStack itemStack, int pageIdx, int slot, @Nullable RegisteredSpell spell) {
 		setPageSpellID(itemStack, pageIdx, slot, (spell == null) ? -1 : spell.getRegistryID());
 	}
 	
@@ -724,7 +725,6 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 				// Create a temporary spell
 				// Request spell from server
 				requests[requestcount++] = id;
-				getTemp(id);
 			}
 		}
 		
@@ -736,10 +736,6 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		}
 	}
 	
-	private static Spell getTemp(int id) {
-		return Spell.CreateFake("Loading...", id);
-	}
-
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public BookScreen getScreen(Object userdata) {
@@ -758,7 +754,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		// width 110
 		String title = stack.getHoverName().getString();
 		int level = getLevel(stack);
-		List<Spell> spells = getSpellLibrary(stack);
+		List<RegisteredSpell> spells = getSpellLibrary(stack);
 		int spellCount = (spells != null && !spells.isEmpty() ? spells.size() : 0);
 		int weightCapacity = getCapacity(stack);
 		int weightSum = getUsedCapacity(stack);
@@ -780,7 +776,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (spells != null && spellCount > 0) {
 			boolean top = true;
 			SpellPreviewPage page = null;
-			for (Spell spell : spells) {
+			for (RegisteredSpell spell : spells) {
 				if (top) {
 					page = new SpellPreviewPage(stack, spell);
 				} else {
@@ -952,7 +948,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	public static int getUsedCapacity(ItemStack tome) {
-		List<Spell> spells = getSpellLibrary(tome);
+		List<RegisteredSpell> spells = getSpellLibrary(tome);
 		return (spells != null && !spells.isEmpty() ? spells.stream().map(s -> s.getWeight()).collect(Collectors.summingInt(i -> i)) : 0);
 	}
 	
@@ -985,7 +981,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	 * @param tome
 	 * @return
 	 */
-	public static boolean hasRoom(ItemStack tome, Spell spell) {
+	public static boolean hasRoom(ItemStack tome, RegisteredSpell spell) {
 		final int capacity = SpellTome.getCapacity(tome);
 		final int used = SpellTome.getUsedCapacity(tome);
 		
@@ -996,7 +992,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (tome.isEmpty() || scroll.isEmpty())
 			return false;
 		
-		Spell spell = SpellScroll.GetSpell(scroll);
+		RegisteredSpell spell = SpellScroll.GetSpell(scroll);
 		if (spell == null)
 			return false;
 		
@@ -1018,8 +1014,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 
 	@Override
 	public boolean shouldTrace(Level world, Player player, ItemStack stack) {
-		Spell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
-		for (Spell spell : spells) {
+		RegisteredSpell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
+		for (RegisteredSpell spell : spells) {
 			if (spell != null && spell.shouldTrace(player)) {
 				return true;
 			}
@@ -1031,8 +1027,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	@Override
 	public double getTraceRange(Level world, Player player, ItemStack stack) {
 		double largest = 0;
-		Spell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
-		for (Spell spell : spells) {
+		RegisteredSpell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
+		for (RegisteredSpell spell : spells) {
 			if (spell != null && spell.shouldTrace(player)) {
 				largest = Math.max(largest, spell.getTraceRange(player));
 			}
@@ -1054,15 +1050,15 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 
 	@Override
-	public Spell getSpell(ItemStack stack) {
+	public RegisteredSpell getSpell(ItemStack stack) {
 		// If the last spell a player cast is in this time, return that.
 		// Otherwise return first spell on the page they're on.
-		@Nullable Spell ret = null;
+		@Nullable RegisteredSpell ret = null;
 		@Nullable Player player = NostrumMagica.instance.proxy.getPlayer();
 		if (player != null) {
-			@Nullable Spell lastSpell = NostrumMagica.playerListener.getLastSpell(player);
-			if (lastSpell != null) {
-				List<Spell> library = getSpellLibrary(stack);
+			@Nullable Spell lastSpellRaw = NostrumMagica.playerListener.getLastSpell(player);
+			if (lastSpellRaw != null && lastSpellRaw instanceof RegisteredSpell lastSpell) {
+				List<RegisteredSpell> library = getSpellLibrary(stack);
 				if (library != null && library.stream().anyMatch((s) -> s.getRegistryID() == lastSpell.getRegistryID())) {
 					ret = lastSpell;
 				}
@@ -1070,7 +1066,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		}
 		
 		if (ret == null) {
-			Spell[] pageSpells = getSpellsInCurrentPage(stack);
+			RegisteredSpell[] pageSpells = getSpellsInCurrentPage(stack);
 			if (pageSpells != null) {
 				for (int i = 0; i < pageSpells.length; i++) {
 					if (pageSpells[i] != null) {

@@ -16,7 +16,8 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
+import com.smanzana.nostrummagica.spell.SpellType;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
@@ -24,19 +25,19 @@ import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.WorldGenRegion;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneWallTorchBlock;
 import net.minecraft.world.level.block.StairBlock;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.server.level.WorldGenRegion;
 
 public class RoomLectern extends StaticRoom {
 	
@@ -239,7 +240,7 @@ public class RoomLectern extends StaticRoom {
 		return builder.toString();
 	}
 	
-	static private Spell genSpell(Random rand) {
+	static private RegisteredSpell genSpell(Random rand) {
 		EMagicElement element;
 		boolean harmful = false;
 		boolean status = false;
@@ -252,7 +253,7 @@ public class RoomLectern extends StaticRoom {
 		}
 		
 		// Build the spell
-		Spell spell = new Spell(genSpellName(rand, element, harmful, status), 75, 3);
+		RegisteredSpell spell = RegisteredSpell.MakeAndRegister(genSpellName(rand, element, harmful, status), SpellType.Crafted, 75, 3);
 		if (harmful) {
 			
 			int roll = rand.nextInt(10);
@@ -350,7 +351,7 @@ public class RoomLectern extends StaticRoom {
 			{
 				AltarTileEntity te = (AltarTileEntity) ent;
 				ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
-				Spell spell =  genSpell(world.getRandom());
+				RegisteredSpell spell = genSpell(world.getRandom());
 				SpellScroll.setSpell(scroll, spell);
 				scroll.setDamageValue(NostrumMagica.rand.nextInt(10));
 				

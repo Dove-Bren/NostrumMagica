@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellType;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
@@ -130,18 +131,18 @@ public class SpellCrafting {
 			return null;
 		}
 		
-		return CreateSpellFromPartsInternal(context, spellName, parts, true);
+		return CreateSpellFromPartsInternal(context, spellName, parts);
 	}
 	
 //	public static Spell CreateSpellFromParts(SpellCraftContext context, @Nullable SpellCraftPattern pattern, String spellName, List<SpellPart> parts, boolean trans) {
 //		return CreateSpellFromPartsInternal(context, pattern, spellName, parts, trans);
 //	}
 	
-	protected static Spell CreateSpellFromPartsInternal(SpellCraftContext context, String spellName, List<SpellCraftPart> parts, boolean trans) {
+	protected static Spell CreateSpellFromPartsInternal(SpellCraftContext context, String spellName, List<SpellCraftPart> parts) {
 		
 		final int manaCost = CalculateManaCost(context, parts);
 		final int weight = CalculateWeight(context, parts);
-		Spell spell = new Spell(spellName, trans, manaCost, weight);
+		Spell spell = new Spell(spellName, SpellType.Crafted, manaCost, weight);
 		for (SpellCraftPart part : parts) {
 			if (part.isShape()) {
 				spell.addPart(part.getShapePart());

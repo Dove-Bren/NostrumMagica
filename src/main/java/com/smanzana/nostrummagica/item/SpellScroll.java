@@ -13,7 +13,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpellRequestMessage;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.SpellCastEvent;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
@@ -63,7 +63,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		
 		if (playerIn.isShiftKeyDown()) {
 			// Open scroll screen
-			final Spell spell = GetSpell(itemStackIn);
+			final RegisteredSpell spell = GetSpell(itemStackIn);
 			if (spell != null && worldIn.isClientSide()) {
 				NostrumMagica.instance.proxy.openSpellScreen(spell);
 			}
@@ -85,7 +85,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		if (!nbt.contains(NBT_SPELL, Tag.TAG_INT))
 			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStackIn);
 		
-		Spell spell = GetSpell(itemStackIn);
+		RegisteredSpell spell = GetSpell(itemStackIn);
 		if (spell == null)
 			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStackIn);
 		
@@ -115,7 +115,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		
     }
 	
-	public static void setSpell(ItemStack itemStack, Spell spell) {
+	public static void setSpell(ItemStack itemStack, RegisteredSpell spell) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellScroll))
 			return;
 		
@@ -132,7 +132,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		itemStack.enchant(Enchantments.POWER_ARROWS, 1);
 	}
 	
-	public static Spell GetSpell(ItemStack itemStack) {
+	public static RegisteredSpell GetSpell(ItemStack itemStack) {
 		if (itemStack.isEmpty() || !(itemStack.getItem() instanceof SpellScroll))
 			return null;
 		
@@ -141,7 +141,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 			return null;
 		
 		int id = nbt.getInt(NBT_SPELL);
-		Spell spell = NostrumMagica.instance.getSpellRegistry().lookup(id);
+		RegisteredSpell spell = NostrumMagica.instance.getSpellRegistry().lookup(id);
 		
 		if (spell == null) {
 			if (NostrumMagica.instance.proxy.isServer()) {
@@ -168,7 +168,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		return Math.max(1, nbt.getInt(NBT_DURABILITY));
 	}
 	
-	public static ItemStack create(Spell spell) {
+	public static ItemStack create(RegisteredSpell spell) {
 		ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
 		setSpell(scroll, spell);
 		return scroll;
@@ -178,7 +178,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	 * Figure out how many uses to give the provided spell.
 	 * More complex spells have less uses per scroll.
 	 */
-	protected static final int GetMaxUses(Spell spell) {
+	protected static final int GetMaxUses(RegisteredSpell spell) {
 		final int weight = (spell == null ? 0 : spell.getWeight());
 		if (weight == 0) {
 			return 100;
@@ -189,7 +189,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		}
 	}
 	
-	protected int getCastDurabilityCost(Player caster, Spell spell) {
+	protected int getCastDurabilityCost(Player caster, RegisteredSpell spell) {
 		// By default, cost durability-1 of the scroll so that it has exactly 2 casts.
 		// With skill, take a constant base here (5).
 		// With another skill, take less constant.
@@ -242,7 +242,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	
 	@Override
 	public boolean shouldTrace(Level world, Player player, ItemStack stack) {
-		Spell spell = GetSpell(stack);
+		RegisteredSpell spell = GetSpell(stack);
 		return spell == null ? false : spell.shouldTrace(player);
 	}
 	
@@ -260,12 +260,12 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 
 	@Override
 	public double getTraceRange(Level world, Player player, ItemStack stack) {
-		Spell spell = GetSpell(stack);
+		RegisteredSpell spell = GetSpell(stack);
 		return spell == null ? 0 : spell.getTraceRange(player);
 	}
 
 	@Override
-	public Spell getSpell(ItemStack stack) {
+	public RegisteredSpell getSpell(ItemStack stack) {
 		return GetSpell(stack);
 	}
 	

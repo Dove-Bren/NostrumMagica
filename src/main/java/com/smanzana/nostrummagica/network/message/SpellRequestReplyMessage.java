@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -28,32 +28,32 @@ public class SpellRequestReplyMessage {
 			NostrumMagica.instance.getSpellRegistry().clear();
 		}
 		
-		for (Spell spell : message.spells) {
+		for (RegisteredSpell spell : message.spells) {
 			NostrumMagica.instance.getSpellRegistry().override(spell.getRegistryID(), spell);
 		}
 	}
 		
-	private final List<Spell> spells;
+	private final List<RegisteredSpell> spells;
 	private final boolean clean;
 	
-	public SpellRequestReplyMessage(List<Spell> spells) {
+	public SpellRequestReplyMessage(List<RegisteredSpell> spells) {
 		this(spells, false);
 	}
 	
-	public SpellRequestReplyMessage(List<Spell> spells, boolean clean) {
+	public SpellRequestReplyMessage(List<RegisteredSpell> spells, boolean clean) {
 		this.spells = spells;
 		this.clean = clean;
 	}
 
 	public static SpellRequestReplyMessage decode(FriendlyByteBuf buf) {
-		List<Spell> spells = new ArrayList<>();
+		List<RegisteredSpell> spells = new ArrayList<>();
 		boolean clean = buf.readBoolean();
 		int spellCount = buf.readVarInt();
 		
 		for (int i = 0; i < spellCount; i++) {
 			int spellID = buf.readVarInt();
 			CompoundTag tag = buf.readNbt();
-			Spell spell = Spell.fromNBT(tag, spellID);
+			RegisteredSpell spell = RegisteredSpell.FromNBT(tag, spellID);
 			
 			if (spell != null) {
 				spells.add(spell);
@@ -67,7 +67,7 @@ public class SpellRequestReplyMessage {
 		buf.writeBoolean(msg.clean);
 		buf.writeVarInt(msg.spells.size());
 		
-		for (Spell spell : msg.spells) {
+		for (RegisteredSpell spell : msg.spells) {
 			buf.writeVarInt(spell.getRegistryID());
 			buf.writeNbt(spell.toNBT());
 		}

@@ -49,6 +49,7 @@ import com.smanzana.nostrummagica.network.message.VanillaEffectSyncMessage;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellActionSummary;
 import com.smanzana.nostrummagica.spell.SpellCastEvent;
@@ -1517,9 +1518,12 @@ public class PlayerListener {
 		
 		// Let this be the thing that updates spell cooldowns
 		if (!event.isChecking && event.getCastResult().succeeded && event.getCaster() instanceof Player && !event.getCaster().level.isClientSide() && !event.getCaster().isDeadOrDying()) {
-			final int cooldown = SpellCasting.CalculateSpellCooldown(event.getCastResult());
+			// Only have cooldowns on registered spells
+			if (event.getSpell() instanceof RegisteredSpell registered) {
+				final int cooldown = SpellCasting.CalculateSpellCooldown(event.getCastResult());
+				NostrumMagica.instance.getSpellCooldownTracker(event.getCaster().level).setSpellCooldown((Player) event.getCaster(), registered, cooldown);
+			}
 			final int globalCooldown = SpellCasting.CalculateGlobalSpellCooldown(event.getCastResult());
-			NostrumMagica.instance.getSpellCooldownTracker(event.getCaster().level).setSpellCooldown((Player) event.getCaster(), event.getSpell(), cooldown);
 			NostrumMagica.instance.getSpellCooldownTracker(event.getCaster().level).setGlobalCooldown((Player) event.getCaster(), globalCooldown);
 		}
 	}

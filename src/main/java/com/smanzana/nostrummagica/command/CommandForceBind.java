@@ -9,13 +9,13 @@ import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.StatSyncMessage;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.chat.TextComponent;
 
 public class CommandForceBind {
 
@@ -47,7 +47,7 @@ public class CommandForceBind {
 				|| SpellScroll.GetSpell(offhand) == null) {
 			context.getSource().sendSuccess(new TextComponent("Either use while holding a tome that's currently binding OR hold a spell scroll in your offhand"), true);
 		} else {
-			Spell spell = SpellScroll.GetSpell(offhand);
+			RegisteredSpell spell = SpellScroll.GetSpell(offhand);
 			if (SpellTome.hasRoom(stack, spell)) {
 				SpellTome.addSpell(stack, spell);
 			} else {

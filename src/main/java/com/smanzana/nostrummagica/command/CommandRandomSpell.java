@@ -15,7 +15,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
+import com.smanzana.nostrummagica.spell.SpellType;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.AIShape;
@@ -53,19 +54,19 @@ public class CommandRandomSpell {
 			name = "Random Spell";
 		}
 		
-		final Spell spell = CreateRandomSpell(name, null, cost, weight);
+		final RegisteredSpell spell = CreateRandomSpell(name, null, cost, weight);
 		ItemStack stack = SpellScroll.create(spell);
 		player.getInventory().add(stack);
 		
 		return 0;
 	}
 
-	public static Spell CreateRandomSpell(String name, @Nullable Random rand, int cost, int weight) {
+	public static RegisteredSpell CreateRandomSpell(String name, @Nullable Random rand, int cost, int weight) {
 		if (rand == null) {
 			rand = NostrumMagica.rand;
 		}
 		
-		Spell spell = new Spell(name, false, cost, weight);
+		RegisteredSpell spell = RegisteredSpell.MakeAndRegister(name, SpellType.Crafted, cost, weight);
 		
 		// Go ahead and do 1 shape
 		final List<SpellShape> shapes = Lists.newArrayList(SpellShape.getAllShapes().stream().filter((t) -> {return !(t instanceof AIShape);}).iterator());

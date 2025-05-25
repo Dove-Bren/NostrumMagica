@@ -56,7 +56,7 @@ public class Incantation {
 	
 	public int getWeight() {
 		final SpellCraftContext context = SpellCraftContext.DUMMY;
-		return 2
+		return 0
 				+ SpellCrafting.CalculateWeight(context, shapePart)
 				+ SpellCrafting.CalculateWeight(context, effectPart)
 				+ (secondShapePart == null ? 0 : SpellCrafting.CalculateWeight(context, secondShapePart));
@@ -65,7 +65,7 @@ public class Incantation {
 	protected Spell createSpell() {
 		final int mana = getManaCost();
 		final int weight = getWeight();
-		final Spell spell = new Spell("incantation", true, mana, weight).addPart(shapePart);
+		final Spell spell = new Spell("incantation", SpellType.Incantation, mana, weight).addPart(shapePart);
 		if (this.secondShapePart != null) {
 			spell.addPart(this.secondShapePart);
 		}

@@ -53,7 +53,7 @@ public class SpellChargeTracker {
 		}
 		
 		public static final SpellCharge FromNBT(CompoundTag nbt) {
-			Spell incant = Spell.fromNBT(nbt.getCompound("spell"));
+			Spell incant = Spell.FromNBT(nbt.getCompound("spell"));
 			final int duration = nbt.getInt("duration");
 			final ChargeType type = ChargeType.valueOf("type");
 			

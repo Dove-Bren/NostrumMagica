@@ -22,7 +22,7 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.SpellCastEvent;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
@@ -124,7 +124,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
-		final @Nullable Spell spell = getSpell(stack);
+		final @Nullable RegisteredSpell spell = getSpell(stack);
 		if (spell != null) {
 			tooltip.add(new TranslatableComponent("info.caster_wand.spell", spell.getName()).withStyle(ChatFormatting.GOLD));
 		} else {
@@ -136,7 +136,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 		tooltip.add(new TextComponent(" -2 Spell Weight").withStyle(ChatFormatting.DARK_GREEN));
 	}
 	
-	protected void setSpell(ItemStack wand, @Nullable Spell spell) {
+	protected void setSpell(ItemStack wand, @Nullable RegisteredSpell spell) {
 		CompoundTag tag = wand.getOrCreateTag();
 		if (spell == null) {
 			tag.remove(NBT_SPELL);
@@ -146,14 +146,14 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 		wand.setTag(tag);
 	}
 	
-	public static final void SetSpell(ItemStack wand, @Nullable Spell spell) {
+	public static final void SetSpell(ItemStack wand, @Nullable RegisteredSpell spell) {
 		if (!wand.isEmpty() && wand.getItem() instanceof CasterWandItem) {
 			((CasterWandItem) wand.getItem()).setSpell(wand, spell);
 		}
 	}
 	
 	@Override
-	public @Nullable Spell getSpell(ItemStack wand) {
+	public @Nullable RegisteredSpell getSpell(ItemStack wand) {
 		if (wand.hasTag()) {
 			CompoundTag tag = wand.getTag();
 			if (tag.contains(NBT_SPELL, Tag.TAG_INT)) {
@@ -164,7 +164,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 		return null;
 	}
 	
-	public static final @Nullable Spell GetSpell(ItemStack wand) {
+	public static final @Nullable RegisteredSpell GetSpell(ItemStack wand) {
 		if (!wand.isEmpty() && wand.getItem() instanceof CasterWandItem) {
 			return ((CasterWandItem) wand.getItem()).getSpell(wand);
 		}
@@ -172,12 +172,12 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 		return null;
 	}
 	
-	protected boolean canStoreSpell(ItemStack wand, @Nonnull Spell spell) {
+	protected boolean canStoreSpell(ItemStack wand, @Nonnull RegisteredSpell spell) {
 		// No real limits on spell?
 		return true;
 	}
 	
-	public static final boolean CanStoreSpell(ItemStack wand, @Nonnull Spell spell) {
+	public static final boolean CanStoreSpell(ItemStack wand, @Nonnull RegisteredSpell spell) {
 		if (!wand.isEmpty() && wand.getItem() instanceof CasterWandItem) {
 			return ((CasterWandItem) wand.getItem()).canStoreSpell(wand, spell);
 		}
@@ -190,7 +190,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 		public int getColor(ItemStack stack, int layer) {
 			if (layer == 1) {
 				// Color based on spell
-				final @Nullable Spell spell = GetSpell(stack);
+				final @Nullable RegisteredSpell spell = GetSpell(stack);
 				if (spell != null) {
 					return 0xFF000000 | spell.getPrimaryElement().getColor();
 				} else {
@@ -204,7 +204,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 
 	@Override
 	public boolean shouldTrace(Level world, Player player, ItemStack stack) {
-		@Nullable Spell spell = this.getSpell(stack);
+		@Nullable RegisteredSpell spell = this.getSpell(stack);
 		if (spell == null) {
 			return false;
 		}
@@ -214,7 +214,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	
 	@Override
 	public double getTraceRange(Level world, Player player, ItemStack stack) {
-		@Nullable Spell spell = this.getSpell(stack);
+		@Nullable RegisteredSpell spell = this.getSpell(stack);
 		if (spell == null) {
 			return 0;
 		}
@@ -224,7 +224,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	
 	@Override
 	protected boolean canCharge(Level worldIn, Player playerIn, InteractionHand hand, ItemStack stack) {
-		@Nullable Spell spell = this.getSpell(stack);
+		@Nullable RegisteredSpell spell = this.getSpell(stack);
 		return spell != null;
 	}
 
@@ -240,7 +240,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 
 	@Override
 	protected void fireChargedWeapon(Level worldIn, LivingEntity playerIn, InteractionHand hand, ItemStack stack) {
-		@Nullable Spell spell = this.getSpell(stack);
+		@Nullable RegisteredSpell spell = this.getSpell(stack);
 		if (spell != null) {
 			if (worldIn.isClientSide()) {
 				if (SpellCasting.CheckToolCast(spell, playerIn, stack).succeeded) {

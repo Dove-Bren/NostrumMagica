@@ -69,7 +69,7 @@ public class ClientCastAdhocMessage {
 
 	public static ClientCastAdhocMessage decode(FriendlyByteBuf buf) {
 		return new ClientCastAdhocMessage(
-				Spell.transientFromNBT(buf.readNbt()),
+				Spell.FromNBT(buf.readNbt()),
 				buf.readInt()
 				);
 	}

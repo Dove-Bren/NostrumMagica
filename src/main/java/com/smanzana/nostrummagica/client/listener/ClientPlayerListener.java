@@ -62,6 +62,7 @@ import com.smanzana.nostrummagica.network.message.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Incantation;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
@@ -433,12 +434,12 @@ public class ClientPlayerListener extends PlayerListener {
 	
 	private void doCast(int castSlot) {
 		final Player player = NostrumMagica.instance.proxy.getPlayer();
-		Spell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
+		RegisteredSpell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
 		if (castSlot < 0 || spells == null || spells.length == 0 || spells.length <= castSlot) {
 			return;
 		}
 		
-		final Spell spell = spells[castSlot];
+		final RegisteredSpell spell = spells[castSlot];
 		if (spell == null) {
 			// No spell in slot
 			return;
@@ -567,12 +568,12 @@ public class ClientPlayerListener extends PlayerListener {
 	}
 	
 	protected void finishSpellCast(Player player, ClientTomeCharge charge) {
-		Spell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
+		RegisteredSpell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
 		if (charge.castSlot < 0 || spells == null || spells.length == 0 || spells.length <= charge.castSlot) {
 			return;
 		}
 		
-		final Spell spell = spells[charge.castSlot];
+		final RegisteredSpell spell = spells[charge.castSlot];
 		if (spell == null) {
 			// No spell in slot
 			return;

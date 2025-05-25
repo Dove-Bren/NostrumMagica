@@ -13,6 +13,7 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spellcraft.SpellCraftContext;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
@@ -211,18 +212,19 @@ public class SpellTableTileEntity extends BlockEntity implements ISpellCraftingI
 	}
 	
 	@Override
-	public Spell craft(Player crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
+	public RegisteredSpell craft(Player crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
 		ItemStack stack = this.getItem(0);
 		if (stack.isEmpty() || !(stack.getItem() instanceof BlankScroll)) {
 			return null;
 		}
 		
 		SpellCraftContext context = new SpellCraftContext(crafter, this.level, this.worldPosition);
-		Spell spell = SpellCreationGui.SpellCreationContainer.craftSpell(
+		Spell tempSpell = SpellCreationGui.SpellCreationContainer.craftSpell(
 				context, pattern, name, iconIndex, this, crafter, null, null, null, true);
+		RegisteredSpell spell = null;
 		
-		if (spell != null) {
-			spell.promoteFromTrans();
+		if (tempSpell != null) {
+			spell = RegisteredSpell.WrapAndRegister(tempSpell);
 			spell.setIcon(iconIndex);
 			ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
 			SpellScroll.setSpell(scroll, spell);

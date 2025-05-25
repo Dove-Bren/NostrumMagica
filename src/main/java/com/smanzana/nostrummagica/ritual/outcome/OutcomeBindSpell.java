@@ -6,17 +6,17 @@ import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
 import com.smanzana.nostrummagica.util.TextUtils;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 public class OutcomeBindSpell implements IRitualOutcome {
@@ -42,7 +42,7 @@ public class OutcomeBindSpell implements IRitualOutcome {
 				|| scroll.isEmpty())
 			return false;
 		
-		Spell spell = SpellScroll.GetSpell(scroll);
+		RegisteredSpell spell = SpellScroll.GetSpell(scroll);
 		if (spell == null) {
 			if (!player.level.isClientSide) {
 				player.sendMessage(new TextComponent("The scroll is missing it's spell..."), Util.NIL_UUID);

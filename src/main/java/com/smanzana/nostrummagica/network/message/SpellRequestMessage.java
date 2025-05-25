@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
@@ -22,8 +22,8 @@ public class SpellRequestMessage {
 		
 		// Note: This message handler is not on main thread, but the spell registry is threadsafe.
 		ctx.get().setPacketHandled(true);
-		List<Spell> spells = new LinkedList<>();
-		Spell spell;
+		List<RegisteredSpell> spells = new LinkedList<>();
+		RegisteredSpell spell;
 		for (int id : message.ids) {
 			spell = NostrumMagica.instance.getSpellRegistry().lookup(id);
 			if (spell != null)

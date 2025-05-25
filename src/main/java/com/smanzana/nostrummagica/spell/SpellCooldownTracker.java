@@ -32,7 +32,7 @@ public class SpellCooldownTracker {
 		return cooldowns.computeIfAbsent(player, (p) -> new Cooldowns());
 	}
 	
-	public @Nullable SpellCooldown getSpellCooldown(Player player, Spell spell) {
+	public @Nullable SpellCooldown getSpellCooldown(Player player, RegisteredSpell spell) {
 		Cooldowns cooldowns = getCooldowns(player);
 		@Nullable SpellCooldown spellCooldown = cooldowns.getSpellCooldown(spell);
 		@Nullable SpellCooldown globalCooldown = cooldowns.getGlobalCooldown();
@@ -49,7 +49,7 @@ public class SpellCooldownTracker {
 		return globalCooldown.endTicks > spellCooldown.endTicks ? globalCooldown : spellCooldown;
 	}
 	
-	public boolean hasCooldown(Player player, Spell spell) {
+	public boolean hasCooldown(Player player, RegisteredSpell spell) {
 		@Nullable SpellCooldown cooldown = this.getSpellCooldown(player, spell);
 		if (cooldown == null) { 
 			return false;
@@ -58,17 +58,17 @@ public class SpellCooldownTracker {
 		return player.tickCount < cooldown.endTicks;
 	}
 	
-	public void setSpellCooldown(Player player, Spell spell, int ticks) {
+	public void setSpellCooldown(Player player, RegisteredSpell spell, int ticks) {
 		SpellCooldown cooldown = new SpellCooldown(player.tickCount, player.tickCount + ticks);
 		cooldowns.computeIfAbsent(player, (p) -> new Cooldowns()).setSpellCooldown(spell, cooldown);
 		notifyPlayer(player, spell, ticks);
 	}
 	
-	public void removeSpellCooldown(Player player, Spell spell) {
+	public void removeSpellCooldown(Player player, RegisteredSpell spell) {
 		setSpellCooldown(player, spell, 0);
 	}
 	
-	public void overrideSpellCooldown(Player player, Spell spell, int cooldownTicks) {
+	public void overrideSpellCooldown(Player player, RegisteredSpell spell, int cooldownTicks) {
 		SpellCooldown cooldown = new SpellCooldown(player.tickCount, player.tickCount + cooldownTicks);
 		cooldowns.computeIfAbsent(player, (p) -> new Cooldowns()).setSpellCooldown(spell, cooldown);
 	}
@@ -84,7 +84,7 @@ public class SpellCooldownTracker {
 		cooldowns.computeIfAbsent(player, (p) -> new Cooldowns()).setGlobalCooldown(cooldown);
 	}
 	
-	protected void notifyPlayer(Player player, Spell spell, int cooldown) {
+	protected void notifyPlayer(Player player, RegisteredSpell spell, int cooldown) {
 		NetworkHandler.sendTo(new SpellCooldownMessage(spell, cooldown), (ServerPlayer) player);
 	}
 	
@@ -108,7 +108,7 @@ public class SpellCooldownTracker {
 			globalCooldown = new SpellCooldown(0, 0);
 		}
 		
-		public void setSpellCooldown(Spell spell, SpellCooldown cooldown) {
+		public void setSpellCooldown(RegisteredSpell spell, SpellCooldown cooldown) {
 			spellCooldowns.put(spell.getRegistryID(), cooldown);
 		}
 		
@@ -116,7 +116,7 @@ public class SpellCooldownTracker {
 			globalCooldown = cooldown;
 		}
 		
-		public @Nullable SpellCooldown getSpellCooldown(Spell spell) {
+		public @Nullable SpellCooldown getSpellCooldown(RegisteredSpell spell) {
 			for (Entry<Integer, SpellCooldown> entry : spellCooldowns.entrySet()) {
 				if (entry.getKey() == spell.getRegistryID()) {
 					return entry.getValue();

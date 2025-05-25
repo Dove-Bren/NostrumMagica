@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.network.message;
 import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
@@ -38,10 +38,10 @@ public class SpellCooldownMessage {
 	}
 		
 
-	private final Spell spell;
+	private final RegisteredSpell spell;
 	private final int cooldownTicks;
 	
-	public SpellCooldownMessage(Spell spell, int cooldownTicks) {
+	public SpellCooldownMessage(RegisteredSpell spell, int cooldownTicks) {
 		this.spell = spell;
 		this.cooldownTicks = cooldownTicks;
 	}
