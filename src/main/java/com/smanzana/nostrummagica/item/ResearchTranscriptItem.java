@@ -104,7 +104,7 @@ public class ResearchTranscriptItem extends Item implements ILoreTagged {
 				attr.completeResearch(research.getKey());
 				NostrumMagicaSounds.LORE.play(null, playerIn.level, playerIn.getX(), playerIn.getY(), playerIn.getZ());
 				stack.shrink(1);
-				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) playerIn);
+				NostrumMagica.Proxy.syncPlayer((ServerPlayer) playerIn);
 				playerIn.sendMessage(new TranslatableComponent("info.research.learn", new TranslatableComponent(research.getNameKey())), Util.NIL_UUID);
 				
 			}
@@ -121,7 +121,7 @@ public class ResearchTranscriptItem extends Item implements ILoreTagged {
 		if (research != null) {
 			tooltip.add(new TranslatableComponent("item.nostrummagica." + ID + ".desc", new TranslatableComponent(research.getNameKey()).withStyle(ChatFormatting.BLUE)));
 			
-			final Player player = NostrumMagica.instance.proxy.getPlayer();
+			final Player player = NostrumMagica.Proxy.getPlayer();
 			INostrumMagic attr = player == null ? null : NostrumMagica.getMagicWrapper(player);
 			if (attr != null && attr.getCompletedResearches().contains(research.getKey())) {
 				tooltip.add(new TextComponent(" "));

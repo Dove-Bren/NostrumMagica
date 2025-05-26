@@ -61,7 +61,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 			// Open scroll screen
 			final RegisteredSpell spell = GetSpell(itemStackIn);
 			if (spell != null && worldIn.isClientSide()) {
-				NostrumMagica.instance.proxy.openSpellScreen(spell);
+				NostrumMagica.Proxy.openSpellScreen(spell);
 			}
 			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
 		}
@@ -143,7 +143,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		RegisteredSpell spell = NostrumMagica.instance.getSpellRegistry().lookup(id);
 		
 		if (spell == null) {
-			if (NostrumMagica.instance.proxy.isServer()) {
+			if (NostrumMagica.Proxy.isServer()) {
 				NostrumMagica.logger.error("Failed to lookup spell in scroll with id " + id);
 			} else {
 				NostrumMagica.logger.info("Requesting spell " + id

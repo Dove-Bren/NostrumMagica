@@ -37,7 +37,7 @@ public class LoreMessage {
 		//update local attributes
 		ctx.get().setPacketHandled(true);
 		Minecraft.getInstance().submit(() -> {
-			NostrumMagica.instance.proxy.receiveStatOverrides(message.stats);
+			NostrumMagica.Proxy.receiveStatOverrides(message.stats);
 			
 			TextComponent loreName = new TextComponent("[" + message.lore.getLoreDisplayName() + "]");
 			Style style = Style.EMPTY
@@ -48,7 +48,7 @@ public class LoreMessage {
 					
 			loreName.setStyle(style);
 			
-			Player player = NostrumMagica.instance.proxy.getPlayer();
+			Player player = NostrumMagica.Proxy.getPlayer();
 			MutableComponent comp = new TranslatableComponent("info.lore.get", loreName);
 			
 			player.sendMessage(comp, Util.NIL_UUID);

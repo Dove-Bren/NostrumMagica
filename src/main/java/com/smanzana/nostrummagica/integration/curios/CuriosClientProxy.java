@@ -29,14 +29,14 @@ public class CuriosClientProxy extends CuriosProxy {
 	
 	@SubscribeEvent
 	public static void registerColorHandlers(ColorHandlerEvent.Item ev) {
-		if (NostrumMagica.instance.curios.isEnabled()) {
+		if (NostrumMagica.CuriosProxy.isEnabled()) {
 			ev.getItemColors().register(new RainbowItemColor(1), NostrumCurios.neckKoid);
 		}
 	}
 	
 	@SubscribeEvent
 	public void onClientInit(FMLClientSetupEvent event) {
-		if (NostrumMagica.instance.curios.isEnabled()) {
+		if (NostrumMagica.CuriosProxy.isEnabled()) {
 			CuriosRendererRegistry.register(NostrumItems.spellTomeCombat, () -> new SpelltomeCurioRenderer());
 			CuriosRendererRegistry.register(NostrumItems.spellTomeAdvanced, () -> new SpelltomeCurioRenderer());
 			CuriosRendererRegistry.register(NostrumItems.spellTomeDeath, () -> new SpelltomeCurioRenderer());

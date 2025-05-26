@@ -358,7 +358,7 @@ public class AltarRitualLayout implements IRitualLayout {
 					
 					NostrumMagicaSounds.AMBIENT_WOOSH2.play(world, pos.getX(), pos.getY(), pos.getZ());
 	
-					NostrumMagica.instance.proxy.playRitualEffect(world, pos, result.element == null ? EMagicElement.PHYSICAL : result.element,
+					NostrumMagica.Proxy.playRitualEffect(world, pos, result.element == null ? EMagicElement.PHYSICAL : result.element,
 							result.centerItem, result.extraItems, result.reagentItems, result.output);
 					
 					if (player instanceof ServerPlayer) {

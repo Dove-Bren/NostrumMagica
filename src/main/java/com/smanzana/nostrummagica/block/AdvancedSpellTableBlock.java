@@ -38,7 +38,7 @@ public class AdvancedSpellTableBlock extends BasicSpellTableBlock {
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand handIn, BlockHitResult hit) {
 		BasicSpellTableTileEntity te = (BasicSpellTableTileEntity) worldIn.getBlockEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(playerIn, RedwoodSpellCraftGui.RedwoodContainer.Make(te));
+		NostrumMagica.Proxy.openContainer(playerIn, RedwoodSpellCraftGui.RedwoodContainer.Make(te));
 		
 		return InteractionResult.SUCCESS;
 	}

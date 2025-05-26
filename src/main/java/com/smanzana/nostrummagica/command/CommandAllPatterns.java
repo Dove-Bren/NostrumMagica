@@ -35,7 +35,7 @@ public class CommandAllPatterns  {
 			attr.addPattern(pattern);
 		}
 		
-		NostrumMagica.instance.proxy.syncPlayer(player);
+		NostrumMagica.Proxy.syncPlayer(player);
 		
 		return 0;
 	}

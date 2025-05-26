@@ -180,7 +180,7 @@ public abstract class SpellShape {
 	protected final void spawnDefaultShapeEffect(LivingEntity caster,
 			@Nullable LivingEntity target, SpellLocation location, SpellShapeProperties properties,
 			SpellCharacteristics characteristics) {
-		NostrumMagica.instance.proxy.spawnSpellShapeVfx(location.world, this, properties,
+		NostrumMagica.Proxy.spawnSpellShapeVfx(location.world, this, properties,
 				caster, null, target, location.hitPosition,
 				characteristics);
 	}

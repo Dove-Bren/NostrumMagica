@@ -119,7 +119,7 @@ public class SpellChargeTracker {
 	
 	public void overrideServerCharge(UUID id, @Nullable SpellCharge charge) {
 		// For integrated servers, we don't want to touch the running client's data
-		final @Nullable Player integratedPlayer = NostrumMagica.instance.proxy.getPlayer();
+		final @Nullable Player integratedPlayer = NostrumMagica.Proxy.getPlayer();
 		if (integratedPlayer != null && integratedPlayer.getUUID().equals(id)) {
 			return;
 		}
@@ -143,7 +143,7 @@ public class SpellChargeTracker {
 	
 	private void notifyServer(Entity e) {
 		// If e is our player, send to server
-		if (e == NostrumMagica.instance.proxy.getPlayer()) {
+		if (e == NostrumMagica.Proxy.getPlayer()) {
 			NetworkHandler.sendToServer(new SpellChargeClientUpdateMessage(getCharge(e)));
 		}
 	}

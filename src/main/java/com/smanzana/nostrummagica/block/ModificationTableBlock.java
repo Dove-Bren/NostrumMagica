@@ -40,7 +40,7 @@ public class ModificationTableBlock extends BaseEntityBlock {
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		if (!worldIn.isClientSide()) {
 			ModificationTableTileEntity te = (ModificationTableTileEntity) worldIn.getBlockEntity(pos);
-			NostrumMagica.instance.proxy.openContainer(player, ModificationTableGui.ModificationTableContainer.Make(te));
+			NostrumMagica.Proxy.openContainer(player, ModificationTableGui.ModificationTableContainer.Make(te));
 		}
 		
 		return InteractionResult.SUCCESS;

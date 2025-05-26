@@ -248,7 +248,7 @@ public abstract class PortalBlock extends Block implements IPortalBlock, EntityB
 		final int cooldownTicks = -(TELEPORT_CHARGE_TIME * 5 * 20);
 		if (worldIn.isClientSide()) {
 			// Clients manage their own entity.
-			if (entityIn == NostrumMagica.instance.proxy.getPlayer()) {
+			if (entityIn == NostrumMagica.Proxy.getPlayer()) {
 				if (ClientTeleportCharge == 0) {
 					// First frame of charging
 					entityIn.playSound(SoundEvents.PORTAL_TRIGGER, 1f, (4f / (float) TELEPORT_CHARGE_TIME));
@@ -286,7 +286,7 @@ public abstract class PortalBlock extends Block implements IPortalBlock, EntityB
 		}
 		
 		if (doTeleport) {
-			NostrumMagica.instance.proxy.attemptBlockTeleport(entityIn, pos);
+			NostrumMagica.Proxy.attemptBlockTeleport(entityIn, pos);
 		}
 	}
 	

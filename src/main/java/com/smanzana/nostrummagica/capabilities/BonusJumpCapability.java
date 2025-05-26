@@ -50,7 +50,7 @@ public class BonusJumpCapability implements IBonusJumpCapability {
 			return;
 		}
 		
-		final Player player = NostrumMagica.instance.proxy.getPlayer();
+		final Player player = NostrumMagica.Proxy.getPlayer();
 		if (player == null || !player.isOnGround()) {
 			return;
 		}

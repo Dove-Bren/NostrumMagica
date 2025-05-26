@@ -30,7 +30,7 @@ public class CandleIgniteMessage {
 		ctx.get().setPacketHandled(true);
 		Minecraft.getInstance().submit(() -> {
 			
-			Player player = NostrumMagica.instance.proxy.getPlayer();
+			Player player = NostrumMagica.Proxy.getPlayer();
 			if (!DimensionUtils.InDimension(player, message.dimension)) {
 				return;
 			}

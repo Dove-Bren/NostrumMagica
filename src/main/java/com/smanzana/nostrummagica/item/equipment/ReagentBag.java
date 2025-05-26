@@ -221,7 +221,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		int pos = Inventories.getPlayerHandSlotIndex(playerIn.getInventory(), hand);
-		NostrumMagica.instance.proxy.openContainer(playerIn, ReagentBagGui.BagContainer.Make(pos));
+		NostrumMagica.Proxy.openContainer(playerIn, ReagentBagGui.BagContainer.Make(pos));
 		
 		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, playerIn.getItemInHand(hand));
     }

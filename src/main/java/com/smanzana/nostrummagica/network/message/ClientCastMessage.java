@@ -108,7 +108,7 @@ public class ClientCastMessage {
 			// Whether it failed or not, sync attributes to client.
 			// if it failed because they're out of mana on the server, or don't have the right attribs, etc.
 			// then we'd want to sync them. If it succeeded, their mana and xp etc. have been adjusted!
-			NostrumMagica.instance.proxy.syncPlayer(sp);
+			NostrumMagica.Proxy.syncPlayer(sp);
 			
 			if (!success) {
 				NostrumMagica.logger.debug("Player attempted to cast " + spell.getName() + " but failed server side checks");

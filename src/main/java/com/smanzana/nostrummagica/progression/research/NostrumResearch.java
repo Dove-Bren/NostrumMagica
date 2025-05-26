@@ -220,7 +220,7 @@ public class NostrumResearch {
 			NostrumMagicaSounds.SUCCESS_RESEARCH.play(player.level, player.getX(), player.getY(), player.getZ());
 			NostrumMagicaSounds.UI_RESEARCH.play(player.level, player.getX(), player.getY(), player.getZ());
 		} else {
-			NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
+			NostrumMagica.Proxy.syncPlayer((ServerPlayer) player);
 		}
 	}
 

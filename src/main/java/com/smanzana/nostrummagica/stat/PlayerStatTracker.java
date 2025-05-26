@@ -88,7 +88,7 @@ public class PlayerStatTracker extends SavedData {
 		}
 		
 		this.setDirty();
-	    NostrumMagica.instance.proxy.sendPlayerStatSync(player);
+	    NostrumMagica.Proxy.sendPlayerStatSync(player);
 	}
 	
 	@OnlyIn(Dist.CLIENT)

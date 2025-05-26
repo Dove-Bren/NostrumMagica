@@ -40,7 +40,7 @@ public class RuneShaperBlock extends BaseEntityBlock {
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		RuneShaperTileEntity te = (RuneShaperTileEntity) worldIn.getBlockEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(player, RuneShaperGui.RuneShaperContainer.Make(te));
+		NostrumMagica.Proxy.openContainer(player, RuneShaperGui.RuneShaperContainer.Make(te));
 		
 		return InteractionResult.SUCCESS;
 	}

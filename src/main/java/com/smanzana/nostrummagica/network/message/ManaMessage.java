@@ -20,9 +20,9 @@ public class ManaMessage {
 
 	public static void handle(ManaMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
-		NostrumMagica.instance.proxy.applyOverride();
+		NostrumMagica.Proxy.applyOverride();
 		
-		Player player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.Proxy.getPlayer();
 		
 		if (player == null) {
 			// Haven't finished loading. Just drop it

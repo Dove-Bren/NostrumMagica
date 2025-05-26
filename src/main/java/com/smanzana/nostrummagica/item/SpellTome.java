@@ -241,7 +241,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand hand) {
 		final @Nonnull ItemStack itemStackIn = playerIn.getItemInHand(hand);
 		if (worldIn.isClientSide)
-			NostrumMagica.instance.proxy.openBook(playerIn, this, itemStackIn);
+			NostrumMagica.Proxy.openBook(playerIn, this, itemStackIn);
 		
 		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
     }
@@ -466,8 +466,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		nbt.putInt(NBT_PAGE_INDEX, index);
 		
-		if (initial != index && !NostrumMagica.instance.proxy.isServer()) {
-			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
+		if (initial != index && !NostrumMagica.Proxy.isServer()) {
+			NostrumMagicaSounds.UI_TICK.play(NostrumMagica.Proxy.getPlayer());
 			return index;
 		} else
 			return -1;
@@ -667,7 +667,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		if (ids == null || ids.length == 0)
 			return list;
 		
-		if (!NostrumMagica.instance.proxy.isServer()) {
+		if (!NostrumMagica.Proxy.isServer()) {
 			sniffIDs(ids);
 		}
 		
@@ -1054,7 +1054,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		// If the last spell a player cast is in this time, return that.
 		// Otherwise return first spell on the page they're on.
 		@Nullable RegisteredSpell ret = null;
-		@Nullable Player player = NostrumMagica.instance.proxy.getPlayer();
+		@Nullable Player player = NostrumMagica.Proxy.getPlayer();
 		if (player != null) {
 			@Nullable Spell lastSpellRaw = NostrumMagica.playerListener.getLastSpell(player);
 			if (lastSpellRaw != null && lastSpellRaw instanceof RegisteredSpell lastSpell) {

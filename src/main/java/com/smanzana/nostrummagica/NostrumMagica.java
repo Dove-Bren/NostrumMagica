@@ -108,11 +108,11 @@ public class NostrumMagica {
 
 	public static NostrumMagica instance;
 	
-	public final CommonProxy proxy;
-	public final CuriosProxy curios;
-	public final AetheriaProxy aetheria;
+	public static final CommonProxy Proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
+	public static final CuriosProxy CuriosProxy = DistExecutor.safeRunForDist(() -> CuriosClientProxy::new, () -> CuriosProxy::new);
+	public static final AetheriaProxy AetheriaProxy = DistExecutor.safeRunForDist(() -> AetheriaClientProxy::new, () -> AetheriaProxy::new);;
 	//public final EnderIOProxy enderIO;
-	public final MinecoloniesProxy minecolonies;
+	public static final MinecoloniesProxy MinecoloniesProxy = new MinecoloniesProxy();
 
 	public static CreativeModeTab creativeTab;
 	public static CreativeModeTab equipmentTab;
@@ -142,11 +142,7 @@ public class NostrumMagica {
 	public NostrumMagica() {
 		instance = this;
 		
-		proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
-		curios = DistExecutor.safeRunForDist(() -> CuriosClientProxy::new, () -> CuriosProxy::new);
-		aetheria = DistExecutor.safeRunForDist(() -> AetheriaClientProxy::new, () -> AetheriaProxy::new);
 		//enderIO = DistExecutor.safeRunForDist(() -> EnderIOClientProxy::new, () -> EnderIOProxy::new);
-		minecolonies = new MinecoloniesProxy();
 		
 		(new ModConfig()).register();
 		
@@ -198,16 +194,16 @@ public class NostrumMagica {
 		};
 
 		if (ModList.get().isLoaded(CuriosApi.MODID)) {
-			curios.enable();
+			CuriosProxy.enable();
 		}
 		if (ModList.get().isLoaded("nostrumaetheria")) {
-			aetheria.enable();
+			AetheriaProxy.enable();
 		}
 //		if (ModList.get().isLoaded("enderio") || ModList.get().isLoaded("enderio")) {
 //			enderIO.enable();
 //		}
 		if (ModList.get().isLoaded("minecolonies")) {
-			minecolonies.enable();
+			MinecoloniesProxy.enable();
 		}
 
 		MinecraftForge.EVENT_BUS.register(this);
@@ -263,7 +259,7 @@ public class NostrumMagica {
 	public static ItemStack findTome(Player entity, int tomeID) {
 		// We look in mainhand first, then offhand, then just down
 		// hotbar.
-		@Nullable IInventorySlotKey<LivingEntity> key = NostrumMagica.instance.curios.getTomeSlotKey(entity);
+		@Nullable IInventorySlotKey<LivingEntity> key = NostrumMagica.CuriosProxy.getTomeSlotKey(entity);
 		if (key != null) {
 			final ItemStack item = key.getHeldStack(entity);
 			if (!item.isEmpty() && item.getItem() instanceof SpellTome)
@@ -291,7 +287,7 @@ public class NostrumMagica {
 		// hotbar.
 		ItemStack tome = ItemStack.EMPTY;
 		
-		@Nullable IInventorySlotKey<LivingEntity> key = NostrumMagica.instance.curios.getTomeSlotKey(entity);
+		@Nullable IInventorySlotKey<LivingEntity> key = NostrumMagica.CuriosProxy.getTomeSlotKey(entity);
 		final ItemStack tomeSlotItem = (key == null ? ItemStack.EMPTY : key.getHeldStack(entity));
 
 		if (!tomeSlotItem.isEmpty() && tomeSlotItem.getItem() instanceof SpellTome) {
@@ -357,7 +353,7 @@ public class NostrumMagica {
 			}
 		}
 		
-		Container curios = NostrumMagica.instance.curios.getCurios(player);
+		Container curios = NostrumMagica.CuriosProxy.getCurios(player);
 		if (curios != null) {
 			for (int i = 0; i < curios.getContainerSize(); i++) {
 				ItemStack equip = curios.getItem(i);
@@ -378,7 +374,7 @@ public class NostrumMagica {
 		if (getReagentCount(player, type) < count)
 			return false;
 		
-		Container curios = NostrumMagica.instance.curios.getCurios(player);
+		Container curios = NostrumMagica.CuriosProxy.getCurios(player);
 		if (curios != null) {
 			for (int i = 0; i < curios.getContainerSize(); i++) {
 				ItemStack equip = curios.getItem(i);
@@ -483,11 +479,11 @@ public class NostrumMagica {
 	public void reloadDefaultResearch() {
 		NostrumResearch.ClearAllResearch();
 		ModInit.registerDefaultResearch();
-		if (curios.isEnabled()) {
-			curios.reinitResearch();
+		if (CuriosProxy.isEnabled()) {
+			CuriosProxy.reinitResearch();
 		}
-		if (aetheria.isEnabled()) {
-			aetheria.reinitResearch();
+		if (AetheriaProxy.isEnabled()) {
+			AetheriaProxy.reinitResearch();
 		}
 //		if (enderIO.isEnabled()) {
 //			enderIO.reinitResearch();
@@ -770,7 +766,7 @@ public class NostrumMagica {
 
 	public SpellRegistry getSpellRegistry() {
 		if (spellRegistry == null) {
-			if (proxy.isServer()) {
+			if (Proxy.isServer()) {
 				throw new RuntimeException("Accessing SpellRegistry before a world has been loaded!");
 			} else {
 				spellRegistry = new SpellRegistry();
@@ -782,7 +778,7 @@ public class NostrumMagica {
 
 	public PetSoulRegistry getPetSoulRegistry() {
 		if (petSoulRegistry == null) {
-			if (proxy.isServer()) {
+			if (Proxy.isServer()) {
 				throw new RuntimeException("Accessing PetSoulRegistry before a world has been loaded!");
 			} else {
 				petSoulRegistry = new PetSoulRegistry();
@@ -793,7 +789,7 @@ public class NostrumMagica {
 
 	public PlayerStatTracker getPlayerStats() {
 		if (playerStats == null) {
-			if (proxy.isServer()) {
+			if (Proxy.isServer()) {
 				throw new RuntimeException("Accessing PlayerStats before a world has been loaded!");
 			} else {
 				playerStats = new PlayerStatTracker();
@@ -896,7 +892,7 @@ public class NostrumMagica {
 	}
 
 	public static boolean IsSameTeam(LivingEntity ent1, LivingEntity ent2) {
-		return PetFuncs.IsSameTeam(ent1, ent2) || instance.minecolonies.IsSameColony(ent1, ent2);
+		return PetFuncs.IsSameTeam(ent1, ent2) || MinecoloniesProxy.IsSameColony(ent1, ent2);
 	}
 
 	public static @Nullable LivingEntity resolveLivingEntity(@Nullable Entity entityOrSubEntity) {

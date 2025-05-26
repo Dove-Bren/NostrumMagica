@@ -200,7 +200,7 @@ public class SoulDagger extends ChargingSwordItem implements ILoreTagged, ISpell
 		
 		int durationTicks = (target instanceof Player ? 20 : 60);
 		
-		NostrumMagica.instance.proxy.playPredefinedEffect(PredefinedEffect.SOUL_DAGGER_STAB, durationTicks, target.level, target);
+		NostrumMagica.Proxy.playPredefinedEffect(PredefinedEffect.SOUL_DAGGER_STAB, durationTicks, target.level, target);
 		
 		float damage = 6.0f + EnchantmentHelper.getDamageBonus(dagger, target.getMobType());
 		

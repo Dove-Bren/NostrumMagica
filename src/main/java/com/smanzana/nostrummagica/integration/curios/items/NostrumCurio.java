@@ -215,7 +215,7 @@ public class NostrumCurio extends Item implements INostrumCurio, ILoreTagged, IS
 	@Override
 	public boolean canEquip(ItemStack stack, SlotContext slot) {
 		final LivingEntity entity = slot.entity();
-		if (entity.level.isClientSide && entity != NostrumMagica.instance.proxy.getPlayer()) {
+		if (entity.level.isClientSide && entity != NostrumMagica.Proxy.getPlayer()) {
 			return true; // Auto allow for other entities on client side when the server says they have them
 		}
 		

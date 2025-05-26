@@ -184,7 +184,7 @@ public class AspectedEarthWeapon extends DiggerItem implements ILoreTagged, ISpe
 						context.getLevel().setBlockAndUpdate(context.getClickedPos(), state.setValue(MineBlock.LEVEL, state.getValue(MineBlock.LEVEL) + 1));
 						doMineEffect(context.getPlayer(), context.getLevel(), context.getClickedPos());
 						attr.addMana(-manaCost);
-						NostrumMagica.instance.proxy.sendMana(context.getPlayer());
+						NostrumMagica.Proxy.sendMana(context.getPlayer());
 					}
 				} else if (context.getLevel().isEmptyBlock(context.getClickedPos().relative(context.getClickedFace()))) {
 				BlockPos pos = context.getClickedPos().relative(context.getClickedFace());
@@ -192,7 +192,7 @@ public class AspectedEarthWeapon extends DiggerItem implements ILoreTagged, ISpe
 						ItemStacks.damageItem(held, context.getPlayer(), context.getHand(), 1);
 						doMineEffect(context.getPlayer(), context.getLevel(), context.getClickedPos());
 						attr.addMana(-manaCost);
-						NostrumMagica.instance.proxy.sendMana(context.getPlayer());
+						NostrumMagica.Proxy.sendMana(context.getPlayer());
 					}
 				}
 			}

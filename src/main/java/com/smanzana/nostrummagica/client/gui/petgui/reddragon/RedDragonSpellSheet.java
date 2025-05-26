@@ -498,7 +498,7 @@ public class RedDragonSpellSheet implements IPetGUISheet<TameRedDragonEntity> {
 		}
 		
 		sendGambitCycle(index, mouseButton == 0);
-		NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
+		NostrumMagicaSounds.UI_TICK.play(NostrumMagica.Proxy.getPlayer());
 		return true;
 	}
 	

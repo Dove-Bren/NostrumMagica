@@ -37,7 +37,7 @@ public interface ISpellEquipment {
 		// Possibly use baubles (for players)
 		if (entity instanceof Player) {
 			final Player playerCast = (Player) entity;
-			Container curios = NostrumMagica.instance.curios.getCurios(playerCast);
+			Container curios = NostrumMagica.CuriosProxy.getCurios(playerCast);
 			if (curios != null) {
 				for (int i = 0; i < curios.getContainerSize(); i++) {
 					ItemStack equip = curios.getItem(i);

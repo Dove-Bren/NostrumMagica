@@ -375,7 +375,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	
 	protected void initSlices() {
 		// Remake slices each time to allow attr to change
-		Player player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.Proxy.getPlayer();
 		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
 		// elements
@@ -395,7 +395,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		this.element = element;
 		
 		// If no alterations are discovered, submit now
-		Player player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.Proxy.getPlayer();
 		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		final boolean alterPickAllowed = attr != null
 				&& attr.getAlterations().values().stream().filter(Objects::nonNull).anyMatch(Boolean::booleanValue)
@@ -531,7 +531,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
 		if (/*this.isEnabled() || */this.getFadeProgress() > 0f) {
 			final float fade = this.getFadeProgress();
-			Player player = NostrumMagica.instance.proxy.getPlayer();
+			Player player = NostrumMagica.Proxy.getPlayer();
 			final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr != null) {
 				final float radius = 90f;

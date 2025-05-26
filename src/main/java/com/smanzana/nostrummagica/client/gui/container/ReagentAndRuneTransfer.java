@@ -79,7 +79,7 @@ public final class ReagentAndRuneTransfer {
 			}
 		}
 		
-		Container curios = NostrumMagica.instance.curios.getCurios(player);
+		Container curios = NostrumMagica.CuriosProxy.getCurios(player);
 		if (curios != null) {
 			for (int i = 0; i < curios.getContainerSize(); i++) {
 				ItemStack equip = curios.getItem(i);
@@ -110,7 +110,7 @@ public final class ReagentAndRuneTransfer {
 			}
 		}
 		
-		Container curios = NostrumMagica.instance.curios.getCurios(player);
+		Container curios = NostrumMagica.CuriosProxy.getCurios(player);
 		if (curios != null) {
 			for (int i = 0; i < curios.getContainerSize(); i++) {
 				ItemStack equip = curios.getItem(i);

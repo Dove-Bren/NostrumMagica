@@ -333,8 +333,8 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 		@OnlyIn(Dist.CLIENT)
 		public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 			final boolean extra = Screen.hasShiftDown();
-			final @Nullable AbstractContainerMenu openContainer = (NostrumMagica.instance.proxy.getPlayer() != null)
-					? NostrumMagica.instance.proxy.getPlayer().containerMenu : null;
+			final @Nullable AbstractContainerMenu openContainer = (NostrumMagica.Proxy.getPlayer() != null)
+					? NostrumMagica.Proxy.getPlayer().containerMenu : null;
 			SpellShapeProperties params = getPieceShapeParam(stack);
 			tooltip.add(new TextComponent("Shape").withStyle(ChatFormatting.DARK_RED));
 			if (shape.getAttributes(params).terminal) {

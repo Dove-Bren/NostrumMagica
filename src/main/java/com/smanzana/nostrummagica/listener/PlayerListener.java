@@ -580,7 +580,7 @@ public class PlayerListener {
 						if (isLava && living.tickCount % 4 == 0) {
 							attr.addMana(-manaCost);
 							if (living instanceof Player) {
-								NostrumMagica.instance.proxy.sendMana((Player) living);
+								NostrumMagica.Proxy.sendMana((Player) living);
 							}
 						}
 						return;
@@ -627,8 +627,8 @@ public class PlayerListener {
 								action.apply(livingTarget, livingSource, 1.0f, ISpellLogBuilder.Dummy);
 						}
 					}
-					if (NostrumMagica.instance.curios.isEnabled() && livingTarget instanceof Player) {
-						Container inv = NostrumMagica.instance.curios.getCurios((Player) livingTarget);
+					if (NostrumMagica.CuriosProxy.isEnabled() && livingTarget instanceof Player) {
+						Container inv = NostrumMagica.CuriosProxy.getCurios((Player) livingTarget);
 						if (inv != null) {
 							for (int i = 0; i < inv.getContainerSize(); i++) {
 								ItemStack stack = inv.getItem(i);
@@ -658,8 +658,8 @@ public class PlayerListener {
 							action.apply(livingSource, livingTarget, 1.0f, ISpellLogBuilder.Dummy);
 					}
 				}
-				if (NostrumMagica.instance.curios.isEnabled() && livingSource instanceof Player) {
-					Container inv = NostrumMagica.instance.curios.getCurios((Player) livingSource);
+				if (NostrumMagica.CuriosProxy.isEnabled() && livingSource instanceof Player) {
+					Container inv = NostrumMagica.CuriosProxy.getCurios((Player) livingSource);
 					if (inv != null) {
 						for (int i = 0; i < inv.getContainerSize(); i++) {
 							ItemStack stack = inv.getItem(i);
@@ -1000,7 +1000,7 @@ public class PlayerListener {
 				}
 			}
 			
-			Container curios = NostrumMagica.instance.curios.getCurios(player);
+			Container curios = NostrumMagica.CuriosProxy.getCurios(player);
 			if (curios != null) {
 				for (int i = 0; i < curios.getContainerSize(); i++) {
 					ItemStack equip = curios.getItem(i);
@@ -1191,7 +1191,7 @@ public class PlayerListener {
 			mana++;
 		
 		stats.addMana(mana);
-		NostrumMagica.instance.proxy.sendMana(player);
+		NostrumMagica.Proxy.sendMana(player);
 	}
 	
 	@SubscribeEvent
@@ -1200,7 +1200,7 @@ public class PlayerListener {
 			return;
 		}
 		
-		NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) event.getPlayer());
+		NostrumMagica.Proxy.syncPlayer((ServerPlayer) event.getPlayer());
 	}
 	
 	@SubscribeEvent
@@ -1242,7 +1242,7 @@ public class PlayerListener {
 				}
 			}
 			// Possibly use baubles
-			Container baubles = NostrumMagica.instance.curios.getCurios(player);
+			Container baubles = NostrumMagica.CuriosProxy.getCurios(player);
 			if (xp != 0)	
 			if (baubles != null) {
 				for (int i = 0; i < baubles.getContainerSize(); i++) {
@@ -1363,7 +1363,7 @@ public class PlayerListener {
 		
 		if (ElementalArmor.DoEarthDig(player.level, player, e.getPos(), e.getFace())) {
 			attr.addMana(-20);
-			NostrumMagica.instance.proxy.sendMana(player);
+			NostrumMagica.Proxy.sendMana(player);
 			e.setCanceled(true);
 		}
 	}

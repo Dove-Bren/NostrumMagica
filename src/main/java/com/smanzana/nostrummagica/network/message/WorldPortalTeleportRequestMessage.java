@@ -21,7 +21,7 @@ public class WorldPortalTeleportRequestMessage {
 		ServerPlayer sp = ctx.get().getSender();
 		
 		ctx.get().enqueueWork(() -> {
-			NostrumMagica.instance.proxy.attemptBlockTeleport(sp, message.portalPos);				
+			NostrumMagica.Proxy.attemptBlockTeleport(sp, message.portalPos);				
 		});
 	}
 

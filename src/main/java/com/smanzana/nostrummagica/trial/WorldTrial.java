@@ -82,7 +82,7 @@ public abstract class WorldTrial {
 			NostrumMagicaSounds.LEVELUP.play(player);
 			// Message done in attr
 			//player.sendMessage(new TranslationTextComponent("info.element.mastery" + mastery.intValue(), new Object[] {this.element.getName()}));
-			NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
+			NostrumMagica.Proxy.syncPlayer((ServerPlayer) player);
 		}
 			
 	}

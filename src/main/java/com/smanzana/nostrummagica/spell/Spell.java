@@ -178,7 +178,7 @@ public class Spell {
 		}
 		
 		final ISpellLogBuilder logger;
-		if (caster instanceof Player && NostrumMagica.instance.proxy.hasIntegratedServer()) {
+		if (caster instanceof Player && NostrumMagica.Proxy.hasIntegratedServer()) {
 			SpellLogEntry log = new SpellLogEntry(this, caster);
 			logger = new SpellLogBuilder(log);
 		} else {

@@ -603,7 +603,7 @@ public class SpellAction {
 			
 			if (caster != null && caster instanceof Player) {
 				// Look for lightning belt
-				Container baubles = NostrumMagica.instance.curios.getCurios((Player) caster);
+				Container baubles = NostrumMagica.CuriosProxy.getCurios((Player) caster);
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getContainerSize(); i++) {
 						ItemStack stack = baubles.getItem(i);
@@ -802,7 +802,7 @@ public class SpellAction {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 			attr.giveTransmuteKnowledge(result.source.getName(), level);
 			if (caster instanceof ServerPlayer) {
-				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) caster);
+				NostrumMagica.Proxy.syncPlayer((ServerPlayer) caster);
 			}
 			
 			if (entity instanceof Player) {
@@ -847,7 +847,7 @@ public class SpellAction {
 			attr.giveTransmuteKnowledge(result.source.getName(), level);
 			
 			if (caster instanceof ServerPlayer) {
-				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) caster);
+				NostrumMagica.Proxy.syncPlayer((ServerPlayer) caster);
 			}
 			
 			location.world.setBlockAndUpdate(location.selectedBlockPos, result.output.defaultBlockState());
@@ -972,7 +972,7 @@ public class SpellAction {
 			
 			if (caster != null && caster instanceof Player) {
 				// Look for lightning belt
-				Container baubles = NostrumMagica.instance.curios.getCurios((Player) caster);
+				Container baubles = NostrumMagica.CuriosProxy.getCurios((Player) caster);
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getContainerSize(); i++) {
 						ItemStack stack = baubles.getItem(i);
@@ -1355,7 +1355,7 @@ public class SpellAction {
 			
 			if (caster != null && caster instanceof Player) {
 				// Look for ender belt
-				Container baubles = NostrumMagica.instance.curios.getCurios((Player) caster);
+				Container baubles = NostrumMagica.CuriosProxy.getCurios((Player) caster);
 				if (baubles != null) {
 					for (int i = 0; i < baubles.getContainerSize(); i++) {
 						ItemStack stack = baubles.getItem(i);

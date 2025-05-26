@@ -54,7 +54,7 @@ public class DragonFlightWingsLayer extends RenderLayer<AbstractClientPlayer, Pl
 		}
 		
 		// Try bauables
-		Container baubles = NostrumMagica.instance.curios.getCurios(player);
+		Container baubles = NostrumMagica.CuriosProxy.getCurios(player);
 		
 		if (baubles != null) {
 			for (int i = 0; i < baubles.getContainerSize(); i++) {
@@ -80,7 +80,7 @@ public class DragonFlightWingsLayer extends RenderLayer<AbstractClientPlayer, Pl
 		}
 		
 		// Try bauables
-		Container baubles = NostrumMagica.instance.curios.getCurios(player);
+		Container baubles = NostrumMagica.CuriosProxy.getCurios(player);
 		if (baubles != null) {
 			for (int i = 0; i < baubles.getContainerSize(); i++) {
 				ItemStack stack = baubles.getItem(i);

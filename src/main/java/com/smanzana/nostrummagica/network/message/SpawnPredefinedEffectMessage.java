@@ -28,7 +28,7 @@ public class SpawnPredefinedEffectMessage {
 
 	public static void handle(SpawnPredefinedEffectMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
-		Player player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.Proxy.getPlayer();
 		if (!DimensionUtils.InDimension(player, message.dimension)) {
 			return;
 		}

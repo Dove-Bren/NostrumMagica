@@ -61,8 +61,8 @@ public class RemoteInteractMessage {
 	protected static void handleServerCheck(RemoteInteractMessage message) {
 		// Server responded. Make sure it agrees to proceed
 		if (message.success) {
-			Player player = NostrumMagica.instance.proxy.getPlayer();
-			if (NostrumMagica.instance.proxy.attemptPlayerInteract(player, player.level, message.pos, message.hand, makeFakeHit(message.pos))) {
+			Player player = NostrumMagica.Proxy.getPlayer();
+			if (NostrumMagica.Proxy.attemptPlayerInteract(player, player.level, message.pos, message.hand, makeFakeHit(message.pos))) {
 				NetworkHandler.sendToServer(new RemoteInteractMessage(Phase.CLIENT_COMMIT, message.dimension, message.pos, message.hand, true));
 			}
 		} else {
@@ -73,7 +73,7 @@ public class RemoteInteractMessage {
 	protected static void handleClientCommit(ServerPlayer sender, RemoteInteractMessage message) {
 		final Level world = ServerLifecycleHooks.getCurrentServer().getLevel(message.dimension);
 		if (world != null && NostrumMagica.isBlockLoaded(world, message.pos)) {
-			NostrumMagica.instance.proxy.attemptPlayerInteract(sender, world, message.pos, message.hand, makeFakeHit(message.pos));
+			NostrumMagica.Proxy.attemptPlayerInteract(sender, world, message.pos, message.hand, makeFakeHit(message.pos));
 		}
 	}
 	

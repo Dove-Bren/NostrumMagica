@@ -23,11 +23,11 @@ public class PlayerStatSyncMessage {
 		// Note: This handler is not done on the game thread since the spell registry is thread safe.
 		ctx.get().setPacketHandled(true);
 		ctx.get().enqueueWork(() -> {
-			final UUID myID = NostrumMagica.instance.proxy.getPlayer().getUUID();
+			final UUID myID = NostrumMagica.Proxy.getPlayer().getUUID();
 			if (!myID.equals(message.id)) {
 				NostrumMagica.logger.error("Received PlayerStatSync message for a different player: " + message.id);
 			} else {
-				NostrumMagica.instance.getPlayerStats().override(NostrumMagica.instance.proxy.getPlayer(), message.stats);
+				NostrumMagica.instance.getPlayerStats().override(NostrumMagica.Proxy.getPlayer(), message.stats);
 			}
 		});
 	}

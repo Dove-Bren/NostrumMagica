@@ -30,7 +30,7 @@ public class SpawnNostrumRitualEffectMessage {
 
 	public static void handle(SpawnNostrumRitualEffectMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
-		Player player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.Proxy.getPlayer();
 		if (!DimensionUtils.InDimension(player, message.dimension)) {
 			return;
 		}

@@ -462,12 +462,12 @@ public class ObeliskScreen extends Screen {
 		if (!butt.isValid)
 			return;
 		
-		NostrumMagica.instance.proxy.setObeliskIndex(tileEntity.getBlockPos(), butt.obeliskIndex);
+		NostrumMagica.Proxy.setObeliskIndex(tileEntity.getBlockPos(), butt.obeliskIndex);
 		Minecraft.getInstance().setScreen(null);
 	}
 	
 	protected void onRemoveClicked(RemoveButton button) {
-		NostrumMagica.instance.proxy.removeObeliskIndex(tileEntity.getBlockPos(), button.obeliskIndex);
+		NostrumMagica.Proxy.removeObeliskIndex(tileEntity.getBlockPos(), button.obeliskIndex);
 		Minecraft.getInstance().setScreen(null);
 	}
 	

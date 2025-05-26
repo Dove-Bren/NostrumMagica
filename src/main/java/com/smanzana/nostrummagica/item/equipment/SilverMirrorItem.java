@@ -60,7 +60,7 @@ public class SilverMirrorItem extends HandheldMirrorItem implements ILoreTagged 
 	@Override
 	protected void handleOpen(Player player, InteractionHand hand, ItemStack stack) {
 		int pos = Inventories.getPlayerHandSlotIndex(player.getInventory(), hand);
-		NostrumMagica.instance.proxy.openContainer(player, SilverMirrorGui.MirrorContainer.Make(pos));
+		NostrumMagica.Proxy.openContainer(player, SilverMirrorGui.MirrorContainer.Make(pos));
 	}
 
 }

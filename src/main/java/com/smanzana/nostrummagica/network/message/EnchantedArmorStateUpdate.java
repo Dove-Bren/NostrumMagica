@@ -21,7 +21,7 @@ public class EnchantedArmorStateUpdate {
 	public static void handle(EnchantedArmorStateUpdate message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
 		LivingEntity ent = (ctx.get().getDirection().getReceptionSide().isClient()
-				? (LivingEntity) NostrumMagica.instance.proxy.getPlayer().level.getEntity(message.entityID)
+				? (LivingEntity) NostrumMagica.Proxy.getPlayer().level.getEntity(message.entityID)
 						: ctx.get().getSender());
 		if (ent != null) {
 			ElementalArmor.HandleStateUpdate(message.state, ent, message.data);

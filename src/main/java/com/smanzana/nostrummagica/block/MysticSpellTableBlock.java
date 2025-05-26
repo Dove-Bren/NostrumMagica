@@ -38,7 +38,7 @@ public class MysticSpellTableBlock extends BasicSpellTableBlock {
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand handIn, BlockHitResult hit) {
 		
 		MysticSpellTableTileEntity te = (MysticSpellTableTileEntity) worldIn.getBlockEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(playerIn, MysticSpellCraftGui.MysticContainer.Make(te));
+		NostrumMagica.Proxy.openContainer(playerIn, MysticSpellCraftGui.MysticContainer.Make(te));
 		
 		return InteractionResult.SUCCESS;
 	}

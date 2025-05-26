@@ -54,7 +54,7 @@ public class RedstoneTriggerBlock extends TriggerRepeaterBlock {
 	
 	@Override
 	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
-		if (worldIn.isClientSide() && NostrumMagica.instance.proxy.getPlayer() != null && NostrumMagica.instance.proxy.getPlayer().isCreative()) {
+		if (worldIn.isClientSide() && NostrumMagica.Proxy.getPlayer() != null && NostrumMagica.Proxy.getPlayer().isCreative()) {
 			worldIn.addParticle(new BlockParticleOption(ParticleTypes.BLOCK_MARKER, Blocks.BARRIER.defaultBlockState()), pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, 0, 0, 0);
 		}
 	}

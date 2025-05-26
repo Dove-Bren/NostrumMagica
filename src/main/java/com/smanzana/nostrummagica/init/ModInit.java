@@ -192,8 +192,8 @@ public class ModInit {
 		MinecraftForge.EVENT_BUS.addListener(ModInit::registerDefaultRituals);
 		
 		preinit();
-		NostrumMagica.instance.aetheria.preInit();
-		NostrumMagica.instance.curios.preInit();
+		NostrumMagica.AetheriaProxy.preInit();
+		NostrumMagica.CuriosProxy.preInit();
 		//NostrumMagica.instance.enderIO.preInit();
 		
 		// MID phase:
@@ -214,8 +214,8 @@ public class ModInit {
 		//NostrumDungeonStructure.initGens();
 
 		init();
-		NostrumMagica.instance.aetheria.init();
-		NostrumMagica.instance.curios.init();
+		NostrumMagica.AetheriaProxy.init();
+		NostrumMagica.CuriosProxy.init();
 		//NostrumMagica.instance.enderIO.init();
 	
 		// LATE phase:
@@ -223,7 +223,7 @@ public class ModInit {
 		// Used to be two different mod init steps!
 		
 		postinit();
-		NostrumMagica.instance.aetheria.postInit();
+		NostrumMagica.AetheriaProxy.postInit();
 		//NostrumMagica.instance.curios.postInit();
 		//NostrumMagica.instance.enderIO.postInit();
 		
@@ -805,7 +805,7 @@ public class ModInit {
 						new OutcomeSpawnItem(new ItemStack(NostrumItems.skillEnderPin))));
 
 		// Mirror Shield
-		Ingredient extra = (NostrumMagica.instance.curios.isEnabled() ? Ingredient.of(NostrumCurios.smallRibbon)
+		Ingredient extra = (NostrumMagica.CuriosProxy.isEnabled() ? Ingredient.of(NostrumCurios.smallRibbon)
 				: Ingredient.of(NostrumTags.Items.CrystalSmall));
 
 		registry.register(RitualRecipe.createTier3("mirror_shield",
@@ -817,7 +817,7 @@ public class ModInit {
 				new ResearchRequirement("mirror_shield"),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.mirrorShield))));
 
-		extra = (NostrumMagica.instance.curios.isEnabled() ? Ingredient.of(NostrumCurios.mediumRibbon)
+		extra = (NostrumMagica.CuriosProxy.isEnabled() ? Ingredient.of(NostrumCurios.mediumRibbon)
 				: Ingredient.of(NostrumTags.Items.CrystalMedium));
 		registry
 				.register(RitualRecipe.createTier3("true_mirror_shield",
@@ -1879,7 +1879,7 @@ public class ModInit {
 				.build("dragon_armor", NostrumResearchTab.OUTFITTING, Size.LARGE, -2, 4, true,
 						new ItemStack(DragonArmor.GetArmor(DragonEquipmentSlot.HELM, DragonArmorMaterial.IRON)));
 
-		NostrumResearch.startBuilding().parent("enchanted_armor").parent(NostrumMagica.instance.curios.isEnabled() ? "belts" : "origin")
+		NostrumResearch.startBuilding().parent("enchanted_armor").parent(NostrumMagica.CuriosProxy.isEnabled() ? "belts" : "origin")
 				.reference("ritual::mirror_shield", "ritual.mirror_shield.name").build("mirror_shield",
 						NostrumResearchTab.OUTFITTING, Size.LARGE, -3, 3, true, new ItemStack(NostrumItems.mirrorShield));
 

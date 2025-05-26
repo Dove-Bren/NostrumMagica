@@ -187,7 +187,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 				// Just learned!
 				final int color = 0x80000000 | (0x00FFFFFF & element.getColor());
 				DoEffect(worldPosition, player, color);
-				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
+				NostrumMagica.Proxy.syncPlayer((ServerPlayer) player);
 				
 				final EElementalMastery mastery = attr.getElementalMastery(element);
 				final Component msg = new TranslatableComponent("info.element_mastery." + mastery.getTranslationKey(), element.getDisplayName().copy().withStyle(element.getChatColor()));
@@ -267,7 +267,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 				
 				final Component msg = new TranslatableComponent("info.shrine.alteration", alteration.getDisplayName());
 				player.sendMessage(msg, Util.NIL_UUID);
-				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
+				NostrumMagica.Proxy.syncPlayer((ServerPlayer) player);
 				
 				((ServerPlayer)player).connection.send(new ClientboundSetSubtitleTextPacket(msg));
 				((ServerPlayer)player).connection.send(new ClientboundSetTitleTextPacket(TextComponent.EMPTY));
@@ -346,7 +346,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 				DoEffect(worldPosition, player, 0x8080C0A0);
 				final Component msg = new TranslatableComponent("info.shrine.shape", new Object[] {shape.getDisplayName()});
 				player.sendMessage(msg, Util.NIL_UUID);
-				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
+				NostrumMagica.Proxy.syncPlayer((ServerPlayer) player);
 				
 				((ServerPlayer)player).connection.send(new ClientboundSetSubtitleTextPacket(msg));
 				((ServerPlayer)player).connection.send(new ClientboundSetTitleTextPacket(TextComponent.EMPTY));
@@ -421,7 +421,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 				DoEffect(worldPosition, player, 0x80666666);
 				final Component msg = new TranslatableComponent("info.shrine.tier", tier.getName());
 				player.sendMessage(msg, Util.NIL_UUID);
-				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
+				NostrumMagica.Proxy.syncPlayer((ServerPlayer) player);
 				
 				((ServerPlayer)player).connection.send(new ClientboundSetSubtitleTextPacket(msg));
 				((ServerPlayer)player).connection.send(new ClientboundSetTitleTextPacket(TextComponent.EMPTY));

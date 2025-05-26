@@ -87,7 +87,7 @@ public class OnFoodShape extends OnMetricLevelShape {
 
 					expired = true;
 					this.trigger(data);
-					NostrumMagica.instance.proxy.spawnSpellShapeVfx(this.getState().getSelf().level,
+					NostrumMagica.Proxy.spawnSpellShapeVfx(this.getState().getSelf().level,
 							NostrumSpellShapes.OnFood, properties,
 							this.getState().getSelf(), null, this.getState().getSelf(), null, characteristics);
 					NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_FOOD, this.entity);

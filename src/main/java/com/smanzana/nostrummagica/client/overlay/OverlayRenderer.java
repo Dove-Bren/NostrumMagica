@@ -1244,7 +1244,7 @@ public class OverlayRenderer extends GuiComponent {
 	}
 	
 	private void renderSpellCooldownOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
-		final Player player = NostrumMagica.instance.proxy.getPlayer();
+		final Player player = NostrumMagica.Proxy.getPlayer();
 		final SpellCooldownTracker tracker = NostrumMagica.instance.getSpellCooldownTracker(player.getLevel());
 		final Cooldowns cooldowns = tracker.getCooldowns(player);
 		if (cooldowns != null && cooldowns.getGlobalCooldown().endTicks > player.tickCount) {

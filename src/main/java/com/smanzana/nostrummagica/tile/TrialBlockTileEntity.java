@@ -152,7 +152,7 @@ public class TrialBlockTileEntity extends BlockEntity implements TickableBlockEn
 		
 		attr.endTrial(this.getElement());
 		NostrumMagica.UnlockElementalMastery(player, this.element, newMastery);
-		NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
+		NostrumMagica.Proxy.syncPlayer((ServerPlayer) player);
 	}
 	
 	protected void stopTrial(boolean success) {

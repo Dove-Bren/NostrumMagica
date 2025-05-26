@@ -359,7 +359,7 @@ public class MagicCharm extends Item implements ILoreTagged {
 	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		if (element == EMagicElement.ENDER) {
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.instance.proxy.getPlayer());
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.Proxy.getPlayer());
 			if (attr != null && attr.hasEnhancedTeleport()) {
 				tooltip.add(new TranslatableComponent("info.endercharm.enhanced"));
 			}

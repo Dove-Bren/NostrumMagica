@@ -18,7 +18,7 @@ public class SorceryPortalTileEntity extends PortalBlock.NostrumPortalTileEntity
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public int getColor() {
-		Player player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.Proxy.getPlayer();
 		if (PortalBlock.getRemainingCharge(player) > 0) {
 			return 0x00FF0050;
 		}
@@ -34,7 +34,7 @@ public class SorceryPortalTileEntity extends PortalBlock.NostrumPortalTileEntity
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public float getOpacity() {
-		Player player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.Proxy.getPlayer();
 		if (PortalBlock.getCooldownTime(player) > 0) {
 			return 0.5f;
 		}

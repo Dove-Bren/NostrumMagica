@@ -246,7 +246,7 @@ public class ObeliskBlock extends Block implements EntityBlock {
 		if (!worldIn.isClientSide()) {
 			worldIn.sendBlockUpdated(pos, state, state, 2);
 		} else {
-			NostrumMagica.instance.proxy.openObeliskScreen(worldIn, pos);
+			NostrumMagica.Proxy.openObeliskScreen(worldIn, pos);
 		}
 		return InteractionResult.SUCCESS;
 	}

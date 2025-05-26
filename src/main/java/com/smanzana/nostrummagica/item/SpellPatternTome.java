@@ -120,7 +120,7 @@ public class SpellPatternTome extends Item implements ILoreTagged {
 				attr.addPattern(pattern);
 				NostrumMagicaSounds.LORE.play(null, playerIn.level, playerIn.getX(), playerIn.getY(), playerIn.getZ());
 				stack.shrink(1);
-				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) playerIn);
+				NostrumMagica.Proxy.syncPlayer((ServerPlayer) playerIn);
 				playerIn.sendMessage(new TranslatableComponent("info.pattern.learn", pattern.getName()), Util.NIL_UUID);
 				
 			}

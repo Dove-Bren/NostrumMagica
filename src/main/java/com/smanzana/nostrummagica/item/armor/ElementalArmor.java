@@ -1245,7 +1245,7 @@ public class ElementalArmor extends ArmorItem
 
 					if (player.tickCount % 3 == 0) {
 						attr.addMana(-1);
-						NostrumMagica.instance.proxy.sendMana(player);
+						NostrumMagica.Proxy.sendMana(player);
 					}
 				}
 			} else if (element == EMagicElement.EARTH) {
@@ -1255,7 +1255,7 @@ public class ElementalArmor extends ArmorItem
 						// Attempt bonemeal
 						if (DoEarthGrow(world, player.blockPosition()) != null) {
 							attr.addMana(-EARTH_GROW_COST);
-							NostrumMagica.instance.proxy.sendMana(player);
+							NostrumMagica.Proxy.sendMana(player);
 						}
 					}
 				}
@@ -1544,7 +1544,7 @@ public class ElementalArmor extends ArmorItem
 
 	@SubscribeEvent
 	public static void onKey(KeyInputEvent event) {
-		Player player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.Proxy.getPlayer();
 		if (bindingEnderLeft.consumeClick()) {
 			clientDashSide(player, false);
 		} else if (bindingEnderRight.consumeClick()) {
@@ -1744,7 +1744,7 @@ public class ElementalArmor extends ArmorItem
 			final EnchantedArmorStateUpdate message = new EnchantedArmorStateUpdate(ArmorState.FLYING,
 					ArmorCheckFlying(player), player.getId());
 			if (player.level.isClientSide) {
-				assert (player == NostrumMagica.instance.proxy.getPlayer());
+				assert (player == NostrumMagica.Proxy.getPlayer());
 				NetworkHandler.sendToServer(message);
 			} else if (toPlayer != null) {
 				NetworkHandler.sendTo(message, (ServerPlayer) toPlayer);
@@ -2052,7 +2052,7 @@ public class ElementalArmor extends ArmorItem
 						ElementalArmor.consumeEnderDash(ent);
 					} else {
 						if (ent instanceof Player) {
-							NostrumMagica.instance.proxy.sendMana((Player) ent);
+							NostrumMagica.Proxy.sendMana((Player) ent);
 						}
 					}
 				}

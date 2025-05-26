@@ -125,7 +125,7 @@ public class RuneLibraryBlock extends BaseEntityBlock {
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		RuneLibraryTileEntity te = (RuneLibraryTileEntity) worldIn.getBlockEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(player, RuneLibraryGui.RuneLibraryContainer.Make(te));
+		NostrumMagica.Proxy.openContainer(player, RuneLibraryGui.RuneLibraryContainer.Make(te));
 		
 		return InteractionResult.SUCCESS;
 	}

@@ -47,7 +47,7 @@ public class SwitchTriggerRenderer extends LivingEntityRenderer<SwitchTriggerEnt
 	
 	@Override
 	protected boolean shouldShowName(SwitchTriggerEntity entity) {
-		return entity.hasCustomName() || NostrumMagica.instance.proxy.getPlayer().isCreative();
+		return entity.hasCustomName() || NostrumMagica.Proxy.getPlayer().isCreative();
 	}
 	
 	@Override

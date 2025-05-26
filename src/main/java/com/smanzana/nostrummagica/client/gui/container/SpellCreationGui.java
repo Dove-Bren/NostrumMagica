@@ -1217,7 +1217,7 @@ public class SpellCreationGui {
 		
 		private static final Map<EAlteration, Map<EMagicElement, SpellAction>> actionCache = new HashMap<>();
 		protected static @Nullable SpellAction getKnownActionForPart(SpellEffectPart part) {
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.instance.proxy.getPlayer());
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.Proxy.getPlayer());
 			final boolean known = attr != null && attr.hasKnowledge(part.getElement(), part.getAlteration());
 			if (!known) {
 				return null;

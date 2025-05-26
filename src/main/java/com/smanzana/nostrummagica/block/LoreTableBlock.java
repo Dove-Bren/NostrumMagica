@@ -46,7 +46,7 @@ public class LoreTableBlock extends BaseEntityBlock {
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		if (!worldIn.isClientSide()) {
 			LoreTableTileEntity te = (LoreTableTileEntity) worldIn.getBlockEntity(pos);
-			NostrumMagica.instance.proxy.openContainer(player, LoreTableGui.LoreTableContainer.Make(te));
+			NostrumMagica.Proxy.openContainer(player, LoreTableGui.LoreTableContainer.Make(te));
 		}
 		
 		return InteractionResult.SUCCESS;

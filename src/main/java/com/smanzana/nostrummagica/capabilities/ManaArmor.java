@@ -149,7 +149,7 @@ public class ManaArmor implements IManaArmor {
 		this.setHasArmor(false, 0);
 		spawnBreakEffects(exhaustedEntity);
 		if (exhaustedEntity instanceof ServerPlayer) {
-			NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) exhaustedEntity);
+			NostrumMagica.Proxy.syncPlayer((ServerPlayer) exhaustedEntity);
 		}
 	}
 	

@@ -30,7 +30,7 @@ public class SpellCraftingCapabilitySyncMessage {
 			final Minecraft mc = Minecraft.getInstance();
 			@Nullable Entity ent = mc.player.getCommandSenderWorld().getEntity(message.entID);
 			if (ent != null) {
-				NostrumMagica.instance.proxy.receiveSpellCraftingOverride(ent, message.stats);
+				NostrumMagica.Proxy.receiveSpellCraftingOverride(ent, message.stats);
 			}
 		});
 	}

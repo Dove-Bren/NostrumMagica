@@ -30,7 +30,7 @@ public class ManaArmorSyncMessage {
 			final Minecraft mc = Minecraft.getInstance();
 			@Nullable Entity ent = mc.player.getCommandSenderWorld().getEntity(message.entID);
 			if (ent != null) {
-				NostrumMagica.instance.proxy.receiveManaArmorOverride(ent, message.stats);
+				NostrumMagica.Proxy.receiveManaArmorOverride(ent, message.stats);
 			}
 		});
 	}

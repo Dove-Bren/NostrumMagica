@@ -26,7 +26,7 @@ public class StatSyncMessage {
 		Minecraft.getInstance().submit(() -> {
 			INostrumMagic override = new NostrumMagic(null);
 			override.deserializeNBT(message.tag);
-			NostrumMagica.instance.proxy.receiveStatOverrides(override);
+			NostrumMagica.Proxy.receiveStatOverrides(override);
 		});
 		
 		ctx.get().setPacketHandled(true);

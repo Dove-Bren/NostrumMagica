@@ -55,7 +55,7 @@ public class PutterBlock extends BaseEntityBlock {
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		PutterBlockTileEntity te = (PutterBlockTileEntity) worldIn.getBlockEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(player, PutterBlockGui.PutterBlockContainer.Make(te));
+		NostrumMagica.Proxy.openContainer(player, PutterBlockGui.PutterBlockContainer.Make(te));
 		
 		return InteractionResult.SUCCESS;
 	}

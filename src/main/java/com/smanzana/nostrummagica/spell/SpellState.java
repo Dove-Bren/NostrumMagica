@@ -355,13 +355,13 @@ public class SpellState implements ISpellState {
 			if (first) {
 				if (!affectedEnts.isEmpty())
 				for (LivingEntity affected : affectedEnts) {
-					NostrumMagica.instance.proxy.spawnSpellEffectVfx(affected.level, part,
+					NostrumMagica.Proxy.spawnSpellEffectVfx(affected.level, part,
 							caster, null, affected, null);
 				}
 				
 				if (!affectedPos.isEmpty())
 				for (SpellLocation affectPos : affectedPos) {
-					NostrumMagica.instance.proxy.spawnSpellEffectVfx(affectPos.world, part,
+					NostrumMagica.Proxy.spawnSpellEffectVfx(affectPos.world, part,
 							caster, null, null, new Vec3(affectPos.selectedBlockPos.getX() + .5, affectPos.selectedBlockPos.getY(), affectPos.selectedBlockPos.getZ() + .5)
 							);
 				}

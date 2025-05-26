@@ -132,7 +132,7 @@ public class Skill {
 		if (!player.level.isClientSide)
 			NostrumMagicaSounds.SUCCESS_QUEST.play(player.level, player.getX(), player.getY(), player.getZ());
 		else
-			NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) player);
+			NostrumMagica.Proxy.syncPlayer((ServerPlayer) player);
 	}
 	
 	/**

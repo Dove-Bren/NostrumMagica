@@ -158,7 +158,7 @@ public class MasterSpellTableBlock extends HorizontalDirectionalBlock implements
 		}
 		
 		SpellTableTileEntity te = (SpellTableTileEntity) worldIn.getBlockEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(playerIn, MasterSpellCreationGui.SpellCreationContainer.Make(te));
+		NostrumMagica.Proxy.openContainer(playerIn, MasterSpellCreationGui.SpellCreationContainer.Make(te));
 		
 		return InteractionResult.SUCCESS;
 	}

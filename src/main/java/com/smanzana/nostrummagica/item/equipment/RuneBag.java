@@ -147,7 +147,7 @@ public class RuneBag extends Item implements ILoreTagged {
 			inHand = playerIn.getOffhandItem();
 			pos = Inventories.getPlayerHandSlotIndex(playerIn.getInventory(), InteractionHand.OFF_HAND);
 		}
-		NostrumMagica.instance.proxy.openContainer(playerIn, RuneBagGui.BagContainer.Make(pos));
+		NostrumMagica.Proxy.openContainer(playerIn, RuneBagGui.BagContainer.Make(pos));
 		
 		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, playerIn.getItemInHand(hand));
     }

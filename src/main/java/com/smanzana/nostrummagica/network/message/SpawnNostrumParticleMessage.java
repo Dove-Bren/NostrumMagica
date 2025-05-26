@@ -20,7 +20,7 @@ public class SpawnNostrumParticleMessage {
 	public static void handle(SpawnNostrumParticleMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
 		Minecraft.getInstance().submit(() -> {
-			message.type.spawn(NostrumMagica.instance.proxy.getPlayer().getCommandSenderWorld(), message.params);
+			message.type.spawn(NostrumMagica.Proxy.getPlayer().getCommandSenderWorld(), message.params);
 		});
 	}
 

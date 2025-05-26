@@ -61,7 +61,7 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public int getColor() {
-		Player player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.Proxy.getPlayer();
 		if (PortalBlock.getRemainingCharge(player) > 0) {
 			return 0x00A00050;
 		}
@@ -77,7 +77,7 @@ public class TeleportationPortalTileEntity extends PortalBlock.NostrumPortalTile
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public float getOpacity() {
-		Player player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.Proxy.getPlayer();
 		if (PortalBlock.getRemainingCharge(player) > 0) {
 			return 0.5f;
 		}

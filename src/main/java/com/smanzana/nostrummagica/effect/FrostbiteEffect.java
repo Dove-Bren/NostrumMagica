@@ -73,7 +73,7 @@ public class FrostbiteEffect extends MobEffect {
 				}
 				attr.addMana(-manaCost);
 				if (entity instanceof Player) {
-					NostrumMagica.instance.proxy.sendMana((Player) entity);
+					NostrumMagica.Proxy.sendMana((Player) entity);
 				}
 				
 				AreaEffectEntity cloud = new AreaEffectEntity(NostrumEntityTypes.areaEffect, entity.level, entity.getX(), entity.getY(), entity.getZ());

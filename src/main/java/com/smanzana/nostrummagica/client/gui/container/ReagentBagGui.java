@@ -348,7 +348,7 @@ public class ReagentBagGui {
 					boolean val = ReagentBag.isVacuumEnabled(bag.stack);
 					NetworkHandler.sendToServer(
 			    			new ReagentBagToggleMessage(bag.bagPos != 40, val));
-					NostrumMagicaSounds.UI_TICK.play(NostrumMagica.instance.proxy.getPlayer());
+					NostrumMagicaSounds.UI_TICK.play(NostrumMagica.Proxy.getPlayer());
 					
 					return true;
 			} else {

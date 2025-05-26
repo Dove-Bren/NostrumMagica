@@ -56,7 +56,7 @@ public class DungeonLauncherBlock extends DirectionalBlock implements ITriggered
 			return InteractionResult.PASS;
 		}
 		DungeonLauncherTileEntity te = (DungeonLauncherTileEntity) worldIn.getBlockEntity(pos);
-		NostrumMagica.instance.proxy.openContainer(player, LauncherBlockGui.LauncherBlockContainer.Make(te));
+		NostrumMagica.Proxy.openContainer(player, LauncherBlockGui.LauncherBlockContainer.Make(te));
 		
 		return InteractionResult.SUCCESS;
 	}

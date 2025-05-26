@@ -290,7 +290,7 @@ public class ClientProxy extends CommonProxy {
 		}
 		
 		if (event.getWorld() != null && event.getWorld().isClientSide() && event.getEntity() instanceof Player) {
-			NostrumMagica.instance.proxy.requestStats((Player) event.getEntity());
+			NostrumMagica.Proxy.requestStats((Player) event.getEntity());
 		}
 	}
 	

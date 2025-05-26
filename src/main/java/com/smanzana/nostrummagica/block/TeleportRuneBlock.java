@@ -135,7 +135,7 @@ public class TeleportRuneBlock extends BaseEntityBlock  {
 			
 			boolean hasEnderBelt = false;
 			// Look for lightning belt
-			Container baubles = NostrumMagica.instance.curios.getCurios(playerIn);
+			Container baubles = NostrumMagica.CuriosProxy.getCurios(playerIn);
 			if (baubles != null) {
 				for (int i = 0; i < baubles.getContainerSize(); i++) {
 					ItemStack stack = baubles.getItem(i);

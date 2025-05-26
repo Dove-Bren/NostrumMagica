@@ -70,7 +70,7 @@ public class AetherCloakLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
 		
 		// Nothing so far. Check baubles if there're there.
 		if (player instanceof Player) {
-			Container inventory = NostrumMagica.instance.curios.getCurios((Player) player);
+			Container inventory = NostrumMagica.CuriosProxy.getCurios((Player) player);
 			if (inventory != null) {
 				for (int i = 0; i < inventory.getContainerSize(); i++) {
 					ItemStack stack = inventory.getItem(i);

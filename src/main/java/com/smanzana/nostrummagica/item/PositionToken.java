@@ -203,8 +203,8 @@ public class PositionToken extends PositionCrystal {
 	public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
-		if (hasRecallUnlocked(NostrumMagica.instance.proxy.getPlayer(), worldIn, stack)) {
-			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.instance.proxy.getPlayer());
+		if (hasRecallUnlocked(NostrumMagica.Proxy.getPlayer(), worldIn, stack)) {
+			INostrumMagic attr = NostrumMagica.getMagicWrapper(NostrumMagica.Proxy.getPlayer());
 			if (attr != null && attr.hasEnhancedTeleport()) {
 				tooltip.add(new TranslatableComponent("info.geotoken.recall_enhanced"));
 			} else {

@@ -835,7 +835,7 @@ public class NostrumMagic implements INostrumMagic {
 		
 		Boolean old = map.put(alteration, true);
 		if ((old == null || !old) && entity != null && entity instanceof Player) {
-			NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) entity);
+			NostrumMagica.Proxy.syncPlayer((ServerPlayer) entity);
 		}
 	}
 	

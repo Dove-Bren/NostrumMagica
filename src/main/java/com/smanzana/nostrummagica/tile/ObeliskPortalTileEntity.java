@@ -53,7 +53,7 @@ public class ObeliskPortalTileEntity extends TeleportationPortalTileEntity {
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public float getOpacity() {
-		Player player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.Proxy.getPlayer();
 		if (PortalBlock.getCooldownTime(player) > 0) {
 			return 0.5f;
 		}

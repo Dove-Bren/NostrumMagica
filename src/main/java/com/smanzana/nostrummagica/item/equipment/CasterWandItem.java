@@ -276,7 +276,7 @@ public class CasterWandItem extends ChargingSwordItem implements ILoreTagged, IS
 	@Override
 	public void onFinishCastFromTool(LivingEntity caster, SpellCastSummary summary, ItemStack stack) {
 		if (caster instanceof Player) {
-			NostrumMagica.instance.proxy.sendMana((Player) caster);
+			NostrumMagica.Proxy.sendMana((Player) caster);
 			((Player) caster).getCooldowns().addCooldown(stack.getItem(), 20);
 		}
 	}

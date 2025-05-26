@@ -56,8 +56,14 @@ import net.minecraftforge.network.PacketDistributor.TargetPoint;
 
 public class CommonProxy {
 	
+	private static CommonProxy proxy = null;
+	
+	public static CommonProxy Get() {
+		return proxy;
+	}
+	
 	public CommonProxy() {
-		
+		proxy = this; // works for subclasses, too!
 	}
 	
     public void syncPlayer(ServerPlayer player) {

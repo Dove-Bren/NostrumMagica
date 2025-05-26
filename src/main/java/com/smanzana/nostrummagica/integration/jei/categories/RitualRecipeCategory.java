@@ -307,7 +307,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 				&& mouseX > 101 && mouseX < 124
 				&& mouseY > 66 && mouseY < 85) {
 			List<Component> tooltip = TextUtils.GetTranslatedList("info.jei.recipe.ritual.invalid", ChatFormatting.BOLD + "" + ChatFormatting.RED, ChatFormatting.BLACK);
-			List<Component> extras = ritual.getRequirement() == null ? null : ritual.getRequirement().getDescription(NostrumMagica.instance.proxy.getPlayer());
+			List<Component> extras = ritual.getRequirement() == null ? null : ritual.getRequirement().getDescription(NostrumMagica.Proxy.getPlayer());
 			if (extras != null) {
 				extras.forEach(t -> tooltip.add(new TextComponent(" - ").append(t)));
 			}
@@ -320,7 +320,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 	protected boolean canPerform(RitualRecipe ritual) {
 		// Check whether this ritual can be performed
 		boolean canPerform = true;
-		Player player = NostrumMagica.instance.proxy.getPlayer();
+		Player player = NostrumMagica.Proxy.getPlayer();
 		if (player != null) {
 			// Client side, so check if player has unlocked the ritual
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);

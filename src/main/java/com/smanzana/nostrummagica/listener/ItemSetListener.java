@@ -97,8 +97,8 @@ public class ItemSetListener {
 			}
 		}
 		
-		if (NostrumMagica.instance.curios.isEnabled() && entity instanceof Player) {
-			CurioInventoryWrapper curios = NostrumMagica.instance.curios.getCurios((Player) entity);
+		if (NostrumMagica.CuriosProxy.isEnabled() && entity instanceof Player) {
+			CurioInventoryWrapper curios = NostrumMagica.CuriosProxy.getCurios((Player) entity);
 			if (curios != null) {
 				for (CurioSlotReference slot : curios.getKeySet()) {
 					ItemStack stack = slot.getHeldStack(entity);
@@ -200,10 +200,10 @@ public class ItemSetListener {
 	@SubscribeEvent
 	public void ClientWorldTick(ClientTickEvent event) {
 		if (event.phase == TickEvent.Phase.END
-				&& !NostrumMagica.instance.proxy.hasIntegratedServer()
-				&& NostrumMagica.instance.proxy.getPlayer() != null
-				&& NostrumMagica.instance.proxy.getPlayer().level != null) {
-			((ClientLevel) NostrumMagica.instance.proxy.getPlayer().level).entitiesForRendering().forEach((ent) -> {
+				&& !NostrumMagica.Proxy.hasIntegratedServer()
+				&& NostrumMagica.Proxy.getPlayer() != null
+				&& NostrumMagica.Proxy.getPlayer().level != null) {
+			((ClientLevel) NostrumMagica.Proxy.getPlayer().level).entitiesForRendering().forEach((ent) -> {
 				if (ent instanceof LivingEntity) {
 					LivingEntity living = (LivingEntity) ent;
 					updateEntity(living);

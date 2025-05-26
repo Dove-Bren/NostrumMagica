@@ -726,7 +726,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				);
 		attr.addMana(-30);
 		if (entity instanceof Player) {
-			NostrumMagica.instance.proxy.sendMana((Player) entity);
+			NostrumMagica.Proxy.sendMana((Player) entity);
 		}
 		
 		if (attr.hasSkill(NostrumSkills.Lightning_Weapon)) {
@@ -765,7 +765,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		int count = 1;
 		if (caster != null && caster instanceof Player) {
 			// Look for lightning belt
-			Container baubles = NostrumMagica.instance.curios.getCurios((Player) caster);
+			Container baubles = NostrumMagica.CuriosProxy.getCurios((Player) caster);
 			if (baubles != null) {
 				for (int i = 0; i < baubles.getContainerSize(); i++) {
 					ItemStack stack = baubles.getItem(i);
@@ -810,7 +810,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		
 		attr.addMana(-30);
 		if (caster instanceof Player) {
-			NostrumMagica.instance.proxy.sendMana((Player) caster);
+			NostrumMagica.Proxy.sendMana((Player) caster);
 		}
 		return true;
 	}
@@ -864,7 +864,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 				propelAction.apply(player, player, 2f, ISpellLogBuilder.Dummy);
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 				attr.addMana(-WIND_COST);
-				NostrumMagica.instance.proxy.sendMana(player);
+				NostrumMagica.Proxy.sendMana(player);
 				player.startAutoSpinAttack(20);
 			}
 		} else {

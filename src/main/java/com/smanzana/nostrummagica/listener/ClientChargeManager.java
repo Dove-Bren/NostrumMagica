@@ -50,7 +50,7 @@ public class ClientChargeManager {
 		this.currentCharge = charge;
 		this.chargeStartMS = System.currentTimeMillis();
 		
-		NostrumMagica.spellChargeTracker.setCharging(NostrumMagica.instance.proxy.getPlayer(), charge == null ? null : charge.charge);
+		NostrumMagica.spellChargeTracker.setCharging(NostrumMagica.Proxy.getPlayer(), charge == null ? null : charge.charge);
 		if (oldCharge == null && charge != null) {
 			// start charging
 			// FX?

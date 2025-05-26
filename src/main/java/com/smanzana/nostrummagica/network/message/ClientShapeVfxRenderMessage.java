@@ -27,7 +27,7 @@ public class ClientShapeVfxRenderMessage {
 	public static void handle(ClientShapeVfxRenderMessage message, Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().setPacketHandled(true);
 		Minecraft.getInstance().submit(() -> {
-			final Level world = NostrumMagica.instance.proxy.getPlayer().level;
+			final Level world = NostrumMagica.Proxy.getPlayer().level;
 			LivingEntity caster, target;
 			caster = target = null;
 			
@@ -44,7 +44,7 @@ public class ClientShapeVfxRenderMessage {
 				return;
 			}
 			
-			NostrumMagica.instance.proxy.spawnSpellShapeVfx(NostrumMagica.instance.proxy.getPlayer().level, 
+			NostrumMagica.Proxy.spawnSpellShapeVfx(NostrumMagica.Proxy.getPlayer().level, 
 					message.shape, message.properties,
 					caster, message.casterPos, target, message.targetPos,
 					message.characteristics);

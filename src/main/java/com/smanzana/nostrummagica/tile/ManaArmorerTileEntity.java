@@ -128,7 +128,7 @@ public class ManaArmorerTileEntity extends BlockEntity implements TickableBlockE
 			if (attr.getMaxMana() > this.calcManaBurnAmt(entity)) {
 				armor.setHasArmor(true, calcManaBurnAmt(entity));
 				if (entity instanceof ServerPlayer) {
-					NostrumMagica.instance.proxy.syncPlayer((ServerPlayer)entity);
+					NostrumMagica.Proxy.syncPlayer((ServerPlayer)entity);
 				}
 			}
 		}
@@ -348,10 +348,10 @@ public class ManaArmorerTileEntity extends BlockEntity implements TickableBlockE
 				// play sound!
 				
 				float freq = .5f + .5f * this.getManaProgress();
-				level.playSound(NostrumMagica.instance.proxy.getPlayer(), worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5,
+				level.playSound(NostrumMagica.Proxy.getPlayer(), worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5,
 						SoundEvents.NOTE_BLOCK_XYLOPHONE, SoundSource.BLOCKS,
 						.25f, freq + .5f);
-				level.playSound(NostrumMagica.instance.proxy.getPlayer(), worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5,
+				level.playSound(NostrumMagica.Proxy.getPlayer(), worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5,
 						SoundEvents.NOTE_BLOCK_CHIME, SoundSource.BLOCKS,
 						.25f, freq + .25f);
 			}

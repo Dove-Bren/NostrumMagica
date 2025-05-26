@@ -204,7 +204,7 @@ public class ActiveHopperBlock extends BaseEntityBlock {
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		if (!worldIn.isClientSide) {
 			ActiveHopperTileEntity te = (ActiveHopperTileEntity) worldIn.getBlockEntity(pos);
-			NostrumMagica.instance.proxy.openContainer(player, ActiveHopperGui.ActiveHopperContainer.Make(te));
+			NostrumMagica.Proxy.openContainer(player, ActiveHopperGui.ActiveHopperContainer.Make(te));
 		}
 		
 		return InteractionResult.SUCCESS;

@@ -96,7 +96,7 @@ public abstract class SkillItem extends Item implements ILoreTagged {
 			if (this.func.award(playerIn, attr, stack)) {
 				NostrumMagicaSounds.LORE.play(null, playerIn.level, playerIn.getX(), playerIn.getY(), playerIn.getZ());
 				stack.shrink(1);
-				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) playerIn);
+				NostrumMagica.Proxy.syncPlayer((ServerPlayer) playerIn);
 			}
 			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, stack);
 		}

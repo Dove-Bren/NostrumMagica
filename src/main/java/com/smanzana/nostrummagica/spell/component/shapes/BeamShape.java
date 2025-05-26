@@ -206,7 +206,7 @@ public class BeamShape extends SpellShape {
 		final Vec3 end = start.add(dir.scale(BEAM_RANGE));
 		
 		if (!state.isPreview()) {
-			NostrumMagica.instance.proxy.spawnSpellShapeVfx(location.world, this, properties,
+			NostrumMagica.Proxy.spawnSpellShapeVfx(location.world, this, properties,
 					null, start, null, end, characteristics);
 		}
 		

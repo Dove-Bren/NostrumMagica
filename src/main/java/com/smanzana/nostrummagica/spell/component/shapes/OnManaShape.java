@@ -80,7 +80,7 @@ public class OnManaShape extends OnMetricLevelShape {
 
 					expired = true;
 					this.trigger(data);
-					NostrumMagica.instance.proxy.spawnSpellShapeVfx(this.getState().getSelf().level,
+					NostrumMagica.Proxy.spawnSpellShapeVfx(this.getState().getSelf().level,
 							NostrumSpellShapes.OnMana, properties,
 							this.getState().getSelf(), null, this.getState().getSelf(), null, characteristics);
 					NostrumMagica.magicEffectProxy.remove(SpecialEffect.CONTINGENCY_MANA, this.entity);

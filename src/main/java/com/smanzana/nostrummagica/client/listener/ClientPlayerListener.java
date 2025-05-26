@@ -347,7 +347,7 @@ public class ClientPlayerListener extends PlayerListener {
 		{
 			final Input input = event.getInput();
 			if (input.down || input.up || input.left || input.right || input.jumping) {
-				if (this.chargeManager.getCurrentCharge() != null && !NostrumMagica.instance.proxy.getPlayer().isCrouching()) {
+				if (this.chargeManager.getCurrentCharge() != null && !NostrumMagica.Proxy.getPlayer().isCrouching()) {
 					this.interruptSpellCharge();
 				}
 			}
@@ -434,7 +434,7 @@ public class ClientPlayerListener extends PlayerListener {
 	}
 	
 	private void doCast(int castSlot) {
-		final Player player = NostrumMagica.instance.proxy.getPlayer();
+		final Player player = NostrumMagica.Proxy.getPlayer();
 		RegisteredSpell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
 		if (castSlot < 0 || spells == null || spells.length == 0 || spells.length <= castSlot) {
 			return;
@@ -480,7 +480,7 @@ public class ClientPlayerListener extends PlayerListener {
 	}
 	
 	public void startIncantationCast(Incantation incant) {
-		final Player player = NostrumMagica.instance.proxy.getPlayer();
+		final Player player = NostrumMagica.Proxy.getPlayer();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr != null && attr.isUnlocked()) {
 			if (incant != null) {
@@ -531,7 +531,7 @@ public class ClientPlayerListener extends PlayerListener {
 	}
 	
 	public void startScrollCast(InteractionHand hand, ItemStack scroll, RegisteredSpell spell) {
-		final Player player = NostrumMagica.instance.proxy.getPlayer();
+		final Player player = NostrumMagica.Proxy.getPlayer();
 		final ClientScrollCharge charge = new ClientScrollCharge(
 				new SpellCharge(spell, 20, ChargeType.SCROLL),
 				player.getMainHandItem(), player.getOffhandItem(),
@@ -548,7 +548,7 @@ public class ClientPlayerListener extends PlayerListener {
 		}
 		
 		// Check tome slot
-		@Nullable IInventorySlotKey<LivingEntity> key = NostrumMagica.instance.curios.getTomeSlotKey(player);
+		@Nullable IInventorySlotKey<LivingEntity> key = NostrumMagica.CuriosProxy.getTomeSlotKey(player);
 		if (key != null) {
 			if (SpellCasting.ItemAllowsCasting(key.getHeldStack(player), null)) {
 				return true;
@@ -627,7 +627,7 @@ public class ClientPlayerListener extends PlayerListener {
 	}
 	
 	protected void finishChargeCast(ClientSpellCharge charge) {
-		final Player player = NostrumMagica.instance.proxy.getPlayer();
+		final Player player = NostrumMagica.Proxy.getPlayer();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr != null && attr.isUnlocked()) {
 			switch (charge.charge.type()) {
@@ -667,7 +667,7 @@ public class ClientPlayerListener extends PlayerListener {
 		
 		if (this.chargeManager.getCurrentCharge() != null && this.chargeManager.getCurrentCharge().charge.type() == ChargeType.SCROLL) {
 			// make sure item hasn't changed!
-			final Player player = NostrumMagica.instance.proxy.getPlayer();
+			final Player player = NostrumMagica.Proxy.getPlayer();
 			final ClientScrollCharge charge = (ClientScrollCharge) this.chargeManager.getCurrentCharge();
 			ItemStack inHand = charge.isMainhand ? player.getMainHandItem() : player.getOffhandItem();
 			if (!inHand.equals(charge.scroll, false)) {
@@ -678,7 +678,7 @@ public class ClientPlayerListener extends PlayerListener {
 	
 	protected HitResult defaultTrace() {
 		final Minecraft mc = Minecraft.getInstance();
-		final Player player = NostrumMagica.instance.proxy.getPlayer();
+		final Player player = NostrumMagica.Proxy.getPlayer();
 		final float partialTicks = mc.getFrameTime();
 		
 		double range = 0f;
@@ -706,7 +706,7 @@ public class ClientPlayerListener extends PlayerListener {
 	}
 	
 	protected boolean shouldDoTargetting() {
-		final Player player = NostrumMagica.instance.proxy.getPlayer();
+		final Player player = NostrumMagica.Proxy.getPlayer();
 		if (this.getChargeManager().getCurrentCharge() != null
 				&& this.getChargeManager().getCurrentCharge().charge.spell().shouldTrace(player)) {
 			return true;
@@ -816,7 +816,7 @@ public class ClientPlayerListener extends PlayerListener {
 				);
 		
 		if (!shouldRenderMe) {
-			final Player player = NostrumMagica.instance.proxy.getPlayer();
+			final Player player = NostrumMagica.Proxy.getPlayer();
 			
 			// Normal render didn't happen. Do rooted render manually instead.
 			renderRoots(event.getPoseStack(), player);

@@ -26,7 +26,7 @@ public class SpellDebugMessage {
 		}
 		
 		Minecraft.getInstance().submit(() -> {
-			NostrumMagica.instance.proxy.getPlayer().sendMessage(message.comp, Util.NIL_UUID);
+			NostrumMagica.Proxy.getPlayer().sendMessage(message.comp, Util.NIL_UUID);
 		});
 	}
 

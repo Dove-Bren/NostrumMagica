@@ -41,7 +41,7 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 		}
 		
 		Player player = (Player) ent;
-		Container inv = NostrumMagica.instance.curios.getCurios(player);
+		Container inv = NostrumMagica.CuriosProxy.getCurios(player);
 		if (inv != null) {
 			for (int i = 0; i < inv.getContainerSize(); i++) {
 				ItemStack stack = inv.getItem(i);
@@ -68,7 +68,7 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 		}
 		
 		Player player = (Player) ent;
-		Container inv = NostrumMagica.instance.curios.getCurios(player);
+		Container inv = NostrumMagica.CuriosProxy.getCurios(player);
 		if (inv != null) {
 			for (int i = 0; i < inv.getContainerSize(); i++) {
 				ItemStack stack = inv.getItem(i);

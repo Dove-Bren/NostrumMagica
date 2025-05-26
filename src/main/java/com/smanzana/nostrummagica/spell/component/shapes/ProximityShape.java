@@ -62,7 +62,7 @@ public class ProximityShape extends SpellShape {
 				if (dead)
 					return true;
 				
-				NostrumMagica.instance.proxy.spawnSpellShapeVfx(world, ProximityShape.this, this.properties, 
+				NostrumMagica.Proxy.spawnSpellShapeVfx(world, ProximityShape.this, this.properties, 
 						null, null, null, this.pos, this.characteristics);
 				if (!set) {
 					// Trap is now set!
