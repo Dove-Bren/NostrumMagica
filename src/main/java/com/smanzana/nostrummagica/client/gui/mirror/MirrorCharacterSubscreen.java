@@ -118,6 +118,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 					NostrumAttributes.magicResist,
 					NostrumAttributes.magicDamage,
 					NostrumAttributes.xpBonus,
+					NostrumAttributes.castSpeed,
 			};
 			
 			for (Attribute attribute : list) {

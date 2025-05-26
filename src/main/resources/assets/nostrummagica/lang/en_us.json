@@ -401,14 +401,24 @@
 	"effect.nostrummagica.magic_weakness": "Magic Weakness",
 	"effect.nostrummagica.mob_blindness": "Blindness (Mobs)",
 	"effect.nostrummagica.bonus_jump": "Bonus Jump",
+	"effect.nostrummagica.swift_cast": "Swift Cast",
+	"effect.nostrummagica.lasting_swift_cast": "Unlimited Swift Cast",
 
     "item.minecraft.tipped_arrow.effect.mana-regen": "Arrow of Mana Regen",
+	"item.minecraft.tipped_arrow.effect.swift_cast": "Arrow of Swift Cast",
+	"item.minecraft.tipped_arrow.effect.lasting_swift_cast": "Arrow of Unlimited Swift Cast",
 
     "item.minecraft.potion.effect.mana-regen": "Potion of Mana Regen",
+	"item.minecraft.potion.effect.swift_cast": "Potion of Swift Cast",
+	"item.minecraft.potion.effect.lasting_swift_cast": "Potion of Unlimited Swift Cast",
 
     "item.minecraft.splash_potion.effect.mana-regen": "Splash Potion of Mana Regen",
+	"item.minecraft.splash_potion.effect.swift_cast": "Splash Potion of Swift Cast",
+	"item.minecraft.splash_potion.effect.lasting_swift_cast": "Splash Potion of Unlimited Swift Cast",
 
     "item.minecraft.lingering_potion.effect.mana-regen": "Linger Potion of Mana Regen",
+	"item.minecraft.lingering_potion.effect.swift_cast": "Linger Potion of Swift Cast",
+	"item.minecraft.lingering_potion.effect.lasting_swift_cast": "Linger Potion of Unlimited Swift Cast",
 
     "block.nostrummagica.magic_wall": "Magic Wall",
     "block.nostrummagica.mani_ore": "Mani Ore",
@@ -652,7 +662,9 @@
 	"attribute.nostrummagica.elemxp_bonus_all.name": "Elemental XP Bonus",
 	"attribute.nostrummagica.elemxp_bonus_all.name.desc": "Increases the amount of elemental skill XP gained from spells",
 	"attribute.nostrummagica.bonus_jump.name": "Bonus Jumps",
-	"attribute.nostrummagica.bonus_jump.name.desc": "Amount of times an entity can jump beyond their first initial jump.",
+	"attribute.nostrummagica.bonus_jump.name.desc": "Amount of times an entity can jump beyond their first initial jump",
+	"attribute.nostrummagica.casting_speed.name": "Casting Speed",
+	"attribute.nostrummagica.casting_speed.name.desc": "How quickly an entity casts spells",
 	"attribute.perc.modifier.plus.0": "+%s%% %s",
 	"attribute.perc.modifier.plus.1": "x%s%% %s",
 	"attribute.perc.modifier.plus.2": "x%s%% %s",

@@ -59,6 +59,8 @@ public class NostrumEffects {
 	@ObjectHolder(MagicWeaknessEffect.ID) public static MagicWeaknessEffect magicWeakness;
 	@ObjectHolder(MobBlindnessEffect.ID) public static MobBlindnessEffect mobBlindness;
 	@ObjectHolder(BonusJumpEffect.ID) public static BonusJumpEffect bonusJump;
+	@ObjectHolder(SwiftCastEffect.ID_INSTANT) public static SwiftCastEffect swiftCast;
+	@ObjectHolder(SwiftCastEffect.ID_LASTING) public static SwiftCastEffect lastingSwiftCast;
 	
 	@SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<MobEffect> event) {
@@ -109,5 +111,7 @@ public class NostrumEffects {
     	registry.register(new MagicWeaknessEffect().setRegistryName(MagicWeaknessEffect.ID));
     	registry.register(new MobBlindnessEffect().setRegistryName(MobBlindnessEffect.ID));
     	registry.register(new BonusJumpEffect().setRegistryName(BonusJumpEffect.ID));
+    	registry.register(new SwiftCastEffect(true).setRegistryName(SwiftCastEffect.ID_INSTANT));
+    	registry.register(new SwiftCastEffect(false).setRegistryName(SwiftCastEffect.ID_LASTING));
     }
 }

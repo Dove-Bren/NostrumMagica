@@ -58,6 +58,7 @@ public class NostrumAttributes {
 	@ObjectHolder(ID_XP_WIND) public static ElementXPBonusAttribute xpWind;
 	@ObjectHolder(AllElementXPBonusAttribute.ID) public static AllElementXPBonusAttribute xpAllElements;
 	@ObjectHolder(BonusJumpAttribute.ID) public static BonusJumpAttribute bonusJump;
+	@ObjectHolder(CastSpeedAttribute.ID) public static CastSpeedAttribute castSpeed; 
 	
 	protected static final String makeName(String base) {
 		return "attribute.nostrummagica." + base + ".name";
@@ -82,6 +83,7 @@ public class NostrumAttributes {
 		makeAndRegister(registry, AllElementXPBonusAttribute::new, AllElementXPBonusAttribute.ID);
 		makeAndRegister(registry, AllMagicReductionAttribute::new, AllMagicReductionAttribute.ID);
 		makeAndRegister(registry, BonusJumpAttribute::new, BonusJumpAttribute.ID);
+		makeAndRegister(registry, CastSpeedAttribute::new, CastSpeedAttribute.ID);
 		
 		for (EMagicElement elem : EMagicElement.values()) {
 			final String REDUC_ID = MagicReductionAttribute.ID_PREFIX + elem.name().toLowerCase();
@@ -102,6 +104,7 @@ public class NostrumAttributes {
 			event.add(type, xpBonus);
 			event.add(type, xpAllElements);
 			event.add(type, reduceAll);
+			event.add(type, castSpeed);
 			for (EMagicElement elem : EMagicElement.values()) {
 				event.add(type, GetReduceAttribute(elem));
 				event.add(type, GetXPAttribute(elem));

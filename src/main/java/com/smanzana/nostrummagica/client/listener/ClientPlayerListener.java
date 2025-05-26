@@ -584,6 +584,7 @@ public class ClientPlayerListener extends PlayerListener {
 		
 		NetworkHandler.sendToServer(
     			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome), this.getTargetManager().getLastTarget(1f)));
+		player.swing(InteractionHand.MAIN_HAND);
 	}
 	
 	protected void finishIncantationCast(Player player, ClientSpellCharge charge) {

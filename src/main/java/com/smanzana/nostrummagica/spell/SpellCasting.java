@@ -116,7 +116,16 @@ public class SpellCasting {
 		
 		// Cast it!
 		boolean seen = att.wasSpellDone(spell);
-		SpellCastSummary summary = new SpellCastSummary(spell.getManaCost(), spell.getXP(seen), CalculateBaseCastingTicks(spell));
+		final float attrSpeedRate = (float) (entity.getAttributeValue(NostrumAttributes.castSpeed) / 100.0);
+		final int castTicks;
+		if (attrSpeedRate >= 10f) {
+			castTicks = 0;
+		} else {
+			final float handSpeedModifier = CalculateHandsSpellCastModifier(entity);
+			castTicks = (int) ((CalculateBaseCastingTicks(spell) * handSpeedModifier) / attrSpeedRate);
+		}
+		
+		SpellCastSummary summary = new SpellCastSummary(spell.getManaCost(), spell.getXP(seen), castTicks);
 		
 		// Add player's base magic potency
 		summary.addEfficiency((float) entity.getAttribute(NostrumAttributes.magicPotency).getValue() / 100f);
@@ -128,8 +137,8 @@ public class SpellCasting {
 		// Add xp bonuses
 		summary.addXPRate((float) entity.getAttribute(NostrumAttributes.xpBonus).getValue() / 100f);
 		
-		// Add bonus/penalty to cast time for held item status
-		summary.addCastSpeedRate(CalculateHandsSpellCastModifier(entity));
+		// Add bonus/penalty to cast time for attribute (example 120 = 1.2x casting speed = -.2 to rate which means it takes 80% of normal time to cast
+		//summary.addCastSpeedRate((float) -((entity.getAttributeValue(NostrumAttributes.castSpeed) / 100f) - 1f));
 		
 		// Add tome enchancements
 		if (!tool.isEmpty() && tool.getItem() instanceof ISpellCastingTool) {
@@ -443,6 +452,6 @@ public class SpellCasting {
 		if (!ItemAllowsCasting(entity.getOffhandItem(), EquipmentSlot.OFFHAND)) {
 			penalty += .25f;
 		}
-		return penalty;
+		return 1f + penalty;
 	}
 }

@@ -29,6 +29,9 @@ public enum NostrumPotions {
 	MANAREGEN_STRONG("strong_mana-regen", () -> NostrumEffects.manaRegen.getEffectName(), () -> new MobEffectInstance(NostrumEffects.manaRegen, 20 * 60, 1)),
 	MANAREGEN_REALLY_STRONG("reallystrong_mana-regen", () -> NostrumEffects.manaRegen.getEffectName(), () -> new MobEffectInstance(NostrumEffects.manaRegen, 20 * 60, 2)),
 	MANAREGEN_STRONG_AND_LONG("strongandlong_mana-regen", () -> NostrumEffects.manaRegen.getEffectName(), () -> new MobEffectInstance(NostrumEffects.manaRegen, 20 * 3 * 60, 1)),
+	SWIFT_CAST("swift_cast", () -> SwiftCastEffect.ID_INSTANT, () -> new MobEffectInstance(NostrumEffects.swiftCast, 20 * 15, 0)),
+	SWIFT_CAST_TRIPLE("swift_cast_tri", () -> SwiftCastEffect.ID_INSTANT, () -> new MobEffectInstance(NostrumEffects.swiftCast, 20 * 15, 2)),
+	SWIFT_CAST_LONG("lasting_swift_cast", () -> SwiftCastEffect.ID_INSTANT, () -> new MobEffectInstance(NostrumEffects.lastingSwiftCast, 20 * 15)),
 	;
 	
 	private final String registryName;
@@ -78,6 +81,17 @@ public enum NostrumPotions {
 	    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN.getType()),
 	    			Ingredient.of(Tags.Items.DUSTS_GLOWSTONE),
 	    			MakePotion(NostrumPotions.MANAREGEN_STRONG.getType()));
+	    	
+	    	// Swift cast potion
+	    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.MANAREGEN.getType()),
+	    			Ingredient.of(NostrumTags.Items.ReagentBlackPearl),
+	    			MakePotion(NostrumPotions.SWIFT_CAST.getType()));
+	    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.SWIFT_CAST.getType()),
+	    			Ingredient.of(NostrumTags.Items.Essence),
+	    			MakePotion(NostrumPotions.SWIFT_CAST_TRIPLE.getType()));
+	    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.SWIFT_CAST_TRIPLE.getType()),
+	    			Ingredient.of(NostrumTags.Items.WispPebble),
+	    			MakePotion(NostrumPotions.SWIFT_CAST_LONG.getType()));
 		});
 	}
 	

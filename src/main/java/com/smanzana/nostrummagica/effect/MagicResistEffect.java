@@ -22,6 +22,6 @@ public class MagicResistEffect extends MobEffect {
 	}
 	
 	public boolean isDurationEffectTick(int duration, int amp) {
-		return duration > 0; // Every tick
+		return false;
 	}
 }
