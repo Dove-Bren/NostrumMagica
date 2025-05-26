@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.client.listener.ClientPlayerListener;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -17,18 +18,14 @@ import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.SpellCastEvent;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
-import com.smanzana.nostrummagica.util.ItemStacks;
-import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -36,7 +33,6 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -70,10 +66,6 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
 		}
 		
-		if (worldIn.isClientSide()) {
-			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
-		}
-		
 		if (itemStackIn.isEmpty())
 			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStackIn);
 		
@@ -89,27 +81,34 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		if (spell == null)
 			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStackIn);
 		
-		HitResult mop = RayTrace.raytraceApprox(playerIn.getLevel(), playerIn, playerIn.getEyePosition(), playerIn.getXRot(), playerIn.getYRot(), 100, (e) -> e != playerIn && e instanceof LivingEntity, .5);
-		final @Nullable LivingEntity hint = RayTrace.entFromRaytrace(mop) == null ? null : (LivingEntity) RayTrace.entFromRaytrace(mop);
-		
-		SpellCastResult result = SpellCasting.AttemptScrollCast(spell, playerIn, hint);
-		if (result.succeeded) {
-			if (!playerIn.isCreative()) {
-				ItemStacks.damageItem(itemStackIn, playerIn, hand, getCastDurabilityCost(playerIn, GetSpell(itemStackIn)));
-			}
-			
-			// Set cooldown directly even though event handler will have already set it.
-			// Using a scroll has more cooldown than noticing other spells being cast.
-			playerIn.getCooldowns().addCooldown(this, SpellCasting.CalculateSpellCooldown(spell, playerIn, result.summary) * 2);
-			
-			NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) playerIn);
+		if (worldIn.isClientSide()) {
+			int unused; // this isn't okay
+			((ClientPlayerListener) NostrumMagica.playerListener).startScrollCast(hand, itemStackIn, spell);
 		}
-
-		if (itemStackIn.getDamageValue() > itemStackIn.getMaxDamage() // Old way, I think never happens?
-				|| itemStackIn.isEmpty()) {
-			// Going to break
-			NostrumMagica.instance.getSpellRegistry().evict(spell);
-		}
+//		{
+//		
+//			HitResult mop = RayTrace.raytraceApprox(playerIn.getLevel(), playerIn, playerIn.getEyePosition(), playerIn.getXRot(), playerIn.getYRot(), 100, (e) -> e != playerIn && e instanceof LivingEntity, .5);
+//			final @Nullable LivingEntity hint = RayTrace.entFromRaytrace(mop) == null ? null : (LivingEntity) RayTrace.entFromRaytrace(mop);
+//			
+//			SpellCastResult result = SpellCasting.AttemptScrollCast(spell, playerIn, hint);
+//			if (result.succeeded) {
+//				if (!playerIn.isCreative()) {
+//					ItemStacks.damageItem(itemStackIn, playerIn, hand, getCastDurabilityCost(playerIn, GetSpell(itemStackIn)));
+//				}
+//				
+//				// Set cooldown directly even though event handler will have already set it.
+//				// Using a scroll has more cooldown than noticing other spells being cast.
+//				playerIn.getCooldowns().addCooldown(this, SpellCasting.CalculateSpellCooldown(spell, playerIn, result.summary) * 2);
+//				
+//				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) playerIn);
+//			}
+//	
+//			if (itemStackIn.getDamageValue() > itemStackIn.getMaxDamage() // Old way, I think never happens?
+//					|| itemStackIn.isEmpty()) {
+//				// Going to break
+//				NostrumMagica.instance.getSpellRegistry().evict(spell);
+//			}
+//		}
 		
 		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
 		
@@ -189,7 +188,7 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 		}
 	}
 	
-	protected int getCastDurabilityCost(Player caster, RegisteredSpell spell) {
+	public int getCastDurabilityCost(Player caster, RegisteredSpell spell) {
 		// By default, cost durability-1 of the scroll so that it has exactly 2 casts.
 		// With skill, take a constant base here (5).
 		// With another skill, take less constant.

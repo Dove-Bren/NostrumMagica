@@ -5,12 +5,16 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.SpellCasting;
+import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
+import com.smanzana.nostrummagica.util.ItemStacks;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -41,7 +45,7 @@ public class ClientCastMessage {
 		}
 		
 		final boolean isScroll = message.isScroll;
-		final int tomeID = message.tomeId;
+		final int toolID = message.toolId;
 		final int entHintID = message.entityHintId;
 		
 		
@@ -57,14 +61,12 @@ public class ClientCastMessage {
 				hintEntity = null;
 			}
 			
-			// Look up tome if there's supposed to be one
-			ItemStack tome = ItemStack.EMPTY;
 			if (!isScroll) {
 				// Find the tome this was cast from, if any
-				tome = NostrumMagica.findTome(sp, tomeID);
+				ItemStack tome = NostrumMagica.findTome(sp, toolID);
 				
 				if (!tome.isEmpty() && tome.getItem() instanceof SpellTome
-						&& SpellTome.getTomeID(tome) == tomeID) {
+						&& SpellTome.getTomeID(tome) == toolID) {
 					// Casting from a tome.
 					success = SpellCasting.AttemptToolCast(spell, sp, tome, hintEntity).succeeded;
 				} else {
@@ -72,6 +74,34 @@ public class ClientCastMessage {
 					success = false;
 				}
 			} else {
+				// toolID is main hand (0) or offhand (1)
+				final InteractionHand hand = (toolID == 0 ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
+				ItemStack scroll = sp.getItemInHand(hand);
+				if (scroll.isEmpty()
+						|| !(scroll.getItem() instanceof SpellScroll scrollItem)) {
+					NostrumMagica.logger.warn("Got cast from client with mismatched scroll location");
+					success = false;
+				} else {
+					RegisteredSpell scrollSpell = scrollItem.getSpell(scroll);
+					if (scrollSpell == null || scrollSpell.getRegistryID() != message.id) {
+						NostrumMagica.logger.warn("Got cast from client with mismatched scroll spell ID");
+						success = false;
+					} else {
+						final SpellCastResult result = SpellCasting.AttemptScrollCast(spell, sp, hintEntity);
+						success = result.succeeded;
+						if (success) {
+							// Set cooldown directly even though event handler will have already set it.
+							// Using a scroll has more cooldown than noticing other spells being cast.
+							sp.getCooldowns().addCooldown(scroll.getItem(), SpellCasting.CalculateSpellCooldown(spell, sp, result.summary) * 2);
+
+							if (!sp.isCreative()) {
+								ItemStacks.damageItem(scroll, sp, hand, scrollItem.getCastDurabilityCost(sp, spell));
+							}
+						}
+						
+					}
+				}
+				
 				success = SpellCasting.AttemptScrollCast(spell, sp, hintEntity).succeeded;
 			}
 
@@ -87,12 +117,12 @@ public class ClientCastMessage {
 	}
 
 	private final int id;
-	private final int tomeId;
+	private final int toolId;
 	private final boolean isScroll;
 	private final int entityHintId;
 	
-	public ClientCastMessage(RegisteredSpell spell, boolean scroll, int tomeID, @Nullable Entity entityHint) {
-		this(spell.getRegistryID(), scroll, tomeID, entityHint == null ? -1 : entityHint.getId());
+	public ClientCastMessage(RegisteredSpell spell, boolean scroll, int toolID, @Nullable Entity entityHint) {
+		this(spell.getRegistryID(), scroll, toolID, entityHint == null ? -1 : entityHint.getId());
 	}
 	
 	public ClientCastMessage(int id, boolean scroll, int tomeID) {
@@ -102,7 +132,7 @@ public class ClientCastMessage {
 	public ClientCastMessage(int id, boolean scroll, int tomeID, int entityHintId) {
 		this.id = id;
 		this.isScroll = scroll;
-		this.tomeId = tomeID;
+		this.toolId = tomeID;
 		this.entityHintId = entityHintId;
 	}
 
@@ -113,7 +143,7 @@ public class ClientCastMessage {
 		public static void encode(ClientCastMessage msg, FriendlyByteBuf buf) {
 		buf.writeInt(msg.id);
 		buf.writeBoolean(msg.isScroll);
-		buf.writeInt(msg.tomeId);
+		buf.writeInt(msg.toolId);
 		buf.writeInt(msg.entityHintId);
 	}
 

@@ -46,6 +46,7 @@ import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 import com.smanzana.nostrummagica.item.IRaytraceOverlay;
+import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.listener.ClientChargeManager;
@@ -519,6 +520,26 @@ public class ClientPlayerListener extends PlayerListener {
 		}
 	}
 	
+	private static final class ClientScrollCharge extends ClientSpellCharge {
+		public final ItemStack scroll;
+		public boolean isMainhand;
+		public ClientScrollCharge(SpellCharge charge, ItemStack mainhand, ItemStack offhand, float displayRate, ItemStack scroll, boolean isMainhand) {
+			super(charge, mainhand, offhand, displayRate);
+			this.scroll = scroll;
+			this.isMainhand = isMainhand;
+		}
+	}
+	
+	public void startScrollCast(InteractionHand hand, ItemStack scroll, RegisteredSpell spell) {
+		final Player player = NostrumMagica.instance.proxy.getPlayer();
+		final ClientScrollCharge charge = new ClientScrollCharge(
+				new SpellCharge(spell, 20, ChargeType.SCROLL),
+				player.getMainHandItem(), player.getOffhandItem(),
+				0f,
+				scroll, hand == InteractionHand.MAIN_HAND);
+			this.chargeManager.startCharging(charge);
+	}
+	
 	protected boolean hasIncantHand(Player player) {
 		for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND}) {
 			if (SpellCasting.ItemAllowsCasting(player.getItemBySlot(slot), slot)) {
@@ -596,6 +617,15 @@ public class ClientPlayerListener extends PlayerListener {
 		this.tutorial.onIncantationCastFinished();
 	}
 	
+	protected void finishScrollCast(Player playerIn, ClientScrollCharge charge) {
+		HitResult mop = RayTrace.raytraceApprox(playerIn.getLevel(), playerIn, playerIn.getEyePosition(), playerIn.getXRot(), playerIn.getYRot(), 100, (e) -> e != playerIn && e instanceof LivingEntity, .5);
+		final @Nullable LivingEntity hint = RayTrace.entFromRaytrace(mop) == null ? null : (LivingEntity) RayTrace.entFromRaytrace(mop);
+		
+		RegisteredSpell spell = SpellScroll.GetSpell(charge.scroll);
+		NetworkHandler.sendToServer(new ClientCastMessage(spell, true, charge.isMainhand ? 0 : 1, hint));
+		playerIn.swing(InteractionHand.MAIN_HAND);
+	}
+	
 	protected void finishChargeCast(ClientSpellCharge charge) {
 		final Player player = NostrumMagica.instance.proxy.getPlayer();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
@@ -606,6 +636,9 @@ public class ClientPlayerListener extends PlayerListener {
 				break;
 			case TOME_CAST:
 				finishSpellCast(player, (ClientTomeCharge) charge);
+				break;
+			case SCROLL:
+				finishScrollCast(player, (ClientScrollCharge) charge);
 				break;
 			}
 		}
@@ -630,6 +663,16 @@ public class ClientPlayerListener extends PlayerListener {
 			this.chargeManager.cancelCharge(false);
 //			final UUID id = UUID.fromString("637ec07c-9931-45ca-bd8e-e47c7f9b50a6");
 //			NostrumMagica.instance.proxy.getPlayer().getAttributes().getInstance(Attributes.MOVEMENT_SPEED).removeModifier(id);
+		}
+		
+		if (this.chargeManager.getCurrentCharge() != null && this.chargeManager.getCurrentCharge().charge.type() == ChargeType.SCROLL) {
+			// make sure item hasn't changed!
+			final Player player = NostrumMagica.instance.proxy.getPlayer();
+			final ClientScrollCharge charge = (ClientScrollCharge) this.chargeManager.getCurrentCharge();
+			ItemStack inHand = charge.isMainhand ? player.getMainHandItem() : player.getOffhandItem();
+			if (!inHand.equals(charge.scroll, false)) {
+				this.interruptSpellCharge();
+			}
 		}
 	}
 	

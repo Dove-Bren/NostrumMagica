@@ -37,6 +37,7 @@ public class SpellChargeTracker {
 	public static enum ChargeType {
 		INCANTATION,
 		TOME_CAST,
+		SCROLL,
 		;
 	}
 	
