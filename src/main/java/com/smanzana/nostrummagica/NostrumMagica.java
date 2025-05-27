@@ -27,8 +27,6 @@ import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.entity.IMultiPartEntityPart;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.init.ModInit;
-import com.smanzana.nostrummagica.integration.aetheria.AetheriaClientProxy;
-import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
 import com.smanzana.nostrummagica.integration.curios.CuriosClientProxy;
 import com.smanzana.nostrummagica.integration.curios.CuriosProxy;
 import com.smanzana.nostrummagica.integration.minecolonies.MinecoloniesProxy;
@@ -110,7 +108,7 @@ public class NostrumMagica {
 	
 	public static final CommonProxy Proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
 	public static final CuriosProxy CuriosProxy = DistExecutor.safeRunForDist(() -> CuriosClientProxy::new, () -> CuriosProxy::new);
-	public static final AetheriaProxy AetheriaProxy = DistExecutor.safeRunForDist(() -> AetheriaClientProxy::new, () -> AetheriaProxy::new);;
+	//public static final AetheriaProxy AetheriaProxy = DistExecutor.safeRunForDist(() -> AetheriaClientProxy::new, () -> AetheriaProxy::new);;
 	//public final EnderIOProxy enderIO;
 	public static final MinecoloniesProxy MinecoloniesProxy = new MinecoloniesProxy();
 
@@ -196,9 +194,9 @@ public class NostrumMagica {
 		if (ModList.get().isLoaded(CuriosApi.MODID)) {
 			CuriosProxy.enable();
 		}
-		if (ModList.get().isLoaded("nostrumaetheria")) {
-			AetheriaProxy.enable();
-		}
+//		if (ModList.get().isLoaded("nostrumaetheria")) {
+//			AetheriaProxy.enable();
+//		}
 //		if (ModList.get().isLoaded("enderio") || ModList.get().isLoaded("enderio")) {
 //			enderIO.enable();
 //		}
@@ -481,9 +479,6 @@ public class NostrumMagica {
 		ModInit.registerDefaultResearch();
 		if (CuriosProxy.isEnabled()) {
 			CuriosProxy.reinitResearch();
-		}
-		if (AetheriaProxy.isEnabled()) {
-			AetheriaProxy.reinitResearch();
 		}
 //		if (enderIO.isEnabled()) {
 //			enderIO.reinitResearch();

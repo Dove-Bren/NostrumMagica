@@ -192,7 +192,7 @@ public class ModInit {
 		MinecraftForge.EVENT_BUS.addListener(ModInit::registerDefaultRituals);
 		
 		preinit();
-		NostrumMagica.AetheriaProxy.preInit();
+		//NostrumMagica.AetheriaProxy.preInit();
 		NostrumMagica.CuriosProxy.preInit();
 		//NostrumMagica.instance.enderIO.preInit();
 		
@@ -214,7 +214,7 @@ public class ModInit {
 		//NostrumDungeonStructure.initGens();
 
 		init();
-		NostrumMagica.AetheriaProxy.init();
+		//NostrumMagica.AetheriaProxy.init();
 		NostrumMagica.CuriosProxy.init();
 		//NostrumMagica.instance.enderIO.init();
 	
@@ -223,7 +223,7 @@ public class ModInit {
 		// Used to be two different mod init steps!
 		
 		postinit();
-		NostrumMagica.AetheriaProxy.postInit();
+		//NostrumMagica.AetheriaProxy.postInit();
 		//NostrumMagica.instance.curios.postInit();
 		//NostrumMagica.instance.enderIO.postInit();
 		

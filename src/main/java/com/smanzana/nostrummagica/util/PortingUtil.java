@@ -249,9 +249,9 @@ public class PortingUtil {
 			submap.put(11, NostrumCurios.ringTrueSilver);
 			submap.put(12, NostrumCurios.ringCorruptedSilver);
 			submap.put(13, NostrumCurios.floatGuard);
-			submap.put(14, AetheriaProxy.ringShieldSmall);
-			submap.put(15, AetheriaProxy.ringShieldLarge);
-			submap.put(16, AetheriaProxy.eludeCape);
+			submap.put(14, null);//AetheriaProxy.ringShieldSmall);
+			submap.put(15, null);// AetheriaProxy.ringShieldLarge);
+			submap.put(16, null);//AetheriaProxy.eludeCape);
 			submap.put(17, NostrumCurios.dragonWingPendant);
 		}
 		ItemMap1_12_2.put(id, submap);

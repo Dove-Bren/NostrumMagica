@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.item;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrumaetheria.api.capability.IAetherBurnable;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
@@ -206,12 +206,12 @@ public class ReagentItem extends Item implements ILoreTagged, ICapabilityProvide
 		return InfoScreenTabs.INFO_REAGENTS;
 	}
 	
-	private LazyOptional<?> AetherBurnableLazy = LazyOptional.of(() -> NostrumMagica.AetheriaProxy.makeBurnable(100, 150f));
+	private LazyOptional<?> AetherBurnableLazy = LazyOptional.of(() -> AetheriaProxy.makeBurnable(100, 150));
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 		
-		if (NostrumMagica.AetheriaProxy.isEnabled() && cap != null && cap == AetheriaProxy.AetherBurnableCapability && cap.isRegistered()) {
+		if (cap != null && cap == IAetherBurnable.CAPABILITY && cap.isRegistered()) {
 			return AetherBurnableLazy.cast();
 		}
 		
