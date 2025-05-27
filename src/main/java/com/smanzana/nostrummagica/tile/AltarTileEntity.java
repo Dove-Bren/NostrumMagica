@@ -2,8 +2,6 @@ package com.smanzana.nostrummagica.tile;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrumaetheria.api.capability.IAetherAccepter;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -15,12 +13,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.util.LazyOptional;
 
-public class AltarTileEntity extends BlockEntity implements WorldlyContainer/*, IAetherInfusableTileEntity*/ {
+public class AltarTileEntity extends BlockEntity implements WorldlyContainer {
 	
 	private @Nonnull ItemStack stack = ItemStack.EMPTY;
 	
@@ -195,21 +189,6 @@ public class AltarTileEntity extends BlockEntity implements WorldlyContainer/*, 
 	@Override
 	public boolean isEmpty() {
 		return stack.isEmpty();
-	}
-	
-	private static final Capability<IAetherAccepter> AETHER_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
-	
-	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-		
-		if (cap != null && cap == AETHER_CAPABILITY && cap.isRegistered()) {
-			// Let held items work
-			if (!this.getItem().isEmpty()) {
-				return this.getItem().getCapability(cap, null);
-			}
-		}
-		
-		return super.getCapability(cap, side);
 	}
 	
 }
