@@ -177,7 +177,7 @@ dependencies {
 	implementation fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}")
 	
 	compileOnly fg.deobf("com.smanzana.nostrumaetheria:nostrumaetheria:${aetheria_version}:api")
-	runtimeOnly fg.deobf("com.smanzana.nostrumaetheria:nostrumaetheria:${aetheria_version}")
+	//runtimeOnly fg.deobf("com.smanzana.nostrumaetheria:nostrumaetheria:${aetheria_version}")
 	
 	runtimeOnly fg.deobf("com.smanzana.petcommand:petcommand:${petcommand_version}")
 	compileOnly fg.deobf("com.smanzana.petcommand:petcommand:${petcommand_version}:api")
@@ -268,6 +268,7 @@ publishing {
     publications {
         register('mavenJava', MavenPublication) {
             artifact jar
+			artifactId = mod_id
         }
     }
     repositories {
