@@ -90,7 +90,7 @@ public class NostrumFeatures {
 		
 		ID = NostrumMagica.Loc(ID_FEATURE_SKYCAGE);
 		CONFFEATURE_SKY_CAGE = FeatureUtils.register(ID.toString(), FEATURE_SKYCAGE, NoneFeatureConfiguration.INSTANCE);
-		PLACED_SKYCAGE = PlacementUtils.register(ID.toString(), CONFFEATURE_SKY_CAGE, RarityFilter.onAverageOnceEvery(2000), InSquarePlacement.spread(), HeightRangePlacement.of(ConstantHeight.of(VerticalAnchor.absolute(200))));
+		PLACED_SKYCAGE = PlacementUtils.register(ID.toString(), CONFFEATURE_SKY_CAGE, RarityFilter.onAverageOnceEvery(1500), InSquarePlacement.spread(), HeightRangePlacement.of(ConstantHeight.of(VerticalAnchor.absolute(200))));
 	}
 	
 	public static final void onBiomeLoad(BiomeLoadingEvent event) {

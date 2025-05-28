@@ -1,0 +1,369 @@
+{
+  "pools": [
+	  {
+		"name": "goodies",
+		"rolls": 3,
+		"entries": [
+			{
+				"type": "item",
+				"name": "nostrummagica:crystal_small",
+				"entryName": "mani_gem",
+				"weight": 1
+			},
+			{
+				"type": "item",
+				"name": "nostrummagica:nostrum_gem_unattuned",
+				"entryName": "infused_gem",
+				"weight": 1
+			},
+			{
+				"type": "item",
+				"name": "nostrummagica:nostrum_gem_earth",
+				"entryName": "infused_gem_earth",
+				"weight": 2
+			},
+			{
+				"type": "item",
+				"name": "nostrummagica:nostrum_gem_ender",
+				"entryName": "infused_gem_ender",
+				"weight": 2
+			},
+			{
+				"type": "item",
+				"name": "nostrummagica:nostrum_gem_fire",
+				"entryName": "infused_gem_fire",
+				"weight": 2
+			},
+			{
+				"type": "item",
+				"name": "nostrummagica:nostrum_gem_ice",
+				"entryName": "infused_gem_ice",
+				"weight": 2
+			},
+			{
+				"type": "item",
+				"name": "nostrummagica:nostrum_gem_lightning",
+				"entryName": "infused_gem_lightning",
+				"weight": 2
+			},
+			{
+				"type": "item",
+				"name": "nostrummagica:nostrum_gem_wind",
+				"entryName": "infused_gem_wind",
+				"weight": 2
+			},
+			{
+				"type": "item",
+				"name": "nostrummagica:research_scroll_small",
+				"entryName": "researchscroll",
+				"weight": 2
+			},
+			{
+				"type": "item",
+				"name": "nostrummagica:research_scroll_large",
+				"entryName": "researchscroll_large",
+				"weight": 1
+			},
+			{
+				"type": "item",
+				"entryName": "kani_gem",
+				"name": "nostrummagica:crystal_medium",
+				"weight": 1
+			},
+			{
+				"type": "empty",
+				"weight": 20
+			}
+		]
+	},
+	{
+		"name": "rare-guarantee",
+		"rolls": 1,
+		"entries": [
+			{
+			 "type": "item",
+			 "name": "nostrummagica:spelltomeplate_novice",
+			 "entryName": "novice",
+			 "weight": 2,
+			 "functions": 
+				[{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 0,
+					"capacity_max": 5,
+					"slot_min": 2,
+					"slot_max": 3
+				}]
+			},
+			{
+			 "type": "item",
+			 "name": "nostrummagica:spelltomeplate_advanced",
+			 "entryName": "advanced",
+			 "weight": 2,
+			 "functions":
+				[{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 0,
+					"capacity_max": 10,
+					"slot_min": 2,
+					"slot_max": 4
+				}]
+			},
+			{
+			 "type": "item",
+			 "name": "nostrummagica:spelltomeplate_combat",
+			 "entryName": "combat",
+			 "weight": 2,
+			 "functions":
+				[{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 0,
+					"capacity_max": 5,
+					"slot_min": 2,
+					"slot_max": 5
+				}]
+			},
+			{
+			 "type": "item",
+			 "name": "nostrummagica:spelltomeplate_death",
+			 "entryName": "death",
+			 "weight": 2,
+			 "functions":
+				[{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 0,
+					"capacity_max": 15,
+					"slot_min": 2,
+					"slot_max": 3
+				}]
+			},
+			{
+			 "type": "item",
+			 "name": "nostrummagica:spelltomeplate_muted",
+			 "entryName": "muted",
+			 "weight": 2,
+			 "functions":
+				[{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 0,
+					"capacity_max": 10,
+					"slot_min": 1,
+					"slot_max": 5
+				}]
+			},
+			{
+			 "type": "item",
+			 "name": "nostrummagica:spelltomeplate_spooky",
+			 "entryName": "spooky",
+			 "weight": 2,
+			 "functions":
+				[{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 0,
+					"capacity_max": 0,
+					"slot_min": 3,
+					"slot_max": 5
+				}]
+			},
+			{
+			 "type": "item",
+			 "name": "nostrummagica:spelltomeplate_living",
+			 "entryName": "living",
+			 "weight": 2,
+			 "functions":
+				[{
+					"function": "nostrummagica:roll_tomeplate",
+					"capacity_min": 5,
+					"capacity_max": 5,
+					"slot_min": 2,
+					"slot_max": 5
+				}]
+			},
+			{
+				"type": "item",
+				"name": "nostrummagica:spelltome_page",
+				"entryName": "page",
+				"weight": 5,
+				"functions": [{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: lower_reagent_cost, nostrum_level: 1}"
+				},{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: lower_reagent_cost, nostrum_level: 2}",
+					"conditions": [{
+						"condition": "random_chance", 
+						"chance": 0.5
+						}]
+				},{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: lower_reagent_cost, nostrum_level: 3}",
+					"conditions": [{
+						"condition": "random_chance", 
+						"chance": 0.3
+						}]
+				},{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: lower_reagent_cost, nostrum_level: 4}",
+					"conditions": [{
+						"condition": "random_chance", 
+						"chance": 0.2
+						}]
+				},{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: lower_reagent_cost, nostrum_level: 5}",
+					"conditions": [{
+						"condition": "random_chance", 
+						"chance": 0.1
+						}]
+				},{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: lower_reagent_cost, nostrum_level: 6}",
+					"conditions": [{
+						"condition": "random_chance", 
+						"chance": 0.02
+						}]
+				},{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: lower_mana_cost, nostrum_level: 1}",
+					"conditions": [{
+						"condition": "random_chance", 
+						"chance": 0.2
+						}]
+				},{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: lower_mana_cost, nostrum_level: 2}",
+					"conditions": [{
+						"condition": "random_chance", 
+						"chance": 0.1
+						}]
+				},{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: lower_mana_cost, nostrum_level: 3}",
+					"conditions": [{
+						"condition": "random_chance", 
+						"chance": 0.1
+						}]
+				},{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: lower_mana_cost, nostrum_level: 4}",
+					"conditions": [{
+						"condition": "random_chance", 
+						"chance": 0.05
+						}]
+				},{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: eff_bonus, nostrum_level: 1}",
+					"conditions": [{
+						"condition": "random_chance", 
+						"chance": 0.5
+						}]
+				},{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: eff_bonus, nostrum_level: 2}",
+					"conditions": [{
+						"condition": "random_chance", 
+						"chance": 0.2
+						}]
+				},{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: eff_bonus, nostrum_level: 3}",
+					"conditions": [{
+						"condition": "random_chance", 
+						"chance": 0.1
+						}]
+				},{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: xp_bonus, nostrum_level: 1}",
+					"conditions": [{
+						"condition": "random_chance", 
+						"chance": 0.1
+						}]
+				},{
+					"function": "set_nbt",
+					"tag": "{nostrum_type: xp_bonus, nostrum_level: 2}",
+					"conditions": [{
+						"condition": "random_chance", 
+						"chance": 0.05
+						}]
+				}]
+			},
+			{
+				"type": "item",
+				"name": "nostrummagica:pendant_left",
+				"entryName": "thano_left",
+				"weight": 4
+			},
+			{
+				"type": "item",
+				"name": "nostrummagica:pendant_right",
+				"entryName": "thano_right",
+				"weight": 4
+			}
+		]
+	},
+	{
+		"name": "reagents",
+		"rolls": 3,
+		"entries": [
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_black_pearl",
+			"entryName": "reagent_black_pearl",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 8 } }]
+		},
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_crystabloom",
+			"entryName": "reagent_crystabloom",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 8 } }]
+		},
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_ginseng",
+			"entryName": "reagent_ginseng",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 8 } }]
+		},
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_grave_dust",
+			"entryName": "reagent_grave_dust",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 8 } }]
+		},
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_mandrake_root",
+			"entryName": "reagent_mandrake_root",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 8 } }]
+		},
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_mani_dust",
+			"entryName": "reagent_mani_dust",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 8 } }]
+		},
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_sky_ash",
+			"entryName": "reagent_sky_ash",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 8 } }]
+		},
+		{
+			"type": "item",
+			"name": "nostrummagica:reagent_spider_silk",
+			"entryName": "reagent_spider_silk",
+			"weight": 1,
+			"functions": [{ "function": "set_count", "count": { "min": 1, "max": 8 } }]
+		},
+		{
+			"type": "empty",
+			"weight": 1
+		}
+		]
+	}]
+}

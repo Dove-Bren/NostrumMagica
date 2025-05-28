@@ -1,19 +1,28 @@
 package com.smanzana.nostrummagica.world.gen.feature;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
 import com.mojang.serialization.Codec;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.CandleBlock;
+import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.MagicBreakableContainerBlock;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -21,6 +30,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraftforge.common.Tags;
 
 public class FloatingChestCageFeature extends Feature<NoneFeatureConfiguration> {
 	
@@ -28,7 +38,7 @@ public class FloatingChestCageFeature extends Feature<NoneFeatureConfiguration> 
 
 	public FloatingChestCageFeature(Codec<NoneFeatureConfiguration> codec) {
 		super(codec);
-		lootTable = NostrumMagica.Loc("nostrum_shrine_room");
+		lootTable = NostrumMagica.Loc("chests/floating_cage");
 	}
 
 	@Override
@@ -40,8 +50,6 @@ public class FloatingChestCageFeature extends Feature<NoneFeatureConfiguration> 
 		if (!world.isEmptyBlock(position)) {
 			return false;
 		}
-		
-		System.out.println("At " + position);
 		
 		final BlockState[] baseMaterials = decideMaterials(world, position, rand);
 		
@@ -57,8 +65,33 @@ public class FloatingChestCageFeature extends Feature<NoneFeatureConfiguration> 
 	}
 	
 	protected BlockState[] decideMaterials(WorldGenLevel world, BlockPos center, Random rand) {
+		final Holder<Biome> biome = world.getBiome(center);
+		if (biome.containsTag(Tags.Biomes.IS_DRY_OVERWORLD)) {
+			return new BlockState[] {
+					Blocks.SANDSTONE.defaultBlockState(),
+					Blocks.SANDSTONE.defaultBlockState(),
+					Blocks.CUT_SANDSTONE.defaultBlockState(),
+					Blocks.CHISELED_SANDSTONE.defaultBlockState(),
+					Blocks.SMOOTH_SANDSTONE.defaultBlockState(),
+				};
+		}
+		
+		if (biome.containsTag(Tags.Biomes.IS_WATER)) {
+			return new BlockState[] {
+					Blocks.PRISMARINE_BRICKS.defaultBlockState(),
+					Blocks.PRISMARINE_BRICKS.defaultBlockState(),
+					Blocks.PRISMARINE_BRICKS.defaultBlockState(),
+					Blocks.PRISMARINE.defaultBlockState(),
+					Blocks.DARK_PRISMARINE.defaultBlockState(),
+				};
+		}
+		
 		return new BlockState[] {
-			Blocks.STONE_BRICKS.defaultBlockState()	
+			Blocks.STONE_BRICKS.defaultBlockState(),
+			Blocks.STONE_BRICKS.defaultBlockState(),
+			Blocks.CHISELED_STONE_BRICKS.defaultBlockState(),
+			Blocks.MOSSY_STONE_BRICKS.defaultBlockState(),
+			Blocks.CRACKED_STONE_BRICKS.defaultBlockState(),
 		};
 	}
 	
@@ -75,9 +108,16 @@ public class FloatingChestCageFeature extends Feature<NoneFeatureConfiguration> 
 				world.setBlock(center.offset(x, 0, z), state, 2);
 			}
 		}
+		
+		if (rand.nextBoolean()) {
+			// one free mani crystal below center
+			world.setBlock(center.below(), NostrumBlocks.maniCrystalBlock.defaultBlockState(), 2);
+		}
 	}
 	
 	protected void placeUpperWall(WorldGenLevel world, BlockPos center, int radius, Random rand, BlockState[] materials) {
+		Set<BlockPos> candleSpots = new HashSet<>();
+		
 		// square of radius-2
 		if (radius > 3) {
 			radius = radius - 2;
@@ -92,8 +132,37 @@ public class FloatingChestCageFeature extends Feature<NoneFeatureConfiguration> 
 					} else {
 						dir = null;
 					}
-					genUpperColumn(world, center.offset(x, 1, z), rand, 3, materials, dir);
+					final BlockPos at = center.offset(x, 1, z);
+					if (genUpperColumn(world, at, rand, 3, materials, dir) >= 2) {
+						// candle candidate
+						if (dir == null // not a 'door/gate' spot
+								&& !((x == -radius || x == radius) && (z == -radius || z == radius)) // not a corner
+								) {
+							// figure out which direction is in
+							BlockPos pos;
+							if (x == -radius) {
+								pos = at.east();
+							} else if (x == radius) {
+								pos = at.west();
+							} else if (z == -radius) {
+								pos = at.south();
+							} else {
+								pos = at.north();
+							}
+							candleSpots.add(pos.above());
+						}
+					}
 				}
+			}
+		}
+		
+		if (!candleSpots.isEmpty()) {
+			int count = rand.nextInt(4);
+			List<BlockPos> spots = new ArrayList<>(candleSpots);
+			Collections.shuffle(spots);
+			while (!spots.isEmpty() && count-- > 0) {
+				final BlockPos at = spots.remove(spots.size() - 1);
+				placeCandle(world, at);
 			}
 		}
 	}
@@ -165,6 +234,9 @@ public class FloatingChestCageFeature extends Feature<NoneFeatureConfiguration> 
 			
 			count++;
 		}
+		if (doorDirection != null) {
+			this.markAboveForPostProcessing(world, center.below());
+		}
 		return count;
 	}
 	
@@ -180,6 +252,19 @@ public class FloatingChestCageFeature extends Feature<NoneFeatureConfiguration> 
 	}
 	
 	protected boolean placeCandle(WorldGenLevel world, BlockPos at) {
+		BlockState blockstate = NostrumBlocks.candle.defaultBlockState().setValue(CandleBlock.LIT, true);
+		
+		for(Direction direction : Direction.Plane.HORIZONTAL) {
+			direction = direction.getOpposite();
+			if (CandleBlock.FACING.getPossibleValues().contains(direction)) {
+				Direction direction1 = direction;
+				blockstate = blockstate.setValue(CandleBlock.FACING, direction1);
+				if (blockstate.canSurvive(world, at)) {
+					world.setBlock(at, blockstate, 2);
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 	

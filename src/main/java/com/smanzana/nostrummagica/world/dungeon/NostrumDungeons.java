@@ -23,7 +23,7 @@ public class NostrumDungeons {
 					NostrumDungeonRooms.PLANTBOSS_ENTRANCE, NostrumDungeonRooms.RefExtendedEntranceStaircaseLight),
 				NostrumDungeonRooms.PLANTBOSS_BOSSROOM
 			).setColor(0x80106020)
-			.setLootTable(NostrumMagica.Loc("nostrum_shrine_room"))
+			.setLootTable(NostrumMagica.Loc("chests/nostrum_shrine_room"))
 			;
 	
 	public static final String TAG_DRAGON = "dragon";
@@ -35,7 +35,7 @@ public class NostrumDungeons {
 			NostrumDungeonRooms.RefRedDragonArena,
 			4, 1
 			).setColor(0x80601005)
-			.setLootTable(NostrumMagica.Loc("nostrum_shrine_room"))
+			.setLootTable(NostrumMagica.Loc("chests/nostrum_shrine_room"))
 			;
 	
 	public static final String TAG_PORTAL = "portal";
@@ -48,7 +48,7 @@ public class NostrumDungeons {
 					NostrumDungeonRooms.RefExtendedEntranceStaircaseLight),
 			NostrumDungeonRooms.PORTAL_ENDROOM
 			).setColor(0x80402080)
-			.setLootTable(NostrumMagica.Loc("nostrum_shrine_room"))
+			.setLootTable(NostrumMagica.Loc("chests/nostrum_shrine_room"))
 			;
 
 	@SubscribeEvent
