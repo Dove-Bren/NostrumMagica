@@ -15,6 +15,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -32,20 +33,33 @@ import net.minecraft.world.level.block.state.BlockState;
 public class BreakContainerTileEntity extends BlockEntity implements Container {
 	
 	private static final String NBT_INVENTORY = "inventory";
+	private static final String NBT_LOOT_TABLE = "loot_table";
+	private static final String NBT_LOOT_SEED = "loot_seed";
 	
 	private @Nullable SimpleContainer inventory;
+	// OR
+	private @Nullable ResourceLocation lootTable;
+	private long lootSeed;
 	
 	public BreakContainerTileEntity(BlockPos pos, BlockState state) {
 		super(NostrumBlockEntities.BreakContainer, pos, state);
-		inventory = new SimpleContainer(27);
-		inventory.addListener((c) -> this.dirty());
+	}
+	
+	protected void guaranteeInventory() {
+		if (inventory == null) {
+			inventory = new SimpleContainer(27);
+			inventory.addListener((c) -> this.dirty());
+			lootTable = null;
+		}
 	}
 	
 	public void addItem(ItemStack stack) {
+		guaranteeInventory();
 		addItem(stack, true);
 	}
 	
 	public void addItem(ItemStack stack, boolean randomSpot) {
+		guaranteeInventory();
 		if (randomSpot) {
 			setItemInRandomSlot(stack);
 		} else {
@@ -54,16 +68,19 @@ public class BreakContainerTileEntity extends BlockEntity implements Container {
 	}
 	
 	public ItemStack getFirstHeldItem() {
-		for (int i = 0; i < this.getContainerSize(); i++) {
-			ItemStack stack = this.getItem(i);
-			if (!stack.isEmpty()) {
-				return stack;
+		if (this.inventory != null) {
+			for (int i = 0; i < this.getContainerSize(); i++) {
+				ItemStack stack = this.getItem(i);
+				if (!stack.isEmpty()) {
+					return stack;
+				}
 			}
 		}
 		return ItemStack.EMPTY;
 	}
 	
 	protected boolean setItemInRandomSlot(ItemStack stack) {
+		guaranteeInventory();
 		List<Integer> spots = new ArrayList<>(27);
 		for (int i = 0; i < this.getContainerSize(); i++) {
 			ItemStack held = this.getItem(i);
@@ -82,6 +99,10 @@ public class BreakContainerTileEntity extends BlockEntity implements Container {
 	}
 	
 	public boolean isChestMode() {
+		if (this.inventory == null && this.lootTable != null) {
+			return true;
+		}
+		
 		boolean foundOne = false;
 		for (int i = 0; i < this.getContainerSize(); i++) {
 			ItemStack stack = this.getItem(i);
@@ -97,14 +118,22 @@ public class BreakContainerTileEntity extends BlockEntity implements Container {
 	}
 	
 	private void dirty() {
-		level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+		if (this.level != null) {
+			level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
+		}
 		setChanged();
 	}
 	
 	@Override
 	public void saveAdditional(CompoundTag nbt) {
 		super.saveAdditional(nbt);
-		nbt.put(NBT_INVENTORY, Inventories.serializeInventory(inventory));
+		if (inventory != null) {
+			nbt.put(NBT_INVENTORY, Inventories.serializeInventory(inventory));
+		}
+		if (this.lootTable != null) {
+			nbt.putString(NBT_LOOT_TABLE, this.lootTable.toString());
+			nbt.putLong(NBT_LOOT_SEED, lootSeed);
+		}
 	}
 	
 	@Override
@@ -114,7 +143,15 @@ public class BreakContainerTileEntity extends BlockEntity implements Container {
 		if (nbt == null)
 			return;
 		
-		Inventories.deserializeInventory(inventory, nbt.get(NBT_INVENTORY));
+		if (nbt.contains(NBT_INVENTORY)) {
+			this.guaranteeInventory();
+			Inventories.deserializeInventory(inventory, nbt.get(NBT_INVENTORY));
+		}
+		
+		if (nbt.contains(NBT_LOOT_TABLE)) {
+			this.lootTable = ResourceLocation.parse(nbt.getString(NBT_LOOT_TABLE));
+			this.lootSeed = nbt.getLong(NBT_LOOT_SEED);
+		}
 	}
 	
 	@Override
@@ -147,11 +184,16 @@ public class BreakContainerTileEntity extends BlockEntity implements Container {
 				}
 			}
 			
-			SimpleContainer copy = new SimpleContainer(this.inventory.getContainerSize());
-			for (int i = 0; i < this.inventory.getContainerSize(); i++) {
-				copy.setItem(i, inventory.removeItemNoUpdate(i));
+			final SimpleContainer copy;
+			if (this.inventory != null) {
+				copy = new SimpleContainer(this.inventory.getContainerSize());
+				for (int i = 0; i < this.inventory.getContainerSize(); i++) {
+					copy.setItem(i, inventory.removeItemNoUpdate(i));
+				}
+				this.inventory.setChanged();
+			} else {
+				copy = null;
 			}
-			this.inventory.setChanged();
 			
 			// Set to chest, which will remove us. Make sure to have cleared inventory by this point!
 			this.level.setBlock(worldPosition, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, face), 3); // Removes us!
@@ -178,62 +220,74 @@ public class BreakContainerTileEntity extends BlockEntity implements Container {
 		if (entity != null && entity instanceof ChestBlockEntity chest) {
 			chest.clearContent();
 			
-			final int sharedSlotCount = Math.min(source.getContainerSize(), chest.getContainerSize());
-			
-			int i = 0;
-			for (; i < sharedSlotCount; i++) {
-				chest.setItem(i, source.removeItemNoUpdate(i));
-			}
-			
-			// For any leftover items, drop on ground
-			for (; i < source.getContainerSize(); i++) {
-				Block.popResource(level, worldPosition, source.removeItemNoUpdate(i));
+			if (source == null) {
+				chest.setLootTable(lootTable, lootSeed);
+			} else {
+				final int sharedSlotCount = Math.min(source.getContainerSize(), chest.getContainerSize());
+				
+				int i = 0;
+				for (; i < sharedSlotCount; i++) {
+					chest.setItem(i, source.removeItemNoUpdate(i));
+				}
+				
+				// For any leftover items, drop on ground
+				for (; i < source.getContainerSize(); i++) {
+					Block.popResource(level, worldPosition, source.removeItemNoUpdate(i));
+				}
 			}
 		}
 	}
 	
 	@Override
 	public void clearContent() {
-		this.inventory.clearContent();
+		if (this.inventory != null) {
+			this.inventory.clearContent();
+		}
+		if (this.lootTable != null) {
+			this.lootTable = null;
+		}
 	}
 
 	@Override
 	public int getContainerSize() {
-		return this.inventory.getContainerSize();
+		return inventory == null ? 0 : this.inventory.getContainerSize();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return this.inventory.isEmpty();
+		return inventory == null ? true : this.inventory.isEmpty();
 	}
 
 	@Override
 	public ItemStack getItem(int index) {
-		return this.inventory.getItem(index);
+		return inventory == null ? null : this.inventory.getItem(index);
 	}
 
 	@Override
 	public ItemStack removeItem(int index, int count) {
-		return this.inventory.removeItem(index, count);
+		return inventory == null ? null : this.inventory.removeItem(index, count);
 	}
 
 	@Override
 	public ItemStack removeItemNoUpdate(int index) {
-		return this.inventory.removeItemNoUpdate(index);
+		return inventory == null ? null : this.inventory.removeItemNoUpdate(index);
 	}
 
 	@Override
 	public void setItem(int index, ItemStack stack) {
-		this.inventory.setItem(index, stack);
+		if (inventory != null) {
+			this.inventory.setItem(index, stack);
+		}
 	}
 
 	@Override
 	public boolean stillValid(Player player) {
-		return this.inventory.stillValid(player);
+		return inventory != null && this.inventory.stillValid(player);
 	}
 
 	public void setContents(Container chest) {
 		this.clearContent();
+		this.guaranteeInventory();
 		final int sharedSlotCount = Math.min(this.getContainerSize(), chest.getContainerSize());
 		
 		int i = 0;
@@ -245,6 +299,11 @@ public class BreakContainerTileEntity extends BlockEntity implements Container {
 		for (; i < this.getContainerSize(); i++) {
 			Block.popResource(level, worldPosition, chest.removeItemNoUpdate(i));
 		}
+	}
+
+	public void setLootTableNoUpdate(ResourceLocation lootTable, long lootSeed) {
+		this.lootTable = lootTable;
+		this.lootSeed = lootSeed;
 	}
 	
 }
