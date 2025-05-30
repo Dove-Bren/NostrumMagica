@@ -72,6 +72,7 @@ public class NostrumEntityTypes {
 	@ObjectHolder(ArcaneWolfEntity.ID) public static EntityType<ArcaneWolfEntity> arcaneWolf;
 	@ObjectHolder(SpellProjectileEntity.ID) public static EntityType<SpellProjectileEntity> spellProjectile;
 	@ObjectHolder(ChakramSpellSaucerEntity.ID) public static EntityType<ChakramSpellSaucerEntity> chakramSpellSaucer;
+	@ObjectHolder(SeekerSpellSaucerEntity.ID) public static EntityType<SeekerSpellSaucerEntity> seekerSpellSaucer;
 	@ObjectHolder(CyclerSpellSaucerEntity.ID) public static EntityType<CyclerSpellSaucerEntity> cyclerSpellSaucer;
 	@ObjectHolder(SwitchTriggerEntity.ID) public static EntityType<SwitchTriggerEntity> switchTrigger;
 	@ObjectHolder(TameLightning.ID) public static EntityType<TameLightning> tameLightning;
@@ -223,6 +224,10 @@ public class NostrumEntityTypes {
 				.sized(1F, .2F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
 			.build("").setRegistryName(CyclerSpellSaucerEntity.ID));
+		registry.register(EntityType.Builder.<SeekerSpellSaucerEntity>of(SeekerSpellSaucerEntity::new, MobCategory.MISC)
+				.sized(.5F, .125F)
+				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
+			.build("").setRegistryName(SeekerSpellSaucerEntity.ID));
 		registry.register(EntityType.Builder.<MagicDamageProjectileEntity>of(MagicDamageProjectileEntity::new, MobCategory.MISC)
 				.sized(.3F, .3F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)

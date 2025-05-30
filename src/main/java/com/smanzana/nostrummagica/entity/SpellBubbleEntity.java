@@ -96,6 +96,11 @@ public class SpellBubbleEntity extends SpellProjectileEntity {
 	}
 	
 	@Override
+	protected void spawnTrailParticle() {
+		// no trail
+	}
+	
+	@Override
 	public void tick() {
 		if (!level.isClientSide()) {
 			// Apply drag if still moving

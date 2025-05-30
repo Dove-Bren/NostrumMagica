@@ -178,12 +178,16 @@ public class SpellProjectileEntity extends AbstractHurtingProjectile {
 		
 	}
 	
+	protected void spawnTrailParticle() {
+		NostrumParticles.GLOW_TRAIL.spawn(level, new SpawnParams(1, getX(), getY(), getZ(), 0, 300, 0,
+				new TargetLocation(this, true)).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(this.getElement().getColor(), .7f)));
+	}
+	
 	@Override
 	public void tick() {
 		if (level.isClientSide()) {
 			if (firstTick) {
-				NostrumParticles.GLOW_TRAIL.spawn(level, new SpawnParams(1, getX(), getY(), getZ(), 0, 300, 0,
-						new TargetLocation(this, true)).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(this.getElement().getColor(), .7f)));
+				spawnTrailParticle();
 			}
 		}
 		

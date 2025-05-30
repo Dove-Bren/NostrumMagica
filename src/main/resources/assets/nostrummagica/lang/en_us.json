@@ -103,6 +103,7 @@
 	"item.nostrummagica.rune_shape_self": "Self Rune",
 	"item.nostrummagica.rune_shape_ring": "Ring Rune",
 	"item.nostrummagica.rune_shape_bubblespray": "Bubble Spray Rune",
+	"item.nostrummagica.rune_shape_barrage": "Barrage Rune",
 
     "item.nostrummagica.crystal_small": "Mani Crystal",
     "item.nostrummagica.crystal_medium": "Kani Crystal",
@@ -1328,6 +1329,8 @@
 	"shape.cutter.desc": "Fires a projectile that pierces blocks and entities, applying effects to each it passes.",
 	"shape.bubblespray.name": "Bubble Spray",
 	"shape.bubblespray.desc": "Sprays several spell bubbles, which inflict a weakened version of the spell when they are collided with.",
+	"shape.barrage.name": "Barrage",
+	"shape.barrage.desc": "Fires multiple seeking projectiles that barrage the target any any others they happen to pass through",
 	
 	"alteration.inflict.name": "Inflict",
 	"alteration.inflict.desc": "Produces negative status effects",
@@ -1512,6 +1515,7 @@
     "ritual.rune.aura.name": "Aura Rune",
     "ritual.rune.ring.name": "Ring Rune",
 	"ritual.rune.bubblespray.name": "Bubble Spray Rune",
+	"ritual.rune.barrage.name": "Barrage Rune",
 
     "ritual.charm.fire.name": "Fire Charm",
     "ritual.charm.ice.name": "Ice Charm",
@@ -1908,6 +1912,8 @@
 	"shapeprop.mana.level.desc": "Mana level to trigger around",
 	"shapeprop.mana.when_above.name": "Trigger Type",
 	"shapeprop.mana.when_above.desc": "Whether to trigger above or below the Mana Level",
+	"shapeprop.barrage.count.name": "Count",
+	"shapeprop.barrage.count.desc": "Number of barrage projectiles to launch",
 	
 	"shapeprop.selector.name": "Mode",
 	"shapeprop.selector.desc": "Whether to affect blocks, mobs, or both",

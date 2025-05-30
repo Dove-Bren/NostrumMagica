@@ -30,6 +30,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraft.world.level.Level;
 
 public class WallShape extends AreaShape {
@@ -267,6 +268,10 @@ public class WallShape extends AreaShape {
 	public static final SpellShapeProperty<Boolean> LINGER = new BooleanSpellShapeProperty("linger");
 	public static final SpellShapeProperty<Float> RADIUS = new FloatSpellShapeProperty("radius", 1f, 2f, 3f, 0f);
 	
+	private static final Lazy<NonNullList<ItemStack>> REAGENTS = Lazy.of(() -> NonNullList.of(ItemStack.EMPTY,
+			ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
+			ReagentItem.CreateStack(ReagentType.MANDRAKE_ROOT, 1)));
+	
 	public WallShape() {
 		super(ID);
 	}
@@ -299,9 +304,7 @@ public class WallShape extends AreaShape {
 
 	@Override
 	public NonNullList<ItemStack> getReagents() {
-		return NonNullList.of(ItemStack.EMPTY,
-				ReagentItem.CreateStack(ReagentType.BLACK_PEARL, 1),
-				ReagentItem.CreateStack(ReagentType.MANDRAKE_ROOT, 1));
+		return REAGENTS.get();
 	}
 
 	@Override
