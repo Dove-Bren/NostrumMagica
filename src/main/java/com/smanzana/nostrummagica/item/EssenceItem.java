@@ -2,20 +2,16 @@ package com.smanzana.nostrummagica.item;
 
 import java.util.Optional;
 
-import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-public class EssenceItem extends Item implements ILoreTagged, IEnchantableItem {
+public class EssenceItem extends Item implements ILoreTagged {
 
 	public static final String ID_PREFIX = "nostrum_essence_";
 	
@@ -100,28 +96,23 @@ public class EssenceItem extends Item implements ILoreTagged, IEnchantableItem {
 		return this.element;
 	}
 
-	@Override
-	public boolean canEnchant(ItemStack stack) {
-		return true;
-	}
-
-	@Override
-	public Result attemptEnchant(ItemStack stack, LivingEntity entity, EMagicElement element, int power) {
-		final boolean elemMatch = (this.element == element);
-		final int count;
-		final double amt;
-		if (elemMatch) {
-			count = power + 2; // bonus hit count for matching
-			amt = 2 + power; // bonus damage for matching
-		} else {
-			count = power + 1;
-			amt = 2; // non-matching essences don't get bonus damage
-		}
-		entity.removeEffectNoUpdate(NostrumEffects.magicBuff);
-		NostrumMagica.magicEffectProxy.applyMagicBuff(entity, this.element, amt, count);
-		entity.addEffect(new MobEffectInstance(NostrumEffects.magicBuff, 60 * 20, (int) (amt - 1)));
-		return new Result(true, ItemStack.EMPTY);
-	}
+//	@Override
+//	public Result attemptEnchant(ItemStack stack, LivingEntity entity, EMagicElement element, int power) {
+//		final boolean elemMatch = (this.element == element);
+//		final int count;
+//		final double amt;
+//		if (elemMatch) {
+//			count = power + 2; // bonus hit count for matching
+//			amt = 2 + power; // bonus damage for matching
+//		} else {
+//			count = power + 1;
+//			amt = 2; // non-matching essences don't get bonus damage
+//		}
+//		entity.removeEffectNoUpdate(NostrumEffects.magicBuff);
+//		NostrumMagica.magicEffectProxy.applyMagicBuff(entity, this.element, amt, count);
+//		entity.addEffect(new MobEffectInstance(NostrumEffects.magicBuff, 60 * 20, (int) (amt - 1)));
+//		return new Result(true, ItemStack.EMPTY);
+//	}
 	
 	@Override
 	public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {

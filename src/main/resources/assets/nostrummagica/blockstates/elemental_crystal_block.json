@@ -1,0 +1,11 @@
+{
+    "variants": {
+        "element=physical": { "model": "nostrummagica:block/elemental_crystal_block" },
+		"element=fire": { "model": "nostrummagica:block/elemental_crystal_block" },
+		"element=ice": { "model": "nostrummagica:block/elemental_crystal_block" },
+		"element=wind": { "model": "nostrummagica:block/elemental_crystal_block" },
+		"element=earth": { "model": "nostrummagica:block/elemental_crystal_block" },
+		"element=lightning": { "model": "nostrummagica:block/elemental_crystal_block" },
+		"element=ender": { "model": "nostrummagica:block/elemental_crystal_block" }
+    }
+}

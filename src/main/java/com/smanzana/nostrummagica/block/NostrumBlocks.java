@@ -41,6 +41,7 @@ import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
@@ -137,7 +138,8 @@ public class NostrumBlocks {
 	@ObjectHolder(MagicBreakableBlock.ID) public static MagicBreakableBlock breakBlock;
 	@ObjectHolder(MagicBreakableContainerBlock.ID) public static MagicBreakableContainerBlock breakContainerBlock;
 	@ObjectHolder(ConjureGhostBlock.ID) public static ConjureGhostBlock conjureGhostBlock;
-	@ObjectHolder(LaserBlock.ID) public static LaserBlock laser; 
+	@ObjectHolder(LaserBlock.ID) public static LaserBlock laser;
+	@ObjectHolder(ElementalCrystalBlock.ID) public static ElementalCrystalBlock elementalCrystal;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -228,6 +230,7 @@ public class NostrumBlocks {
     	registry.register(new BreakBlockContainerItem(breakContainerBlock, NostrumItems.PropDungeonBase()).setRegistryName(breakContainerBlock.getRegistryName()));
     	registry.register(new ConjureGhostBlockItem(conjureGhostBlock, NostrumItems.PropDungeonBase()).setRegistryName(conjureGhostBlock.getRegistryName()));
     	registerBlockItem(laser, laser.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(elementalCrystal, elementalCrystal.getRegistryName(), NostrumItems.PropUnstackable().rarity(Rarity.EPIC), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -335,6 +338,7 @@ public class NostrumBlocks {
     	registerBlock(new MagicBreakableContainerBlock(), MagicBreakableContainerBlock.ID, registry);
     	registerBlock(new ConjureGhostBlock(), ConjureGhostBlock.ID, registry);
     	registerBlock(new LaserBlock(), LaserBlock.ID, registry);
+    	registerBlock(new ElementalCrystalBlock(), ElementalCrystalBlock.ID, registry);
     }
     
 }

@@ -38,7 +38,7 @@ import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
-import com.smanzana.nostrummagica.item.IEnchantableItem;
+import com.smanzana.nostrummagica.item.ICrystalEnchantableItem;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
@@ -1476,58 +1476,58 @@ public class SpellAction {
 				resultBuilder.applied |= true;
 			}
 			
-			ItemStack inhand = entity.getMainHandItem();
-			boolean offhand = false;
-			if (!isEnchantable(inhand)) {
-				inhand = entity.getOffhandItem();
-				offhand = true;
-			}
-			
-			ItemStack addedItem = ItemStack.EMPTY;
-			boolean didEmpower = false;
-			boolean consumeInput = false;
-			
-			// Main hand attempt
-			if (!inhand.isEmpty()) {
-				Item item = inhand.getItem();
-				if (item instanceof IEnchantableItem) {
-					IEnchantableItem.Result result = ((IEnchantableItem) item).attemptEnchant(inhand, entity, element, level);
-					didEmpower = result.success;
-					addedItem = result.resultItem;
-					consumeInput = result.consumeInput;
-				}
-			}
-			
-			if (addedItem.isEmpty() && !didEmpower) {
-				//NostrumMagicaSounds.CAST_FAIL.play(entity);
-			} else {
-				if (entity instanceof Player) {
-					Player p = (Player) entity;
-					
-					if (consumeInput) {
-						if (inhand.getCount() == 1) {
-							if (offhand) {
-								p.getInventory().removeItemNoUpdate(40);
-							} else {
-								p.getInventory().removeItemNoUpdate(p.getInventory().selected);
-							}
-						} else {
-							inhand.split(1);
-						}
-					}
-					if (!addedItem.isEmpty()) {
-						((Player) entity).getInventory().add(addedItem);
-					}
-					
-					
-				} else {
-					// MobEntity has held item in slot 0
-					if (!addedItem.isEmpty()) {
-						entity.setItemInHand(InteractionHand.MAIN_HAND, addedItem);
-					}
-				}
-				NostrumMagicaSounds.CAST_CONTINUE.play(entity);
-			}
+//			ItemStack inhand = entity.getMainHandItem();
+//			boolean offhand = false;
+//			if (!isEnchantable(inhand)) {
+//				inhand = entity.getOffhandItem();
+//				offhand = true;
+//			}
+//			
+//			ItemStack addedItem = ItemStack.EMPTY;
+//			boolean didEmpower = false;
+//			boolean consumeInput = false;
+//			
+//			// Main hand attempt
+//			if (!inhand.isEmpty()) {
+//				Item item = inhand.getItem();
+//				if (item instanceof ICrystalEnchantableItem) {
+//					ICrystalEnchantableItem.Result result = ((ICrystalEnchantableItem) item).attemptEnchant(inhand, entity, element, level);
+//					didEmpower = result.success;
+//					addedItem = result.resultItem;
+//					consumeInput = result.consumeInput;
+//				}
+//			}
+//			
+//			if (addedItem.isEmpty() && !didEmpower) {
+//				//NostrumMagicaSounds.CAST_FAIL.play(entity);
+//			} else {
+//				if (entity instanceof Player) {
+//					Player p = (Player) entity;
+//					
+//					if (consumeInput) {
+//						if (inhand.getCount() == 1) {
+//							if (offhand) {
+//								p.getInventory().removeItemNoUpdate(40);
+//							} else {
+//								p.getInventory().removeItemNoUpdate(p.getInventory().selected);
+//							}
+//						} else {
+//							inhand.split(1);
+//						}
+//					}
+//					if (!addedItem.isEmpty()) {
+//						((Player) entity).getInventory().add(addedItem);
+//					}
+//					
+//					
+//				} else {
+//					// MobEntity has held item in slot 0
+//					if (!addedItem.isEmpty()) {
+//						entity.setItemInHand(InteractionHand.MAIN_HAND, addedItem);
+//					}
+//				}
+//				NostrumMagicaSounds.CAST_CONTINUE.play(entity);
+//			}
 			
 			// Apply enchant effect
 			entity.addEffect(new MobEffectInstance(ElementalEnchantEffect.GetForElement(this.element), (int) (20 * 15 * efficiency), level-1));
@@ -2347,7 +2347,7 @@ public class SpellAction {
 	
 	public static final boolean isEnchantable(ItemStack stack) {
 		Item item = stack.getItem();
-		return !stack.isEmpty() && item instanceof IEnchantableItem && ((IEnchantableItem) item).canEnchant(stack);
+		return !stack.isEmpty() && item instanceof ICrystalEnchantableItem && ((ICrystalEnchantableItem) item).canEnchant(stack);
 	}
 	
 	public SpellAction damage(EMagicElement element, float amount) {

@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Either;
 import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.ElementalCrystalBlock;
 import com.smanzana.nostrummagica.block.ModificationTableBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.MagicBreakableBlock;
@@ -347,6 +348,7 @@ public class ClientInit {
 		event.getBlockColors().register(TogglePlatformBlock::MakePlatformColor, NostrumBlocks.togglePlatform);
 		event.getBlockColors().register(MagicBreakableBlock::MakeBlockColor, NostrumBlocks.breakBlock);
 		event.getBlockColors().register(MagicBreakableContainerBlock::MakeBlockColor, NostrumBlocks.breakContainerBlock);
+		event.getBlockColors().register(ElementalCrystalBlock::MakeBlockColor, NostrumBlocks.elementalCrystal);
 	}
 	
 	@SubscribeEvent
@@ -491,6 +493,7 @@ public class ClientInit {
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.breakContainerBlock, RenderType.translucent());
 		//ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.conjureGhostBlock, NostrumRenderTypes.COLORED_GHOSTBLOCK); // doens't actually render and we need tile entity
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.laser, RenderType.solid());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.elementalCrystal, RenderType.translucent());
 	}
 	
 	private static final void registerItemModelProperties() {

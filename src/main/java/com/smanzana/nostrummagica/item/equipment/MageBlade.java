@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
-import com.smanzana.nostrummagica.item.IEnchantableItem;
+import com.smanzana.nostrummagica.item.ICrystalEnchantableItem;
 import com.smanzana.nostrummagica.item.ISpellEquipment;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -41,7 +41,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment, IEnchantableItem {
+public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment, ICrystalEnchantableItem {
 
 	public static final String ID = "mage_blade";
 	
@@ -229,13 +229,13 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 	}
 
 	@Override
-	public Result attemptEnchant(ItemStack stack, LivingEntity entity, EMagicElement element, int power) {
-		final int charges = (int) (10 * Math.pow(2, power-1)); // 10, 20, 40, ...
+	public Result attemptEnchant(ItemStack stack, EMagicElement element) {
+		final int charges = 20;
 		
 		MageBlade blade = (MageBlade) stack.getItem();
 		blade.setElement(stack, element);
 		blade.setCharges(stack, charges);
-		return new Result(true, ItemStack.EMPTY, false);
+		return new Result(true, stack);
 	}
 	
 	@OnlyIn(Dist.CLIENT)

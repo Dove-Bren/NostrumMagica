@@ -15,7 +15,6 @@ import com.smanzana.nostrummagica.tile.CandleTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -29,7 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * @author Skyler
  *
  */
-public class InfusedGemItem extends Item implements ILoreTagged, IEnchantableItem {
+public class InfusedGemItem extends Item implements ILoreTagged, ICrystalEnchantableItem {
 
 	public static final String ID_PREFIX = "nostrum_gem_";
 	public static final String MakeID(EMagicElement element) {
@@ -179,9 +178,9 @@ public class InfusedGemItem extends Item implements ILoreTagged, IEnchantableIte
 	}
 
 	@Override
-	public Result attemptEnchant(ItemStack stack, LivingEntity entity, EMagicElement element, int power) {
+	public Result attemptEnchant(ItemStack stack, EMagicElement element) {
 		if (this.element == EMagicElement.PHYSICAL || this.element == null) {
-			int count = (int) Math.pow(2, power - 1);
+			int count = 1;
 			return new Result(true, InfusedGemItem.getGem(element, count));
 		} else {
 			return new Result(false);

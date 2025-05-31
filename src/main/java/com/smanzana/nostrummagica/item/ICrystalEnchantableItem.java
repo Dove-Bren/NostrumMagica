@@ -4,24 +4,20 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
-public interface IEnchantableItem {
+/**
+ * Item can be enchanted by an Elemental Crystal block 
+ */
+public interface ICrystalEnchantableItem {
 	
 	public static final class Result {
 		public final boolean success;
 		public final @Nonnull ItemStack resultItem;
-		public final boolean consumeInput;
-		
-		public Result(boolean success, @Nonnull ItemStack resultItem, boolean consumeInput) {
-			this.success = success;
-			this.resultItem = resultItem;
-			this.consumeInput = consumeInput;
-		}
 		
 		public Result(boolean success, @Nonnull ItemStack resultItem) {
-			this(success, resultItem, true);
+			this.success = success;
+			this.resultItem = resultItem;
 		}
 		
 		public Result(boolean success) {
@@ -37,6 +33,6 @@ public interface IEnchantableItem {
 	 */
 	public boolean canEnchant(ItemStack stack);
 
-	public @Nonnull Result attemptEnchant(ItemStack stack, LivingEntity entity, EMagicElement element, int power);
+	public @Nonnull Result attemptEnchant(ItemStack stack, EMagicElement element);
 	
 }
