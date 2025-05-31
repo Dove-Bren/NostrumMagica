@@ -5,8 +5,8 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.item.SpellScroll;
-import com.smanzana.nostrummagica.item.SpellTome;
+import com.smanzana.nostrummagica.item.equipment.SpellScroll;
+import com.smanzana.nostrummagica.item.equipment.SpellTome;
 import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;

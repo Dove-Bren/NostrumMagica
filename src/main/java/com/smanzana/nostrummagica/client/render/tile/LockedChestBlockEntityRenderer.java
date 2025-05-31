@@ -8,7 +8,7 @@ import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
-import com.smanzana.nostrummagica.item.WorldKeyItem;
+import com.smanzana.nostrummagica.item.mapmaking.WorldKeyItem;
 import com.smanzana.nostrummagica.tile.LockedChestTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 

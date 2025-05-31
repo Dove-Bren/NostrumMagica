@@ -2,8 +2,8 @@ package com.smanzana.nostrummagica.ritual.outcome;
 
 import java.util.List;
 
-import com.smanzana.nostrummagica.item.SpellScroll;
-import com.smanzana.nostrummagica.item.SpellTome;
+import com.smanzana.nostrummagica.item.equipment.SpellScroll;
+import com.smanzana.nostrummagica.item.equipment.SpellTome;
 import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.spell.RegisteredSpell;

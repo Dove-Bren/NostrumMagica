@@ -11,7 +11,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.item.SpellTome.TomeStyle;
+import com.smanzana.nostrummagica.item.equipment.SpellTome.TomeStyle;
 import com.smanzana.nostrummagica.spell.SpellChargeTracker.ChargeType;
 import com.smanzana.nostrummagica.spell.SpellChargeTracker.SpellCharge;
 

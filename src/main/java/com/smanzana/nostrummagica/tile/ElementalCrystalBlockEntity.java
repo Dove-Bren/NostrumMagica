@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
-import com.smanzana.nostrummagica.item.ICrystalEnchantableItem;
+import com.smanzana.nostrummagica.item.api.ICrystalEnchantableItem;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.TargetLocation;
 

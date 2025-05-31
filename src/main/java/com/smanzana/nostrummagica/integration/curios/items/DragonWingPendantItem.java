@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.integration.curios.items;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.item.IDragonWingRenderItem;
+import com.smanzana.nostrummagica.item.api.IDragonWingRenderItem;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.world.entity.LivingEntity;

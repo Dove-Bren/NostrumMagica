@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
-import com.smanzana.nostrummagica.item.WorldKeyItem;
+import com.smanzana.nostrummagica.item.mapmaking.WorldKeyItem;
 import com.smanzana.nostrummagica.tile.LockedDoorTileEntity;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;

@@ -14,7 +14,7 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.ScrollScreen;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.item.SpellTome;
+import com.smanzana.nostrummagica.item.equipment.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.ClientTomeDropSpellMessage;
 import com.smanzana.nostrummagica.spell.RegisteredSpell;

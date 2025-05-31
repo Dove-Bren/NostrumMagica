@@ -8,7 +8,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.BillboardModel;
 import com.smanzana.nostrummagica.client.model.KeySwitchTriggerModel;
 import com.smanzana.nostrummagica.entity.KeySwitchTriggerEntity;
-import com.smanzana.nostrummagica.item.WorldKeyItem;
+import com.smanzana.nostrummagica.item.mapmaking.WorldKeyItem;
 import com.smanzana.nostrummagica.tile.KeySwitchBlockTileEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 

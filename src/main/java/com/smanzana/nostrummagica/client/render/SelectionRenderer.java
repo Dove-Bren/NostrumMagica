@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.client.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.smanzana.nostrummagica.item.ISelectionItem;
+import com.smanzana.nostrummagica.item.api.ISelectionItem;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.Minecraft;

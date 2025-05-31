@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.item;
+package com.smanzana.nostrummagica.item.mapmaking;
 
 import com.smanzana.nostrummagica.block.dungeon.ConjureGhostBlock;
 

@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.item;
+package com.smanzana.nostrummagica.item.equipment;
 
 import java.util.ArrayList;
 import java.util.List;

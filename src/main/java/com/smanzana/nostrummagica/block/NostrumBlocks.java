@@ -32,9 +32,9 @@ import com.smanzana.nostrummagica.block.dungeon.TrialBlock;
 import com.smanzana.nostrummagica.block.dungeon.TriggerRepeaterBlock;
 import com.smanzana.nostrummagica.block.dungeon.TriggeredMatchSpawnerBlock;
 import com.smanzana.nostrummagica.fluid.NostrumFluids;
-import com.smanzana.nostrummagica.item.BreakBlockContainerItem;
-import com.smanzana.nostrummagica.item.ConjureGhostBlockItem;
 import com.smanzana.nostrummagica.item.NostrumItems;
+import com.smanzana.nostrummagica.item.mapmaking.BreakBlockContainerItem;
+import com.smanzana.nostrummagica.item.mapmaking.ConjureGhostBlockItem;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 

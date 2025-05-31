@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.integration.curios.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.client.render.entity.SpelltomeRenderer;
-import com.smanzana.nostrummagica.item.SpellTome;
+import com.smanzana.nostrummagica.item.equipment.SpellTome;
 
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;

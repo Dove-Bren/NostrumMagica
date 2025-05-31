@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.item;
+package com.smanzana.nostrummagica.item.mapmaking;
 
 import java.util.List;
 
@@ -8,6 +8,8 @@ import com.smanzana.autodungeons.item.IBlueprintHolder;
 import com.smanzana.autodungeons.world.blueprints.Blueprint;
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.autodungeons.world.blueprints.IBlueprint;
+import com.smanzana.nostrummagica.item.NostrumItems;
+import com.smanzana.nostrummagica.item.api.ISelectionItem;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.Util;

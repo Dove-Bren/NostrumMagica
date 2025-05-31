@@ -4,10 +4,10 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ModificationTableBlock;
-import com.smanzana.nostrummagica.item.SpellScroll;
-import com.smanzana.nostrummagica.item.SpellTome;
 import com.smanzana.nostrummagica.item.SpellTomePage;
 import com.smanzana.nostrummagica.item.equipment.CasterWandItem;
+import com.smanzana.nostrummagica.item.equipment.SpellScroll;
+import com.smanzana.nostrummagica.item.equipment.SpellTome;
 import com.smanzana.nostrummagica.item.equipment.WarlockSword;
 import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;

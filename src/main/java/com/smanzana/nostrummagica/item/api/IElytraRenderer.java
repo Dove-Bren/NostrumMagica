@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.item;
+package com.smanzana.nostrummagica.item.api;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;

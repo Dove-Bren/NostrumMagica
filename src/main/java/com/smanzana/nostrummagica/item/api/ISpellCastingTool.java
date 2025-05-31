@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.item;
+package com.smanzana.nostrummagica.item.api;
 
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 

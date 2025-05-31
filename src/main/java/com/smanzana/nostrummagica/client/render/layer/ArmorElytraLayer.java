@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.client.render.layer;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrummagica.item.IElytraRenderer;
+import com.smanzana.nostrummagica.item.api.IElytraRenderer;
 import com.smanzana.nostrummagica.item.armor.ICapeProvider;
 
 import net.minecraft.client.model.EntityModel;

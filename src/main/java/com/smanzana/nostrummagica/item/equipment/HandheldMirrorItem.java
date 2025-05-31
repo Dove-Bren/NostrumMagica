@@ -7,9 +7,9 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.item.IPositionHolderItem;
-import com.smanzana.nostrummagica.item.ISelectionItem;
 import com.smanzana.nostrummagica.item.PositionCrystal;
+import com.smanzana.nostrummagica.item.api.IPositionHolderItem;
+import com.smanzana.nostrummagica.item.api.ISelectionItem;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.world.item.TooltipFlag;

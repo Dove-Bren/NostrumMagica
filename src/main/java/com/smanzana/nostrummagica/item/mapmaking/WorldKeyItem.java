@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.item;
+package com.smanzana.nostrummagica.item.mapmaking;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.autodungeons.tile.IWorldKeyHolder;
 import com.smanzana.autodungeons.world.WorldKey;
+import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.tile.LockedChestTileEntity;
 
 import net.minecraft.ChatFormatting;

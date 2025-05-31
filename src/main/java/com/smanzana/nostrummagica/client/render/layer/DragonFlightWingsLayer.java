@@ -7,7 +7,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.DragonFlightWingsModel;
 import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
-import com.smanzana.nostrummagica.item.IDragonWingRenderItem;
+import com.smanzana.nostrummagica.item.api.IDragonWingRenderItem;
 import com.smanzana.nostrummagica.util.ColorUtil;
 
 import net.minecraft.client.player.AbstractClientPlayer;

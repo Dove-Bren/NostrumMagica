@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.item.api.ISelectionItem;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.util.DimensionUtils;

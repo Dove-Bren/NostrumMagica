@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer.Outline;
-import com.smanzana.nostrummagica.item.ISpellContainerItem;
+import com.smanzana.nostrummagica.item.api.ISpellContainerItem;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;

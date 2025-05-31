@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.item;
+package com.smanzana.nostrummagica.item.equipment;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -19,6 +19,12 @@ import com.smanzana.nostrummagica.client.gui.book.LinedTextPage;
 import com.smanzana.nostrummagica.client.gui.book.SpellPreviewPage;
 import com.smanzana.nostrummagica.client.gui.book.TitlePage;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.item.NostrumItems;
+import com.smanzana.nostrummagica.item.SpellPlate;
+import com.smanzana.nostrummagica.item.SpellTomePage;
+import com.smanzana.nostrummagica.item.api.IRaytraceOverlay;
+import com.smanzana.nostrummagica.item.api.ISpellCastingTool;
+import com.smanzana.nostrummagica.item.api.ISpellContainerItem;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;

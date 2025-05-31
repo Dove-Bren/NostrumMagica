@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.item;
+package com.smanzana.nostrummagica.item.mapmaking;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
+
+import com.smanzana.nostrummagica.item.NostrumItems;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;

@@ -12,7 +12,7 @@ import com.smanzana.nostrummagica.entity.dragon.DragonGambit;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity.RedDragonSpellInventory;
 import com.smanzana.nostrummagica.item.NostrumItems;
-import com.smanzana.nostrummagica.item.SpellScroll;
+import com.smanzana.nostrummagica.item.equipment.SpellScroll;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.util.RenderFuncs;
