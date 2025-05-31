@@ -5,7 +5,6 @@ import com.smanzana.nostrummagica.block.property.MagicElementProperty;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
@@ -127,15 +126,13 @@ public class MagicBreakableBlock extends Block implements ISpellTargetBlock {
 
 	@Override
 	public boolean processSpellEffect(Level level, BlockState state, BlockPos pos, LivingEntity caster,
-			SpellLocation hitLocation, Spell spell, SpellAction action) {
+			SpellLocation hitLocation, SpellEffectPart effect, SpellAction action) {
 		// Blocks require INFLICT to break with matching elements
 		final EMagicElement element = getElement(state);
-		for (SpellEffectPart part : spell.getSpellEffectParts()) {
-			if (part.getElement() == element
-					&& part.getAlteration() == EAlteration.INFLICT) {
-				this.trigger(level, pos, state);
-				return true;
-			}
+		if (effect.getElement() == element
+				&& effect.getAlteration() == EAlteration.INFLICT) {
+			this.trigger(level, pos, state);
+			return true;
 		}
 		
 		return false;

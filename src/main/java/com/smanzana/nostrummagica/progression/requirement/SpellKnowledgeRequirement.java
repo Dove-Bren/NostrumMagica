@@ -40,7 +40,7 @@ public class SpellKnowledgeRequirement implements IRequirement{
 
 	@Override
 	public List<Component> getDescription(Player player) {
-		SpellAction action = SpellEffects.solveAction(alteration, element, 1);
+		SpellAction action = SpellEffects.SolveAction(alteration, element, 1);
 		return Lists.newArrayList(new TranslatableComponent("info.requirement.spellknowledge", 
 				action.getName().withStyle(ChatFormatting.DARK_PURPLE)));
 	}

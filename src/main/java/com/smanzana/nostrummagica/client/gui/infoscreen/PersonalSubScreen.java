@@ -613,7 +613,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			SpellAction action = map.get(element);
 			if (action == null) {
-				action = SpellEffects.solveAction(alteration, element, 1);
+				action = SpellEffects.SolveAction(alteration, element, 1);
 				map.put(element, action);
 			}
 			

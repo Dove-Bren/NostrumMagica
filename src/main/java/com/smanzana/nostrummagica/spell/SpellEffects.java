@@ -1,20 +1,45 @@
 package com.smanzana.nostrummagica.spell;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.BiConsumer;
+
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.ISpellTargetBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.effect.ElementalSpellBoostEffect;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.component.SpellAction.SpellActionResult;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
+import com.smanzana.nostrummagica.spell.log.ESpellLogModifierType;
+import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
+import com.smanzana.nostrummagica.util.NonNullEnumMap;
 
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public final class SpellEffects {
 	
 	private SpellEffects() {}
 
-	public static final SpellAction solveAction(EAlteration alteration,	EMagicElement element, int elementCount) {
+	public static final SpellAction SolveAction(EAlteration alteration,	EMagicElement element, int elementCount) {
 		
 		// Could do a registry with hooks here, if wanted it to be extensible
 		
@@ -349,4 +374,222 @@ public final class SpellEffects {
 		return null;
 	}
 	
+	public static record ApplyResult(boolean anySuccess,
+			float damageTotal,
+			float healTotal,
+			Map<LivingEntity, Map<EMagicElement, Float>> totalAffectedEntities,
+			Set<SpellLocation> totalAffectedLocations,
+			Map<LivingEntity, EMagicElement> entityLastElement
+			) {}
+	
+	public static final ApplyResult ApplySpellEffects(LivingEntity caster, List<SpellEffectPart> parts, float castEfficiency,
+			List<LivingEntity> targets, List<SpellLocation> locations,
+			ISpellLogBuilder log, BiConsumer<LivingEntity, SpellActionResult> onEnt, BiConsumer<SpellLocation, SpellActionResult> onBlock) {
+		boolean first = true;
+		boolean anySuccess = false;
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+		float damageTotal = 0f;
+		float healTotal = 0f;
+		final Map<LivingEntity, Map<EMagicElement, Float>> totalAffectedEntities = new HashMap<>();
+		final Set<SpellLocation> totalAffectedLocations = new HashSet<>();
+		final Map<LivingEntity, EMagicElement> entityLastElement = new HashMap<>();
+		
+		for (SpellEffectPart part : parts) {
+			SpellAction action = SpellEffects.SolveAction(part.getAlteration(), part.getElement(), part.getElementCount());
+			float efficiency = castEfficiency + (part.getPotency() - 1f);
+			
+			log.pushModifierStack();
+			
+			// Apply part-specific bonuses that don't matter on targets here
+			final float partBonus = getCasterEfficiencyBonus(caster, part, action, efficiency, log);
+			efficiency += partBonus;
+			
+			if (attr != null && attr.isUnlocked()) {
+				attr.setKnowledge(part.getElement(), part.getAlteration());
+			}
+			
+			// Track what entities/positions actually have an affect applied to them
+			final List<LivingEntity> affectedEnts = new ArrayList<>();
+			final List<SpellLocation> affectedPos = new ArrayList<>();
+			
+			if (targets != null && !targets.isEmpty()) {
+				for (LivingEntity targ : targets) {
+					if (targ == null) {
+						continue;
+					}
+					
+					log.effect(targ);
+					log.pushModifierStack();
+					
+					// Apply per-target bonuses
+					final float targBonus = getTargetEfficiencyBonus(caster, targ, part, action, efficiency, log);
+					float perEfficiency = efficiency + targBonus;
+					
+					SpellActionResult result = action.apply(caster, targ, perEfficiency, log); 
+					if (result.applied) {
+						affectedEnts.add(targ);
+						totalAffectedEntities.computeIfAbsent(targ, e -> new NonNullEnumMap<>(EMagicElement.class, 0f)).merge(part.getElement(), result.damage - result.heals, Float::sum);
+						entityLastElement.put(targ, part.getElement());
+						damageTotal += result.damage;
+						healTotal += result.heals;
+						anySuccess = true;
+						if (onEnt != null) {
+							onEnt.accept(targ, result);
+						}
+					}
+					
+					log.popModifierStack();
+					
+					log.endEffect();
+				}
+			} else if (locations != null && !locations.isEmpty()) {
+				// use locations
+				for (SpellLocation pos : locations) {
+					// Possibly interact with spell aware blocks
+					BlockState state = pos.world.getBlockState(pos.selectedBlockPos);
+					if (state.getBlock() instanceof ISpellTargetBlock target) {
+						if (target.processSpellEffect(pos.world, state, pos.selectedBlockPos, caster, pos, part, action)) {
+							// Block consumed this effect
+							anySuccess = true;
+							totalAffectedLocations.add(pos);
+							continue;
+						}
+					}
+					
+					log.effect(pos);
+					SpellActionResult result = action.apply(caster, pos, efficiency, log); 
+					if (result.applied) {
+						if (result.affectedPos != null) {
+							affectedPos.add(result.affectedPos);
+						}
+						anySuccess = true;
+						totalAffectedLocations.add(result.affectedPos);
+						if (onBlock != null) {
+							onBlock.accept(pos, result);
+						}
+					}
+					log.endEffect();
+				}
+			} else {
+				; // Drop it on the floor
+			}
+			
+			// Evaluate showing vfx for each part
+			if (first) {
+				if (!affectedEnts.isEmpty())
+				for (LivingEntity affected : affectedEnts) {
+					NostrumMagica.Proxy.spawnSpellEffectVfx(affected.level, part,
+							caster, null, affected, null);
+				}
+				
+				if (!affectedPos.isEmpty())
+				for (SpellLocation affectPos : affectedPos) {
+					NostrumMagica.Proxy.spawnSpellEffectVfx(affectPos.world, part,
+							caster, null, null, new Vec3(affectPos.selectedBlockPos.getX() + .5, affectPos.selectedBlockPos.getY(), affectPos.selectedBlockPos.getZ() + .5)
+							);
+				}
+			}
+			
+			first = false;
+			
+			log.popModifierStack();
+		}
+		
+		if (anySuccess) {
+			if (attr != null && attr.hasSkill(NostrumSkills.Spellcasting_ElemLinger)) {
+				for (Entry<LivingEntity, EMagicElement> entry : entityLastElement.entrySet()) {
+					final MobEffect effect = ElementalSpellBoostEffect.GetForElement(entry.getValue());
+					entry.getKey().addEffect(new MobEffectInstance(effect, 20 * 5, 0));
+				}
+			}
+		} else {
+			// Do an effect so it's clearer to caster that there was no effect at any tried location/entity.
+			// Mirror "ents, then if not positions" from above.
+			if (targets != null && !targets.isEmpty()) {
+				for (LivingEntity targ : targets) {
+					doFailEffect(targ.level, targ.position().add(0, .2 + targ.getBbHeight(), 0));
+				}
+			} else if (locations != null && !locations.isEmpty()) {
+				for (SpellLocation pos : locations) {
+					doFailEffect(pos.world, pos.hitPosition);
+				}
+			}
+		}
+		
+		return new ApplyResult(anySuccess, damageTotal, healTotal, totalAffectedEntities, totalAffectedLocations, entityLastElement);
+	}
+	
+	protected static final float getTargetEfficiencyBonus(LivingEntity caster, LivingEntity target, SpellEffectPart effect, SpellAction action, float base, ISpellLogBuilder log) {
+		float bonus = 0f;
+		
+		if (effect.getElement() != EMagicElement.PHYSICAL) {
+			final MobEffect boostEffect = ElementalSpellBoostEffect.GetForElement(effect.getElement().getOpposite());
+			if (target.getEffect(boostEffect) != null) {
+				final float amt = .25f * (1 + target.getEffect(boostEffect).getAmplifier());
+				bonus += amt;
+				target.removeEffect(boostEffect);
+				log.addGlobalModifier(NostrumSkills.Spellcasting_ElemLinger, amt, ESpellLogModifierType.BONUS_SCALE);
+			}
+		}
+		
+		return bonus;
+	}
+	
+	protected static final float getCasterEfficiencyBonus(LivingEntity caster, SpellEffectPart effect, SpellAction action, float base, ISpellLogBuilder log) {
+		float bonus = 0f;
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+		
+		if (attr != null)
+		switch (effect.getElement()) {
+		case EARTH:
+			if (attr.hasSkill(NostrumSkills.Earth_Novice)) {
+				bonus += .2f;
+				log.addGlobalModifier(NostrumSkills.Earth_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
+			}
+			break;
+		case ENDER:
+			if (attr.hasSkill(NostrumSkills.Ender_Novice)) {
+				bonus += .2f;
+				log.addGlobalModifier(NostrumSkills.Ender_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
+			}
+			break;
+		case FIRE:
+			if (attr.hasSkill(NostrumSkills.Fire_Novice)) {
+				bonus += .2f;
+				log.addGlobalModifier(NostrumSkills.Fire_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
+			}
+			break;
+		case ICE:
+			if (attr.hasSkill(NostrumSkills.Ice_Novice)) {
+				bonus += .2f;
+				log.addGlobalModifier(NostrumSkills.Ice_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
+			}
+			break;
+		case LIGHTNING:
+			if (attr.hasSkill(NostrumSkills.Lightning_Novice)) {
+				bonus += .2f;
+				log.addGlobalModifier(NostrumSkills.Lightning_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
+			}
+			break;
+		case PHYSICAL:
+			if (attr.hasSkill(NostrumSkills.Physical_Novice)) {
+				bonus += .2f;
+				log.addGlobalModifier(NostrumSkills.Physical_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
+			}
+			break;
+		case WIND:
+			if (attr.hasSkill(NostrumSkills.Wind_Novice)) {
+				bonus += .2f;
+				log.addGlobalModifier(NostrumSkills.Wind_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
+			}
+			break;
+		}
+		
+		return bonus;
+	}
+	
+	protected static final void doFailEffect(Level world, Vec3 pos) {
+		NostrumMagicaSounds.CAST_FAIL.play(world, pos.x(), pos.y(), pos.z());
+		((ServerLevel) world).sendParticles(ParticleTypes.SMOKE, pos.x(), pos.y(), pos.z(), 10, 0, 0, 0, .05);
+	}
 }

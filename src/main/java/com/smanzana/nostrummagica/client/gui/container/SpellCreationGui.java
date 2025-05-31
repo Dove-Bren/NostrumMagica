@@ -1231,7 +1231,7 @@ public class SpellCreationGui {
 			
 			SpellAction action = map.get(part.getElement());
 			if (action == null) {
-				action = SpellEffects.solveAction(part.getAlteration(), part.getElement(), 1);
+				action = SpellEffects.SolveAction(part.getAlteration(), part.getElement(), 1);
 				map.put(part.getElement(), action);
 			}
 			

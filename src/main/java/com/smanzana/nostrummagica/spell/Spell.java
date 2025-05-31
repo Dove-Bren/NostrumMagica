@@ -130,7 +130,7 @@ public class Spell {
 			element = parts.get(0).getElement();
 			
 			for (SpellEffectPart part : parts) {
-				SpellAction action = SpellEffects.solveAction(part.getAlteration(), part.getElement(), part.getElementCount());
+				SpellAction action = SpellEffects.SolveAction(part.getAlteration(), part.getElement(), part.getElementCount());
 				if (action.getProperties().isHarmful) {
 					harmful = true;
 					break;

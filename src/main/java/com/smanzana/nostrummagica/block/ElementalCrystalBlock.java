@@ -7,7 +7,6 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
@@ -113,15 +112,13 @@ public class ElementalCrystalBlock extends BaseEntityBlock implements ISpellTarg
 	}
 
 	@Override
-	public boolean processSpellEffect(Level level, BlockState state, BlockPos pos, LivingEntity caster, SpellLocation hitLocation, Spell spell, SpellAction action) {
+	public boolean processSpellEffect(Level level, BlockState state, BlockPos pos, LivingEntity caster, SpellLocation hitLocation, SpellEffectPart part, SpellAction action) {
 		// Blocks require ENCHANT and take the element
 		final EMagicElement element = getElement(state);
-		for (SpellEffectPart part : spell.getSpellEffectParts()) {
-			if (part.getElement() != element
-					&& part.getAlteration() == EAlteration.ENCHANT) {
-				level.setBlock(pos, state.setValue(ELEMENT, part.getElement()), Block.UPDATE_ALL);
-				return true;
-			}
+		if (part.getElement() != element
+				&& part.getAlteration() == EAlteration.ENCHANT) {
+			level.setBlock(pos, state.setValue(ELEMENT, part.getElement()), Block.UPDATE_ALL);
+			return true;
 		}
 		
 		return false;

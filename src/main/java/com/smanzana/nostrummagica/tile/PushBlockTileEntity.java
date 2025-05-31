@@ -5,9 +5,9 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.block.dungeon.PushBlock;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
@@ -239,9 +239,9 @@ public class PushBlockTileEntity extends BlockEntity {
 		return this.onPlayerPush(player, direction);
 	}
 
-	public boolean onSpell(LivingEntity caster, Spell spell, SpellAction action, SpellLocation hitLocation) {
+	public boolean onSpell(LivingEntity caster, SpellEffectPart effect, SpellAction action, SpellLocation hitLocation) {
 		// could try to figure out based on spell action what element it is but no need
-		if (spell.getPrimaryElement() == this.element) {
+		if (effect.getElement() == this.element) {
 			final Direction direction = directionFromHit(hitLocation.hitPosition);
 			if (canPushDirectly(direction)) {
 				push(direction);

@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.block;
 
-import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,6 +14,6 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public interface ISpellTargetBlock {
 
-	public boolean processSpellEffect(Level level, BlockState state, BlockPos pos, LivingEntity caster, SpellLocation hitLocation, Spell spell, SpellAction action);
+	public boolean processSpellEffect(Level level, BlockState state, BlockPos pos, LivingEntity caster, SpellLocation hitLocation, SpellEffectPart effect, SpellAction action);
 	
 }

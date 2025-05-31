@@ -2,9 +2,9 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ISpellTargetBlock;
-import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.tile.PushBlockTileEntity;
 
 import net.minecraft.core.BlockPos;
@@ -118,13 +118,13 @@ public class PushBlock extends BaseEntityBlock implements ISpellTargetBlock {
 	}
 
 	@Override
-	public boolean processSpellEffect(Level level, BlockState state, BlockPos pos, LivingEntity caster, SpellLocation hitLocation, Spell spell, SpellAction action) {
+	public boolean processSpellEffect(Level level, BlockState state, BlockPos pos, LivingEntity caster, SpellLocation hitLocation, SpellEffectPart effect, SpellAction action) {
 		if (!level.isClientSide()) {
 			BlockEntity te = level.getBlockEntity(pos);
 			if (te == null || !(te instanceof PushBlockTileEntity pushEntity))
 				return false;
 			
-			return pushEntity.onSpell(caster, spell, action, hitLocation);
+			return pushEntity.onSpell(caster, effect, action, hitLocation);
 		}
 		
 		return false;
