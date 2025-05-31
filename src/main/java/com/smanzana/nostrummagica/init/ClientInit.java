@@ -130,6 +130,7 @@ import com.smanzana.nostrummagica.inventory.tooltip.EnchantableHintTooltip;
 import com.smanzana.nostrummagica.inventory.tooltip.LoreHintTooltip;
 import com.smanzana.nostrummagica.inventory.tooltip.TransmutableHintTooltip;
 import com.smanzana.nostrummagica.item.EssenceItem;
+import com.smanzana.nostrummagica.item.ICrystalEnchantableItem;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.SpellTome.TomeStyle;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
@@ -148,7 +149,6 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.Transmutation;
 import com.smanzana.nostrummagica.spell.component.shapes.BeamShape;
@@ -771,7 +771,7 @@ public class ClientInit {
 		}
 		
 		final ItemStack stack = event.getItemStack();
-		if (SpellAction.isEnchantable(stack)) {
+		if (ICrystalEnchantableItem.isEnchantable(stack)) {
 			event.getTooltipElements().add(Either.right(new EnchantableHintTooltip()));
 		}
 		if (ModificationTableBlock.IsModifiable(stack)) {

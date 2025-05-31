@@ -72,7 +72,7 @@ public class ElementalCrystalBlockEntity extends BlockEntity implements Tickable
 			return entity;
 		}
 		
-		if (!enchantable.canEnchant(entity.getItem())) {
+		if (!enchantable.canEnchant(entity.getItem(), getElement())) {
 			return entity;
 		}
 		
@@ -143,7 +143,7 @@ public class ElementalCrystalBlockEntity extends BlockEntity implements Tickable
 		return ent.isAlive()
 				&& !ent.getItem().isEmpty()
 				&& ent.getItem().getItem() instanceof ICrystalEnchantableItem enchantable
-				&& enchantable.canEnchant(ent.getItem())
+				&& enchantable.canEnchant(ent.getItem(), getElement())
 				; 
 	}
 	

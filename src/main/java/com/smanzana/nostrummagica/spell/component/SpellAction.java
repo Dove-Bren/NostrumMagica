@@ -38,7 +38,6 @@ import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
-import com.smanzana.nostrummagica.item.ICrystalEnchantableItem;
 import com.smanzana.nostrummagica.item.SpellScroll;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
@@ -2343,11 +2342,6 @@ public class SpellAction {
 	
 	public SpellActionProperties getProperties() {
 		return new SpellActionProperties(this);
-	}
-	
-	public static final boolean isEnchantable(ItemStack stack) {
-		Item item = stack.getItem();
-		return !stack.isEmpty() && item instanceof ICrystalEnchantableItem && ((ICrystalEnchantableItem) item).canEnchant(stack);
 	}
 	
 	public SpellAction damage(EMagicElement element, float amount) {

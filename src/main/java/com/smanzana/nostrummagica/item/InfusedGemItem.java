@@ -172,9 +172,11 @@ public class InfusedGemItem extends Item implements ILoreTagged, ICrystalEnchant
 	}
 	
 	@Override
-	public boolean canEnchant(ItemStack stack) {
+	public boolean canEnchant(ItemStack stack, EMagicElement element) {
 		// Only void gems are enchantable
-		return this.element == null || this.element == EMagicElement.PHYSICAL;
+		return element != EMagicElement.PHYSICAL
+				&& (this.element == null || this.element == EMagicElement.PHYSICAL)
+				;
 	}
 
 	@Override

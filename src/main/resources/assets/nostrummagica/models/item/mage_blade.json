@@ -32,13 +32,13 @@
             "predicate": {
                 "nostrummagica:element": 2
             },
-            "model": "nostrummagica:item/mage_blade_lightning"
+            "model": "nostrummagica:item/mage_blade_fire"
         },
 		{
             "predicate": {
                 "nostrummagica:element": 3
             },
-            "model": "nostrummagica:item/mage_blade_fire"
+            "model": "nostrummagica:item/mage_blade_ice"
         },
 		{
             "predicate": {
@@ -50,13 +50,13 @@
             "predicate": {
                 "nostrummagica:element": 5
             },
-            "model": "nostrummagica:item/mage_blade_ice"
+            "model": "nostrummagica:item/mage_blade_wind"
         },
 		{
             "predicate": {
                 "nostrummagica:element": 6
             },
-            "model": "nostrummagica:item/mage_blade_wind"
+            "model": "nostrummagica:item/mage_blade_lightning"
         },
 		{
             "predicate": {

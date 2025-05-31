@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -25,13 +26,19 @@ public interface ICrystalEnchantableItem {
 		}
 	}
 	
+	public static boolean isEnchantable(ItemStack stack) {
+		Item item = stack.getItem();
+		return !stack.isEmpty() && item instanceof ICrystalEnchantableItem && ((ICrystalEnchantableItem) item).canEnchant(stack, null);
+	}
+	
 	/**
 	 * Return whether this itemstack is generally enchantable.
 	 * Used for tooltips, and should check any restrictions on the type based on stored element, etc.
 	 * @param stack
+	 * @param element TODO
 	 * @return
 	 */
-	public boolean canEnchant(ItemStack stack);
+	public boolean canEnchant(ItemStack stack, EMagicElement element);
 
 	public @Nonnull Result attemptEnchant(ItemStack stack, EMagicElement element);
 	
