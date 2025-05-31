@@ -104,6 +104,7 @@
 	"item.nostrummagica.rune_shape_ring": "Ring Rune",
 	"item.nostrummagica.rune_shape_bubblespray": "Bubble Spray Rune",
 	"item.nostrummagica.rune_shape_barrage": "Barrage Rune",
+	"item.nostrummagica.rune_shape_imbue": "Imbue Rune",
 
     "item.nostrummagica.crystal_small": "Mani Crystal",
     "item.nostrummagica.crystal_medium": "Kani Crystal",
@@ -1026,6 +1027,8 @@
 	
 	"info.item.spellchanneling": "Spell Channeling",
 	"info.incant.nohands": "You must have a free hand or Spell Channeling item in your hands",
+	
+	"tooltip.imbued": "Imbued",
 
     "gambit.always.name": "Always",
     "gambit.always.desc": "Dragon will%1$s always%2$s try to use this spell.|Only passed if dragon doesn't have enough mana",
@@ -1331,7 +1334,9 @@
 	"shape.bubblespray.name": "Bubble Spray",
 	"shape.bubblespray.desc": "Sprays several spell bubbles, which inflict a weakened version of the spell when they are collided with.",
 	"shape.barrage.name": "Barrage",
-	"shape.barrage.desc": "Fires multiple seeking projectiles that barrage the target any any others they happen to pass through",
+	"shape.barrage.desc": "Fires multiple seeking projectiles that barrage the target any any others they happen to pass through.",
+	"shape.imbue.name": "Imbue",
+	"shape.imbue.desc": "Attaches spell effects to an item that is applied when it is eaten, launched, or used to attack an entity.",
 	
 	"alteration.inflict.name": "Inflict",
 	"alteration.inflict.desc": "Produces negative status effects",
@@ -1517,6 +1522,7 @@
     "ritual.rune.ring.name": "Ring Rune",
 	"ritual.rune.bubblespray.name": "Bubble Spray Rune",
 	"ritual.rune.barrage.name": "Barrage Rune",
+	"ritual.rune.imbue.name": "Imbue Rune",
 
     "ritual.charm.fire.name": "Fire Charm",
     "ritual.charm.ice.name": "Ice Charm",

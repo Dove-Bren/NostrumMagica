@@ -52,6 +52,7 @@ import com.smanzana.nostrummagica.client.gui.container.SilverMirrorGui;
 import com.smanzana.nostrummagica.client.gui.tooltip.AbsoluteTooltipComponent;
 import com.smanzana.nostrummagica.client.gui.tooltip.ConfigurableHintTooltipComponent;
 import com.smanzana.nostrummagica.client.gui.tooltip.EnchantableHintTooltipComponent;
+import com.smanzana.nostrummagica.client.gui.tooltip.ImbuementTooltipComponent;
 import com.smanzana.nostrummagica.client.gui.tooltip.LoreHintTooltipComponent;
 import com.smanzana.nostrummagica.client.gui.tooltip.TransmutableHintTooltipComponent;
 import com.smanzana.nostrummagica.client.gui.widget.QuickMoveBagButton;
@@ -127,6 +128,7 @@ import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 import com.smanzana.nostrummagica.fluid.NostrumFluids;
 import com.smanzana.nostrummagica.inventory.tooltip.ConfigurableHintTooltip;
 import com.smanzana.nostrummagica.inventory.tooltip.EnchantableHintTooltip;
+import com.smanzana.nostrummagica.inventory.tooltip.ImbuementTooltip;
 import com.smanzana.nostrummagica.inventory.tooltip.LoreHintTooltip;
 import com.smanzana.nostrummagica.inventory.tooltip.TransmutableHintTooltip;
 import com.smanzana.nostrummagica.item.EssenceItem;
@@ -143,11 +145,12 @@ import com.smanzana.nostrummagica.item.equipment.MageBlade;
 import com.smanzana.nostrummagica.item.equipment.MirrorShield;
 import com.smanzana.nostrummagica.item.equipment.MirrorShieldImproved;
 import com.smanzana.nostrummagica.item.equipment.SoulDagger;
-import com.smanzana.nostrummagica.item.equipment.ThanosStaff;
 import com.smanzana.nostrummagica.item.equipment.SpellTome.TomeStyle;
+import com.smanzana.nostrummagica.item.equipment.ThanosStaff;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.ItemImbuement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.Transmutation;
@@ -261,6 +264,7 @@ public class ClientInit {
     	MinecraftForgeClient.registerTooltipComponentFactory(ConfigurableHintTooltip.class, ConfigurableHintTooltipComponent::new);
     	MinecraftForgeClient.registerTooltipComponentFactory(TransmutableHintTooltip.class, TransmutableHintTooltipComponent::new);
     	MinecraftForgeClient.registerTooltipComponentFactory(LoreHintTooltip.class, LoreHintTooltipComponent::new);
+    	MinecraftForgeClient.registerTooltipComponentFactory(ImbuementTooltip.class, ImbuementTooltipComponent::new);
     	
     }
 	
@@ -810,6 +814,11 @@ public class ClientInit {
 		
 		if (Screen.hasShiftDown() && stack.is(NostrumTags.Items.SpellChanneling)) {
 			event.getTooltipElements().add(Either.left(new TranslatableComponent("info.item.spellchanneling")));
+		}
+		
+		ItemImbuement imbue = ItemImbuement.FromItemStack(stack);
+		if (imbue != null) {
+			event.getTooltipElements().add(Either.right(new ImbuementTooltip(imbue)));
 		}
 	}
 	

@@ -22,6 +22,7 @@ public class NostrumSpellShapes {
 	public static final MagicCyclerShape Cycler = new MagicCyclerShape();
 	public static final DelayShape Delay = new DelayShape();
 	public static final FieldShape Field = new FieldShape();
+	public static final ImbueShape Imbue = new ImbueShape();
 	public static final MortarShape Mortar = new MortarShape();
 	public static final OnDamageShape OnDamage = new OnDamageShape();
 	public static final OnFoodShape OnFood = new OnFoodShape();
@@ -49,6 +50,7 @@ public class NostrumSpellShapes {
 		event.getRegistry().register(Cycler);
 		event.getRegistry().register(Delay);
 		event.getRegistry().register(Field);
+		event.getRegistry().register(Imbue);
 		event.getRegistry().register(Mortar);
 		event.getRegistry().register(OnDamage);
 		event.getRegistry().register(OnFood);

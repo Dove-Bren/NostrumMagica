@@ -49,6 +49,7 @@ public class Spell {
 		public LivingEntity getSelf();
 		public LivingEntity getCaster();
 		public @Nullable LivingEntity getTargetHint();
+		public Spell getSpell();
 		
 		public boolean isPreview();
 		// May not be supported if isPreview() is true

@@ -68,6 +68,11 @@ public class SpellState implements ISpellState {
 	}
 	
 	@Override
+	public Spell getSpell() {
+		return this.spell;
+	}
+	
+	@Override
 	public boolean isPreview() {
 		return false;
 	}
