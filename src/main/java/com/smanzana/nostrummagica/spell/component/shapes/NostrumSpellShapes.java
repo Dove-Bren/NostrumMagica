@@ -15,6 +15,7 @@ public class NostrumSpellShapes {
 	public static final AuraShape Aura = new AuraShape();
 	public static final BarrageShape Barrage = new BarrageShape();
 	public static final BeamShape Beam = new BeamShape();
+	public static final BoulderShape Boulder = new BoulderShape();
 	public static final BubbleSprayShape BubbleSpray = new BubbleSprayShape();
 	public static final BurstShape Burst = new BurstShape();
 	public static final ChainShape Chain = new ChainShape();
@@ -44,6 +45,7 @@ public class NostrumSpellShapes {
 		event.getRegistry().register(Aura);
 		event.getRegistry().register(Barrage);
 		event.getRegistry().register(Beam);
+		event.getRegistry().register(Boulder);
 		event.getRegistry().register(BubbleSpray);
 		event.getRegistry().register(Burst);
 		event.getRegistry().register(Chain);

@@ -17,11 +17,13 @@ import com.smanzana.nostrummagica.listener.PlayerListener.IGenericListener;
 import com.smanzana.nostrummagica.spell.Spell.ISpellState;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.SpellLocation;
+import com.smanzana.nostrummagica.spell.component.BooleanSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.FloatSpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
+import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -33,6 +35,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.Lazy;
 
@@ -48,6 +51,7 @@ public class WaveShape extends AreaShape {
 		private final Vec3 normal;
 		private final float length;
 		private final int duration;
+		private final boolean gravity;
 		protected final SpellCharacteristics characteristics;
 		protected final SpellShapeProperties properties;
 		
@@ -59,7 +63,7 @@ public class WaveShape extends AreaShape {
 		protected final Set<LivingEntity> affectedEnts = new HashSet<>();;
 		protected final Set<BlockPos> affectedLocs = new HashSet<>();
 		
-		public WaveShapeInstance(ISpellState state, Level world, Vec3 pos, Vec3 dir, float length, SpellShapeProperties properties, SpellCharacteristics characteristics) {
+		public WaveShapeInstance(ISpellState state, Level world, Vec3 pos, Vec3 dir, float length, boolean gravity, SpellShapeProperties properties, SpellCharacteristics characteristics) {
 			super(state);
 			this.world = world;
 			this.duration = (int)Math.ceil(5 * length);
@@ -68,6 +72,7 @@ public class WaveShape extends AreaShape {
 			this.origin = pos;
 			this.dir = dir.multiply(1, 0, 1).normalize(); // horizontal only
 			this.characteristics = characteristics;
+			this.gravity = gravity;
 			
 			this.normal = this.dir.cross(new Vec3(0, 1, 0)).normalize(); // the left/right of our direction
 		}
@@ -187,26 +192,27 @@ public class WaveShape extends AreaShape {
 		}
 		
 		protected void tick() {
-			final float prog = getLengthProg();
-			final float progDist = prog * length;
-			Vec3 center = this.origin.add(dir.scale(progDist)).add(0, y, 0);
-			BlockPos pos = new BlockPos(center);
-			if (this.world.isEmptyBlock(pos)) {
-				if (!world.isEmptyBlock(pos.below())) {
-					y -= Mth.frac(this.origin.y + y);
+			if (gravity) {
+				final float prog = getLengthProg();
+				final float progDist = prog * length;
+				Vec3 center = this.origin.add(dir.scale(progDist)).add(0, y, 0);
+				BlockPos pos = new BlockPos(center);
+				if (this.world.isEmptyBlock(pos)) {
+					if (!world.isEmptyBlock(pos.below())) {
+						y -= Mth.frac(this.origin.y + y);
+					} else {
+						y--;
+					}
 				} else {
-					y--;
-				}
-			} else {
-				if (world.isEmptyBlock(pos.below())) {
-					y--;
-				} else {
-					y++; // move up by default if either dir looks bad
+					if (world.isEmptyBlock(pos.below())) {
+						y--;
+					} else {
+						y++; // move up by default if either dir looks bad
+					}
 				}
 			}
 			
 			// Recalc center and do collision checking
-			this.origin.add(dir.scale(progDist)).add(0, y, 0);
 			final List<AABB> bounds = this.getCurrentHitBoxes();
 			
 			Set<SpellLocation> locations = new HashSet<>();
@@ -342,6 +348,7 @@ public class WaveShape extends AreaShape {
 			ReagentItem.CreateStack(ReagentType.SPIDER_SILK, 1)));
 	
 	public static final SpellShapeProperty<Float> LENGTH = new FloatSpellShapeProperty("length", 5f, 7f, 10f);
+	public static final SpellShapeProperty<Boolean> GRAVITY = new BooleanSpellShapeProperty("gravity");
 	
 	protected WaveShape(String key) {
 		super(key);
@@ -350,7 +357,7 @@ public class WaveShape extends AreaShape {
 	@Override
 	protected void registerProperties() {
 		super.registerProperties();
-		baseProperties.addProperty(LENGTH).addProperty(SpellShapeSelector.PROPERTY, SpellShapeSelector.ENTITIES);
+		baseProperties.addProperty(LENGTH).addProperty(GRAVITY, true).addProperty(SpellShapeSelector.PROPERTY, SpellShapeSelector.ENTITIES);
 	}
 	
 	public WaveShape() {
@@ -360,13 +367,25 @@ public class WaveShape extends AreaShape {
 	protected float getLength(SpellShapeProperties properties) {
 		return properties.getValue(LENGTH);
 	}
+	
+	protected boolean getGravity(SpellShapeProperties properties) {
+		return properties.getValue(GRAVITY);
+	}
 
 	@Override
 	public WaveShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw,
 			SpellShapeProperties properties, SpellCharacteristics characteristics) {
 		final Vec3 lookDir = Vec3.directionFromRotation(pitch, yaw);
-		return new WaveShapeInstance(state, location.world, location.hitPosition.add(lookDir), lookDir,
-				getLength(properties), properties, characteristics);
+		final Vec3 lookEnd = location.shooterPosition.add(lookDir);
+		final Vec3 startPos;
+		HitResult result = RayTrace.raytrace(location.world, entity, location.shooterPosition, lookEnd, (e) -> false);
+		if (result.getType() == HitResult.Type.MISS) {
+			startPos = lookEnd;
+		} else {
+			startPos = result.getLocation();
+		}
+		return new WaveShapeInstance(state, location.world, startPos, lookDir,
+				getLength(properties), getGravity(properties), properties, characteristics);
 	}
 
 	@Override
@@ -379,18 +398,24 @@ public class WaveShape extends AreaShape {
 		return new ItemStack(Items.WATER_BUCKET);
 	}
 
-	public static NonNullList<ItemStack> costs = null;
+	public static NonNullList<ItemStack> costsLength = null;
+	public static NonNullList<ItemStack> costsGravity = null;
 	@Override
 	public <T> NonNullList<ItemStack> getPropertyItemRequirements(SpellShapeProperty<T> property) {
-		if (costs == null) {
-			costs = NonNullList.of(ItemStack.EMPTY,
+		if (costsLength == null) {
+			costsLength = NonNullList.of(ItemStack.EMPTY,
 				ItemStack.EMPTY,
-				new ItemStack(Items.DRAGON_BREATH),
 				new ItemStack(Blocks.DIAMOND_BLOCK),
 				new ItemStack(NostrumItems.crystalMedium, 1)
 				);
+			costsGravity = NonNullList.of(ItemStack.EMPTY,
+					new ItemStack(Items.DRAGON_BREATH),
+					ItemStack.EMPTY
+					);
 		}
-		return property == LENGTH ? costs : super.getPropertyItemRequirements(property);
+		return property == LENGTH ? costsLength : 
+			property == GRAVITY ? costsGravity :
+				super.getPropertyItemRequirements(property);
 	}
 
 	@Override
@@ -421,8 +446,8 @@ public class WaveShape extends AreaShape {
 		return super.addToPreview(builder, state, entity, location, pitch, yaw, properties, characteristics);
 	}
 
-	public SpellShapeProperties makeProps(float length) {
-		return this.getDefaultProperties().setValue(LENGTH, length);
+	public SpellShapeProperties makeProps(float length, boolean gravity) {
+		return this.getDefaultProperties().setValue(LENGTH, length).setValue(GRAVITY, gravity);
 	}
 	
 	@Override

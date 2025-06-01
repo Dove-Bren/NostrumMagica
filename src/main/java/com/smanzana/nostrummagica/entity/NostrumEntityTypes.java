@@ -74,6 +74,7 @@ public class NostrumEntityTypes {
 	@ObjectHolder(ChakramSpellSaucerEntity.ID) public static EntityType<ChakramSpellSaucerEntity> chakramSpellSaucer;
 	@ObjectHolder(SeekerSpellSaucerEntity.ID) public static EntityType<SeekerSpellSaucerEntity> seekerSpellSaucer;
 	@ObjectHolder(CyclerSpellSaucerEntity.ID) public static EntityType<CyclerSpellSaucerEntity> cyclerSpellSaucer;
+	@ObjectHolder(SpellBoulderEntity.ID) public static EntityType<SpellBoulderEntity> boulder;
 	@ObjectHolder(SwitchTriggerEntity.ID) public static EntityType<SwitchTriggerEntity> switchTrigger;
 	@ObjectHolder(TameLightning.ID) public static EntityType<TameLightning> tameLightning;
 	@ObjectHolder(HookShotEntity.ID) public static EntityType<HookShotEntity> hookShot;
@@ -232,6 +233,10 @@ public class NostrumEntityTypes {
 				.sized(.3F, .3F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
 			.build("").setRegistryName(MagicDamageProjectileEntity.ID));
+		registry.register(EntityType.Builder.<SpellBoulderEntity>of(SpellBoulderEntity::new, MobCategory.MISC)
+				.sized(2.5F, 2.5F)
+				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
+			.build("").setRegistryName(SpellBoulderEntity.ID));
 		registry.register(EntityType.Builder.<SwitchTriggerEntity>of(SwitchTriggerEntity::new, MobCategory.MISC)
 				.sized(.8f, 1.8f)
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)

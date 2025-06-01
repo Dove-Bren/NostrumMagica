@@ -87,6 +87,7 @@ import com.smanzana.nostrummagica.client.render.entity.PlantBossRenderer;
 import com.smanzana.nostrummagica.client.render.entity.SeekerSaucerRenderer;
 import com.smanzana.nostrummagica.client.render.entity.ShadowDragonRedRenderer;
 import com.smanzana.nostrummagica.client.render.entity.ShrineTriggerRenderer;
+import com.smanzana.nostrummagica.client.render.entity.SpellBoulderRenderer;
 import com.smanzana.nostrummagica.client.render.entity.SpellBubbleRenderer;
 import com.smanzana.nostrummagica.client.render.entity.SpellBulletRenderer;
 import com.smanzana.nostrummagica.client.render.entity.SpellMortarRenderer;
@@ -398,6 +399,7 @@ public class ClientInit {
 		event.registerEntityRenderer(NostrumEntityTypes.magicDamageProjectile, (manager) -> new MagicProjectileRenderer(manager, .5f));
 		event.registerEntityRenderer(NostrumEntityTypes.cursedGlassTrigger, (manager) -> new CursedGlassTriggerRenderer(manager));
 		event.registerEntityRenderer(NostrumEntityTypes.seekerSpellSaucer, SeekerSaucerRenderer::new);
+		event.registerEntityRenderer(NostrumEntityTypes.boulder, SpellBoulderRenderer::new);
 	}
 	
 	@SubscribeEvent

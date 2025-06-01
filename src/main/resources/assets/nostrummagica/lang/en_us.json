@@ -106,6 +106,7 @@
 	"item.nostrummagica.rune_shape_barrage": "Barrage Rune",
 	"item.nostrummagica.rune_shape_imbue": "Imbue Rune",
 	"item.nostrummagica.rune_shape_wave": "Wave Rune",
+	"item.nostrummagica.rune_shape_boulder": "Boulder Rune",
 
     "item.nostrummagica.crystal_small": "Mani Crystal",
     "item.nostrummagica.crystal_medium": "Kani Crystal",
@@ -1340,6 +1341,8 @@
 	"shape.imbue.desc": "Attaches spell effects to an item that is applied when it is eaten, launched, or used to attack an entity.",
 	"shape.wave.name": "Wave",
 	"shape.wave.desc": "Unleashes an advancing wave, applying spell effects to any entities or blocks touched.",
+	"shape.boulder.name": "Boulder",
+	"shape.boulder.desc": "Hurls a conjured bouncing boulder projectile that applies effects to every entity hit.",
 	
 	"alteration.inflict.name": "Inflict",
 	"alteration.inflict.desc": "Produces negative status effects",
@@ -1527,6 +1530,7 @@
 	"ritual.rune.barrage.name": "Barrage Rune",
 	"ritual.rune.imbue.name": "Imbue Rune",
 	"ritual.rune.wave.name": "Wave Rune",
+	"ritual.rune.boulder.name": "Boulder Rune",
 
     "ritual.charm.fire.name": "Fire Charm",
     "ritual.charm.ice.name": "Ice Charm",
@@ -1927,6 +1931,10 @@
 	"shapeprop.barrage.count.desc": "Number of barrage projectiles to launch",
 	"shapeprop.wave.length.name": "Distance",
 	"shapeprop.wave.length.desc": "How far in blocks the wave travels",
+	"shapeprop.wave.gravity.name": "Gravity",
+	"shapeprop.wave.gravity.desc": "Whether the wave rises and falls over blocks, or just moves in a straight line",
+	"shapeprop.boulder.bounce.name": "Bounce",
+	"shapeprop.boulder.bounce.desc": "If the boulder bounces when colliding with rocks, or explodes",
 	
 	"shapeprop.selector.name": "Mode",
 	"shapeprop.selector.desc": "Whether to affect blocks, mobs, or both",

@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.smanzana.nostrummagica.util.RayTrace;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
@@ -121,6 +122,12 @@ public class SpellLocation {
 	@Override
 	public int hashCode() {
 		return Objects.hash(world, selectedBlockPos, hitPosition, hitBlockPos, shooterPosition);
+	}
+	
+	public static final Direction InferFace(SpellLocation location) {
+		final Vec3 selectedCenter = Vec3.atCenterOf(location.selectedBlockPos);
+		final Vec3 dirVec = selectedCenter.subtract(location.hitPosition).normalize();
+		return Direction.getNearest(dirVec.x, dirVec.y, dirVec.z);
 	}
 	
 }

@@ -200,7 +200,7 @@ public class SpellProjectileEntity extends AbstractHurtingProjectile {
 				return;
 			}
 			// Can't avoid a SQR; tracking motion would require SQR, too to get path length
-			if (this.position().distanceToSqr(origin) > maxDistance) {
+			if (maxDistance != 0 && this.position().distanceToSqr(origin) > maxDistance) {
 				trigger.onProjectileEnd(this.position());
 				this.onProjectileDeath();
 				this.discard();
