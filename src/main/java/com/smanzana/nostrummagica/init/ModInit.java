@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.IBonusJumpCapability;
+import com.smanzana.nostrummagica.capabilities.IImbuedProjectile;
 import com.smanzana.nostrummagica.capabilities.ILaserReactive;
 import com.smanzana.nostrummagica.capabilities.IManaArmor;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -2152,6 +2153,7 @@ public class ModInit {
 		event.register(ISpellCrafting.class);
 		event.register(IBonusJumpCapability.class);
 		event.register(ILaserReactive.class);
+		event.register(IImbuedProjectile.class);
 		new CapabilityHandler();
 	}
 }

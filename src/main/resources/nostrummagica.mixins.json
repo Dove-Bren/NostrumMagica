@@ -6,6 +6,9 @@
 	"client": [
 		"PlayerModelMixin"
 	],
+	"mixins": [
+		"BowItemMixin"
+	],
 	"injectors": {
 		"defaultRequire": 1
 	},

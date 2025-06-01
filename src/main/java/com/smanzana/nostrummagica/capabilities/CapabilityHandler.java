@@ -19,6 +19,7 @@ public class CapabilityHandler {
 	private static final ResourceLocation CAPABILITY_MANARMOR_LOC = new ResourceLocation(NostrumMagica.MODID, "manaarmorattrib");
 	private static final ResourceLocation CAPABILITY_SPELLCRAFTING_LOC = NostrumMagica.Loc("spellcrafting");
 	private static final ResourceLocation CAPABILITY_BONUSJUMP_LOC = NostrumMagica.Loc("bonusjump");
+	public static final ResourceLocation CAPABILITY_IMBUED_PROJECTILE_LOC = NostrumMagica.Loc("proj_imbuement");
 	
 	public static final Capability<INostrumMagic> CAPABILITY_MAGIC = CapabilityManager.get(new CapabilityToken<>(){});
 	public static final Capability<IManaArmor> CAPABILITY_MANAARMOR = CapabilityManager.get(new CapabilityToken<>(){});
@@ -27,6 +28,7 @@ public class CapabilityHandler {
 	public static final Capability<INostrumMana> CAPABILITY_MANA = CapabilityManager.get(new CapabilityToken<>(){});
 	public static final Capability<IIncantationHolder> CAPABILITY_INCANTATION_HOLDER = CapabilityManager.get(new CapabilityToken<>(){});
 	public static final Capability<ILaserReactive> CAPABILITY_LASER_REACTIVE = CapabilityManager.get(new CapabilityToken<>(){});
+	public static final Capability<IImbuedProjectile> CAPABILITY_IMBUED_PROJECTILE = CapabilityManager.get(new CapabilityToken<>(){});
 	
 	public CapabilityHandler() {
 		MinecraftForge.EVENT_BUS.register(this);
