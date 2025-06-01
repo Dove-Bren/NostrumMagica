@@ -19,7 +19,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 
 /**
- * Abstract trigger that waits for entities to be in an area and then applies the spell to them.
+ * Abstract trigger that waits for entities to be in a (static) area and then applies the spell to them.
  * May apply multiple times.
  * @author Skyler
  *
@@ -28,9 +28,11 @@ public abstract class AreaShape extends SpellShape implements ISelectableShape {
 	
 	public abstract class AreaShapeInstance extends SpellShape.SpellShapeInstance implements IGenericListener {
 		
-		private static final int TICK_RATE = 5;
-		private static final int NUM_TICKS = (20 * 20) / TICK_RATE; // 20 seconds
-		private static final int GROUND_TICK_CYCLES = (20 * 4) / TICK_RATE;
+//		private static final int TICK_RATE = 5;
+//		private static final int NUM_TICKS = (20 * 20) / TICK_RATE; // 20 seconds
+//		private static final int GROUND_TICK_CYCLES = (20 * 4) / TICK_RATE;
+		
+		private static final int GROUND_TICK_CYCLES = 4; // make this configurable! This means every 4 (tickRate) intervals affects the ground
 
 		protected final Level world;
 		protected final Vec3 pos;
@@ -42,7 +44,7 @@ public abstract class AreaShape extends SpellShape implements ISelectableShape {
 		
 		private final float radiusHint;
 		
-		private int aliveCycles;
+		protected int aliveCycles;
 		private boolean dead;
 		private Map<LivingEntity, Integer> affected; // maps to time last effect visited
 		
@@ -70,7 +72,7 @@ public abstract class AreaShape extends SpellShape implements ISelectableShape {
 			NostrumMagica.playerListener.registerProximity(this, world, pos, radiusHint);
 			
 			// Register timer for life and for effects
-			NostrumMagica.playerListener.registerTimer(this, 0, TICK_RATE);
+			NostrumMagica.playerListener.registerTimer(this, 0, this.tickRate);
 			
 			doEffect();
 		}
@@ -104,7 +106,7 @@ public abstract class AreaShape extends SpellShape implements ISelectableShape {
 				}
 				
 				aliveCycles++;
-				if (aliveCycles >= NUM_TICKS) { // 20 seconds
+				if (aliveCycles >= duration) { // 20 seconds
 					this.dead = true;
 					return true;
 				}

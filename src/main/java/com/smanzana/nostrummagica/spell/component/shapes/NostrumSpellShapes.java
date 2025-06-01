@@ -35,6 +35,7 @@ public class NostrumSpellShapes {
 	public static final SelfShape Self = new SelfShape();
 	public static final TouchShape Touch = new TouchShape();
 	public static final WallShape Wall = new WallShape();
+	public static final WaveShape Wave = new WaveShape();
 	
 	@SubscribeEvent
 	public static void registerShapes(RegisterSpellShapeEvent event) {
@@ -63,6 +64,7 @@ public class NostrumSpellShapes {
 		event.getRegistry().register(Self);
 		event.getRegistry().register(Touch);
 		event.getRegistry().register(Wall);
+		event.getRegistry().register(Wave);
 	}
 	
 }
