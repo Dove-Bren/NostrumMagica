@@ -25,6 +25,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -94,6 +95,14 @@ public class CandleBlock extends BaseEntityBlock {
 		LevelReader iworldreader = context.getLevel();
 		BlockPos blockpos = context.getClickedPos();
 		Direction[] adirection = context.getNearestLookingDirections();
+		
+		if (context.getPlayer() != null) {
+			final InteractionHand other = context.getHand() == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+			final ItemStack stack = context.getPlayer().getItemInHand(other);
+			if (!stack.isEmpty() && stack.getItem() == Items.FLINT_AND_STEEL) {
+				blockstate = blockstate.setValue(LIT, true);
+			}
+		}
 		
 		for(Direction direction : adirection) {
 			direction = direction.getOpposite();
