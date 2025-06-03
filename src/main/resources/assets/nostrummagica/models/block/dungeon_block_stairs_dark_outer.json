@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "nostrummagica:block/dungeon_dark",
+    "top": "nostrummagica:block/dungeon_dark",
+    "side": "nostrummagica:block/dungeon_dark"
+  }
+}

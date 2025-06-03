@@ -44,6 +44,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.event.RegistryEvent;
@@ -68,6 +70,8 @@ public class NostrumBlocks {
 	@ObjectHolder(DungeonBarsBlock.ID) public static DungeonBarsBlock dungeonBars;
 	@ObjectHolder(DungeonBlock.ID_LIGHT) public static DungeonBlock lightDungeonBlock;
 	@ObjectHolder(DungeonBlock.ID_DARK) public static DungeonBlock dungeonBlock;
+	@ObjectHolder(DungeonBlock.ID_STAIR_LIGHT) public static StairBlock lightDungeonStairs;
+	@ObjectHolder(DungeonBlock.ID_STAIR_DARK) public static StairBlock dungeonStairs;
 	@ObjectHolder(EssenceOreBlock.ID) public static EssenceOreBlock essenceOre;
 	@ObjectHolder(ItemDuctBlock.ID) public static ItemDuctBlock itemDuct;
 	@ObjectHolder(LogicDoorBlock.ID) public static LogicDoorBlock logicDoor;
@@ -167,6 +171,8 @@ public class NostrumBlocks {
     	registerBlockItem(dungeonBars, dungeonBars.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(lightDungeonBlock, lightDungeonBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(dungeonBlock, dungeonBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(lightDungeonStairs, lightDungeonStairs.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(dungeonStairs, dungeonStairs.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(essenceOre, essenceOre.getRegistryName(), registry);
     	registerBlockItem(itemDuct, itemDuct.getRegistryName(), registry);
     	registerBlockItem(logicDoor, logicDoor.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
@@ -256,8 +262,13 @@ public class NostrumBlocks {
     	registerBlock(new CursedIceBlock(), CursedIceBlock.ID, registry);
     	registerBlock(new DungeonAirBlock(), DungeonAirBlock.ID, registry);
     	registerBlock(new DungeonBarsBlock(), DungeonBarsBlock.ID, registry);
-    	registerBlock(new DungeonBlock(DungeonBlock.Type.LIGHT), DungeonBlock.ID_LIGHT, registry);
-    	registerBlock(new DungeonBlock(DungeonBlock.Type.DARK), DungeonBlock.ID_DARK, registry);
+    	
+    	final DungeonBlock lightDungeonBlock = new DungeonBlock(DungeonBlock.Type.LIGHT);
+    	final DungeonBlock darkDungeonBlock = new DungeonBlock(DungeonBlock.Type.DARK);
+    	registerBlock(lightDungeonBlock, DungeonBlock.ID_LIGHT, registry);
+    	registerBlock(darkDungeonBlock, DungeonBlock.ID_DARK, registry);
+    	registerBlock(new StairBlock(() -> lightDungeonBlock.defaultBlockState(), BlockBehaviour.Properties.copy(lightDungeonBlock)), DungeonBlock.ID_STAIR_LIGHT, registry);
+    	registerBlock(new StairBlock(() -> darkDungeonBlock.defaultBlockState(), BlockBehaviour.Properties.copy(darkDungeonBlock)), DungeonBlock.ID_STAIR_DARK, registry);
     	registerBlock(new EssenceOreBlock(), EssenceOreBlock.ID, registry);
     	registerBlock(new ItemDuctBlock(), ItemDuctBlock.ID, registry);
     	registerBlock(new LogicDoorBlock(), LogicDoorBlock.ID, registry);

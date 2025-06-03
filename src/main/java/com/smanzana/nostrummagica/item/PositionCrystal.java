@@ -223,24 +223,32 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 
 	@Override
 	public boolean shouldRenderSelection(Player player, ItemStack stack) {
+		final ItemStack mainhand = player.getMainHandItem();
+		//final ItemStack offhand = player.getOffhandItem();
 		return player.isCreative() && player.isShiftKeyDown()
-				&& !player.getMainHandItem().isEmpty() && player.getMainHandItem().getItem() instanceof PositionCrystal
-				&& !player.getOffhandItem().isEmpty() && player.getOffhandItem().getItem() instanceof PositionCrystal
-				&& getBlockPosition(player.getMainHandItem()) != null
-				&& getBlockPosition(player.getOffhandItem()) != null
-				&& DimensionUtils.InDimension(player, getDimension(player.getMainHandItem()))
-				&& DimensionUtils.InDimension(player, getDimension(player.getOffhandItem()))
+				&& !mainhand.isEmpty() && mainhand.getItem() instanceof PositionCrystal
+				//&& !offhand.isEmpty() && offhand.getItem() instanceof PositionCrystal
+				&& getBlockPosition(mainhand) != null
+				//&& getBlockPosition(offhand) != null
+				&& DimensionUtils.InDimension(player, getDimension(mainhand))
+				//&& DimensionUtils.InDimension(player, getDimension(offhand))
 				;
 	}
 
 	@Override
 	public BlockPos getAnchor(Player player, ItemStack stack) {
-		return getBlockPosition(player.getMainHandItem());
+		return getBlockPosition(stack);//getBlockPosition(player.getMainHandItem());
 	}
 
 	@Override
 	public BlockPos getBoundingPos(Player player, ItemStack stack) {
-		return getBlockPosition(player.getOffhandItem());
+		final ItemStack mainhand = player.getMainHandItem();
+		final ItemStack offhand = player.getOffhandItem();
+		if (stack == mainhand && !offhand.isEmpty() && offhand.getItem() instanceof PositionCrystal
+				&& getBlockPosition(offhand) != null && DimensionUtils.InDimension(player, getDimension(offhand))) {
+			return getBlockPosition(player.getOffhandItem());
+		}
+		return getBlockPosition(stack);
 	}
 
 	@Override

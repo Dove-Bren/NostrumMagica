@@ -27,7 +27,7 @@ public class BowItemMixin extends Item {
 	
 	//                               Lnet/minecraft/world/level/LevelWriter;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z
 	//at=@At(value="INVOKE", target="Lnet/minecraft/world/level/LevelWriter;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z")
-	@Inject(method = "releaseUsing", at=@At(value="INVOKE", target="Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z", args="log=true"), locals=LocalCapture.CAPTURE_FAILHARD)
+	@Inject(method = "releaseUsing", at=@At(value="INVOKE", target="Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"), locals=LocalCapture.CAPTURE_FAILHARD)
 	public void onArrowFired(ItemStack bow, Level level, LivingEntity user, int idk, CallbackInfo ci, Player player, boolean flag, ItemStack itemstack, int i, float f, boolean flag1, ArrowItem arrowitem, AbstractArrow abstractarrow) {
 		ArrowFiredEvent event = new ArrowFiredEvent(player, abstractarrow, itemstack, bow);
 		MinecraftForge.EVENT_BUS.post(event);

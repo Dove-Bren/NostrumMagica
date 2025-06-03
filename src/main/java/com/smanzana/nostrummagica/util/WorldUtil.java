@@ -96,7 +96,7 @@ public class WorldUtil {
 				final int z = (baseZ + iterZ);
 				final int y = iterY;
 				
-				if (y < 0 || y > world.getMaxBuildHeight()) {
+				if (y < world.getMinBuildHeight() || y > world.getMaxBuildHeight()) {
 					continue;
 				}
 				
