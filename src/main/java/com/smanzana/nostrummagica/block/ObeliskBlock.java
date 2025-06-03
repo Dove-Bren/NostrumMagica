@@ -7,8 +7,8 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
-import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity.Corner;
+import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;

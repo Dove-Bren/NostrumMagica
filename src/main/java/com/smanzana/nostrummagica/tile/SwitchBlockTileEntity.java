@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.tile;
 
-import com.smanzana.autodungeons.tile.IOrientedTileEntity;
+import com.smanzana.autodungeons.api.block.entity.IOrientedTileEntity;
 import com.smanzana.autodungeons.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;

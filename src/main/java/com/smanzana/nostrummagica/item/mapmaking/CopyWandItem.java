@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.autodungeons.item.IBlueprintHolder;
+import com.smanzana.autodungeons.api.item.IBlueprintHolder;
 import com.smanzana.autodungeons.world.blueprints.Blueprint;
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.autodungeons.world.blueprints.IBlueprint;

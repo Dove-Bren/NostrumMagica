@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.tile;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.autodungeons.tile.IOrientedTileEntity;
+import com.smanzana.autodungeons.api.block.entity.IOrientedTileEntity;
 import com.smanzana.autodungeons.world.blueprints.BlueprintBlock;
 import com.smanzana.nostrummagica.block.dungeon.ConjureGhostBlock;
 

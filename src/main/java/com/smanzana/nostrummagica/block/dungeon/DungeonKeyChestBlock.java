@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.block.dungeon;
 import javax.annotation.Nullable;
 
 import com.smanzana.autodungeons.AutoDungeons;
-import com.smanzana.autodungeons.block.ILargeKeyMarker;
+import com.smanzana.autodungeons.api.block.ILargeKeyMarker;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
 import com.smanzana.autodungeons.world.dungeon.DungeonRecord;

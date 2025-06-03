@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.tile;
 import java.util.UUID;
 
 import com.smanzana.autodungeons.AutoDungeons;
-import com.smanzana.autodungeons.tile.IUniqueBlueprintTileEntity;
-import com.smanzana.autodungeons.tile.IWorldKeyHolder;
+import com.smanzana.autodungeons.api.block.entity.IUniqueBlueprintTileEntity;
+import com.smanzana.autodungeons.api.block.entity.IWorldKeyHolder;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;

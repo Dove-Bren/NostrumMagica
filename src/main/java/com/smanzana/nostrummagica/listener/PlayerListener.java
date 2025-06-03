@@ -14,8 +14,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.smanzana.autodungeons.event.GetPlayerRegionSelectionEvent;
-import com.smanzana.autodungeons.event.GetPlayerSelectionEvent;
+import com.smanzana.autodungeons.api.event.GetPlayerRegionSelectionEvent;
+import com.smanzana.autodungeons.api.event.GetPlayerSelectionEvent;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportedOtherEvent;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
