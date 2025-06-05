@@ -61,7 +61,7 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 		final Player player = context.getPlayer();
 		
 		if (world.isClientSide)
-			return InteractionResult.SUCCESS;
+			return InteractionResult.sidedSuccess(world.isClientSide);
 		
 		if (FMLEnvironment.dist == Dist.DEDICATED_SERVER) {
 			player.sendMessage(new TextComponent("This item only works in single player"), Util.NIL_UUID);
@@ -79,7 +79,7 @@ public class CopyWandItem extends Item implements IBlueprintHolder, ISelectionIt
 		}
 		
 		// Handle selection and spawning based on shift
-		if (player.isShiftKeyDown()) {
+		if (player.isCrouching()) {
 			Direction face = null;
 			// Figure out facing by looking at clicked pos vs our pos
 			final BlockPos playerPos = player.blockPosition();

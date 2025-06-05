@@ -74,6 +74,7 @@ public enum NostrumMagicaSounds {
 	TOCK("ambient.tock", SoundSource.BLOCKS),
 	BUBBLE_SPRAY("spell.bubble_spray", SoundSource.AMBIENT),
 	BUBBLE_POP("spell.bubble_pop", SoundSource.AMBIENT),
+	ROCK_SMASH("spell.smash", SoundSource.PLAYERS),
 	;
 	
 	private ResourceLocation resource;

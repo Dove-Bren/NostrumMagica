@@ -16,6 +16,7 @@ public abstract class SpellTomeEnhancement {
 	public static EnhancementLowerManaCost LOWER_MANA_COST;
 	public static EnhancementEfficiency EFFICIENCY;
 	public static EnhancementBonusXP BONUS_XP;
+	public static EnhancementCastSpeed CAST_SPEED;
 	
 
 	private static Map<String, SpellTomeEnhancement> registry = new HashMap<>();
@@ -97,6 +98,7 @@ public abstract class SpellTomeEnhancement {
 		LOWER_MANA_COST = new EnhancementLowerManaCost();
 		BONUS_XP = new EnhancementBonusXP();
 		EFFICIENCY = new EnhancementEfficiency();
+		CAST_SPEED = new EnhancementCastSpeed();
 	}
 	
 }

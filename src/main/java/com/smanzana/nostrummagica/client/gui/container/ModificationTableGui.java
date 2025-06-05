@@ -368,7 +368,7 @@ public class ModificationTableGui {
 			} else if (container.tomeMode) {
 				// Draw tome info
 				int x, y;
-				y = verticalMargin + PANEL_VOFFSET + 10;
+				y = verticalMargin + PANEL_VOFFSET + 5;
 				ItemStack tome = container.inventory.getMainSlot();
 				if (!tome.isEmpty()) {
 					Component nameComp = tome.getHoverName();
@@ -407,6 +407,11 @@ public class ModificationTableGui {
 					// XP
 					mc.font.drawShadow(matrixStackIn, "Bonus XP: ", x, y, 0xFFA0A0A0);
 					mc.font.draw(matrixStackIn, String.format("%+03.0f%%", (summary.getXpRate() - 1f) * 100), valX, y, 0xFFFFFFFF);
+					y += 2 + mc.font.lineHeight;
+					
+					// XP
+					mc.font.drawShadow(matrixStackIn, "Cast Speed: ", x, y, 0xFFA0A0A0);
+					mc.font.draw(matrixStackIn, String.format("%+03.0f%%", (summary.getCastSpeedRate() - 1f) * -100), valX, y, 0xFFFFFFFF);
 					y += 2 + mc.font.lineHeight;
 					
 					y = topY;

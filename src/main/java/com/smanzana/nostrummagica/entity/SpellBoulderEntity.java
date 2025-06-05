@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.entity;
 
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 
 import net.minecraft.core.BlockPos;
@@ -98,6 +99,7 @@ public class SpellBoulderEntity extends SpellSaucerEntity {
 	protected void doImpact(SpellLocation location) {
 		// always bounce, and then maybe apply
 		bounceAgainst(location);
+		NostrumMagicaSounds.ROCK_SMASH.play(level, getX(), getY(), getZ());
 		
 		if (!this.hasBeenHit(location.selectedBlockPos, this.hitCooldown)) {
 			super.doImpact(location);

@@ -46,29 +46,25 @@ public class TimedSwitchTriggerModel extends SwitchTriggerModel {
 			bufferIn.vertex(transform, 0, (height/4f), 0).color(red, green, blue, alpha).uv(.5f, .5f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n1.x(), n1.y(), n1.z()).endVertex();
 			bufferIn.vertex(transform, vx2, -height, vz2).color(red, green, blue, alpha).uv(u2, v2).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n1.x(), n1.y(), n1.z()).endVertex();
 			bufferIn.vertex(transform, vx1, -height, vz1).color(red, green, blue, alpha).uv(u1, v1).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n1.x(), n1.y(), n1.z()).endVertex();
+			bufferIn.vertex(transform, 0, (height/4f), 0).color(red, green, blue, alpha).uv(.5f, .5f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n1.x(), n1.y(), n1.z()).endVertex();
 			
 			// for ynegative, add in YN, LOW ANGLE, HIGH ANGLE
 			bufferIn.vertex(transform, 0, -(height/4f), 0).color(red, green, blue, alpha).uv(.5f, .5f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n2.x(), n2.y(), n2.z()).endVertex();
 			bufferIn.vertex(transform, vx1, height, vz1).color(red, green, blue, alpha).uv(u1, v1).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n2.x(), n2.y(), n2.z()).endVertex();
 			bufferIn.vertex(transform, vx2, height, vz2).color(red, green, blue, alpha).uv(u2, v2).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n2.x(), n2.y(), n2.z()).endVertex();
+			bufferIn.vertex(transform, 0, -(height/4f), 0).color(red, green, blue, alpha).uv(.5f, .5f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, n2.x(), n2.y(), n2.z()).endVertex();
 		}
 		
 		// Top and bottom 'quads'
 		bufferIn.vertex(transform, -width, height, 0).color(red, green, blue, alpha).uv(0f, 0f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
 		bufferIn.vertex(transform, 0, height, width).color(red, green, blue, alpha).uv(1f, 0f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
 		bufferIn.vertex(transform, width, height, 0).color(red, green, blue, alpha).uv(1f, 1f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
-		//
-		bufferIn.vertex(transform, width, height, 0).color(red, green, blue, alpha).uv(1f, 1f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
 		bufferIn.vertex(transform, 0, height, -width).color(red, green, blue, alpha).uv(0f, 1f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
-		bufferIn.vertex(transform, -width, height, 0).color(red, green, blue, alpha).uv(0f, 0f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
 		
 		bufferIn.vertex(transform, -width, -height, 0).color(red, green, blue, alpha).uv(1f, 0f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
 		bufferIn.vertex(transform, 0, -height, -width).color(red, green, blue, alpha).uv(1f, 1f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
 		bufferIn.vertex(transform, width, -height, 0).color(red, green, blue, alpha).uv(0f, 1f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
-		//
-		bufferIn.vertex(transform, width, -height, 0).color(red, green, blue, alpha).uv(0f, 1f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
 		bufferIn.vertex(transform, 0, -height, width).color(red, green, blue, alpha).uv(0f, 0f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
-		bufferIn.vertex(transform, -width, -height, 0).color(red, green, blue, alpha).uv(1f, 0f).overlayCoords(packedOverlayIn).uv2(packedLightIn).normal(normal, 0, 1f, 0).endVertex();
 		
 		matrixStackIn.popPose();
 	}

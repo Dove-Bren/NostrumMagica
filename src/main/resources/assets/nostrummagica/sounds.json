@@ -195,6 +195,12 @@
 			"nostrummagica:spell/bubble_spray"
 		]
 	},
+	"spell.smash":
+	{
+		"sounds": [
+			"nostrummagica:spell/smash"
+		]
+	},
     
     "player.levelup":
     {

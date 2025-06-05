@@ -1611,6 +1611,8 @@
     "enhancement.xp_bonus.desc": "Grants a bonus to XP gained when casting spells",
     "enhancement.eff_bonus.name": "Spell Power",
     "enhancement.eff_bonus.desc": "Amplifies the potency of cast spells",
+    "enhancement.cast_speed.name": "Casting Speed",
+    "enhancement.cast_speed.desc": "Reduces the time spent charging a spell before casting it",
 
     "enchantment.nostrummagica.nostrum_enchantment_mana_recovery": "Mana Recovery",
 	"enchantment.nostrummagica.nostrum_enchantment_mana_recovery.desc": "Improves mana recovery speed",
