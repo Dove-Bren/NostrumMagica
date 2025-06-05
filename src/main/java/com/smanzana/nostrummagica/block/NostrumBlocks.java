@@ -144,6 +144,7 @@ public class NostrumBlocks {
 	@ObjectHolder(ConjureGhostBlock.ID) public static ConjureGhostBlock conjureGhostBlock;
 	@ObjectHolder(LaserBlock.ID) public static LaserBlock laser;
 	@ObjectHolder(ElementalCrystalBlock.ID) public static ElementalCrystalBlock elementalCrystal;
+	@ObjectHolder(PureWaterBlock.ID) public static PureWaterBlock pureWater; 
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -350,6 +351,7 @@ public class NostrumBlocks {
     	registerBlock(new ConjureGhostBlock(), ConjureGhostBlock.ID, registry);
     	registerBlock(new LaserBlock(), LaserBlock.ID, registry);
     	registerBlock(new ElementalCrystalBlock(), ElementalCrystalBlock.ID, registry);
+    	registerBlock(new PureWaterBlock(() -> NostrumFluids.pureWater), PureWaterBlock.ID, registry);
     }
     
 }

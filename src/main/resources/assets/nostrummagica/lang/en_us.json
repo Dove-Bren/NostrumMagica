@@ -299,6 +299,7 @@
 	
 	"item.nostrummagica.poison_water_bucket": "Poison Water Bucket",
 	"item.nostrummagica.poison_water_unbreakable_bucket": "Unbreakable Poison Water Bucket",
+	"item.nostrummagica.pure_water_bucket": "Pure Water Bucket",
 	
 	"item.nostrummagica.world_key": "World Key",
 	"item.nostrummagica.fill_tool_air": "Fill Dungeon Air",
@@ -722,6 +723,7 @@
 
     "fluid.nostrummagica.poison_water": "Poison Water",
     "fluid.nostrummagica.poison_water_unbreakable": "Poison Water (Dungeon)",
+	"fluid.nostrummagica.pure_water": "Pure Water",
 	
 	"spellcraftmod.weight": "%1$s%2$d Weight",
 	"spellcraftmod.mana": "%1$s%2$d%% Mana Cost",

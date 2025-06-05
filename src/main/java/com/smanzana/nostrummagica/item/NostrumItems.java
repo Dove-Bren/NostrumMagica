@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.item;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
+import com.smanzana.nostrummagica.fluid.NostrumFluids;
 import com.smanzana.nostrummagica.fluid.PoisonWaterFluid;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellRune.AlterationSpellRune;
@@ -312,6 +313,7 @@ public class NostrumItems {
 	
 	@ObjectHolder(PoisonWaterFluid.ID_BREAKABLE + "_bucket") public static BucketItem poisonWaterBucket;
 	@ObjectHolder(PoisonWaterFluid.ID_UNBREAKABLE + "_bucket") public static BucketItem unbreakablePoisonWaterBucket;
+	@ObjectHolder("pure_water_bucket") public static BucketItem pureWaterBucket;
 	
 	
 	public static Item.Properties PropBase() {

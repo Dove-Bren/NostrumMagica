@@ -500,6 +500,9 @@ public class ClientInit {
 		//ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.conjureGhostBlock, NostrumRenderTypes.COLORED_GHOSTBLOCK); // doens't actually render and we need tile entity
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.laser, RenderType.solid());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.elementalCrystal, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.pureWater, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumFluids.pureWater, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumFluids.pureWaterFlowing, RenderType.translucent());
 	}
 	
 	private static final void registerItemModelProperties() {
