@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -56,7 +57,7 @@ public class ElementalCrystalBlock extends BaseEntityBlock implements ISpellTarg
 				.sound(SoundType.AMETHYST_CLUSTER)
 				.noOcclusion()
 				.noDrops()
-				.lightLevel((state) -> 5)
+				.lightLevel((state) -> 12)
 				);
 		
 		this.registerDefaultState(this.defaultBlockState().setValue(ELEMENT, EMagicElement.PHYSICAL));
@@ -115,6 +116,12 @@ public class ElementalCrystalBlock extends BaseEntityBlock implements ISpellTarg
 	public boolean processSpellEffect(Level level, BlockState state, BlockPos pos, LivingEntity caster, SpellLocation hitLocation, SpellEffectPart part, SpellAction action) {
 		// Blocks require ENCHANT and take the element
 		final EMagicElement element = getElement(state);
+		
+		// Only physical can be changed by non-creative players
+		if ((!(caster instanceof Player player) || !player.isCreative()) && element != EMagicElement.PHYSICAL) {
+			return false;
+		}
+		
 		if (part.getElement() != element
 				&& part.getAlteration() == EAlteration.ENCHANT) {
 			level.setBlock(pos, state.setValue(ELEMENT, part.getElement()), Block.UPDATE_ALL);

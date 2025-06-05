@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.item;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
-import com.smanzana.nostrummagica.fluid.NostrumFluids;
 import com.smanzana.nostrummagica.fluid.PoisonWaterFluid;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellRune.AlterationSpellRune;

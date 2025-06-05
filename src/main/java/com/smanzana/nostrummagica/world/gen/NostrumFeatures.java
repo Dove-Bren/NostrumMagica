@@ -4,11 +4,13 @@ import java.util.List;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.world.gen.feature.ElementalGeodeFeature;
 import com.smanzana.nostrummagica.world.gen.feature.FloatingChestCageFeature;
 
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.features.FeatureUtils;
 import net.minecraft.data.worldgen.features.OreFeatures;
+import net.minecraft.data.worldgen.placement.CavePlacements;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
@@ -22,6 +24,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConf
 import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.heightproviders.ConstantHeight;
+import net.minecraft.world.level.levelgen.placement.BiomeFilter;
 import net.minecraft.world.level.levelgen.placement.CountPlacement;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
 import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
@@ -43,20 +46,24 @@ public class NostrumFeatures {
 	private static final String ID_ORE_MANI = "nostrum_ore_mani";
 	private static final String ID_ORE_ESSORE = "nostrum_ore_essore";
 	private static final String ID_FEATURE_SKYCAGE = "skycage";
+	private static final String ID_ELEMENTAL_GEODE = "elemental_geode";
 	
 	protected static  Feature<NoneFeatureConfiguration> FEATURE_SKYCAGE;
+	protected static Feature<NoneFeatureConfiguration> FEATURE_ELEMENTAL_GEODE;
 
 	protected static Holder<ConfiguredFeature<RandomPatchConfiguration, ?>> CONFFEATURE_FLOWER_CRYSTABLOOM;
 	protected static Holder<ConfiguredFeature<RandomPatchConfiguration, ?>> CONFFEATURE_FLOWER_MIDNIGHTIRIS;
 	protected static Holder<ConfiguredFeature<OreConfiguration, ?>> CONFFEATURE_ORE_MANI;
 	protected static Holder<ConfiguredFeature<OreConfiguration, ?>> CONFFEATURE_ORE_ESSORE;
 	protected static Holder<ConfiguredFeature<NoneFeatureConfiguration, ?>> CONFFEATURE_SKY_CAGE;
+	protected static Holder<ConfiguredFeature<NoneFeatureConfiguration, ?>> CONFFEATURE_ELEMENTAL_GEODE;
 	
 	public static Holder<PlacedFeature> PLACED_FLOWER_CRYSTABLOOM;
 	public static Holder<PlacedFeature> PLACED_FLOWER_MIDNIGHTIRIS;
 	public static Holder<PlacedFeature> PLACED_ORE_MANI;
 	public static Holder<PlacedFeature> PLACED_ORE_ESSORE;
 	public static Holder<PlacedFeature> PLACED_SKYCAGE;
+	public static Holder<PlacedFeature> PLACED_ELEMENTAL_GEODE;
 	
 	@SubscribeEvent
 	public static void registerFeatures(RegistryEvent.Register<Feature<?>> event) {
@@ -66,6 +73,10 @@ public class NostrumFeatures {
 		FEATURE_SKYCAGE = new FloatingChestCageFeature(NoneFeatureConfiguration.CODEC);
 		FEATURE_SKYCAGE.setRegistryName(ID_FEATURE_SKYCAGE);
 		registry.register(FEATURE_SKYCAGE);
+		
+		FEATURE_ELEMENTAL_GEODE = new ElementalGeodeFeature(NoneFeatureConfiguration.CODEC);
+		FEATURE_ELEMENTAL_GEODE.setRegistryName(NostrumMagica.Loc(ID_ELEMENTAL_GEODE));
+		registry.register(FEATURE_ELEMENTAL_GEODE);
 		
 		
 		
@@ -90,7 +101,11 @@ public class NostrumFeatures {
 		
 		ID = NostrumMagica.Loc(ID_FEATURE_SKYCAGE);
 		CONFFEATURE_SKY_CAGE = FeatureUtils.register(ID.toString(), FEATURE_SKYCAGE, NoneFeatureConfiguration.INSTANCE);
-		PLACED_SKYCAGE = PlacementUtils.register(ID.toString(), CONFFEATURE_SKY_CAGE, RarityFilter.onAverageOnceEvery(1500), InSquarePlacement.spread(), HeightRangePlacement.of(ConstantHeight.of(VerticalAnchor.absolute(200))));
+		PLACED_SKYCAGE = PlacementUtils.register(ID.toString(), CONFFEATURE_SKY_CAGE, RarityFilter.onAverageOnceEvery(1500), InSquarePlacement.spread(), HeightRangePlacement.of(ConstantHeight.of(VerticalAnchor.absolute(200))), BiomeFilter.biome());
+		
+		ID = NostrumMagica.Loc(ID_ELEMENTAL_GEODE); // \/ configuration copied from vanilla's amythest geode
+		CONFFEATURE_ELEMENTAL_GEODE = FeatureUtils.register(ID.toString(), FEATURE_ELEMENTAL_GEODE, NoneFeatureConfiguration.INSTANCE);
+		PLACED_ELEMENTAL_GEODE = PlacementUtils.register(ID.toString(), CONFFEATURE_ELEMENTAL_GEODE, RarityFilter.onAverageOnceEvery(800), InSquarePlacement.spread(), HeightRangePlacement.uniform(VerticalAnchor.aboveBottom(6), VerticalAnchor.absolute(30)), BiomeFilter.biome());
 	}
 	
 	public static final void onBiomeLoad(BiomeLoadingEvent event) {
@@ -113,6 +128,11 @@ public class NostrumFeatures {
 		
 		if (category != Biome.BiomeCategory.OCEAN && category != Biome.BiomeCategory.BEACH) {
 			event.getGeneration().addFeature(GenerationStep.Decoration.SURFACE_STRUCTURES, NostrumFeatures.PLACED_SKYCAGE);
+		}
+		
+		// Add elemental geode if amythest is here. Note simple contains check doesn't work
+		if (event.getGeneration().getFeatures(GenerationStep.Decoration.LOCAL_MODIFICATIONS).stream().anyMatch(f -> f.is(CavePlacements.AMETHYST_GEODE.unwrapKey().get()))) {
+			event.getGeneration().addFeature(GenerationStep.Decoration.LOCAL_MODIFICATIONS, PLACED_ELEMENTAL_GEODE);
 		}
 	}
 }
