@@ -5,19 +5,21 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
+import com.smanzana.autodungeons.world.dungeon.room.DungeonExitData;
+import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomExit;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneWallTorchBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
 
 public class RoomGrandStaircase extends StaticRoom {
 	
@@ -548,12 +550,12 @@ public class RoomGrandStaircase extends StaticRoom {
 	}
 
 	@Override
-	public List<BlueprintLocation> getExits(BlueprintLocation start) {
-		List<BlueprintLocation> list = new LinkedList<>();
+	public List<DungeonRoomExit> getExits(BlueprintLocation start) {
+		List<DungeonRoomExit> list = new LinkedList<>();
 		
 		BlockPos exit = new BlockPos(0, -16, 21);
 		
-		list.add(NostrumDungeon.asRotated(start, exit, Direction.NORTH));
+		list.add(new DungeonRoomExit(NostrumDungeon.asRotated(start, exit, Direction.NORTH), DungeonExitData.EMPTY));
 		
 		return list;
 	}

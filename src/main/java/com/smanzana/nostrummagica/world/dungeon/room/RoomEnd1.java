@@ -1,21 +1,23 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
+import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomExit;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.RedstoneWallTorchBlock;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RedstoneWallTorchBlock;
 
 public class RoomEnd1 extends StaticRoom {
 	
@@ -89,8 +91,8 @@ public class RoomEnd1 extends StaticRoom {
 	}
 
 	@Override
-	public List<BlueprintLocation> getExits(BlueprintLocation start) {
-		return new LinkedList<>();
+	public List<DungeonRoomExit> getExits(BlueprintLocation start) {
+		return new ArrayList<>();
 	}
 
 	@Override

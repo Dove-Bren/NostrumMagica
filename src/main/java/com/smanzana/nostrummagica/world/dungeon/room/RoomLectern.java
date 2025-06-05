@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -9,6 +10,8 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
+import com.smanzana.autodungeons.world.dungeon.room.DungeonExitData;
+import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomExit;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
@@ -113,12 +116,12 @@ public class RoomLectern extends StaticRoom {
 	}
 
 	@Override
-	public List<BlueprintLocation> getExits(BlueprintLocation start) {
-		List<BlueprintLocation> list = new LinkedList<>();
+	public List<DungeonRoomExit> getExits(BlueprintLocation start) {
+		List<DungeonRoomExit> list = new ArrayList<>();
 		
 		BlockPos exit = new BlockPos(0, 0, 6);
 		
-		list.add(NostrumDungeon.asRotated(start, exit, Direction.NORTH));
+		list.add(new DungeonRoomExit(NostrumDungeon.asRotated(start, exit, Direction.NORTH), DungeonExitData.EMPTY));
 		
 		return list;
 	}

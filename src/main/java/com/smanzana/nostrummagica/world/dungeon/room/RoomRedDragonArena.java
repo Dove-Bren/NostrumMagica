@@ -5,12 +5,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
+import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomExit;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Blocks;
 
 public class RoomRedDragonArena extends StaticRoom {
 	
@@ -94,8 +95,8 @@ public class RoomRedDragonArena extends StaticRoom {
 	}
 
 	@Override
-	public List<BlueprintLocation> getExits(BlueprintLocation start) {
-		return new LinkedList<>();
+	public List<DungeonRoomExit> getExits(BlueprintLocation start) {
+		return new ArrayList<>();
 	}
 
 	@Override

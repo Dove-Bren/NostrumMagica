@@ -5,19 +5,21 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
+import com.smanzana.autodungeons.world.dungeon.room.DungeonExitData;
+import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomExit;
 import com.smanzana.autodungeons.world.dungeon.room.IDungeonLobbyRoom;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Vec3i;
 
 public class DragonLobby extends StaticRoom implements IDungeonLobbyRoom {
 	
@@ -135,16 +137,16 @@ public class DragonLobby extends StaticRoom implements IDungeonLobbyRoom {
 	}
 
 	@Override
-	public List<BlueprintLocation> getExits(BlueprintLocation start) {
-		List<BlueprintLocation> list = new LinkedList<>();
+	public List<DungeonRoomExit> getExits(BlueprintLocation start) {
+		List<DungeonRoomExit> list = new ArrayList<>();
 		
 		BlockPos pos;
 		
 		pos = new BlockPos(-5, 0, 3);
-		list.add(NostrumDungeon.asRotated(start, pos, Direction.EAST));
+		list.add(new DungeonRoomExit(NostrumDungeon.asRotated(start, pos, Direction.EAST), DungeonExitData.EMPTY));
 		
 		pos = new BlockPos(5, 0, 3);
-		list.add(NostrumDungeon.asRotated(start, pos, Direction.WEST));
+		list.add(new DungeonRoomExit(NostrumDungeon.asRotated(start, pos, Direction.WEST), DungeonExitData.EMPTY));
 		
 		return list;
 	}

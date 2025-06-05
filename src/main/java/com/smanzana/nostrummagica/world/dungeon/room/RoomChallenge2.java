@@ -1,23 +1,25 @@
 package com.smanzana.nostrummagica.world.dungeon.room;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
+import com.smanzana.autodungeons.world.dungeon.room.DungeonExitData;
+import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomExit;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.RedstoneWallTorchBlock;
 import net.minecraft.world.level.block.VineBlock;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
 
 public class RoomChallenge2 extends StaticRoom {
 	
@@ -293,12 +295,12 @@ public class RoomChallenge2 extends StaticRoom {
 	}
 
 	@Override
-	public List<BlueprintLocation> getExits(BlueprintLocation start) {
-		List<BlueprintLocation> list = new LinkedList<>();
+	public List<DungeonRoomExit> getExits(BlueprintLocation start) {
+		List<DungeonRoomExit> list = new ArrayList<>();
 		
 		BlockPos exit = new BlockPos(-16, 6, 17);
 		
-		list.add(NostrumDungeon.asRotated(start, exit, Direction.EAST));
+		list.add(new DungeonRoomExit(NostrumDungeon.asRotated(start, exit, Direction.EAST), DungeonExitData.EMPTY));
 		
 		return list;
 	}
