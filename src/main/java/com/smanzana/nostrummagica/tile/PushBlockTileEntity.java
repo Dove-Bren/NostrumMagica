@@ -21,6 +21,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -31,9 +32,11 @@ import net.minecraft.world.phys.Vec3;
 public class PushBlockTileEntity extends BlockEntity {
 	
 	private static final String NBT_ELEMENT = "element";
+	private static final String NBT_GRAVITY = "gravity";
 	private static final int ANIM_DURATION = 20;
 	
 	private @Nullable EMagicElement element;
+	private boolean gravity;
 	
 	// Used to lerp between old position and current position
 	private long animStartTicks;
@@ -54,6 +57,15 @@ public class PushBlockTileEntity extends BlockEntity {
 		return element;
 	}
 	
+	public void setGravity(boolean gravity) {
+		this.gravity = gravity;
+		dirty();
+	}
+	
+	public boolean hasGravity() {
+		return this.gravity;
+	}
+	
 	protected void animateFrom(Direction oldDirection) {
 		this.animStartTicks = this.hasLevel() ? this.level.getGameTime() : 0;
 		this.oldDirection = oldDirection;
@@ -69,6 +81,7 @@ public class PushBlockTileEntity extends BlockEntity {
 		if (this.oldDirection != null) {
 			nbt.putString("FROM_DIRECTION", this.oldDirection.getName());
 		}
+		nbt.putBoolean(NBT_GRAVITY, gravity);
 	}
 	
 	@Override
@@ -86,6 +99,7 @@ public class PushBlockTileEntity extends BlockEntity {
 		} else {
 			this.oldDirection = null;
 		}
+		this.gravity = nbt.getBoolean(NBT_GRAVITY);
 	}
 	
 	public float getAnimTicksElapsed(float partialTicks) {
@@ -134,12 +148,29 @@ public class PushBlockTileEntity extends BlockEntity {
 		}
 		
 		BlockPos to = this.getBlockPos().relative(direction);
-		return this.level.isLoaded(to)
-				&& this.level.isEmptyBlock(to);
+		if (!this.level.isLoaded(to)) {
+			return false;
+		}
+		
+		if (level.isEmptyBlock(to)) {
+			return true;
+		}
+		
+		BlockState toState = level.getBlockState(to);
+		if (!(toState.getBlock() instanceof PushBlock)) {
+			return false;
+		}
+		
+		final BlockEntity toTE = level.getBlockEntity(to);
+		if (toTE == null || !(toTE instanceof PushBlockTileEntity pushEntity)) {
+			return false;
+		}
+		
+		return pushEntity.canPush(direction);
 	}
 	
 	public boolean canPushDirectly(Direction direction) {
-		return canPush(direction) && !isStacked() && isOnGround() && !anyIsOn() && !this.isAnimating();
+		return canPush(direction) && !isStacked() && isOnGround() && !anyEntsOn() && !this.isAnimating();
 	}
 	
 	protected boolean isStacked() {
@@ -156,6 +187,14 @@ public class PushBlockTileEntity extends BlockEntity {
 		}
 	}
 	
+	protected void propogateFall() {
+		// Propogate up
+		final BlockEntity te = level.getBlockEntity(getBlockPos().above());
+		if (te instanceof PushBlockTileEntity push) {
+			push.fall();
+		}
+	}
+	
 	protected void setNewBlock(Direction direction) {
 		BlockPos toPos = this.getBlockPos().relative(direction);
 		level.setBlock(toPos, getBlockState(), Block.UPDATE_ALL);
@@ -164,13 +203,27 @@ public class PushBlockTileEntity extends BlockEntity {
 		BlockEntity te = level.getBlockEntity(toPos);
 		if (te instanceof PushBlockTileEntity push) {
 			push.setElement(this.getElement());
+			push.setGravity(this.hasGravity());
 			push.animateFrom(direction.getOpposite());
+			level.scheduleTick(toPos, getBlockState().getBlock(), ANIM_DURATION);
 		}
 		
 	}
 	
 	protected void push(Direction direction) {
-		// First set up new block
+		// First propogate forward, if applicable
+		{
+			if (!isStacked()) {
+				final BlockEntity te = level.getBlockEntity(getBlockPos().relative(direction));
+				if (te instanceof PushBlockTileEntity push) {
+					if (push.canPush(direction)) {
+						push.push(direction);
+					}
+				}
+			}
+		}
+		
+		// Then set up new block
 		setNewBlock(direction);
 		
 		// Then propogate up
@@ -185,6 +238,22 @@ public class PushBlockTileEntity extends BlockEntity {
 		this.level.removeBlock(getBlockPos(), false);
 	}
 	
+	protected void fall() {
+		// Set up new block
+		setNewBlock(Direction.DOWN);
+		
+		// Then remeove self (since ent will e moving into space)
+		this.level.removeBlock(getBlockPos(), false);
+		
+		// Then propogate up
+		propogateFall();
+		
+		// Do effects (for bottom only)
+		if (!this.isStacked()) {
+			level.playSound(null, getBlockPos(), SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 1f, 1f);
+		}
+	}
+	
 	protected boolean entityIsOn(Entity ent, int topY) {
 		// Makes assumptions that ent is at least in the block BB above top layer
 		return ent.isOnGround() && ent.getBlockY() >= topY;
@@ -194,7 +263,7 @@ public class PushBlockTileEntity extends BlockEntity {
 //				&& ent.getY() > this.worldPosition.getY() + 1;
 	}
 	
-	protected boolean anyIsOn() {
+	protected boolean anyEntsOn() {
 		// Find top of any stacked blocks
 		MutableBlockPos pos = this.getBlockPos().mutable();
 		
@@ -226,6 +295,12 @@ public class PushBlockTileEntity extends BlockEntity {
 		if (player.isCreative() && !heldItem.isEmpty() && heldItem.getItem() instanceof InfusedGemItem gem) {
 			this.oldDirection = null;
 			this.setElement(gem.getElement());
+			return true;
+		}
+		
+		if (player.isCreative() && !heldItem.isEmpty() && heldItem.getItem() == Items.ARROW) {
+			this.oldDirection = null;
+			this.setGravity(!this.hasGravity());
 			return true;
 		}
 		
@@ -266,6 +341,15 @@ public class PushBlockTileEntity extends BlockEntity {
 		return false;
 	}
 	
-	
+	public void onWorldCheckTick() {
+		if (this.level.isClientSide() || !this.hasGravity() || this.isStacked()) {
+			return;
+		}
+		
+		// Bottom-most block with gravity. Should we fall?
+		if (!isOnGround()) {
+			fall();
+		}
+	}
 	
 }

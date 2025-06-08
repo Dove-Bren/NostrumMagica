@@ -1208,11 +1208,12 @@ public class OverlayRenderer extends GuiComponent {
 				final float infoAlpha = Mth.sin(Mth.PI * (Math.min(40f, elapsedTicks) / 40f));
 				
 				// Rate
-				if (charge.chargeSpeed != 0f) {
+				final float chargeSpeed = -(SpellCasting.CalculateHandsSpellCastModifier(NostrumMagica.Proxy.getPlayer()) - 1f);
+				if (chargeSpeed != 0f) {
 					matrixStackIn.pushPose();
 					matrixStackIn.translate(0, 12, 0);
 					matrixStackIn.scale(.5f, .5f, 1f);
-					final String rate = String.format("%+.0f%%", charge.chargeSpeed * 100);
+					final String rate = String.format("%+.0f%%", chargeSpeed * 100);
 					final int len = gui.getFont().width(rate);
 					gui.getFont().draw(matrixStackIn, rate, -len / 2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, infoAlpha));
 					matrixStackIn.popPose();

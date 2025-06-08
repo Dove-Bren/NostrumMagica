@@ -7,10 +7,14 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.TriggerRepeaterTileEntity;
 import com.smanzana.nostrummagica.util.DimensionUtils;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -33,6 +37,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -128,8 +133,15 @@ public class TriggerRepeaterBlock extends BaseEntityBlock implements ITriggeredB
 			playerIn.sendMessage(new TextComponent("Holding " + offsets.size() + " offsets"), Util.NIL_UUID);
 			if (playerIn.isShiftKeyDown()) {
 				for (BlockPos offset : offsets) {
+					final BlockPos worldPosition = pos.offset(offset);
 					playerIn.sendMessage(new TextComponent(" > " + offset), Util.NIL_UUID);
+					NostrumParticles.GLOW_TRAIL.spawn(worldIn, new SpawnParams(1, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
+							0, 300, 0, new TargetLocation(Vec3.atCenterOf(worldPosition))
+							).setTargetBehavior(new ParticleTargetBehavior().joinMode(true)).color(1f, .8f, 1f, .3f));
 				}
+			}
+			if (ent.getTriggerRequirement() > 1) {
+				playerIn.sendMessage(new TextComponent("Triggered %d out of %d times ".formatted(ent.getCurrentTriggerCount(), ent.getTriggerRequirement())), Util.NIL_UUID);
 			}
 		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof PositionCrystal) {
 			BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
@@ -148,6 +160,12 @@ public class TriggerRepeaterBlock extends BaseEntityBlock implements ITriggeredB
 			final int count = ent.cleanOffests(playerIn);
 			playerIn.sendMessage(new TextComponent("Cleaned " + count + " offsets"), Util.NIL_UUID);
 			NostrumMagicaSounds.DAMAGE_WIND.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+		} else if (!heldItem.isEmpty() && heldItem.getItem() == Items.CLOCK) {
+			// Add requirement count
+			final int newReq = ent.getTriggerRequirement() + 1;
+			ent.setTriggerRequirement(newReq, false);
+			playerIn.sendMessage(new TextComponent("Increased to %d required triggers before repeating".formatted(newReq)), Util.NIL_UUID);
+			NostrumMagicaSounds.TOCK.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 		}
 		
 		return InteractionResult.SUCCESS;

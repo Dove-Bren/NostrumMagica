@@ -29,12 +29,18 @@ import net.minecraft.world.level.block.state.BlockState;
 public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedTileEntity {
 	
 	private static final String NBT_OFFSET_LIST = "offsets";
+	private static final String NBT_TRIGGER_COUNT = "trigger_count";
+	private static final String NBT_TRIGGER_REQUIREMENT = "trigger_requirement";
 	
 	private List<BlockPos> offsets;
+	private int triggerRequirement;
+	private int triggerCount;
 	
 	protected TriggerRepeaterTileEntity(BlockEntityType<? extends TriggerRepeaterTileEntity> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 		offsets = new ArrayList<>();
+		triggerRequirement = 1;
+		triggerCount = 0;
 	}
 	
 	public TriggerRepeaterTileEntity(BlockPos pos, BlockState state) {
@@ -58,6 +64,19 @@ public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedT
 	
 	public List<BlockPos> getOffsets() {
 		return offsets;
+	}
+	
+	public void setTriggerRequirement(int count, boolean isWorldGen) {
+		this.triggerRequirement = Math.max(1, count);
+		flush(isWorldGen);
+	}
+	
+	public int getTriggerRequirement() {
+		return this.triggerRequirement;
+	}
+	
+	public int getCurrentTriggerCount() {
+		return this.triggerCount;
 	}
 	
 	@Override
@@ -84,6 +103,8 @@ public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedT
 			list.add(NbtUtils.writeBlockPos(offset));
 		}
 		compound.put(NBT_OFFSET_LIST, list);
+		compound.putInt(NBT_TRIGGER_COUNT, triggerCount);
+		compound.putInt(NBT_TRIGGER_REQUIREMENT, triggerRequirement);
 	}
 	
 	@Override
@@ -95,6 +116,8 @@ public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedT
 		for (int i = 0; i < list.size(); i++) {
 			offsets.add(NbtUtils.readBlockPos(list.getCompound(i)));
 		}
+		this.triggerCount = compound.getInt(NBT_TRIGGER_COUNT);
+		this.triggerRequirement = Math.max(1, compound.getInt(NBT_TRIGGER_REQUIREMENT));
 	}
 	
 	protected void flush(boolean isWorldGen) {
@@ -118,19 +141,23 @@ public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedT
 	}
 	
 	public void trigger(BlockPos triggerSource) {
-		for (BlockPos offset : this.offsets) {
-			final BlockPos target = this.worldPosition.offset(offset);
-			if (target.equals(triggerSource)) {
-				continue;
+		this.triggerCount++;
+		if (this.triggerCount >= this.triggerRequirement) {
+			this.triggerCount = 0;
+			for (BlockPos offset : this.offsets) {
+				final BlockPos target = this.worldPosition.offset(offset);
+				if (target.equals(triggerSource)) {
+					continue;
+				}
+				
+				BlockState state = level.getBlockState(target);
+				if (state == null || !(state.getBlock() instanceof ITriggeredBlock)) {
+					NostrumMagica.logger.debug("Non-triggerable block pointed to at " + target);
+					continue;
+				}
+				
+				((ITriggeredBlock) state.getBlock()).trigger(level, target, state, this.getBlockPos());
 			}
-			
-			BlockState state = level.getBlockState(target);
-			if (state == null || !(state.getBlock() instanceof ITriggeredBlock)) {
-				NostrumMagica.logger.debug("Non-triggerable block pointed to at " + target);
-				continue;
-			}
-			
-			((ITriggeredBlock) state.getBlock()).trigger(level, target, state, this.getBlockPos());
 		}
 	}
 	

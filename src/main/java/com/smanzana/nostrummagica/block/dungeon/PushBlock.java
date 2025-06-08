@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
+import java.util.Random;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ISpellTargetBlock;
 import com.smanzana.nostrummagica.spell.SpellLocation;
@@ -9,6 +11,7 @@ import com.smanzana.nostrummagica.tile.PushBlockTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -163,5 +166,15 @@ public class PushBlock extends BaseEntityBlock implements ISpellTargetBlock {
 			return;
 		
 		pushEntity.onPlayerPush(player, closest);
+	}
+	
+	@Override
+	public void tick(BlockState state, ServerLevel level, BlockPos pos, Random rand) {
+		//super.tick(state, world, pos, rand);
+		BlockEntity te = level.getBlockEntity(pos);
+		if (te == null || !(te instanceof PushBlockTileEntity pushEntity))
+			return;
+		
+		pushEntity.onWorldCheckTick();
 	}
 }

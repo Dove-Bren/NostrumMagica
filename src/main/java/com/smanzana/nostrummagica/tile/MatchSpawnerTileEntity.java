@@ -10,8 +10,12 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.MatchSpawnerBlock;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.Entities;
+import com.smanzana.nostrummagica.util.TargetLocation;
 import com.smanzana.nostrummagica.util.WorldUtil;
 
 import net.minecraft.core.BlockPos;
@@ -21,10 +25,12 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Entity.RemovalReason;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements IOrientedTileEntity {
 	
@@ -129,9 +135,20 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 			}
 		} else {
 			if (!entity.isAlive()) {
-				NostrumMagicaSounds.AMBIENT_WOOSH2.play(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
-				this.doTrigger(state);
-				level.removeBlock(worldPosition, false);
+				if (entity.getRemovalReason() != RemovalReason.UNLOADED_TO_CHUNK) {
+					NostrumMagicaSounds.AMBIENT_WOOSH2.play(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
+					
+					if (this.triggerOffset != null) {
+						NostrumParticles.GLOW_TRAIL.spawn(level, new SpawnParams(1, entity.getX(), entity.getY() + entity.getBbHeight() / 2, entity.getZ(),
+								0, 300, 0, new TargetLocation(Vec3.atCenterOf(worldPosition.offset(this.triggerOffset)))
+								).setTargetBehavior(new ParticleTargetBehavior().joinMode(true)).color(1f, .8f, 1f, .3f));
+					}
+					
+					this.doTrigger(state);
+					level.removeBlock(worldPosition, false);
+				} else {
+					this.unlinkedEntID = entity.getUUID();
+				}
 			}
 		}
 	}

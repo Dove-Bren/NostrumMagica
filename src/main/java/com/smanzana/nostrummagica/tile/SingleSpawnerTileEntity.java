@@ -30,7 +30,7 @@ public class SingleSpawnerTileEntity extends BlockEntity implements TickableBloc
 	
 	@Override
 	public void tick() {
-		if (!level.isClientSide && ++ticksExisted % 32 == 0) {
+		if (!level.isClientSide && ++ticksExisted % 16 == 0) {
 			BlockState state = this.level.getBlockState(this.worldPosition);
 			if (state == null || !(state.getBlock() instanceof SingleSpawnerBlock)) {
 				level.removeBlockEntity(worldPosition);

@@ -1,6 +1,9 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.item.PositionCrystal;
@@ -9,6 +12,7 @@ import com.smanzana.nostrummagica.tile.MatchSpawnerTileEntity;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 import com.smanzana.nostrummagica.util.DimensionUtils;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -29,6 +33,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -100,6 +105,11 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 			ItemStack heldItem = playerIn.getItemInHand(hand);
 			if (heldItem.isEmpty()) {
 				playerIn.sendMessage(new TextComponent("Currently set to " + state.getValue(MOB).getSerializedName()), Util.NIL_UUID);
+				if (ent.getTriggerOffset() != null) {
+					NostrumParticles.GLOW_TRAIL.spawn(worldIn, new SpawnParams(1, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
+							0, 300, 0, new TargetLocation(Vec3.atCenterOf(pos.offset(ent.getTriggerOffset())))
+							).setTargetBehavior(new ParticleTargetBehavior().joinMode(true)).color(1f, .8f, 1f, .3f));
+				}
 			} else if (heldItem.getItem() instanceof EssenceItem) {
 				Type type = null;
 				switch (EssenceItem.findType(heldItem)) {
