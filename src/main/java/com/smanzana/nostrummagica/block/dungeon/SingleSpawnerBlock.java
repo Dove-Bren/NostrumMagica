@@ -4,7 +4,8 @@ import java.util.Random;
 
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.entity.dragon.RedDragonEntity;
+import com.smanzana.nostrummagica.entity.boss.plantboss.PlantBossEntity;
+import com.smanzana.nostrummagica.entity.boss.reddragon.RedDragonEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicEarthGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicEnderGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicFireGolemEntity;
@@ -12,7 +13,6 @@ import com.smanzana.nostrummagica.entity.golem.MagicIceGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
-import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
 import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.SingleSpawnerTileEntity;

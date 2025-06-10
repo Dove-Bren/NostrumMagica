@@ -9,7 +9,7 @@ import java.util.Map;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.entity.dragon.RedDragonEntity;
+import com.smanzana.nostrummagica.entity.boss.reddragon.RedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.RedDragonBaseEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.util.ColorUtil;

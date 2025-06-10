@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector3f;
-import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
-import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity.PlantBossLeafLimb;
+import com.smanzana.nostrummagica.entity.boss.plantboss.PlantBossEntity;
+import com.smanzana.nostrummagica.entity.boss.plantboss.PlantBossEntity.PlantBossLeafLimb;
 
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;

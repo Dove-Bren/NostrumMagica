@@ -4,8 +4,11 @@ import java.util.Random;
 import java.util.Set;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.entity.boss.plantboss.PlantBossBrambleEntity;
+import com.smanzana.nostrummagica.entity.boss.plantboss.PlantBossEntity;
+import com.smanzana.nostrummagica.entity.boss.playerstatue.PlayerStatueEntity;
+import com.smanzana.nostrummagica.entity.boss.reddragon.RedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.DragonEggEntity;
-import com.smanzana.nostrummagica.entity.dragon.RedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.ShadowRedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicEarthGolemEntity;
@@ -15,8 +18,6 @@ import com.smanzana.nostrummagica.entity.golem.MagicIceGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
-import com.smanzana.nostrummagica.entity.plantboss.PlantBossBrambleEntity;
-import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -90,6 +91,7 @@ public class NostrumEntityTypes {
 	@ObjectHolder(ShrineTriggerEntity.Tier.ID) public static EntityType<ShrineTriggerEntity.Tier> tierShrine;
 	@ObjectHolder(MagicDamageProjectileEntity.ID) public static EntityType<MagicDamageProjectileEntity> magicDamageProjectile;
 	@ObjectHolder(CursedGlassTriggerEntity.ID) public static EntityType<CursedGlassTriggerEntity> cursedGlassTrigger;
+	@ObjectHolder(PlayerStatueEntity.ID) public static EntityType<PlayerStatueEntity> playerStatue;
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<EntityType<?>> event) {
@@ -294,6 +296,11 @@ public class NostrumEntityTypes {
     			.sized(0.125F, 0.125F)
     			.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
     		.build("").setRegistryName(SpellBubbleEntity.ID));
+		
+		registry.register(EntityType.Builder.<PlayerStatueEntity>of(PlayerStatueEntity::new, MobCategory.MONSTER)
+				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
+				.sized(1, 2)
+			.build("").setRegistryName(PlayerStatueEntity.ID));
 	}
 	
 	private static final boolean netherMobGroundSpawnTest(EntityType<?> type, LevelAccessor world, MobSpawnType reason, BlockPos pos, Random rand) {
@@ -405,6 +412,7 @@ public class NostrumEntityTypes {
 		event.put(keySwitchTrigger, KeySwitchTriggerEntity.BuildKeySwitchAttributes().build());
 		// No attributes event.put(enderRodBall, EntityEnderRodBall.BuildAttributes().create());
 		event.put(cursedGlassTrigger, CursedGlassTriggerEntity.BuildAttributes().build());
+		event.put(playerStatue, PlayerStatueEntity.BuildAttributes().build());
 		
 	}
 	

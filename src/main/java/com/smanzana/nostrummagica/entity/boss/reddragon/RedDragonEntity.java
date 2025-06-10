@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.entity.dragon;
+package com.smanzana.nostrummagica.entity.boss.reddragon;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.entity.IMultiPartEntity;
 import com.smanzana.nostrummagica.entity.IMultiPartEntityPart;
 import com.smanzana.nostrummagica.entity.MultiPartEntityPart;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
+import com.smanzana.nostrummagica.entity.dragon.RedDragonBaseEntity;
 import com.smanzana.nostrummagica.entity.tasks.SpellAttackGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonAggroTableGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonFlyEvasionGoal;

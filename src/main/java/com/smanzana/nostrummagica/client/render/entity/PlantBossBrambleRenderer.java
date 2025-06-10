@@ -4,8 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.PlantBossBrambleModel;
+import com.smanzana.nostrummagica.entity.boss.plantboss.PlantBossBrambleEntity;
 import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
-import com.smanzana.nostrummagica.entity.plantboss.PlantBossBrambleEntity;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;

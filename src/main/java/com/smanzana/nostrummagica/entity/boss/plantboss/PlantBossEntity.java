@@ -1,4 +1,4 @@
-package com.smanzana.nostrummagica.entity.plantboss;
+package com.smanzana.nostrummagica.entity.boss.plantboss;
 
 import java.util.ArrayList;
 import java.util.Arrays;

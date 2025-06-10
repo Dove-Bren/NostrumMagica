@@ -114,6 +114,7 @@ import com.smanzana.nostrummagica.serializer.OptionalMagicElementDataSerializer;
 import com.smanzana.nostrummagica.serializer.OptionalParticleDataSerializer;
 import com.smanzana.nostrummagica.serializer.PetJobSerializer;
 import com.smanzana.nostrummagica.serializer.PlantBossTreeTypeSerializer;
+import com.smanzana.nostrummagica.serializer.PlayerStatuePoseSerializer;
 import com.smanzana.nostrummagica.serializer.RedDragonBodyPartTypeSerializer;
 import com.smanzana.nostrummagica.serializer.WilloStatusSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -2093,6 +2094,7 @@ public class ModInit {
     	registry.register(new DataSerializerEntry(OptionalParticleDataSerializer.instance).setRegistryName("nostrum.serial.particle_opt"));
     	registry.register(new DataSerializerEntry(RedDragonBodyPartTypeSerializer.instance).setRegistryName("nostrum.serial.red_dragon.body_part_type"));
     	registry.register(new DataSerializerEntry(PetJobSerializer.GetInstance()).setRegistryName("nostrum.serial.pet_job"));
+    	registry.register(new DataSerializerEntry(PlayerStatuePoseSerializer.instance).setRegistryName("nostrum.player_statue.pos"));
     }
 	
 	public static final void registerCommands(RegisterCommandsEvent event) {

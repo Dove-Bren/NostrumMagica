@@ -84,6 +84,7 @@ import com.smanzana.nostrummagica.client.render.entity.PlantBossBodyRenderer;
 import com.smanzana.nostrummagica.client.render.entity.PlantBossBrambleRenderer;
 import com.smanzana.nostrummagica.client.render.entity.PlantBossLeafRenderer;
 import com.smanzana.nostrummagica.client.render.entity.PlantBossRenderer;
+import com.smanzana.nostrummagica.client.render.entity.PlayerStatueRenderer;
 import com.smanzana.nostrummagica.client.render.entity.SeekerSaucerRenderer;
 import com.smanzana.nostrummagica.client.render.entity.ShadowDragonRedRenderer;
 import com.smanzana.nostrummagica.client.render.entity.ShrineTriggerRenderer;
@@ -118,7 +119,7 @@ import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.ChakramSpellSaucerEntity;
 import com.smanzana.nostrummagica.entity.CyclerSpellSaucerEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.entity.dragon.RedDragonEntity;
+import com.smanzana.nostrummagica.entity.boss.reddragon.RedDragonEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicEarthGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicEnderGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicFireGolemEntity;
@@ -400,6 +401,7 @@ public class ClientInit {
 		event.registerEntityRenderer(NostrumEntityTypes.cursedGlassTrigger, (manager) -> new CursedGlassTriggerRenderer(manager));
 		event.registerEntityRenderer(NostrumEntityTypes.seekerSpellSaucer, SeekerSaucerRenderer::new);
 		event.registerEntityRenderer(NostrumEntityTypes.boulder, SpellBoulderRenderer::new);
+		event.registerEntityRenderer(NostrumEntityTypes.playerStatue, PlayerStatueRenderer::new);
 	}
 	
 	@SubscribeEvent

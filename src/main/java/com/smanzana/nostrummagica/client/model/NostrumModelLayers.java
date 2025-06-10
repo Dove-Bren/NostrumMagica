@@ -2,7 +2,9 @@ package com.smanzana.nostrummagica.client.model;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
+import net.minecraft.client.model.geom.LayerDefinitions;
 import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -19,6 +21,8 @@ public class NostrumModelLayers {
 	public static final ModelLayerLocation Plantboss = make("plantboss");
 	public static final ModelLayerLocation PlantbossBramble = make("plantboss_bramble");
 	public static final ModelLayerLocation PlantbossLeaf = make("plantboss_leaf");
+	public static final ModelLayerLocation PlayerStatue = make("player_statue");
+	public static final ModelLayerLocation PlayerStatueArmor = make("player_statue_armor");
 	public static final ModelLayerLocation Willo = make("willo");
 	public static final ModelLayerLocation WitchHat = make("witchhat");
 	
@@ -51,6 +55,8 @@ public class NostrumModelLayers {
 		event.registerLayerDefinition(Willo, WilloModel::createLayer);
 		event.registerLayerDefinition(WitchHat, WitchHatModel::createLayer);
 		event.registerLayerDefinition(ArcaneWolf, ArcaneWolfModel::createLayer);
+		event.registerLayerDefinition(PlayerStatue, () -> PlayerStatueModel.createLayer(CubeDeformation.NONE));
+		event.registerLayerDefinition(PlayerStatueArmor, () -> PlayerStatueModel.createLayer(LayerDefinitions.INNER_ARMOR_DEFORMATION));
 
 		event.registerLayerDefinition(ElemArmor_0, () -> EnchantedArmorBaseModel.createLayer(0));
 		event.registerLayerDefinition(ElemArmor_1, () -> EnchantedArmorBaseModel.createLayer(1));

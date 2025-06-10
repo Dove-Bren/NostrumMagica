@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.client.render.entity;
 
-import com.smanzana.nostrummagica.entity.dragon.RedDragonEntity;
+import com.smanzana.nostrummagica.entity.boss.reddragon.RedDragonEntity;
 
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 

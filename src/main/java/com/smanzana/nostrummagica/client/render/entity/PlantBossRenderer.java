@@ -7,9 +7,9 @@ import com.mojang.math.Matrix4f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.PlantBossModel;
 import com.smanzana.nostrummagica.client.model.RenderShivModel;
+import com.smanzana.nostrummagica.entity.boss.plantboss.PlantBossEntity;
+import com.smanzana.nostrummagica.entity.boss.plantboss.PlantBossEntity.PlantBossTreeType;
 import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
-import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity;
-import com.smanzana.nostrummagica.entity.plantboss.PlantBossEntity.PlantBossTreeType;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.ColorUtil;
 

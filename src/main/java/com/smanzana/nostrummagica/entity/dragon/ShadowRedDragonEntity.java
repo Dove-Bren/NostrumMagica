@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.entity.dragon;
 
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
+import com.smanzana.nostrummagica.entity.boss.reddragon.RedDragonEntity;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonFocusedTargetGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonNearestAttackableTargetGoal;

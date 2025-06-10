@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.serializer;
 
-import com.smanzana.nostrummagica.entity.dragon.RedDragonEntity.DragonBodyPartType;
+import com.smanzana.nostrummagica.entity.boss.reddragon.RedDragonEntity.DragonBodyPartType;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
