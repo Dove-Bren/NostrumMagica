@@ -2,17 +2,9 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import java.util.Random;
 
+import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
-import com.smanzana.nostrummagica.entity.boss.plantboss.PlantBossEntity;
-import com.smanzana.nostrummagica.entity.boss.reddragon.RedDragonEntity;
-import com.smanzana.nostrummagica.entity.golem.MagicEarthGolemEntity;
-import com.smanzana.nostrummagica.entity.golem.MagicEnderGolemEntity;
-import com.smanzana.nostrummagica.entity.golem.MagicFireGolemEntity;
-import com.smanzana.nostrummagica.entity.golem.MagicIceGolemEntity;
-import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
-import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
-import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 import com.smanzana.nostrummagica.item.EssenceItem;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.SingleSpawnerTileEntity;
@@ -25,10 +17,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -69,7 +62,6 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 		}
 	}
 	
-	public static final int SPAWN_DIST_SQ = 900; // 30^2 
 	public static final EnumProperty<Type> MOB = EnumProperty.create("mob", Type.class);
 
 	public static final String ID = "nostrum_spawner";
@@ -94,6 +86,10 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 		return defaultBlockState().setValue(MOB, type);
 	}
 	
+	public SingleSpawnerBlock.Type getLegacySpawnType(BlockState state) {
+		return state.getValue(MOB);
+	}
+	
 	@Override
 	public RenderShape getRenderShape(BlockState state) {
 		return RenderShape.MODEL;
@@ -101,69 +97,9 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 	
 	@Override
 	public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
-		if (!worldIn.isClientSide())
-		{
-			for (Player player : worldIn.players()) {
-				if (!player.isSpectator() && !player.isCreative() && player.distanceToSqr(pos.getX() + .5, pos.getY(), pos.getZ() + .5) < SPAWN_DIST_SQ) {
-					this.spawn(worldIn, pos, state, rand);
-					worldIn.removeBlock(pos, false);
-					return;
-				}
-			}
-		}
+		//super.tick(state, worldIn, pos, rand);
 	}
 	
-	public Mob spawn(Level world, BlockPos pos, BlockState state, Random rand) {
-		Type type = state.getValue(MOB);
-		Mob entity = getEntity(type, world, pos);
-		
-		entity.setPersistenceRequired();
-		entity.setPos(pos.getX() + 0.5, pos.getY(), pos.getZ() + .5);
-		
-		world.addFreshEntity(entity);
-		return entity;
-	}
-	
-	protected static Mob getEntity(Type type, Level world, BlockPos pos) {
-		if (type == null)
-			return null;
-		
-		Mob entity = null;
-		
-		switch (type) {
-		case GOLEM_EARTH:
-			entity = new MagicEarthGolemEntity(NostrumEntityTypes.golemEarth, world);
-			break;
-		case GOLEM_ENDER:
-			entity = new MagicEnderGolemEntity(NostrumEntityTypes.golemEnder, world);
-			break;
-		case GOLEM_FIRE:
-			entity = new MagicFireGolemEntity(NostrumEntityTypes.golemFire, world);
-			break;
-		case GOLEM_ICE:
-			entity = new MagicIceGolemEntity(NostrumEntityTypes.golemIce, world);
-			break;
-		case GOLEM_LIGHTNING:
-			entity = new MagicLightningGolemEntity(NostrumEntityTypes.golemLightning, world);
-			break;
-		case GOLEM_PHYSICAL:
-			entity = new MagicPhysicalGolemEntity(NostrumEntityTypes.golemPhysical, world);
-			break;
-		case GOLEM_WIND:
-			entity = new MagicWindGolemEntity(NostrumEntityTypes.golemWind, world);
-			break;
-		case DRAGON_RED:
-			entity = new RedDragonEntity(NostrumEntityTypes.dragonRed, world);
-			break;
-		case PLANT_BOSS:
-			entity = new PlantBossEntity(NostrumEntityTypes.plantBoss, world);
-			break;
-		}
-		
-		return entity;
-	}
-
-
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new SingleSpawnerTileEntity(pos, state);
@@ -174,21 +110,6 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.SingleSpawner);
 	}
 	
-//	@Override
-//	public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
-//		if (state.getBlock() != newState.getBlock()) {
-//        	world.removeTileEntity(pos);
-//		}
-//	}
-	
-//	@SuppressWarnings("deprecation")
-//	@Override
-//	public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int eventID, int eventParam) {
-//		super.eventReceived(state, worldIn, pos, eventID, eventParam);
-//		TileEntity tileentity = worldIn.getTileEntity(pos);
-//        return tileentity == null ? false : tileentity.receiveClientEvent(eventID, eventParam);
-//	}
-
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (worldIn.isClientSide) {
@@ -200,45 +121,49 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 		}
 		
 		BlockEntity te = worldIn.getBlockEntity(pos);
-		if (te == null || !(te instanceof SingleSpawnerTileEntity)) {
+		if (te == null || !(te instanceof SingleSpawnerTileEntity spawner)) {
 			return InteractionResult.SUCCESS;
 		}
 		
 		if (playerIn.isCreative()) {
 			ItemStack heldItem = playerIn.getItemInHand(hand);
 			if (heldItem.isEmpty()) {
-				playerIn.sendMessage(new TextComponent("Currently set to " + state.getValue(MOB).getSerializedName()), Util.NIL_UUID);
+				playerIn.sendMessage(new TextComponent("Currently set to " + spawner.getSpawnType().toString()), Util.NIL_UUID);
 			} else if (heldItem.getItem() instanceof EssenceItem) {
-				Type type = null;
+				EntityType<?> type = null;
 				switch (EssenceItem.findType(heldItem)) {
 				case EARTH:
-					type = Type.GOLEM_EARTH;
+					type = NostrumEntityTypes.golemEarth;
 					break;
 				case ENDER:
-					type = Type.GOLEM_ENDER;
+					type = NostrumEntityTypes.golemEnder;
 					break;
 				case FIRE:
-					type = Type.GOLEM_FIRE;
+					type = NostrumEntityTypes.golemFire;
 					break;
 				case ICE:
-					type = Type.GOLEM_ICE;
+					type = NostrumEntityTypes.golemIce;
 					break;
 				case LIGHTNING:
-					type = Type.GOLEM_LIGHTNING;
+					type = NostrumEntityTypes.golemLightning;
 					break;
 				case PHYSICAL:
-					type = Type.GOLEM_PHYSICAL;
+					type = NostrumEntityTypes.golemPhysical;
 					break;
 				case WIND:
-					type = Type.GOLEM_WIND;
+					type = NostrumEntityTypes.golemWind;
 					break;
 				}
 				
-				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, type));
+				spawner.setSpawnType(type);
 			} else if (heldItem.is(NostrumTags.Items.DragonWing)) {
-				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, Type.DRAGON_RED));
+				spawner.setSpawnType(NostrumEntityTypes.dragonRed);
 			} else if (heldItem.getItem() == Items.SUGAR_CANE) {
-				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, Type.PLANT_BOSS));
+				spawner.setSpawnType(NostrumEntityTypes.plantBoss);
+			} else if (heldItem.getItem() == NostrumBlocks.pushBlock.asItem()) {
+				spawner.setSpawnType(NostrumEntityTypes.playerStatue);
+			} else if (heldItem.getItem() instanceof SpawnEggItem egg) {
+				spawner.setSpawnType(egg.getType(heldItem.getTag()));
 			}
 			return InteractionResult.SUCCESS;
 		}

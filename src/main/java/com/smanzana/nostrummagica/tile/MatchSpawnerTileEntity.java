@@ -8,7 +8,6 @@ import com.smanzana.autodungeons.api.block.entity.IOrientedTileEntity;
 import com.smanzana.autodungeons.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
-import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.MatchSpawnerBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -89,7 +88,7 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	}
 	
 	protected void spawnMatch(BlockState state) {
-		entity = NostrumBlocks.matchSpawner.spawn(level, worldPosition, state, NostrumMagica.rand);
+		entity = this.spawn(worldPosition, NostrumMagica.rand);
 		//world.notifyBlockUpdate(pos, state, state, 2);
 		//world.addBlockEvent(pos, state.getBlock(), 9, 0);
 		updateBlockState();
@@ -98,7 +97,7 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 	
 	protected boolean shouldSpawnMatch(BlockState state) {
 		for (Player player : ((ServerLevel) level).players()) {
-			if (!player.isSpectator() && !player.isCreative() && player.distanceToSqr(worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5) < MatchSpawnerBlock.SPAWN_DIST_SQ) {
+			if (!player.isSpectator() && !player.isCreative() && player.distanceToSqr(worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5) < SPAWN_DIST_SQ) {
 				return true;
 			}
 		}
