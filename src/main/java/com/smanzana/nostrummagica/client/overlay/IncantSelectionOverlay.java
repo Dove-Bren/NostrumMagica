@@ -23,6 +23,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Matrix4f;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.commonwidget.ITooltip;
@@ -83,12 +84,15 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	
 	private @Nullable Incantation lastIncantation;
 	
-	private final SelectionStage elementStage;
-	private final SelectionStage shapeStage1;
-	private final SelectionStage shapeStage2;
-	private final SelectionStage alterationStage;
+	private final List<SelectionStage> stages;
 	
-	private @Nullable SelectionStage currentStage;
+//	private final SelectionStage elementStage;
+//	private final SelectionStage shapeStage1;
+//	private final SelectionStage shapeStage2;
+//	private final SelectionStage alterationStage;
+	
+	private int currentStageIdx = -1;
+	
 	
 	// Tooltip stuff
 	private @Nullable WheelSlice<?> hovered;
@@ -100,10 +104,23 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		MinecraftForge.EVENT_BUS.register(this);
 		this.mc = Minecraft.getInstance();
 		
-		this.elementStage = new SelectionStage();
-		this.shapeStage1 = new SelectionStage();
-		this.shapeStage2 = new SelectionStage();
-		this.alterationStage = new SelectionStage();
+		this.stages = new ArrayList<>();
+	}
+	
+	// Should these be here?
+	protected boolean hasFullShapeSelection(INostrumMagic attr) {
+		// With current unlock order, this is as soon as you unlock any 4th shape which will mean
+		// it's just the same as shape.size() > 3. Room for progression by expanding it but then players
+		// might not be able to try out their new shape.
+		return attr.getTier().isGreaterOrEqual(EMagicTier.KANI) && attr.getShapes().size() > 3;
+	}
+	
+	protected boolean hasDoubleShapeSelection(INostrumMagic attr) {
+		return attr.getTier().isGreaterOrEqual(EMagicTier.VANI) && hasFullShapeSelection(attr);
+	}
+	
+	protected boolean hasAlterationSelection(INostrumMagic attr) {
+		return attr.getTier().isGreaterOrEqual(EMagicTier.MANI) && attr.getAlterations() != null && attr.getAlterations().containsValue(Boolean.TRUE);
 	}
 	
 	protected boolean isEnabled() {
@@ -181,14 +198,9 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	}
 	
 	protected @Nullable SelectionStage getCurrentStage() {
-//		if (this.shape == null) {
-//			return this.shapeStage1;
-//		} else if (this.element == null) {
-//			return this.elementStage;
-//		} else {
-//			return this.alterationStage;
-//		}
-		return this.currentStage;
+		return this.currentStageIdx >= 0 && currentStageIdx < stages.size()
+				? stages.get(currentStageIdx)
+				: null;
 	}
 	
 	protected @Nullable SelectionStagePage getCurrentPage() {
@@ -199,8 +211,19 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		return null;
 	}
 	
-	protected void setStage(SelectionStage stage) {
-		this.currentStage = stage;
+	protected void advanceStage() {
+		advanceStage(false);
+	}
+	
+	protected void advanceStage(boolean skipNext) {
+		this.currentStageIdx += (skipNext ? 2 : 1);
+		if (currentStageIdx >= this.stages.size()) {
+			this.submitSelection();
+		}
+	}
+	
+	protected void resetStage() {
+		this.currentStageIdx = 0;
 	}
 	
 	protected @Nullable WheelSlice<?> getSelection(int width, int height, int mouseX, int mouseY) {
@@ -238,7 +261,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		return null; // can this happen? Should return last slice?
 	}
 	
-	protected SelectionStagePage[] makeElementPages(Player player, @Nullable INostrumMagic attr) {
+	protected SelectionStage makeElementStage(Player player, @Nullable INostrumMagic attr) {
 		// elements are even split of the circle
 		final int count = EMagicElement.values().length;
 		WheelSlice<?>[] elementSlices = new WheelSlice[count];
@@ -254,10 +277,10 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 				elementSlices[i] = new WheelSlice<>(elem, SpellComponentIcon.get(elem), elem.getDisplayName(), () -> this.getElementTooltip(elem), prog, perSlice/2f, this::setElement, false);
 			}
 		}
-		return new SelectionStagePage[] {new SelectionStagePage(elementSlices)};
+		return new SelectionStage().setPages(new SelectionStagePage(elementSlices));
 	}
 	
-	protected SelectionStagePage[] makeAlterationPages(Player player, @Nullable INostrumMagic attr) {
+	protected SelectionStage makeAlterationStage(Player player, @Nullable INostrumMagic attr) {
 		// Alterations are even, with "NO ALTERATION" being on top
 		
 		final int count = EAlteration.values().length + 1;
@@ -279,10 +302,10 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 			}
 		}
 		
-		return new SelectionStagePage[] {new SelectionStagePage(alterationSlices)};
+		return new SelectionStage().setPages(new SelectionStagePage(alterationSlices));
 	}
 	
-	protected SelectionStagePage[] makeShapePages(Player player, @Nullable INostrumMagic attr, boolean isSecondStage) {
+	protected SelectionStage makeFullShapeStage(Player player, @Nullable INostrumMagic attr, boolean isSecondStage) {
 		// Shapes are mostly even, with a few called out specifically.
 		final SpellShape[] specials = {NostrumSpellShapes.Projectile, NostrumSpellShapes.Touch, NostrumSpellShapes.Self};
 		
@@ -363,14 +386,37 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 				} else if (!known.contains(shape)) {
 					curSlices[i] = WheelSlice.Hidden(prog, sliceWidth/2f);
 				} else if (isSecondStage && shape == this.shape) { // shape selected in first stage
-					curSlices[i] = new WheelSlice<>((SpellShape) shape, null, noneTitle, noneShapeTooltip, prog, sliceWidth/2f, this::setShape, true);
+					curSlices[i] = new WheelSlice<>((SpellShape) shape, null, noneTitle, noneShapeTooltip, prog, sliceWidth/2f, isSecondStage ? this::setSecondShape : this::setFirstShape, true);
 				} else {
-					curSlices[i] = new WheelSlice<>(shape, SpellComponentIcon.get(shape), shape.getDisplayName(), () -> this.getShapeTooltip(shape), prog, sliceWidth/2f, this::setShape, i < specials.length);
+					curSlices[i] = new WheelSlice<>(shape, SpellComponentIcon.get(shape), shape.getDisplayName(), () -> this.getShapeTooltip(shape), prog, sliceWidth/2f, isSecondStage ? this::setSecondShape : this::setFirstShape, i < specials.length);
 				}
 			}
 			shapePages[page] = new SelectionStagePage(curSlices);
 		}
-		return shapePages;
+		return new SelectionStage().setPages(shapePages);
+	}
+	
+	protected SelectionStage makePrimaryShapeStage(Player player, @Nullable INostrumMagic attr, boolean isSecondStage) {
+		// Primary Shapes!
+		final SpellShape[] primaries = {NostrumSpellShapes.Projectile, NostrumSpellShapes.Touch, NostrumSpellShapes.Self};
+		Set<SpellShape> known = (attr != null && attr.isUnlocked()) ? Set.copyOf(attr.getShapes()) : new HashSet<>();
+		WheelSlice<?>[] slices = new WheelSlice[primaries.length];
+		
+		final float perSlice = (1f / (float) primaries.length);
+		for (int i = 0; i < primaries.length; i++) {
+			final float prog = (.75f + (i * perSlice)) % 1; // start at 75% around which is up
+			final SpellShape shape = primaries[i];
+			
+			if (!known.contains(shape)) {
+				slices[i] = WheelSlice.Hidden(prog, perSlice/2f);
+			} else if (isSecondStage && shape == this.shape) { // shape selected in first stage
+				slices[i] = new WheelSlice<>((SpellShape) shape, null, noneTitle, noneShapeTooltip, prog, perSlice/2f, isSecondStage ? this::setSecondShape : this::setFirstShape, false);
+			} else {
+				slices[i] = new WheelSlice<>(shape, SpellComponentIcon.get(shape), shape.getDisplayName(), () -> this.getShapeTooltip(shape), prog, perSlice/2f, isSecondStage ? this::setSecondShape : this::setFirstShape, false);
+			}
+		}
+		
+		return new SelectionStage().setPages(new SelectionStagePage(slices));
 	}
 	
 	protected void initSlices() {
@@ -378,17 +424,35 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		Player player = NostrumMagica.Proxy.getPlayer();
 		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
-		// elements
-		this.elementStage.setPages(this.makeElementPages(player, attr));
+		stages.clear();
 		
-		// Shapes
-		this.shapeStage1.setPages(this.makeShapePages(player, attr, false));
-		this.shapeStage2.setPages(this.makeShapePages(player, attr, true));
+		// First stage is shapes
+		if (hasFullShapeSelection(attr)) {
+			stages.add(makeFullShapeStage(player, attr, false));
+		} else {
+			stages.add(makePrimaryShapeStage(player, attr, false));
+		}
+		if (hasDoubleShapeSelection(attr)) {
+			if (hasFullShapeSelection(attr)) {
+				stages.add(makeFullShapeStage(player, attr, true));
+			} else {
+				stages.add(makePrimaryShapeStage(player, attr, true));
+			}
+		}
 		
-		// Alterations
-		this.alterationStage.setPages(this.makeAlterationPages(player, attr));
+		// elements are second
+		stages.add(makeElementStage(player, attr));
 		
-		this.setStage(this.shapeStage1);
+//		// Shapes
+//		this.shapeStage1.setPages(this.makeShapePages(player, attr, false));
+//		this.shapeStage2.setPages(this.makeShapePages(player, attr, true));
+		
+		// Alterations last
+		if (hasAlterationSelection(attr)) {
+			stages.add(makeAlterationStage(player, attr));
+		}
+		
+		this.resetStage();
 	}
 	
 	protected void setElement(EMagicElement element, boolean isRight) {
@@ -402,50 +466,29 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 				// TODO and tier/skill check
 				;
 		if (isRight || !alterPickAllowed) {
-			this.submitSelection();
+			this.advanceStage(true);
 		} else {
-			this.setStage(alterationStage);
+			this.advanceStage();
 		}
 	}
 	
 	protected void setAlteration(EAlteration alteration, boolean isRight) {
 		this.alteration = alteration;
-		this.submitSelection();
+		this.advanceStage();
 	}
 	
-	protected void setShape(SpellShape shape, boolean isRight) {
-		final boolean isFirst = this.getCurrentStage() == this.shapeStage1;
-		boolean secondPickAllowed = shape != null && !shape.getAttributes(shape.getDefaultProperties()).terminal; // AND tier check?
-		if (this.getCurrentStage() == this.shapeStage1) {
-			this.shape = shape;
-			if (isRight) {
-				// Skip second shape selection
-				secondPickAllowed = false;
-			}
-		} else {
-			this.shape2 = shape;
-			secondPickAllowed = false;
-		}
-		
-		if (secondPickAllowed && isFirst) {
-			// fix up second stage to replace what we picked with the 'none' option
-			{
-				for (int i = 0; i < shapeStage2.getPageCount(); i++) {
-					final SelectionStagePage page = shapeStage2.pages[i];
-					for (int j = 0; j < page.slices.length; j++) {
-						WheelSlice<?> slice = page.slices[j];
-						if (slice != null && slice.val() == this.shape) {
-							page.slices[j] = new WheelSlice<>((SpellShape) null, null, noneTitle, noneShapeTooltip, slice.rotationPerc, slice.width, this::setShape, true);
-							// don't break, because may be on multiple pages
-						}
-					}
-				}
-			}
-			
-			this.setStage(shapeStage2);
-		} else {
-			this.setStage(elementStage);
-		}
+	protected void setFirstShape(SpellShape shape, boolean isRight) {
+		// This used to do the work to figure out if it should show the second shape stage, but now that's all determined
+		// when creating stages. This just needs to advance.
+		this.shape = shape;
+		this.advanceStage(isRight);
+	}
+	
+	protected void setSecondShape(SpellShape shape, boolean isRight) {
+		// This used to do the work to figure out if it should show the second shape stage, but now that's all determined
+		// when creating stages. This just needs to advance.
+		this.shape2 = shape;
+		this.advanceStage(false); // can't skip element
 	}
 	
 	protected List<Component> getShapeTooltip(SpellShape shape) {
@@ -854,11 +897,12 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 			
 		}
 		
-		public void setPages(SelectionStagePage ...pages) {
+		public SelectionStage setPages(SelectionStagePage ...pages) {
 			this.pages = pages;
 			if (this.pageIdx >= pages.length) {
 				pageIdx = pages.length - 1;
 			}
+			return this;
 		}
 		
 		public void movePage(Boolean isNext) {

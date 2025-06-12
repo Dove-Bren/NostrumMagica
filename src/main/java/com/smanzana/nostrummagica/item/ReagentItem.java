@@ -21,6 +21,8 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -206,12 +208,13 @@ public class ReagentItem extends Item implements ILoreTagged, ICapabilityProvide
 		return InfoScreenTabs.INFO_REAGENTS;
 	}
 	
+	private static final Capability<IAetherBurnable> AETHER_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
 	private LazyOptional<?> AetherBurnableLazy = LazyOptional.of(() -> AetheriaProxy.makeBurnable(100, 150));
 
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 		
-		if (cap != null && cap == IAetherBurnable.CAPABILITY && cap.isRegistered()) {
+		if (cap != null && cap == AETHER_CAPABILITY && cap.isRegistered()) {
 			return AetherBurnableLazy.cast();
 		}
 		

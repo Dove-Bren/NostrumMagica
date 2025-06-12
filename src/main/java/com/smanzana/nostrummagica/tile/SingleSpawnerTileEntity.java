@@ -18,6 +18,7 @@ import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -173,6 +174,26 @@ public class SingleSpawnerTileEntity extends BlockEntity implements TickableBloc
 		}
 		
 		return entity;
+	}
+	
+	@Override
+	public void saveAdditional(CompoundTag nbt) {
+		super.saveAdditional(nbt);
+		if (spawnType != null) {
+			nbt.putString("SpawnType", spawnType.toString());
+		}
+	}
+	
+	@Override
+	public void load(CompoundTag nbt) {
+		super.load(nbt);
+		
+		if (nbt == null)
+			return;
+			
+		if (nbt.contains("SpawnType")) {
+			this.spawnType = ResourceLocation.parse(nbt.getString("SpawnType"));
+		}
 	}
 	
 	@Override

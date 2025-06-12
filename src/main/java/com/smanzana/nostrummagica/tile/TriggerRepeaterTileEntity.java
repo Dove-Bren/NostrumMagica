@@ -122,6 +122,7 @@ public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedT
 	
 	protected void flush(boolean isWorldGen) {
 		if (!isWorldGen && level != null && !level.isClientSide) {
+			this.setChanged();
 			BlockState state = level.getBlockState(worldPosition);
 			level.sendBlockUpdated(worldPosition, state, state, 2);
 		}
@@ -142,6 +143,7 @@ public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedT
 	
 	public void trigger(BlockPos triggerSource) {
 		this.triggerCount++;
+		this.setChanged();
 		if (this.triggerCount >= this.triggerRequirement) {
 			this.triggerCount = 0;
 			for (BlockPos offset : this.offsets) {
@@ -176,6 +178,7 @@ public class TriggerRepeaterTileEntity extends BlockEntity implements IOrientedT
 				count++;
 			}
 		}
+		this.setChanged();
 		return count;
 	}
 }

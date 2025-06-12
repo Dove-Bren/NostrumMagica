@@ -194,6 +194,10 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 				
 				((ServerPlayer)player).connection.send(new ClientboundSetSubtitleTextPacket(msg));
 				((ServerPlayer)player).connection.send(new ClientboundSetTitleTextPacket(TextComponent.EMPTY));
+				
+				if (attr.getKnownElements().values().stream().mapToInt(b -> b ? 1 : 0).sum() == 2) {
+					NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.Tutorial.FORM_INCANTATION), ((ServerPlayer)player));
+				}
 			} else {
 				player.sendMessage(new TranslatableComponent("info.shrine.seektrial"), Util.NIL_UUID);
 			}
@@ -350,10 +354,6 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 				
 				((ServerPlayer)player).connection.send(new ClientboundSetSubtitleTextPacket(msg));
 				((ServerPlayer)player).connection.send(new ClientboundSetTitleTextPacket(TextComponent.EMPTY));
-				
-				if (attr.getShapes().size() >= 2) {
-					NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.Tutorial.FORM_INCANTATION), ((ServerPlayer)player));
-				}
 			}
 		}
 

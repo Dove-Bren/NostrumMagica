@@ -558,13 +558,31 @@ public class ClientPlayerListener extends PlayerListener {
 		return false;
 	}
 	
+	protected boolean hasIncantSelectUnlocked(Player player, INostrumMagic attr) {
+		// Can hackily just check elements, since that's how players have to unlock it.
+		// But instead I will checkf or anything to make it expand easier in the future
+		if (attr.getKnownElements().values().stream().filter((b) -> !!b).mapToInt(b -> b ? 1 : 0).sum() > 1) {
+			return true;
+		}
+		
+		if (attr.getShapes() != null && attr.getShapes().size() > 1) {
+			return true;
+		}
+		
+		if (attr.getAlterations() != null && attr.getAlterations().containsValue(Boolean.TRUE)) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	protected boolean startIncantHold(Player player) {
 		if (chargeManager.getCurrentCharge() == null && NostrumMagica.instance.getSpellCooldownTracker(player.level).getCooldowns(player).getGlobalCooldown().endTicks < player.tickCount) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 			if (attr != null && attr.isUnlocked()) {
 				if (hasIncantHand(player)) {
 					// Either enable selection, or just cast baby incantation if nothing else is unlocked
-					if (attr.getShapes() == null || attr.getShapes().size() < 2) {
+					if (!hasIncantSelectUnlocked(player, attr)) {
 						startIncantationCast(new Incantation(
 								attr.getShapes() == null || attr.getShapes().isEmpty() ? NostrumSpellShapes.Touch : attr.getShapes().get(0),
 								EMagicElement.PHYSICAL, // hardcoding that physical is first element

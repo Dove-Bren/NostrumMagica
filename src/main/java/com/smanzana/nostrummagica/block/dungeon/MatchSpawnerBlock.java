@@ -2,10 +2,8 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
-import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.crafting.NostrumTags;
-import com.smanzana.nostrummagica.item.EssenceItem;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior;
 import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.MatchSpawnerTileEntity;
@@ -23,7 +21,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.EnderEyeItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -104,43 +101,12 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 		if (playerIn.isCreative()) {
 			ItemStack heldItem = playerIn.getItemInHand(hand);
 			if (heldItem.isEmpty()) {
-				playerIn.sendMessage(new TextComponent("Currently set to " + state.getValue(MOB).getSerializedName()), Util.NIL_UUID);
 				if (ent.getTriggerOffset() != null) {
 					NostrumParticles.GLOW_TRAIL.spawn(worldIn, new SpawnParams(1, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5,
 							0, 300, 0, new TargetLocation(Vec3.atCenterOf(pos.offset(ent.getTriggerOffset())))
 							).setTargetBehavior(new ParticleTargetBehavior().joinMode(true)).color(1f, .8f, 1f, .3f));
 				}
-			} else if (heldItem.getItem() instanceof EssenceItem) {
-				Type type = null;
-				switch (EssenceItem.findType(heldItem)) {
-				case EARTH:
-					type = Type.GOLEM_EARTH;
-					break;
-				case ENDER:
-					type = Type.GOLEM_ENDER;
-					break;
-				case FIRE:
-					type = Type.GOLEM_FIRE;
-					break;
-				case ICE:
-					type = Type.GOLEM_ICE;
-					break;
-				case LIGHTNING:
-					type = Type.GOLEM_LIGHTNING;
-					break;
-				case PHYSICAL:
-					type = Type.GOLEM_PHYSICAL;
-					break;
-				case WIND:
-					type = Type.GOLEM_WIND;
-					break;
-				}
-				
-				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, type));
-			} else if (heldItem.is(NostrumTags.Items.DragonWing)) {
-				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, Type.DRAGON_RED));
-			} else if (heldItem.getItem() == Items.SUGAR_CANE) {
-				worldIn.setBlockAndUpdate(pos, state.setValue(MOB, Type.PLANT_BOSS));
+				// let super run to display stored entity return InteractionResult.SUCCESS;
 			} else if (heldItem.getItem() instanceof PositionCrystal) {
 				BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
 				if (heldPos != null && DimensionUtils.DimEquals(PositionCrystal.getDimension(heldItem), worldIn.dimension())) {
@@ -157,11 +123,12 @@ public class MatchSpawnerBlock extends SingleSpawnerBlock {
 					} else {
 						playerIn.sendMessage(new TextComponent("Not pointed at valid triggered block!"), Util.NIL_UUID);
 					}
+					return InteractionResult.SUCCESS;
 				}
 			}
-			return InteractionResult.SUCCESS;
+			
 		}
 		
-		return InteractionResult.FAIL;
+		return super.use(state, worldIn, pos, playerIn, hand, hit);
 	}
 }

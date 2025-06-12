@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.tile;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.block.dungeon.PushBlock;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
@@ -317,11 +319,25 @@ public class PushBlockTileEntity extends BlockEntity {
 	public boolean onSpell(LivingEntity caster, SpellEffectPart effect, SpellAction action, SpellLocation hitLocation) {
 		// could try to figure out based on spell action what element it is but no need
 		if (effect.getElement() == this.element) {
-			final Direction direction = directionFromHit(hitLocation.hitPosition);
-			if (canPushDirectly(direction)) {
-				push(direction);
-				return true;
-			}
+			// Originally I had you push with the element
+			// but that ends up being a lot of casts which is a lot of reagents
+			// which doesn't make sense for puzzle elements
+			// so dispell element if they match it
+//			final Direction direction = directionFromHit(hitLocation.hitPosition);
+//			if (canPushDirectly(direction)) {
+//				push(direction);
+//				return true;
+//			}
+			NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
+					10, hitLocation.hitPosition.x, hitLocation.hitPosition.y, hitLocation.hitPosition.z, 0,
+					60, 20,
+					Vec3.ZERO, new Vec3(.2, .1, .2)
+					).color(element.getColor()));
+			level.playSound(null, worldPosition, SoundEvents.GLASS_BREAK, SoundSource.BLOCKS, .8f, .8f);
+			
+			this.oldDirection = null;
+			this.setElement(null);
+			this.dirty();
 		}
 		
 		return false;

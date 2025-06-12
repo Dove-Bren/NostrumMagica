@@ -495,7 +495,7 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 		cursor.set(getOnPos());
 		while (true) {
 			cursor.move(Direction.UP); // +y
-			if (!level.isEmptyBlock(cursor)) {
+			if (!level.isEmptyBlock(cursor) && !level.getBlockState(cursor).getCollisionShape(level, cursor).isEmpty()) {
 				break;
 			}
 		}

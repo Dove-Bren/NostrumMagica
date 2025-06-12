@@ -54,6 +54,7 @@ public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTile
 	 */
 	public void setOffset(int offsetX, int offsetY, int offsetZ, boolean isWorldGen) {
 		this.teleOffset = new BlockPos(offsetX, offsetY, offsetZ);
+		this.setChanged();
 		flush(isWorldGen);
 	}
 	
@@ -67,6 +68,7 @@ public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTile
 		} else {
 			this.teleOffset = target.subtract(worldPosition);
 		}
+		this.setChanged();
 		flush(isWorldGen);
 	}
 	
