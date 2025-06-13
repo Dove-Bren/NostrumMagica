@@ -2,10 +2,10 @@ package com.smanzana.nostrummagica.tile;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.PortalBlock;
 import com.smanzana.nostrummagica.util.Location;
-import com.smanzana.nostrummagica.util.WorldUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

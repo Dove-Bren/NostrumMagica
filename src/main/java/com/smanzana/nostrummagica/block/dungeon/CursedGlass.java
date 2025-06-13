@@ -1,15 +1,17 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
+import java.util.function.Consumer;
+
 import javax.annotation.Nullable;
 
+import com.smanzana.autodungeons.util.WorldUtil;
+import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.CursedGlassTileEntity;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
-import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -252,9 +254,9 @@ public class CursedGlass extends SwitchBlock {
 			}
 
 			@Override
-			public boolean walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
-					BlockState state, int distance, int walkCount) {
-				return state.getBlock() == CursedGlass.this && !isDummy(state);
+			public IBlockWalker.WalkResult walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
+					BlockState state, int distance, int walkCount, Consumer<BlockPos> addBlock) {
+				return state.getBlock() == CursedGlass.this && !isDummy(state) ? IBlockWalker.WalkResult.ABORT : IBlockWalker.WalkResult.CONTINUE;
 			}
 		}, 48);
 	}

@@ -1,12 +1,13 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
 import java.awt.Color;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.autodungeons.util.WorldUtil;
+import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
-import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -154,10 +155,10 @@ public class TogglePlatformBlock extends Block implements ITriggeredBlock {
 				}
 
 				@Override
-				public boolean walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
-						BlockState state, int distance, int walkCount) {
+				public IBlockWalker.WalkResult walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
+						BlockState state, int distance, int walkCount, Consumer<BlockPos> addBlock) {
 					((TogglePlatformBlock) state.getBlock()).triggerInternal((Level) world, pos, state, triggerPos);
-					return false;
+					return IBlockWalker.WalkResult.CONTINUE;
 				}
 			}, 256);
 		}

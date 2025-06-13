@@ -1,5 +1,9 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
+import java.util.function.Consumer;
+
+import com.smanzana.autodungeons.util.WorldUtil;
+import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
 import com.smanzana.nostrummagica.block.ISpellTargetBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.property.MagicElementProperty;
@@ -10,8 +14,6 @@ import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.tile.ConjureGhostBlockEntity;
-import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -141,10 +143,10 @@ public class ConjureGhostBlock extends BaseEntityBlock implements ISpellTargetBl
 				}
 
 				@Override
-				public boolean walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
-						BlockState state, int distance, int walkCount) {
+				public IBlockWalker.WalkResult walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
+						BlockState state, int distance, int walkCount, Consumer<BlockPos> addBlock) {
 					((ConjureGhostBlock) state.getBlock()).triggerInternal((Level) world, pos, state);
-					return false;
+					return IBlockWalker.WalkResult.CONTINUE;
 				}
 			}, 256);
 		}

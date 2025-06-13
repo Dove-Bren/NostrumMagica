@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.smanzana.autodungeons.AutoDungeons;
+import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.autodungeons.world.dungeon.DungeonRecord;
 import com.smanzana.nostrummagica.block.dungeon.DungeonKeyChestBlock;
@@ -14,7 +15,6 @@ import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
-import com.smanzana.nostrummagica.util.WorldUtil;
 
 import net.minecraft.Util;
 import net.minecraft.advancements.CriteriaTriggers;

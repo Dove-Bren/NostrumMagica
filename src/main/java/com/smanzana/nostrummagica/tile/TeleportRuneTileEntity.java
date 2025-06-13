@@ -9,11 +9,11 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import com.smanzana.autodungeons.api.block.entity.IOrientedTileEntity;
+import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.util.WorldUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

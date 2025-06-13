@@ -1,5 +1,9 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
+import java.util.function.Consumer;
+
+import com.smanzana.autodungeons.util.WorldUtil;
+import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
 import com.smanzana.nostrummagica.block.ISpellTargetBlock;
 import com.smanzana.nostrummagica.block.property.MagicElementProperty;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
@@ -8,8 +12,6 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
-import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -110,10 +112,10 @@ public class MagicBreakableBlock extends Block implements ISpellTargetBlock {
 				}
 
 				@Override
-				public boolean walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
-						BlockState state, int distance, int walkCount) {
+				public IBlockWalker.WalkResult walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
+						BlockState state, int distance, int walkCount, Consumer<BlockPos> addBlock) {
 					((MagicBreakableBlock) state.getBlock()).triggerInternal((Level) world, pos, state);
-					return false;
+					return IBlockWalker.WalkResult.CONTINUE;
 				}
 			}, 256);
 		}

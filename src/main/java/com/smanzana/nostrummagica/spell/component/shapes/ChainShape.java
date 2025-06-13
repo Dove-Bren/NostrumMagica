@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Consumer;
 
+import com.smanzana.autodungeons.util.WorldUtil;
+import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -25,8 +28,6 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeSelector;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 import com.smanzana.nostrummagica.util.TargetLocation;
-import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -181,16 +182,16 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 			}
 
 			@Override
-			public boolean walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos, BlockState state, int distance, int walkCount) {
+			public IBlockWalker.WalkResult walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos, BlockState state, int distance, int walkCount, Consumer<BlockPos> addBlock) {
 				final SpellLocation loc = new SpellLocation((Level) world, pos);
 				locsAffected.add(loc);
 				locLinks.computeIfAbsent(location, (l) -> new ArrayList<>()).add(loc);
 				
 				if (--arcs[0] <= 0) {
-					return true; // stop walking; all done
+					return IBlockWalker.WalkResult.ABORT; // stop walking; all done
 				}
 				
-				return false;
+				return IBlockWalker.WalkResult.CONTINUE;
 			}
 			
 		}, arc * arc);

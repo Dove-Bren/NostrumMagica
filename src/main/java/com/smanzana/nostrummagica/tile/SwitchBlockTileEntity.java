@@ -1,13 +1,13 @@
 package com.smanzana.nostrummagica.tile;
 
 import com.smanzana.autodungeons.api.block.entity.IOrientedTileEntity;
+import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.SwitchTriggerEntity;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
-import com.smanzana.nostrummagica.util.WorldUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

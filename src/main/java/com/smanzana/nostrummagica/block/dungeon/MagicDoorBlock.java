@@ -4,12 +4,13 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.autodungeons.util.WorldUtil;
+import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.util.WorldUtil;
-import com.smanzana.nostrummagica.util.WorldUtil.IBlockWalker;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -122,13 +123,13 @@ public abstract class MagicDoorBlock extends HorizontalDirectionalBlock {
 			}
 
 			@Override
-			public boolean walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
-					BlockState state, int distance, int walkCount) {
+			public IBlockWalker.WalkResult walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
+					BlockState state, int distance, int walkCount, Consumer<BlockPos> addBlock) {
 				if (startPos.equals(pos)) {
 					// Block was already destroyed, so use saved blockstate
 					state = origState;
 				}
-				return walkFunc.walk(pos, state);
+				return walkFunc.walk(pos, state) ? IBlockWalker.WalkResult.ABORT : IBlockWalker.WalkResult.CONTINUE;
 			}
 		}, 512);
 		

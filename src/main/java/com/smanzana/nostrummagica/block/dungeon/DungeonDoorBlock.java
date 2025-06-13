@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.autodungeons.AutoDungeons;
 import com.smanzana.autodungeons.api.block.ILargeDoorMarker;
+import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
 import com.smanzana.autodungeons.world.dungeon.DungeonRecord;
@@ -12,7 +13,6 @@ import com.smanzana.nostrummagica.tile.DungeonDoorTileEntity;
 import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
-import com.smanzana.nostrummagica.util.WorldUtil;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;

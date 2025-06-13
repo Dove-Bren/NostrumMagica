@@ -5,8 +5,8 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
-import com.smanzana.autodungeons.world.dungeon.Dungeon;
 import com.smanzana.autodungeons.world.dungeon.DungeonRoomInstance;
+import com.smanzana.autodungeons.world.dungeon.RandomPoolDungeon;
 import com.smanzana.autodungeons.world.dungeon.room.DungeonStartRoom;
 import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
@@ -14,12 +14,12 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.Level;
 
-public class NostrumDungeon extends Dungeon {
+public class NostrumDungeon extends RandomPoolDungeon {
 	
 	public NostrumDungeon(String tag, DungeonStartRoom starting, IDungeonRoomRef<?> ending, int minPath, int randPath) {
 		super(tag, starting, ending, minPath, randPath);
@@ -43,13 +43,13 @@ public class NostrumDungeon extends Dungeon {
 	}
 	
 	@Override
-	protected void spawnLargeKey(DungeonRoomInstance room, LevelAccessor world, BlueprintLocation keyLocation) {
+	public void spawnLargeKey(DungeonRoomInstance room, LevelAccessor world, BlueprintLocation keyLocation) {
 		// Technically, this spawns at two positions and could go out of bounds
 		NostrumBlocks.largeDungeonKeyChest.makeDungeonChest(world, keyLocation.getPos(), keyLocation.getFacing(), room.getDungeonInstance());
 	}
 	
 	@Override
-	protected void spawnLargeDoor(DungeonRoomInstance room, LevelAccessor world, BlueprintLocation doorLocation) {
+	public void spawnLargeDoor(DungeonRoomInstance room, LevelAccessor world, BlueprintLocation doorLocation) {
 		// Relying on there already being a door... could make large chest do the same?
 		NostrumBlocks.largeDungeonDoor.overrideDungeonKey(world, doorLocation.getPos(), room.getDungeonInstance());
 		
@@ -57,12 +57,12 @@ public class NostrumDungeon extends Dungeon {
 	}
 	
 	@Override
-	protected void spawnSmallKey(DungeonRoomInstance room, LevelAccessor world, BlueprintLocation keyLocation) {
+	public void spawnSmallKey(DungeonRoomInstance room, LevelAccessor world, BlueprintLocation keyLocation) {
 		NostrumBlocks.smallDungeonKeyChest.makeDungeonChest(world, keyLocation.getPos(), keyLocation.getFacing(), room.getDungeonInstance());
 	}
 	
 	@Override
-	protected void spawnSmallDoor(DungeonRoomInstance room, LevelAccessor world, BlueprintLocation smallDoor, @Nullable BoundingBox bounds) {
+	public void spawnSmallDoor(DungeonRoomInstance room, LevelAccessor world, BlueprintLocation smallDoor, @Nullable BoundingBox bounds) {
 		NostrumBlocks.smallDungeonDoor.spawnDungeonDoor(world, smallDoor.getPos(), smallDoor.getFacing(), bounds, room.getDungeonInstance());
 	}
 }
