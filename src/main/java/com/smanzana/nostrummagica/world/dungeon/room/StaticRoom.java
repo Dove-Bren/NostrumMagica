@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
+import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
 import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoom;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
@@ -18,6 +19,7 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumOverworldDungeon;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.LevelAccessor;
@@ -229,7 +231,7 @@ public abstract class StaticRoom implements IDungeonRoom {
 	}
 	
 	@Override
-	public void spawn(LevelAccessor world, BlueprintLocation start, @Nullable BoundingBox bounds, UUID dungeonID) {
+	public void spawn(LevelAccessor world, BlueprintLocation start, @Nullable BoundingBox bounds, DungeonInstance dungeonInstance, UUID roomID) {
 		Set<ChunkAccess> chunks = new HashSet<>();
 		
 		// Get inversions based on rotation
@@ -422,4 +424,9 @@ public abstract class StaticRoom implements IDungeonRoom {
 	public abstract List<String> getRoomTags();
 	
 	public abstract String getRoomName();
+	
+	@Override
+	public @Nullable Component getDisplayName() {
+		return null; // we have names here... could use them... new TextComponent(getRoomName());
+	}
 }

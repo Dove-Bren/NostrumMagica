@@ -2,14 +2,18 @@ package com.smanzana.nostrummagica.world.gen;
 
 import java.util.List;
 
+import com.mojang.serialization.Codec;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.DragonStructure;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.ManiCastleStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.PlantBossStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.PortalStructure;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -17,6 +21,8 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
+import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
+import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -30,9 +36,11 @@ public class NostrumStructures {
 	private static final String DUNGEONGEN_PORTAL_ID = "nostrum_dungeons_portal";
 	private static final String DUNGEONGEN_DRAGON_ID = "nostrum_dungeons_dragon";
 	private static final String DUNGEONGEN_PLANTBOSS_ID = "nostrum_dungeons_plantboss";
+	private static final String DUNGEONGEN_MANI_CASTLE_ID = "struct_mani_castle";
 	private static final String DUNGEONGEN_PORTAL_CONF_ID = "configured_" + DUNGEONGEN_PORTAL_ID;
 	private static final String DUNGEONGEN_DRAGON_CONF_ID = "configured_" + DUNGEONGEN_DRAGON_ID;
 	private static final String DUNGEONGEN_PLANTBOSS_CONF_ID = "configured_" + DUNGEONGEN_PLANTBOSS_ID;
+	private static final String DUNGEONGEN_MANI_CASTLE_CONF_ID = "configured_" + DUNGEONGEN_MANI_CASTLE_ID;
 	
 	@ObjectHolder(DUNGEONGEN_PORTAL_ID) public static PortalStructure DUNGEON_PORTAL;
 	protected static ConfiguredStructureFeature<?, ?> CONFIGURED_DUNGEON_PORTAL;
@@ -45,6 +53,12 @@ public class NostrumStructures {
 	@ObjectHolder(DUNGEONGEN_PLANTBOSS_ID) public static PlantBossStructure DUNGEON_PLANTBOSS;
 	public static ConfiguredStructureFeature<?, ?> CONFIGUREDDUNGEON_PLANTBOSS;
 	public static Holder<ConfiguredStructureFeature<?, ?>> REF_DUNGEON_PLANTBOSS;
+	
+	@ObjectHolder(DUNGEONGEN_MANI_CASTLE_ID) public static ManiCastleStructure DUNGEON_MANI_CASTLE;
+	public static ConfiguredStructureFeature<?, ?> CONFIGUREDDUNGEON_MANI_CASTLE;
+	public static Holder<ConfiguredStructureFeature<?, ?>> REF_DUNGEON_MANI_CASTLE;
+	
+	public static StructurePlacementType<GridStructureSetPlacement> PLACEMENT_FIXED_GRID;
 
 	@SubscribeEvent
 	public static void registerStructures(RegistryEvent.Register<StructureFeature<?>> event) {
@@ -78,6 +92,12 @@ public class NostrumStructures {
 		CONFIGUREDDUNGEON_PLANTBOSS = configured;
 		REF_DUNGEON_PLANTBOSS = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_ID), NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_CONF_ID));
 		
+		structure = new ManiCastleStructure();
+		configured = structure.configured(FeatureConfiguration.NONE, TagKey.create(Registry.BIOME_REGISTRY, NostrumMagica.Loc("sorcery_dimension")));
+		// Avg dist: sqrt(32^2 + 32^2) = 724 blocks
+		CONFIGUREDDUNGEON_MANI_CASTLE = configured;
+		REF_DUNGEON_MANI_CASTLE = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_MANI_CASTLE_ID), NostrumMagica.Loc(DUNGEONGEN_MANI_CASTLE_CONF_ID));
+		
 		
 		// Register structure sets, which include rules of how to place them and distances between things in the same set.
 		// Putting everything into ONE set so that dungeons don't generate into eachother, but making portal weight by heigher.
@@ -92,6 +112,9 @@ public class NostrumStructures {
 				new RandomSpreadStructurePlacement(averageChunks, minChunks, RandomSpreadType.LINEAR, 0x26F1BDCF)
 		);
 		BuiltinRegistries.register(BuiltinRegistries.STRUCTURE_SETS, NostrumMagica.Loc("dungeon_structures"), structures);
+		
+		// Register custom structure placement types. Would prob need to be earlier if anything besides empty dim chunk gen used it
+		PLACEMENT_FIXED_GRID = registerPlacement(NostrumMagica.Loc("fixed_grid"), GridStructureSetPlacement.CODEC);
 	}
 	
 	private static Holder<ConfiguredStructureFeature<?, ?>> registerStructure(RegistryEvent.Register<StructureFeature<?>> event, StructureFeature<?> structure, ConfiguredStructureFeature<?, ?> config, ResourceLocation structName, ResourceLocation confName) {
@@ -133,4 +156,10 @@ public class NostrumStructures {
 //			provider.generator.getSettings().structureConfig = tempMap;
 //		}
 //	}
+	
+	private static <SP extends StructurePlacement> StructurePlacementType<SP> registerPlacement(ResourceLocation name, Codec<SP> codec) {
+		return Registry.register(Registry.STRUCTURE_PLACEMENT_TYPE, name, () -> {
+			return codec;
+		});
+	}
 }

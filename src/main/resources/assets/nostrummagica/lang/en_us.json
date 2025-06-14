@@ -734,6 +734,13 @@
 	"spellcraftmod.override.element": "Forced %1$s",
 	"spellcraftmod.override.alteration": "Forced %1$s",
 	"spellcraftmod.override.shape": "Forced %1$s",
+	
+	"dungeon.plant_boss.name": "Overgrown Chambers",
+	"dungeon.red_dragon.name": "Heat Prison",
+	"dungeon.portal.name": "Mystic Ruins",
+	"dungeon.mani_castle.name": "Mani Castle",
+	
+	"dungeon.room.mani_castle.name": "",
 
     "info.recall.fail": "A mark location must be set first",
     "info.recall.baddimension": "Your mark location is in a different dimension",

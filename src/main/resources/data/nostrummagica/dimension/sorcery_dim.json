@@ -2,6 +2,10 @@
 	"type": "nostrummagica:emptydim",
 	"generator": {
 		"type": "nostrummagica:emptychunks",
-		"biome": "nostrummagica:sorcery_biome"
+		"biome": "nostrummagica:sorcery_biome",
+		"structure_overrides": [
+			"nostrummagica:sorcery_dungeon"
+		],
+		"fakefield": "abc"
 	}
 }

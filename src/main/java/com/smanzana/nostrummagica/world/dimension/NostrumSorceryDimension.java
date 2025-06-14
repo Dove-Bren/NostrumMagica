@@ -5,7 +5,6 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef.DungeonRoomRef;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
@@ -77,17 +76,19 @@ public class NostrumSorceryDimension {
 				initBlueprints();
 			}
 			
-			long startTime = System.currentTimeMillis();
-			lobbyBlueprint.spawn(world, new BlueprintLocation(center, Direction.NORTH), null, dungeonID);
-			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate sorcery lobby");
-			
-			startTime = System.currentTimeMillis();
-			wholeBlueprint.spawn(world, new BlueprintLocation(center, Direction.NORTH), null, dungeonID);
-			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate whole dungeon");
+			int unused;
+//			long startTime = System.currentTimeMillis();
+//			lobbyBlueprint.spawn(world, new BlueprintLocation(center, Direction.NORTH), null, dungeonID);
+//			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate sorcery lobby");
+//			
+//			startTime = System.currentTimeMillis();
+//			wholeBlueprint.spawn(world, new BlueprintLocation(center, Direction.NORTH), null, dungeonID);
+//			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate whole dungeon");
 		}
 		
 		protected static final boolean DungeonPresent(ServerLevel world, BlockPos center) {
-			return !world.isEmptyBlock(center.above());
+			int unused;
+			return true;// !world.isEmptyBlock(center.above());
 		}
 		
 	}

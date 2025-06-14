@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.tile;
 import java.util.UUID;
 
 import com.smanzana.autodungeons.AutoDungeons;
+import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
 import com.smanzana.nostrummagica.block.dungeon.DungeonDoorBlock;
 
 import net.minecraft.core.BlockPos;
@@ -24,8 +25,9 @@ public class DungeonDoorTileEntity extends LockedDoorTileEntity {
 	}
 	
 	@Override
-	public void onRoomBlueprintSpawn(UUID dungeonID, UUID roomID, boolean isWorldGen) {
-		; // Don't change key; let dungeon stamp in key
+	public void onRoomBlueprintSpawn(DungeonInstance dungeonInstance, UUID roomID, boolean isWorldGen) {
+		// Set key to dungeon keys
+		this.setWorldKey(((DungeonDoorBlock) this.getBlockState().getBlock()).pickDungeonKey(dungeonInstance), isWorldGen);
 	}
 	
 	public boolean isLarge() {

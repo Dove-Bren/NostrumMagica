@@ -1,0 +1,11 @@
+{
+		"placement": {
+			"type": "nostrummagica:fixed_grid",
+			"grid_size": 5120,
+			"offset": [500, 0, 0]
+		},
+		"structures": [{
+			"structure": "nostrummagica:configured_struct_mani_castle",
+			"weight": 1
+		}]
+}

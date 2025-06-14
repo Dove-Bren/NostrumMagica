@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.autodungeons.world.dungeon.Dungeon.IWorldHeightReader;
+import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
 import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomExit;
 import com.smanzana.autodungeons.world.dungeon.room.IStaircaseRoom;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -92,16 +93,16 @@ public class RoomExtendedEntranceStaircase extends StaticRoom implements IStairc
 	}
 	
 	@Override
-	public void spawn(LevelAccessor world, BlueprintLocation start, BoundingBox bounds, UUID dungeonID) {
-		getEntryStart((type, x, z) -> world.getHeight(type, x, z), start, true, world, bounds, dungeonID);
+	public void spawn(LevelAccessor world, BlueprintLocation start, BoundingBox bounds, DungeonInstance dungeonInstance, UUID roomID) {
+		getEntryStart((type, x, z) -> world.getHeight(type, x, z), start, true, world, bounds, dungeonInstance, roomID);
 	}
 	
 	@Override
 	public BlueprintLocation getEntryStart(IWorldHeightReader world, BlueprintLocation start) {
-		return getEntryStart(world, start, false, null, null, null);
+		return getEntryStart(world, start, false, null, null, null, null);
 	}
 	
-	private BlueprintLocation getEntryStart(IWorldHeightReader heightReader, BlueprintLocation start, boolean spawn, LevelAccessor world, BoundingBox bounds, UUID dungeonID) {
+	private BlueprintLocation getEntryStart(IWorldHeightReader heightReader, BlueprintLocation start, boolean spawn, LevelAccessor world, BoundingBox bounds, DungeonInstance dungeonInstance, UUID roomID) {
 		int stairHeight = 4;
 		BlockPos pos = start.getPos();
 		
@@ -114,7 +115,7 @@ public class RoomExtendedEntranceStaircase extends StaticRoom implements IStairc
 				|| loops < 2 // Make sure we always do at least two
 			) {
 			if (spawn) {
-				super.spawn(world, new BlueprintLocation(cur, start.getFacing()), bounds, dungeonID);
+				super.spawn(world, new BlueprintLocation(cur, start.getFacing()), bounds, dungeonInstance, roomID);
 			}
 			cur = cur.offset(0, stairHeight, 0);
 			loops++;

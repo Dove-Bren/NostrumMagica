@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
+import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
 import com.smanzana.autodungeons.world.dungeon.room.DungeonExitData;
 import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomExit;
 import com.smanzana.nostrummagica.NostrumMagica;
@@ -25,8 +26,8 @@ import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
-import com.smanzana.nostrummagica.world.dungeon.NostrumOverworldDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
+import com.smanzana.nostrummagica.world.dungeon.NostrumOverworldDungeon;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -334,9 +335,9 @@ public class RoomLectern extends StaticRoom {
 	}
 	
 	@Override
-	public void spawn(LevelAccessor world, BlueprintLocation start, @Nullable BoundingBox bounds, UUID dungeonID)
+	public void spawn(LevelAccessor world, BlueprintLocation start, @Nullable BoundingBox bounds, DungeonInstance dungeonInstance, UUID roomID)
 	{
-		super.spawn(world, start, bounds, dungeonID);
+		super.spawn(world, start, bounds, dungeonInstance, roomID);
 		
 		// Fill out lectern!
 		BlockPos offset = new BlockPos(-15, 1, 3);

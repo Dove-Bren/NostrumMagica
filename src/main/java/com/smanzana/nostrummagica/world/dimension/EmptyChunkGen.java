@@ -10,7 +10,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryCodecs;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.LevelHeightAccessor;
@@ -44,6 +46,9 @@ public class EmptyChunkGen extends ChunkGenerator {
 		RegistryOps.retrieveRegistry(Registry.STRUCTURE_SET_REGISTRY).forGetter((p_208008_) -> {
 	         return p_208008_.structureSets;
 	      }),
+		RegistryCodecs.homogeneousList(Registry.STRUCTURE_SET_REGISTRY, true).fieldOf("structure_overrides").forGetter((p_209812_) -> {
+	         return p_209812_.structureOverrides.get();
+	      }),
 		RegistryOps.retrieveRegistry(Registry.BIOME_REGISTRY).forGetter((p_161916_) -> {
 	         return p_161916_.biomeRegistry;
 	      }),
@@ -55,8 +60,8 @@ public class EmptyChunkGen extends ChunkGenerator {
 	protected final Registry<Biome> biomeRegistry;
 	protected final Holder<Biome> biome;
 	
-	public EmptyChunkGen(Registry<StructureSet> structures, Registry<Biome> biomes, Holder<Biome> biome) {
-		super(structures, Optional.empty(), new FixedBiomeSource(biome));
+	public EmptyChunkGen(Registry<StructureSet> structures, HolderSet<StructureSet> structureOverrides, Registry<Biome> biomes, Holder<Biome> biome) {
+		super(structures, Optional.of(structureOverrides), new FixedBiomeSource(biome));
 		this.biomeRegistry = biomes;
 		this.biome = biome;
 	}

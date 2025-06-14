@@ -6,6 +6,7 @@ import com.smanzana.autodungeons.AutoDungeons;
 import com.smanzana.autodungeons.api.block.entity.IUniqueBlueprintTileEntity;
 import com.smanzana.autodungeons.api.block.entity.IWorldKeyHolder;
 import com.smanzana.autodungeons.world.WorldKey;
+import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.KeySwitchTriggerEntity;
@@ -135,13 +136,15 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 	}
 	
 	@Override
-	public void onRoomBlueprintSpawn(UUID dungeonID, UUID roomID, boolean isWorldGen) {
+	public void onRoomBlueprintSpawn(DungeonInstance dungeonInstance, UUID roomID, boolean isWorldGen) {
 		// TODO: should this use dungeon ID? Or even let it be configurable?
 		// Sorcery dungeon is one big room, and I feel like MOST of my uses of this
 		// will want unique-per-room keys?
 		// Ehh well the whole points is that things don't have to be close to eachother, so maybe
 		// that's wrong?
-		final WorldKey newKey = this.key.mutateWithID(roomID);
+		// Edit: I was _accidentally_ calling the dungeon ID the room ID, so this was using dungeon-wide ids already.
+		// I've went and made that explicit, especially since key switch blocks in practice are dungeon-wide.
+		final WorldKey newKey = this.key.mutateWithID(dungeonInstance.getInstanceID());
 		if (isWorldGen) {
 			this.key = newKey;
 		} else {

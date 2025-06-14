@@ -5,6 +5,8 @@ import com.smanzana.autodungeons.world.dungeon.room.DungeonStartRoom;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.dungeon.room.NostrumDungeonRooms;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -24,6 +26,7 @@ public class NostrumDungeons {
 				NostrumDungeonRooms.PLANTBOSS_BOSSROOM
 			).setColor(0x80106020)
 			.setLootTable(NostrumMagica.Loc("chests/nostrum_shrine_room"))
+			.setDisplayTitle(new TranslatableComponent("dungeon.plant_boss.name").withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD))
 			;
 	
 	public static final String TAG_DRAGON = "dragon";
@@ -36,6 +39,7 @@ public class NostrumDungeons {
 			4, 1
 			).setColor(0x80601005)
 			.setLootTable(NostrumMagica.Loc("chests/nostrum_shrine_room"))
+			.setDisplayTitle(new TranslatableComponent("dungeon.red_dragon.name").withStyle(ChatFormatting.RED, ChatFormatting.BOLD))
 			;
 	
 	public static final String TAG_PORTAL = "portal";
@@ -49,10 +53,11 @@ public class NostrumDungeons {
 			NostrumDungeonRooms.PORTAL_ENDROOM
 			).setColor(0x80402080)
 			.setLootTable(NostrumMagica.Loc("chests/nostrum_shrine_room"))
+			.setDisplayTitle(new TranslatableComponent("dungeon.portal.name").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD))
 			;
 	
 	protected static final ResourceLocation ID_MANI_CASTLE_DUNGEON = NostrumMagica.Loc("mani_castle"); 
-	public static Dungeon MANI_CASTLE_DUNGEON = new NostrumSorceryDungeon(NostrumDungeonRooms.RefManiCastleStart);
+	public static Dungeon MANI_CASTLE_DUNGEON = new NostrumSorceryDungeon(NostrumDungeonRooms.RefManiCastleStart).setDisplayTitle(new TranslatableComponent("dungeon.mani_castle.name").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
 	@SubscribeEvent
 	public static final void onRoomRegistration(RegistryEvent.Register<Dungeon> event) {

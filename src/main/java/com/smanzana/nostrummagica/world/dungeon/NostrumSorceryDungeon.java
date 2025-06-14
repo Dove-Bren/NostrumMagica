@@ -6,9 +6,14 @@ import com.smanzana.autodungeons.world.dungeon.StaticDungeon;
 import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.VerticalAnchor;
+import net.minecraft.world.level.levelgen.WorldGenerationContext;
+import net.minecraft.world.level.levelgen.heightproviders.ConstantHeight;
+import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
 import net.minecraft.world.phys.Vec3;
 
 public class NostrumSorceryDungeon extends StaticDungeon {
@@ -28,5 +33,11 @@ public class NostrumSorceryDungeon extends StaticDungeon {
 				new Vec3(0, .025, 0), new Vec3(.01, .0125, .01)
 				).color(color));
 		}
+	}
+	
+	@Override
+	public HeightProvider getSpawnHeight(WorldGenerationContext genContext) {
+		// Pick random Y between 45 and 75 from bottom of world by default
+		return ConstantHeight.of(VerticalAnchor.absolute(NostrumSorceryDimension.SPAWN_Y));
 	}
 }

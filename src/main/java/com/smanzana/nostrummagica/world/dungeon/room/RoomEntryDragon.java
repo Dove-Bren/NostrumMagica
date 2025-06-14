@@ -3,9 +3,6 @@ package com.smanzana.nostrummagica.world.dungeon.room;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
-
-import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
@@ -18,7 +15,6 @@ import com.smanzana.nostrummagica.world.dungeon.NostrumOverworldDungeon;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.LadderBlock;
@@ -26,7 +22,6 @@ import net.minecraft.world.level.block.RedstoneWallTorchBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
 // Tiny tight spiral staircase used when creating the entrance to the dungeon
 public class RoomEntryDragon extends StaticRoom {
@@ -292,11 +287,6 @@ public class RoomEntryDragon extends StaticRoom {
 		return list;
 	}
 	
-	@Override
-	public void spawn(LevelAccessor world, BlueprintLocation start, @Nullable BoundingBox bounds, UUID dungeonID) {
-		super.spawn(world, start, bounds, dungeonID);
-	}
-
 	@Override
 	public List<String> getRoomTags() {
 		return Lists.newArrayList(); // no tags; don't auto place anywhere!

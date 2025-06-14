@@ -10,7 +10,6 @@ import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
 import com.smanzana.autodungeons.world.dungeon.DungeonRecord;
 import com.smanzana.autodungeons.world.dungeon.DungeonRoomInstance;
 import com.smanzana.nostrummagica.tile.DungeonDoorTileEntity;
-import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 
@@ -83,7 +82,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 		return InteractionResult.SUCCESS;
 	}
 	
-	protected abstract WorldKey pickDungeonKey(DungeonInstance dungeon);
+	public abstract WorldKey pickDungeonKey(DungeonInstance dungeon);
 	
 	public void spawnDungeonDoor(LevelAccessor worldIn, BlockPos start, Direction facing, @Nullable BoundingBox bounds, DungeonInstance dungeon) {
 		final boolean isWorldGen = WorldUtil.IsWorldGen(worldIn);
@@ -95,7 +94,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 		// DungeonChests run into an issue where LootUtil has already forced a chest TE to generate, and so our
 		// blockstate change here doesn't cause a TE refresh.
 		// So we're going to force it.
-		if (isWorldGen && worldIn.getBlockEntity(start) != null && !(worldIn.getBlockEntity(start) instanceof DungeonKeyChestTileEntity)) {
+		if (isWorldGen && worldIn.getBlockEntity(start) != null && !(worldIn.getBlockEntity(start) instanceof DungeonDoorTileEntity)) {
 			worldIn.removeBlock(start, false);
 		}
 		
@@ -136,7 +135,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 		}
 
 		@Override
-		protected WorldKey pickDungeonKey(DungeonInstance dungeon) {
+		public WorldKey pickDungeonKey(DungeonInstance dungeon) {
 			return dungeon.getSmallKey();
 		}
 	}
@@ -150,7 +149,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 		}
 
 		@Override
-		protected WorldKey pickDungeonKey(DungeonInstance dungeon) {
+		public WorldKey pickDungeonKey(DungeonInstance dungeon) {
 			return dungeon.getLargeKey();
 		}
 	}

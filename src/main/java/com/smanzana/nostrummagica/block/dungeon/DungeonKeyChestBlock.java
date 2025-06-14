@@ -88,7 +88,7 @@ public abstract class DungeonKeyChestBlock extends HorizontalDirectionalBlock im
 			if (player.isCreative() && player.isShiftKeyDown()) {
 				DungeonRecord record = AutoDungeons.GetDungeonTracker().getDungeon(player);
 				if (record != null) {
-					WorldKey key = chest.isLarge() ? record.instance.getLargeKey() : record.instance.getSmallKey();
+					WorldKey key = pickDungeonKey(record.instance);
 					chest.setWorldKey(key);
 					player.sendMessage(new TextComponent("Set to dungeon key"), Util.NIL_UUID);
 				} else {
@@ -130,6 +130,8 @@ public abstract class DungeonKeyChestBlock extends HorizontalDirectionalBlock im
 		DungeonKeyChestTileEntity tileentity = (DungeonKeyChestTileEntity) world.getBlockEntity(pos);
 		tileentity.setWorldKey(key, WorldUtil.IsWorldGen(world));
 	}
+	
+	public abstract WorldKey pickDungeonKey(DungeonInstance dungeon);
 	
 	public static class Small extends DungeonKeyChestBlock {
 		
@@ -197,6 +199,11 @@ public abstract class DungeonKeyChestBlock extends HorizontalDirectionalBlock im
 			} else {
 				NostrumMagica.logger.warn("Couldn't set key chest TE at " + pos);
 			}
+		}
+
+		@Override
+		public WorldKey pickDungeonKey(DungeonInstance dungeon) {
+			return dungeon.getSmallKey();
 		}
 	}
 	
@@ -406,6 +413,11 @@ public abstract class DungeonKeyChestBlock extends HorizontalDirectionalBlock im
 		@Override
 		public boolean isLargeKey(BlockState state) {
 			return !state.getValue(SLAVE);
+		}
+
+		@Override
+		public WorldKey pickDungeonKey(DungeonInstance dungeon) {
+			return dungeon.getLargeKey();
 		}
 	}
 }

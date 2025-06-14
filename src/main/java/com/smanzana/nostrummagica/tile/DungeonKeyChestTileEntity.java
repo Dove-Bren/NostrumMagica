@@ -1,10 +1,13 @@
 package com.smanzana.nostrummagica.tile;
 
 import java.util.Random;
+import java.util.UUID;
 
 import com.smanzana.autodungeons.AutoDungeons;
+import com.smanzana.autodungeons.api.block.entity.IUniqueBlueprintTileEntity;
 import com.smanzana.autodungeons.api.block.entity.IWorldKeyHolder;
 import com.smanzana.autodungeons.world.WorldKey;
+import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
 import com.smanzana.nostrummagica.block.dungeon.DungeonKeyChestBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -24,7 +27,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class DungeonKeyChestTileEntity extends BlockEntity implements IWorldKeyHolder {
+public class DungeonKeyChestTileEntity extends BlockEntity implements IWorldKeyHolder, IUniqueBlueprintTileEntity {
 	
 	private WorldKey key;
 	private boolean triggered;
@@ -111,6 +114,12 @@ public class DungeonKeyChestTileEntity extends BlockEntity implements IWorldKeyH
 	@Override
 	public WorldKey getWorldKey() {
 		return this.key;
+	}
+	
+	@Override
+	public void onRoomBlueprintSpawn(DungeonInstance dungeonInstance, UUID roomID, boolean isWorldGen) {
+		// Set key to dungeon keys
+		this.setWorldKey(((DungeonKeyChestBlock) this.getBlockState().getBlock()).pickDungeonKey(dungeonInstance), isWorldGen);
 	}
 	
 	public boolean isLarge() {

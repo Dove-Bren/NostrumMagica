@@ -45,4 +45,11 @@ public abstract class NostrumDungeonStructures {
 //		}
 	}
 	
+	public static class ManiCastleStructure extends DungeonStructure {
+
+		public ManiCastleStructure() {
+			super(NostrumDungeons.MANI_CASTLE_DUNGEON);
+		}
+		
+	}
 }
