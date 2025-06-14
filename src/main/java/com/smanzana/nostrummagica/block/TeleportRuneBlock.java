@@ -1,7 +1,9 @@
 package com.smanzana.nostrummagica.block;
 
 import java.util.Random;
+import java.util.function.Consumer;
 
+import com.smanzana.autodungeons.api.block.scan.IRoomBridge;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.item.PositionCrystal;
@@ -41,7 +43,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class TeleportRuneBlock extends BaseEntityBlock  {
+public class TeleportRuneBlock extends BaseEntityBlock implements IRoomBridge  {
 	
 	public static final String ID = "teleport_rune";
 	protected static final VoxelShape RUNE_AABB = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 2D, 16.0D);
@@ -227,6 +229,13 @@ public class TeleportRuneBlock extends BaseEntityBlock  {
 			double mz = 1 * (rand.nextFloat() - .5f);
 			
 			worldIn.addParticle(ParticleTypes.PORTAL, dx + mx, dy, dz + mz, mx / 3, 0.0D, mz / 3);
+		}
+	}
+
+	@Override
+	public void visitBridge(BlockGetter level, BlockState state, BlockPos pos, BlockEntity ent, Consumer<BlockPos> addBlock) {
+		if (ent != null && ent instanceof TeleportRuneTileEntity tile && tile.getOffset() != null) {
+			addBlock.accept(pos.offset(tile.getOffset()));
 		}
 	}
 }

@@ -25,7 +25,7 @@ import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.tile.AltarTileEntity;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumOverworldDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
 import net.minecraft.core.BlockPos;
@@ -121,7 +121,7 @@ public class RoomLectern extends StaticRoom {
 		
 		BlockPos exit = new BlockPos(0, 0, 6);
 		
-		list.add(new DungeonRoomExit(NostrumDungeon.asRotated(start, exit, Direction.NORTH), DungeonExitData.EMPTY));
+		list.add(new DungeonRoomExit(NostrumOverworldDungeon.asRotated(start, exit, Direction.NORTH), DungeonExitData.EMPTY));
 		
 		return list;
 	}
@@ -340,7 +340,7 @@ public class RoomLectern extends StaticRoom {
 		
 		// Fill out lectern!
 		BlockPos offset = new BlockPos(-15, 1, 3);
-		BlueprintLocation point = NostrumDungeon.asRotated(start, offset, start.getFacing());
+		BlueprintLocation point = NostrumOverworldDungeon.asRotated(start, offset, start.getFacing());
 		BlockPos pos = point.getPos();
 		
 		if (bounds == null || bounds.isInside(pos)) {

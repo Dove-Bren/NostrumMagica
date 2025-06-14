@@ -47,6 +47,12 @@ public class ToggleLogicDoor extends LogicDoorBlock {
 		builder.add(TOGGLED);
 	}
 	
+	@Override
+	public boolean isPartition(BlockState state) {
+		return true; // see through door... although? Maybe it makes sense to even have these be room partitions?
+		// They just are OFTEN used inside what I consider a room
+	}
+	
 	public boolean isToggled(BlockState state) {
 		return state.getValue(TOGGLED);
 	}

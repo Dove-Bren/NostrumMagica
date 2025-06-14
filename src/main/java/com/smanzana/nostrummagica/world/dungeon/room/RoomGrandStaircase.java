@@ -9,7 +9,7 @@ import com.smanzana.autodungeons.world.dungeon.room.DungeonExitData;
 import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomExit;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumOverworldDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
 import net.minecraft.core.BlockPos;
@@ -555,7 +555,7 @@ public class RoomGrandStaircase extends StaticRoom {
 		
 		BlockPos exit = new BlockPos(0, -16, 21);
 		
-		list.add(new DungeonRoomExit(NostrumDungeon.asRotated(start, exit, Direction.NORTH), DungeonExitData.EMPTY));
+		list.add(new DungeonRoomExit(NostrumOverworldDungeon.asRotated(start, exit, Direction.NORTH), DungeonExitData.EMPTY));
 		
 		return list;
 	}

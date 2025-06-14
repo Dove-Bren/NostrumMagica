@@ -17,7 +17,7 @@ public class NostrumDungeons {
 	public static final String TAG_PLANTBOSS = "plant_boss";
 	protected static final ResourceLocation ID_PLANTBOSS_DUNGEON = NostrumMagica.Loc("plantboss");
 	
-	public static Dungeon PLANTBOSS_DUNGEON = new NostrumDungeon(
+	public static Dungeon PLANTBOSS_DUNGEON = new NostrumOverworldDungeon(
 			TAG_PLANTBOSS,
 			new DungeonStartRoom(NostrumDungeonRooms.PLANTBOSS_LOBBY,
 					NostrumDungeonRooms.PLANTBOSS_ENTRANCE, NostrumDungeonRooms.RefExtendedEntranceStaircaseLight),
@@ -29,7 +29,7 @@ public class NostrumDungeons {
 	public static final String TAG_DRAGON = "dragon";
 	protected static final ResourceLocation ID_DRAGON_DUNGEON = NostrumMagica.Loc("dragon");
 
-	public static Dungeon DRAGON_DUNGEON = new NostrumDungeon(
+	public static Dungeon DRAGON_DUNGEON = new NostrumOverworldDungeon(
 			TAG_DRAGON,
 			new DungeonStartRoom(NostrumDungeonRooms.RefDragonLobby, NostrumDungeonRooms.RefEntryDragon, NostrumDungeonRooms.RefExtendedEntranceStaircaseLight),
 			NostrumDungeonRooms.RefRedDragonArena,
@@ -41,7 +41,7 @@ public class NostrumDungeons {
 	public static final String TAG_PORTAL = "portal";
 	protected static final ResourceLocation ID_PORTAL_DUNGEON = NostrumMagica.Loc("portal");
 	
-	public static Dungeon PORTAL_DUNGEON = new NostrumDungeon(
+	public static Dungeon PORTAL_DUNGEON = new NostrumOverworldDungeon(
 			TAG_PORTAL,
 			new DungeonStartRoom(NostrumDungeonRooms.PORTAL_LOBBY,
 					NostrumDungeonRooms.PORTAL_ENTRANCE,
@@ -50,6 +50,9 @@ public class NostrumDungeons {
 			).setColor(0x80402080)
 			.setLootTable(NostrumMagica.Loc("chests/nostrum_shrine_room"))
 			;
+	
+	protected static final ResourceLocation ID_MANI_CASTLE_DUNGEON = NostrumMagica.Loc("mani_castle"); 
+	public static Dungeon MANI_CASTLE_DUNGEON = new NostrumSorceryDungeon(NostrumDungeonRooms.RefManiCastleStart);
 
 	@SubscribeEvent
 	public static final void onRoomRegistration(RegistryEvent.Register<Dungeon> event) {
@@ -58,5 +61,7 @@ public class NostrumDungeons {
 		registry.register(DRAGON_DUNGEON.setRegistryName(ID_DRAGON_DUNGEON));
 		registry.register(PORTAL_DUNGEON.setRegistryName(ID_PORTAL_DUNGEON));
 		registry.register(PLANTBOSS_DUNGEON.setRegistryName(ID_PLANTBOSS_DUNGEON));
+		registry.register(MANI_CASTLE_DUNGEON.setRegistryName(ID_MANI_CASTLE_DUNGEON));
+		
 	}
 }

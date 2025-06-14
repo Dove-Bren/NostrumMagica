@@ -10,7 +10,7 @@ import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomExit;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumOverworldDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
 import net.minecraft.core.BlockPos;
@@ -341,11 +341,11 @@ public class RoomJail1 extends StaticRoom {
 	public List<DungeonRoomExit> getExits(BlueprintLocation start) {
 		List<DungeonRoomExit> list = new ArrayList<>();
 		
-		list.add(new DungeonRoomExit(NostrumDungeon.asRotated(start,
+		list.add(new DungeonRoomExit(NostrumOverworldDungeon.asRotated(start,
 						new BlockPos(0, 0, 24),
 						Direction.NORTH), DungeonExitData.EMPTY));
 		
-		list.add(new DungeonRoomExit(NostrumDungeon.asRotated(start,
+		list.add(new DungeonRoomExit(NostrumOverworldDungeon.asRotated(start,
 				new BlockPos(14, 0, 21),
 				Direction.WEST), DungeonExitData.EMPTY));
 		
@@ -390,10 +390,10 @@ public class RoomJail1 extends StaticRoom {
 	@Override
 	public List<BlueprintLocation> getTreasureLocations(BlueprintLocation start) {
 		return Lists.newArrayList(
-				NostrumDungeon.asRotated(start,
+				NostrumOverworldDungeon.asRotated(start,
 						new BlockPos(5, 0, 12),
 						Direction.EAST),
-				NostrumDungeon.asRotated(start,
+				NostrumOverworldDungeon.asRotated(start,
 						new BlockPos(6, 4, 11),
 						Direction.SOUTH));
 	}

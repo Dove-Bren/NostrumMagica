@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.autodungeons.api.block.scan.IRoomPartition;
 import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -38,7 +39,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public abstract class MagicDoorBlock extends HorizontalDirectionalBlock {
+public abstract class MagicDoorBlock extends HorizontalDirectionalBlock implements IRoomPartition {
 	
 	protected static final BooleanProperty MASTER = BooleanProperty.create("master");
 	protected static final VoxelShape MIRROR_AABB_EW = Block.box(6.4D, 0.0D, 0D,09.6D, 16D, 16D);
@@ -273,6 +274,11 @@ public abstract class MagicDoorBlock extends HorizontalDirectionalBlock {
 	
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
 		return InteractionResult.PASS;
+	}
+
+	@Override
+	public Direction getFacing(BlockState state) {
+		return state.getValue(FACING);
 	}
 	
 	public void clearDoor(Level world, BlockPos onePos, BlockState state) {

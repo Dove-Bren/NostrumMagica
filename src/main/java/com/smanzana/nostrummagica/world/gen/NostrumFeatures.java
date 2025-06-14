@@ -126,7 +126,7 @@ public class NostrumFeatures {
 		event.getGeneration().addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, NostrumFeatures.PLACED_ORE_ESSORE);
 		event.getGeneration().addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, NostrumFeatures.PLACED_ORE_MANI);
 		
-		if (category != Biome.BiomeCategory.OCEAN && category != Biome.BiomeCategory.BEACH) {
+		if (category != Biome.BiomeCategory.OCEAN && category != Biome.BiomeCategory.BEACH && category != Biome.BiomeCategory.NONE) {
 			event.getGeneration().addFeature(GenerationStep.Decoration.SURFACE_STRUCTURES, NostrumFeatures.PLACED_SKYCAGE);
 		}
 		

@@ -13,7 +13,7 @@ import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomExit;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumOverworldDungeon;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -284,10 +284,10 @@ public class RoomEntryDragon extends StaticRoom {
 		List<BlueprintLocation> list = new LinkedList<>();
 		
 		BlockPos pos = new BlockPos(-1, 11, 1);
-		list.add(NostrumDungeon.asRotated(start, pos, Direction.SOUTH));
+		list.add(NostrumOverworldDungeon.asRotated(start, pos, Direction.SOUTH));
 		
 		pos = new BlockPos(1, 11, 1);
-		list.add(NostrumDungeon.asRotated(start, pos, Direction.SOUTH));
+		list.add(NostrumOverworldDungeon.asRotated(start, pos, Direction.SOUTH));
 		
 		return list;
 	}

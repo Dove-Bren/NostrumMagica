@@ -19,13 +19,13 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.Vec3;
 
-public class NostrumDungeon extends RandomPoolDungeon {
+public class NostrumOverworldDungeon extends RandomPoolDungeon {
 	
-	public NostrumDungeon(String tag, DungeonStartRoom starting, IDungeonRoomRef<?> ending, int minPath, int randPath) {
+	public NostrumOverworldDungeon(String tag, DungeonStartRoom starting, IDungeonRoomRef<?> ending, int minPath, int randPath) {
 		super(tag, starting, ending, minPath, randPath);
 	}
 	
-	public NostrumDungeon(String tag, DungeonStartRoom starting, IDungeonRoomRef<?> ending) {
+	public NostrumOverworldDungeon(String tag, DungeonStartRoom starting, IDungeonRoomRef<?> ending) {
 		this(tag, starting, ending, 2, 3);
 	}
 	

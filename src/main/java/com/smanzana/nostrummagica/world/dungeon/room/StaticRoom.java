@@ -14,7 +14,7 @@ import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoom;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumOverworldDungeon;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -405,8 +405,8 @@ public abstract class StaticRoom implements IDungeonRoom {
 	@Override
 	public BoundingBox getBounds(BlueprintLocation entry) {
 		// TODO stash and store these
-		BlueprintLocation corner1 = NostrumDungeon.asRotated(entry, new BlockPos(locMinX, locMinY, locMinZ), Direction.NORTH);
-		BlueprintLocation corner2 = NostrumDungeon.asRotated(entry, new BlockPos(locMaxX, locMaxY, locMaxZ), Direction.NORTH);
+		BlueprintLocation corner1 = NostrumOverworldDungeon.asRotated(entry, new BlockPos(locMinX, locMinY, locMinZ), Direction.NORTH);
+		BlueprintLocation corner2 = NostrumOverworldDungeon.asRotated(entry, new BlockPos(locMaxX, locMaxY, locMaxZ), Direction.NORTH);
 		
 		return BoundingBox.fromCorners(corner1.getPos(), corner2.getPos());
 	}

@@ -10,7 +10,7 @@ import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomExit;
 import com.smanzana.autodungeons.world.dungeon.room.IDungeonLobbyRoom;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumOverworldDungeon;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -143,10 +143,10 @@ public class DragonLobby extends StaticRoom implements IDungeonLobbyRoom {
 		BlockPos pos;
 		
 		pos = new BlockPos(-5, 0, 3);
-		list.add(new DungeonRoomExit(NostrumDungeon.asRotated(start, pos, Direction.EAST), DungeonExitData.EMPTY));
+		list.add(new DungeonRoomExit(NostrumOverworldDungeon.asRotated(start, pos, Direction.EAST), DungeonExitData.EMPTY));
 		
 		pos = new BlockPos(5, 0, 3);
-		list.add(new DungeonRoomExit(NostrumDungeon.asRotated(start, pos, Direction.WEST), DungeonExitData.EMPTY));
+		list.add(new DungeonRoomExit(NostrumOverworldDungeon.asRotated(start, pos, Direction.WEST), DungeonExitData.EMPTY));
 		
 		return list;
 	}
@@ -191,7 +191,7 @@ public class DragonLobby extends StaticRoom implements IDungeonLobbyRoom {
 		List<BlueprintLocation> list = new LinkedList<>();
 		
 		BlockPos pos = new BlockPos(3, 0, -4);
-		list.add(NostrumDungeon.asRotated(start, pos, Direction.SOUTH));
+		list.add(NostrumOverworldDungeon.asRotated(start, pos, Direction.SOUTH));
 		
 		return list;
 	}

@@ -10,7 +10,7 @@ import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomExit;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumOverworldDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
 import net.minecraft.core.BlockPos;
@@ -122,7 +122,7 @@ public class RoomEnd1 extends StaticRoom {
 
 	@Override
 	public BlueprintLocation getKeyLocation(BlueprintLocation start) {
-		return NostrumDungeon.asRotated(start,
+		return NostrumOverworldDungeon.asRotated(start,
 				new BlockPos(-3, 0, 1), Direction.SOUTH);
 	}
 	
@@ -135,11 +135,11 @@ public class RoomEnd1 extends StaticRoom {
 	public List<BlueprintLocation> getTreasureLocations(BlueprintLocation start) {
 		List<BlueprintLocation> list = new LinkedList<>();
 		
-		list.add(NostrumDungeon.asRotated(start,
+		list.add(NostrumOverworldDungeon.asRotated(start,
 				new BlockPos(-3, 0, 5), Direction.EAST));
 		
 		if (withChest)
-			list.add(NostrumDungeon.asRotated(start,
+			list.add(NostrumOverworldDungeon.asRotated(start,
 					new BlockPos(-3, 0, 1), Direction.SOUTH)
 				);
 		

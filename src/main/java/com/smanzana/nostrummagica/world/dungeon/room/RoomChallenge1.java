@@ -9,7 +9,7 @@ import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomExit;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
-import com.smanzana.nostrummagica.world.dungeon.NostrumDungeon;
+import com.smanzana.nostrummagica.world.dungeon.NostrumOverworldDungeon;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
 import net.minecraft.core.BlockPos;
@@ -413,7 +413,7 @@ public class RoomChallenge1 extends StaticRoom {
 	@Override
 	public List<BlueprintLocation> getTreasureLocations(BlueprintLocation start) {
 		return Lists.newArrayList(
-				NostrumDungeon.asRotated(start,
+				NostrumOverworldDungeon.asRotated(start,
 						new BlockPos(-4, 1, 21),
 						Direction.EAST));
 	}
