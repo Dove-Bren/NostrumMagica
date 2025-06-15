@@ -1,11 +1,9 @@
 package com.smanzana.nostrummagica.world.dimension;
 
-import java.util.UUID;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef.DungeonRoomRef;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
@@ -15,7 +13,6 @@ import net.minecraft.client.renderer.FogRenderer.FogMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -47,52 +44,10 @@ public class NostrumSorceryDimension {
 	
 	public static final int SPAWN_Y = 128;
 	
-	private static final ResourceLocation DIMENSION_ENTRY_TEMPLATE = NostrumMagica.Loc("sorcery_lobby");
-	private static final ResourceLocation DIMENSION_WHOLE_TEMPLATE = NostrumMagica.Loc("sorcery_dungeon");
-	
 	public static final void RegisterListener() {
 		DistExecutor.unsafeRunForDist(() -> DimensionClientListener::new, () -> DimensionListener::new);
 	}
 	
-	private static final class DungeonSpawner {
-		private static DungeonRoomRef lobbyBlueprint = null;
-		private static DungeonRoomRef wholeBlueprint = null;
-		
-		private static void initBlueprints() {
-			lobbyBlueprint = new DungeonRoomRef(DIMENSION_ENTRY_TEMPLATE);
-			wholeBlueprint = new DungeonRoomRef(DIMENSION_WHOLE_TEMPLATE);
-			
-			if (!lobbyBlueprint.isValid()) {
-				NostrumMagica.logger.fatal("Failed to load sorcery lobby from name " + DIMENSION_ENTRY_TEMPLATE);
-			}
-			
-			if (!wholeBlueprint.isValid()) {
-				NostrumMagica.logger.fatal("Failed to load sorcery dungeon from name " + DIMENSION_WHOLE_TEMPLATE);
-			}
-		}
-		
-		protected static final void SpawnDungeon(ServerLevel world, BlockPos center, UUID dungeonID) {
-			if (lobbyBlueprint == null) {
-				initBlueprints();
-			}
-			
-			int unused;
-//			long startTime = System.currentTimeMillis();
-//			lobbyBlueprint.spawn(world, new BlueprintLocation(center, Direction.NORTH), null, dungeonID);
-//			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate sorcery lobby");
-//			
-//			startTime = System.currentTimeMillis();
-//			wholeBlueprint.spawn(world, new BlueprintLocation(center, Direction.NORTH), null, dungeonID);
-//			NostrumMagica.logger.info("Took " + ((double) (System.currentTimeMillis() - startTime) / 1000.0) + " seconds to generate whole dungeon");
-		}
-		
-		protected static final boolean DungeonPresent(ServerLevel world, BlockPos center) {
-			int unused;
-			return true;// !world.isEmptyBlock(center.above());
-		}
-		
-	}
-		
 	public static class DimensionEntryTeleporter implements ITeleporter {
 		
 		public static final DimensionEntryTeleporter INSTANCE = new DimensionEntryTeleporter();
@@ -113,7 +68,7 @@ public class NostrumSorceryDimension {
 			// I wish we got passed the PortalInfo that's gonna be used to move us in repositionEntity so I didn't
 			// have to recompute this and rely on it being the same!
 			final BlockPos center = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
-			final BlockPos spawn = center.north();
+			final BlockPos spawn = center.east();
 			
 			// Capture current spawn point and then set new one in the sorcery dimension
 			if (NostrumMagica.getMagicWrapper(player) != null) {
@@ -129,7 +84,7 @@ public class NostrumSorceryDimension {
 				}
 				// else clear?
 			}
-			player.setRespawnPosition(NostrumDimensions.GetSorceryDimension(), spawn.above(2), Direction.NORTH.toYRot(), true, false);
+			player.setRespawnPosition(NostrumDimensions.GetSorceryDimension(), spawn.above(2), Direction.EAST.toYRot(), true, false);
 			
 			if (!player.isCreative() && !player.isSpectator()) {
 				player.setGameMode(GameType.ADVENTURE);
@@ -147,15 +102,10 @@ public class NostrumSorceryDimension {
 			
 			final ServerPlayer player = (ServerPlayer) entity;
 			final BlockPos center = NostrumMagica.getOrCreatePlayerDimensionSpawn(player);
-			final UUID dungeonID = player.getUUID(); // Use entity UUID as dungeon ID?
 			
-			if (!DungeonSpawner.DungeonPresent(destWorld, center)) {
-				DungeonSpawner.SpawnDungeon(destWorld, center, dungeonID);
-			}
-			
-			final BlockPos spawn = center.north(); // Idr why this is like it is
+			final BlockPos spawn = center.east(); // Idr why this is like it is
 			Vec3 pos = new Vec3(spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5);
-			float yaw = Direction.NORTH.toYRot();
+			float yaw = Direction.EAST.toYRot();
 			float pitch = 0;
 			return new PortalInfo(pos, Vec3.ZERO, yaw, pitch);
 		}
@@ -185,11 +135,11 @@ public class NostrumSorceryDimension {
 				NostrumMagica.logger.warn("Unable to find player spawning location. Sending to overworld.");
 				player.changeDimension(player.server.getLevel(Level.OVERWORLD));
 			} else {
-				spawn = spawn.north();
+				spawn = spawn.east();
 				
 				player.teleportTo(player.server.getLevel(NostrumDimensions.GetSorceryDimension()),
 						spawn.getX() + .5, spawn.getY() + 2, spawn.getZ() + .5,
-						Direction.NORTH.toYRot(),
+						Direction.EAST.toYRot(),
 						0
 						);
 				player.fallDistance = 0;
