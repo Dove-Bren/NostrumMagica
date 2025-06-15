@@ -8,12 +8,14 @@ import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.DragonStruc
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.ManiCastleStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.PlantBossStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.PortalStructure;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.SorceryIslandStructure;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -37,10 +39,12 @@ public class NostrumStructures {
 	private static final String DUNGEONGEN_DRAGON_ID = "nostrum_dungeons_dragon";
 	private static final String DUNGEONGEN_PLANTBOSS_ID = "nostrum_dungeons_plantboss";
 	private static final String DUNGEONGEN_MANI_CASTLE_ID = "struct_mani_castle";
+	private static final String DUNGEONGEN_SORCERY_ISLAND_ID = "struct_sorcery_island";
 	private static final String DUNGEONGEN_PORTAL_CONF_ID = "configured_" + DUNGEONGEN_PORTAL_ID;
 	private static final String DUNGEONGEN_DRAGON_CONF_ID = "configured_" + DUNGEONGEN_DRAGON_ID;
 	private static final String DUNGEONGEN_PLANTBOSS_CONF_ID = "configured_" + DUNGEONGEN_PLANTBOSS_ID;
 	private static final String DUNGEONGEN_MANI_CASTLE_CONF_ID = "configured_" + DUNGEONGEN_MANI_CASTLE_ID;
+	private static final String DUNGEONGEN_SORCERY_ISLAND_CONF_ID = "configured_" + DUNGEONGEN_SORCERY_ISLAND_ID;
 	
 	@ObjectHolder(DUNGEONGEN_PORTAL_ID) public static PortalStructure DUNGEON_PORTAL;
 	protected static ConfiguredStructureFeature<?, ?> CONFIGURED_DUNGEON_PORTAL;
@@ -57,6 +61,10 @@ public class NostrumStructures {
 	@ObjectHolder(DUNGEONGEN_MANI_CASTLE_ID) public static ManiCastleStructure DUNGEON_MANI_CASTLE;
 	public static ConfiguredStructureFeature<?, ?> CONFIGUREDDUNGEON_MANI_CASTLE;
 	public static Holder<ConfiguredStructureFeature<?, ?>> REF_DUNGEON_MANI_CASTLE;
+	
+	@ObjectHolder(DUNGEONGEN_SORCERY_ISLAND_ID) public static SorceryIslandStructure DUNGEON_SORCERY_ISLAND;
+	public static ConfiguredStructureFeature<?, ?> CONFIGUREDDUNGEON_SORCERY_ISLAND;
+	public static Holder<ConfiguredStructureFeature<?, ?>> REF_DUNGEON_SORCERY_ISLAND;
 	
 	public static StructurePlacementType<GridStructureSetPlacement> PLACEMENT_FIXED_GRID;
 
@@ -92,11 +100,17 @@ public class NostrumStructures {
 		CONFIGUREDDUNGEON_PLANTBOSS = configured;
 		REF_DUNGEON_PLANTBOSS = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_ID), NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_CONF_ID));
 		
+		final TagKey<Biome> fakeSorceryBiomeKey = TagKey.create(Registry.BIOME_REGISTRY, NostrumMagica.Loc("sorcery_dimension"));
+		
 		structure = new ManiCastleStructure();
-		configured = structure.configured(FeatureConfiguration.NONE, TagKey.create(Registry.BIOME_REGISTRY, NostrumMagica.Loc("sorcery_dimension")));
-		// Avg dist: sqrt(32^2 + 32^2) = 724 blocks
+		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
 		CONFIGUREDDUNGEON_MANI_CASTLE = configured;
 		REF_DUNGEON_MANI_CASTLE = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_MANI_CASTLE_ID), NostrumMagica.Loc(DUNGEONGEN_MANI_CASTLE_CONF_ID));
+		
+		structure = new SorceryIslandStructure();
+		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
+		CONFIGUREDDUNGEON_SORCERY_ISLAND = configured;
+		REF_DUNGEON_SORCERY_ISLAND = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_SORCERY_ISLAND_ID), NostrumMagica.Loc(DUNGEONGEN_SORCERY_ISLAND_CONF_ID));
 		
 		
 		// Register structure sets, which include rules of how to place them and distances between things in the same set.

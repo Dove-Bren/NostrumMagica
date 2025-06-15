@@ -52,4 +52,12 @@ public abstract class NostrumDungeonStructures {
 		}
 		
 	}
+	
+	public static class SorceryIslandStructure extends DungeonStructure {
+
+		public SorceryIslandStructure() {
+			super(NostrumDungeons.SORCERY_ISLAND_DUNGEON);
+		}
+		
+	}
 }

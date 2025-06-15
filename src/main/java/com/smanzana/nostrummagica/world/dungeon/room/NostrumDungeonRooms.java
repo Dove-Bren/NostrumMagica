@@ -43,6 +43,7 @@ public class NostrumDungeonRooms {
 	private static final ResourceLocation PORTAL_ENTRANCE_NAME = NostrumMagica.Loc("portal_entrance");
 	private static final ResourceLocation PORTAL_END_NAME = NostrumMagica.Loc("portal_room");
 	private static final ResourceLocation MANI_CASTLE_START_NAME = NostrumMagica.Loc("mani_castle/mani_castle_start");
+	private static final ResourceLocation SORCERY_ISLAND_NAME = NostrumMagica.Loc("sorcery_island");
 	
 	public static final DungeonLobbyRoomRef PLANTBOSS_LOBBY = new DungeonLobbyRoomRef(PLANTBOSS_LOBBY_NAME);
 	public static final DungeonRoomRef PLANTBOSS_ENTRANCE = new DungeonRoomRef(PLANTBOSS_ENTRANCE_NAME);
@@ -51,6 +52,7 @@ public class NostrumDungeonRooms {
 	public static final DungeonRoomRef PORTAL_ENTRANCE = new DungeonRoomRef(PORTAL_ENTRANCE_NAME);
 	public static final DungeonRoomRef PORTAL_ENDROOM = new DungeonRoomRef(PORTAL_END_NAME);
 	public static final DungeonRoomRef RefManiCastleStart = new DungeonRoomRef(MANI_CASTLE_START_NAME);
+	public static final DungeonRoomRef RefSorceryIsland = new DungeonRoomRef(SORCERY_ISLAND_NAME);
 
 	@SubscribeEvent
 	public static final void onRoomRegistration(DungeonRoomRegisterEvent event) {

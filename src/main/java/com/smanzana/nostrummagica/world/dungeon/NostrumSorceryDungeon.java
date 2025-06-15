@@ -8,6 +8,8 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.world.dimension.NostrumSorceryDimension;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
@@ -39,5 +41,18 @@ public class NostrumSorceryDungeon extends StaticDungeon {
 	public HeightProvider getSpawnHeight(WorldGenerationContext genContext) {
 		// Pick random Y between 45 and 75 from bottom of world by default
 		return ConstantHeight.of(VerticalAnchor.absolute(NostrumSorceryDimension.SPAWN_Y));
+	}
+	
+	@Override
+	public BlockPos getSpawnChunkPos(WorldGenerationContext genContext) {
+		return BlockPos.ZERO; // right at spot
+	}
+	
+	@Override
+	public Direction getSpawnRotation(WorldGenerationContext genContext, Random rand) {
+		// Hardcode north, so all are facing the same direction and offsets are right.
+		// Whats most important is that all dungeons that are part of the sorcery dimension dungeon set are the same direction.
+		// Capture code puts things as north by default, so north will mean no rotation.
+		return Direction.NORTH;
 	}
 }

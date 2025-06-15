@@ -114,6 +114,9 @@ public class NostrumRenderTypes extends RenderType {
 		
 
 	public static void InitRenderStates() {
+		
+		final ShaderStateShard POS_COLOR_TEX_LIGHTMAP_FOG_SHADER = RENDERTYPE_TEXT_SHADER;
+		
 	    // Define render types
 		RenderType.CompositeState glState;
 		
@@ -195,30 +198,30 @@ public class NostrumRenderTypes extends RenderType {
 		glState = RenderType.CompositeState.builder()
 				.setTextureState(new RenderStateShard.TextureStateShard(SwitchTriggerModel.TEXT, false, true))
 				.setTransparencyState(NO_TRANSPARENCY)
-				.setLightmapState(NO_LIGHTING)
+				.setLightmapState(LIGHTMAP_ENABLED)
 				//.setLayeringState(VIEW_OFFSET_Z_LAYERING)
 				//.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
-				.setShaderState(POSITION_COLOR_TEX_SHADER)
+				.setShaderState(POS_COLOR_TEX_LIGHTMAP_FOG_SHADER)
 			.createCompositeState(true);
-		SWITCH_TRIGGER_BASE = RenderType.create(Name("switch_trigger_base"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 64, false, false, glState);
+		SWITCH_TRIGGER_BASE = RenderType.create(Name("switch_trigger_base"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.QUADS, 64, false, false, glState);
 		
 		glState = RenderType.CompositeState.builder()
 				.setTextureState(new RenderStateShard.TextureStateShard(SwitchTriggerModel.CAGE_TEXT, false, true))
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-				.setLightmapState(NO_LIGHTING)
+				.setLightmapState(LIGHTMAP_ENABLED)
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
 				//.depthTest(DEPTH_EQUAL)
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
-				.setShaderState(POSITION_COLOR_TEX_SHADER)
+				.setShaderState(POS_COLOR_TEX_LIGHTMAP_FOG_SHADER)
 			.createCompositeState(false);
-		SWITCH_TRIGGER_CAGE = RenderType.create(Name("switch_trigger_cage"), DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 64, false, false, glState);
+		SWITCH_TRIGGER_CAGE = RenderType.create(Name("switch_trigger_cage"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.QUADS, 64, false, false, glState);
 		
 		glState = RenderType.CompositeState.builder()
 				.setTextureState(new RenderStateShard.TextureStateShard(PortalBlockEntityRenderer.TEX_LOC, false, true))
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-				.setLightmapState(NO_LIGHTING)
+				.setLightmapState(LIGHTMAP_ENABLED)
 				.setCullState(NO_CULL)
-				.setShaderState(POSITION_COLOR_TEX_LIGHTMAP_SHADER)
+				.setShaderState(POS_COLOR_TEX_LIGHTMAP_FOG_SHADER)
 			.createCompositeState(false);
 		NOSTRUM_PORTAL = RenderType.create(Name("nostrum_portal"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.TRIANGLES, 64, false, false, glState);
 		
@@ -228,7 +231,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setLightmapState(LIGHTMAP_ENABLED)
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
 				.setWriteMaskState(WRITE_TO_DEPTH_AND_COLOR)
-				.setShaderState(POSITION_COLOR_TEX_LIGHTMAP_SHADER)
+				.setShaderState(POS_COLOR_TEX_LIGHTMAP_FOG_SHADER)
 			.createCompositeState(false);
 		PROGRESSION_DOOR_LOCK = RenderType.create(Name("prog_door_lock"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.TRIANGLES, 64, false, false, glState);
 		
@@ -238,7 +241,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setTransparencyState(TRANSLUCENT_TRANSPARENCY)
 				.setLightmapState(LIGHTMAP_ENABLED)
 				.setCullState(NO_CULL)
-				.setShaderState(POSITION_COLOR_TEX_LIGHTMAP_SHADER)
+				.setShaderState(POS_COLOR_TEX_LIGHTMAP_FOG_SHADER)
 			.createCompositeState(false);
 		LOCKEDCHEST_LOCK = RenderType.create(Name("lockedchest_lock"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.QUADS, 32, false, false, glState);
 		
@@ -248,7 +251,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setLightmapState(LIGHTMAP_ENABLED)
 				.setCullState(NO_CULL)
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
-				.setShaderState(POSITION_COLOR_TEX_LIGHTMAP_SHADER)
+				.setShaderState(POS_COLOR_TEX_LIGHTMAP_FOG_SHADER)
 			.createCompositeState(false);
 		LOCKEDCHEST_CHAIN = RenderType.create(Name("lockedchest_chain"), DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.QUADS, 64, false, false, glState);
 		

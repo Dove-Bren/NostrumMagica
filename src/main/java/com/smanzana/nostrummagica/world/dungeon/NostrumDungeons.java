@@ -56,6 +56,9 @@ public class NostrumDungeons {
 			.setDisplayTitle(new TranslatableComponent("dungeon.portal.name").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD))
 			;
 	
+	protected static final ResourceLocation ID_SORCERY_ISLAND_DUNGEON = NostrumMagica.Loc("sorcery_island"); 
+	public static Dungeon SORCERY_ISLAND_DUNGEON = new NostrumSorceryDungeon(NostrumDungeonRooms.RefSorceryIsland).setDisplayTitle(new TranslatableComponent("dungeon.sorcery_island.name").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD));
+	
 	protected static final ResourceLocation ID_MANI_CASTLE_DUNGEON = NostrumMagica.Loc("mani_castle"); 
 	public static Dungeon MANI_CASTLE_DUNGEON = new NostrumSorceryDungeon(NostrumDungeonRooms.RefManiCastleStart).setDisplayTitle(new TranslatableComponent("dungeon.mani_castle.name").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
 
@@ -67,6 +70,7 @@ public class NostrumDungeons {
 		registry.register(PORTAL_DUNGEON.setRegistryName(ID_PORTAL_DUNGEON));
 		registry.register(PLANTBOSS_DUNGEON.setRegistryName(ID_PLANTBOSS_DUNGEON));
 		registry.register(MANI_CASTLE_DUNGEON.setRegistryName(ID_MANI_CASTLE_DUNGEON));
+		registry.register(SORCERY_ISLAND_DUNGEON.setRegistryName(ID_SORCERY_ISLAND_DUNGEON));
 		
 	}
 }

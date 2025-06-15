@@ -4,8 +4,8 @@
 		"type": "nostrummagica:emptychunks",
 		"biome": "nostrummagica:sorcery_biome",
 		"structure_overrides": [
-			"nostrummagica:sorcery_dungeon"
-		],
-		"fakefield": "abc"
+			"nostrummagica:sorcerydim_sorcery_island",
+			"nostrummagica:sorcerydim_mani_castle"
+		]
 	}
 }

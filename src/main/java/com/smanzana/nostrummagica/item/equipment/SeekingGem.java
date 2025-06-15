@@ -57,7 +57,7 @@ public class SeekingGem extends Item implements ILoreTagged {
 		WorldUtil.ScanBlocks(world, min, max, (worldIn, pos) -> {
 			BlockState state = world.getBlockState(pos);
 			if (chestFilter.test(world, pos, state)) {
-				matches.add(pos);
+				matches.add(pos.immutable());
 			}
 			return true;
 		});
@@ -67,7 +67,7 @@ public class SeekingGem extends Item implements ILoreTagged {
 		for (BlockPos candidate : matches) {
 			final int dist = center.distManhattan(candidate);
 			if (dist < minLength) {
-				closest = center;
+				closest = candidate;
 				minLength = dist;
 			}
 		}
@@ -110,6 +110,10 @@ public class SeekingGem extends Item implements ILoreTagged {
 				@Nullable BlockPos nearest = attemptDungeonSeek(player, world, stack, dungeon);
 				if (nearest != null) {
 					NostrumMagicaSounds.AMBIENT_WOOSH3.playClient(world, nearest.getX() + .5, nearest.getY() + .5, nearest.getZ() + .5);
+					
+//					NostrumParticles.GLOW_TRAIL.spawn(world, new SpawnParams(1, player.getX() + .5, player.getY() + .5, player.getZ() + .5,
+//							0, 300, 0, new TargetLocation(Vec3.atCenterOf(nearest))
+//							).setTargetBehavior(new ParticleTargetBehavior().joinMode(true)).color(1f, .8f, 1f, .3f));
 				} else {
 					NostrumMagicaSounds.CAST_FAIL.playClient(player);
 				}
