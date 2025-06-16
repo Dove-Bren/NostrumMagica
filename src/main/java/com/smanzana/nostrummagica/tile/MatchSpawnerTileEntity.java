@@ -87,19 +87,17 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 		level.setBlock(worldPosition, this.getBlockState().setValue(MatchSpawnerBlock.TRIGGERED, true), 3);
 	}
 	
-	protected void spawnMatch(BlockState state) {
-		entity = this.spawn(worldPosition, NostrumMagica.rand);
+	protected void spawnMatch(BlockState state, Player player) {
+		entity = this.spawn(worldPosition, NostrumMagica.rand, player);
 		//world.notifyBlockUpdate(pos, state, state, 2);
 		//world.addBlockEvent(pos, state.getBlock(), 9, 0);
 		updateBlockState();
 		this.setChanged();
 	}
 	
-	protected boolean shouldSpawnMatch(BlockState state) {
-		for (Player player : ((ServerLevel) level).players()) {
-			if (!player.isSpectator() && !player.isCreative() && player.distanceToSqr(worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5) < SPAWN_DIST_SQ) {
-				return true;
-			}
+	protected boolean shouldSpawnMatch(BlockState state, Player player) {
+		if (!player.isSpectator() && !player.isCreative() && player.distanceToSqr(worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5) < SPAWN_DIST_SQ) {
+			return true;
 		}
 		
 		return false;
@@ -128,9 +126,10 @@ public class MatchSpawnerTileEntity extends SingleSpawnerTileEntity implements I
 				level.removeBlock(worldPosition, false);
 			}
 		} else if (entity == null) {
-			if (shouldSpawnMatch(state)) {
-				spawnMatch(state);
-				return;
+			for (Player player : ((ServerLevel) level).players()) {
+				if (shouldSpawnMatch(state, player)) {
+					spawnMatch(state, player);
+				}
 			}
 		} else {
 			if (!entity.isAlive()) {

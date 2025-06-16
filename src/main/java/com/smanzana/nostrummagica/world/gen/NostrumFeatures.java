@@ -119,6 +119,10 @@ public class NostrumFeatures {
 			return;
 		}
 		
+		if (category == Biome.BiomeCategory.NONE) { // void, sorcery edimension
+			return;
+		}
+		
 		// Filter this list maybe?
 		event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, NostrumFeatures.PLACED_FLOWER_CRYSTABLOOM);
 		event.getGeneration().addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, NostrumFeatures.PLACED_FLOWER_MIDNIGHTIRIS);
@@ -126,7 +130,7 @@ public class NostrumFeatures {
 		event.getGeneration().addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, NostrumFeatures.PLACED_ORE_ESSORE);
 		event.getGeneration().addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, NostrumFeatures.PLACED_ORE_MANI);
 		
-		if (category != Biome.BiomeCategory.OCEAN && category != Biome.BiomeCategory.BEACH && category != Biome.BiomeCategory.NONE) {
+		if (category != Biome.BiomeCategory.OCEAN && category != Biome.BiomeCategory.BEACH) {
 			event.getGeneration().addFeature(GenerationStep.Decoration.SURFACE_STRUCTURES, NostrumFeatures.PLACED_SKYCAGE);
 		}
 		

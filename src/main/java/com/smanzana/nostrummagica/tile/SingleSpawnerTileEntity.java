@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.tile;
 import java.util.Optional;
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
@@ -20,6 +22,8 @@ import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -27,6 +31,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class SingleSpawnerTileEntity extends BlockEntity implements TickableBlockEntity {
 	
@@ -105,7 +110,7 @@ public class SingleSpawnerTileEntity extends BlockEntity implements TickableBloc
 		{
 			for (Player player : level.players()) {
 				if (!player.isSpectator() && !player.isCreative() && player.distanceToSqr(worldPosition.getX() + .5, worldPosition.getY(), worldPosition.getZ() + .5) < SPAWN_DIST_SQ) {
-					this.spawn(worldPosition, NostrumMagica.rand);
+					this.spawn(worldPosition, NostrumMagica.rand, player);
 					level.removeBlock(worldPosition, false);
 					return;
 				}
@@ -115,11 +120,17 @@ public class SingleSpawnerTileEntity extends BlockEntity implements TickableBloc
 		//NostrumBlocks.singleSpawner.tick(state, (ServerLevel) level, worldPosition, NostrumMagica.rand);
 	}
 	
-	protected Mob spawn(BlockPos pos, Random rand) {
+	protected Mob spawn(BlockPos pos, Random rand, @Nullable Entity facingEntity) {
 		Mob entity = createEntity(getLevel(), this.getBlockState());
 		
 		entity.setPersistenceRequired();
 		entity.setPos(pos.getX() + 0.5, pos.getY(), pos.getZ() + .5);
+		if (facingEntity != null) {
+			Vec3 diff = new Vec3(pos.getX() + 0.5, pos.getY(), pos.getZ() + .5).subtract(facingEntity.position()).normalize();
+			entity.setYRot(Mth.wrapDegrees((float)(Mth.atan2(diff.z, diff.x) * (double)(180F / (float)Math.PI)) + 90.0F));
+			entity.setYHeadRot(entity.getYRot());
+			entity.setOldPosAndRot();
+		}
 		
 		level.addFreshEntity(entity);
 		return entity;

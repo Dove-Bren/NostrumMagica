@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.tile;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
@@ -24,7 +25,7 @@ public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
 	}
 	
 	@Override
-	protected boolean shouldSpawnMatch(BlockState state) {
+	protected boolean shouldSpawnMatch(BlockState state, Player player) {
 		return false; // We spawn when it's time
 	}
 	
@@ -44,7 +45,7 @@ public class TriggeredMatchSpawnerTileEntity extends MatchSpawnerTileEntity {
 	
 	public void triggerSpawn() {
 		if (!this.isTriggered()) {
-			this.spawnMatch(getBlockState());
+			this.spawnMatch(getBlockState(), null);
 			this.setTriggered(true);
 		}
 	}
