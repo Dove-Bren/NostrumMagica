@@ -338,6 +338,7 @@ public class PushBlockTileEntity extends BlockEntity {
 			this.oldDirection = null;
 			this.setElement(null);
 			this.dirty();
+			return true;
 		}
 		
 		return false;

@@ -451,7 +451,9 @@ public final class SpellEffects {
 						if (target.processSpellEffect(pos.world, state, pos.selectedBlockPos, caster, pos, part, action)) {
 							// Block consumed this effect
 							anySuccess = true;
+							log.effect(pos);
 							totalAffectedLocations.add(pos);
+							log.endEffect();
 							continue;
 						}
 					}
