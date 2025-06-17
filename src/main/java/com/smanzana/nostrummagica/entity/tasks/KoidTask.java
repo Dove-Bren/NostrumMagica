@@ -113,12 +113,12 @@ public class KoidTask extends Goal {
 					NostrumSpellShapes.AI,
 					EMagicElement.PHYSICAL,
 					1,
-					null);
+					EAlteration.HARM);
 			putSpell(meleeSpells, "Bone Crusher",
 					NostrumSpellShapes.AI,
 					EMagicElement.PHYSICAL,
 					2,
-					null);
+					EAlteration.HARM);
 			
 			// Lightning
 			putSpell(buffSpells, "Magic Shell",
@@ -129,7 +129,7 @@ public class KoidTask extends Goal {
 					NostrumSpellShapes.AI,
 					EMagicElement.LIGHTNING,
 					1,
-					EAlteration.CONJURE);
+					null);
 			putSpell(rangedSpells, "Shock",
 					NostrumSpellShapes.AI,
 					EMagicElement.LIGHTNING,
@@ -140,17 +140,17 @@ public class KoidTask extends Goal {
 					NostrumSpellShapes.Chain,
 					EMagicElement.LIGHTNING,
 					1,
-					null);
+					EAlteration.HARM);
 			putSpell(rangedSpells, "Lightning Ball II",
 					NostrumSpellShapes.Projectile,
 					EMagicElement.LIGHTNING,
 					2,
-					null);
+					EAlteration.HARM);
 			putSpell(meleeSpells, "Shocking Touch",
 					NostrumSpellShapes.AI,
 					EMagicElement.LIGHTNING,
 					2,
-					null);
+					EAlteration.HARM);
 			
 			// Fire
 			putSpell(rangedSpells, "Burn",
@@ -168,7 +168,7 @@ public class KoidTask extends Goal {
 					NostrumSpellShapes.Projectile,
 					EMagicElement.FIRE,
 					3,
-					null);
+					EAlteration.HARM);
 
 			// Ice
 			putSpell(buffSpells, "Magic Aegis",
@@ -179,7 +179,7 @@ public class KoidTask extends Goal {
 					NostrumSpellShapes.Projectile,
 					EMagicElement.ICE,
 					1,
-					null);
+					EAlteration.HARM);
 			spell = Spell.CreateAISpell("Group Frostbite");
 			spell.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
 			spell.addPart(new SpellShapePart(NostrumSpellShapes.Burst, NostrumSpellShapes.Burst.makeProps(5f)));
@@ -192,7 +192,7 @@ public class KoidTask extends Goal {
 					NostrumSpellShapes.Burst,
 					EMagicElement.ICE,
 					2,
-					null);
+					EAlteration.HARM);
 			
 			// Earth
 			putSpell(buffSpells, "Earth Aegis",
@@ -212,12 +212,12 @@ public class KoidTask extends Goal {
 					NostrumSpellShapes.Projectile,
 					EMagicElement.EARTH,
 					1,
-					null);
+					EAlteration.HARM);
 			putSpell(meleeSpells, "Earth Bash",
 					NostrumSpellShapes.AI,
 					EMagicElement.EARTH,
 					2,
-					null);
+					EAlteration.HARM);
 			
 			// Wind
 			putSpell(buffSpells, "Gust",
@@ -237,17 +237,17 @@ public class KoidTask extends Goal {
 					NostrumSpellShapes.AI,
 					EMagicElement.WIND,
 					1,
-					null);
+					EAlteration.HARM);
 			putSpell(rangedSpells, "Wind Ball I",
 					NostrumSpellShapes.Projectile,
 					EMagicElement.WIND,
 					2,
-					null);
+					EAlteration.HARM);
 			putSpell(rangedSpells, "Wind Ball II",
 					NostrumSpellShapes.Projectile,
 					EMagicElement.WIND,
 					3,
-					null);
+					EAlteration.HARM);
 			
 			// Ender
 			putSpell(buffSpells, "Invisibility",
@@ -268,11 +268,11 @@ public class KoidTask extends Goal {
 					NostrumSpellShapes.AI,
 					EMagicElement.ENDER,
 					1,
-					EAlteration.CONJURE);
+					null);
 			putSpell(rangedSpells, "Random Teleport Self",
 					EMagicElement.ENDER,
 					2,
-					EAlteration.CONJURE);
+					null);
 		}
 	}
 	

@@ -34,7 +34,7 @@ public class MagicLightningGolemEntity extends MagicGolemEntity {
 			spellRanged1.addPart(new SpellEffectPart(
 					EMagicElement.LIGHTNING,
 					1,
-					EAlteration.CONJURE));
+					null));
 			
 			spellRanged2 = Spell.CreateAISpell("Spark");
 			spellRanged2.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
@@ -42,7 +42,7 @@ public class MagicLightningGolemEntity extends MagicGolemEntity {
 			spellRanged2.addPart(new SpellEffectPart(
 					EMagicElement.LIGHTNING,
 					1,
-					null));
+					EAlteration.HARM));
 			
 			spellBuff = Spell.CreateAISpell("Magic Ward");
 			spellBuff.addPart(new SpellShapePart(NostrumSpellShapes.AI));

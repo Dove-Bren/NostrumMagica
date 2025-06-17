@@ -314,7 +314,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 							&& target.getEffect(MobEffects.REGENERATION) == null;
 				}),
 		MAGIC_SHIELD("magicshield", WolfSpellTargetGroup.SELF, 30,
-				(Spell.CreateAISpell("WolfMagicShield")).addPart(new SpellShapePart(NostrumSpellShapes.Chain, NostrumSpellShapes.Chain.makeProps(8, true))).addPart(new SpellEffectPart(EMagicElement.ICE, 1, EAlteration.SUPPORT)),
+				(Spell.CreateAISpell("WolfMagicShield")).addPart(new SpellShapePart(NostrumSpellShapes.Chain, NostrumSpellShapes.Chain.makeProps(8, true))).addPart(new SpellEffectPart(EMagicElement.ICE, 1, EAlteration.RESIST)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.ICE, 1),
 				(wolf, target) -> {
 					return wolf.getTarget() != null; // Don't want to cast out of battle
@@ -351,7 +351,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 							;
 				}),
 		ENDER_SHROUD("endershroud", WolfSpellTargetGroup.ENEMY, 20,
-				(Spell.CreateAISpell("WolfEnderShroud")).addPart(new SpellShapePart(NostrumSpellShapes.SeekingBullet)).addPart(new SpellShapePart(NostrumSpellShapes.Burst, NostrumSpellShapes.Burst.makeProps(3))).addPart(new SpellEffectPart(EMagicElement.ENDER, 2, null)).addPart(new SpellEffectPart(EMagicElement.ENDER, 1, EAlteration.INFLICT)),
+				(Spell.CreateAISpell("WolfEnderShroud")).addPart(new SpellShapePart(NostrumSpellShapes.SeekingBullet)).addPart(new SpellShapePart(NostrumSpellShapes.Burst, NostrumSpellShapes.Burst.makeProps(3))).addPart(new SpellEffectPart(EMagicElement.ENDER, 2, EAlteration.HARM)).addPart(new SpellEffectPart(EMagicElement.ENDER, 1, EAlteration.INFLICT)),
 				(wolf) -> wolf.hasElementLevel(EMagicElement.ENDER, 1),
 				(wolf, target) -> true),
 		ENDER_FANGS("enderfang", WolfSpellTargetGroup.SELF, 75,

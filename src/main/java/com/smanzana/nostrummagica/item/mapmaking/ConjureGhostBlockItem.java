@@ -1,6 +1,6 @@
 package com.smanzana.nostrummagica.item.mapmaking;
 
-import com.smanzana.nostrummagica.block.dungeon.ConjureGhostBlock;
+import com.smanzana.nostrummagica.block.dungeon.SummonGhostBlock;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -38,7 +38,7 @@ public class ConjureGhostBlockItem extends BlockItem {
 		}
 		
 		if (!worldIn.isClientSide()) {
-			if (!ConjureGhostBlock.WrapBlock(worldIn, pos)) {
+			if (!SummonGhostBlock.WrapBlock(worldIn, pos)) {
 				playerIn.sendMessage(new TextComponent("Failed to wrap block"), Util.NIL_UUID);
 			} else {
 				playerIn.sendMessage(new TextComponent("Wrapped block"), Util.NIL_UUID); 

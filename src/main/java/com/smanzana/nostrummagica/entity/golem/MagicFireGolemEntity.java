@@ -32,7 +32,7 @@ public class MagicFireGolemEntity extends MagicGolemEntity {
 			spellRanged1.addPart(new SpellEffectPart(
 					EMagicElement.FIRE,
 					1,
-					null));
+					EAlteration.HARM));
 			
 			spellRanged2 = Spell.CreateAISpell("Blaze");
 			spellRanged2.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
@@ -40,7 +40,7 @@ public class MagicFireGolemEntity extends MagicGolemEntity {
 			spellRanged2.addPart(new SpellEffectPart(
 					EMagicElement.FIRE,
 					1,
-					EAlteration.CONJURE));
+					null));
 			
 			spellRanged3 = Spell.CreateAISpell("Melt Armor");
 			spellRanged3.addPart(new SpellShapePart(NostrumSpellShapes.Projectile, NostrumSpellShapes.Projectile.makeProps(false)));

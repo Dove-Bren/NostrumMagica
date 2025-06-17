@@ -13,7 +13,7 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
-import com.smanzana.nostrummagica.tile.ConjureGhostBlockEntity;
+import com.smanzana.nostrummagica.tile.SummonGhostBlockEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -46,13 +46,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * Block that is a different block, but that needs a spell effect to make it actually conjure the other block.
  * For example, a ghost ladder block that can't be used until activated.
  */
-public class ConjureGhostBlock extends BaseEntityBlock implements ISpellTargetBlock {
+public class SummonGhostBlock extends BaseEntityBlock implements ISpellTargetBlock {
 
 	public static final String ID = "mechblock_ghost";
 	
 	public static final MagicElementProperty ELEMENT = MagicElementProperty.create("element");
 	
-	public ConjureGhostBlock() {
+	public SummonGhostBlock() {
 		super(Block.Properties.of(Material.GLASS)
 			.strength(-1.0F, 3600000.8F)
 			.sound(SoundType.GLASS)
@@ -66,7 +66,7 @@ public class ConjureGhostBlock extends BaseEntityBlock implements ISpellTargetBl
 	
 	protected BlockState getGhostState(BlockState state, BlockGetter level, BlockPos pos) {
 		BlockEntity ent = level.getBlockEntity(pos);
-		if (ent == null || !(ent instanceof ConjureGhostBlockEntity blockentity)) {
+		if (ent == null || !(ent instanceof SummonGhostBlockEntity blockentity)) {
 			return Blocks.STONE.defaultBlockState();
 		}
 		
@@ -138,14 +138,14 @@ public class ConjureGhostBlock extends BaseEntityBlock implements ISpellTargetBl
 				@Override
 				public boolean canVisit(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
 						BlockState state, int distance) {
-					return state.getBlock() == ConjureGhostBlock.this
+					return state.getBlock() == SummonGhostBlock.this
 							&& getElement(state) == originalElement;
 				}
 
 				@Override
 				public IBlockWalker.WalkResult walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
 						BlockState state, int distance, int walkCount, Consumer<BlockPos> addBlock) {
-					((ConjureGhostBlock) state.getBlock()).triggerInternal((Level) world, pos, state);
+					((SummonGhostBlock) state.getBlock()).triggerInternal((Level) world, pos, state);
 					return IBlockWalker.WalkResult.CONTINUE;
 				}
 			}, 256);
@@ -155,7 +155,7 @@ public class ConjureGhostBlock extends BaseEntityBlock implements ISpellTargetBl
 	protected void triggerInternal(Level world, BlockPos blockPos, BlockState state) {
 		// MAke the block entity process it since it's what's tracking the actual new block state
 		BlockEntity ent = world.getBlockEntity(blockPos);
-		if (ent == null || !(ent instanceof ConjureGhostBlockEntity blockentity)) {
+		if (ent == null || !(ent instanceof SummonGhostBlockEntity blockentity)) {
 			return;
 		}
 		
@@ -177,7 +177,7 @@ public class ConjureGhostBlock extends BaseEntityBlock implements ISpellTargetBl
 		// Blocks require CONJURE with matching elements
 		final EMagicElement element = getElement(state);
 		if (effect.getElement() == element
-				&& effect.getAlteration() == EAlteration.CONJURE) {
+				&& effect.getAlteration() == EAlteration.SUMMON) {
 			this.trigger(level, pos, state);
 			return true;
 		}
@@ -187,11 +187,11 @@ public class ConjureGhostBlock extends BaseEntityBlock implements ISpellTargetBl
 
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new ConjureGhostBlockEntity(pos, state);
+		return new SummonGhostBlockEntity(pos, state);
 	}
 	
 	public static final int MakeBlockColor(BlockState state, BlockAndTintGetter world, BlockPos pos, int tintIndex) {
-		if (state.getBlock() instanceof ConjureGhostBlock block) {
+		if (state.getBlock() instanceof SummonGhostBlock block) {
 			return block.getElement(state).getColor();
 		}
 		return 0xFFFFFFFF;
@@ -200,9 +200,9 @@ public class ConjureGhostBlock extends BaseEntityBlock implements ISpellTargetBl
 	public static boolean WrapBlock(Level world, BlockPos pos) {
 		BlockState state = world.getBlockState(pos);
 		BlockEntity ent = world.getBlockEntity(pos);
-		world.setBlock(pos, NostrumBlocks.conjureGhostBlock.defaultBlockState(), 3);
+		world.setBlock(pos, NostrumBlocks.summonGhostBlock.defaultBlockState(), 3);
 			
-		ConjureGhostBlockEntity container = (ConjureGhostBlockEntity) world.getBlockEntity(pos);
+		SummonGhostBlockEntity container = (SummonGhostBlockEntity) world.getBlockEntity(pos);
 		container.setContainedState(state, ent);
 		return true;
 	}

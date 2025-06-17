@@ -433,6 +433,18 @@ public class SpellLogBuilder implements ISpellLogBuilder {
 		flushEffectLine();
 		return this;
 	}
+	
+	@Override
+	public ISpellLogBuilder damageManaStart(int baseDamage, @Nullable EMagicElement element) { return this; }
+
+	@Override
+	public ISpellLogBuilder damageManaFinish(int finalDamage) { return this; }
+
+	@Override
+	public ISpellLogBuilder restoreManaStart(int baseHeal, @Nullable EMagicElement element) { return this; }
+
+	@Override
+	public ISpellLogBuilder restoreManaFinish(int finalHeal) { return this; }
 
 	@Override
 	public SpellLogBuilder statusStart(MobEffect effect, int baseDuration) {

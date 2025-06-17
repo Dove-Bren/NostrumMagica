@@ -169,7 +169,7 @@ public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEnt
 					NostrumSpellShapes.Field.makeProps(2, false),
 					EMagicElement.EARTH,
 					1,
-					null
+					EAlteration.HARM
 					);
 		}
 		
@@ -197,7 +197,7 @@ public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEnt
 					NostrumSpellShapes.Projectile,
 					EMagicElement.EARTH,
 					3,
-					null
+					EAlteration.HARM
 					);
 		}
 		

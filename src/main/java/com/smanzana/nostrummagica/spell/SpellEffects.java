@@ -44,16 +44,14 @@ public final class SpellEffects {
 		// Could do a registry with hooks here, if wanted it to be extensible
 		
 		if (alteration == null) {
-			// Damage spell
-			return new SpellAction().damage(element, (float) (elementCount + 1))
-					.name("damage." + element.name().toLowerCase());
+			return solveBase(element, elementCount);
 		}
 		
 		switch (alteration) {
 		case RUIN:
 			return solveRuin(element, elementCount);
-		case CONJURE:
-			return solveConjure(element, elementCount);
+		case HARM:
+			return solveHarm(element, elementCount);
 		case ENCHANT:
 			return solveEnchant(element, elementCount);
 		case GROWTH:
@@ -68,6 +66,8 @@ public final class SpellEffects {
 			return solveSupport(element, elementCount);
 		case CORRUPT:
 			return solveCorrupt(element, elementCount);
+		case EXTRACT:
+			return solveExtract(element, elementCount);
 		}
 		
 		return null;
@@ -185,17 +185,33 @@ public final class SpellEffects {
 		case PHYSICAL:
 			return new SpellAction().status(MobEffects.DAMAGE_RESISTANCE, duration, amp).name("resistance");
 		case EARTH:
-			return new SpellAction().status(MobEffects.DAMAGE_BOOST, duration, amp).name("strength");
+			return new SpellAction().status(NostrumEffects.physicalShield, duration, (caster, target, eff) -> {
+				// With the support skill, give 2 extra levels of shield
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.hasSkill(NostrumSkills.Earth_Resist)) {
+					return amp + 2;
+				}
+				return amp;
+			}).name("shield.physical");
 		case ENDER:
 			return new SpellAction().status(MobEffects.INVISIBILITY, duration, amp).name("invisibility");
 		case FIRE:
 			return new SpellAction().status(MobEffects.FIRE_RESISTANCE, duration, amp).name("fireresist");
 		case ICE:
-			return new SpellAction().dispel(elementCount * (int) (Math.pow(3, elementCount - 1))).name("dispel");
+			return new SpellAction().status(NostrumEffects.magicShield, duration, amp)
+				.status(NostrumEffects.manaRegen, duration, 0, (caster, target, eff) -> {
+					// With the support skill, also give mana regen
+					INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+					if (attr != null && attr.hasSkill(NostrumSkills.Ice_Resist)) {
+						return true;
+					}
+					return false;
+				}).name("shield.magic");
 		case LIGHTNING:
 			return new SpellAction().status(NostrumEffects.magicResist, duration, amp).name("magicresist");
 		case WIND:
-			return new SpellAction().push(5f + (2 * amp), elementCount).name("push");
+			int unused;
+			return new SpellAction().knockback(elementCount).name("push");
 		}
 		
 		return null;
@@ -208,30 +224,23 @@ public final class SpellEffects {
 		case PHYSICAL:
 			return new SpellAction().status(MobEffects.ABSORPTION, duration * 5, amp).name("lifeboost");
 		case EARTH:
-			return new SpellAction().status(NostrumEffects.physicalShield, duration, (caster, target, eff) -> {
-				// With the support skill, give 2 extra levels of shield
-				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-				if (attr != null && attr.hasSkill(NostrumSkills.Earth_Support)) {
-					return amp + 2;
-				}
-				return amp;
-			}).name("shield.physical");
+			return new SpellAction().status(MobEffects.DAMAGE_BOOST, duration, amp).name("strength");
 		case ENDER:
 			return new SpellAction().blink(15.0f * elementCount).name("blink");
 		case FIRE:
 			return new SpellAction().status(NostrumEffects.magicBoost, duration, amp).name("magicboost");
 		case ICE:
-			return new SpellAction().status(NostrumEffects.magicShield, duration, amp)
-			.status(NostrumEffects.manaRegen, duration, 0, (caster, target, eff) -> {
-				// With the support skill, also give mana regen
-				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-				if (attr != null && attr.hasSkill(NostrumSkills.Ice_Support)) {
-					return true;
-				}
-				return false;
-			}).name("shield.magic");
+			return new SpellAction().status(NostrumEffects.swiftSwim, duration, amp).name("swift_swim");
 		case LIGHTNING:
-			return new SpellAction().pull(5 * elementCount, elementCount).name("pull");
+			return new SpellAction().status(MobEffects.JUMP, duration, amp)
+					.status(NostrumEffects.bonusJump, duration, 0, (caster, target, eff) -> {
+						// With the growth skill, also give jump boost
+						INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+						if (attr != null && attr.hasSkill(NostrumSkills.Lightning_Growth)) {
+							return true;
+						}
+						return false;
+					}).name("jumpboost");
 		case WIND:
 			return new SpellAction().status(MobEffects.MOVEMENT_SPEED, duration, amp)
 					.status(MobEffects.DIG_SPEED, duration, amp, (caster, target, eff) -> {
@@ -285,15 +294,7 @@ public final class SpellEffects {
 		case ICE:
 			return new SpellAction().heal(4f * elementCount).name("heal");
 		case LIGHTNING:
-			return new SpellAction().status(MobEffects.JUMP, duration, amp)
-					.status(NostrumEffects.bonusJump, duration, 0, (caster, target, eff) -> {
-						// With the growth skill, also give jump boost
-						INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-						if (attr != null && attr.hasSkill(NostrumSkills.Lightning_Growth)) {
-							return true;
-						}
-						return false;
-					}).name("jumpboost");
+			return new SpellAction().healMana(elementCount * 10).name("restore_mana");
 		case WIND:
 			return new SpellAction().propel(elementCount).name("propel");
 		}
@@ -305,10 +306,16 @@ public final class SpellEffects {
 		return new SpellAction().enchant(element, elementCount).name("enchant." + element.name().toLowerCase());
 	}
 	
-	private static final SpellAction solveConjure(EMagicElement element, int elementCount) {
+	private static final SpellAction solveHarm(EMagicElement element, int elementCount) {
+		// Damage spell
+		return new SpellAction().damage(element, (float) (elementCount + 1))
+				.name("damage." + element.name().toLowerCase());
+	}
+	
+	private static final SpellAction solveBase(EMagicElement element, int elementCount) {
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction().blockBreak(elementCount).name("break");
+			return new SpellAction().blockBreak(elementCount).knockback(elementCount).name("bash");
 		case EARTH:
 			return new SpellAction().grow(elementCount).name("grow");
 		case ENDER:
@@ -369,6 +376,29 @@ public final class SpellEffects {
 				}
 				return false;
 			}).name("fastfall");
+		}
+		
+		return null;
+	}
+	
+	private static final SpellAction solveExtract(EMagicElement element, int elementCount) {
+		int duration = 20 * 15 * elementCount;
+		int amp = elementCount - 1;
+		switch (element) {
+		case PHYSICAL:
+			return new SpellAction().status(NostrumEffects.carapace, duration, amp).name("carapace");
+		case EARTH:
+			return new SpellAction().status(MobEffects.GLOWING, duration, amp).lightBlock().name("light");
+		case ENDER:
+			return new SpellAction().status(MobEffects.NIGHT_VISION, duration, amp).name("night_vision");
+		case FIRE:
+			return new SpellAction().stealHealth(element, 1 + elementCount).name("health_steal");
+		case ICE:
+			return new SpellAction().stealMana(element, 5 + (5 * elementCount)).name("mana_steal");
+		case LIGHTNING:
+			return new SpellAction().pull(5 * elementCount, elementCount).name("pull");
+		case WIND:
+			return new SpellAction().dispel(elementCount * (int) (Math.pow(3, elementCount - 1))).name("dispel");
 		}
 		
 		return null;

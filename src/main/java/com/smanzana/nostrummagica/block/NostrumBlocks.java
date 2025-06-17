@@ -1,7 +1,7 @@
 package com.smanzana.nostrummagica.block;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.dungeon.ConjureGhostBlock;
+import com.smanzana.nostrummagica.block.dungeon.SummonGhostBlock;
 import com.smanzana.nostrummagica.block.dungeon.CursedGlass;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonBarsBlock;
@@ -141,10 +141,11 @@ public class NostrumBlocks {
 	@ObjectHolder(PushBlock.ID) public static PushBlock pushBlock;
 	@ObjectHolder(MagicBreakableBlock.ID) public static MagicBreakableBlock breakBlock;
 	@ObjectHolder(MagicBreakableContainerBlock.ID) public static MagicBreakableContainerBlock breakContainerBlock;
-	@ObjectHolder(ConjureGhostBlock.ID) public static ConjureGhostBlock conjureGhostBlock;
+	@ObjectHolder(SummonGhostBlock.ID) public static SummonGhostBlock summonGhostBlock;
 	@ObjectHolder(LaserBlock.ID) public static LaserBlock laser;
 	@ObjectHolder(ElementalCrystalBlock.ID) public static ElementalCrystalBlock elementalCrystal;
 	@ObjectHolder(PureWaterBlock.ID) public static PureWaterBlock pureWater; 
+	@ObjectHolder(MageLightBlock.ID) public static MageLightBlock mageLight;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -235,9 +236,10 @@ public class NostrumBlocks {
     	registerBlockItem(breakBlock, breakBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	//registerBlockItem(breakContainerBlock, breakContainerBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registry.register(new BreakBlockContainerItem(breakContainerBlock, NostrumItems.PropDungeonBase()).setRegistryName(breakContainerBlock.getRegistryName()));
-    	registry.register(new ConjureGhostBlockItem(conjureGhostBlock, NostrumItems.PropDungeonBase()).setRegistryName(conjureGhostBlock.getRegistryName()));
+    	registry.register(new ConjureGhostBlockItem(summonGhostBlock, NostrumItems.PropDungeonBase()).setRegistryName(summonGhostBlock.getRegistryName()));
     	registerBlockItem(laser, laser.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(elementalCrystal, elementalCrystal.getRegistryName(), NostrumItems.PropUnstackable().rarity(Rarity.EPIC), registry);
+    	registerBlockItem(mageLight, mageLight.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -348,10 +350,11 @@ public class NostrumBlocks {
     	registerBlock(new PushBlock(), PushBlock.ID, registry);
     	registerBlock(new MagicBreakableBlock(), MagicBreakableBlock.ID, registry);
     	registerBlock(new MagicBreakableContainerBlock(), MagicBreakableContainerBlock.ID, registry);
-    	registerBlock(new ConjureGhostBlock(), ConjureGhostBlock.ID, registry);
+    	registerBlock(new SummonGhostBlock(), SummonGhostBlock.ID, registry);
     	registerBlock(new LaserBlock(), LaserBlock.ID, registry);
     	registerBlock(new ElementalCrystalBlock(), ElementalCrystalBlock.ID, registry);
     	registerBlock(new PureWaterBlock(() -> NostrumFluids.pureWater), PureWaterBlock.ID, registry);
+    	registerBlock(new MageLightBlock(), MageLightBlock.ID, registry);
     }
     
 }

@@ -31,7 +31,7 @@ public class MagicEnderGolemEntity extends MagicGolemEntity {
 			spellRange.addPart(new SpellEffectPart(
 					EMagicElement.ENDER,
 					1,
-					null));
+					EAlteration.HARM));
 			
 			spellDebuff = Spell.CreateAISpell("Blind");
 			spellDebuff.addPart(new SpellShapePart(NostrumSpellShapes.AI));

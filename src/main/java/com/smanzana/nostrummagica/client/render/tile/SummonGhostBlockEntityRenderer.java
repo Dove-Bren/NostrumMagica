@@ -4,11 +4,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector3f;
-import com.smanzana.nostrummagica.block.dungeon.ConjureGhostBlock;
+import com.smanzana.nostrummagica.block.dungeon.SummonGhostBlock;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.spell.EAlteration;
-import com.smanzana.nostrummagica.tile.ConjureGhostBlockEntity;
+import com.smanzana.nostrummagica.tile.SummonGhostBlockEntity;
 import com.smanzana.nostrummagica.util.Color;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
@@ -21,20 +21,20 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class ConjureGhostBlockEntityRenderer extends BlockEntityRendererBase<ConjureGhostBlockEntity> {
+public class SummonGhostBlockEntityRenderer extends BlockEntityRendererBase<SummonGhostBlockEntity> {
 
-	public ConjureGhostBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
+	public SummonGhostBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
 		super(context);
 	}
 	
 	@Override
-	public void render(ConjureGhostBlockEntity tileEntityIn, float partialTicks, PoseStack matrixStackIn,
+	public void render(SummonGhostBlockEntity tileEntityIn, float partialTicks, PoseStack matrixStackIn,
 			MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 		
 		final Level level = tileEntityIn.getLevel();
 		final BlockPos pos = tileEntityIn.getBlockPos();
 		final BlockState state = tileEntityIn.getGhostState();
-		final int rawColor = ConjureGhostBlock.MakeBlockColor(tileEntityIn.getBlockState(), level, pos, 0);
+		final int rawColor = SummonGhostBlock.MakeBlockColor(tileEntityIn.getBlockState(), level, pos, 0);
 		final Camera camera = this.context.getBlockEntityRenderDispatcher().camera;
 		
 		final float ticks = level.getGameTime() + partialTicks;
@@ -67,7 +67,7 @@ public class ConjureGhostBlockEntityRenderer extends BlockEntityRendererBase<Con
 		matrixStackIn.popPose();
 	}
 	
-	protected void renderSymbol(ConjureGhostBlockEntity tileEntityIn, float partialTicks, PoseStack matrixStackIn,
+	protected void renderSymbol(SummonGhostBlockEntity tileEntityIn, float partialTicks, PoseStack matrixStackIn,
 			MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn, float alpha) {
 		final float scale = 1f;
 		
@@ -76,7 +76,7 @@ public class ConjureGhostBlockEntityRenderer extends BlockEntityRendererBase<Con
 		matrixStackIn.scale(.5f, .5f, .5f);
 		matrixStackIn.scale(scale, scale, 1f);
 		matrixStackIn.translate(-.5, -.5, 0);
-		SpellComponentIcon icon = SpellComponentIcon.get(((ConjureGhostBlock) tileEntityIn.getBlockState().getBlock()).getElement(tileEntityIn.getBlockState()));
+		SpellComponentIcon icon = SpellComponentIcon.get(((SummonGhostBlock) tileEntityIn.getBlockState().getBlock()).getElement(tileEntityIn.getBlockState()));
 		icon.draw(matrixStackIn, bufferIn, combinedLightIn, 1, 1, false, 1f, 1f, 1f, Math.max(.01f, alpha));
 		matrixStackIn.popPose();
 		
@@ -84,7 +84,7 @@ public class ConjureGhostBlockEntityRenderer extends BlockEntityRendererBase<Con
 		matrixStackIn.scale(.35f, .35f, .35f);
 		matrixStackIn.scale(scale, scale, 1f);
 		matrixStackIn.translate(-.5, -.5, 0);
-		icon = SpellComponentIcon.get(EAlteration.CONJURE);
+		icon = SpellComponentIcon.get(EAlteration.SUMMON);
 		icon.draw(matrixStackIn, bufferIn, combinedLightIn, 1, 1, false, 0f, 0f, 0f, Math.max(.01f, alpha));
 		icon.draw(matrixStackIn, bufferIn, combinedLightIn, 1, 1, false, 1f, 1f, 1f, Math.max(.01f, alpha));
 		matrixStackIn.popPose();

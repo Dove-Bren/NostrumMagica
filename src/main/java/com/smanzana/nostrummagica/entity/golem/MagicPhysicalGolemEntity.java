@@ -29,7 +29,7 @@ public class MagicPhysicalGolemEntity extends MagicGolemEntity {
 			spellRanged.addPart(new SpellEffectPart(
 					EMagicElement.PHYSICAL,
 					1,
-					null));
+					EAlteration.HARM));
 			
 			spellDebuff = Spell.CreateAISpell("Corrupt Offense");
 			spellDebuff.addPart(new SpellShapePart(NostrumSpellShapes.AI));

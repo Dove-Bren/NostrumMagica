@@ -68,7 +68,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	
 	private static final Component prevTitle = new TextComponent("Previous");
 	private static final ITooltip prevTooltip = Tooltip.create(new TextComponent("View the previous page of shapes"));
-	private static final ITooltip noneTooltip = Tooltip.create(new TextComponent("Do not use an alteration"));
+	private static final ITooltip noneTooltip = Tooltip.create(new TextComponent("Do not use an alteration, manifesting a raw representation of the element"));
 	private static final ITooltip noneShapeTooltip = Tooltip.create(new TextComponent("Do not use a second shape"));
 	private static final Component terminalText = new TextComponent("Terminal").withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_PURPLE);
 	

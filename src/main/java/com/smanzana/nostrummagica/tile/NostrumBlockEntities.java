@@ -57,7 +57,7 @@ public class NostrumBlockEntities {
 	private static final String ID_DungeonDoor = "dungeon_door_te";
 	private static final String ID_PushBlock = "push_block_te";
 	private static final String ID_BreakContainer = "break_container_te";
-	private static final String ID_ConjureGhostBlock = "conjure_ghost_block_te";
+	private static final String ID_SummonGhostBlock = "conjure_ghost_block_te";
 	private static final String ID_LaserBlock = "laser_block_ent";
 	private static final String ID_ElementalCrystal = "elemental_crystal";
 	
@@ -105,7 +105,7 @@ public class NostrumBlockEntities {
 	@ObjectHolder(ID_DungeonDoor) public static BlockEntityType<DungeonDoorTileEntity> DungeonDoor;
 	@ObjectHolder(ID_PushBlock) public static BlockEntityType<PushBlockTileEntity> PushBlock;
 	@ObjectHolder(ID_BreakContainer) public static BlockEntityType<BreakContainerTileEntity> BreakContainer;
-	@ObjectHolder(ID_ConjureGhostBlock) public static BlockEntityType<ConjureGhostBlockEntity> ConjureGhostBlock;
+	@ObjectHolder(ID_SummonGhostBlock) public static BlockEntityType<SummonGhostBlockEntity> SummonGhostBlock;
 	@ObjectHolder(ID_LaserBlock) public static BlockEntityType<LaserBlockEntity> Laser;
 	@ObjectHolder(ID_ElementalCrystal) public static BlockEntityType<ElementalCrystalBlockEntity> ElementalCrystal;
 	
@@ -160,7 +160,7 @@ public class NostrumBlockEntities {
 		register(registry, BlockEntityType.Builder.of(DungeonDoorTileEntity::new, NostrumBlocks.smallDungeonDoor, NostrumBlocks.largeDungeonDoor).build(null), ID_DungeonDoor);
 		register(registry, BlockEntityType.Builder.of(PushBlockTileEntity::new, NostrumBlocks.pushBlock).build(null), ID_PushBlock);
 		register(registry, BlockEntityType.Builder.of(BreakContainerTileEntity::new, NostrumBlocks.breakContainerBlock).build(null), ID_BreakContainer);
-		register(registry, BlockEntityType.Builder.of(ConjureGhostBlockEntity::new, NostrumBlocks.conjureGhostBlock).build(null), ID_ConjureGhostBlock);
+		register(registry, BlockEntityType.Builder.of(SummonGhostBlockEntity::new, NostrumBlocks.summonGhostBlock).build(null), ID_SummonGhostBlock);
 		register(registry, BlockEntityType.Builder.of(LaserBlockEntity::new, NostrumBlocks.laser).build(null), ID_LaserBlock);
 		register(registry, BlockEntityType.Builder.of(ElementalCrystalBlockEntity::new, NostrumBlocks.elementalCrystal).build(null), ID_ElementalCrystal);
     }

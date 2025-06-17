@@ -671,37 +671,7 @@ public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchant
 					NostrumSpellShapes.Projectile,
 					EMagicElement.PHYSICAL,
 					1,
-					null);
-//			putSpell("Shield",
-//					SelfTrigger.instance(),
-//					AoEShape.instance(),
-//					EMagicElement.PHYSICAL,
-//					1,
-//					EAlteration.RESIST);
-//			putSpell("Weaken",
-//					AITargetTrigger.instance(),
-//					SingleShape.instance(),
-//					EMagicElement.PHYSICAL,
-//					1,
-//					EAlteration.INFLICT);
-//			putSpell("Weaken II",
-//					AITargetTrigger.instance(),
-//					SingleShape.instance(),
-//					EMagicElement.PHYSICAL,
-//					2,
-//					EAlteration.INFLICT);
-//			putSpell("Crush",
-//					NostrumSpellShapes.Projectile,
-//					SingleShape.instance(),
-//					EMagicElement.PHYSICAL,
-//					1,
-//					null);
-//			putSpell("Bone Crusher",
-//					NostrumSpellShapes.Projectile,
-//					SingleShape.instance(),
-//					EMagicElement.PHYSICAL,
-//					2,
-//					null);
+					EAlteration.HARM);
 			
 			// Lightning
 			putSpell(SpellUtils.MakeSpell("Lightning Ball I",
@@ -709,186 +679,42 @@ public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchant
 					NostrumSpellShapes.Chain,
 					EMagicElement.LIGHTNING,
 					1,
-					null), EMagicElement.LIGHTNING);
-//			putSpell("Magic Shell",
-//					SelfTrigger.instance(),
-//					AoEShape.instance(),
-//					EMagicElement.LIGHTNING,
-//					1,
-//					EAlteration.RESIST);
-//			putSpell("Bolt",
-//					BeamTrigger.instance(),
-//					SingleShape.instance(),
-//					EMagicElement.LIGHTNING,
-//					1,
-//					EAlteration.CONJURE);
-//			putSpell("Shock",
-//					AITargetTrigger.instance(),
-//					SingleShape.instance(),
-//					EMagicElement.LIGHTNING,
-//					1,
-//					EAlteration.INFLICT);
-//			putSpell("Lightning Ball I",
-//					NostrumSpellShapes.Projectile,
-//					ChainShape.instance(),
-//					EMagicElement.LIGHTNING,
-//					1,
-//					null);
-//			putSpell("Lightning Ball II",
-//					NostrumSpellShapes.Projectile,
-//					SingleShape.instance(),
-//					EMagicElement.LIGHTNING,
-//					2,
-//					null);
+					EAlteration.HARM), EMagicElement.LIGHTNING);
 			
 			// Fire
 			putSpell("Burn",
 					NostrumSpellShapes.SeekingBullet,
 					EMagicElement.FIRE,
 					1,
-					EAlteration.CONJURE);
-//			spell = new Spell("Fireball", true);
-//			spell.addPart(new SpellPart(NostrumSpellShapes.Projectile));
-//			spell.addPart(new SpellPart(AoEShape.instance(), EMagicElement.FIRE,
-//					1, null, new SpellPartParam(3, false)));
-//			defaultSpells.add(spell);
-//			putSpell("Flare",
-//					NostrumSpellShapes.Projectile,
-//					SingleShape.instance(),
-//					EMagicElement.FIRE,
-//					3,
-//					null);
+					null);
 
 			// Ice
 			spell = SpellUtils.MakeSpell("Frostbite",
 					NostrumSpellShapes.Projectile,
 					EMagicElement.ICE, 1, EAlteration.INFLICT,
-					EMagicElement.ICE, 1, null);
+					EMagicElement.ICE, 1, EAlteration.HARM);
 			putSpell(spell, EMagicElement.ICE);
-//			putSpell("Magic Aegis",
-//					SelfTrigger.instance(),
-//					SingleShape.instance(),
-//					EMagicElement.ICE,
-//					2,
-//					EAlteration.SUPPORT);
-//			putSpell("Ice Shard",
-//					NostrumSpellShapes.Projectile,
-//					SingleShape.instance(),
-//					EMagicElement.ICE,
-//					1,
-//					null);
-//			spell = new Spell("Group Frostbite", true);
-//			spell.addPart(new SpellPart(NostrumSpellShapes.Projectile));
-//			spell.addPart(new SpellPart(AoEShape.instance(), EMagicElement.ICE,
-//					1, EAlteration.INFLICT, new SpellPartParam(5, false)));
-//			defaultSpells.add(spell);
-//			
-//			putSpell("Hand Of Cold",
-//					MagicCyclerTrigger.instance(),
-//					AoEShape.instance(),
-//					EMagicElement.ICE,
-//					2,
-//					EAlteration.RUIN);
 			
 			// Earth
 			putSpell("Rock Fling",
 					NostrumSpellShapes.Projectile,
 					EMagicElement.EARTH,
 					1,
-					null);
-//			putSpell("Earth Aegis",
-//					SelfTrigger.instance(),
-//					SingleShape.instance(),
-//					EMagicElement.EARTH,
-//					2,
-//					EAlteration.SUPPORT);
-//			putSpell("Earth Aegis II",
-//					SelfTrigger.instance(),
-//					SingleShape.instance(),
-//					EMagicElement.EARTH,
-//					3,
-//					EAlteration.SUPPORT);
-//			putSpell("Roots",
-//					AITargetTrigger.instance(),
-//					SingleShape.instance(),
-//					EMagicElement.EARTH,
-//					3,
-//					EAlteration.INFLICT);
-//			putSpell("Rock Fling",
-//					NostrumSpellShapes.Projectile,
-//					SingleShape.instance(),
-//					EMagicElement.EARTH,
-//					1,
-//					null);
-//			putSpell("Earth Bash",
-//					NostrumSpellShapes.Projectile,
-//					SingleShape.instance(),
-//					EMagicElement.EARTH,
-//					2,
-//					null);
+					EAlteration.HARM);
 			
 			// Wind
 			putSpell("Wind Slash",
 					NostrumSpellShapes.Projectile,
 					EMagicElement.WIND,
 					1,
-					null);
-//			putSpell("Gust",
-//					SelfTrigger.instance(),
-//					SingleShape.instance(),
-//					EMagicElement.WIND,
-//					2,
-//					EAlteration.RESIST);
-//			putSpell("Poison",
-//					AITargetTrigger.instance(),
-//					SingleShape.instance(),
-//					EMagicElement.WIND,
-//					1,
-//					EAlteration.INFLICT);
-//			putSpell("Wind Slash",
-//					MagicCutterTrigger.instance(),
-//					SingleShape.instance(),
-//					EMagicElement.WIND,
-//					1,
-//					null);
-//			putSpell("Wind Ball I",
-//					NostrumSpellShapes.Projectile,
-//					SingleShape.instance(),
-//					EMagicElement.WIND,
-//					2,
-//					null);
-//			putSpell("Wind Ball II",
-//					NostrumSpellShapes.Projectile,
-//					SingleShape.instance(),
-//					EMagicElement.WIND,
-//					3,
-//					null);
+					EAlteration.HARM);
 			
 			// Ender
 			putSpell("Ender Beam",
 					NostrumSpellShapes.Beam,
 					EMagicElement.ENDER,
 					1,
-					null);
-//			spell = new Spell("Blinker", true);
-//			spell.addPart(new SpellPart(SelfTrigger.instance()));
-//			spell.addPart(new SpellPart(DamagedTrigger.instance()));
-//			spell.addPart(new SpellPart(OtherTrigger.instance()));
-//			spell.addPart(new SpellPart(SingleShape.instance(), EMagicElement.ENDER,
-//					2, EAlteration.GROWTH));
-//			defaultSpells.add(spell);
-//			putSpell("Blindness",
-//					NostrumSpellShapes.Projectile,
-//					AoEShape.instance(),
-//					EMagicElement.ENDER,
-//					1,
-//					EAlteration.INFLICT);
-//			putSpell("Random Teleport",
-//					NostrumSpellShapes.Projectile,
-//					SingleShape.instance(),
-//					EMagicElement.ENDER,
-//					1,
-//					EAlteration.CONJURE);
+					EAlteration.HARM);
 		}
 	}
 

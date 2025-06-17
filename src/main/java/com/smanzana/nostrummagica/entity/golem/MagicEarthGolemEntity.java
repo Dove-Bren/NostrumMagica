@@ -30,14 +30,14 @@ public class MagicEarthGolemEntity extends MagicGolemEntity {
 			spellBuff1.addPart(new SpellEffectPart(
 					EMagicElement.EARTH,
 					1,
-					EAlteration.SUPPORT));
+					EAlteration.RESIST));
 			
 			spellBuff2 = Spell.CreateAISpell("Impact Enchantment");
 			spellBuff2.addPart(new SpellShapePart(NostrumSpellShapes.AI));
 			spellBuff2.addPart(new SpellEffectPart(
 					EMagicElement.EARTH,
 					1,
-					EAlteration.RESIST));
+					EAlteration.SUPPORT));
 		}
 	}
 

@@ -33,6 +33,14 @@ public interface ISpellLogBuilder {
 	
 	public default ISpellLogBuilder healFinish(float finalHeal) { return this; }
 	
+	public default ISpellLogBuilder damageManaStart(int baseDamage, @Nullable EMagicElement element) { return this; }
+	
+	public default ISpellLogBuilder damageManaFinish(int finalDamage) { return this; }
+	
+	public default ISpellLogBuilder restoreManaStart(int baseHeal, @Nullable EMagicElement element) { return this; }
+	
+	public default ISpellLogBuilder restoreManaFinish(int finalHeal) { return this; }
+	
 	public default ISpellLogBuilder statusStart(MobEffect effect, int baseDuration) { return this; }
 	
 	public default ISpellLogBuilder statusFinish(int finalDuration) { return this; }

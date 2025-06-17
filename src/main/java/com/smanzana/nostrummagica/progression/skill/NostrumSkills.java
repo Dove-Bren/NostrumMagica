@@ -148,7 +148,7 @@ public class NostrumSkills {
 	public static /*final*/ Skill Ice_Corrupt;
 	public static /*final*/ Skill Ice_Weapon;
 	public static /*final*/ Skill Ice_Inflict;
-	public static /*final*/ Skill Ice_Support;
+	public static /*final*/ Skill Ice_Resist;
 
 	public static /*final*/ Skill Earth_Novice;
 	public static /*final*/ Skill Earth_Adept;
@@ -156,7 +156,7 @@ public class NostrumSkills {
 	public static /*final*/ Skill Earth_Corrupt;
 	public static /*final*/ Skill Earth_Weapon;
 	public static /*final*/ Skill Earth_Inflict;
-	public static /*final*/ Skill Earth_Support;
+	public static /*final*/ Skill Earth_Resist;
 
 	public static /*final*/ Skill Wind_Novice;
 	public static /*final*/ Skill Wind_Adept;
@@ -242,7 +242,7 @@ public class NostrumSkills {
 		Ice_Adept = new HiddenSkill(ID_ICE_ADEPT, Category_Element_Ice, ID_ICE_NOVICE, () -> new ItemStack(NostrumItems.infusedGemIce), x, y-1, new ElementMasteryRequirement(EMagicElement.ICE, EElementalMastery.ADEPT));
 		Ice_Master = new HiddenSkill(ID_ICE_MASTER, Category_Element_Ice, ID_ICE_ADEPT, () -> SpellRune.getRune(NostrumSpellShapes.OnHealth), x, y-2, new ElementMasteryRequirement(EMagicElement.ICE, EElementalMastery.MASTER));
 		Ice_Inflict = new HiddenSkill(ID_ICE_INFLICT, Category_Element_Ice, ID_ICE_NOVICE, () -> new ItemStack(Items.POTION), x-1, y-1, new SpellKnowledgeRequirement(EMagicElement.ICE, EAlteration.INFLICT));
-		Ice_Support = new HiddenSkill(ID_ICE_SUPPORT, Category_Element_Ice, ID_ICE_NOVICE, () -> SpellRune.getRune(NostrumSpellShapes.OnMana), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.ICE, EAlteration.SUPPORT));
+		Ice_Resist = new HiddenSkill(ID_ICE_SUPPORT, Category_Element_Ice, ID_ICE_NOVICE, () -> SpellRune.getRune(NostrumSpellShapes.OnMana), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.ICE, EAlteration.RESIST));
 		Ice_Corrupt = new HiddenSkill(ID_ICE_CORRUPT, Category_Element_Ice, ID_ICE_ADEPT, () -> new ItemStack(Items.SOUL_LANTERN), x-1, y-2, new SpellKnowledgeRequirement(EMagicElement.ICE, EAlteration.CORRUPT));
 		Ice_Weapon = new HiddenSkill(ID_ICE_WEAPON, Category_Element_Ice, ID_ICE_ADEPT, () -> new ItemStack(NostrumItems.enchantedWeaponIceMaster), x+1, y-2, new ResearchRequirement("enchanted_weapons"));
 
@@ -252,7 +252,7 @@ public class NostrumSkills {
 		Earth_Adept = new HiddenSkill(ID_EARTH_ADEPT, Category_Element_Earth, ID_EARTH_NOVICE, () -> new ItemStack(Items.NETHERITE_AXE), x, y-1, new ElementMasteryRequirement(EMagicElement.EARTH, EElementalMastery.ADEPT));
 		Earth_Master = new HiddenSkill(ID_EARTH_MASTER, Category_Element_Earth, ID_EARTH_ADEPT, () -> new ItemStack(Items.GLISTERING_MELON_SLICE), x, y-2, new ElementMasteryRequirement(EMagicElement.EARTH, EElementalMastery.MASTER));
 		Earth_Inflict = new HiddenSkill(ID_EARTH_INFLICT, Category_Element_Earth, ID_EARTH_NOVICE, () -> new ItemStack(Items.IRON_BLOCK), x-1, y-1, new SpellKnowledgeRequirement(EMagicElement.EARTH, EAlteration.INFLICT));
-		Earth_Support = new HiddenSkill(ID_EARTH_SUPPORT, Category_Element_Earth, ID_EARTH_NOVICE, () -> new ItemStack(NostrumItems.mirrorShield), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.EARTH, EAlteration.SUPPORT));
+		Earth_Resist = new HiddenSkill(ID_EARTH_SUPPORT, Category_Element_Earth, ID_EARTH_NOVICE, () -> new ItemStack(NostrumItems.mirrorShield), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.EARTH, EAlteration.RESIST));
 		Earth_Corrupt = new HiddenSkill(ID_EARTH_CORRUPT, Category_Element_Earth, ID_EARTH_ADEPT, () -> new ItemStack(Items.DIAMOND), x-1, y-2, new SpellKnowledgeRequirement(EMagicElement.EARTH, EAlteration.CORRUPT));
 		Earth_Weapon = new HiddenSkill(ID_EARTH_WEAPON, Category_Element_Earth, ID_EARTH_ADEPT, () -> new ItemStack(NostrumItems.earthPike), x+1, y-2, new ResearchRequirement("sword_earth"));
 
@@ -272,7 +272,7 @@ public class NostrumSkills {
 		Lightning_Adept = new HiddenSkill(ID_LIGHTNING_ADEPT, Category_Element_Lightning, ID_LIGHTNING_NOVICE, () -> new ItemStack(NostrumItems.enchantedWeaponLightningAdept), x, y-1, new ElementMasteryRequirement(EMagicElement.LIGHTNING, EElementalMastery.ADEPT));
 		Lightning_Master = new HiddenSkill(ID_LIGHTNING_MASTER, Category_Element_Lightning, ID_LIGHTNING_ADEPT, () -> new ItemStack(NostrumItems.magicCharmLightning), x, y-2, new ElementMasteryRequirement(EMagicElement.LIGHTNING, EElementalMastery.MASTER));
 		Lightning_Inflict = new HiddenSkill(ID_LIGHTNING_INFLICT, Category_Element_Lightning, ID_LIGHTNING_NOVICE, () -> new ItemStack(Blocks.ICE), x-1, y-1, new SpellKnowledgeRequirement(EMagicElement.LIGHTNING, EAlteration.INFLICT));
-		Lightning_Growth = new HiddenSkill(ID_LIGHTNING_GROWTH, Category_Element_Lightning, ID_LIGHTNING_NOVICE, () -> new ItemStack(Items.GOLDEN_BOOTS), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.LIGHTNING, EAlteration.GROWTH));
+		Lightning_Growth = new HiddenSkill(ID_LIGHTNING_GROWTH, Category_Element_Lightning, ID_LIGHTNING_NOVICE, () -> new ItemStack(Items.GOLDEN_BOOTS), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.LIGHTNING, EAlteration.SUPPORT));
 		Lightning_Corrupt = new HiddenSkill(ID_LIGHTNING_CORRUPT, Category_Element_Lightning, ID_LIGHTNING_ADEPT, () -> new ItemStack(Items.SPLASH_POTION), x-1, y-2, new SpellKnowledgeRequirement(EMagicElement.LIGHTNING, EAlteration.CORRUPT));
 		Lightning_Weapon = new HiddenSkill(ID_LIGHTNING_WEAPON, Category_Element_Lightning, ID_LIGHTNING_ADEPT, () -> new ItemStack(NostrumItems.enchantedWeaponLightningMaster), x+1, y-2, new ResearchRequirement("enchanted_weapons"));
 

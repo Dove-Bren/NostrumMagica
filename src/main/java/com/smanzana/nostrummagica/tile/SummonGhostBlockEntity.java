@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.autodungeons.api.block.entity.IOrientedTileEntity;
 import com.smanzana.autodungeons.world.blueprints.BlueprintBlock;
-import com.smanzana.nostrummagica.block.dungeon.ConjureGhostBlock;
+import com.smanzana.nostrummagica.block.dungeon.SummonGhostBlock;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,21 +19,21 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class ConjureGhostBlockEntity extends BlockEntity implements IOrientedTileEntity {
+public class SummonGhostBlockEntity extends BlockEntity implements IOrientedTileEntity {
 	
 	protected BlockState mimicState;
 	protected @Nullable CompoundTag tileEntityData;
 	protected @Nullable Direction facingOffset;
 	
-	protected ConjureGhostBlockEntity(BlockEntityType<? extends ConjureGhostBlockEntity> type, BlockPos pos, BlockState state) {
+	protected SummonGhostBlockEntity(BlockEntityType<? extends SummonGhostBlockEntity> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 		mimicState = Blocks.STONE.defaultBlockState();
 		tileEntityData = null;
 		facingOffset = null;
 	}
 	
-	public ConjureGhostBlockEntity(BlockPos pos, BlockState state) {
-		this(NostrumBlockEntities.ConjureGhostBlock, pos, state);
+	public SummonGhostBlockEntity(BlockPos pos, BlockState state) {
+		this(NostrumBlockEntities.SummonGhostBlock, pos, state);
 	}
 	
 	public BlockState getGhostState() {
@@ -137,7 +137,7 @@ public class ConjureGhostBlockEntity extends BlockEntity implements IOrientedTil
 	
 	public boolean shouldShowHint() {
 		// Show hint if no (conjure) blocks are below this one and a player is close enough
-		if (this.hasLevel() && !(this.getLevel().getBlockState(worldPosition.below()).getBlock() instanceof ConjureGhostBlock)) {
+		if (this.hasLevel() && !(this.getLevel().getBlockState(worldPosition.below()).getBlock() instanceof SummonGhostBlock)) {
 			@Nullable Player nearest = getLevel().getNearestPlayer(worldPosition.getX() + .5, worldPosition.getY(), worldPosition.getZ() + .5, 3, false);
 			return nearest != null;
 		}

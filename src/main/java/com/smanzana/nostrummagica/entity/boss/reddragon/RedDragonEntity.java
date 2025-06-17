@@ -140,7 +140,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 					NostrumSpellShapes.Burst.makeProps(3),
 					EMagicElement.FIRE,
 					2,
-					null
+					EAlteration.HARM
 					);
 			DSPELL_Fireball2 = SpellUtils.MakeSpell("Fireball2",
 					NostrumSpellShapes.Projectile,
@@ -148,7 +148,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 					NostrumSpellShapes.Burst.makeProps(3),
 					EMagicElement.FIRE,
 					3,
-					null);
+					EAlteration.HARM);
 			DSPELL_Speed = SpellUtils.MakeSpell("Speed",
 					EMagicElement.WIND,
 					1,
@@ -157,7 +157,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 			DSPELL_Shield = SpellUtils.MakeSpell("Shield",
 					EMagicElement.EARTH,
 					2,
-					EAlteration.SUPPORT
+					EAlteration.RESIST
 					);
 			DSPELL_Weaken = SpellUtils.MakeSpell("Weaken",
 					NostrumSpellShapes.AI,
@@ -169,7 +169,7 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 					NostrumSpellShapes.Delay,
 					EMagicElement.PHYSICAL,
 					2,
-					null,
+					EAlteration.HARM,
 					EMagicElement.PHYSICAL,
 					1,
 					EAlteration.INFLICT);

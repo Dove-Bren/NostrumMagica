@@ -749,7 +749,7 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 					NostrumSpellShapes.Projectile,
 					EMagicElement.PHYSICAL,
 					2,
-					null);
+					EAlteration.HARM);
 			putSpell("Shield",
 					NostrumSpellShapes.Burst,
 					EMagicElement.PHYSICAL,
@@ -804,16 +804,16 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 					1,
 					EAlteration.RESIST);
 			putSpell("Bolt",
-					NostrumSpellShapes.Beam,
+					NostrumSpellShapes.Projectile,
 					EMagicElement.LIGHTNING,
 					1,
-					EAlteration.CONJURE);
+					null);
 			putSpell("Lightning Ball I",
 					NostrumSpellShapes.Projectile,
 					NostrumSpellShapes.Burst,
 					EMagicElement.LIGHTNING,
 					3,
-					null);
+					EAlteration.HARM);
 			putSpell("Lightning Ball II",
 					NostrumSpellShapes.Projectile,
 					NostrumSpellShapes.Burst,
@@ -826,7 +826,7 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 					NostrumSpellShapes.SeekingBullet,
 					EMagicElement.FIRE,
 					2,
-					EAlteration.CONJURE);
+					null);
 			putSpell("Overheat",
 					NostrumSpellShapes.SeekingBullet,
 					EMagicElement.FIRE,
@@ -850,7 +850,7 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 			putSpell("Magic Aegis",
 					EMagicElement.ICE,
 					1,
-					EAlteration.SUPPORT);
+					EAlteration.RESIST);
 			putSpell("Ice Shard",
 					NostrumSpellShapes.Projectile,
 					EMagicElement.ICE,
@@ -865,11 +865,6 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 					EMagicElement.ICE,
 					2,
 					EAlteration.GROWTH);
-			putSpell("Dispel",
-					NostrumSpellShapes.SeekingBullet,
-					EMagicElement.ICE,
-					1,
-					EAlteration.RESIST);
 			putSpell("Hand Of Cold",
 					NostrumSpellShapes.Cycler,
 					EMagicElement.ICE,
@@ -890,7 +885,7 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 			putSpell("Earth Aegis",
 					EMagicElement.EARTH,
 					2,
-					EAlteration.SUPPORT);
+					EAlteration.RESIST);
 			putSpell("Earthen Regen",
 					EMagicElement.EARTH,
 					2,
@@ -958,7 +953,7 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 					NostrumSpellShapes.Projectile,
 					EMagicElement.ENDER,
 					2,
-					EAlteration.CONJURE);
+					null);
 			putSpell("Invisibility",
 					EMagicElement.ENDER,
 					3,

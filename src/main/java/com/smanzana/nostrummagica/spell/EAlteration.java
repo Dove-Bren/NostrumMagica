@@ -19,12 +19,13 @@ import net.minecraft.world.item.Items;
 
 public enum EAlteration {
 
-	INFLICT(5, 1, ReagentType.GRAVE_DUST),
+	INFLICT(5, 1, ReagentType.SKY_ASH),
+	HARM(5, 0, ReagentType.GRAVE_DUST),
 	RESIST(10, 1, ReagentType.CRYSTABLOOM),
 	SUPPORT(10, 1, ReagentType.GINSENG),
-	GROWTH(15, 1, ReagentType.SKY_ASH),
+	GROWTH(15, 1, ReagentType.SKY_ASH, () -> new ItemStack(Items.AMETHYST_SHARD)),
 	ENCHANT(15, 1, ReagentType.BLACK_PEARL),
-	CONJURE(20, 1, ReagentType.MANDRAKE_ROOT),
+	EXTRACT(15, 1, ReagentType.MANDRAKE_ROOT),
 	SUMMON(30, 2, ReagentType.MANI_DUST),
 	RUIN(15, 2, ReagentType.SPIDER_SILK),
 	CORRUPT(15, 1, ReagentType.GRAVE_DUST, () -> new ItemStack(Items.PHANTOM_MEMBRANE)),
@@ -106,7 +107,7 @@ public enum EAlteration {
 	}
 	
 	public static final EAlteration FromNBT(Tag nbt) {
-		EAlteration alteration = EAlteration.INFLICT;
+		EAlteration alteration = EAlteration.HARM;
 		try {
 			alteration = EAlteration.valueOf(((StringTag) nbt).getAsString().toUpperCase());
 		} catch (Exception e) {

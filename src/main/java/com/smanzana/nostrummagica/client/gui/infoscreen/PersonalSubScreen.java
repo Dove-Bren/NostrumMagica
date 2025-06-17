@@ -465,7 +465,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 				int posX = 0;
 				int posY = 0;
 				final int xOffset = 100;
-				final int yOffset = 60;
+				final int yOffset = 75;
 				
 				for (EMagicElement elem : EMagicElement.values()) {
 					//drawTable(attr, mc, x + posX * xOffset, y + (posY * yOffset), elem, mouseX, mouseY);

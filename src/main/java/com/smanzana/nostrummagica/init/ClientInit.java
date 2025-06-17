@@ -102,7 +102,7 @@ import com.smanzana.nostrummagica.client.render.item.NostrumItemSpecialRenderer;
 import com.smanzana.nostrummagica.client.render.tile.AltarBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.BreakContainerBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.CandleBlockEntityRenderer;
-import com.smanzana.nostrummagica.client.render.tile.ConjureGhostBlockEntityRenderer;
+import com.smanzana.nostrummagica.client.render.tile.SummonGhostBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.DungeonDoorBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.DungeonKeyChestBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.LaserBlockEntityRenderer;
@@ -423,7 +423,7 @@ public class ClientInit {
 		event.registerBlockEntityRenderer(NostrumBlockEntities.DungeonDoor, DungeonDoorBlockEntityRenderer::new);
 		event.registerBlockEntityRenderer(NostrumBlockEntities.PushBlock, PushBlockBlockEntityRenderer::new);
 		event.registerBlockEntityRenderer(NostrumBlockEntities.BreakContainer, BreakContainerBlockEntityRenderer::new);
-		event.registerBlockEntityRenderer(NostrumBlockEntities.ConjureGhostBlock, ConjureGhostBlockEntityRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.SummonGhostBlock, SummonGhostBlockEntityRenderer::new);
 		event.registerBlockEntityRenderer(NostrumBlockEntities.Laser, LaserBlockEntityRenderer::new);
 	}
 	
@@ -505,6 +505,7 @@ public class ClientInit {
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.pureWater, RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(NostrumFluids.pureWater, RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(NostrumFluids.pureWaterFlowing, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.mageLight, RenderType.cutout());
 	}
 	
 	private static final void registerItemModelProperties() {
@@ -854,6 +855,31 @@ public class ClientInit {
 		return effect;
 	}
 	
+	private static final ClientEffect doExtractEffect(LivingEntity source,
+			Vec3 sourcePos,
+			LivingEntity target,
+			Vec3 targetPos,
+			SpellEffectPart part) {
+		ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.position() : targetPos,
+				new ClientEffectFormFlat(ClientEffectIcon.ARROWD, 0, 0, 0),
+				3L * 500L, 6);
+		
+		effect.modify(new ClientEffectModifierColor(part.getElement().getColor(), part.getElement().getColor()));
+		
+		if (target != null) {
+			effect.modify(new ClientEffectModifierFollow(target));
+		}
+		
+		effect
+		.modify(new ClientEffectModifierRotate(0f, .5f, 0f))
+		.modify(new ClientEffectModifierTranslate(0, 1.5f, -1.5f))
+		.modify(new ClientEffectModifierMove(new Vec3(0, 0, 0), new Vec3(0, -2, 0), .3f, 1f))
+		.modify(new ClientEffectModifierGrow(.8f, .2f, 1f, 1f, .5f))
+		.modify(new ClientEffectModifierShrink(1f, 1f, 1f, 0f, .8f))
+		;
+		return effect;
+	}
+	
 	public static void initDefaultEffects() {
 		ClientEffectRenderer renderer = ((ClientPlayerListener) NostrumMagica.playerListener).getEffectRenderer();
 		
@@ -1060,7 +1086,7 @@ public class ClientInit {
 		
 		// Alterations
 		
-		renderer.registerEffect((EAlteration) null,
+		renderer.registerEffect(EAlteration.HARM,
 				(source, sourcePos, target, targetPos, part) -> {
 					ClientEffect effect = new ClientEffectMirrored(target == null ? targetPos : new Vec3(0, 0, 0),
 							new ClientEffectFormFlat(ClientEffectIcon.TING1, 0, 0, 0),
@@ -1205,7 +1231,7 @@ public class ClientInit {
 					return effect;
 				});
 
-		renderer.registerEffect(EAlteration.CONJURE,
+		renderer.registerEffect((EAlteration) null,
 				(source, sourcePos, target, targetPos, part) -> {
 					// TODO physical breaks stuff. Lots of particles. Should we return null here?
 					
@@ -1278,5 +1304,6 @@ public class ClientInit {
 				});
 		
 		renderer.registerEffect(EAlteration.CORRUPT, ClientInit::doCorruptEffect);
+		renderer.registerEffect(EAlteration.EXTRACT, ClientInit::doExtractEffect);
 	}
 }

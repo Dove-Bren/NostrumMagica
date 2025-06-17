@@ -819,7 +819,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	public InteractionResult interactLivingEntity(ItemStack stack, Player playerIn, LivingEntity target, InteractionHand hand) {
 		if (element == EMagicElement.WIND) {
 			SpellAction fly = new SpellAction();
-			fly.push(5.0f, typeScale(this.type));
+			fly.knockback(typeScale(this.type));
 			fly.apply(playerIn, target, 1.0f, ISpellLogBuilder.Dummy);
 			ItemStacks.damageItem(stack, playerIn, hand, 2);
 			return InteractionResult.SUCCESS;

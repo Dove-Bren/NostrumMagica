@@ -19,6 +19,7 @@ import com.smanzana.nostrummagica.block.MagicWallBlock;
 import com.smanzana.nostrummagica.block.MysticWaterBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.INostrumMana;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
@@ -196,16 +197,15 @@ public class SpellAction {
 	}
 	
 	private static class DamageEffect extends NegativeSpellEffect {
-		private float amount;
-		private EMagicElement element;
+		protected final float amount;
+		protected final EMagicElement element;
 		
 		public DamageEffect(EMagicElement element, float amount) {
 			this.amount = amount;
 			this.element = element;
 		}
 		
-		@Override
-		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+		public float doDamage(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			caster.setLastHurtMob(entity);
 			entity.setLastHurtByMob(caster);
 			//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
@@ -247,6 +247,12 @@ public class SpellAction {
 			resultBuilder.applied |= true;
 			resultBuilder.damage += fin;
 			log.damageFinish(fin);
+			return fin;
+		}
+		
+		@Override
+		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			this.doDamage(caster, entity, efficiency, resultBuilder, log);
 		}
 		
 		@Override
@@ -672,15 +678,14 @@ public class SpellAction {
 		}
 	}
 	
-	private static class PushEffect extends NegativeSpellEffect {
+	private static class PullEffect extends NegativeSpellEffect {
 
-		private static final Component LABEL_PUSH_NAME = new TranslatableComponent("spelllog.nostrummagica.push.name");
 		private static final Component LABEL_PULL_NAME = new TranslatableComponent("spelllog.nostrummagica.pull.name");
 		
 		private float range;
-		private int amp; // - is pull
+		private int amp;
 		
-		public PushEffect(float range, int amp) {
+		public PullEffect(float range, int amp) {
 			this.range = range;
 			this.amp = amp; 
 		}
@@ -692,14 +697,11 @@ public class SpellAction {
 		
 		@Override
 		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
-			final Component desc = (amp < 0
-					? new TranslatableComponent("spelllog.nostrummagica.pull.desc", String.format("%.1f", this.range))
-					: new TranslatableComponent("spelllog.nostrummagica.push.desc", String.format("%.1f", this.range)));
-			log.generalEffectStart(amp < 0 ? LABEL_PULL_NAME : LABEL_PUSH_NAME, desc, false);
+			final Component desc = new TranslatableComponent("spelllog.nostrummagica.pull.desc", String.format("%.1f", this.range));
+			log.generalEffectStart(LABEL_PULL_NAME, desc, false);
 			log.generalEffectFinish(0f, 0f);
 
-			// We abs the amp here, but check it belwo for pull and negate vector
-			float magnitude = .35f * (Math.abs(amp) + 1.0f) * (float) Math.min(2.0f, Math.max(0.0f, 1.0f + Math.log(efficiency)));
+			float magnitude = .35f * (amp + 1.0f) * (float) Math.min(2.0f, Math.max(0.0f, 1.0f + Math.log(efficiency)));
 			Vec3 center = Vec3.atCenterOf(location.hitBlockPos); // idr why I wanted it centered in the block?
 			NostrumMagicaSounds.DAMAGE_WIND.play(location.world, center.x, center.y, center.z);
 			
@@ -720,24 +722,23 @@ public class SpellAction {
 							direction.y * magnitude,
 							direction.z * magnitude
 							);
-					if (amp < 0) {
-						// pull
-						// Cap force's magnitude at .2 dist
-						double mod = force.length();
-						if (mod > dist * .2) {
-							mod = (dist * .4) / mod;
-							force = new Vec3(
-									force.x * mod,
-									force.y * mod,
-									force.z * mod
-									);
-						}
-
+					
+					// pull
+					// Cap force's magnitude at .2 dist
+					double mod = force.length();
+					if (mod > dist * .2) {
+						mod = (dist * .4) / mod;
 						force = new Vec3(
-								force.x * -1.0,
-								force.y * -1.0,
-								force.z * -1.0);
+								force.x * mod,
+								force.y * mod,
+								force.z * mod
+								);
 					}
+
+					force = new Vec3(
+							force.x * -1.0,
+							force.y * -1.0,
+							force.z * -1.0);
 					
 					e.push(force.x, force.y, force.z);
 					any = true;
@@ -756,6 +757,43 @@ public class SpellAction {
 		@Override
 		public boolean affectsEntities() {
 			return false;
+		}
+	}
+	
+	private static class KnockbackEffect extends NegativeSpellEffect {
+
+		private static final Component LABEL_PUSH_NAME = new TranslatableComponent("spelllog.nostrummagica.push.name");
+		
+		private int amp;
+		
+		public KnockbackEffect(int amp) {
+			this.amp = amp; 
+		}
+		
+		@Override
+		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			final Component desc = new TranslatableComponent("spelllog.nostrummagica.push.desc", String.format("%d", this.amp));
+			log.generalEffectStart(LABEL_PUSH_NAME, desc, false);
+			Vec3 dir = entity.position().subtract(caster.position()).normalize();
+			entity.knockback(.5f + (.2f * amp), dir.x, dir.z);
+			log.generalEffectFinish(0f, 0f);
+			
+			resultBuilder.applied |= true;
+		}
+		
+		@Override
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			;
+		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return true;
 		}
 	}
 	
@@ -2275,6 +2313,127 @@ public class SpellAction {
 		
 	}
 	
+	private static class HealthStealEffect extends DamageEffect {
+		
+		public HealthStealEffect(EMagicElement element, float amount) {
+			super(element, amount);
+		}
+		
+		@Override
+		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			final float fin = this.doDamage(caster, entity, efficiency, resultBuilder, log);
+			
+			if (fin > 0) {
+				// Heal for the damage dealt
+				log.healStart(fin, element);
+				caster.heal(fin);
+				log.healFinish(fin);
+			}
+		}
+		
+		@Override
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			return; // Do nothing
+		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+	}
+	
+	private static class ManaStealEffect extends NegativeSpellEffect {
+		
+		protected final EMagicElement element;
+		protected final int amount;
+		
+		public ManaStealEffect(EMagicElement element, int amount) {
+			this.element = element;
+			this.amount = amount;
+		}
+		
+		@Override
+		public void applyEffect(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			caster.setLastHurtMob(entity);
+			entity.setLastHurtByMob(caster);
+			//entity.setHealth(Math.max(0f, entity.getHealth() - fin));
+			entity.invulnerableTime = 0;
+			
+			log.damageManaStart(this.amount, this.element);
+			
+			final int fin;
+			final @Nullable INostrumMana targetMana = NostrumMagica.getManaWrapper(entity);
+			final @Nullable INostrumMana casterMana = NostrumMagica.getManaWrapper(caster);
+			if (targetMana != null) {
+				fin = Math.min(targetMana.getMana(), this.amount);
+				targetMana.addMana(-fin);
+			} else {
+				fin = amount; // just pretend
+			}
+			
+			NostrumMagicaSounds.LUX_DEATH.play(entity);
+			resultBuilder.applied |= true;
+			//resultBuilder.damage += fin;
+			log.damageManaFinish(fin);
+			
+			if (fin > 0 && casterMana != null) {
+				// Heal for the damage dealt
+				log.restoreManaStart(fin, element);
+				casterMana.addMana(fin);
+				log.restoreManaFinish(fin);
+			}
+		}
+		
+		@Override
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			return; // Do nothing
+		}
+		
+		@Override
+		public boolean affectsBlocks() {
+			return false;
+		}
+	}
+	
+	private static class LightEffect implements SpellEffect {
+		
+		private static final Component LABEL_LIGHT_STATUS_NAME = new TranslatableComponent("spelllog.nostrummagica.light.name");
+		private static final Component LABEL_LIGHT_STATUS_DESC = new TranslatableComponent("spelllog.nostrummagica.light.desc");
+		
+		public LightEffect() {
+			
+		}
+
+		@Override
+		public void apply(LivingEntity caster, LivingEntity entity, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			// actually won't ever be called, because we use a regular status effect for this part
+		}
+
+		@Override
+		public void apply(LivingEntity caster, SpellLocation location, float eff, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			log.generalEffectStart(LABEL_LIGHT_STATUS_NAME, LABEL_LIGHT_STATUS_DESC, false);
+			log.generalEffectFinish(0f, 0f);
+			
+			final BlockState state = NostrumBlocks.mageLight.defaultBlockState();
+			final BlockPos pos = location.hitBlockPos;
+			if (location.world.getBlockState(pos).getMaterial().isReplaceable() && state.canSurvive(location.world, pos) && location.world.setBlockAndUpdate(pos, state)) {
+				NostrumMagicaSounds.DAMAGE_EARTH.play(location.world, pos);
+				resultBuilder.applied |= true;
+				resultBuilder.affectedPos = new SpellLocation(location.world, pos);
+			}
+		}
+
+		@Override
+		public boolean affectsEntities() {
+			return false;
+		}
+
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+	}
+	
 	private List<SpellEffect> effects;
 	private BaseComponent name;
 	private BaseComponent desc;
@@ -2354,6 +2513,16 @@ public class SpellAction {
 		return this;
 	}
 	
+	public SpellAction stealHealth(EMagicElement element, float amount) {
+		effects.add(new HealthStealEffect(element, amount));
+		return this;
+	}
+	
+	public SpellAction stealMana(EMagicElement element, int amount) {
+		effects.add(new ManaStealEffect(element, amount));
+		return this;
+	}
+	
 	public SpellAction status(MobEffect effect, int duration, int amplitude) {
 		effects.add(new StatusEffect(effect, duration, amplitude));
 		return this;
@@ -2379,13 +2548,13 @@ public class SpellAction {
 		return this;
 	}
 	
-	public SpellAction push(float radius, int level) {
-		effects.add(new PushEffect(radius, level));
+	public SpellAction knockback(int level) {
+		effects.add(new KnockbackEffect(level));
 		return this;
 	}
 	
 	public SpellAction pull(float radius, int level) {
-		effects.add(new PushEffect(radius, -level));
+		effects.add(new PullEffect(radius, level));
 		return this;
 	}
 	
@@ -2419,8 +2588,8 @@ public class SpellAction {
 		return this;
 	}
 	
-	public SpellAction healMana(int level) {
-		effects.add(new HealManaEffect(20 * level));
+	public SpellAction healMana(int mana) {
+		effects.add(new HealManaEffect(mana));
 		return this;
 	}
 	
@@ -2502,6 +2671,11 @@ public class SpellAction {
 	public SpellAction dropEquipment(int level, @Nullable IEffectPredicate predicate) {
 		final int pieces = (int) Math.pow(2, level-1); // 1, 2, 4
 		effects.add(new DropEquipmentEffect(predicate, pieces));
+		return this;
+	}
+	
+	public SpellAction lightBlock() {
+		effects.add(new LightEffect());
 		return this;
 	}
 	

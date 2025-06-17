@@ -35,7 +35,7 @@ public class MagicIceGolemEntity extends MagicGolemEntity {
 			spellBuff.addPart(new SpellEffectPart(
 					EMagicElement.ICE,
 					1,
-					EAlteration.SUPPORT));
+					EAlteration.RESIST));
 		}
 	}
 
