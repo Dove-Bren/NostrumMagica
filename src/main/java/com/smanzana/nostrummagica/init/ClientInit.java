@@ -96,13 +96,13 @@ import com.smanzana.nostrummagica.client.render.entity.SpellProjectileRenderer;
 import com.smanzana.nostrummagica.client.render.entity.SpriteRenderer;
 import com.smanzana.nostrummagica.client.render.entity.SwitchTriggerRenderer;
 import com.smanzana.nostrummagica.client.render.entity.TameDragonRedRenderer;
+import com.smanzana.nostrummagica.client.render.entity.WhirlwindRenderer;
 import com.smanzana.nostrummagica.client.render.entity.WilloRenderer;
 import com.smanzana.nostrummagica.client.render.entity.WispRenderer;
 import com.smanzana.nostrummagica.client.render.item.NostrumItemSpecialRenderer;
 import com.smanzana.nostrummagica.client.render.tile.AltarBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.BreakContainerBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.CandleBlockEntityRenderer;
-import com.smanzana.nostrummagica.client.render.tile.SummonGhostBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.DungeonDoorBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.DungeonKeyChestBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.LaserBlockEntityRenderer;
@@ -113,6 +113,7 @@ import com.smanzana.nostrummagica.client.render.tile.ObeliskBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.PortalBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.ProgressionDoorBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.PushBlockBlockEntityRenderer;
+import com.smanzana.nostrummagica.client.render.tile.SummonGhostBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TrialBlockEntityRenderer;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
@@ -402,6 +403,7 @@ public class ClientInit {
 		event.registerEntityRenderer(NostrumEntityTypes.seekerSpellSaucer, SeekerSaucerRenderer::new);
 		event.registerEntityRenderer(NostrumEntityTypes.boulder, SpellBoulderRenderer::new);
 		event.registerEntityRenderer(NostrumEntityTypes.playerStatue, PlayerStatueRenderer::new);
+		event.registerEntityRenderer(NostrumEntityTypes.whirlwind, WhirlwindRenderer::new);
 	}
 	
 	@SubscribeEvent

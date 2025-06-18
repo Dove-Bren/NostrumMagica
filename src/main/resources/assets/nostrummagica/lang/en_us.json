@@ -545,6 +545,7 @@
 	"entity.nostrummagica.entity_shrine_ent_tier": "Magic Shrine",
 	"entity.nostrummagica.magic_projectile": "Magic Projectile",
 	"entity.nostrummagica.player_statue": "Magic Statue",
+	"entity.nostrummagica.whirlwind": "Whirlwind",
 
     "entity.nostrummagica.placeholder.soulbound": "Soulbound Pet",
 
@@ -1320,6 +1321,8 @@
 	"spelleffect.carapace.desc": "Applies the Carapace status effect, reducing and reflecting .5 damage per level.",
 	"spelleffect.light.name": "Light",
 	"spelleffect.light.desc": "Creates a mage light, or applies the glowing effect.",
+	"spelleffect.whirlwind.name": "Whirlwind",
+    "spelleffect.whirlwind.desc": "Creates a whirlwind on a block or entity that continuously pushes other entities away.",
 	
 	"shape.ai.name": "AI",
 	"shape.ai.desc": "Targets the entity's current attack target. Not intended for player use.",

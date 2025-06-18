@@ -25,6 +25,7 @@ public class NostrumModelLayers {
 	public static final ModelLayerLocation PlayerStatueArmor = make("player_statue_armor");
 	public static final ModelLayerLocation Willo = make("willo");
 	public static final ModelLayerLocation WitchHat = make("witchhat");
+	public static final ModelLayerLocation Whirlwind = make("whirlwind");
 	
 	public static final ModelLayerLocation ElemArmor_0 = make("elemarmor_0");
 	public static final ModelLayerLocation ElemArmor_1 = make("elemarmor_1");
@@ -57,6 +58,7 @@ public class NostrumModelLayers {
 		event.registerLayerDefinition(ArcaneWolf, ArcaneWolfModel::createLayer);
 		event.registerLayerDefinition(PlayerStatue, () -> PlayerStatueModel.createLayer(CubeDeformation.NONE));
 		event.registerLayerDefinition(PlayerStatueArmor, () -> PlayerStatueModel.createLayer(LayerDefinitions.INNER_ARMOR_DEFORMATION));
+		event.registerLayerDefinition(Whirlwind, WhirlwindModel::createLayer);
 
 		event.registerLayerDefinition(ElemArmor_0, () -> EnchantedArmorBaseModel.createLayer(0));
 		event.registerLayerDefinition(ElemArmor_1, () -> EnchantedArmorBaseModel.createLayer(1));

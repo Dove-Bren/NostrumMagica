@@ -137,7 +137,7 @@ public class NostrumRenderTypes extends RenderType {
 				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
 				.setWriteMaskState(WRITE_NO_DEPTH_BUT_COLOR)
 				.setTexturingState(MANAARMOR_GLINT)
-				.setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+				.setShaderState(RENDERTYPE_ENERGY_SWIRL_SHADER)
 				// depth test?
 			.createCompositeState(false);
 		MANA_ARMOR = RenderType.create(Name("manaarmor"), DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 128, false, false, glState);
@@ -366,6 +366,22 @@ public class NostrumRenderTypes extends RenderType {
 	
 	public static final RenderType GetBlendedEntity(ResourceLocation texture) {
 		return GetBlendedEntity(texture, true);
+	}
+	
+	// This is more-or-less a copy of 1.21's "breezeWind()" render type creation method
+	public static final RenderType XOffsetEnt(ResourceLocation texture, float offset, boolean outline) {
+		RenderType.CompositeState glState;
+		
+		glState = RenderType.CompositeState.builder()
+				.setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
+				.setLightmapState(LIGHTMAP_ENABLED)
+				.setOverlayState(NO_OVERLAY)
+				.setCullState(NO_CULL)
+				.setLayeringState(VIEW_OFFSET_Z_LAYERING)
+				.setTexturingState(new RenderStateShard.OffsetTexturingStateShard(offset, 0f))
+				.setShaderState(RENDERTYPE_ENERGY_SWIRL_SHADER)
+			.createCompositeState(outline);
+		return RenderType.create(Name("xoffsetEnt"), DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, false, true, glState);
 	}
 	
 }

@@ -210,8 +210,7 @@ public final class SpellEffects {
 		case LIGHTNING:
 			return new SpellAction().status(NostrumEffects.magicResist, duration, amp).name("magicresist");
 		case WIND:
-			int unused;
-			return new SpellAction().knockback(elementCount).name("push");
+			return new SpellAction().whirlwind((5 + (elementCount * 5)) * 20, 1f + (elementCount * .5f)).name("whirlwind");
 		}
 		
 		return null;

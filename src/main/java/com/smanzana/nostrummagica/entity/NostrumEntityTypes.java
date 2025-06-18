@@ -92,6 +92,7 @@ public class NostrumEntityTypes {
 	@ObjectHolder(MagicDamageProjectileEntity.ID) public static EntityType<MagicDamageProjectileEntity> magicDamageProjectile;
 	@ObjectHolder(CursedGlassTriggerEntity.ID) public static EntityType<CursedGlassTriggerEntity> cursedGlassTrigger;
 	@ObjectHolder(PlayerStatueEntity.ID) public static EntityType<PlayerStatueEntity> playerStatue;
+	@ObjectHolder(WhirlwindEntity.ID) public static EntityType<WhirlwindEntity> whirlwind;
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<EntityType<?>> event) {
@@ -301,6 +302,11 @@ public class NostrumEntityTypes {
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.sized(1, 2)
 			.build("").setRegistryName(PlayerStatueEntity.ID));
+		
+		registry.register(EntityType.Builder.<WhirlwindEntity>of(WhirlwindEntity::new, MobCategory.MISC)
+    			.sized(0.5F, 0.5F)
+    			.setTrackingRange(64).setUpdateInterval(5).setShouldReceiveVelocityUpdates(false)
+    		.build("").setRegistryName(WhirlwindEntity.ID));
 	}
 	
 	private static final boolean netherMobGroundSpawnTest(EntityType<?> type, LevelAccessor world, MobSpawnType reason, BlockPos pos, Random rand) {

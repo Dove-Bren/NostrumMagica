@@ -29,6 +29,7 @@ import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.IEnchantableEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.TameLightning;
+import com.smanzana.nostrummagica.entity.WhirlwindEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicEarthGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicEnderGolemEntity;
@@ -1083,16 +1084,10 @@ public class SpellAction {
 		}
 	}
 	
-	private static class SummonEffect implements SpellEffect {
-		private EMagicElement element;
-		private int power;
+	private static abstract class SummonEffect<T extends Entity> implements SpellEffect {
 		
-		public SummonEffect(EMagicElement element, int power) {
-			this.element = element;
-			this.power = power;
+		public SummonEffect() {
 			
-			if (this.element == null)
-				this.element = EMagicElement.PHYSICAL;
 		}
 
 		@Override
@@ -1135,17 +1130,25 @@ public class SpellAction {
 					return;
 				}
 				
+				int baseTime = getSummonBaseDuration();
+				int time = (int) (baseTime * efficiency);
+				
 				NostrumMagica.getMagicWrapper(caster).clearFamiliars();
 				caster.removeEffectNoUpdate(NostrumEffects.familiar);
-				for (int i = 0; i < power; i++) {
-					MagicGolemEntity golem = spawnGolem(location.world);
-					golem.setPos(applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
-					location.world.addFreshEntity(golem);
-					golem.setOwnerUUID(caster.getUUID());
-					NostrumMagica.getMagicWrapper(caster).addFamiliar(golem);
+				for (int i = 0; i < getSummonCount(); i++) {
+					T summon = spawnSummon(location.world, time, caster);
+					summon.setPos(applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
+					location.world.addFreshEntity(summon);
+					
+					if (summon instanceof LivingEntity living) {
+						NostrumMagica.getMagicWrapper(caster).addFamiliar(living);
+					}
+					
+					if (summon instanceof MagicGolemEntity golem) { // TODO expand this
+						golem.setOwnerUUID(caster.getUUID());
+					}
 				}
-				int baseTime = (int) (20 * 60 * 2.5 * Math.pow(2, Math.max(0, power - 1)));
-				int time = (int) (baseTime * efficiency);
+				
 				caster.addEffect(new MobEffectInstance(NostrumEffects.familiar, time, 0) {
 					@Override
 					public boolean tick(LivingEntity entityIn, Runnable onComplete) {
@@ -1177,19 +1180,16 @@ public class SpellAction {
 						return ret;
 					}
 				});
-				
-				final Component LABEL_SUMMON_NAME = new TranslatableComponent("spelllog.nostrummagica.summon.name", this.element.getDisplayName());
-				final Component LABEL_SUMMON_DESC = new TranslatableComponent("spelllog.nostrummagica.summon.desc", this.element.getDisplayName(), "" + power, "" + ((float) (baseTime) / 20f), "" + ((float) time / 20f));
-				log.generalEffectStart(LABEL_SUMMON_NAME, LABEL_SUMMON_DESC, false);
-				log.generalEffectFinish(0f, 0f);
 			} else {
 				// Just summon some new golems
 				final int time = (int) (20f * (15f * efficiency));
-				for (int i = 0; i < power; i++) {
-					MagicGolemEntity golem = spawnGolem(location.world);
-					golem.setPos(applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
-					golem.setExpiresAfterTicks(time);
-					location.world.addFreshEntity(golem);
+				for (int i = 0; i < getSummonCount(); i++) {
+					T summon = spawnSummon(location.world, time, caster);
+					summon.setPos(applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
+					location.world.addFreshEntity(summon);
+					if (summon instanceof MagicGolemEntity golem) {
+						golem.setExpiresAfterTicks(time);
+					}
 				}
 			}
 			
@@ -1199,7 +1199,50 @@ public class SpellAction {
 			resultBuilder.affectedPos = new SpellLocation(location.world, applyPos);
 		}
 		
-		private MagicGolemEntity spawnGolem(Level world) {
+		protected abstract T spawnSummon(Level world, int durationTicks, LivingEntity caster);
+		
+		protected abstract int getSummonCount();
+		
+		protected abstract int getSummonBaseDuration();
+		
+		@Override
+		public boolean affectsBlocks() {
+			return true;
+		}
+		
+		@Override
+		public boolean affectsEntities() {
+			return false;
+		}
+	}
+	
+	private static class SummonGolemEffect extends SummonEffect<MagicGolemEntity> {
+		private EMagicElement element;
+		private int power;
+		
+		public SummonGolemEffect(EMagicElement element, int power) {
+			super();
+			this.element = element;
+			this.power = power;
+			
+			if (this.element == null)
+				this.element = EMagicElement.PHYSICAL;
+		}
+
+		@Override
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			super.apply(caster, location, efficiency, resultBuilder, log);
+			
+			final int baseTime = getSummonBaseDuration();
+			final int time = (int) (baseTime * efficiency);
+			final Component LABEL_SUMMON_NAME = new TranslatableComponent("spelllog.nostrummagica.summon.name", this.element.getDisplayName());
+			final Component LABEL_SUMMON_DESC = new TranslatableComponent("spelllog.nostrummagica.summon.desc", this.element.getDisplayName(), "" + power, "" + ((float) (baseTime) / 20f), "" + ((float) time / 20f));
+			log.generalEffectStart(LABEL_SUMMON_NAME, LABEL_SUMMON_DESC, false);
+			log.generalEffectFinish(0f, 0f);
+		}
+		
+		@Override
+		protected MagicGolemEntity spawnSummon(Level world, int duration, LivingEntity caster) {
 			MagicGolemEntity golem;
 			
 			switch (element) {
@@ -1231,13 +1274,68 @@ public class SpellAction {
 		}
 		
 		@Override
-		public boolean affectsBlocks() {
-			return true;
+		protected int getSummonCount() {
+			return this.power;
 		}
 		
 		@Override
-		public boolean affectsEntities() {
-			return false;
+		protected int getSummonBaseDuration() {
+			return (int) (20 * 60 * 2.5 * Math.pow(2, Math.max(0, power - 1)));
+		}
+	}
+	
+	private static class SummonWhirlwindEffect extends SummonEffect<WhirlwindEntity> {
+		private float size;
+		private int duration;
+		
+		public SummonWhirlwindEffect(int duration, float size) {
+			super();
+			this.size = size;
+			this.duration = duration;
+		}
+		
+		@Override
+		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			WhirlwindEntity whirlwind = spawnSummon(entity.level, (int) (this.duration * efficiency), caster, entity);
+			whirlwind.setPos(entity.position());
+			entity.level.addFreshEntity(whirlwind);
+			
+			NostrumMagicaSounds.CAST_CONTINUE.play(entity.level,
+					entity.getX() + .5, entity.getY(), entity.getZ() + .5);
+			resultBuilder.applied |= true;
+			//resultBuilder.affectedPos = new SpellLocation(entity.level, entity.position());
+		}
+
+		@Override
+		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
+			super.apply(caster, location, efficiency, resultBuilder, log);
+			
+//			final int baseTime = getSummonBaseDuration();
+//			final int time = (int) (baseTime * efficiency);
+//			final Component LABEL_SUMMON_NAME = new TranslatableComponent("spelllog.nostrummagica.summon.name", this.element.getDisplayName());
+//			final Component LABEL_SUMMON_DESC = new TranslatableComponent("spelllog.nostrummagica.summon.desc", this.element.getDisplayName(), "" + power, "" + ((float) (baseTime) / 20f), "" + ((float) time / 20f));
+//			log.generalEffectStart(LABEL_SUMMON_NAME, LABEL_SUMMON_DESC, false);
+//			log.generalEffectFinish(0f, 0f);
+		}
+		
+		protected WhirlwindEntity spawnSummon(Level world, int duration, LivingEntity caster, @Nullable LivingEntity target) {
+			WhirlwindEntity whirlwind = new WhirlwindEntity(world, duration, size, target, e -> e != caster);
+			return whirlwind;
+		}
+		
+		@Override
+		protected WhirlwindEntity spawnSummon(Level world, int duration, LivingEntity caster) {
+			return spawnSummon(world, duration, caster, null); // block version
+		}
+		
+		@Override
+		protected int getSummonCount() {
+			return 1;
+		}
+		
+		@Override
+		protected int getSummonBaseDuration() {
+			return duration;
 		}
 	}
 	
@@ -1326,6 +1424,8 @@ public class SpellAction {
 			return true;
 		}
 	}
+	
+	
 	
 	private static class PropelEffect implements SpellEffect {
 		
@@ -2569,7 +2669,7 @@ public class SpellAction {
 	}
 	
 	public SpellAction summon(EMagicElement element, int power) {
-		effects.add(new SummonEffect(element, power));
+		effects.add(new SummonGolemEffect(element, power));
 		return this;
 	}
 	
@@ -2676,6 +2776,11 @@ public class SpellAction {
 	
 	public SpellAction lightBlock() {
 		effects.add(new LightEffect());
+		return this;
+	}
+	
+	public SpellAction whirlwind(int duration, float scale) {
+		effects.add(new SummonWhirlwindEffect(duration, scale));
 		return this;
 	}
 	
