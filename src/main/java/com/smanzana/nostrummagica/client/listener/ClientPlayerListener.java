@@ -41,6 +41,7 @@ import com.smanzana.nostrummagica.client.render.layer.DragonFlightWingsLayer;
 import com.smanzana.nostrummagica.client.render.layer.EntityEffectLayer;
 import com.smanzana.nostrummagica.client.render.layer.KoidHelmLayer;
 import com.smanzana.nostrummagica.client.render.layer.ManaArmorLayer;
+import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
@@ -400,8 +401,17 @@ public class ClientPlayerListener extends PlayerListener {
 	
 	@SubscribeEvent
 	public void onJumpInput(PlayerJumpEvent.Pre event) {
-		// Evaluate double jump
 		final LocalPlayer player = (LocalPlayer) event.getPlayer();
+		
+		// make smoother client-side rooted
+		if (player.hasEffect(NostrumEffects.rooted) && player.getEffect(NostrumEffects.rooted).getDuration() > 0) {
+			event.consume();
+			NostrumMagicaSounds.CAST_FAIL.play(player);
+			return;
+		}
+		
+		// Evaluate double jump
+		
 		if (!event.isConsumed() && !player.isOnGround()) {
 			final int extraJumps = (int) event.getPlayer().getAttributeValue(NostrumAttributes.bonusJump);
 			if (extraJumps > 0) {

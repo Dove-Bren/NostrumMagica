@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.entity;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.tile.EntityProxiedTileEntity;
 
 import net.minecraft.core.BlockPos;
@@ -16,7 +18,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?>> extends Mob {
+public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?>> extends Mob implements ISpellHandlingEntity {
 	
 	private BlockPos cachePos;
 	private E cacheEntity;
@@ -90,6 +92,17 @@ public abstract class TileProxyTriggerEntity<E extends EntityProxiedTileEntity<?
 		if (canBeHitBy(livingSource)) {
 			te.trigger(livingSource, source, amount);
 			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public boolean processSpellEffect(LivingEntity caster, SpellEffectPart effect, SpellAction action) {
+		if (canBeHitBy(caster)) {
+			E te = getLinkedTileEntity();
+			if (te != null) {
+				te.trigger(caster, effect, action);
+			}
 		}
 		return false;
 	}

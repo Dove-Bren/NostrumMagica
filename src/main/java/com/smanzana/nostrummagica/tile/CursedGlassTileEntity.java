@@ -11,6 +11,8 @@ import com.smanzana.nostrummagica.entity.SwitchTriggerEntity;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.SpellEffectEvent.SpellEffectEndEvent;
+import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -271,6 +273,11 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 		}
 		
 		super.trigger(entity, source, damage);
+	}
+	
+	@Override
+	public void trigger(LivingEntity caster, SpellEffectPart effect, SpellAction action) {
+		; // don't process; needs to be damage, and damage effects will happen next
 	}
 	
 	@Override

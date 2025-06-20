@@ -43,8 +43,8 @@ public class PushBlock extends BaseEntityBlock implements ISpellTargetBlock {
 	
 	public static final String ID = "push_block";
 	
-	private static final double RECESSED_AMT = .25;
-	private static final VoxelShape RECESSED_BLOCK = Block.box(RECESSED_AMT, 0.0D, RECESSED_AMT, 16 - RECESSED_AMT, 16, 16 - RECESSED_AMT);
+	protected static final double RECESSED_AMT = .25;
+	protected static final VoxelShape RECESSED_BLOCK = Block.box(RECESSED_AMT, 0.0D, RECESSED_AMT, 16 - RECESSED_AMT, 16, 16 - RECESSED_AMT);
 	
 	public PushBlock() {
 		super(Block.Properties.of(Material.STONE)

@@ -158,7 +158,7 @@ public class NostrumBlockEntities {
 		register(registry, BlockEntityType.Builder.of(CursedGlassTileEntity::new, NostrumBlocks.cursedGlass).build(null), ID_CursedGlass);
 		register(registry, BlockEntityType.Builder.of(DungeonKeyChestTileEntity::new, NostrumBlocks.smallDungeonKeyChest, NostrumBlocks.largeDungeonKeyChest).build(null), ID_DungeonKeyChest);
 		register(registry, BlockEntityType.Builder.of(DungeonDoorTileEntity::new, NostrumBlocks.smallDungeonDoor, NostrumBlocks.largeDungeonDoor).build(null), ID_DungeonDoor);
-		register(registry, BlockEntityType.Builder.of(PushBlockTileEntity::new, NostrumBlocks.pushBlock).build(null), ID_PushBlock);
+		register(registry, BlockEntityType.Builder.of(PushBlockTileEntity::new, NostrumBlocks.pushBlock, NostrumBlocks.pushPassthroughBlock).build(null), ID_PushBlock);
 		register(registry, BlockEntityType.Builder.of(BreakContainerTileEntity::new, NostrumBlocks.breakContainerBlock).build(null), ID_BreakContainer);
 		register(registry, BlockEntityType.Builder.of(SummonGhostBlockEntity::new, NostrumBlocks.summonGhostBlock).build(null), ID_SummonGhostBlock);
 		register(registry, BlockEntityType.Builder.of(LaserBlockEntity::new, NostrumBlocks.laser).build(null), ID_LaserBlock);

@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.tile;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.entity.TileProxyTriggerEntity;
+import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -52,6 +54,8 @@ public abstract class EntityProxiedTileEntity<E extends TileProxyTriggerEntity<?
 	}
 	
 	public abstract void trigger(@Nullable LivingEntity entity, DamageSource source, float damage);
+	
+	public abstract void trigger(LivingEntity caster, SpellEffectPart effect, SpellAction action);
 	
 	protected Vec3 getEntityOffset() {
 		return new Vec3(.5, 0, .5);

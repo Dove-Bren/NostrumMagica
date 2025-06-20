@@ -179,7 +179,9 @@ public class OverlayRenderer extends GuiComponent {
 		
 		final int h = (int) player.getEyeHeight();
 		BlockState inBlock = player.level.getBlockState(new BlockPos(player.getX(), player.getY() + h, player.getZ()));
-		if (inBlock.getBlock() instanceof DungeonAirBlock) {
+		if (inBlock.getBlock() instanceof DungeonAirBlock airBlock) {
+			final float[] color = ColorUtil.ARGBToColor(airBlock.getOverlayColor(inBlock));
+			
 			// Render dungeon air overlay
 			{
 				final Matrix4f transform = matrixStackIn.last().pose();
@@ -192,10 +194,10 @@ public class OverlayRenderer extends GuiComponent {
 				final float depth = -91f;
 				RenderSystem.setShader(GameRenderer::getPositionColorShader);
 				bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-				bufferbuilder.vertex(transform, 0, height, depth).color(.3f, 0, .3f, .2f).endVertex();
-				bufferbuilder.vertex(transform, width, height, depth).color(.3f, 0, .3f, .2f).endVertex();
-				bufferbuilder.vertex(transform, width, 0, depth).color(.3f, 0, .3f, .2f).endVertex();
-				bufferbuilder.vertex(transform, 0, 0, depth).color(.3f, 0, .3f, .2f).endVertex();
+				bufferbuilder.vertex(transform, 0, height, depth).color(color[0], color[1], color[2], color[3]).endVertex();
+				bufferbuilder.vertex(transform, width, height, depth).color(color[0], color[1], color[2], color[3]).endVertex();
+				bufferbuilder.vertex(transform, width, 0, depth).color(color[0], color[1], color[2], color[3]).endVertex();
+				bufferbuilder.vertex(transform, 0, 0, depth).color(color[0], color[1], color[2], color[3]).endVertex();
 				bufferbuilder.end();
 				BufferUploader.end(bufferbuilder);
 				RenderSystem.enableTexture();

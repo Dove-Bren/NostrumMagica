@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.MysticWaterBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
@@ -128,9 +129,9 @@ public class MysticWaterFluid extends Fluid {
 		// power 1 should dry up every OTHER tick
 		// power 2 should never dry up
 		final int power = state.getValue(POWER);
-		if (power >= 2) {
+		if (power >= 2 && !DimensionUtils.IsSorceryDim(worldIn)) {
 			return false;
-		} else if (power == 1) {
+		} else if (power >= 1) {
 			// Figure out if it's the second tick by looking at worl tick time
 			final int rate = getTickDelay(worldIn);
 			return (worldIn.getGameTime() % (rate * 2) >= rate); 

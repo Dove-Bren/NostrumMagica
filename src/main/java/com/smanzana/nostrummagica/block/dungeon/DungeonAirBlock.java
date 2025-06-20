@@ -42,31 +42,11 @@ public class DungeonAirBlock extends HalfTransparentBlock {
 	public float getShadeBrightness(BlockState state, BlockGetter worldIn, BlockPos pos) {
 		return 1.0F;
 	}
-	
-//	@Override
-//	public boolean isSolid(BlockState state) {
-//		return false;
-//	}
 
 	@Override
 	public boolean propagatesSkylightDown(BlockState state, BlockGetter reader, BlockPos pos) {
 		return true;
 	}
-
-//	@Override
-//	public boolean causesSuffocation(BlockState state, IBlockReader worldIn, BlockPos pos) {
-//		return false;
-//	}
-//
-//	@Override
-//	public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
-//		return false;
-//	}
-
-//	@Override
-//	public boolean canEntitySpawn(BlockState state, IBlockReader worldIn, BlockPos pos, EntityType<?> type) {
-//		return false;
-//	}
 	
 	@OnlyIn(Dist.CLIENT)
 	@Override
@@ -91,58 +71,6 @@ public class DungeonAirBlock extends HalfTransparentBlock {
 		}
 	}
 	
-//	@Override
-//	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-//		final Item item = stack.getItem();
-//		if (item == fillItem) {
-//			this.spawnDoor(worldIn, pos);
-//		} else {
-//			super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
-//		}
-//	}
-	
-//	private void spawnDoor(World world, BlockPos center) {
-//		// Fill all air blocks around the start up to a maximum. Flood!
-//		Set<BlockPos> visited = new HashSet<>();
-//		List<BlockPos> next = new LinkedList<>();
-//		int blocksLeft = 256;
-//		
-//		// Center already placed so ignore it
-//		next.add(center.up());
-//		next.add(center.down());
-//		next.add(center.north());
-//		next.add(center.south());
-//		next.add(center.east());
-//		next.add(center.west());
-//		
-//		while (!next.isEmpty() && blocksLeft > 0) {
-//			BlockPos cur = next.remove(0);
-//			
-//			if (visited.contains(cur))
-//				continue;
-//			
-//			if (!world.isAirBlock(cur))
-//				continue;
-//			
-//			blocksLeft--;
-//			
-//			visited.add(cur);
-//			world.setBlockState(cur, this.getDefaultState());
-//			
-//			next.add(cur.up());
-//			next.add(cur.down());
-//			next.add(cur.north());
-//			next.add(cur.south());
-//			next.add(cur.east());
-//			next.add(cur.west());
-//		}
-//	}
-	
-//	@Override
-//	public boolean canBeConnectedTo(BlockState state, IBlockReader world, BlockPos pos, Direction facing) {
-//		return false;
-//	}
-	
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
 		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
@@ -155,19 +83,8 @@ public class DungeonAirBlock extends HalfTransparentBlock {
 		
 		return Shapes.block();
 	}
-	
-//	@Override
-//	public boolean canCollideCheck(BlockState state, boolean hitIfLiquid) {
-//		final PlayerEntity player = NostrumMagica.instance.proxy.getPlayer();
-//		if (player == null || player.world == null || !player.isCreative()) {
-//			return false;
-//		}
-//		return true;
-//	}
-//	
-//	@Override
-//	public boolean isCollidable()
-//    {
-//        return false;
-//    }
+
+	public int getOverlayColor(BlockState inBlock) {
+		return 0x304D004D;
+	}
 }

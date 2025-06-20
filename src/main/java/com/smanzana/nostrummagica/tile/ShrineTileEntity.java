@@ -15,6 +15,8 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.TargetLocation;
 
@@ -94,6 +96,11 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 			NostrumParticles.FILLED_ORB.spawn(this.getLevel(), new SpawnParams(30, pos.x(), pos.y() + yOffset, pos.z(), .3,
 					40, 20, new Vec3(0, .1, 0), new Vec3(.1, .05, .1)).gravity(true).color(getParticleColor()));
 		}
+	}
+	
+	@Override
+	public void trigger(LivingEntity caster, SpellEffectPart effect, SpellAction action) {
+		this.trigger(caster, null, 0);
 	}
 	
 	protected abstract void doReward(Player player);

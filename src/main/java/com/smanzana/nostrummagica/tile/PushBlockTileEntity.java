@@ -35,6 +35,7 @@ public class PushBlockTileEntity extends BlockEntity {
 	
 	private static final String NBT_ELEMENT = "element";
 	private static final String NBT_GRAVITY = "gravity";
+	private static final String NBT_PUSH_DIRECTION = "FROM_DIRECTION";
 	private static final int ANIM_DURATION = 20;
 	
 	private @Nullable EMagicElement element;
@@ -81,7 +82,7 @@ public class PushBlockTileEntity extends BlockEntity {
 			nbt.put(NBT_ELEMENT, this.getElement().toNBT());
 		}
 		if (this.oldDirection != null) {
-			nbt.putString("FROM_DIRECTION", this.oldDirection.getName());
+			nbt.putString(NBT_PUSH_DIRECTION, this.oldDirection.getName());
 		}
 		nbt.putBoolean(NBT_GRAVITY, gravity);
 	}
@@ -96,8 +97,8 @@ public class PushBlockTileEntity extends BlockEntity {
 			this.element = null;
 		}
 		
-		if (nbt.contains("FROM_DIRECTION")) {
-			this.animateFrom(Direction.byName(nbt.getString("FROM_DIRECTION")));
+		if (nbt.contains(NBT_PUSH_DIRECTION)) {
+			this.animateFrom(Direction.byName(nbt.getString(NBT_PUSH_DIRECTION)));
 		} else {
 			this.oldDirection = null;
 		}

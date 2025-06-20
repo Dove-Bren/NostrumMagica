@@ -8,6 +8,8 @@ import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.SwitchTriggerEntity;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
+import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -289,6 +291,13 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 				// Wrong input type
 				NostrumMagicaSounds.CAST_FAIL.play(level, worldPosition.getX() + .5, worldPosition.getY() + 1, worldPosition.getZ() + .5);
 			}
+		}
+	}
+	
+	@Override
+	public void trigger(LivingEntity caster, SpellEffectPart effect, SpellAction action) {
+		if (!this.isTriggered() && !this.level.isClientSide()) {
+			doTrigger();
 		}
 	}
 

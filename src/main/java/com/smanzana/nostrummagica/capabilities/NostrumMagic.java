@@ -1379,8 +1379,12 @@ public class NostrumMagic implements INostrumMagic {
 		for (String key : compound.getAllKeys()) {
 			boolean val = compound.getBoolean(key);
 			if (val) {
-				EAlteration elem = EAlteration.valueOf(key);
-				unlockAlteration(elem);
+				try {
+					EAlteration elem = EAlteration.valueOf(key);
+					unlockAlteration(elem);
+				} catch (IllegalArgumentException e) {
+					NostrumMagica.logger.warn("Ignoring unknown alteration (%s) in player data".formatted(key));
+				}
 			}
 		}
 		

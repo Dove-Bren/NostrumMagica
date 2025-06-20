@@ -12,6 +12,8 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.KeySwitchTriggerEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -133,6 +135,11 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 				50, 10,
 				Vec3.ZERO, new Vec3(.075, .05, .075)
 				).gravity(-.1f).color(this.getColor().getTextColor() | 0xAA000000));
+	}
+	
+	@Override
+	public void trigger(LivingEntity caster, SpellEffectPart effect, SpellAction action) {
+		this.trigger(caster, null, 0);
 	}
 	
 	@Override

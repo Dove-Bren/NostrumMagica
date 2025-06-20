@@ -508,6 +508,8 @@ public class ClientInit {
 		ItemBlockRenderTypes.setRenderLayer(NostrumFluids.pureWater, RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(NostrumFluids.pureWaterFlowing, RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.mageLight, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.pushPassthroughBlock, RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.rootingAir, RenderType.translucent());
 	}
 	
 	private static final void registerItemModelProperties() {

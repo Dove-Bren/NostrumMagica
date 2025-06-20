@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.block.ISpellTargetBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.effect.ElementalSpellBoostEffect;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
+import com.smanzana.nostrummagica.entity.ISpellHandlingEntity;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
@@ -445,6 +446,15 @@ public final class SpellEffects {
 				for (LivingEntity targ : targets) {
 					if (targ == null) {
 						continue;
+					}
+					
+					if (targ instanceof ISpellHandlingEntity spellHandler) {
+						if (spellHandler.processSpellEffect(caster, part, action)) {
+							log.effect(targ);
+							anySuccess = true;
+							totalAffectedEntities.computeIfAbsent(targ, e -> new NonNullEnumMap<>(EMagicElement.class, 0f));
+							log.endEffect();
+						}
 					}
 					
 					log.effect(targ);
