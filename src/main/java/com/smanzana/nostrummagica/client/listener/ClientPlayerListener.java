@@ -407,6 +407,7 @@ public class ClientPlayerListener extends PlayerListener {
 		if (player.hasEffect(NostrumEffects.rooted) && player.getEffect(NostrumEffects.rooted).getDuration() > 0) {
 			event.consume();
 			NostrumMagicaSounds.CAST_FAIL.play(player);
+			player.sendMessage(new TranslatableComponent("info.rooted.no_jump"), Util.NIL_UUID);
 			return;
 		}
 		

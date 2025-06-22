@@ -296,6 +296,7 @@ public class NostrumItems {
 	@ObjectHolder(FillItem.ID_AIR_ALL) public static FillItem fillDungeonAir;
 	@ObjectHolder(FillItem.ID_WATER_ALL) public static FillItem fillWater;
 	@ObjectHolder(FillItem.ID_WATER_DOWN) public static FillItem fillWaterLevel;
+	@ObjectHolder(FillItem.ID_ROOTING_AIR_ALL) public static FillItem fillHeavyAir;
 	@ObjectHolder(MageBlade.ID) public static MageBlade mageBlade;
 	@ObjectHolder(AspectedFireWeapon.ID) public static AspectedFireWeapon flameRod;
 	@ObjectHolder(AspectedPhysicalWeapon.ID) public static AspectedPhysicalWeapon deepMetalAxe;
@@ -598,6 +599,7 @@ public class NostrumItems {
     	register(registry, new FillItem(() -> NostrumBlocks.dungeonAir.defaultBlockState(), false).setRegistryName(FillItem.ID_AIR_ALL));
     	register(registry, new FillItem(() -> Blocks.WATER.defaultBlockState(), false).setRegistryName(FillItem.ID_WATER_ALL));
     	register(registry, new FillItem(() -> Blocks.WATER.defaultBlockState(), true).setRegistryName(FillItem.ID_WATER_DOWN));
+    	register(registry, new FillItem(() -> NostrumBlocks.rootingAir.defaultBlockState(), false).setRegistryName(FillItem.ID_ROOTING_AIR_ALL));
     	register(registry, new MageBlade().setRegistryName(MageBlade.ID));
     	register(registry, new AspectedFireWeapon().setRegistryName(AspectedFireWeapon.ID));
     	register(registry, new AspectedPhysicalWeapon().setRegistryName(AspectedPhysicalWeapon.ID));

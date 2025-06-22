@@ -304,6 +304,7 @@
 	
 	"item.nostrummagica.world_key": "World Key",
 	"item.nostrummagica.fill_tool_air": "Fill Dungeon Air",
+	"item.nostrummagica.fill_tool_rooting_air": "Fill Heavy Air",
 	"item.nostrummagica.fill_tool_water": "Fill Water",
 	"item.nostrummagica.fill_tool_water_level": "Fill Water Level",
 	
@@ -831,6 +832,7 @@
 	"info.research.already_know": "You already have researched %1$s",
 	"info.heldmirror.set_warning": "You are about to change what the mirror is pointing at. Sneak-use again on the same block to confirm.",
 	"info.gold_mirror.not_loaded": "The remote block can't be reached (unloaded).",
+	"info.rooted.no_jump": "The roots at your feet prevent you from jumping",
 	
 	"mastery.unknown.name": "Unknown",
 	"mastery.novice.name": "Novice",

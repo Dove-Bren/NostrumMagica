@@ -21,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -152,6 +153,14 @@ public class CursedGlass extends SwitchBlock {
 					if (te != null) {
 						CursedGlassTileEntity ent = (CursedGlassTileEntity) te;
 						ent.setRequiredDamage(ent.getRequiredDamage() + 1f);
+						NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+					}
+					return InteractionResult.SUCCESS;
+				} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof PickaxeItem) {
+					BlockEntity te = worldIn.getBlockEntity(pos);
+					if (te != null) {
+						CursedGlassTileEntity ent = (CursedGlassTileEntity) te;
+						ent.setRequiredDamage(Math.max(.1f, ent.getRequiredDamage() - 1f));
 						NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 					}
 					return InteractionResult.SUCCESS;

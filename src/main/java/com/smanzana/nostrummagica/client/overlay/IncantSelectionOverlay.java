@@ -481,7 +481,10 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		// This used to do the work to figure out if it should show the second shape stage, but now that's all determined
 		// when creating stages. This just needs to advance.
 		this.shape = shape;
-		this.advanceStage(isRight);
+		
+		Player player = NostrumMagica.Proxy.getPlayer();
+		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		this.advanceStage(isRight && hasFullShapeSelection(attr));
 	}
 	
 	protected void setSecondShape(SpellShape shape, boolean isRight) {

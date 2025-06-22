@@ -1,7 +1,9 @@
 package com.smanzana.nostrummagica.item.equipment;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -11,16 +13,20 @@ import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.autodungeons.world.dungeon.DungeonRecord;
 import com.smanzana.nostrummagica.block.dungeon.DungeonKeyChestBlock;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.DungeonKeyChestTileEntity;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
-import net.minecraft.Util;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -29,9 +35,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Solidified position crystal for obelisk linking
@@ -41,27 +50,34 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 public class SeekingGem extends Item implements ILoreTagged {
 	
 	public static interface IChestFilter {
-		public boolean test(Level world, BlockPos pos, BlockState state);
+		public boolean test(Level world, BlockPos pos, BlockState state, @Nullable BlockEntity blockEnt);
 	}
 	
-	protected static final IChestFilter IS_DUNGEONCHEST = (world, pos, state) -> state.getBlock() instanceof DungeonKeyChestBlock && !state.getValue(DungeonKeyChestBlock.OPEN);
+	protected static final IChestFilter IS_DUNGEONCHEST = (world, pos, state, ent) -> state.getBlock() instanceof DungeonKeyChestBlock && !state.getValue(DungeonKeyChestBlock.OPEN);
+	protected static final IChestFilter IS_EMPTYCHEST = (world, pos, state, ent) -> state.getBlock() instanceof ChestBlock && ent != null && ent instanceof ChestBlockEntity chest && chest.lootTable == null && chest.isEmpty();
+	protected static final IChestFilter IS_FILLEDCHEST = (world, pos, state, ent) -> state.getBlock() instanceof ChestBlock && ent != null && ent instanceof ChestBlockEntity chest && chest.lootTable == null && !chest.isEmpty();
+	protected static final IChestFilter IS_LOOTCHEST = (world, pos, state, ent) -> state.getBlock() instanceof ChestBlock && ent != null && ent instanceof ChestBlockEntity chest && chest.lootTable != null;
 	
-	public static @Nullable BlockPos FindKeyChest(Level world, BoundingBox bounds, BlockPos center, @Nullable IChestFilter chestFilterIn) {
+	public static void FindChests(Level world, BoundingBox bounds, BlockPos center, @Nullable IChestFilter chestFilterIn, List<BlockPos> matches) {
 		final IChestFilter chestFilter = chestFilterIn != null
 				? chestFilterIn
 				: IS_DUNGEONCHEST; 
 		
 		final BlockPos min = new BlockPos(bounds.minX(), bounds.minY(), bounds.minZ());
 		final BlockPos max = new BlockPos(bounds.maxX(), bounds.maxY(), bounds.maxZ());
-		List<BlockPos> matches = new ArrayList<>();
 		WorldUtil.ScanBlocks(world, min, max, (worldIn, pos) -> {
 			BlockState state = world.getBlockState(pos);
-			if (chestFilter.test(world, pos, state)) {
+			BlockEntity ent = world.getBlockEntity(pos);
+			if (chestFilter.test(world, pos, state, ent)) {
 				matches.add(pos.immutable());
 			}
 			return true;
 		});
-		
+	}
+	
+	public static @Nullable BlockPos FindClosestChest(Level world, BoundingBox bounds, BlockPos center, @Nullable IChestFilter chestFilterIn) {
+		List<BlockPos> matches = new ArrayList<>();
+		FindChests(world, bounds, center, chestFilterIn, matches);
 		BlockPos closest = null;
 		int minLength = Integer.MAX_VALUE;
 		for (BlockPos candidate : matches) {
@@ -81,53 +97,113 @@ public class SeekingGem extends Item implements ILoreTagged {
 		super(props);
 	}
 	
-	protected @Nullable BlockPos attemptDungeonSeek(Player playerIn, Level worldIn, ItemStack gem, DungeonRecord dungeon) {
+	protected static enum SeekTargetType {
+		KEY_CHEST,
+		LOOT_CHEST,
+		NON_EMPTY_CHEST,
+		EMPTY_CHEST
+	}
+	
+	protected static record SeekTarget(SeekTargetType type, BlockPos pos) {}
+	
+	protected @Nullable SeekTarget attemptDungeonSeek(Player playerIn, Level worldIn, ItemStack gem, DungeonRecord dungeon) {
 		if (dungeon != null && dungeon.currentRoom != null) {
-			return FindKeyChest(worldIn, dungeon.currentRoom.getBounds(), playerIn.blockPosition(), (world, pos, state) -> {
-				if (!IS_DUNGEONCHEST.test(world, pos, state)) {
+			// Sorcery dimension has prefilled non-empty chests and key chests. Overworld dungeons have key chests and loot chests. Find all three.
+			// Since we have to lambda, might as well track directly and avoid a second loop and re-check
+			Set<BlockPos> keyChests = new HashSet<>();
+			Set<BlockPos> lootChests = new HashSet<>();
+			Set<BlockPos> filledChests = new HashSet<>();
+			
+			IChestFilter filter = (world, pos, state, ent) -> {
+				if (IS_DUNGEONCHEST.test(world, pos, state, ent)) {
+					// Also make sure its key matches the dungeon!
+					BlockEntity te = world.getBlockEntity(pos);
+					if (te == null || !(te instanceof DungeonKeyChestTileEntity)) {
+						return false;
+					}
+					
+					final WorldKey hasKey = ((DungeonKeyChestTileEntity) te).getWorldKey();
+					if (hasKey != null && (hasKey.equals(dungeon.instance.getLargeKey()) || hasKey.equals(dungeon.instance.getSmallKey()))) {
+						keyChests.add(pos.immutable());
+						return true;
+					}
 					return false;
 				}
 				
-				// Also make sure its key matches the dungeon!
-				BlockEntity te = world.getBlockEntity(pos);
-				if (te == null || !(te instanceof DungeonKeyChestTileEntity)) {
-					return false;
+				if (IS_LOOTCHEST.test(world, pos, state, ent)) {
+					lootChests.add(pos.immutable());
+					return true;
 				}
 				
-				final WorldKey hasKey = ((DungeonKeyChestTileEntity) te).getWorldKey();
-				return hasKey != null && (hasKey.equals(dungeon.instance.getLargeKey()) || hasKey.equals(dungeon.instance.getSmallKey()));
-			});
+				if (IS_FILLEDCHEST.test(world, pos, state, ent)) {
+					filledChests.add(pos.immutable());
+					return true;
+				}
+				
+				return false;
+			};
+			@Nullable BlockPos foundPos = FindClosestChest(worldIn, dungeon.currentRoom.getBounds(), playerIn.blockPosition(), filter);
+			
+			if (foundPos != null) {
+				final SeekTargetType type;
+				if (keyChests.contains(foundPos)) {
+					type = SeekTargetType.KEY_CHEST;
+				} else if (lootChests.contains(foundPos)) {
+					type = SeekTargetType.LOOT_CHEST;
+				} else {
+					type = SeekTargetType.NON_EMPTY_CHEST;
+				}
+				return new SeekTarget(type, foundPos);
+			} else {
+				return null;
+			}
 		}
 		
-		return null;
+		// Not in a dungeon. Since this is client-side, we don't know if we're in a structure either...
+		// So fall back to just cuboid scan
+		final BoundingBox fallbackBox = BoundingBox.fromCorners(playerIn.blockPosition().below(10).west(20).north(20), playerIn.blockPosition().above(10).east(20).south(20));
+		final boolean searchForEmpty = playerIn.isCreative() && playerIn.isCrouching();
+		@Nullable BlockPos foundPos = FindClosestChest(worldIn, fallbackBox, playerIn.blockPosition(), searchForEmpty ? IS_EMPTYCHEST : IS_LOOTCHEST);
+		
+		return foundPos == null ? null : new SeekTarget(searchForEmpty ? SeekTargetType.EMPTY_CHEST : SeekTargetType.LOOT_CHEST, foundPos);
 	}
 	
 	protected boolean doSeek(Level world, Player player, ItemStack stack) {
-		DungeonRecord dungeon = AutoDungeons.GetDungeonTracker().getDungeon(player);
-		if (dungeon != null) {
-			// Only do work on client side!
-			if (world.isClientSide) {
-				@Nullable BlockPos nearest = attemptDungeonSeek(player, world, stack, dungeon);
-				if (nearest != null) {
-					NostrumMagicaSounds.AMBIENT_WOOSH3.playClient(world, nearest.getX() + .5, nearest.getY() + .5, nearest.getZ() + .5);
-					
-//					NostrumParticles.GLOW_TRAIL.spawn(world, new SpawnParams(1, player.getX() + .5, player.getY() + .5, player.getZ() + .5,
-//							0, 300, 0, new TargetLocation(Vec3.atCenterOf(nearest))
-//							).setTargetBehavior(new ParticleTargetBehavior().joinMode(true)).color(1f, .8f, 1f, .3f));
-				} else {
-					NostrumMagicaSounds.CAST_FAIL.playClient(player);
+		
+		// Only do work on client side... except client side doesn't have chest info besides dungeon chests. Yikes?
+		if (!world.isClientSide) {
+			DungeonRecord dungeon = AutoDungeons.GetDungeonTracker().getDungeon(player);
+			@Nullable SeekTarget nearest = attemptDungeonSeek(player, world, stack, dungeon);
+			if (nearest != null) {
+				final BlockPos nearestPos = nearest.pos;
+				switch (nearest.type) {
+				case EMPTY_CHEST:
+					NostrumMagicaSounds.DAMAGE_ICE.play(world, nearestPos.getX() + .5, nearestPos.getY() + .5, nearestPos.getZ() + .5);
+					break;
+				case KEY_CHEST:
+					NostrumMagicaSounds.AMBIENT_WOOSH3.play(world, nearestPos.getX() + .5, nearestPos.getY() + .5, nearestPos.getZ() + .5);
+					break;
+				case LOOT_CHEST:
+					world.playSound(null, nearestPos, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1f, 1f);
+					break;
+				case NON_EMPTY_CHEST:
+					world.playSound(null, nearestPos, SoundEvents.NOTE_BLOCK_PLING, SoundSource.PLAYERS, 1f, 1f);
+					break;
 				}
-				player.getCooldowns().addCooldown(stack.getItem(), 20); // Jut client side
-				return nearest != null;
+				
+				if (player.isCreative()) {
+					NostrumParticles.GLOW_TRAIL.spawn(world, new SpawnParams(1, player.getX() + .5, player.getY() + .5, player.getZ() + .5,
+							0, 300, 0, new TargetLocation(Vec3.atCenterOf(nearestPos))
+							).setTargetBehavior(new ParticleTargetBehavior().joinMode(true)).color(1f, .8f, 1f, .3f));
+				}
+			} else {
+				NostrumMagicaSounds.CAST_FAIL.playClient(player);
 			}
-			
-			return true;
-		} else {
-			if (world.isClientSide) {
-				player.sendMessage(new TextComponent("It doesn't seem to do anything here..."), Util.NIL_UUID);
-			}
+			player.getCooldowns().addCooldown(stack.getItem(), 20); // Jut client side
+			return nearest != null;
 		}
-		return false;
+		
+		return true;
 	}
 	
 	@Override

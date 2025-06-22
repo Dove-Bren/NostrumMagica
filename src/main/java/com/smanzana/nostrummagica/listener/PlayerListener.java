@@ -61,6 +61,9 @@ import com.smanzana.nostrummagica.util.Projectiles;
 import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockPos.MutableBlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Direction.Axis;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -79,9 +82,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChainBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -108,6 +117,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimension
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -1641,5 +1651,41 @@ public class PlayerListener {
 		
 		event.setPos1(PositionCrystal.getBlockPosition(main));
 		event.setPos2(PositionCrystal.getBlockPosition(offhand));
+	}
+	
+	@SubscribeEvent
+	public void onBlockUse(RightClickBlock event) {
+		// Map building specific code: allow placing chains lower if a chain item is used on a chain block
+		if (event.isCanceled()) {
+			return;
+		}
+		
+		final Level level = event.getPlayer().getLevel();
+		final BlockState state = level.getBlockState(event.getPos());
+		if (state == null || !state.is(Blocks.CHAIN) || state.getValue(ChainBlock.AXIS) != Axis.Y) {
+			return;
+		}
+		
+		final ItemStack stack = event.getPlayer().getItemInHand(event.getHand());
+		if (stack.isEmpty() || !stack.is(Items.CHAIN)) {
+			return;
+		}
+		
+		// Find where we'd place
+		MutableBlockPos cursor = new MutableBlockPos();
+		cursor.set(event.getPos());
+		do {
+			cursor.move(Direction.DOWN);
+		} while (level.getBlockState(cursor.immutable()).is(Blocks.CHAIN));
+				// If it's an air block, make it a chain!
+		if (level.isEmptyBlock(cursor.immutable())) {
+			// We know item is chain from above
+			BlockItem blockItem = (BlockItem) stack.getItem();
+			//public BlockPlaceContext(Player p_43631_, InteractionHand p_43632_, ItemStack p_43633_, BlockHitResult p_43634_)
+			BlockHitResult fakeHit = event.getHitVec().withPosition(cursor.immutable()).withDirection(Direction.DOWN);
+			BlockPlaceContext newContext = new BlockPlaceContext(event.getPlayer(), event.getHand(), stack, fakeHit); // might be weird cause wrong hit vec?
+			event.setCancellationResult(blockItem.place(newContext));
+			event.setCanceled(true);
+		} // else let normal things happen
 	}
 }
