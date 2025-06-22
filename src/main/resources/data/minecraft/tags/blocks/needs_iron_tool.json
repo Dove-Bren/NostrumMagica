@@ -3,6 +3,12 @@
 	"values": [
 		"nostrummagica:essore",
 		"nostrummagica:magic_dirt",
-		"nostrummagica:mani_ore"
+		"nostrummagica:mani_ore",
+		"nostrummagica:fire_stone",
+		"nostrummagica:wind_stone",
+		"nostrummagica:ice_stone",
+		"nostrummagica:earth_stone",
+		"nostrummagica:lightning_stone",
+		"nostrummagica:ender_stone"
 	]
 }

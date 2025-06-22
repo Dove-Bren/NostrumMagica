@@ -17,6 +17,12 @@
 		"nostrummagica:nostrum_obelisk",
 		"nostrummagica:paradox_mirror",
 		"nostrummagica:putter",
-		"nostrummagica:portal_spawner"
+		"nostrummagica:portal_spawner",
+		"nostrummagica:fire_stone",
+		"nostrummagica:wind_stone",
+		"nostrummagica:ice_stone",
+		"nostrummagica:earth_stone",
+		"nostrummagica:lightning_stone",
+		"nostrummagica:ender_stone"
 	]
 }

@@ -510,6 +510,12 @@ public class ClientInit {
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.mageLight, RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.pushPassthroughBlock, RenderType.cutout());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.rootingAir, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.fireStone, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.iceStone, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.windStone, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.earthStone, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.lightningStone, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.enderStone, RenderType.translucent());
 	}
 	
 	private static final void registerItemModelProperties() {

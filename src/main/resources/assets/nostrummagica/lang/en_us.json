@@ -506,6 +506,12 @@
 	"block.nostrummagica.elemental_crystal_block": "Elemental Crystal",
 	"block.nostrummagica.mage_light": "Mage Light",
 	"block.nostrummagica.rooting_air": "Heavy Air",
+	"block.nostrummagica.fire_stone": "Fire Stone",
+	"block.nostrummagica.ice_stone": "Ice Stone",
+	"block.nostrummagica.earth_stone": "Earth Stone",
+	"block.nostrummagica.wind_stone": "Wind Stone",
+	"block.nostrummagica.lightning_stone": "Lightning Stone",
+	"block.nostrummagica.ender_stone": "Ender Stone",
 	
 	"block.nostrummagica.mani_crystal_mani": "Mani Crystal",
     "block.nostrummagica.mani_crystal_kani": "Kani Crystal",

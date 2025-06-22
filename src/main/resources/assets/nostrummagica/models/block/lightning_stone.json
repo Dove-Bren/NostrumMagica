@@ -1,0 +1,6 @@
+{
+    "parent": "block/cube_all",
+    "textures": {
+        "all": "nostrummagica:block/lightning_stone"
+    }
+}

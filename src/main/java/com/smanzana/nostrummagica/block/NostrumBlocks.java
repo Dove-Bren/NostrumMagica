@@ -1,7 +1,6 @@
 package com.smanzana.nostrummagica.block;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.block.dungeon.SummonGhostBlock;
 import com.smanzana.nostrummagica.block.dungeon.CursedGlass;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonBarsBlock;
@@ -27,6 +26,7 @@ import com.smanzana.nostrummagica.block.dungeon.RedstoneTriggerBlock;
 import com.smanzana.nostrummagica.block.dungeon.RootingAirBlock;
 import com.smanzana.nostrummagica.block.dungeon.ShrineBlock;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
+import com.smanzana.nostrummagica.block.dungeon.SummonGhostBlock;
 import com.smanzana.nostrummagica.block.dungeon.SwitchBlock;
 import com.smanzana.nostrummagica.block.dungeon.ToggleLogicDoor;
 import com.smanzana.nostrummagica.block.dungeon.TogglePlatformBlock;
@@ -45,6 +45,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HalfTransparentBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -59,6 +60,13 @@ import net.minecraftforge.registries.ObjectHolder;
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 @ObjectHolder(NostrumMagica.MODID)
 public class NostrumBlocks {
+	
+	protected static final String ID_FIRE_STONE = "fire_stone";
+	protected static final String ID_ICE_STONE = "ice_stone";
+	protected static final String ID_WIND_STONE = "wind_stone";
+	protected static final String ID_EARTH_STONE = "earth_stone";
+	protected static final String ID_LIGHTNING_STONE = "lightning_stone";
+	protected static final String ID_ENDER_STONE = "ender_stone";
 	
 	@ObjectHolder(ActiveHopperBlock.ID) public static ActiveHopperBlock activeHopper;
 	@ObjectHolder(AltarBlock.ID) public static AltarBlock altar;
@@ -150,6 +158,12 @@ public class NostrumBlocks {
 	@ObjectHolder(PureWaterBlock.ID) public static PureWaterBlock pureWater; 
 	@ObjectHolder(MageLightBlock.ID) public static MageLightBlock mageLight;
 	@ObjectHolder(RootingAirBlock.ID) public static RootingAirBlock rootingAir;
+	@ObjectHolder(ID_FIRE_STONE) public static Block fireStone;
+	@ObjectHolder(ID_ICE_STONE) public static Block iceStone;
+	@ObjectHolder(ID_WIND_STONE) public static Block windStone;
+	@ObjectHolder(ID_EARTH_STONE) public static Block earthStone;
+	@ObjectHolder(ID_LIGHTNING_STONE) public static Block lightningStone;
+	@ObjectHolder(ID_ENDER_STONE) public static Block enderStone;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -246,6 +260,12 @@ public class NostrumBlocks {
     	registerBlockItem(mageLight, mageLight.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(pushPassthroughBlock, pushPassthroughBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(rootingAir, rootingAir.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(fireStone, fireStone.getRegistryName(), registry);
+    	registerBlockItem(iceStone, iceStone.getRegistryName(), registry);
+    	registerBlockItem(windStone, windStone.getRegistryName(), registry);
+    	registerBlockItem(earthStone, earthStone.getRegistryName(), registry);
+    	registerBlockItem(lightningStone, lightningStone.getRegistryName(), registry);
+    	registerBlockItem(enderStone, enderStone.getRegistryName(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -363,6 +383,14 @@ public class NostrumBlocks {
     	registerBlock(new MageLightBlock(), MageLightBlock.ID, registry);
     	registerBlock(new PushPassthroughBlock(), PushPassthroughBlock.ID, registry);
     	registerBlock(new RootingAirBlock(), RootingAirBlock.ID, registry);
+    	
+    	final Block fireStone = new HalfTransparentBlock(BlockBehaviour.Properties.of(Material.AMETHYST).sound(SoundType.AMETHYST_CLUSTER).noOcclusion().strength(2.0F, 6.0F).requiresCorrectToolForDrops());
+    	registerBlock(fireStone, ID_FIRE_STONE, registry);
+    	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_ICE_STONE, registry);
+    	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_WIND_STONE, registry);
+    	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_EARTH_STONE, registry);
+    	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_LIGHTNING_STONE, registry);
+    	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_ENDER_STONE, registry);
     }
     
 }
