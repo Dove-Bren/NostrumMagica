@@ -2,10 +2,13 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.item.EssenceItem;
+import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.SingleSpawnerTileEntity;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
@@ -17,11 +20,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -35,6 +40,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class SingleSpawnerBlock extends BaseEntityBlock {
 	
@@ -93,6 +102,24 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 	@Override
 	public RenderShape getRenderShape(BlockState state) {
 		return RenderShape.MODEL;
+	}
+	
+	@Override
+	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		// Render/particle code calls with dummy sometimes and crashes if you return an empty cube
+		if (context != CollisionContext.empty() && context instanceof EntityCollisionContext) {
+			final @Nullable Entity entity = ((EntityCollisionContext) context).getEntity();
+			if (entity != null && entity instanceof Player && ((Player) entity).isCreative()) {
+				return Shapes.block();
+			}
+		}
+		
+		return Shapes.empty();
+	}
+	
+	@Override
+	public VoxelShape getCollisionShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+		return Shapes.empty();
 	}
 	
 	@Override
@@ -162,6 +189,8 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 				spawner.setSpawnType(NostrumEntityTypes.plantBoss);
 			} else if (heldItem.getItem() == NostrumBlocks.pushBlock.asItem()) {
 				spawner.setSpawnType(NostrumEntityTypes.playerStatue);
+			} else if (heldItem.getItem() == NostrumItems.crystalSmall) {
+				spawner.setSpawnType(NostrumEntityTypes.primalMage);
 			} else if (heldItem.getItem() instanceof SpawnEggItem egg) {
 				spawner.setSpawnType(egg.getType(heldItem.getTag()));
 			}

@@ -59,12 +59,13 @@ public class SummonGhostBlock extends BaseEntityBlock implements ISpellTargetBlo
 			.noOcclusion()
 			.noDrops()
 			.noCollission()
+			.isSuffocating((state, level, pos) -> false)
 			);
 	
 		this.registerDefaultState(this.defaultBlockState().setValue(ELEMENT, EMagicElement.PHYSICAL));
 	}
 	
-	protected BlockState getGhostState(BlockState state, BlockGetter level, BlockPos pos) {
+	public BlockState getGhostState(BlockState state, BlockGetter level, BlockPos pos) {
 		BlockEntity ent = level.getBlockEntity(pos);
 		if (ent == null || !(ent instanceof SummonGhostBlockEntity blockentity)) {
 			return Blocks.STONE.defaultBlockState();
@@ -124,7 +125,24 @@ public class SummonGhostBlock extends BaseEntityBlock implements ISpellTargetBlo
 		final ItemStack heldItem = playerIn.getItemInHand(hand);
 		if (!heldItem.isEmpty() && heldItem.getItem() instanceof InfusedGemItem gem) {
 			final EMagicElement element = gem.getElement();
-			worldIn.setBlockAndUpdate(pos, setElement(state, element));
+			final EMagicElement originalElement = this.getElement(state);
+			
+			WorldUtil.WalkConnectedBlocks(worldIn, pos, new IBlockWalker() {
+				@Override
+				public boolean canVisit(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
+						BlockState state, int distance) {
+					return state.getBlock() == SummonGhostBlock.this
+							&& getElement(state) == originalElement;
+				}
+
+				@Override
+				public IBlockWalker.WalkResult walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
+						BlockState state, int distance, int walkCount, Consumer<BlockPos> addBlock) {
+					worldIn.setBlockAndUpdate(pos, setElement(state, element));
+					return IBlockWalker.WalkResult.CONTINUE;
+				}
+			}, 256);
+			
 			return InteractionResult.SUCCESS;
 		}
 		

@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.boss.plantboss.PlantBossBrambleEntity;
 import com.smanzana.nostrummagica.entity.boss.plantboss.PlantBossEntity;
 import com.smanzana.nostrummagica.entity.boss.playerstatue.PlayerStatueEntity;
+import com.smanzana.nostrummagica.entity.boss.primalmage.PrimalMageEntity;
 import com.smanzana.nostrummagica.entity.boss.reddragon.RedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.DragonEggEntity;
 import com.smanzana.nostrummagica.entity.dragon.ShadowRedDragonEntity;
@@ -93,6 +94,7 @@ public class NostrumEntityTypes {
 	@ObjectHolder(CursedGlassTriggerEntity.ID) public static EntityType<CursedGlassTriggerEntity> cursedGlassTrigger;
 	@ObjectHolder(PlayerStatueEntity.ID) public static EntityType<PlayerStatueEntity> playerStatue;
 	@ObjectHolder(WhirlwindEntity.ID) public static EntityType<WhirlwindEntity> whirlwind;
+	@ObjectHolder(PrimalMageEntity.ID) public static EntityType<PrimalMageEntity> primalMage;
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<EntityType<?>> event) {
@@ -302,6 +304,10 @@ public class NostrumEntityTypes {
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.sized(1, 2)
 			.build("").setRegistryName(PlayerStatueEntity.ID));
+		registry.register(EntityType.Builder.<PrimalMageEntity>of(PrimalMageEntity::new, MobCategory.MONSTER)
+				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
+				.sized(0.6F, 1.95F)
+			.build("").setRegistryName(PrimalMageEntity.ID));
 		
 		registry.register(EntityType.Builder.<WhirlwindEntity>of(WhirlwindEntity::new, MobCategory.MISC)
     			.sized(0.5F, 0.5F)
@@ -419,6 +425,7 @@ public class NostrumEntityTypes {
 		// No attributes event.put(enderRodBall, EntityEnderRodBall.BuildAttributes().create());
 		event.put(cursedGlassTrigger, CursedGlassTriggerEntity.BuildAttributes().build());
 		event.put(playerStatue, PlayerStatueEntity.BuildAttributes().build());
+		event.put(primalMage, PrimalMageEntity.BuildAttributes().build());
 		
 	}
 	

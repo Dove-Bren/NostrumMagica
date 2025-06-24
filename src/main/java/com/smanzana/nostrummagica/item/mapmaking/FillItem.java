@@ -38,8 +38,9 @@ public class FillItem extends Item {
 	public static final String ID_WATER_ALL = "fill_tool_water";
 	public static final String ID_WATER_DOWN = "fill_tool_water_level";
 	public static final String ID_ROOTING_AIR_ALL = "fill_tool_rooting_air";
+	public static final String ID_MECHBLOCK_GHOST_CONNECTED = "fill_tool_mechblock_ghost";
 	
-	private static final int MAX_BLOCKS = 4098;
+	protected static final int MAX_BLOCKS = 4098;
 	
 	private final boolean onlyDown;
 	private final Supplier<BlockState> fillStateSupplier;
@@ -97,20 +98,24 @@ public class FillItem extends Item {
 		return this.fillStateCache;
 	}
 	
-	protected void setState(Player player, Level world, BlockPos pos) {
+	protected void setState(FillContext context, Level world, BlockPos pos) {
 		world.setBlock(pos, this.getFillState(), 3); // ? Different flags for speed?
 	}
 	
-	protected boolean shouldFill(Level world, BlockPos pos) {
+	protected boolean shouldFill(FillContext context, Level world, BlockPos pos) {
 		return world.isEmptyBlock(pos);
 	}
 	
-	protected boolean canSpreadTo(BlockPos startPos, BlockPos checkPos) {
-		return !this.onlyDown || (checkPos.getY() <= startPos.getY());
+	protected boolean canSpreadTo(FillContext context, BlockPos checkPos) {
+		return !this.onlyDown || (checkPos.getY() <= context.start.getY());
+	}
+	
+	protected FillContext makeContext(Player player, Level level, BlockPos start) {
+		return new FillContext(this, start);
 	}
 	
 	protected void fill(Player player, Level world, BlockPos start) {
-		final FillContext context = new FillContext(this, start);
+		final FillContext context = this.makeContext(player, world, start);
 		
 		while (context.hasNext()) {
 			BlockPos pos = context.getNext();
@@ -120,7 +125,7 @@ public class FillItem extends Item {
 		player.sendMessage(new TextComponent("Filled " + context.count + " blocks"), Util.NIL_UUID);
 	}
 	
-	private static final class FillContext {
+	protected static class FillContext {
 		public final FillItem item;
 		public final BlockPos start;
 		public final Set<BlockPos> visitted = new HashSet<>();
@@ -135,7 +140,7 @@ public class FillItem extends Item {
 		}
 		
 		public void addNeighbor(BlockPos pos) {
-			if (count < MAX_BLOCKS && item.canSpreadTo(this.start, pos) && visitted.add(pos)) {
+			if (count < MAX_BLOCKS && item.canSpreadTo(this, pos) && visitted.add(pos)) {
 				queue.add(pos);
 				count++;
 			}
@@ -152,8 +157,8 @@ public class FillItem extends Item {
 	
 	private void fillAndAdd(Player player, Level world, BlockPos pos, FillContext context) {
 		// Check and fill the current block, and then add neighbors to the list
-		if (shouldFill(world, pos)) {
-			setState(player, world, pos);
+		if (shouldFill(context, world, pos)) {
+			setState(context, world, pos);
 			
 			context.addNeighbor(pos.north());
 			context.addNeighbor(pos.south());

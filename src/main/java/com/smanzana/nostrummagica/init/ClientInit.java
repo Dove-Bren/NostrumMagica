@@ -85,6 +85,7 @@ import com.smanzana.nostrummagica.client.render.entity.PlantBossBrambleRenderer;
 import com.smanzana.nostrummagica.client.render.entity.PlantBossLeafRenderer;
 import com.smanzana.nostrummagica.client.render.entity.PlantBossRenderer;
 import com.smanzana.nostrummagica.client.render.entity.PlayerStatueRenderer;
+import com.smanzana.nostrummagica.client.render.entity.PrimalMageRenderer;
 import com.smanzana.nostrummagica.client.render.entity.SeekerSaucerRenderer;
 import com.smanzana.nostrummagica.client.render.entity.ShadowDragonRedRenderer;
 import com.smanzana.nostrummagica.client.render.entity.ShrineTriggerRenderer;
@@ -404,6 +405,7 @@ public class ClientInit {
 		event.registerEntityRenderer(NostrumEntityTypes.boulder, SpellBoulderRenderer::new);
 		event.registerEntityRenderer(NostrumEntityTypes.playerStatue, PlayerStatueRenderer::new);
 		event.registerEntityRenderer(NostrumEntityTypes.whirlwind, WhirlwindRenderer::new);
+		event.registerEntityRenderer(NostrumEntityTypes.primalMage, PrimalMageRenderer::new);
 	}
 	
 	@SubscribeEvent

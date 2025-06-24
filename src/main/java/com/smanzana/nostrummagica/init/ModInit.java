@@ -105,6 +105,7 @@ import com.smanzana.nostrummagica.ritual.outcome.OutcomeSpawnEntity.IEntityFacto
 import com.smanzana.nostrummagica.ritual.outcome.OutcomeSpawnItem;
 import com.smanzana.nostrummagica.ritual.outcome.OutcomeTeleportObelisk;
 import com.smanzana.nostrummagica.serializer.ArcaneWolfElementalTypeSerializer;
+import com.smanzana.nostrummagica.serializer.BlockPosListSerializer;
 import com.smanzana.nostrummagica.serializer.DragonArmorMaterialSerializer;
 import com.smanzana.nostrummagica.serializer.FloatArraySerializer;
 import com.smanzana.nostrummagica.serializer.HookshotTypeDataSerializer;
@@ -115,6 +116,7 @@ import com.smanzana.nostrummagica.serializer.OptionalParticleDataSerializer;
 import com.smanzana.nostrummagica.serializer.PetJobSerializer;
 import com.smanzana.nostrummagica.serializer.PlantBossTreeTypeSerializer;
 import com.smanzana.nostrummagica.serializer.PlayerStatuePoseSerializer;
+import com.smanzana.nostrummagica.serializer.PrimalMagePoseSerializer;
 import com.smanzana.nostrummagica.serializer.RedDragonBodyPartTypeSerializer;
 import com.smanzana.nostrummagica.serializer.WilloStatusSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -2095,6 +2097,8 @@ public class ModInit {
     	registry.register(new DataSerializerEntry(RedDragonBodyPartTypeSerializer.instance).setRegistryName("nostrum.serial.red_dragon.body_part_type"));
     	registry.register(new DataSerializerEntry(PetJobSerializer.GetInstance()).setRegistryName("nostrum.serial.pet_job"));
     	registry.register(new DataSerializerEntry(PlayerStatuePoseSerializer.instance).setRegistryName("nostrum.player_statue.pos"));
+    	registry.register(new DataSerializerEntry(PrimalMagePoseSerializer.instance).setRegistryName("nostrum.primal_mage.pose"));
+    	registry.register(new DataSerializerEntry(BlockPosListSerializer.instance).setRegistryName("nostrum.serial.block_pos_list"));
     }
 	
 	public static final void registerCommands(RegisterCommandsEvent event) {

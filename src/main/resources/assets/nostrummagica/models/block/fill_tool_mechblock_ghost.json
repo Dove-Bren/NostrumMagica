@@ -1,0 +1,6 @@
+{
+    "parent": "nostrummagica:block/mechblock_ghost",
+    "textures": {
+        "all": "nostrummagica:block/fill_tool_mechblock_ghost"
+    }
+}

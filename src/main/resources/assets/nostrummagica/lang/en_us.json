@@ -307,6 +307,7 @@
 	"item.nostrummagica.fill_tool_rooting_air": "Fill Heavy Air",
 	"item.nostrummagica.fill_tool_water": "Fill Water",
 	"item.nostrummagica.fill_tool_water_level": "Fill Water Level",
+	"item.nostrummagica.fill_tool_mechblock_ghost": "Fill Summonable Block",
 	
 	"item.nostrummagica.sword_fire": "Flame Rod",
 	"item.nostrummagica.sword_earth": "Earth Pike",
@@ -501,7 +502,7 @@
 	"block.nostrummagica.push_passthrough_block": "Dungeon Pushable Empty Block",
 	"block.nostrummagica.mechblock_break": "Magic Breakable Block",
 	"block.nostrummagica.mechblock_break_container": "Magic Breakable Container",
-	"block.nostrummagica.mechblock_ghost": "Conjurable Block",
+	"block.nostrummagica.mechblock_ghost": "Summonable Block",
 	"block.nostrummagica.mechblock_laser": "Puzzle Laser Block",
 	"block.nostrummagica.elemental_crystal_block": "Elemental Crystal",
 	"block.nostrummagica.mage_light": "Mage Light",
@@ -555,6 +556,7 @@
 	"entity.nostrummagica.magic_projectile": "Magic Projectile",
 	"entity.nostrummagica.player_statue": "Magic Statue",
 	"entity.nostrummagica.whirlwind": "Whirlwind",
+	"entity.nostrummagica.primal_mage": "Primal Mage",
 
     "entity.nostrummagica.placeholder.soulbound": "Soulbound Pet",
 

@@ -220,16 +220,16 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 		}
 		
 		///// END maybe not eligible checks
-		if (this.getShieldCharges() > 0) {
-			this.consumeShieldCharge();
-			return false;
-		}
+		if (source != DamageSource.OUT_OF_WORLD) {
+			if (this.getShieldCharges() > 0) {
+				this.consumeShieldCharge();
+				return false;
+			}
 		
-		// armor check and consumption
-		
-		if (source.getEntity() == null || !(source.getEntity() instanceof Player)
+			if (source.getEntity() == null || !(source.getEntity() instanceof Player)
 				|| !((Player) source.getEntity()).isCreative()) {
-			amount = Math.min(amount, 10f);
+				amount = Math.min(amount, 10f);
+			}
 		}
 		
 		if (!this.level.isClientSide && source.getEntity() != null) {
@@ -552,6 +552,10 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 			if (jumpTarg != null) {
 				this.jump(jumpTarg);
 				this.lookControl.setLookAt(jumpTarg);
+			} else if (this.aggroTable.getAllTracked().isEmpty()) {
+				// Nobody tracked anymore. Transition back to inactive?
+				activated = false;
+				this.setBattleState(BattleState.INACTIVE);
 			}
 		}
 	}

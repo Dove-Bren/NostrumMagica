@@ -141,8 +141,6 @@ public class ImbuedItemListener {
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void onProjectileShot(ArrowFiredEvent event) {
 		// probably need to add a capability or something to the projectile?
-		System.out.println("fired arrow");
-		
 		ItemImbuement imbue = null;
 		ItemStack fromStack = ItemStack.EMPTY;
 		if (!event.getAmmo().isEmpty()) {

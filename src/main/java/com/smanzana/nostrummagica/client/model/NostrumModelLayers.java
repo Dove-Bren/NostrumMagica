@@ -23,6 +23,8 @@ public class NostrumModelLayers {
 	public static final ModelLayerLocation PlantbossLeaf = make("plantboss_leaf");
 	public static final ModelLayerLocation PlayerStatue = make("player_statue");
 	public static final ModelLayerLocation PlayerStatueArmor = make("player_statue_armor");
+	public static final ModelLayerLocation PrimalMage = make("primal_mage");
+	public static final ModelLayerLocation PrimalMageArmor = make("primal_mage_armor");
 	public static final ModelLayerLocation Willo = make("willo");
 	public static final ModelLayerLocation WitchHat = make("witchhat");
 	public static final ModelLayerLocation Whirlwind = make("whirlwind");
@@ -58,6 +60,8 @@ public class NostrumModelLayers {
 		event.registerLayerDefinition(ArcaneWolf, ArcaneWolfModel::createLayer);
 		event.registerLayerDefinition(PlayerStatue, () -> PlayerStatueModel.createLayer(CubeDeformation.NONE));
 		event.registerLayerDefinition(PlayerStatueArmor, () -> PlayerStatueModel.createLayer(LayerDefinitions.INNER_ARMOR_DEFORMATION));
+		event.registerLayerDefinition(PrimalMage, () -> PrimalMageModel.createLayer(CubeDeformation.NONE));
+		event.registerLayerDefinition(PrimalMageArmor, () -> PrimalMageModel.createLayer(LayerDefinitions.INNER_ARMOR_DEFORMATION));
 		event.registerLayerDefinition(Whirlwind, WhirlwindModel::createLayer);
 
 		event.registerLayerDefinition(ElemArmor_0, () -> EnchantedArmorBaseModel.createLayer(0));

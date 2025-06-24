@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.item.api.ISpellEquipment;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellDamage;
@@ -371,7 +372,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 			for (EMagicElement elem : EMagicElement.values()) {
 				Spell spell = SpellUtils.MakeSpell("WarlockMissle_" + elem.name(),
 						NostrumSpellShapes.SeekingBullet,
-						elem, 1, null);
+						elem, 1, EAlteration.HARM);
 				MissleSpells[elem.ordinal()] = spell;
 			}
 		}

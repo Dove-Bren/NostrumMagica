@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.item;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
+import com.smanzana.nostrummagica.block.dungeon.SummonGhostBlock;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.fluid.PoisonWaterFluid;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
@@ -44,6 +45,7 @@ import com.smanzana.nostrummagica.item.equipment.SpellTome;
 import com.smanzana.nostrummagica.item.equipment.ThanoPendant;
 import com.smanzana.nostrummagica.item.equipment.ThanosStaff;
 import com.smanzana.nostrummagica.item.equipment.WarlockSword;
+import com.smanzana.nostrummagica.item.mapmaking.ConnectedFillItem;
 import com.smanzana.nostrummagica.item.mapmaking.CopyWandItem;
 import com.smanzana.nostrummagica.item.mapmaking.FillItem;
 import com.smanzana.nostrummagica.item.mapmaking.WorldKeyItem;
@@ -297,6 +299,7 @@ public class NostrumItems {
 	@ObjectHolder(FillItem.ID_WATER_ALL) public static FillItem fillWater;
 	@ObjectHolder(FillItem.ID_WATER_DOWN) public static FillItem fillWaterLevel;
 	@ObjectHolder(FillItem.ID_ROOTING_AIR_ALL) public static FillItem fillHeavyAir;
+	@ObjectHolder(FillItem.ID_MECHBLOCK_GHOST_CONNECTED) public static FillItem fillSummonableBlock;
 	@ObjectHolder(MageBlade.ID) public static MageBlade mageBlade;
 	@ObjectHolder(AspectedFireWeapon.ID) public static AspectedFireWeapon flameRod;
 	@ObjectHolder(AspectedPhysicalWeapon.ID) public static AspectedPhysicalWeapon deepMetalAxe;
@@ -600,6 +603,7 @@ public class NostrumItems {
     	register(registry, new FillItem(() -> Blocks.WATER.defaultBlockState(), false).setRegistryName(FillItem.ID_WATER_ALL));
     	register(registry, new FillItem(() -> Blocks.WATER.defaultBlockState(), true).setRegistryName(FillItem.ID_WATER_DOWN));
     	register(registry, new FillItem(() -> NostrumBlocks.rootingAir.defaultBlockState(), false).setRegistryName(FillItem.ID_ROOTING_AIR_ALL));
+    	register(registry, new ConnectedFillItem(SummonGhostBlock::WrapBlock).setRegistryName(FillItem.ID_MECHBLOCK_GHOST_CONNECTED));
     	register(registry, new MageBlade().setRegistryName(MageBlade.ID));
     	register(registry, new AspectedFireWeapon().setRegistryName(AspectedFireWeapon.ID));
     	register(registry, new AspectedPhysicalWeapon().setRegistryName(AspectedPhysicalWeapon.ID));
