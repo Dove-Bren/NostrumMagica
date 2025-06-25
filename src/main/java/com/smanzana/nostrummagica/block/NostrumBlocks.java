@@ -39,6 +39,7 @@ import com.smanzana.nostrummagica.item.mapmaking.BreakBlockContainerItem;
 import com.smanzana.nostrummagica.item.mapmaking.ConjureGhostBlockItem;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -392,5 +393,26 @@ public class NostrumBlocks {
     	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_LIGHTNING_STONE, registry);
     	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_ENDER_STONE, registry);
     }
+
+	public static Block elementalStone(EMagicElement element) {
+		switch (element) {
+		case EARTH:
+			return earthStone;
+		case ENDER:
+			return enderStone;
+		case FIRE:
+			return fireStone;
+		case ICE:
+			return iceStone;
+		case LIGHTNING:
+			return lightningStone;
+		case PHYSICAL:
+			return null;
+		case WIND:
+			return windStone;
+		}
+		
+		return null;
+	}
     
 }

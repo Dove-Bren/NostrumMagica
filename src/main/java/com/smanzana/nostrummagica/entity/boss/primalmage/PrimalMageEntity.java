@@ -6,10 +6,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
+import com.smanzana.autodungeons.util.WorldUtil;
+import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.SummonGhostBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -52,7 +57,9 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.AbstractIllager;
 import net.minecraft.world.entity.monster.SpellcasterIllager;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob {
@@ -552,13 +559,48 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 		if (!this.isActivated()) {
 			// 'activate' boss bar for all players nearby
 			if (!getLevel().isClientSide()) {
-				for (Player player : ((ServerLevel) getLevel()).getNearbyPlayers(TargetingConditions.forNonCombat(), this, this.getBoundingBox().inflate(50))) {
+				for (Player player : ((ServerLevel) getLevel()).getPlayers(p -> p.distanceToSqr(this) < 900)) {
 					this.bossInfo.addPlayer((ServerPlayer) player);
 				}
 				this.setBattleState(BattleState.ACTIVATING);
 			}
 		}
 		
+	}
+	
+	protected void resetCrystal(EMagicElement element, BlockPos start) {
+		if (start == null) {
+			return;
+		}
+		
+		final BlockState originState = level.getBlockState(start);
+		if (originState.getBlock() instanceof SummonGhostBlock) {
+			return; // doesn't need resetting
+		}
+		
+		WorldUtil.WalkConnectedBlocks(level, start, new IBlockWalker() {
+			@Override
+			public boolean canVisit(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
+					BlockState state, int distance) {
+				return startState == state;
+			}
+
+			@Override
+			public IBlockWalker.WalkResult walk(BlockGetter world, BlockPos startPos, BlockState startState, BlockPos pos,
+					BlockState state, int distance, int walkCount, Consumer<BlockPos> addBlock) {
+				level.setBlock(pos, NostrumBlocks.elementalStone(element).defaultBlockState(), 2);
+				SummonGhostBlock.WrapBlock(level, pos, element);
+				return IBlockWalker.WalkResult.CONTINUE;
+			}
+		}, 256);
+	}
+	
+	protected void resetArena() {
+		// for each element, find crystal and then reset it
+		// by walking all connected and wrapping htem, and then setting elem after
+		for (EMagicElement elem : PRIMAL_ELEMENTS) {
+			resetCrystal(elem, arena.getElementalCrystal(elem));
+		}
 	}
 	
 	@Override
@@ -619,6 +661,19 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 
 		// While inactive, we look at elemental top blocks and see if they are summoned yet.
 		if (this.arena == null) {
+			return;
+		}
+		
+		if (!this.getOnPos().equals(this.homeBlock)) {
+			// Presumably reloaded. Likely because player died and ran back.
+			// Will mean server crashes in b oss fight reset, but that might be
+			// better than loading in to an active boss fight
+			if (NostrumMagica.isBlockLoaded(level, this.homeBlock)) {
+				resetArena();
+				this.setPos(Vec3.atBottomCenterOf(this.homeBlock.above()));
+				this.setHealth(this.getMaxHealth());
+			}
+			
 			return;
 		}
 		

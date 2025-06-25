@@ -216,9 +216,13 @@ public class SummonGhostBlock extends BaseEntityBlock implements ISpellTargetBlo
 	}
 	
 	public static boolean WrapBlock(Level world, BlockPos pos) {
+		return WrapBlock(world, pos, EMagicElement.PHYSICAL);
+	}
+	
+	public static boolean WrapBlock(Level world, BlockPos pos, EMagicElement element) {
 		BlockState state = world.getBlockState(pos);
 		BlockEntity ent = world.getBlockEntity(pos);
-		world.setBlock(pos, NostrumBlocks.summonGhostBlock.defaultBlockState(), 3);
+		world.setBlock(pos, NostrumBlocks.summonGhostBlock.setElement(NostrumBlocks.summonGhostBlock.defaultBlockState(), element), 3);
 			
 		SummonGhostBlockEntity container = (SummonGhostBlockEntity) world.getBlockEntity(pos);
 		container.setContainedState(state, ent);
