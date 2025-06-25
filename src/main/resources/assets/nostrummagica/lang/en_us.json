@@ -756,9 +756,11 @@
 	"dungeon.portal.name": "Mystic Ruins",
 	"dungeon.mani_castle.name": "Mani Castle",
 	"dungeon.sorcery_island.name": "Sorcery Dimension",
+	"dungeon.kani_dungeon.name": "Kani Dungeon",
 	
 	"dungeon.room.mani_castle.name": "",
 	"dungeon.room.sorcery_island.name": "",
+	"dungeon.room.kani_dungeon.name": "",
 
     "info.recall.fail": "A mark location must be set first",
     "info.recall.baddimension": "Your mark location is in a different dimension",

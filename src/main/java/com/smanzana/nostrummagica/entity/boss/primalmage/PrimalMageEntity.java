@@ -393,6 +393,15 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 	}
 	
 	@Override
+	public void push(Entity pusher) {
+		if (!this.isActivated()) {
+			return;
+		}
+		
+		super.push(pusher);
+	}
+	
+	@Override
 	public EntityDimensions getDimensions(Pose entPose) {
 		final EntityDimensions baseDims = super.getDimensions(entPose);
 		

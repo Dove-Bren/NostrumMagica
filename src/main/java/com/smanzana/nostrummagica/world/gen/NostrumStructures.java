@@ -5,6 +5,7 @@ import java.util.List;
 import com.mojang.serialization.Codec;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.DragonStructure;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.KaniDungeonStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.ManiCastleStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.PlantBossStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.PortalStructure;
@@ -40,11 +41,13 @@ public class NostrumStructures {
 	private static final String DUNGEONGEN_PLANTBOSS_ID = "nostrum_dungeons_plantboss";
 	private static final String DUNGEONGEN_MANI_CASTLE_ID = "struct_mani_castle";
 	private static final String DUNGEONGEN_SORCERY_ISLAND_ID = "struct_sorcery_island";
+	private static final String DUNGEONGEN_KANI_DUNGEON_ID = "struct_kani_dungeon";
 	private static final String DUNGEONGEN_PORTAL_CONF_ID = "configured_" + DUNGEONGEN_PORTAL_ID;
 	private static final String DUNGEONGEN_DRAGON_CONF_ID = "configured_" + DUNGEONGEN_DRAGON_ID;
 	private static final String DUNGEONGEN_PLANTBOSS_CONF_ID = "configured_" + DUNGEONGEN_PLANTBOSS_ID;
 	private static final String DUNGEONGEN_MANI_CASTLE_CONF_ID = "configured_" + DUNGEONGEN_MANI_CASTLE_ID;
 	private static final String DUNGEONGEN_SORCERY_ISLAND_CONF_ID = "configured_" + DUNGEONGEN_SORCERY_ISLAND_ID;
+	private static final String DUNGEONGEN_KANI_DUNGEON_CONF_ID = "configured_" + DUNGEONGEN_KANI_DUNGEON_ID;
 	
 	@ObjectHolder(DUNGEONGEN_PORTAL_ID) public static PortalStructure DUNGEON_PORTAL;
 	protected static ConfiguredStructureFeature<?, ?> CONFIGURED_DUNGEON_PORTAL;
@@ -65,6 +68,10 @@ public class NostrumStructures {
 	@ObjectHolder(DUNGEONGEN_SORCERY_ISLAND_ID) public static SorceryIslandStructure DUNGEON_SORCERY_ISLAND;
 	public static ConfiguredStructureFeature<?, ?> CONFIGUREDDUNGEON_SORCERY_ISLAND;
 	public static Holder<ConfiguredStructureFeature<?, ?>> REF_DUNGEON_SORCERY_ISLAND;
+	
+	@ObjectHolder(DUNGEONGEN_KANI_DUNGEON_ID) public static KaniDungeonStructure DUNGEON_KANI_DUNGEON;
+	public static ConfiguredStructureFeature<?, ?> CONFIGUREDDUNGEON_KANI_DUNGEON;
+	public static Holder<ConfiguredStructureFeature<?, ?>> REF_DUNGEON_KANI_DUNGEON;
 	
 	public static StructurePlacementType<GridStructureSetPlacement> PLACEMENT_FIXED_GRID;
 
@@ -111,6 +118,11 @@ public class NostrumStructures {
 		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
 		CONFIGUREDDUNGEON_SORCERY_ISLAND = configured;
 		REF_DUNGEON_SORCERY_ISLAND = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_SORCERY_ISLAND_ID), NostrumMagica.Loc(DUNGEONGEN_SORCERY_ISLAND_CONF_ID));
+		
+		structure = new KaniDungeonStructure();
+		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
+		CONFIGUREDDUNGEON_KANI_DUNGEON = configured;
+		REF_DUNGEON_KANI_DUNGEON = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_KANI_DUNGEON_ID), NostrumMagica.Loc(DUNGEONGEN_KANI_DUNGEON_CONF_ID));
 		
 		
 		// Register structure sets, which include rules of how to place them and distances between things in the same set.

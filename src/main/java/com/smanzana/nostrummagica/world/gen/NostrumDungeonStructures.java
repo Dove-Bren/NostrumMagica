@@ -60,4 +60,12 @@ public abstract class NostrumDungeonStructures {
 		}
 		
 	}
+	
+	public static class KaniDungeonStructure extends DungeonStructure {
+
+		public KaniDungeonStructure() {
+			super(NostrumDungeons.KANI_JAIL_DUNGEON);
+		}
+		
+	}
 }

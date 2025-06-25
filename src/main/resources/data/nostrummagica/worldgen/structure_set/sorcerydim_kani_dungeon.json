@@ -1,0 +1,11 @@
+{
+		"placement": {
+			"type": "nostrummagica:fixed_grid",
+			"grid_size": 5120,
+			"offset": [128, 128, 128]
+		},
+		"structures": [{
+			"structure": "nostrummagica:configured_struct_kani_dungeon",
+			"weight": 1
+		}]
+}
