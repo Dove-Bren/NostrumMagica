@@ -3,11 +3,14 @@ package com.smanzana.nostrummagica.client.render.entity;
 import java.util.Optional;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.model.CursedGlassModel;
 import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
 import com.smanzana.nostrummagica.client.model.PrimalMageModel;
+import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.client.render.layer.PrimalMageArmorLayer;
 import com.smanzana.nostrummagica.entity.boss.primalmage.PrimalMageEntity;
 import com.smanzana.nostrummagica.entity.boss.primalmage.PrimalMageEntity.BattlePose;
@@ -34,7 +37,7 @@ public class PrimalMageRenderer extends IllagerRenderer<PrimalMageEntity> {
 	protected CursedGlassModel shieldModel;
 
 	public PrimalMageRenderer(EntityRendererProvider.Context context) {
-		// This is mostly copied from the illager renderer, but its constructor doesn't let us descend from it and modify the model
+		// This is mostly copied from the evoker renderer, but its constructor doesn't let us descend from it and modify the model
 		super(context, new PrimalMageModel(context.bakeLayer(NostrumModelLayers.PrimalMage)), .5f);
 		
 		this.addLayer(new ItemInHandLayer<PrimalMageEntity, IllagerModel<PrimalMageEntity>>(this) {
@@ -94,6 +97,58 @@ public class PrimalMageRenderer extends IllagerRenderer<PrimalMageEntity> {
 		matrixStackIn.popPose();
 	}
 	
+	protected void renderChain(PrimalMageEntity ent, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, float partialTicks, Vector3f chainOffset) {
+		
+		final int points = 20;
+		final float linkWidth = .25f;
+		final VertexConsumer buffer = bufferIn.getBuffer(NostrumRenderTypes.LOCKEDCHEST_CHAIN);
+		final Matrix4f transform = matrixStackIn.last().pose();
+		
+		// alpha will be 0 on edges.
+		// On low-i, it will quickly become 1 (2-4 segments)
+		// it will slowly go back to 0 after 50%
+		
+		for (int i = 0; i < points; i++)
+		{
+			final float prog1 = ((float) i / (float)points);
+			final float px1 = chainOffset.x() * prog1;
+			final float py1 = chainOffset.y() * prog1;
+			final float pz1 = chainOffset.z() * prog1;
+			final float alpha1 = i < 4 ? 0f :
+					i < 5 ? ((float)i / 5f) :
+					i < (points / 2) ? 1f
+					: 1f - ((i - (points / 2f)) / (points / 2f))
+					;
+			final float v1 = (i % 2 == 0 ? 0 : 1);
+			final float offZ1 = linkWidth/2;
+			final float offX1 = linkWidth/2;
+			
+			final float prog2 = ((float) (i+1) / (float)points);
+			final float px2 = chainOffset.x() * prog2;
+			final float py2 = chainOffset.y() * prog2;
+			final float pz2 = chainOffset.z() * prog2;
+			final float alpha2 = (i+1) < 4 ? 0f :
+				(i+1) < 5 ? ((float)(i+1) / 5f) :
+				(i+1) < (points / 2) ? 1f
+				: 1f - (((i+1) - (points / 2f)) / (points / 2f))
+				;
+			final float v2 = ((i+1) % 2 == 0 ? 0 : 1);
+			final float offZ2 = linkWidth/2;
+			final float offX2 = linkWidth/2;
+			
+			buffer.vertex(transform, px1 - offX1, py1, pz1).color(1f, 1f, 1f, alpha1).uv(0, v1).uv2(packedLightIn).endVertex();
+			buffer.vertex(transform, px1 + offX1, py1, pz1).color(1f, 1f, 1f, alpha1).uv(1, v1).uv2(packedLightIn).endVertex();
+			buffer.vertex(transform, px2 + offX2, py2, pz2).color(1f, 1f, 1f, alpha2).uv(1, v2).uv2(packedLightIn).endVertex();
+			buffer.vertex(transform, px2 - offX2, py2, pz2).color(1f, 1f, 1f, alpha2).uv(0, v2).uv2(packedLightIn).endVertex();
+			
+			// Cross quad
+			buffer.vertex(transform, px1, py1, pz1 - offZ1).color(1f, 1f, 1f, alpha1).uv(0, v1 + .5f).uv2(packedLightIn).endVertex();
+			buffer.vertex(transform, px1, py1, pz1 + offZ1).color(1f, 1f, 1f, alpha1).uv(1, v1 + .5f).uv2(packedLightIn).endVertex();
+			buffer.vertex(transform, px2, py2, pz2 + offZ2).color(1f, 1f, 1f, alpha2).uv(1, v2 + .5f).uv2(packedLightIn).endVertex();
+			buffer.vertex(transform, px2, py2, pz2 - offZ2).color(1f, 1f, 1f, alpha2).uv(0, v2 + .5f).uv2(packedLightIn).endVertex();
+		}
+	}
+	
 	@Override
 	public void render(PrimalMageEntity ent, float entityYaw, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn, int packedLight) {
 		final float ticksInPose = partialTicks + ent.getTicksInPose();
@@ -121,6 +176,15 @@ public class PrimalMageRenderer extends IllagerRenderer<PrimalMageEntity> {
 		
 		super.render(ent, entityYaw, partialTicks, matrixStack, bufferIn, packedLight);
 		matrixStack.popPose();
+		
+		if (pose == BattlePose.INACTIVE || pose == BattlePose.ACTIVATING) {
+			matrixStack.pushPose();
+			matrixStack.translate(0, .75f, 0);
+			
+			this.renderChain(ent, matrixStack, bufferIn, packedLight, partialTicks, new Vector3f(3f, 7f, 3f));
+			this.renderChain(ent, matrixStack, bufferIn, packedLight, partialTicks, new Vector3f(-3f, 7f, -3f));
+			matrixStack.popPose();
+		}
 		
 		Optional<EMagicElement> shieldElement = ent.getShieldElement();
 		if (shieldElement.isPresent()) {

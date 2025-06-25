@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.client.model;
 
 import com.smanzana.nostrummagica.entity.boss.primalmage.PrimalMageEntity;
+import com.smanzana.nostrummagica.entity.boss.primalmage.PrimalMageEntity.BattlePose;
 
 import net.minecraft.client.model.IllagerModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -42,6 +43,18 @@ public class PrimalMageModel extends IllagerModel<PrimalMageEntity> {
 
 	public PrimalMageModel(ModelPart root) {
 		super(root);
+	}
+	
+	@Override
+	public void setupAnim(PrimalMageEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks,
+			float netHeadYaw, float headPitch) {
+		final BattlePose pose = entityIn.getBattlePose();
+		if (pose == BattlePose.INACTIVE || pose == BattlePose.ACTIVATING) {
+			// call super but force animation time to stay 0 so they are frozen
+			super.setupAnim(entityIn, limbSwing, limbSwingAmount, 0f, netHeadYaw, headPitch);
+		} else {
+			super.setupAnim(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+		}
 	}
 
 }

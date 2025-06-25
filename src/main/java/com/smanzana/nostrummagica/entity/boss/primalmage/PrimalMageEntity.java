@@ -252,7 +252,9 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 	
 	@Override
 	public boolean isCastingSpell() {
-		return this.getBattlePose() == BattlePose.CASTING_INVLUN || this.getBattlePose() == BattlePose.CASTING_VULN;
+		final BattlePose pose = this.getBattlePose();
+		return pose == BattlePose.CASTING_INVLUN || pose == BattlePose.CASTING_VULN
+				|| pose == BattlePose.INACTIVE || pose == BattlePose.ACTIVATING;
 	}
 
 	@Override
@@ -364,6 +366,8 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 				// Break shield, and fall
 				this.setShieldElement(null);
 				this.setBattleState(BattleState.FALLEN);
+				this.level.playSound(null, this, SoundEvents.EVOKER_DEATH, getSoundSource(), 1f, 1f);
+				this.level.playSound(null, this, SoundEvents.GLASS_BREAK, getSoundSource(), 1f, 1f);
 				return super.hurt(source, amount);
 			}
 			
@@ -373,6 +377,7 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 		
 		// else just vulnerable, so let through and make fall if not already there
 		this.setBattleState(BattleState.FALLEN);
+		this.level.playSound(null, this, SoundEvents.EVOKER_HURT, getSoundSource(), 1f, 1f);
 		return super.hurt(source, amount);
 	}
 	
@@ -389,7 +394,7 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 	
 	@Override
 	public boolean isPushable() {
-		return true;
+		return this.isActivated();
 	}
 	
 	@Override
@@ -399,6 +404,13 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 		}
 		
 		super.push(pusher);
+	}
+	
+	@Override
+	public void push(double x, double y, double z) {
+		if (this.isActivated()) {
+			super.push(x, y, z);
+		}
 	}
 	
 	@Override
@@ -710,6 +722,7 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 			this.setTarget(target);
 			this.lookAt(target, 360f, 180f);
 			SPELL_BARRAGE.get(element).cast(this, 1f, target);
+			this.level.playSound(null, this, SoundEvents.PILLAGER_CELEBRATE, getSoundSource(), 1f, 1f);
 		}
 	}
 	
@@ -722,6 +735,10 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 			return;
 		}
 		floatingHoverTickBase(60f, 1.5f);
+		
+		if (this.tickCount % 20 == 0) {
+			this.level.playSound(null, this, SoundEvents.VILLAGER_TRADE, getSoundSource(), 1f, 1f);
+		}
 	}
 	
 	protected void castChargeBlast(EMagicElement element) {
@@ -730,6 +747,8 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 			this.setTarget(target);
 			this.lookAt(target, 360f, 180f);
 			SPELL_CHARGE_BLAST.get(element).cast(this, 1f, target);
+			
+			this.level.playSound(null, this, SoundEvents.WITCH_CELEBRATE, getSoundSource(), 1f, .75f);
 		}
 	}
 	
@@ -745,6 +764,10 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 			return;
 		}
 		floatingHoverTickBase(100f, .75f);
+		
+		if (this.tickCount % 20 == 0) {
+			this.level.playSound(null, this, SoundEvents.EVOKER_AMBIENT, getSoundSource(), 1f, 1f);
+		}
 	}
 	
 	protected void castMegaBlast(EMagicElement element) {
@@ -783,6 +806,10 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 			NostrumParticles.FILLED_ORB.spawn(level, new SpawnParams(100, getX(), getY() + this.getBbHeight() / 2, getZ(), 5,
 					40, 20, new TargetLocation(this, true)
 					).color(this.getChargeElement().get().getColor()).setTargetBehavior(TargetBehavior.ORBIT_LAZY));
+			
+			if (this.tickCount % 20 == 0) {
+				this.level.playSound(null, this, SoundEvents.ILLUSIONER_CAST_SPELL, getSoundSource(), 1f, 1f);
+			}
 		}
 	}
 	
@@ -803,6 +830,7 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 	protected void fallenTick() {
 		if (this.stateSubTicks++ > 120 || this.stateStartHealth - this.getHealth() > (.1f * this.getMaxHealth())) {
 			this.setBattleState(BattleState.RECOVERING);
+			this.level.playSound(null, this, SoundEvents.VILLAGER_NO, getSoundSource(), 1f, 1f);
 		}
 	}
 	
