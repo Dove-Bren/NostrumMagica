@@ -1,0 +1,16 @@
+{
+	"variants": {
+		"facing=up,triggered=true": { "model": "nostrummagica:block/laser_trigger_enabled" },
+        "facing=up,triggered=false": { "model": "nostrummagica:block/laser_trigger" },
+		"facing=down,triggered=true": { "model": "nostrummagica:block/laser_trigger_enabled", "x": 180 },
+        "facing=down,triggered=false": { "model": "nostrummagica:block/laser_trigger", "x": 180 },
+        "facing=east,triggered=true": { "model": "nostrummagica:block/laser_trigger_enabled", "x": 90, 	"y": 90 },
+        "facing=east,triggered=false": { "model": "nostrummagica:block/laser_trigger", "x": 90, 				"y": 90 },
+        "facing=south,triggered=true": { "model": "nostrummagica:block/laser_trigger_enabled", "x": 90, 	"y": 180 },
+        "facing=south,triggered=false": { "model": "nostrummagica:block/laser_trigger", "x": 90, 				"y": 180 },
+        "facing=west,triggered=true": { "model": "nostrummagica:block/laser_trigger_enabled", "x": 90, 	"y": 270 },
+        "facing=west,triggered=false": { "model": "nostrummagica:block/laser_trigger", "x": 90, 				"y": 270 },
+        "facing=north,triggered=true": { "model": "nostrummagica:block/laser_trigger_enabled", "x": 90, 	"y": 0 },
+        "facing=north,triggered=false": { "model": "nostrummagica:block/laser_trigger", "x": 90, 				"y": 0 }
+	}
+}

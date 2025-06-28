@@ -1,5 +1,7 @@
 package com.smanzana.nostrummagica.capabilities;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -10,7 +12,9 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public interface ILaserReactive {
 	
-	public static final record LaserHitResult(boolean stopLaser, @Nullable EMagicElement newElement) {
+	public static final record SpreadList(List<BlockPos> positions, boolean isRelative) { }
+	
+	public static final record LaserHitResult(boolean stopLaser, @Nullable SpreadList spreadTo) {
 		public static LaserHitResult PASSTHROUGH = new LaserHitResult(false, null);
 		public static LaserHitResult BLOCK = new LaserHitResult(true, null);
 	}

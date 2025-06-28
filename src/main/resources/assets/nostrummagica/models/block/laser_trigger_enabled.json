@@ -1,0 +1,6 @@
+{
+  "parent": "nostrummagica:block/laser_trigger",
+  "textures": {
+    "top": "nostrummagica:block/laser_trigger_enabled_top"
+  }
+}

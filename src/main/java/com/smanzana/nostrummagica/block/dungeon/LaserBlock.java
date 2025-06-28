@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.tile.LaserBlockEntity;
@@ -36,7 +37,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class LaserBlock extends DirectionalBlock implements EntityBlock {
+public class LaserBlock extends DirectionalBlock implements EntityBlock, ITriggeredBlock {
 
 	public static final String ID = "mechblock_laser";
 	
@@ -154,6 +155,17 @@ public class LaserBlock extends DirectionalBlock implements EntityBlock {
 		return (LaserBlockEntity) level.getBlockEntity(pos);
 	}
 	
+	protected void toggleLaser(Level worldIn, BlockState state, BlockPos pos) {
+		LaserBlockEntity ent = getEntity(worldIn, state, pos);
+		if (ent.getEnabled()) {
+			ent.setToggleMode(false);
+			ent.setEnabled(false);
+		} else {
+			ent.setToggleMode(true);
+			ent.setEnabled(true);
+		}
+	}
+	
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (!playerIn.isCreative()) {
@@ -171,15 +183,7 @@ public class LaserBlock extends DirectionalBlock implements EntityBlock {
 		final ItemStack heldItem = playerIn.getItemInHand(hand);
 		if (heldItem.isEmpty()) {
 			if (playerIn.isCrouching()) {
-				LaserBlockEntity ent = getEntity(worldIn, state, pos);
-				if (ent.getEnabled()) {
-					ent.setToggleMode(false);
-					ent.setEnabled(false);
-				} else {
-					ent.setToggleMode(true);
-					ent.setEnabled(true);
-				}
-				//ent.setEnabled(!ent.getDefaultState());
+				toggleLaser(worldIn, state, pos);
 			}
 			return InteractionResult.SUCCESS;
 		} else if (heldItem.getItem() instanceof InfusedGemItem gem) {
@@ -204,6 +208,11 @@ public class LaserBlock extends DirectionalBlock implements EntityBlock {
 	@Override
 	public RenderShape getRenderShape(BlockState state) {
 		return RenderShape.MODEL;
+	}
+
+	@Override
+	public void trigger(Level world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
+		toggleLaser(world, state, blockPos);
 	}
 
 }

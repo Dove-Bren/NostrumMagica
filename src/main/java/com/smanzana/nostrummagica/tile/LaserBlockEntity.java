@@ -1,8 +1,10 @@
 package com.smanzana.nostrummagica.tile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
@@ -261,6 +263,17 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 				}
 			}
 			
+			if (result.spreadTo() != null) {
+				for (BlockPos spread : result.spreadTo().positions()) {
+					if (result.spreadTo().isRelative()) {
+						spread = spread.offset(cursor);
+					}
+					if (seen.add(spread)) {
+						others.add(spread);
+					}
+				}
+			}
+			
 			cursor.move(dir);
 		}
 		
@@ -303,6 +316,10 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 		
 		if (reactive == null && state.getBlock() instanceof ILaserReactive reactiveBlock) {
 			reactive = reactiveBlock;
+		}
+		
+		if (reactive == null) {
+			reactive = HARDCODED_REACTORS.get(state);
 		}
 		return reactive;
 	}
@@ -384,6 +401,36 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 	@Override
 	public void laserNearbyTick(LevelAccessor laserLevel, BlockPos pos, BlockState state, BlockPos laserPos, EMagicElement element, int beamDistance) {
 		; // do nothing
+	}
+	
+	protected static Map<BlockState, ILaserReactive> HARDCODED_REACTORS = new HashMap<>();
+	
+	{
+		List<BlockPos> fiveByFive = new ArrayList<>(5 * 5 * 5);
+		for (int x = -2; x <= 2; x++)
+		for (int y = -2; y <= 2; y++)
+		for (int z = -2; z <= 2; z++) {
+			fiveByFive.add(new BlockPos(x, y, z));
+		}
+		
+		final SpreadList relative5x5 = new SpreadList(fiveByFive, true);
+		final LaserHitResult spread5x5AndPass = new LaserHitResult(false, relative5x5);
+		
+		ILaserReactive amethystReactor = new ILaserReactive() {
+
+			@Override
+			public LaserHitResult laserPassthroughTick(LevelAccessor level, BlockPos pos, BlockState state,
+					BlockPos laserPos, EMagicElement element) {
+				return spread5x5AndPass;
+			}
+
+			@Override
+			public void laserNearbyTick(LevelAccessor level, BlockPos pos, BlockState state, BlockPos laserPos, EMagicElement element, int beamDistance) {
+				;
+			}
+			
+		};
+		Blocks.AMETHYST_CLUSTER.getStateDefinition().getPossibleStates().forEach(s -> HARDCODED_REACTORS.put(s, amethystReactor));
 	}
 	
 }

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_daylight_detector",
+  "textures": {
+    "top": "nostrummagica:block/laser_trigger_top",
+    "side": "nostrummagica:block/laser_trigger_side"
+  }
+}
