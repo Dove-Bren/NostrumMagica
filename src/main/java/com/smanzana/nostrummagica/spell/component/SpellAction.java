@@ -1613,59 +1613,6 @@ public class SpellAction {
 				resultBuilder.applied |= true;
 			}
 			
-//			ItemStack inhand = entity.getMainHandItem();
-//			boolean offhand = false;
-//			if (!isEnchantable(inhand)) {
-//				inhand = entity.getOffhandItem();
-//				offhand = true;
-//			}
-//			
-//			ItemStack addedItem = ItemStack.EMPTY;
-//			boolean didEmpower = false;
-//			boolean consumeInput = false;
-//			
-//			// Main hand attempt
-//			if (!inhand.isEmpty()) {
-//				Item item = inhand.getItem();
-//				if (item instanceof ICrystalEnchantableItem) {
-//					ICrystalEnchantableItem.Result result = ((ICrystalEnchantableItem) item).attemptEnchant(inhand, entity, element, level);
-//					didEmpower = result.success;
-//					addedItem = result.resultItem;
-//					consumeInput = result.consumeInput;
-//				}
-//			}
-//			
-//			if (addedItem.isEmpty() && !didEmpower) {
-//				//NostrumMagicaSounds.CAST_FAIL.play(entity);
-//			} else {
-//				if (entity instanceof Player) {
-//					Player p = (Player) entity;
-//					
-//					if (consumeInput) {
-//						if (inhand.getCount() == 1) {
-//							if (offhand) {
-//								p.getInventory().removeItemNoUpdate(40);
-//							} else {
-//								p.getInventory().removeItemNoUpdate(p.getInventory().selected);
-//							}
-//						} else {
-//							inhand.split(1);
-//						}
-//					}
-//					if (!addedItem.isEmpty()) {
-//						((Player) entity).getInventory().add(addedItem);
-//					}
-//					
-//					
-//				} else {
-//					// MobEntity has held item in slot 0
-//					if (!addedItem.isEmpty()) {
-//						entity.setItemInHand(InteractionHand.MAIN_HAND, addedItem);
-//					}
-//				}
-//				NostrumMagicaSounds.CAST_CONTINUE.play(entity);
-//			}
-			
 			// Apply enchant effect
 			entity.addEffect(new MobEffectInstance(ElementalEnchantEffect.GetForElement(this.element), (int) (20 * 15 * efficiency), level-1));
 			resultBuilder.applied |= true;

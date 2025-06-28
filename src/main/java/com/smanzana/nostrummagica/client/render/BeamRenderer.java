@@ -19,6 +19,8 @@ public class BeamRenderer {
 	
 	public static void renderToBuffer(PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, int packedOverlayIn, int color, Vec3 start, Vec3 end, float radius, double ageTicks) {
 		BeamRenderer.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.beaconBeam(TEX_BEAM, true)), packedLightIn, packedOverlayIn, color, start, end, radius, ageTicks);
+		
+		BeamRenderer.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.beaconBeam(TEX_BEAM, false)), packedLightIn, packedOverlayIn, color, start, end, radius * .5f, ageTicks);
 	}
 
 	public static void renderToBuffer(PoseStack matrixStackIn, VertexConsumer buffer, int packedLightIn, int packedOverlayIn, int color, Vec3 start, Vec3 end, float radius, double ageTicks) {

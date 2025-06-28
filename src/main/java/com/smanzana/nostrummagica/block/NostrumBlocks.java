@@ -49,7 +49,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HalfTransparentBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -64,13 +63,6 @@ import net.minecraftforge.registries.ObjectHolder;
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 @ObjectHolder(NostrumMagica.MODID)
 public class NostrumBlocks {
-	
-	protected static final String ID_FIRE_STONE = "fire_stone";
-	protected static final String ID_ICE_STONE = "ice_stone";
-	protected static final String ID_WIND_STONE = "wind_stone";
-	protected static final String ID_EARTH_STONE = "earth_stone";
-	protected static final String ID_LIGHTNING_STONE = "lightning_stone";
-	protected static final String ID_ENDER_STONE = "ender_stone";
 	
 	@ObjectHolder(ActiveHopperBlock.ID) public static ActiveHopperBlock activeHopper;
 	@ObjectHolder(AltarBlock.ID) public static AltarBlock altar;
@@ -162,12 +154,12 @@ public class NostrumBlocks {
 	@ObjectHolder(PureWaterBlock.ID) public static PureWaterBlock pureWater; 
 	@ObjectHolder(MageLightBlock.ID) public static MageLightBlock mageLight;
 	@ObjectHolder(RootingAirBlock.ID) public static RootingAirBlock rootingAir;
-	@ObjectHolder(ID_FIRE_STONE) public static Block fireStone;
-	@ObjectHolder(ID_ICE_STONE) public static Block iceStone;
-	@ObjectHolder(ID_WIND_STONE) public static Block windStone;
-	@ObjectHolder(ID_EARTH_STONE) public static Block earthStone;
-	@ObjectHolder(ID_LIGHTNING_STONE) public static Block lightningStone;
-	@ObjectHolder(ID_ENDER_STONE) public static Block enderStone;
+	@ObjectHolder(ElementalStoneBlock.ID_FIRE_STONE) public static ElementalStoneBlock fireStone;
+	@ObjectHolder(ElementalStoneBlock.ID_ICE_STONE) public static ElementalStoneBlock iceStone;
+	@ObjectHolder(ElementalStoneBlock.ID_WIND_STONE) public static ElementalStoneBlock windStone;
+	@ObjectHolder(ElementalStoneBlock.ID_EARTH_STONE) public static ElementalStoneBlock earthStone;
+	@ObjectHolder(ElementalStoneBlock.ID_LIGHTNING_STONE) public static ElementalStoneBlock lightningStone;
+	@ObjectHolder(ElementalStoneBlock.ID_ENDER_STONE) public static ElementalStoneBlock enderStone;
 	@ObjectHolder(FogBlock.Deep.ID) public static FogBlock.Deep fogBlock;
 	@ObjectHolder(FogBlock.Edge.ID) public static FogBlock.Edge fogEdgeBlock;
 	@ObjectHolder(FogBlock.Hidden.ID) public static FogBlock.Hidden fogHiddenBlock;
@@ -396,13 +388,13 @@ public class NostrumBlocks {
     	registerBlock(new PushPassthroughBlock(), PushPassthroughBlock.ID, registry);
     	registerBlock(new RootingAirBlock(), RootingAirBlock.ID, registry);
     	
-    	final Block fireStone = new HalfTransparentBlock(BlockBehaviour.Properties.of(Material.AMETHYST).sound(SoundType.AMETHYST_CLUSTER).noOcclusion().strength(2.0F, 6.0F).requiresCorrectToolForDrops());
-    	registerBlock(fireStone, ID_FIRE_STONE, registry);
-    	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_ICE_STONE, registry);
-    	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_WIND_STONE, registry);
-    	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_EARTH_STONE, registry);
-    	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_LIGHTNING_STONE, registry);
-    	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_ENDER_STONE, registry);
+    	final ElementalStoneBlock fireStone = new ElementalStoneBlock(BlockBehaviour.Properties.of(Material.AMETHYST).sound(SoundType.AMETHYST_CLUSTER).noOcclusion().strength(2.0F, 6.0F).requiresCorrectToolForDrops(), EMagicElement.FIRE);
+    	registerBlock(fireStone, ElementalStoneBlock.ID_FIRE_STONE, registry);
+    	registerBlock(new ElementalStoneBlock(BlockBehaviour.Properties.copy(fireStone), EMagicElement.ICE), ElementalStoneBlock.ID_ICE_STONE, registry);
+    	registerBlock(new ElementalStoneBlock(BlockBehaviour.Properties.copy(fireStone), EMagicElement.WIND), ElementalStoneBlock.ID_WIND_STONE, registry);
+    	registerBlock(new ElementalStoneBlock(BlockBehaviour.Properties.copy(fireStone), EMagicElement.EARTH), ElementalStoneBlock.ID_EARTH_STONE, registry);
+    	registerBlock(new ElementalStoneBlock(BlockBehaviour.Properties.copy(fireStone), EMagicElement.LIGHTNING), ElementalStoneBlock.ID_LIGHTNING_STONE, registry);
+    	registerBlock(new ElementalStoneBlock(BlockBehaviour.Properties.copy(fireStone), EMagicElement.ENDER), ElementalStoneBlock.ID_ENDER_STONE, registry);
     	
     	registerBlock(new FogBlock.Deep(), FogBlock.Deep.ID, registry);
     	registerBlock(new FogBlock.Edge(), FogBlock.Edge.ID, registry);
