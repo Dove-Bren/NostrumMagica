@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "hide_count=0": { "model": "nostrummagica:block/none" },
+		"hide_count=1": { "model": "nostrummagica:block/none" }
+    }
+}

@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
@@ -40,8 +41,11 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public abstract class FogBlock extends Block implements ILaserReactive {
 	
+	protected static final int MAX_HIDE_COUNT = 7;
+	
 	// "Block Tick"s left before a hidden fog block will reconstitute into a real fog block 
-	protected static final IntegerProperty HIDE_COUNT = IntegerProperty.create("hide_count", 0, 7);
+	protected static final IntegerProperty HIDE_COUNT = IntegerProperty.create("hide_count", 0, MAX_HIDE_COUNT);
+	protected static final BooleanProperty LIGHT_SOURCE = BooleanProperty.create("light");
 
 	protected final Supplier<BlockState> deepState;
 	protected final Supplier<BlockState> edgeState;
@@ -128,6 +132,13 @@ public abstract class FogBlock extends Block implements ILaserReactive {
 		return getVisibleFogFor(state, worldIn, currentPos);
 	}
 	
+	protected BlockState makeHiddenState(BlockState state, LevelAccessor world, BlockPos pos, int lightDistance) {
+		return this.hiddenState.get()
+				.setValue(LIGHT_SOURCE, lightDistance == 0)
+				.setValue(HIDE_COUNT, Math.min(MAX_HIDE_COUNT, lightDistance))
+				;
+	}
+	
 	public void hideFog(BlockState state, LevelAccessor worldIn, BlockPos pos, int lightDistance) {
 		// If not already a hidden block, change to be hidden.
 		// Also update tick time based on light distance, starting a timer if none set or updating timer if one is present
@@ -137,7 +148,7 @@ public abstract class FogBlock extends Block implements ILaserReactive {
 		FogBlock self;
 		final BlockState hiddenState = this.hiddenState.get();
 		if (hiddenState != state) {
-			state = this.hiddenState.get();
+			state = hiddenState;
 			self = (FogBlock) state.getBlock();
 			worldIn.setBlock(pos, state, Block.UPDATE_ALL);
 			worldIn.scheduleTick(pos, self, 20);
@@ -289,10 +300,11 @@ public abstract class FogBlock extends Block implements ILaserReactive {
 		
 		public Hidden() {
 			super(BaseProps()
-					.noOcclusion(),
+					.noOcclusion()
+					.lightLevel(s -> s.getValue(LIGHT_SOURCE) ? 15 : 0),
 				() -> NostrumBlocks.fogBlock.defaultBlockState(),
 				() -> NostrumBlocks.fogEdgeBlock.defaultBlockState(),
-				() -> NostrumBlocks.fogHiddenBlock.defaultBlockState().setValue(HIDE_COUNT, 7)
+				() -> NostrumBlocks.fogHiddenBlock.defaultBlockState().setValue(HIDE_COUNT, MAX_HIDE_COUNT)
 			);
 			
 			this.registerDefaultState(this.defaultBlockState().setValue(HIDE_COUNT, 2));
@@ -301,7 +313,7 @@ public abstract class FogBlock extends Block implements ILaserReactive {
 		@Override
 		protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 			super.createBlockStateDefinition(builder);
-			builder.add(HIDE_COUNT);
+			builder.add(HIDE_COUNT, LIGHT_SOURCE);
 		}
 		
 		@Override

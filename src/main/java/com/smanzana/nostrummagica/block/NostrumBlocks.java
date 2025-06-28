@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.block.dungeon.DungeonLauncherBlock;
 import com.smanzana.nostrummagica.block.dungeon.FogBlock;
 import com.smanzana.nostrummagica.block.dungeon.KeySwitchBlock;
 import com.smanzana.nostrummagica.block.dungeon.LaserBlock;
+import com.smanzana.nostrummagica.block.dungeon.LaserLight;
 import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
 import com.smanzana.nostrummagica.block.dungeon.LockedDoorBlock;
 import com.smanzana.nostrummagica.block.dungeon.LogicDoorBlock;
@@ -169,6 +170,7 @@ public class NostrumBlocks {
 	@ObjectHolder(FogBlock.Deep.ID) public static FogBlock.Deep fogBlock;
 	@ObjectHolder(FogBlock.Edge.ID) public static FogBlock.Edge fogEdgeBlock;
 	@ObjectHolder(FogBlock.Hidden.ID) public static FogBlock.Hidden fogHiddenBlock;
+	@ObjectHolder(LaserLight.ID) public static LaserLight laserLight;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -402,6 +404,7 @@ public class NostrumBlocks {
     	registerBlock(new FogBlock.Deep(), FogBlock.Deep.ID, registry);
     	registerBlock(new FogBlock.Edge(), FogBlock.Edge.ID, registry);
     	registerBlock(new FogBlock.Hidden(), FogBlock.Hidden.ID, registry);
+    	registerBlock(new LaserLight(), LaserLight.ID, registry);
     }
 
 	public static Block elementalStone(EMagicElement element) {

@@ -1,0 +1,20 @@
+{
+    "variants": {
+        "hide_count=0,light=false": { "model": "nostrummagica:block/none" },
+		"hide_count=0,light=true": { "model": "nostrummagica:block/none" },
+		"hide_count=1,light=false": { "model": "nostrummagica:block/none" },
+		"hide_count=1,light=true": { "model": "nostrummagica:block/none" },
+		"hide_count=2,light=false": { "model": "nostrummagica:block/none" },
+		"hide_count=2,light=true": { "model": "nostrummagica:block/none" },
+		"hide_count=3,light=false": { "model": "nostrummagica:block/none" },
+		"hide_count=3,light=true": { "model": "nostrummagica:block/none" },
+		"hide_count=4,light=false": { "model": "nostrummagica:block/none" },
+		"hide_count=4,light=true": { "model": "nostrummagica:block/none" },
+		"hide_count=5,light=false": { "model": "nostrummagica:block/none" },
+		"hide_count=5,light=true": { "model": "nostrummagica:block/none" },
+		"hide_count=6,light=false": { "model": "nostrummagica:block/none" },
+		"hide_count=6,light=true": { "model": "nostrummagica:block/none" },
+		"hide_count=7,light=false": { "model": "nostrummagica:block/none" },
+		"hide_count=7,light=true": { "model": "nostrummagica:block/none" }
+    }
+}

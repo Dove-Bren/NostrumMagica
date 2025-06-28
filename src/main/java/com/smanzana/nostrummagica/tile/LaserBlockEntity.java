@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.LaserBlock;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.ILaserReactive;
@@ -21,6 +22,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -212,6 +214,10 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 		this.enabledTicks = shrank ? ANIM_TICKS-1 : 0;
 	}
 	
+	protected void createLaserLight(BlockPos pos) {
+		level.setBlockAndUpdate(pos, NostrumBlocks.laserLight.defaultBlockState());
+	}
+	
 	protected LaserHitResult passThroughBlock(BlockState state, BlockPos pos, BlockEntity ent) {
 		// Check if block is laser reactive, and if so give it a chance to react and specify behavior
 		@Nullable ILaserReactive react = this.getLaserReactivity(state, ent, getDirection().getOpposite());
@@ -220,6 +226,9 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 		}
 		
 		if (state.isAir() || state.propagatesSkylightDown(level, pos)) {
+			if (state.getBlock() == Blocks.AIR) {
+				createLaserLight(pos);
+			}
 			return LaserHitResult.PASSTHROUGH;
 		}
 		
