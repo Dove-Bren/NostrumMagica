@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.block.dungeon.DungeonBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonDoorBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonKeyChestBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonLauncherBlock;
+import com.smanzana.nostrummagica.block.dungeon.FogBlock;
 import com.smanzana.nostrummagica.block.dungeon.KeySwitchBlock;
 import com.smanzana.nostrummagica.block.dungeon.LaserBlock;
 import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
@@ -165,6 +166,9 @@ public class NostrumBlocks {
 	@ObjectHolder(ID_EARTH_STONE) public static Block earthStone;
 	@ObjectHolder(ID_LIGHTNING_STONE) public static Block lightningStone;
 	@ObjectHolder(ID_ENDER_STONE) public static Block enderStone;
+	@ObjectHolder(FogBlock.Deep.ID) public static FogBlock.Deep fogBlock;
+	@ObjectHolder(FogBlock.Edge.ID) public static FogBlock.Edge fogEdgeBlock;
+	@ObjectHolder(FogBlock.Hidden.ID) public static FogBlock.Hidden fogHiddenBlock;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -267,6 +271,8 @@ public class NostrumBlocks {
     	registerBlockItem(earthStone, earthStone.getRegistryName(), registry);
     	registerBlockItem(lightningStone, lightningStone.getRegistryName(), registry);
     	registerBlockItem(enderStone, enderStone.getRegistryName(), registry);
+    	registerBlockItem(fogBlock, fogBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	//registerBlockItem(fogEdgeBlock, fogEdgeBlock.getRegistryName(), registry); No need
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -392,6 +398,10 @@ public class NostrumBlocks {
     	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_EARTH_STONE, registry);
     	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_LIGHTNING_STONE, registry);
     	registerBlock(new HalfTransparentBlock(BlockBehaviour.Properties.copy(fireStone)), ID_ENDER_STONE, registry);
+    	
+    	registerBlock(new FogBlock.Deep(), FogBlock.Deep.ID, registry);
+    	registerBlock(new FogBlock.Edge(), FogBlock.Edge.ID, registry);
+    	registerBlock(new FogBlock.Hidden(), FogBlock.Hidden.ID, registry);
     }
 
 	public static Block elementalStone(EMagicElement element) {

@@ -39,6 +39,7 @@ public class FillItem extends Item {
 	public static final String ID_WATER_DOWN = "fill_tool_water_level";
 	public static final String ID_ROOTING_AIR_ALL = "fill_tool_rooting_air";
 	public static final String ID_MECHBLOCK_GHOST_CONNECTED = "fill_tool_mechblock_ghost";
+	public static final String ID_FOG_ALL = "fill_tool_fog";
 	
 	protected static final int MAX_BLOCKS = 4098;
 	

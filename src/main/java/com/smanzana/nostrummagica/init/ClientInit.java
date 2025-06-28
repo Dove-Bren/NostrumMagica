@@ -518,6 +518,8 @@ public class ClientInit {
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.earthStone, RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.lightningStone, RenderType.translucent());
 		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.enderStone, RenderType.translucent());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.fogBlock, RenderType.solid());
+		ItemBlockRenderTypes.setRenderLayer(NostrumBlocks.fogEdgeBlock, RenderType.translucent());
 	}
 	
 	private static final void registerItemModelProperties() {

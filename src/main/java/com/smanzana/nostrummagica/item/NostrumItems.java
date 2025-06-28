@@ -603,6 +603,7 @@ public class NostrumItems {
     	register(registry, new FillItem(() -> Blocks.WATER.defaultBlockState(), false).setRegistryName(FillItem.ID_WATER_ALL));
     	register(registry, new FillItem(() -> Blocks.WATER.defaultBlockState(), true).setRegistryName(FillItem.ID_WATER_DOWN));
     	register(registry, new FillItem(() -> NostrumBlocks.rootingAir.defaultBlockState(), false).setRegistryName(FillItem.ID_ROOTING_AIR_ALL));
+    	register(registry, new FillItem(() -> NostrumBlocks.fogBlock.defaultBlockState(), false).setRegistryName(FillItem.ID_FOG_ALL));
     	register(registry, new ConnectedFillItem(SummonGhostBlock::WrapBlock).setRegistryName(FillItem.ID_MECHBLOCK_GHOST_CONNECTED));
     	register(registry, new MageBlade().setRegistryName(MageBlade.ID));
     	register(registry, new AspectedFireWeapon().setRegistryName(AspectedFireWeapon.ID));

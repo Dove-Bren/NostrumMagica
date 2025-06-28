@@ -20,7 +20,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -212,18 +212,18 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 		this.enabledTicks = shrank ? ANIM_TICKS-1 : 0;
 	}
 	
-	protected boolean passThroughBlock(BlockState state, BlockPos pos, BlockEntity ent) {
+	protected LaserHitResult passThroughBlock(BlockState state, BlockPos pos, BlockEntity ent) {
 		// Check if block is laser reactive, and if so give it a chance to react and specify behavior
 		@Nullable ILaserReactive react = this.getLaserReactivity(state, ent, getDirection().getOpposite());
 		if (react != null) {
-			return react.laserPassthroughTick(level, getBlockPos(), getElement());
+			return react.laserPassthroughTick(level, pos, state, getBlockPos(), getElement());
 		}
 		
 		if (state.isAir() || state.propagatesSkylightDown(level, pos)) {
-			return true;
+			return LaserHitResult.PASSTHROUGH;
 		}
 		
-		return false;
+		return LaserHitResult.BLOCK;
 	}
 	
 	protected boolean validateLength(List<BlockPos> others) {
@@ -236,7 +236,8 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 		for (int i = 0; i < this.getLaserWholeSegments(); i++) {
 			seen.add(cursor.immutable());
 			others.remove(cursor.immutable());
-			if (!passThroughBlock(level.getBlockState(cursor), cursor.immutable(), level.getBlockEntity(cursor))) {
+			final LaserHitResult result = passThroughBlock(level.getBlockState(cursor), cursor.immutable(), level.getBlockEntity(cursor)); 
+			if (result.stopLaser()) {
 				this.setSegmentsTo(i);
 				return true;
 			}
@@ -265,7 +266,8 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 		BlockPos toPos = this.worldPosition.relative(getDirection(), this.getLaserWholeSegments() + 1);
 		BlockState state = level.getBlockState(toPos);
 		BlockEntity ent = level.getBlockEntity(toPos);
-		if (this.passThroughBlock(state, toPos, ent)) {
+		final LaserHitResult result = this.passThroughBlock(state, toPos, ent);
+		if (!result.stopLaser()) {
 			this.addSegment();
 			this.animateLevelChange = true;
 			return true;
@@ -285,10 +287,15 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 	}
 	
 	protected @Nullable ILaserReactive getLaserReactivity(BlockState state, @Nullable BlockEntity entity, Direction direction) {
+		@Nullable ILaserReactive reactive = null;
 		if (entity != null) {
-			return entity.getCapability(CapabilityHandler.CAPABILITY_LASER_REACTIVE, direction).orElse(null);
+			reactive = entity.getCapability(CapabilityHandler.CAPABILITY_LASER_REACTIVE, direction).orElse(null);
 		}
-		return null;
+		
+		if (reactive == null && state.getBlock() instanceof ILaserReactive reactiveBlock) {
+			reactive = reactiveBlock;
+		}
+		return reactive;
 	}
 
 	@Override
@@ -311,15 +318,6 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 			List<BlockPos> nearbyBlocks = new ArrayList<>();
 			if (this.validateLength(nearbyBlocks)) {
 				// made an adjustment and updated tick count
-				// Visit nearby blocks
-				for (BlockPos pos : nearbyBlocks) {
-					BlockState state = level.getBlockState(pos);
-					BlockEntity ent = level.getBlockEntity(pos);
-					@Nullable ILaserReactive react = this.getLaserReactivity(state, ent, getDirection().getOpposite());
-					if (react != null) {
-						react.laserNearbyTick(level, pos, getElement());
-					}
-				}
 			} else {
 				final boolean enabled = this.getEnabled();
 				if (enabled && this.enabledTicks == ANIM_TICKS) {
@@ -328,6 +326,16 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 				} else if (!enabled && this.enabledTicks == 0) {
 					attemptShrink();
 					this.enabledTicks = ANIM_TICKS-1;
+				}
+			}
+			
+			// Visit nearby blocks
+			for (BlockPos pos : nearbyBlocks) {
+				BlockState state = level.getBlockState(pos);
+				BlockEntity ent = level.getBlockEntity(pos);
+				@Nullable ILaserReactive react = this.getLaserReactivity(state, ent, getDirection().getOpposite());
+				if (react != null) {
+					react.laserNearbyTick(level, pos, state, this.getBlockPos(), getElement(), pos.distManhattan(getBlockPos()));
 				}
 			}
 			
@@ -349,7 +357,7 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 	}
 
 	@Override
-	public boolean laserPassthroughTick(Level laserLevel, BlockPos laserPos, EMagicElement element) {
+	public LaserHitResult laserPassthroughTick(LevelAccessor laserLevel, BlockPos pos, BlockState state, BlockPos laserPos, EMagicElement element) {
 		if (!this.enabled) {
 			this.enabled = true;
 			this.setElement(element);
@@ -358,14 +366,14 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 		
 		if (this.getElement() == element) {
 			this.chargeTicks++;
-			return true;
+			return LaserHitResult.PASSTHROUGH;
 		} else {
-			return false;
+			return LaserHitResult.BLOCK;
 		}
 	}
 
 	@Override
-	public void laserNearbyTick(Level laserLevel, BlockPos laserPos, EMagicElement element) {
+	public void laserNearbyTick(LevelAccessor laserLevel, BlockPos pos, BlockState state, BlockPos laserPos, EMagicElement element, int beamDistance) {
 		; // do nothing
 	}
 	

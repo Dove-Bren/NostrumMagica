@@ -1,0 +1,6 @@
+{
+    "parent": "nostrummagica:block/fog_block",
+    "textures": {
+        "all": "nostrummagica:block/fog_block_edge"
+    }
+}

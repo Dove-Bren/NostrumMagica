@@ -308,6 +308,7 @@
 	"item.nostrummagica.fill_tool_water": "Fill Water",
 	"item.nostrummagica.fill_tool_water_level": "Fill Water Level",
 	"item.nostrummagica.fill_tool_mechblock_ghost": "Fill Summonable Block",
+	"item.nostrummagica.fill_tool_fog": "Fill Fog Block",
 	
 	"item.nostrummagica.sword_fire": "Flame Rod",
 	"item.nostrummagica.sword_earth": "Earth Pike",
@@ -513,6 +514,9 @@
 	"block.nostrummagica.wind_stone": "Wind Stone",
 	"block.nostrummagica.lightning_stone": "Lightning Stone",
 	"block.nostrummagica.ender_stone": "Ender Stone",
+	"block.nostrummagica.fog_block": "Dark Fog",
+	"block.nostrummagica.fog_block_edge": "Dark Fog",
+	"block.nostrummagica.fog_block_hidden": "Dark Fog",
 	
 	"block.nostrummagica.mani_crystal_mani": "Mani Crystal",
     "block.nostrummagica.mani_crystal_kani": "Kani Crystal",
