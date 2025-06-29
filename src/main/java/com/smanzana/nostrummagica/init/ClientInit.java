@@ -115,6 +115,7 @@ import com.smanzana.nostrummagica.client.render.tile.PortalBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.ProgressionDoorBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.PushBlockBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.SummonGhostBlockEntityRenderer;
+import com.smanzana.nostrummagica.client.render.tile.TemplateStamperBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TrialBlockEntityRenderer;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
@@ -429,6 +430,7 @@ public class ClientInit {
 		event.registerBlockEntityRenderer(NostrumBlockEntities.BreakContainer, BreakContainerBlockEntityRenderer::new);
 		event.registerBlockEntityRenderer(NostrumBlockEntities.SummonGhostBlock, SummonGhostBlockEntityRenderer::new);
 		event.registerBlockEntityRenderer(NostrumBlockEntities.Laser, LaserBlockEntityRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.TemplateStamper, TemplateStamperBlockEntityRenderer::new);
 	}
 	
 	@SubscribeEvent

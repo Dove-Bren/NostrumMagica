@@ -61,6 +61,7 @@ public class NostrumBlockEntities {
 	private static final String ID_LaserBlock = "laser_block_ent";
 	private static final String ID_ElementalCrystal = "elemental_crystal";
 	private static final String ID_LaserTrigger = "laser_trigger";
+	private static final String ID_TemplateStamper = "template_stamper";
 	
 
 	@ObjectHolder(ID_SpellTable) public static BlockEntityType<SpellTableTileEntity> SpellTable;
@@ -110,6 +111,7 @@ public class NostrumBlockEntities {
 	@ObjectHolder(ID_LaserBlock) public static BlockEntityType<LaserBlockEntity> Laser;
 	@ObjectHolder(ID_ElementalCrystal) public static BlockEntityType<ElementalCrystalBlockEntity> ElementalCrystal;
 	@ObjectHolder(ID_LaserTrigger) public static BlockEntityType<LaserTriggerBlockEntity> LaserTrigger;
+	@ObjectHolder(ID_TemplateStamper) public static BlockEntityType<TemplateStamperBlockEntity> TemplateStamper;
 	
 	private static void register(IForgeRegistry<BlockEntityType<?>> registry, BlockEntityType<?> type, String ID) {
 		registry.register(type.setRegistryName(ID));
@@ -166,5 +168,6 @@ public class NostrumBlockEntities {
 		register(registry, BlockEntityType.Builder.of(LaserBlockEntity::new, NostrumBlocks.laser).build(null), ID_LaserBlock);
 		register(registry, BlockEntityType.Builder.of(ElementalCrystalBlockEntity::new, NostrumBlocks.elementalCrystal).build(null), ID_ElementalCrystal);
 		register(registry, BlockEntityType.Builder.of(LaserTriggerBlockEntity::new, NostrumBlocks.laserTrigger).build(null), ID_LaserTrigger);
+		register(registry, BlockEntityType.Builder.of(TemplateStamperBlockEntity::new, NostrumBlocks.templateStamper).build(null), ID_TemplateStamper);
     }
 }

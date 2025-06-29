@@ -52,7 +52,7 @@ public class ElementalStoneBlock extends HalfTransparentBlock implements ILaserR
 	public boolean processSpellEffect(Level level, BlockState state, BlockPos pos, LivingEntity caster, SpellLocation hitLocation, SpellEffectPart effect, SpellAction action) {
 		// Blocks require ENCHANT with different elements
 		final EMagicElement element = getElement();
-		if (effect.getElement() != element
+		if (effect.getElement() != element && effect.getElement() != EMagicElement.PHYSICAL
 				&& effect.getAlteration() == EAlteration.ENCHANT) {
 			level.setBlockAndUpdate(pos, NostrumBlocks.elementalStone(effect.getElement()).defaultBlockState());
 			return true;

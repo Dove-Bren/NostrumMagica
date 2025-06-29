@@ -31,6 +31,7 @@ import com.smanzana.nostrummagica.block.dungeon.ShrineBlock;
 import com.smanzana.nostrummagica.block.dungeon.SingleSpawnerBlock;
 import com.smanzana.nostrummagica.block.dungeon.SummonGhostBlock;
 import com.smanzana.nostrummagica.block.dungeon.SwitchBlock;
+import com.smanzana.nostrummagica.block.dungeon.TemplateStamperBlock;
 import com.smanzana.nostrummagica.block.dungeon.ToggleLogicDoor;
 import com.smanzana.nostrummagica.block.dungeon.TogglePlatformBlock;
 import com.smanzana.nostrummagica.block.dungeon.TrialBlock;
@@ -165,6 +166,7 @@ public class NostrumBlocks {
 	@ObjectHolder(FogBlock.Hidden.ID) public static FogBlock.Hidden fogHiddenBlock;
 	@ObjectHolder(LaserLight.ID) public static LaserLight laserLight;
 	@ObjectHolder(LaserTrigger.ID) public static LaserTrigger laserTrigger;
+	@ObjectHolder(TemplateStamperBlock.ID) public static TemplateStamperBlock templateStamper;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -174,6 +176,14 @@ public class NostrumBlocks {
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, IForgeRegistry<Item> registry) {
 		registerBlockItem(block, registryName, NostrumItems.PropBase(), registry);
+	}
+	
+	private static void registerBlockItem(Block block, Item.Properties builder, IForgeRegistry<Item> registry) {
+		registerBlockItem(block, block.getRegistryName(), builder, registry);
+	}
+	
+	private static void registerBlockItem(Block block, IForgeRegistry<Item> registry) {
+		registerBlockItem(block, block.getRegistryName(), registry);
 	}
 	
     @SubscribeEvent
@@ -261,15 +271,16 @@ public class NostrumBlocks {
     	registerBlockItem(mageLight, mageLight.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(pushPassthroughBlock, pushPassthroughBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(rootingAir, rootingAir.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
-    	registerBlockItem(fireStone, fireStone.getRegistryName(), registry);
-    	registerBlockItem(iceStone, iceStone.getRegistryName(), registry);
-    	registerBlockItem(windStone, windStone.getRegistryName(), registry);
-    	registerBlockItem(earthStone, earthStone.getRegistryName(), registry);
-    	registerBlockItem(lightningStone, lightningStone.getRegistryName(), registry);
-    	registerBlockItem(enderStone, enderStone.getRegistryName(), registry);
+    	registerBlockItem(fireStone, registry);
+    	registerBlockItem(iceStone, registry);
+    	registerBlockItem(windStone, registry);
+    	registerBlockItem(earthStone, registry);
+    	registerBlockItem(lightningStone, registry);
+    	registerBlockItem(enderStone, registry);
     	registerBlockItem(fogBlock, fogBlock.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	//registerBlockItem(fogEdgeBlock, fogEdgeBlock.getRegistryName(), registry); No need
     	registerBlockItem(laserTrigger, laserTrigger.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(templateStamper, NostrumItems.PropDungeonBase(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -401,6 +412,7 @@ public class NostrumBlocks {
     	registerBlock(new FogBlock.Hidden(), FogBlock.Hidden.ID, registry);
     	registerBlock(new LaserLight(), LaserLight.ID, registry);
     	registerBlock(new LaserTrigger(), LaserTrigger.ID, registry);
+    	registerBlock(new TemplateStamperBlock(), TemplateStamperBlock.ID, registry);
     }
 
 	public static Block elementalStone(EMagicElement element) {
