@@ -8,27 +8,44 @@ import com.smanzana.autodungeons.world.blueprints.Blueprint.LoadContext;
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.autodungeons.world.blueprints.IBlueprint;
 
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class TemplateStamperBlockEntity extends BlockEntity implements IOrientedTileEntity {
 	
 	private static final String NBT_OFFSET = "offset";
 	private static final String NBT_TEMPLATE = "template";
+	private static final String NBT_TRIGGERED_BEFORE = "triggered_before";
+	private static final String NBT_ONE_TIME = "one_time";
+	private static final String NBT_SHOW_HINT = "show_hint";
+	
+	private static final Component HINT_TEXT = new TranslatableComponent("info.template_stamper.hint");
 	
 	private BlueprintLocation spawnOffset;
 	private Blueprint blueprint;
+	private boolean triggeredBefore;
+	private boolean oneTime;
+	private boolean showHint;
 	
 	protected TemplateStamperBlockEntity(BlockEntityType<? extends TemplateStamperBlockEntity> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 		this.spawnOffset = new BlueprintLocation(new BlockPos(0, 2, 0), Direction.NORTH);
 		this.blueprint = null;
+		this.triggeredBefore = false;
+		this.oneTime = false;
+		this.showHint = false;
 	}
 	
 	public TemplateStamperBlockEntity(BlockPos pos, BlockState state) {
@@ -70,11 +87,44 @@ public class TemplateStamperBlockEntity extends BlockEntity implements IOriented
 		return this.blueprint;
 	}
 	
+	public void resetTriggered() {
+		this.triggeredBefore = false;
+		flush(false);
+	}
+	
+	public boolean hasBeenTriggered() {
+		return this.triggeredBefore;
+	}
+	
+	public void setOneTimeOnly(boolean oneTime) {
+		this.oneTime = oneTime;
+		flush(false);
+	}
+	
+	public boolean isOneTimeOnly() {
+		return this.oneTime;
+	}
+	
+	public void setShowHint(boolean showHint) {
+		this.showHint = showHint;
+		flush(false);
+	}
+	
+	public boolean showsHint() {
+		return this.showHint;
+	}
+	
 	protected void spawnBlueprint() {
 		final Blueprint blueprint = this.getBlueprint();
 		final BlueprintLocation location = this.getOffset();
 		if (blueprint != null) {
 			blueprint.spawn(level, this.getBlockPos().offset(location.getPos()), location.getFacing());
+		}
+	}
+	
+	protected void showHintToNearby() {
+		for (Player player : ((ServerLevel) level).getPlayers(p -> p.distanceToSqr(Vec3.atCenterOf(getBlockPos())) < 400)) {
+			player.sendMessage(HINT_TEXT, Util.NIL_UUID);
 		}
 	}
 	
@@ -101,6 +151,9 @@ public class TemplateStamperBlockEntity extends BlockEntity implements IOriented
 		if (blueprint != null) {
 			compound.put(NBT_TEMPLATE, blueprint.toNBT());
 		}
+		compound.putBoolean(NBT_ONE_TIME, oneTime);
+		compound.putBoolean(NBT_SHOW_HINT, showHint);
+		compound.putBoolean(NBT_TRIGGERED_BEFORE, triggeredBefore);
 	}
 	
 	@Override
@@ -112,6 +165,9 @@ public class TemplateStamperBlockEntity extends BlockEntity implements IOriented
 		if (compound.contains(NBT_TEMPLATE)) {
 			this.blueprint = Blueprint.FromNBT(new LoadContext("TemplateStamperEnt load()"), compound.getCompound(NBT_TEMPLATE));
 		}
+		this.oneTime = compound.getBoolean(NBT_ONE_TIME);
+		this.showHint = compound.getBoolean(NBT_SHOW_HINT);
+		this.triggeredBefore = compound.getBoolean(NBT_TRIGGERED_BEFORE);
 	}
 	
 	protected void flush(boolean isWorldGen) {
@@ -136,6 +192,15 @@ public class TemplateStamperBlockEntity extends BlockEntity implements IOriented
 	}
 	
 	public void trigger(BlockPos triggerSource) {
-		this.spawnBlueprint();
+		if (!this.oneTime || !this.triggeredBefore) {
+			this.spawnBlueprint();
+			if (this.showHint) {
+				showHintToNearby();
+			}
+			if (!this.triggeredBefore) {
+				this.triggeredBefore = true;
+				this.flush(false);
+			}
+		}
 	}
 }

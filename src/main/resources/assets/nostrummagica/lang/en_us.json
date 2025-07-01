@@ -850,6 +850,7 @@
 	"info.heldmirror.set_warning": "You are about to change what the mirror is pointing at. Sneak-use again on the same block to confirm.",
 	"info.gold_mirror.not_loaded": "The remote block can't be reached (unloaded).",
 	"info.rooted.no_jump": "The roots at your feet prevent you from jumping",
+	"info.template_stamper.hint": "You sense something changed somewhere nearby...",
 	
 	"mastery.unknown.name": "Unknown",
 	"mastery.novice.name": "Novice",

@@ -21,6 +21,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -129,14 +130,14 @@ public class TemplateStamperBlock extends BaseEntityBlock implements ITriggeredB
 //			if (ent.getTriggerRequirement() > 1) {
 //				playerIn.sendMessage(new TextComponent("Triggered %d out of %d times ".formatted(ent.getCurrentTriggerCount(), ent.getTriggerRequirement())), Util.NIL_UUID);
 //			}
-		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof PositionCrystal) {
+		} else if (heldItem.getItem() instanceof PositionCrystal) {
 			BlockPos heldPos = PositionCrystal.getBlockPosition(heldItem);
 			if (heldPos != null && DimensionUtils.DimEquals(PositionCrystal.getDimension(heldItem), worldIn.dimension())) {
 				ent.setSpawnPoint(heldPos, false);
 				playerIn.sendMessage(new TextComponent("Offset to " + heldPos), Util.NIL_UUID);
 				NostrumMagicaSounds.STATUS_BUFF1.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 			}
-		} else if (!heldItem.isEmpty() && heldItem.getItem() instanceof CopyWandItem copyWand) {
+		} else if (heldItem.getItem() instanceof CopyWandItem copyWand) {
 			IBlueprint blueprint = copyWand.getBlueprint(playerIn, heldItem, pos);
 			if (blueprint != null) {
 				ent.setBlueprint((Blueprint) blueprint);
@@ -174,6 +175,21 @@ public class TemplateStamperBlock extends BaseEntityBlock implements ITriggeredB
 					ent.setSpawnPoint(captureOrigin, Direction.NORTH, false);
 				}
 			}
+		} else if (heldItem.getItem() == Items.LEVER) {
+			final boolean newOneTime = !ent.isOneTimeOnly();
+			playerIn.sendMessage(new TextComponent("%s one time only".formatted(newOneTime ? "Is" : "Is NOT")), Util.NIL_UUID);
+			NostrumMagicaSounds.STATUS_BUFF2.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+			ent.setOneTimeOnly(newOneTime);
+			
+			if (ent.hasBeenTriggered()) {
+				ent.resetTriggered();
+				playerIn.sendMessage(new TextComponent("Reset triggered status"), Util.NIL_UUID);
+			}
+		} else if (heldItem.getItem() == Items.PAPER) {
+			final boolean newShowHint = !ent.showsHint();
+			playerIn.sendMessage(new TextComponent("%s show hint".formatted(newShowHint ? "Will" : "Will NOT")), Util.NIL_UUID);
+			NostrumMagicaSounds.STATUS_BUFF2.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
+			ent.setShowHint(newShowHint);
 		}
 		
 		return InteractionResult.SUCCESS;

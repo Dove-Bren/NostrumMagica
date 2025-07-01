@@ -1,6 +1,8 @@
 package com.smanzana.nostrummagica.spell.component.shapes;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
@@ -15,11 +17,11 @@ import com.smanzana.nostrummagica.spell.component.SpellShapeProperty;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreview;
 import com.smanzana.nostrummagica.spell.preview.SpellShapePreviewComponent;
 
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.core.NonNullList;
 import net.minecraftforge.common.util.Lazy;
 
 /**
@@ -32,10 +34,14 @@ public class DelayShape extends SpellShape {
 	public static class DelayShapeInstance extends SpellShapeInstance implements IGenericListener {
 
 		private final int delayTicks;
+		private LivingEntity entity;
+		private SpellLocation location;
 		
-		public DelayShapeInstance(ISpellState state, int delayTicks, SpellCharacteristics characteristics) {
+		public DelayShapeInstance(ISpellState state, LivingEntity entity, SpellLocation location, int delayTicks, SpellCharacteristics characteristics) {
 			super(state);
 			this.delayTicks = delayTicks;
+			this.entity = entity;
+			this.location = location;
 		}
 		
 		@Override
@@ -47,9 +53,20 @@ public class DelayShape extends SpellShape {
 		public boolean onEvent(Event type, LivingEntity entity, Object unused) {
 			// We only registered for time, so don't bother checking
 			
+			List<LivingEntity> ents = null;
+			if (this.entity != null) {
+				ents = new ArrayList<>(1);
+				ents.add(this.entity);
+			}
+			
+			List<SpellLocation> locs = null;
+			if (this.location != null) {
+				locs = new ArrayList<>(1);
+				locs.add(location);
+			}
+			
 			TriggerData data = new TriggerData(
-					Lists.newArrayList(this.getState().getSelf()),
-					null
+					ents, locs
 					);
 			this.trigger(data);
 			return true;
@@ -81,7 +98,7 @@ public class DelayShape extends SpellShape {
 	
 	@Override
 	public SpellShapeInstance createInstance(ISpellState state, LivingEntity entity, SpellLocation location, float pitch, float yaw, SpellShapeProperties params, SpellCharacteristics characteristics) {
-		return new DelayShapeInstance(state, 20 * getDelaySecs(params), characteristics);
+		return new DelayShapeInstance(state, entity, location, 20 * getDelaySecs(params), characteristics);
 	}
 	
 	@Override
@@ -126,7 +143,7 @@ public class DelayShape extends SpellShape {
 	
 	@Override
 	public SpellShapeAttributes getAttributes(SpellShapeProperties params) {
-		return new SpellShapeAttributes(false, true, false);
+		return new SpellShapeAttributes(false, true, true);
 	}
 
 	@Override
