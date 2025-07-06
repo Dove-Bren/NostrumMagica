@@ -41,7 +41,7 @@ public class SpellChargeTracker {
 		;
 	}
 	
-	public static record SpellCharge(Spell spell, int duration, ChargeType type) {
+	public static record SpellCharge(Spell spell, int duration, ChargeType type, int overchargeCount) {
 		
 		public CompoundTag toNBT() {
 			CompoundTag tag = new CompoundTag();
@@ -49,6 +49,7 @@ public class SpellChargeTracker {
 			tag.put("spell", spell.toNBT());
 			tag.putInt("duration", duration);
 			tag.putString("type", type.name());
+			tag.putInt("overcharge", overchargeCount);
 			
 			return tag;
 		}
@@ -56,9 +57,10 @@ public class SpellChargeTracker {
 		public static final SpellCharge FromNBT(CompoundTag nbt) {
 			Spell incant = Spell.FromNBT(nbt.getCompound("spell"));
 			final int duration = nbt.getInt("duration");
-			final ChargeType type = ChargeType.valueOf("type");
+			final ChargeType type = ChargeType.valueOf(nbt.getString("type"));
+			final int overCharge = nbt.getInt("overcharge");
 			
-			return new SpellCharge(incant, duration, type);
+			return new SpellCharge(incant, duration, type, overCharge);
 		}
 		
 	}
@@ -83,7 +85,7 @@ public class SpellChargeTracker {
 	protected synchronized boolean setCharging(UUID id, @Nullable SpellCharge charge) {
 		final boolean changed;
 		if (charge != null) {
-			changed = (Objects.equals(charge, chargeMap.put(id, charge)));
+			changed = !(Objects.equals(charge, chargeMap.put(id, charge)));
 		} else {
 			changed = chargeMap.remove(id) != null;
 		}

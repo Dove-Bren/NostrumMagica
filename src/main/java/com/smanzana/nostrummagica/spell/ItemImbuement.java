@@ -104,12 +104,12 @@ public final class ItemImbuement {
 	}
 	
 	public SpellEffects.ApplyResult triggerOn(LivingEntity caster, LivingEntity target) {
-		return SpellEffects.ApplySpellEffects(caster, this.effects, this.efficiency, List.of(target), new ArrayList<>(), ISpellLogBuilder.Dummy, null, null);
+		return SpellEffects.ApplySpellEffects(caster, this.effects, SpellCastProperties.makeSimple(this.efficiency), List.of(target), new ArrayList<>(), ISpellLogBuilder.Dummy, null, null);
 		
 	}
 	
 	public SpellEffects.ApplyResult triggerOn(LivingEntity caster, SpellLocation target) {
-		return SpellEffects.ApplySpellEffects(caster, this.effects, this.efficiency, new ArrayList<>(), List.of(target), ISpellLogBuilder.Dummy, null, null);
+		return SpellEffects.ApplySpellEffects(caster, this.effects, SpellCastProperties.makeSimple(this.efficiency), new ArrayList<>(), List.of(target), ISpellLogBuilder.Dummy, null, null);
 	}
 
 	public List<SpellEffectPart> getParts() {

@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.PortalBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
+import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.IBonusJumpCapability;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
@@ -66,6 +67,7 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Incantation;
 import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastProperties;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
 import com.smanzana.nostrummagica.spell.SpellChargeTracker.ChargeType;
@@ -89,7 +91,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
@@ -127,6 +128,8 @@ public class ClientPlayerListener extends PlayerListener {
 	
 	// Whether this current frame has a jump that was unconsumed
 	private boolean hasJump;
+	
+	protected int chargeCount = 0; //TODO remove
 	
 	private final KeyMapping bindingCastSlow;
 	private final KeyMapping bindingCast1;
@@ -436,6 +439,10 @@ public class ClientPlayerListener extends PlayerListener {
 		this.overlayRenderer.startManaWiggle(wiggleCount);
 	}
 	
+	protected boolean hasSpellChargeUnlocked(Player player, INostrumMagic attr) {
+		return attr.getTier().isGreaterOrEqual(EMagicTier.VANI);
+	}
+	
 	private static final class ClientTomeCharge extends ClientSpellCharge {
 		public final int castSlot;
 		public ClientTomeCharge(SpellCharge charge, ItemStack mainhand, ItemStack offhand, float displayRate, int castSlot) {
@@ -445,6 +452,10 @@ public class ClientPlayerListener extends PlayerListener {
 	}
 	
 	private void doCast(int castSlot) {
+		if (this.getChargeManager().getCurrentCharge() != null) {
+			return;
+		}
+		
 		final Player player = NostrumMagica.Proxy.getPlayer();
 		RegisteredSpell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
 		if (castSlot < 0 || spells == null || spells.length == 0 || spells.length <= castSlot) {
@@ -463,10 +474,11 @@ public class ClientPlayerListener extends PlayerListener {
 			SpellCastResult result = SpellCasting.CheckToolCast(spell, player, tome);
 			if (result.succeeded) {
 				final ClientTomeCharge charge = new ClientTomeCharge(
-						new SpellCharge(spell, result.summary.getFinalCastTicks(), ChargeType.TOME_CAST),
+						new SpellCharge(spell, result.summary.getFinalCastTicks(), ChargeType.TOME_CAST, 0),
 						player.getMainHandItem(), player.getOffhandItem(),
 						1f - result.summary.getCastSpeedRate(), // 1.5f -> -.5f; .8f -> .2f
 						castSlot);
+				this.chargeCount = 0;
 				if (result.summary.getFinalCastTicks() > 0) {
 					this.chargeManager.startCharging(charge);
 				} else {
@@ -500,8 +512,9 @@ public class ClientPlayerListener extends PlayerListener {
 				SpellCastResult result = SpellCasting.CheckToolCast(spell, player, ItemStack.EMPTY);
 				if (result.succeeded) {
 					// We think we can cast it, so start charging
+					this.chargeCount = 0;
 					this.chargeManager.startCharging(new ClientSpellCharge(
-							new SpellCharge(spell, result.summary.getFinalCastTicks(), ChargeType.INCANTATION),
+							new SpellCharge(spell, result.summary.getFinalCastTicks(), ChargeType.INCANTATION, 0),
 							player.getMainHandItem(), player.getOffhandItem(),
 							1f - result.summary.getCastSpeedRate()));
 					
@@ -533,7 +546,7 @@ public class ClientPlayerListener extends PlayerListener {
 	
 	private static final class ClientScrollCharge extends ClientSpellCharge {
 		public final ItemStack scroll;
-		public boolean isMainhand;
+		public final boolean isMainhand;
 		public ClientScrollCharge(SpellCharge charge, ItemStack mainhand, ItemStack offhand, float displayRate, ItemStack scroll, boolean isMainhand) {
 			super(charge, mainhand, offhand, displayRate);
 			this.scroll = scroll;
@@ -544,11 +557,12 @@ public class ClientPlayerListener extends PlayerListener {
 	public void startScrollCast(InteractionHand hand, ItemStack scroll, RegisteredSpell spell) {
 		final Player player = NostrumMagica.Proxy.getPlayer();
 		final ClientScrollCharge charge = new ClientScrollCharge(
-				new SpellCharge(spell, 20, ChargeType.SCROLL),
+				new SpellCharge(spell, 20, ChargeType.SCROLL, 0),
 				player.getMainHandItem(), player.getOffhandItem(),
 				0f,
 				scroll, hand == InteractionHand.MAIN_HAND);
-			this.chargeManager.startCharging(charge);
+		this.chargeCount = 0;
+		this.chargeManager.startCharging(charge);
 	}
 	
 	protected boolean hasIncantHand(Player player) {
@@ -631,16 +645,17 @@ public class ClientPlayerListener extends PlayerListener {
 		
 		// Find the tome this was cast from, if any
 		ItemStack tome = NostrumMagica.getCurrentTome(player); 
+		SpellCastProperties props = new SpellCastProperties(1f, this.chargeCount, this.getTargetManager().getLastTarget(1f));
 		
 		NetworkHandler.sendToServer(
-    			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome), this.getTargetManager().getLastTarget(1f)));
+    			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome), props));
 		player.swing(InteractionHand.MAIN_HAND);
 	}
 	
 	protected void finishIncantationCast(Player player, ClientSpellCharge charge) {
-		final @Nullable Entity targetHint = this.getTargetManager().getLastTarget(1f);
+		SpellCastProperties props = new SpellCastProperties(1f, this.chargeCount, this.getTargetManager().getLastTarget(1f));
 		
-		NetworkHandler.sendToServer(new ClientCastAdhocMessage(charge.charge.spell(), targetHint));
+		NetworkHandler.sendToServer(new ClientCastAdhocMessage(charge.charge.spell(), props));
 		player.swing(InteractionHand.MAIN_HAND);
 		
 		this.tutorial.onIncantationCastFinished();
@@ -649,26 +664,34 @@ public class ClientPlayerListener extends PlayerListener {
 	protected void finishScrollCast(Player playerIn, ClientScrollCharge charge) {
 		HitResult mop = RayTrace.raytraceApprox(playerIn.getLevel(), playerIn, playerIn.getEyePosition(), playerIn.getXRot(), playerIn.getYRot(), 100, (e) -> e != playerIn && e instanceof LivingEntity, .5);
 		final @Nullable LivingEntity hint = RayTrace.entFromRaytrace(mop) == null ? null : (LivingEntity) RayTrace.entFromRaytrace(mop);
+		SpellCastProperties props = new SpellCastProperties(1f, this.chargeCount, hint);
 		
 		RegisteredSpell spell = SpellScroll.GetSpell(charge.scroll);
-		NetworkHandler.sendToServer(new ClientCastMessage(spell, true, charge.isMainhand ? 0 : 1, hint));
+		NetworkHandler.sendToServer(new ClientCastMessage(spell, true, charge.isMainhand ? 0 : 1, props));
 		playerIn.swing(InteractionHand.MAIN_HAND);
 	}
 	
 	protected void finishChargeCast(ClientSpellCharge charge) {
 		final Player player = NostrumMagica.Proxy.getPlayer();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		final boolean chargeHeld = this.getBindingIncant().isDown();
 		if (attr != null && attr.isUnlocked()) {
-			switch (charge.charge.type()) {
-			case INCANTATION:
-				finishIncantationCast(player, charge);
-				break;
-			case TOME_CAST:
-				finishSpellCast(player, (ClientTomeCharge) charge);
-				break;
-			case SCROLL:
-				finishScrollCast(player, (ClientScrollCharge) charge);
-				break;
+			if (chargeHeld && chargeCount < 2 && hasSpellChargeUnlocked(player, attr)) {
+				// Try to charge it
+				chargeCount++;
+				this.chargeManager.startCharging(charge);
+			} else {
+				switch (charge.charge.type()) {
+				case INCANTATION:
+					finishIncantationCast(player, charge);
+					break;
+				case TOME_CAST:
+					finishSpellCast(player, (ClientTomeCharge) charge);
+					break;
+				case SCROLL:
+					finishScrollCast(player, (ClientScrollCharge) charge);
+					break;
+				}
 			}
 		}
 	}
@@ -688,8 +711,8 @@ public class ClientPlayerListener extends PlayerListener {
 		
 		if (!mc.isPaused() && this.chargeManager.isDoneCharging()) {
 			ClientSpellCharge charge = this.chargeManager.getCurrentCharge();
-			finishChargeCast(charge);
 			this.chargeManager.cancelCharge(false);
+			finishChargeCast(charge);
 //			final UUID id = UUID.fromString("637ec07c-9931-45ca-bd8e-e47c7f9b50a6");
 //			NostrumMagica.instance.proxy.getPlayer().getAttributes().getInstance(Attributes.MOVEMENT_SPEED).removeModifier(id);
 		}

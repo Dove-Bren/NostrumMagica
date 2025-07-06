@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastProperties;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
@@ -77,7 +78,7 @@ public class MagicEarthGolemEntity extends MagicGolemEntity {
 		else
 			spell = spellBuff1;	
 		
-		spell.cast(this, 1.0f);
+		spell.cast(this, SpellCastProperties.BASE);
 		
 		if (targ != target)
 			this.setTarget(targ);

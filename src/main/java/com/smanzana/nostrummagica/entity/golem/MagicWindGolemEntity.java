@@ -4,6 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastProperties;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
@@ -51,7 +52,7 @@ public class MagicWindGolemEntity extends MagicGolemEntity {
 		if (this.getHealth() < 8f)
 			level = .4f;
 		if (NostrumMagica.rand.nextFloat() < level) {
-			spellPush.cast(this, 1.0f);
+			spellPush.cast(this, SpellCastProperties.BASE);
 		} else {
 			this.doHurtTarget(target);
 		}
@@ -70,7 +71,7 @@ public class MagicWindGolemEntity extends MagicGolemEntity {
 		if (targ != target)
 			this.setTarget(target);
 		
-		spellBuff.cast(this, 1.0f);
+		spellBuff.cast(this, SpellCastProperties.BASE);
 		
 		if (targ != target)
 			this.setTarget(targ);

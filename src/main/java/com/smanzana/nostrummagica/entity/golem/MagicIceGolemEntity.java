@@ -4,6 +4,7 @@ import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastProperties;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
@@ -56,7 +57,7 @@ public class MagicIceGolemEntity extends MagicGolemEntity {
 		if (targ != target)
 			this.setTarget(target);
 		
-		spellRange.cast(this, 1.0f);
+		spellRange.cast(this, SpellCastProperties.BASE);
 		
 		if (targ != target)
 			this.setTarget(targ);
@@ -70,7 +71,7 @@ public class MagicIceGolemEntity extends MagicGolemEntity {
 		if (targ != target)
 			this.setTarget(target);
 		
-		spellBuff.cast(this, 1.0f);
+		spellBuff.cast(this, SpellCastProperties.BASE);
 		
 		if (targ != target)
 			this.setTarget(targ);

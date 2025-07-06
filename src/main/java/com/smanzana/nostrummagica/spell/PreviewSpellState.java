@@ -17,7 +17,7 @@ public final class PreviewSpellState extends SpellState {
 	private final float partialTicks;
 	
 	public PreviewSpellState(Spell spell, LivingEntity caster, SpellShapePreview previewBuilder, float partialTicks) {
-		super(spell, caster, 1f, null, ISpellLogBuilder.Dummy);
+		super(spell, caster, SpellCastProperties.BASE, ISpellLogBuilder.Dummy);
 		this.previewBuilder = previewBuilder;
 		this.partialTicks = partialTicks;
 	}

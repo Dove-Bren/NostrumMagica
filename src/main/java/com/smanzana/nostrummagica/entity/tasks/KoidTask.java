@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.entity.KoidEntity;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastProperties;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
@@ -387,7 +388,7 @@ public class KoidTask extends Goal {
 				// Usually do ourselves, but have a chance to aid master first
 				
 				Spell buff = this.getBuff();
-				buff.cast(koid, 1.0f);
+				buff.cast(koid, SpellCastProperties.BASE);
 				auxCooldown = 20 * 5 * (1 + KoidTask.rand.nextInt(3));
 				done = true;
 			}
@@ -408,7 +409,7 @@ public class KoidTask extends Goal {
 				// Can we do a ranged attack?
 				if (koid.hasLineOfSight(target)) {
 					Spell spell = this.getRanged();
-					spell.cast(koid, 1.0f);
+					spell.cast(koid, SpellCastProperties.BASE);
 					rangeCooldown = 20 * 3 * (1 + KoidTask.rand.nextInt(3));
 					done = true;
 				}
@@ -416,7 +417,7 @@ public class KoidTask extends Goal {
 			
 			if (!done && hasMelee && inMelee && meleeCooldown <= 0) {
 				Spell spell = this.getMelee();
-				spell.cast(koid, 1.0f);
+				spell.cast(koid, SpellCastProperties.BASE);
 				meleeCooldown = 20 * 1;
 				done = true;
 			}

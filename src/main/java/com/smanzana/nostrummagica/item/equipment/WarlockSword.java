@@ -26,6 +26,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastProperties;
 import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.component.shapes.SeekingBulletShape;
@@ -448,7 +449,7 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 						Float val = power.get(elem);
 						if (val != null && val >= 1f) {
 							Spell missle = GetMissleSpell(elem);
-							missle.cast(playerIn, .5f * (int) (float) val);
+							missle.cast(playerIn, SpellCastProperties.makeSimple(.5f * (int) (float) val));
 							any = true;
 						}
 					}

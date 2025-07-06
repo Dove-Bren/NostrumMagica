@@ -58,15 +58,15 @@ public class SpellCasting {
 		}
 	}
 	
-	public static final SpellCastResult AttemptScrollCast(Spell spell, LivingEntity entity, @Nullable LivingEntity targetHint) {
-		return AttemptCast(spell, entity, ItemStack.EMPTY, targetHint, true, false);
+	public static final SpellCastResult AttemptScrollCast(Spell spell, LivingEntity entity, SpellCastProperties castProperties) {
+		return AttemptCast(spell, entity, ItemStack.EMPTY, castProperties, true, false);
 	}
 	
-	public static final SpellCastResult AttemptToolCast(Spell spell, LivingEntity entity, ItemStack tool, @Nullable LivingEntity targetHint) {
+	public static final SpellCastResult AttemptToolCast(Spell spell, LivingEntity entity, ItemStack tool, SpellCastProperties castProperties) {
 		final boolean freeCast = entity instanceof Player
 				? ((Player) entity).isCreative()
 				: false;
-		return AttemptCast(spell, entity, tool, targetHint, freeCast, false);
+		return AttemptCast(spell, entity, tool, castProperties, freeCast, false);
 	}
 	
 	public static final SpellCastResult CheckToolCast(Spell spell, LivingEntity entity, ItemStack tool) {
@@ -81,7 +81,7 @@ public class SpellCasting {
 		return result;
 	}
 
-	protected static final SpellCastResult AttemptCast(Spell spell, LivingEntity entity, ItemStack tool, @Nullable LivingEntity targetHint, boolean freeCast, boolean checking) {
+	protected static final SpellCastResult AttemptCast(Spell spell, LivingEntity entity, ItemStack tool, SpellCastProperties castProperties, boolean freeCast, boolean checking) {
 		INostrumMagic att = NostrumMagica.getMagicWrapper(entity);
 		@Nullable Player playerCast = (entity instanceof Player) ? (Player) entity : null;
 		
@@ -290,7 +290,7 @@ public class SpellCasting {
 		}
 		
 		if (!checking) {
-			spell.cast(entity, summary.getEfficiency(), targetHint);
+			spell.cast(entity, castProperties.withEfficiency(summary.getEfficiency()));
 			
 			// No xp if magic isn't unlocked
 			if (!att.isUnlocked()) {

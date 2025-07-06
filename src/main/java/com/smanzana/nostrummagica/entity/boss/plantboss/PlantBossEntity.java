@@ -33,6 +33,7 @@ import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.util.Entities;
 import com.smanzana.nostrummagica.util.SpellUtils;
@@ -1253,7 +1254,7 @@ public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEnt
 			if (castHeight > 0) {
 				parent.setEyeHeight(castHeight);
 			}
-			spell.cast(parent, 1);
+			spell.cast(parent, SpellCastProperties.BASE);
 			if (castHeight > 0) {
 				parent.setEyeHeight(eyeHeight);
 			}

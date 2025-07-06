@@ -27,6 +27,7 @@ import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastProperties;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.util.SpellUtils;
 import com.smanzana.nostrummagica.util.TargetLocation;
@@ -776,7 +777,7 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 		if (target != null) {
 			this.setTarget(target);
 			this.lookAt(target, 360f, 180f);
-			SPELL_BARRAGE.get(element).cast(this, 1f, target);
+			SPELL_BARRAGE.get(element).cast(this, SpellCastProperties.makeWithTarget(1f, target));
 			this.level.playSound(null, this, SoundEvents.PILLAGER_CELEBRATE, getSoundSource(), 1f, 1f);
 		}
 	}
@@ -801,7 +802,7 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 		if (target != null) {
 			this.setTarget(target);
 			this.lookAt(target, 360f, 180f);
-			SPELL_CHARGE_BLAST.get(element).cast(this, 1f, target);
+			SPELL_CHARGE_BLAST.get(element).cast(this, SpellCastProperties.makeWithTarget(1f, target));
 			
 			this.level.playSound(null, this, SoundEvents.WITCH_CELEBRATE, getSoundSource(), 1f, .75f);
 		}
@@ -837,7 +838,7 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 			LivingEntity living = (LivingEntity) ent;
 			this.setTarget(living);
 			this.lookAt(living, 360f, 180f);
-			spell.cast(this, 1f, living);
+			spell.cast(this, SpellCastProperties.makeWithTarget(1f, living));
 		}
 	}
 	

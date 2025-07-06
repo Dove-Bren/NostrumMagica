@@ -169,11 +169,7 @@ public class Spell {
 		return this.iconIndex;
 	}
 	
-	public void cast(LivingEntity caster, float efficiency) {
-		cast(caster, efficiency, null);
-	}
-	
-	public void cast(LivingEntity caster, float efficiency, @Nullable LivingEntity targetHint) {
+	public void cast(LivingEntity caster, SpellCastProperties castProperties) {
 		if (!caster.getServer().isSameThread()) {
 			throw new IllegalStateException("Can't cast spell on a thread other than the game thread");
 		}
@@ -185,7 +181,7 @@ public class Spell {
 		} else {
 			logger = ISpellLogBuilder.Dummy;
 		}
-		SpellState state = new SpellState(this, caster, efficiency, targetHint, logger);
+		SpellState state = new SpellState(this, caster, castProperties, logger);
 		state.trigger(Lists.newArrayList(caster), null);
 		
 		NostrumMagicaSounds.CAST_LAUNCH.play(caster);

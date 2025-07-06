@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.DragonGambit;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastProperties;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -184,7 +185,7 @@ public abstract class DragonGambittedSpellAttackGoal<T extends DragonEntity & IT
 		
 		dragon.lookAt(currentTarget, 360f, 180f);
 		
-		spell.cast(dragon, 1);
+		spell.cast(dragon, SpellCastProperties.BASE);
 		attackTicks = this.delay;
 	}
 	

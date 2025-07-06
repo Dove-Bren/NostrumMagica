@@ -2,15 +2,13 @@ package com.smanzana.nostrummagica.network.message;
 
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
-
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastProperties;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
@@ -27,22 +25,13 @@ public class ClientCastAdhocMessage {
 		
 		final ServerPlayer sp = ctx.get().getSender();
 		final Spell spell = message.spell;
-		final int entHintID = message.entityHintId;
+		final SpellCastProperties props = message.castProperties.unwrap(id -> sp.level.getEntity(id) instanceof LivingEntity living ? living : null);
 		
 		
 		ctx.get().enqueueWork(() -> {
 			boolean success = true;
 			
-			// Find matching hint entity, if one was indicated
-			final @Nullable LivingEntity hintEntity;
-			if (entHintID != -1) {
-				@Nullable Entity raw = sp.getLevel().getEntity(entHintID);
-				hintEntity = raw != null &&  raw instanceof LivingEntity living ? living : null;
-			} else {
-				hintEntity = null;
-			}
-			
-			success = SpellCasting.AttemptToolCast(spell, sp, ItemStack.EMPTY, hintEntity).succeeded;
+			success = SpellCasting.AttemptToolCast(spell, sp, ItemStack.EMPTY, props).succeeded;
 
 			// Whether it failed or not, sync attributes to client.
 			// if it failed because they're out of mana on the server, or don't have the right attribs, etc.
@@ -56,27 +45,27 @@ public class ClientCastAdhocMessage {
 	}
 
 	private final Spell spell;
-	private final int entityHintId;
+	private final SpellCastProperties.NetworkWrapper castProperties;
 	
-	public ClientCastAdhocMessage(Spell spell, @Nullable Entity entityHint) {
-		this(spell, entityHint == null ? -1 : entityHint.getId());
+	public ClientCastAdhocMessage(Spell spell, SpellCastProperties castProperties) {
+		this(spell, castProperties.wrap());
 	}
 	
-	public ClientCastAdhocMessage(Spell spell, int entityHintId) {
+	public ClientCastAdhocMessage(Spell spell, SpellCastProperties.NetworkWrapper castProperties) {
 		this.spell = spell;
-		this.entityHintId = entityHintId;
+		this.castProperties = castProperties;
 	}
 
 	public static ClientCastAdhocMessage decode(FriendlyByteBuf buf) {
 		return new ClientCastAdhocMessage(
 				Spell.FromNBT(buf.readNbt()),
-				buf.readInt()
+				new SpellCastProperties.NetworkWrapper(buf.readNbt())
 				);
 	}
 
 	public static void encode(ClientCastAdhocMessage msg, FriendlyByteBuf buf) {
 		buf.writeNbt(msg.spell.toNBT());
-		buf.writeInt(msg.entityHintId);
+		buf.writeNbt(msg.castProperties.toNBT());
 	}
 
 }

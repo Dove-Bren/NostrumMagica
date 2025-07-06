@@ -412,7 +412,7 @@ public final class SpellEffects {
 			Map<LivingEntity, EMagicElement> entityLastElement
 			) {}
 	
-	public static final ApplyResult ApplySpellEffects(LivingEntity caster, List<SpellEffectPart> parts, float castEfficiency,
+	public static final ApplyResult ApplySpellEffects(LivingEntity caster, List<SpellEffectPart> parts, SpellCastProperties castProperties,
 			List<LivingEntity> targets, List<SpellLocation> locations,
 			ISpellLogBuilder log, BiConsumer<LivingEntity, SpellActionResult> onEnt, BiConsumer<SpellLocation, SpellActionResult> onBlock) {
 		boolean first = true;
@@ -424,9 +424,30 @@ public final class SpellEffects {
 		final Set<SpellLocation> totalAffectedLocations = new HashSet<>();
 		final Map<LivingEntity, EMagicElement> entityLastElement = new HashMap<>();
 		
+		int extraElements = castProperties.bonusCharges(); // direct 1x per extra chage
+		
 		for (SpellEffectPart part : parts) {
-			SpellAction action = SpellEffects.SolveAction(part.getAlteration(), part.getElement(), part.getElementCount());
-			float efficiency = castEfficiency + (part.getPotency() - 1f);
+			// extraElement will be consumed to bump up the element count of effects.
+			// If part already is maxed, give efficiency bonus based on what's left.
+			// Consume extra elementn count used, or 1 if efficiency is granted even if bonus is larger than 1x.
+			
+			float efficiencyBonus = castProperties.efficiency();
+			
+			int elemCount = part.getElementCount();
+			if (extraElements > 0) {
+				if (elemCount < 2) {
+					final int room = 2 - elemCount;
+					final int consume = Math.min(extraElements, room);
+					elemCount += consume;
+					extraElements -= consume;
+				} else {
+					efficiencyBonus += (.5f * extraElements);
+					extraElements--;
+				}
+			}
+			
+			SpellAction action = SpellEffects.SolveAction(part.getAlteration(), part.getElement(), elemCount);
+			float efficiency = efficiencyBonus + (part.getPotency() - 1f);
 			
 			log.pushModifierStack();
 			

@@ -5,6 +5,7 @@ import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastProperties;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
@@ -72,9 +73,9 @@ public class MagicLightningGolemEntity extends MagicGolemEntity {
 			this.setTarget(target);
 		
 		if (NostrumMagica.rand.nextFloat() <= 0.3f) {
-			spellRanged1.cast(this, 1.0f);
+			spellRanged1.cast(this, SpellCastProperties.BASE);
 		} else {
-			spellRanged2.cast(this, 1.0f);
+			spellRanged2.cast(this, SpellCastProperties.BASE);
 		}
 		
 		if (targ != target)
@@ -89,7 +90,7 @@ public class MagicLightningGolemEntity extends MagicGolemEntity {
 		if (targ != target)
 			this.setTarget(target);
 		
-		spellBuff.cast(this, 1.0f);
+		spellBuff.cast(this, SpellCastProperties.BASE);
 		
 		if (targ != target)
 			this.setTarget(targ);

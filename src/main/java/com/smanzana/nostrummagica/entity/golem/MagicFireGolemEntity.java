@@ -4,6 +4,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastProperties;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
@@ -86,11 +87,11 @@ public class MagicFireGolemEntity extends MagicGolemEntity {
 		}
 		
 		if (canBurnArmor && NostrumMagica.rand.nextFloat() <= 0.2f) {
-			spellRanged3.cast(this, 1.0f);
+			spellRanged3.cast(this, SpellCastProperties.BASE);
 		}else if (NostrumMagica.rand.nextFloat() < 0.3f) {
-			spellRanged2.cast(this, 1.0f);
+			spellRanged2.cast(this, SpellCastProperties.BASE);
 		} else {
-			spellRanged1.cast(this, 1.0f);
+			spellRanged1.cast(this, SpellCastProperties.BASE);
 		}
 		
 		if (targ != target)
@@ -105,7 +106,7 @@ public class MagicFireGolemEntity extends MagicGolemEntity {
 		if (targ != target)
 			this.setTarget(target);
 		
-		spellBuff.cast(this, 1.0f);
+		spellBuff.cast(this, SpellCastProperties.BASE);
 		
 		if (targ != target)
 			this.setTarget(targ);

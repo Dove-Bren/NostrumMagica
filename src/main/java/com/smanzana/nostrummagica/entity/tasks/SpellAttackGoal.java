@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastProperties;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -112,7 +113,7 @@ public class SpellAttackGoal<T extends Mob> extends Goal {
 		}
 		
 		deductMana(spell, entity);
-		spell.cast(entity, 1);
+		spell.cast(entity, SpellCastProperties.BASE);
 		attackTicks = this.delay;
 		entity.setTarget(oldTarget);
 	}

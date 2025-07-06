@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.entity.golem;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
+import com.smanzana.nostrummagica.spell.SpellCastProperties;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
@@ -58,11 +59,11 @@ public class MagicPhysicalGolemEntity extends MagicGolemEntity {
 			LivingEntity targ = this.getTarget();
 			if (targ != target)
 				this.setTarget(target);
-			spellDebuff.cast(this, 1.0f);
+			spellDebuff.cast(this, SpellCastProperties.BASE);
 			if (targ != target)
 				this.setTarget(targ);
 		} else {
-			spellRanged.cast(this, 1.0f);
+			spellRanged.cast(this, SpellCastProperties.BASE);
 		}
 	}
 

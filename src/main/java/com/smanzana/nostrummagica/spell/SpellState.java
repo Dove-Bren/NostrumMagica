@@ -33,8 +33,7 @@ public class SpellState implements ISpellState {
 	
 	protected final Spell spell;
 	protected final LivingEntity caster;
-	protected float efficiency;
-	protected final @Nullable LivingEntity targetHint;
+	protected SpellCastProperties castProperties;
 	protected final ISpellLogBuilder log;
 	protected final List<SpellShapePart> shapes;
 	protected final List<SpellEffectPart> parts;
@@ -45,12 +44,11 @@ public class SpellState implements ISpellState {
 	private LivingEntity self;
 	private SpellShapeInstance shapeInstance;
 	
-	public SpellState(Spell spell, LivingEntity caster, float efficiency, @Nullable LivingEntity targetHint, ISpellLogBuilder log) {
+	public SpellState(Spell spell, LivingEntity caster, SpellCastProperties castProperties, ISpellLogBuilder log) {
 		index = -1;
 		this.caster = this.self = caster;
-		this.efficiency = efficiency;
+		this.castProperties = castProperties;
 		this.spell = spell;
-		this.targetHint = targetHint;
 		this.log = log;
 		this.shapes = spell.getSpellShapeParts();
 		this.parts = spell.getSpellEffectParts();
@@ -64,7 +62,7 @@ public class SpellState implements ISpellState {
 	
 	@Override
 	public @Nullable LivingEntity getTargetHint() {
-		return this.targetHint;
+		return this.castProperties.targetHint();
 	}
 	
 	@Override
@@ -90,7 +88,7 @@ public class SpellState implements ISpellState {
 			final SpellShape stageShape = index == -1 ? null : this.shapes.get(index).getShape();
 			this.log.stage(index + 1, stageShape, (int) (this.caster.level.getGameTime() - this.startTicks), targets, locations);
 			
-			this.efficiency *= stageEfficiency;
+			this.castProperties = this.castProperties.withEfficiency(this.castProperties.efficiency() * stageEfficiency);
 			index++;
 			if (index >= shapes.size()) {
 				this.finish(targets, locations);
@@ -170,7 +168,7 @@ public class SpellState implements ISpellState {
 	}
 	
 	protected SpellState split() {
-		SpellState spawn = new SpellState(spell, caster, this.efficiency, this.targetHint, this.log);
+		SpellState spawn = new SpellState(spell, caster, this.castProperties, this.log);
 		spawn.index = this.index;
 		
 		return spawn;
@@ -186,11 +184,11 @@ public class SpellState implements ISpellState {
 		final BiConsumer<SpellLocation, SpellActionResult> onBlock = (targ, result) -> EmitSpellEffectBlock(this.spell, this.caster, targ, result);
 		
 		log.pushModifierStack();
-		if (this.efficiency != 1f) {
-			log.addGlobalModifier(LABEL_MOD_EFF, this.efficiency-1f, ESpellLogModifierType.BONUS_SCALE);
+		if (this.castProperties.efficiency() != 1f) {
+			log.addGlobalModifier(LABEL_MOD_EFF, this.castProperties.efficiency()-1f, ESpellLogModifierType.BONUS_SCALE);
 		}
 		
-		final SpellEffects.ApplyResult result = SpellEffects.ApplySpellEffects(caster, parts, this.efficiency,
+		final SpellEffects.ApplyResult result = SpellEffects.ApplySpellEffects(caster, parts, this.castProperties,
 				targets, locations, log,
 				onEnt, onBlock);
 		

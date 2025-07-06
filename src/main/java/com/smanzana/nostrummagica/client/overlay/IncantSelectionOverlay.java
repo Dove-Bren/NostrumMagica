@@ -86,6 +86,9 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	
 	private final List<SelectionStage> stages;
 	
+	// Stage that should be fixed up when selecting a shape
+	private @Nullable SelectionStage shapeFixupStage;
+	
 //	private final SelectionStage elementStage;
 //	private final SelectionStage shapeStage1;
 //	private final SelectionStage shapeStage2;
@@ -385,8 +388,6 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 					curSlices[i] = null; // no slice
 				} else if (!known.contains(shape)) {
 					curSlices[i] = WheelSlice.Hidden(prog, sliceWidth/2f);
-				} else if (isSecondStage && shape == this.shape) { // shape selected in first stage
-					curSlices[i] = new WheelSlice<>((SpellShape) shape, null, noneTitle, noneShapeTooltip, prog, sliceWidth/2f, isSecondStage ? this::setSecondShape : this::setFirstShape, true);
 				} else {
 					curSlices[i] = new WheelSlice<>(shape, SpellComponentIcon.get(shape), shape.getDisplayName(), () -> this.getShapeTooltip(shape), prog, sliceWidth/2f, isSecondStage ? this::setSecondShape : this::setFirstShape, i < specials.length);
 				}
@@ -424,7 +425,9 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		Player player = NostrumMagica.Proxy.getPlayer();
 		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		
+		shapeFixupStage = null;
 		stages.clear();
+		
 		
 		// First stage is shapes
 		if (hasFullShapeSelection(attr)) {
@@ -434,10 +437,11 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		}
 		if (hasDoubleShapeSelection(attr)) {
 			if (hasFullShapeSelection(attr)) {
-				stages.add(makeFullShapeStage(player, attr, true));
+				shapeFixupStage = makeFullShapeStage(player, attr, true);
 			} else {
-				stages.add(makePrimaryShapeStage(player, attr, true));
+				shapeFixupStage = makePrimaryShapeStage(player, attr, true);
 			}
+			stages.add(shapeFixupStage);
 		}
 		
 		// elements are second
@@ -482,9 +486,23 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		// when creating stages. This just needs to advance.
 		this.shape = shape;
 		
-		Player player = NostrumMagica.Proxy.getPlayer();
-		final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-		this.advanceStage(isRight && hasFullShapeSelection(attr));
+		// Actually, it still wants to maybe alter the second shape stage to remove the shape that was picked.
+		if (this.shapeFixupStage != null) {
+			for (int i = 0; i < shapeFixupStage.getPageCount(); i++) {
+				final SelectionStagePage page = shapeFixupStage.pages[i];
+				for (int j = 0; j < page.slices.length; j++) {
+					WheelSlice<?> slice = page.slices[j];
+					if (slice != null && slice.val() == this.shape) {
+						page.slices[j] = new WheelSlice<>((SpellShape) null, null, noneTitle, noneShapeTooltip, slice.rotationPerc, slice.width, this::setSecondShape, slice.decorate);
+						// don't break, because may be on multiple pages
+					}
+				}
+			}
+		}
+		
+		this.advanceStage(shapeFixupStage != null // Skip if there is another shape stage...
+				&& (isRight || shape.getAttributes(shape.getDefaultProperties()).terminal) // and either right click, or shape selected is terminal
+			);
 	}
 	
 	protected void setSecondShape(SpellShape shape, boolean isRight) {
