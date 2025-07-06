@@ -406,22 +406,22 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 	protected static Map<BlockState, ILaserReactive> HARDCODED_REACTORS = new HashMap<>();
 	
 	{
-		List<BlockPos> fiveByFive = new ArrayList<>(5 * 5 * 5);
-		for (int x = -2; x <= 2; x++)
-		for (int y = -2; y <= 2; y++)
-		for (int z = -2; z <= 2; z++) {
-			fiveByFive.add(new BlockPos(x, y, z));
+		List<BlockPos> sevenBySeven = new ArrayList<>(7 * 7 * 7);
+		for (int x = -3; x <= 3; x++)
+		for (int y = -3; y <= 3; y++)
+		for (int z = -3; z <= 3; z++) {
+			sevenBySeven.add(new BlockPos(x, y, z));
 		}
 		
-		final SpreadList relative5x5 = new SpreadList(fiveByFive, true);
-		final LaserHitResult spread5x5AndPass = new LaserHitResult(false, relative5x5);
+		final SpreadList relative7x7 = new SpreadList(sevenBySeven, true);
+		final LaserHitResult spread7x7AndPass = new LaserHitResult(false, relative7x7);
 		
 		ILaserReactive amethystReactor = new ILaserReactive() {
 
 			@Override
 			public LaserHitResult laserPassthroughTick(LevelAccessor level, BlockPos pos, BlockState state,
 					BlockPos laserPos, EMagicElement element) {
-				return spread5x5AndPass;
+				return spread7x7AndPass;
 			}
 
 			@Override

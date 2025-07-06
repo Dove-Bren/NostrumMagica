@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.autodungeons.api.block.scan.IRoomBoundary;
 import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
@@ -39,7 +40,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public abstract class FogBlock extends Block implements ILaserReactive {
+public abstract class FogBlock extends Block implements ILaserReactive, IRoomBoundary  {
 	
 	protected static final int MAX_HIDE_COUNT = 7;
 	
@@ -135,7 +136,7 @@ public abstract class FogBlock extends Block implements ILaserReactive {
 	protected BlockState makeHiddenState(BlockState state, LevelAccessor world, BlockPos pos, int lightDistance) {
 		return this.hiddenState.get()
 				.setValue(LIGHT_SOURCE, lightDistance == 0)
-				.setValue(HIDE_COUNT, Math.min(MAX_HIDE_COUNT, lightDistance))
+				.setValue(HIDE_COUNT, Math.min(MAX_HIDE_COUNT, Math.max(1, 8 - lightDistance)))
 				;
 	}
 	
@@ -146,7 +147,7 @@ public abstract class FogBlock extends Block implements ILaserReactive {
 		// time (that will already be set hidden onPlace, probably). The tick func will do some checks to try and make it grow from the edges,
 		// and lasers will periodically scan and push fog back, so it should be fine.
 		FogBlock self;
-		final BlockState hiddenState = this.hiddenState.get();
+		final BlockState hiddenState = this.makeHiddenState(state, worldIn, pos, lightDistance);
 		if (hiddenState != state) {
 			state = hiddenState;
 			self = (FogBlock) state.getBlock();
@@ -242,6 +243,10 @@ public abstract class FogBlock extends Block implements ILaserReactive {
 		this.hideFog(state, level, pos, beamDistance);
 	}
 	
+	@Override
+	public boolean isBoundary(BlockState state) {
+		return false;
+	}
 	
 	
 	
