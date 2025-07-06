@@ -37,6 +37,7 @@ import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
 import com.smanzana.nostrummagica.inventory.EquipmentSetRegistry;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
+import com.smanzana.nostrummagica.item.SpellTomePage;
 import com.smanzana.nostrummagica.item.api.IRaytraceOverlay;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem.HookshotType;
@@ -1209,36 +1210,49 @@ public class OverlayRenderer extends GuiComponent {
 			if (elapsedTicks < 40) {
 				final float infoAlpha = Mth.sin(Mth.PI * (Math.min(40f, elapsedTicks) / 40f));
 				
-				// Rate
-				final float chargeSpeed = -(SpellCasting.CalculateHandsSpellCastModifier(NostrumMagica.Proxy.getPlayer()) - 1f);
-				if (chargeSpeed != 0f) {
+				final int overcharge = charge.charge.overchargeCount();
+				if (overcharge == 0) { // No overcharge, so start info about rate
+				
+					// Rate
+					final float chargeSpeed = -(SpellCasting.CalculateHandsSpellCastModifier(NostrumMagica.Proxy.getPlayer()) - 1f);
+					if (chargeSpeed != 0f) {
+						matrixStackIn.pushPose();
+						matrixStackIn.translate(0, 12, 0);
+						matrixStackIn.scale(.5f, .5f, 1f);
+						final String rate = String.format("%+.0f%%", chargeSpeed * 100);
+						final int len = gui.getFont().width(rate);
+						gui.getFont().draw(matrixStackIn, rate, -len / 2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, infoAlpha));
+						matrixStackIn.popPose();
+					}
+					
+					RenderSystem.setShaderColor(1f, 1f, 0f, infoAlpha);
+					// Items
+					if (!charge.mainhandItem.isEmpty() && !SpellCasting.ItemAllowsCasting(charge.mainhandItem, EquipmentSlot.MAINHAND)) {
+						matrixStackIn.pushPose();
+						matrixStackIn.translate(4, 20, 0);
+						matrixStackIn.scale(.25f, .25f, .25f);
+						RenderFuncs.RenderGUIItem(charge.mainhandItem, matrixStackIn, -8, -8, -1);
+						matrixStackIn.popPose();
+					}
+					
+					if (!charge.offhandItem.isEmpty() && !SpellCasting.ItemAllowsCasting(charge.offhandItem, EquipmentSlot.OFFHAND)) {
+						matrixStackIn.pushPose();
+						matrixStackIn.translate(-4, 20, 0);
+						matrixStackIn.scale(.25f, .25f, .25f);
+						RenderFuncs.RenderGUIItem(charge.offhandItem, matrixStackIn, -8, -8, -1);
+						matrixStackIn.popPose();
+					}
+					RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+				} else {
+					// Overcharging. Don't redisplay speed info, but show info about overcharging
 					matrixStackIn.pushPose();
 					matrixStackIn.translate(0, 12, 0);
 					matrixStackIn.scale(.5f, .5f, 1f);
-					final String rate = String.format("%+.0f%%", chargeSpeed * 100);
+					final String rate = "Charge %s".formatted(SpellTomePage.toRoman(overcharge + 1));
 					final int len = gui.getFont().width(rate);
 					gui.getFont().draw(matrixStackIn, rate, -len / 2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, infoAlpha));
 					matrixStackIn.popPose();
 				}
-				
-				RenderSystem.setShaderColor(1f, 1f, 0f, infoAlpha);
-				// Items
-				if (!charge.mainhandItem.isEmpty() && !SpellCasting.ItemAllowsCasting(charge.mainhandItem, EquipmentSlot.MAINHAND)) {
-					matrixStackIn.pushPose();
-					matrixStackIn.translate(4, 20, 0);
-					matrixStackIn.scale(.25f, .25f, .25f);
-					RenderFuncs.RenderGUIItem(charge.mainhandItem, matrixStackIn, -8, -8, -1);
-					matrixStackIn.popPose();
-				}
-				
-				if (!charge.offhandItem.isEmpty() && !SpellCasting.ItemAllowsCasting(charge.offhandItem, EquipmentSlot.OFFHAND)) {
-					matrixStackIn.pushPose();
-					matrixStackIn.translate(-4, 20, 0);
-					matrixStackIn.scale(.25f, .25f, .25f);
-					RenderFuncs.RenderGUIItem(charge.offhandItem, matrixStackIn, -8, -8, -1);
-					matrixStackIn.popPose();
-				}
-				RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 				
 			}
 			

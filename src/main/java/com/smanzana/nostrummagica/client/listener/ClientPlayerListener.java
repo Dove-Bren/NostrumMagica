@@ -129,8 +129,6 @@ public class ClientPlayerListener extends PlayerListener {
 	// Whether this current frame has a jump that was unconsumed
 	private boolean hasJump;
 	
-	protected int chargeCount = 0; //TODO remove
-	
 	private final KeyMapping bindingCastSlow;
 	private final KeyMapping bindingCast1;
 	private final KeyMapping bindingCast2;
@@ -478,11 +476,10 @@ public class ClientPlayerListener extends PlayerListener {
 						player.getMainHandItem(), player.getOffhandItem(),
 						1f - result.summary.getCastSpeedRate(), // 1.5f -> -.5f; .8f -> .2f
 						castSlot);
-				this.chargeCount = 0;
 				if (result.summary.getFinalCastTicks() > 0) {
 					this.chargeManager.startCharging(charge);
 				} else {
-					this.finishSpellCast(player, charge);
+					this.finishSpellCast(player, charge, false);
 				}
 				NostrumMagica.playerListener.overrideLastSpell(player, spell);
 			} else {
@@ -512,7 +509,6 @@ public class ClientPlayerListener extends PlayerListener {
 				SpellCastResult result = SpellCasting.CheckToolCast(spell, player, ItemStack.EMPTY);
 				if (result.succeeded) {
 					// We think we can cast it, so start charging
-					this.chargeCount = 0;
 					this.chargeManager.startCharging(new ClientSpellCharge(
 							new SpellCharge(spell, result.summary.getFinalCastTicks(), ChargeType.INCANTATION, 0),
 							player.getMainHandItem(), player.getOffhandItem(),
@@ -561,7 +557,6 @@ public class ClientPlayerListener extends PlayerListener {
 				player.getMainHandItem(), player.getOffhandItem(),
 				0f,
 				scroll, hand == InteractionHand.MAIN_HAND);
-		this.chargeCount = 0;
 		this.chargeManager.startCharging(charge);
 	}
 	
@@ -631,40 +626,66 @@ public class ClientPlayerListener extends PlayerListener {
 		return false;
 	}
 	
-	protected void finishSpellCast(Player player, ClientTomeCharge charge) {
-		RegisteredSpell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
-		if (charge.castSlot < 0 || spells == null || spells.length == 0 || spells.length <= charge.castSlot) {
-			return;
+	protected void finishSpellCast(Player player, ClientTomeCharge charge, boolean chargeHeld) {
+		if (chargeHeld && charge.charge.overchargeCount() < 2) {
+			// Make new charge and start charging that
+			ClientTomeCharge newCharge = new ClientTomeCharge(
+					charge.charge.withOvercharge(charge.charge.overchargeCount() + 1),
+					charge.mainhandItem,
+					charge.offhandItem,
+					charge.chargeSpeed,
+					charge.castSlot
+					);
+			this.chargeManager.startCharging(newCharge);
+		} else {
+			RegisteredSpell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
+			if (charge.castSlot < 0 || spells == null || spells.length == 0 || spells.length <= charge.castSlot) {
+				return;
+			}
+			
+			final RegisteredSpell spell = spells[charge.castSlot];
+			if (spell == null) {
+				// No spell in slot
+				return;
+			}
+			
+			// Find the tome this was cast from, if any
+			ItemStack tome = NostrumMagica.getCurrentTome(player); 
+			SpellCastProperties props = new SpellCastProperties(1f, charge.charge.overchargeCount(), this.getTargetManager().getLastTarget(1f));
+			
+			NetworkHandler.sendToServer(
+	    			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome), props));
+			player.swing(InteractionHand.MAIN_HAND);
 		}
-		
-		final RegisteredSpell spell = spells[charge.castSlot];
-		if (spell == null) {
-			// No spell in slot
-			return;
-		}
-		
-		// Find the tome this was cast from, if any
-		ItemStack tome = NostrumMagica.getCurrentTome(player); 
-		SpellCastProperties props = new SpellCastProperties(1f, this.chargeCount, this.getTargetManager().getLastTarget(1f));
-		
-		NetworkHandler.sendToServer(
-    			new ClientCastMessage(spell, false, SpellTome.getTomeID(tome), props));
-		player.swing(InteractionHand.MAIN_HAND);
 	}
 	
-	protected void finishIncantationCast(Player player, ClientSpellCharge charge) {
-		SpellCastProperties props = new SpellCastProperties(1f, this.chargeCount, this.getTargetManager().getLastTarget(1f));
-		
-		NetworkHandler.sendToServer(new ClientCastAdhocMessage(charge.charge.spell(), props));
-		player.swing(InteractionHand.MAIN_HAND);
-		
-		this.tutorial.onIncantationCastFinished();
+	protected void finishIncantationCast(Player player, ClientSpellCharge charge, boolean doOvercharge) {
+		if (doOvercharge && charge.charge.overchargeCount() < 2) {
+			// Make a new charge with the appropriate charge count and start it charging again
+			ClientSpellCharge newCharge = new ClientSpellCharge(
+					charge.charge.withOvercharge(charge.charge.overchargeCount() + 1),
+					charge.mainhandItem,
+					charge.offhandItem,
+					charge.chargeSpeed
+					);
+			this.chargeManager.startCharging(newCharge);
+		} else {
+			//
+			SpellCastProperties props = new SpellCastProperties(1f, charge.charge.overchargeCount(), this.getTargetManager().getLastTarget(1f));
+			
+			NetworkHandler.sendToServer(new ClientCastAdhocMessage(charge.charge.spell(), props));
+			player.swing(InteractionHand.MAIN_HAND);
+			
+			this.tutorial.onIncantationCastFinished();
+		}
 	}
 	
-	protected void finishScrollCast(Player playerIn, ClientScrollCharge charge) {
+	protected void finishScrollCast(Player playerIn, ClientScrollCharge charge, boolean chargeHeld) {
+		// Note: ignore attempt to overcharge
+		
 		HitResult mop = RayTrace.raytraceApprox(playerIn.getLevel(), playerIn, playerIn.getEyePosition(), playerIn.getXRot(), playerIn.getYRot(), 100, (e) -> e != playerIn && e instanceof LivingEntity, .5);
 		final @Nullable LivingEntity hint = RayTrace.entFromRaytrace(mop) == null ? null : (LivingEntity) RayTrace.entFromRaytrace(mop);
-		SpellCastProperties props = new SpellCastProperties(1f, this.chargeCount, hint);
+		SpellCastProperties props = new SpellCastProperties(1f, charge.charge.overchargeCount(), hint);
 		
 		RegisteredSpell spell = SpellScroll.GetSpell(charge.scroll);
 		NetworkHandler.sendToServer(new ClientCastMessage(spell, true, charge.isMainhand ? 0 : 1, props));
@@ -674,24 +695,18 @@ public class ClientPlayerListener extends PlayerListener {
 	protected void finishChargeCast(ClientSpellCharge charge) {
 		final Player player = NostrumMagica.Proxy.getPlayer();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-		final boolean chargeHeld = this.getBindingIncant().isDown();
+		final boolean chargeHeld = this.getBindingIncant().isDown() && hasSpellChargeUnlocked(player, attr);
 		if (attr != null && attr.isUnlocked()) {
-			if (chargeHeld && chargeCount < 2 && hasSpellChargeUnlocked(player, attr)) {
-				// Try to charge it
-				chargeCount++;
-				this.chargeManager.startCharging(charge);
-			} else {
-				switch (charge.charge.type()) {
-				case INCANTATION:
-					finishIncantationCast(player, charge);
-					break;
-				case TOME_CAST:
-					finishSpellCast(player, (ClientTomeCharge) charge);
-					break;
-				case SCROLL:
-					finishScrollCast(player, (ClientScrollCharge) charge);
-					break;
-				}
+			switch (charge.charge.type()) {
+			case INCANTATION:
+				finishIncantationCast(player, charge, chargeHeld);
+				break;
+			case TOME_CAST:
+				finishSpellCast(player, (ClientTomeCharge) charge, chargeHeld);
+				break;
+			case SCROLL:
+				finishScrollCast(player, (ClientScrollCharge) charge, chargeHeld);
+				break;
 			}
 		}
 	}
@@ -965,12 +980,14 @@ public class ClientPlayerListener extends PlayerListener {
 			final float partialTicks = mc.getDeltaFrameTime();
 			SpellCharge charge = NostrumMagica.spellChargeTracker.getCharge(player);
 			final EMagicElement elem = charge.spell().getPrimaryElement();
+			final float rotScale = .145f + (charge.overchargeCount() * .075f);
+			final int particleRandNum = 4 - charge.overchargeCount();
 			
 			base.mulPose(Vector3f.ZP.rotationDegrees((isLeft ? -1 : 1) * 30f * this.getChargeManager().getChargePercent()));
 			base.mulPose(Vector3f.XN.rotationDegrees(30f * this.getChargeManager().getChargePercent()));
-			base.mulPose(Vector3f.YP.rotationDegrees((isLeft ? -1 : 1) * 20f + 10f * Mth.sin(player.tickCount * .145f)));
+			base.mulPose(Vector3f.YP.rotationDegrees((isLeft ? -1 : 1) * 20f + 10f * Mth.sin(player.tickCount * rotScale)));
 				
-			if (!mc.isPaused() && NostrumMagica.rand.nextInt(4) == 0) {
+			if (!mc.isPaused() && NostrumMagica.rand.nextInt(particleRandNum) == 0) {
 				Vec3 offset = new Vec3((isLeft ? -1 : 1) * .4f, -.2f, -.6f);
 				offset = offset.xRot(((player.getViewXRot(partialTicks) % 360f) / 180f) * Mth.PI);
 				offset = offset.yRot((float)Math.PI + -((player.getViewYRot(partialTicks) % 360f) / 180f) * (float)Math.PI);

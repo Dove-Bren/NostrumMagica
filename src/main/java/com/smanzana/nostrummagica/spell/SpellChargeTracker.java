@@ -63,6 +63,10 @@ public class SpellChargeTracker {
 			return new SpellCharge(incant, duration, type, overCharge);
 		}
 		
+		public SpellCharge withOvercharge(int newOverchargeCount) {
+			return new SpellCharge(spell, duration, type, newOverchargeCount);
+		}
+		
 	}
 
 	/**

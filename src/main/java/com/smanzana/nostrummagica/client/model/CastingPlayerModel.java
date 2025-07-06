@@ -20,13 +20,16 @@ public abstract class CastingPlayerModel extends PlayerModel<AbstractClientPlaye
 	
 	//@Override called via mixin
 	public static <T extends LivingEntity> void setupAnim(HumanoidModel<T>self, T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		if (NostrumMagica.spellChargeTracker.getCharge(entityIn) != null) {
+		var charge = NostrumMagica.spellChargeTracker.getCharge(entityIn);
+		if (charge != null) {
+			final float vertAdj = charge.overchargeCount() * -.35f;
+			
 			self.rightArm.z = 0.0F;
 			self.rightArm.x = -5.0F;
 			self.leftArm.z = 0.0F;
 			self.leftArm.x = 5.0F;
-			self.rightArm.xRot = -2f + Mth.cos(ageInTicks * 0.22F) * 0.25F;
-			self.leftArm.xRot = -2f + Mth.cos(ageInTicks * 0.22F) * 0.25F;
+			self.rightArm.xRot = -2f + vertAdj + Mth.cos(ageInTicks * 0.22F) * 0.25F;
+			self.leftArm.xRot = -2f + vertAdj + Mth.cos(ageInTicks * 0.22F) * 0.25F;
 			self.rightArm.zRot = Mth.cos(ageInTicks * 0.22F) * 0.25F;
 			self.leftArm.zRot = -Mth.cos(ageInTicks * 0.22F) * 0.25F;
 			self.rightArm.yRot = Mth.sin(ageInTicks * 0.32F) * 0.25F;

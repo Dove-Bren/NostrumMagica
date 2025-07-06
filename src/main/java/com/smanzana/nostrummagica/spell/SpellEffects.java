@@ -435,8 +435,8 @@ public final class SpellEffects {
 			
 			int elemCount = part.getElementCount();
 			if (extraElements > 0) {
-				if (elemCount < 2) {
-					final int room = 2 - elemCount;
+				if (elemCount < 3) {
+					final int room = 3 - elemCount;
 					final int consume = Math.min(extraElements, room);
 					elemCount += consume;
 					extraElements -= consume;
