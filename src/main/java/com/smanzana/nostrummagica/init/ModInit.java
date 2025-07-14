@@ -118,6 +118,7 @@ import com.smanzana.nostrummagica.serializer.PlantBossTreeTypeSerializer;
 import com.smanzana.nostrummagica.serializer.PlayerStatuePoseSerializer;
 import com.smanzana.nostrummagica.serializer.PrimalMagePoseSerializer;
 import com.smanzana.nostrummagica.serializer.RedDragonBodyPartTypeSerializer;
+import com.smanzana.nostrummagica.serializer.ShadowDragonPoseSerializer;
 import com.smanzana.nostrummagica.serializer.WilloStatusSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
@@ -2099,6 +2100,7 @@ public class ModInit {
     	registry.register(new DataSerializerEntry(PlayerStatuePoseSerializer.instance).setRegistryName("nostrum.player_statue.pos"));
     	registry.register(new DataSerializerEntry(PrimalMagePoseSerializer.instance).setRegistryName("nostrum.primal_mage.pose"));
     	registry.register(new DataSerializerEntry(BlockPosListSerializer.instance).setRegistryName("nostrum.serial.block_pos_list"));
+    	registry.register(new DataSerializerEntry(ShadowDragonPoseSerializer.instance).setRegistryName("nostrum.serial.shadow_dragon.pose"));
     }
 	
 	public static final void registerCommands(RegisterCommandsEvent event) {

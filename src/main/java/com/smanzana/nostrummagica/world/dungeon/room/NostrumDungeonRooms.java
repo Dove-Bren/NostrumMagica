@@ -45,6 +45,7 @@ public class NostrumDungeonRooms {
 	private static final ResourceLocation MANI_CASTLE_START_NAME = NostrumMagica.Loc("mani_castle/mani_castle_start");
 	private static final ResourceLocation SORCERY_ISLAND_NAME = NostrumMagica.Loc("sorcery_island");
 	private static final ResourceLocation KANI_DUNGEON_START_NAME = NostrumMagica.Loc("kani_dungeon/kani_dungeon_start");
+	private static final ResourceLocation VANI_SOLAR_START_NAME = NostrumMagica.Loc("vani_solar/vani_solar_start");
 	
 	public static final DungeonLobbyRoomRef PLANTBOSS_LOBBY = new DungeonLobbyRoomRef(PLANTBOSS_LOBBY_NAME);
 	public static final DungeonRoomRef PLANTBOSS_ENTRANCE = new DungeonRoomRef(PLANTBOSS_ENTRANCE_NAME);
@@ -55,6 +56,7 @@ public class NostrumDungeonRooms {
 	public static final DungeonRoomRef RefManiCastleStart = new DungeonRoomRef(MANI_CASTLE_START_NAME);
 	public static final DungeonRoomRef RefSorceryIsland = new DungeonRoomRef(SORCERY_ISLAND_NAME);
 	public static final DungeonRoomRef RefKaniDungeonStart = new DungeonRoomRef(KANI_DUNGEON_START_NAME);
+	public static final DungeonRoomRef RefVaniSolarStart = new DungeonRoomRef(VANI_SOLAR_START_NAME);
 
 	@SubscribeEvent
 	public static final void onRoomRegistration(DungeonRoomRegisterEvent event) {

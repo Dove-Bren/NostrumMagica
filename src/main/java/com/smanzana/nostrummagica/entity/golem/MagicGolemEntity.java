@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -227,6 +228,16 @@ public abstract class MagicGolemEntity extends TamableAnimal implements ILoreSup
 		
 		return super.hurt(source, amount);
 	}
+	
+	@Override
+	public boolean saveAsPassenger(CompoundTag compound) {
+		// If given an expire time, don't save out with the world/persist
+		if (this.expireTicks != 0) {
+			return false;
+		}
+		
+		return super.saveAsPassenger(compound);
+    }
 	
 	@Override
 	public ILoreTagged getLoreTag() {

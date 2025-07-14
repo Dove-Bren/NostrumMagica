@@ -191,6 +191,8 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 				spawner.setSpawnType(NostrumEntityTypes.playerStatue);
 			} else if (heldItem.getItem() == NostrumItems.crystalSmall) {
 				spawner.setSpawnType(NostrumEntityTypes.primalMage);
+			} else if (heldItem.getItem() == NostrumItems.crystalLarge) {
+				spawner.setSpawnType(NostrumEntityTypes.shadowDragonBoss);
 			} else if (heldItem.getItem() instanceof SpawnEggItem egg) {
 				spawner.setSpawnType(egg.getType(heldItem.getTag()));
 			}

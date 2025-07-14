@@ -6,7 +6,8 @@
 		"structure_overrides": [
 			"nostrummagica:sorcerydim_sorcery_island",
 			"nostrummagica:sorcerydim_mani_castle",
-			"nostrummagica:sorcerydim_kani_dungeon"
+			"nostrummagica:sorcerydim_kani_dungeon",
+			"nostrummagica:sorcerydim_vani_solar"
 		]
 	}
 }

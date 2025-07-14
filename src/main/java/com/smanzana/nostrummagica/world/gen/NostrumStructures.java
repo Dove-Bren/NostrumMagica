@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.ManiCastleS
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.PlantBossStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.PortalStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.SorceryIslandStructure;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.VaniSolarStructure;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -42,12 +43,14 @@ public class NostrumStructures {
 	private static final String DUNGEONGEN_MANI_CASTLE_ID = "struct_mani_castle";
 	private static final String DUNGEONGEN_SORCERY_ISLAND_ID = "struct_sorcery_island";
 	private static final String DUNGEONGEN_KANI_DUNGEON_ID = "struct_kani_dungeon";
+	private static final String DUNGEONGEN_VANI_SOLAR_ID = "struct_vani_solar";
 	private static final String DUNGEONGEN_PORTAL_CONF_ID = "configured_" + DUNGEONGEN_PORTAL_ID;
 	private static final String DUNGEONGEN_DRAGON_CONF_ID = "configured_" + DUNGEONGEN_DRAGON_ID;
 	private static final String DUNGEONGEN_PLANTBOSS_CONF_ID = "configured_" + DUNGEONGEN_PLANTBOSS_ID;
 	private static final String DUNGEONGEN_MANI_CASTLE_CONF_ID = "configured_" + DUNGEONGEN_MANI_CASTLE_ID;
 	private static final String DUNGEONGEN_SORCERY_ISLAND_CONF_ID = "configured_" + DUNGEONGEN_SORCERY_ISLAND_ID;
 	private static final String DUNGEONGEN_KANI_DUNGEON_CONF_ID = "configured_" + DUNGEONGEN_KANI_DUNGEON_ID;
+	private static final String DUNGEONGEN_VANI_SOLAR_CONF_ID = "configured_" + DUNGEONGEN_VANI_SOLAR_ID;
 	
 	@ObjectHolder(DUNGEONGEN_PORTAL_ID) public static PortalStructure DUNGEON_PORTAL;
 	protected static ConfiguredStructureFeature<?, ?> CONFIGURED_DUNGEON_PORTAL;
@@ -72,6 +75,10 @@ public class NostrumStructures {
 	@ObjectHolder(DUNGEONGEN_KANI_DUNGEON_ID) public static KaniDungeonStructure DUNGEON_KANI_DUNGEON;
 	public static ConfiguredStructureFeature<?, ?> CONFIGUREDDUNGEON_KANI_DUNGEON;
 	public static Holder<ConfiguredStructureFeature<?, ?>> REF_DUNGEON_KANI_DUNGEON;
+	
+	@ObjectHolder(DUNGEONGEN_VANI_SOLAR_ID) public static VaniSolarStructure DUNGEON_VANI_SOLAR;
+	public static ConfiguredStructureFeature<?, ?> CONFIGUREDDUNGEON_VANI_SOLAR;
+	public static Holder<ConfiguredStructureFeature<?, ?>> REF_DUNGEON_VANI_SOLAR;
 	
 	public static StructurePlacementType<GridStructureSetPlacement> PLACEMENT_FIXED_GRID;
 
@@ -123,6 +130,11 @@ public class NostrumStructures {
 		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
 		CONFIGUREDDUNGEON_KANI_DUNGEON = configured;
 		REF_DUNGEON_KANI_DUNGEON = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_KANI_DUNGEON_ID), NostrumMagica.Loc(DUNGEONGEN_KANI_DUNGEON_CONF_ID));
+		
+		structure = new VaniSolarStructure();
+		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
+		CONFIGUREDDUNGEON_VANI_SOLAR = configured;
+		REF_DUNGEON_VANI_SOLAR = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_VANI_SOLAR_ID), NostrumMagica.Loc(DUNGEONGEN_VANI_SOLAR_CONF_ID));
 		
 		
 		// Register structure sets, which include rules of how to place them and distances between things in the same set.

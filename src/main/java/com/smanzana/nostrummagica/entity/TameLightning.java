@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.petcommand.api.PetFuncs;
 
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerLevel;
@@ -71,7 +72,7 @@ public class TameLightning extends LightningBolt {
 
 			for (int i = 0; i < list.size(); ++i) {
 				Entity entity = (Entity)list.get(i);
-				if (ignoreEntity != entity && !net.minecraftforge.event.ForgeEventFactory.onEntityStruckByLightning(entity, this)) { 
+				if ((!(entity instanceof LivingEntity living) || ignoreEntity == null || !PetFuncs.IsSameTeam(ignoreEntity, living)) && !net.minecraftforge.event.ForgeEventFactory.onEntityStruckByLightning(entity, this)) { 
 					entity.thunderHit((ServerLevel) level, this); //onStruckByLightning(this);
 					entity.setInvulnerable(false);
 					entity.invulnerableTime = 0;

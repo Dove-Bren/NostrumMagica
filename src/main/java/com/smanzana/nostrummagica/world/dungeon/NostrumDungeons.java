@@ -64,6 +64,9 @@ public class NostrumDungeons {
 	
 	protected static final ResourceLocation ID_KANI_JAIL_DUNGEON = NostrumMagica.Loc("kani_dungeon"); 
 	public static Dungeon KANI_JAIL_DUNGEON = new NostrumSorceryDungeon(NostrumDungeonRooms.RefKaniDungeonStart).setDisplayTitle(new TranslatableComponent("dungeon.kani_dungeon.name").withStyle(ChatFormatting.BLUE, ChatFormatting.BOLD));
+	
+	protected static final ResourceLocation ID_VANI_SOLAR_DUNGEON = NostrumMagica.Loc("vani_solar"); 
+	public static Dungeon VANI_SOLAR_DUNGEON = new NostrumSorceryDungeon(NostrumDungeonRooms.RefVaniSolarStart).setDisplayTitle(new TranslatableComponent("dungeon.vani_solar.name").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
 
 	@SubscribeEvent
 	public static final void onRoomRegistration(RegistryEvent.Register<Dungeon> event) {
@@ -75,6 +78,7 @@ public class NostrumDungeons {
 		registry.register(MANI_CASTLE_DUNGEON.setRegistryName(ID_MANI_CASTLE_DUNGEON));
 		registry.register(SORCERY_ISLAND_DUNGEON.setRegistryName(ID_SORCERY_ISLAND_DUNGEON));
 		registry.register(KANI_JAIL_DUNGEON.setRegistryName(ID_KANI_JAIL_DUNGEON));
+		registry.register(VANI_SOLAR_DUNGEON.setRegistryName(ID_VANI_SOLAR_DUNGEON));
 		
 	}
 }

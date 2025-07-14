@@ -564,6 +564,7 @@
 	"entity.nostrummagica.player_statue": "Magic Statue",
 	"entity.nostrummagica.whirlwind": "Whirlwind",
 	"entity.nostrummagica.primal_mage": "Primal Mage",
+	"entity.nostrummagica.shadow_dragon_boss": "Shadow Dragon",
 
     "entity.nostrummagica.placeholder.soulbound": "Soulbound Pet",
 
@@ -764,10 +765,12 @@
 	"dungeon.mani_castle.name": "Mani Castle",
 	"dungeon.sorcery_island.name": "Sorcery Dimension",
 	"dungeon.kani_dungeon.name": "Kani Dungeon",
+	"dungeon.vani_solar.name": "Vani Solar",
 	
 	"dungeon.room.mani_castle.name": "",
 	"dungeon.room.sorcery_island.name": "",
 	"dungeon.room.kani_dungeon.name": "",
+	"dungeon.room.vani_solar.name": "",
 
     "info.recall.fail": "A mark location must be set first",
     "info.recall.baddimension": "Your mark location is in a different dimension",
@@ -851,6 +854,7 @@
 	"info.gold_mirror.not_loaded": "The remote block can't be reached (unloaded).",
 	"info.rooted.no_jump": "The roots at your feet prevent you from jumping",
 	"info.template_stamper.hint": "You sense something changed somewhere nearby...",
+	"info.shadow_dragoon.ethereal.no_hit": "Your attack seems to pass through the shadow form of the dragon",
 	
 	"mastery.unknown.name": "Unknown",
 	"mastery.novice.name": "Novice",

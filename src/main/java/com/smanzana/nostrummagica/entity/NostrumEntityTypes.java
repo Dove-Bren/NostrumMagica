@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.entity.boss.plantboss.PlantBossEntity;
 import com.smanzana.nostrummagica.entity.boss.playerstatue.PlayerStatueEntity;
 import com.smanzana.nostrummagica.entity.boss.primalmage.PrimalMageEntity;
 import com.smanzana.nostrummagica.entity.boss.reddragon.RedDragonEntity;
+import com.smanzana.nostrummagica.entity.boss.shadowdragon.ShadowDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.DragonEggEntity;
 import com.smanzana.nostrummagica.entity.dragon.ShadowRedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
@@ -95,6 +96,7 @@ public class NostrumEntityTypes {
 	@ObjectHolder(PlayerStatueEntity.ID) public static EntityType<PlayerStatueEntity> playerStatue;
 	@ObjectHolder(WhirlwindEntity.ID) public static EntityType<WhirlwindEntity> whirlwind;
 	@ObjectHolder(PrimalMageEntity.ID) public static EntityType<PrimalMageEntity> primalMage;
+	@ObjectHolder(ShadowDragonEntity.ID) public static EntityType<ShadowDragonEntity> shadowDragonBoss;
 	
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<EntityType<?>> event) {
@@ -308,6 +310,11 @@ public class NostrumEntityTypes {
 				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
 				.sized(0.6F, 1.95F)
 			.build("").setRegistryName(PrimalMageEntity.ID));
+		registry.register(EntityType.Builder.<ShadowDragonEntity>of(ShadowDragonEntity::new, MobCategory.MONSTER)
+				.setTrackingRange(128).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
+				.sized(1.5F, 3F)
+				.fireImmune()
+			.build("").setRegistryName(ShadowDragonEntity.ID));
 		
 		registry.register(EntityType.Builder.<WhirlwindEntity>of(WhirlwindEntity::new, MobCategory.MISC)
     			.sized(0.5F, 0.5F)
@@ -426,6 +433,7 @@ public class NostrumEntityTypes {
 		event.put(cursedGlassTrigger, CursedGlassTriggerEntity.BuildAttributes().build());
 		event.put(playerStatue, PlayerStatueEntity.BuildAttributes().build());
 		event.put(primalMage, PrimalMageEntity.BuildAttributes().build());
+		event.put(shadowDragonBoss, ShadowDragonEntity.BuildAttributes().build());
 		
 	}
 	

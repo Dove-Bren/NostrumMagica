@@ -68,4 +68,12 @@ public abstract class NostrumDungeonStructures {
 		}
 		
 	}
+	
+	public static class VaniSolarStructure extends DungeonStructure {
+
+		public VaniSolarStructure() {
+			super(NostrumDungeons.VANI_SOLAR_DUNGEON);
+		}
+		
+	}
 }
