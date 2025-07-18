@@ -8,6 +8,10 @@ import com.smanzana.nostrummagica.world.dungeon.room.NostrumDungeonRooms;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.VerticalAnchor;
+import net.minecraft.world.level.levelgen.WorldGenerationContext;
+import net.minecraft.world.level.levelgen.heightproviders.ConstantHeight;
+import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -67,7 +71,19 @@ public class NostrumDungeons {
 	
 	protected static final ResourceLocation ID_VANI_SOLAR_DUNGEON = NostrumMagica.Loc("vani_solar"); 
 	public static Dungeon VANI_SOLAR_DUNGEON = new NostrumSorceryDungeon(NostrumDungeonRooms.RefVaniSolarStart).setDisplayTitle(new TranslatableComponent("dungeon.vani_solar.name").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
+	
+	protected static final ResourceLocation ID_LEGACY_SORCERY_DUNGEON = NostrumMagica.Loc("ruined_legacy_dungeon"); 
+	public static Dungeon LEGACY_SORCERY_DUNGEON = new NostrumSorceryDungeon(NostrumDungeonRooms.RefLegacySorceryDungeonStart).setDisplayTitle(new TranslatableComponent("dungeon.ruined_legacy_dungeon.name").withStyle(ChatFormatting.GRAY, ChatFormatting.BOLD));
 
+	protected static final ResourceLocation ID_ELEMENTAL_TRIAL_DUNGEON = NostrumMagica.Loc("elemental_trials"); 
+	public static Dungeon ELEMENTAL_TRIAL_DUNGEON = new NostrumSorceryDungeon(NostrumDungeonRooms.RefElementalTrialStart) {
+		@Override
+		public HeightProvider getSpawnHeight(WorldGenerationContext genContext) {
+			// Pick random Y between 45 and 75 from bottom of world by default
+			return ConstantHeight.of(VerticalAnchor.absolute(101));
+		}
+	}.setDisplayTitle(new TranslatableComponent("dungeon.elemental_trial.name").withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
+	
 	@SubscribeEvent
 	public static final void onRoomRegistration(RegistryEvent.Register<Dungeon> event) {
 		final IForgeRegistry<Dungeon> registry = event.getRegistry();
@@ -79,6 +95,8 @@ public class NostrumDungeons {
 		registry.register(SORCERY_ISLAND_DUNGEON.setRegistryName(ID_SORCERY_ISLAND_DUNGEON));
 		registry.register(KANI_JAIL_DUNGEON.setRegistryName(ID_KANI_JAIL_DUNGEON));
 		registry.register(VANI_SOLAR_DUNGEON.setRegistryName(ID_VANI_SOLAR_DUNGEON));
+		registry.register(LEGACY_SORCERY_DUNGEON.setRegistryName(ID_LEGACY_SORCERY_DUNGEON));
+		registry.register(ELEMENTAL_TRIAL_DUNGEON.setRegistryName(ID_ELEMENTAL_TRIAL_DUNGEON));
 		
 	}
 }

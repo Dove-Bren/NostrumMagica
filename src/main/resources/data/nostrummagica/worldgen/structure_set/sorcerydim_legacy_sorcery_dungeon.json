@@ -1,0 +1,11 @@
+{
+		"placement": {
+			"type": "nostrummagica:fixed_grid",
+			"grid_size": 5120,
+			"offset": [-256, 128, 0]
+		},
+		"structures": [{
+			"structure": "nostrummagica:configured_struct_legacy_sorcery_dungeon",
+			"weight": 1
+		}]
+}

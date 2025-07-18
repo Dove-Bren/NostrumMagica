@@ -46,6 +46,8 @@ public class NostrumDungeonRooms {
 	private static final ResourceLocation SORCERY_ISLAND_NAME = NostrumMagica.Loc("sorcery_island");
 	private static final ResourceLocation KANI_DUNGEON_START_NAME = NostrumMagica.Loc("kani_dungeon/kani_dungeon_start");
 	private static final ResourceLocation VANI_SOLAR_START_NAME = NostrumMagica.Loc("vani_solar/vani_solar_start");
+	private static final ResourceLocation LEGACY_SORCERY_DUNGEON_START_NAME = NostrumMagica.Loc("ruined_legacy_dungeon/ruined_legacy_dungeon_start");
+	private static final ResourceLocation ELEMENTAL_TRIAL_START_NAME = NostrumMagica.Loc("elemental_trial/elemental_trial_start");
 	
 	public static final DungeonLobbyRoomRef PLANTBOSS_LOBBY = new DungeonLobbyRoomRef(PLANTBOSS_LOBBY_NAME);
 	public static final DungeonRoomRef PLANTBOSS_ENTRANCE = new DungeonRoomRef(PLANTBOSS_ENTRANCE_NAME);
@@ -57,6 +59,8 @@ public class NostrumDungeonRooms {
 	public static final DungeonRoomRef RefSorceryIsland = new DungeonRoomRef(SORCERY_ISLAND_NAME);
 	public static final DungeonRoomRef RefKaniDungeonStart = new DungeonRoomRef(KANI_DUNGEON_START_NAME);
 	public static final DungeonRoomRef RefVaniSolarStart = new DungeonRoomRef(VANI_SOLAR_START_NAME);
+	public static final DungeonRoomRef RefLegacySorceryDungeonStart = new DungeonRoomRef(LEGACY_SORCERY_DUNGEON_START_NAME);
+	public static final DungeonRoomRef RefElementalTrialStart = new DungeonRoomRef(ELEMENTAL_TRIAL_START_NAME);
 
 	@SubscribeEvent
 	public static final void onRoomRegistration(DungeonRoomRegisterEvent event) {

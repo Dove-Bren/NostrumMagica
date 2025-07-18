@@ -17,6 +17,7 @@ import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.LaserBlock;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.tile.LaserBlockEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
@@ -26,6 +27,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
@@ -293,7 +295,8 @@ public class ShadowDragonArena {
 				continue;
 			}
 			
-			if (!level.isEmptyBlock(light.source().above().above().above())) {
+			BlockEntity ent = level.getBlockEntity(light.source());
+			if (ent == null || !(ent instanceof LaserBlockEntity laser) || laser.getLaserWholeSegments() < 3) {
 				return false;
 			}
 		}

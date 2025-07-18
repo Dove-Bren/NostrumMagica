@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.world.gen;
 import com.smanzana.autodungeons.world.gen.DungeonStructure;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 
+import net.minecraft.world.level.levelgen.structure.PostPlacementProcessor;
+
 public abstract class NostrumDungeonStructures {
 	
 	public static class DragonStructure extends DungeonStructure {
@@ -74,6 +76,34 @@ public abstract class NostrumDungeonStructures {
 		public VaniSolarStructure() {
 			super(NostrumDungeons.VANI_SOLAR_DUNGEON);
 		}
+		
+	}
+	
+	public static class LegacySorceryStructure extends DungeonStructure {
+
+		public LegacySorceryStructure() {
+			super(NostrumDungeons.LEGACY_SORCERY_DUNGEON);
+		}
+		
+	}
+	
+	public static class ElementalTrialStructure extends DungeonStructure {
+
+		public ElementalTrialStructure() {
+			super(NostrumDungeons.ELEMENTAL_TRIAL_DUNGEON);
+		}
+
+		@Override
+		public PostPlacementProcessor getPostPlacementProcessor() {
+			System.out.println();
+			System.out.println();
+			System.out.println("Post process for elemental trials");
+			System.out.println();
+			System.out.println();
+			return super.getPostPlacementProcessor();
+		}
+		
+		
 		
 	}
 }

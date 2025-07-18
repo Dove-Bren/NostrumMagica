@@ -248,7 +248,7 @@ public class LockedChestTileEntity extends BlockEntity implements TickableBlockE
 		// will want unique-per-room keys?
 		// Ehh well the whole points is that things don't have to be close to eachother, so maybe
 		// that's wrong?
-		final WorldKey newKey = this.lockKey.mutateWithID(roomID);
+		final WorldKey newKey = this.lockKey.mutateWithID(dungeonInstance.getInstanceID());
 		if (isWorldGen) {
 			this.lockKey = newKey;
 		} else {

@@ -66,7 +66,7 @@ public final class PrimalMageArena {
 			
 			// Find top of room above spawner
 			while (!IsArenaEmptyBlock(level.getBlockState(cursor))) cursor.move(Direction.UP); // Move out of any pillar block to start with
-			do { cursor.move(Direction.UP); } while (IsArenaEmptyBlock(level.getBlockState(cursor))); // Stops when not in an empty block anymore
+			do { cursor.move(Direction.UP); } while (cursor.getY() < level.getMaxBuildHeight() && IsArenaEmptyBlock(level.getBlockState(cursor))); // Stops when not in an empty block anymore
 			cursor.move(Direction.DOWN);
 			final int yMax = cursor.getY(); // save for later
 			
@@ -75,23 +75,35 @@ public final class PrimalMageArena {
 			cursor.set(scanStart);
 			while (IsArenaEmptyBlock(level.getBlockState(cursor))) cursor.move(Direction.DOWN); // move down out of air, if we started in air
 			pillarState = level.getBlockState(scanStart);
-			do { cursor.move(Direction.DOWN); } while (level.getBlockState(cursor) == pillarState);
+			do { cursor.move(Direction.DOWN); } while (cursor.getY() > level.getMinBuildHeight() && level.getBlockState(cursor) == pillarState);
+			
+			if (cursor.getY() <= level.getMinBuildHeight()) {
+				return null;
+			}
 	
 			// This is min y
 			cursor.move(Direction.UP);
 			final BlockPos bottomCenter = cursor.immutable(); // copy for restoring later
 			
 			// Walk west/north to get min coord, looking for a wall
-			do { cursor.move(Direction.WEST); } while (level.getBlockState(cursor) == pillarState || IsArenaEmptyBlock(level.getBlockState(cursor))); cursor.move(Direction.EAST);
-			do { cursor.move(Direction.NORTH); } while (level.getBlockState(cursor) == pillarState || IsArenaEmptyBlock(level.getBlockState(cursor))); cursor.move(Direction.SOUTH);
+			do { cursor.move(Direction.WEST); } while (cursor.distManhattan(bottomCenter) < 1000 && (level.getBlockState(cursor) == pillarState || IsArenaEmptyBlock(level.getBlockState(cursor)))); cursor.move(Direction.EAST);
+			do { cursor.move(Direction.NORTH); } while (cursor.distManhattan(bottomCenter) < 1000 && (level.getBlockState(cursor) == pillarState || IsArenaEmptyBlock(level.getBlockState(cursor)))); cursor.move(Direction.SOUTH);
+			
+			if (cursor.distManhattan(bottomCenter) >= 999) {
+				return null;
+			}
 			
 			min = new BlockPos(cursor.immutable());
 			
 			cursor.set(bottomCenter);
 					
 			// Walk east/south to get max coord, looking for a wall
-			do { cursor.move(Direction.EAST); } while (level.getBlockState(cursor) == pillarState || IsArenaEmptyBlock(level.getBlockState(cursor))); cursor.move(Direction.WEST);
-			do { cursor.move(Direction.SOUTH); } while (level.getBlockState(cursor) == pillarState || IsArenaEmptyBlock(level.getBlockState(cursor))); cursor.move(Direction.NORTH);
+			do { cursor.move(Direction.EAST); } while (cursor.distManhattan(bottomCenter) < 1000 && (level.getBlockState(cursor) == pillarState || IsArenaEmptyBlock(level.getBlockState(cursor)))); cursor.move(Direction.WEST);
+			do { cursor.move(Direction.SOUTH); } while (cursor.distManhattan(bottomCenter) < 1000 && (level.getBlockState(cursor) == pillarState || IsArenaEmptyBlock(level.getBlockState(cursor)))); cursor.move(Direction.NORTH);
+			
+			if (cursor.distManhattan(bottomCenter) >= 999) {
+				return null;
+			}
 			
 			max = new BlockPos(cursor.getX(), yMax, cursor.getZ());
 		}

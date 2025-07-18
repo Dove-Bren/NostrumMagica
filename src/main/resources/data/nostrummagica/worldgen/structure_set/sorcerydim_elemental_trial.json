@@ -1,0 +1,11 @@
+{
+		"placement": {
+			"type": "nostrummagica:fixed_grid",
+			"grid_size": 5120,
+			"offset": [0, 101, 0]
+		},
+		"structures": [{
+			"structure": "nostrummagica:configured_struct_elemental_trial",
+			"weight": 1
+		}]
+}

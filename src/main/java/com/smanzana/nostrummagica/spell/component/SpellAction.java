@@ -2151,7 +2151,9 @@ public class SpellAction {
 				return;
 			
 			if (DimensionUtils.IsSorceryDim(location.world)) {
-				return;
+				if (!(caster instanceof Player player) || !player.isCreative()) {
+					return;
+				}
 			}
 			
 			BlockState state = location.world.getBlockState(pos);

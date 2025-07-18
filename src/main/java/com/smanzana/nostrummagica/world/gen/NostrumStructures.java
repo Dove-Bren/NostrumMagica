@@ -5,7 +5,9 @@ import java.util.List;
 import com.mojang.serialization.Codec;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.DragonStructure;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.ElementalTrialStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.KaniDungeonStructure;
+import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.LegacySorceryStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.ManiCastleStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.PlantBossStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.PortalStructure;
@@ -44,6 +46,8 @@ public class NostrumStructures {
 	private static final String DUNGEONGEN_SORCERY_ISLAND_ID = "struct_sorcery_island";
 	private static final String DUNGEONGEN_KANI_DUNGEON_ID = "struct_kani_dungeon";
 	private static final String DUNGEONGEN_VANI_SOLAR_ID = "struct_vani_solar";
+	private static final String DUNGEONGEN_LEGACY_SORCERY_ID = "struct_legacy_sorcery_dungeon";
+	private static final String DUNGEONGEN_ELEMENTAL_TRIAL_ID = "struct_elemental_trial";
 	private static final String DUNGEONGEN_PORTAL_CONF_ID = "configured_" + DUNGEONGEN_PORTAL_ID;
 	private static final String DUNGEONGEN_DRAGON_CONF_ID = "configured_" + DUNGEONGEN_DRAGON_ID;
 	private static final String DUNGEONGEN_PLANTBOSS_CONF_ID = "configured_" + DUNGEONGEN_PLANTBOSS_ID;
@@ -51,6 +55,8 @@ public class NostrumStructures {
 	private static final String DUNGEONGEN_SORCERY_ISLAND_CONF_ID = "configured_" + DUNGEONGEN_SORCERY_ISLAND_ID;
 	private static final String DUNGEONGEN_KANI_DUNGEON_CONF_ID = "configured_" + DUNGEONGEN_KANI_DUNGEON_ID;
 	private static final String DUNGEONGEN_VANI_SOLAR_CONF_ID = "configured_" + DUNGEONGEN_VANI_SOLAR_ID;
+	private static final String DUNGEONGEN_LEGACY_SORCERY_CONF_ID = "configured_" + DUNGEONGEN_LEGACY_SORCERY_ID;
+	private static final String DUNGEONGEN_ELEMENTAL_TRIAL_CONF_ID = "configured_" + DUNGEONGEN_ELEMENTAL_TRIAL_ID;
 	
 	@ObjectHolder(DUNGEONGEN_PORTAL_ID) public static PortalStructure DUNGEON_PORTAL;
 	protected static ConfiguredStructureFeature<?, ?> CONFIGURED_DUNGEON_PORTAL;
@@ -79,6 +85,14 @@ public class NostrumStructures {
 	@ObjectHolder(DUNGEONGEN_VANI_SOLAR_ID) public static VaniSolarStructure DUNGEON_VANI_SOLAR;
 	public static ConfiguredStructureFeature<?, ?> CONFIGUREDDUNGEON_VANI_SOLAR;
 	public static Holder<ConfiguredStructureFeature<?, ?>> REF_DUNGEON_VANI_SOLAR;
+	
+	@ObjectHolder(DUNGEONGEN_LEGACY_SORCERY_ID) public static LegacySorceryStructure DUNGEON_LEGACY_SORCERY;
+	public static ConfiguredStructureFeature<?, ?> CONFIGUREDDUNGEON_LEGACY_SORCERY;
+	public static Holder<ConfiguredStructureFeature<?, ?>> REF_DUNGEON_LEGACY_SORCERY;
+	
+	@ObjectHolder(DUNGEONGEN_ELEMENTAL_TRIAL_ID) public static ElementalTrialStructure DUNGEON_ELEMENTAL_TRIAL;
+	public static ConfiguredStructureFeature<?, ?> CONFIGUREDDUNGEON_ELEMENTAL_TRIAL;
+	public static Holder<ConfiguredStructureFeature<?, ?>> REF_DUNGEON_ELEMENTAL_TRIAL;
 	
 	public static StructurePlacementType<GridStructureSetPlacement> PLACEMENT_FIXED_GRID;
 
@@ -135,6 +149,16 @@ public class NostrumStructures {
 		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
 		CONFIGUREDDUNGEON_VANI_SOLAR = configured;
 		REF_DUNGEON_VANI_SOLAR = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_VANI_SOLAR_ID), NostrumMagica.Loc(DUNGEONGEN_VANI_SOLAR_CONF_ID));
+		
+		structure = new LegacySorceryStructure();
+		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
+		CONFIGUREDDUNGEON_LEGACY_SORCERY = configured;
+		REF_DUNGEON_LEGACY_SORCERY = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_LEGACY_SORCERY_ID), NostrumMagica.Loc(DUNGEONGEN_LEGACY_SORCERY_CONF_ID));
+		
+		structure = new ElementalTrialStructure();
+		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
+		CONFIGUREDDUNGEON_ELEMENTAL_TRIAL = configured;
+		REF_DUNGEON_ELEMENTAL_TRIAL = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_ELEMENTAL_TRIAL_ID), NostrumMagica.Loc(DUNGEONGEN_ELEMENTAL_TRIAL_CONF_ID));
 		
 		
 		// Register structure sets, which include rules of how to place them and distances between things in the same set.

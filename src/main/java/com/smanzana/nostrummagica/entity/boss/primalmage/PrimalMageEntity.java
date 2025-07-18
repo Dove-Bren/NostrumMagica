@@ -617,6 +617,11 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 			}
 			if (this.arena == null) { // not persisted, so will happen every time reloladed
 				this.arena = PrimalMageArena.Capture(getLevel(), this.homeBlock);
+				if (arena == null) {
+					NostrumMagica.logger.error("Primal mage failed to capture arena. Killing...");
+					this.discard();
+					return;
+				}
 			}
 			
 			for (Player player : this.getLevel().getNearbyPlayers(TargetingConditions.forCombat(), this, arena.getBounds())) {
