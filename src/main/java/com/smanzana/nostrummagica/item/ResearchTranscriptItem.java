@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch;
+import com.smanzana.nostrummagica.progression.research.NostrumResearches;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.ChatFormatting;
@@ -19,6 +20,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -41,20 +43,20 @@ public class ResearchTranscriptItem extends Item implements ILoreTagged {
 		super(properties);
 	}
 	
-	protected void setResearchKey(ItemStack stack, String researchName) {
-		stack.getOrCreateTag().putString(NBT_RESEARCH, researchName);
+	protected void setResearchKey(ItemStack stack, ResourceLocation researchName) {
+		stack.getOrCreateTag().putString(NBT_RESEARCH, researchName.toString());
 	}
 	
 	protected void setResearch(ItemStack stack, NostrumResearch research) {
-		setResearchKey(stack, research.getKey());
+		setResearchKey(stack, research.getID());
 	}
 	
-	protected String getResearchKey(ItemStack stack) {
-		return stack.getOrCreateTag().getString(NBT_RESEARCH);
+	protected ResourceLocation getResearchKey(ItemStack stack) {
+		return ResourceLocation.parse(stack.getOrCreateTag().getString(NBT_RESEARCH));
 	}
 	
 	public @Nullable NostrumResearch getResearch(ItemStack stack) {
-		String key = getResearchKey(stack);
+		ResourceLocation key = getResearchKey(stack);
 		return NostrumResearch.lookup(key);
 	}
 	
@@ -98,10 +100,10 @@ public class ResearchTranscriptItem extends Item implements ILoreTagged {
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
 		if (!worldIn.isClientSide && attr != null) {
-			if (attr.getCompletedResearches().contains(research.getKey())) {
+			if (attr.getCompletedResearches().contains(research.getID())) {
 				playerIn.sendMessage(new TranslatableComponent("info.research.already_know", new TranslatableComponent(research.getNameKey())), Util.NIL_UUID);
 			} else {
-				attr.completeResearch(research.getKey());
+				attr.completeResearch(research.getID());
 				NostrumMagicaSounds.LORE.play(null, playerIn.level, playerIn.getX(), playerIn.getY(), playerIn.getZ());
 				stack.shrink(1);
 				NostrumMagica.Proxy.syncPlayer((ServerPlayer) playerIn);
@@ -123,7 +125,7 @@ public class ResearchTranscriptItem extends Item implements ILoreTagged {
 			
 			final Player player = NostrumMagica.Proxy.getPlayer();
 			INostrumMagic attr = player == null ? null : NostrumMagica.getMagicWrapper(player);
-			if (attr != null && attr.getCompletedResearches().contains(research.getKey())) {
+			if (attr != null && attr.getCompletedResearches().contains(research.getID())) {
 				tooltip.add(new TextComponent(" "));
 				tooltip.add(new TextComponent("Already Researched").withStyle(ChatFormatting.RED));
 			}
@@ -134,7 +136,7 @@ public class ResearchTranscriptItem extends Item implements ILoreTagged {
 	public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
 		if (this.allowdedIn(group)) {
 			
-			for (String key: CREATIVE_RESEARCHES) {
+			for (ResourceLocation key: CREATIVE_RESEARCHES) {
 				NostrumResearch research = NostrumResearch.lookup(key);
 				if (research != null) {
 					ItemStack researchItem = new ItemStack(this);
@@ -145,8 +147,8 @@ public class ResearchTranscriptItem extends Item implements ILoreTagged {
 		}
 	}
 	
-	public static final String[] CREATIVE_RESEARCHES = {
-			"advanced_spelltable",
-			"mystic_spelltable",
+	public static final ResourceLocation[] CREATIVE_RESEARCHES = {
+			NostrumResearches.ID_Advanced_Spelltable,
+			NostrumResearches.ID_Mystic_Spelltable,
 	};
 }

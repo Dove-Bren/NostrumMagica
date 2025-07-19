@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.progression.research.NostrumResearch;
 
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -47,7 +48,7 @@ public class ClientPurchaseResearchMessage {
 	}
 
 	public static ClientPurchaseResearchMessage decode(FriendlyByteBuf buf) {
-		final String researchKey = buf.readUtf(32767);
+		final ResourceLocation researchKey = buf.readResourceLocation();
 		NostrumResearch research = NostrumResearch.lookup(researchKey);
 		if (research == null) {
 			throw new DecoderException("Failed to find nostrum research for " + researchKey);
@@ -57,7 +58,7 @@ public class ClientPurchaseResearchMessage {
 	}
 
 	public static void encode(ClientPurchaseResearchMessage msg, FriendlyByteBuf buf) {
-		buf.writeUtf(msg.research.getKey());
+		buf.writeResourceLocation(msg.research.getID());
 	}
 
 }

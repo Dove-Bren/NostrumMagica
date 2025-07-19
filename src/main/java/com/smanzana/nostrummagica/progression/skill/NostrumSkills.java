@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.progression.requirement.ElementMasteryRequirement;
 import com.smanzana.nostrummagica.progression.requirement.ResearchRequirement;
 import com.smanzana.nostrummagica.progression.requirement.SpellKnowledgeRequirement;
+import com.smanzana.nostrummagica.progression.research.NostrumResearches;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -224,7 +225,7 @@ public class NostrumSkills {
 		Physical_Inflict = new HiddenSkill(ID_PHYSICAL_INFLICT, Category_Element_Physical, ID_PHYSICAL_NOVICE, () -> new ItemStack(Items.WOODEN_SWORD), x-1, y-1, new SpellKnowledgeRequirement(EMagicElement.PHYSICAL, EAlteration.INFLICT));
 		Physical_Growth = new HiddenSkill(ID_PHYSICAL_GROWTH, Category_Element_Physical, ID_PHYSICAL_NOVICE, () -> new ItemStack(Items.GOLDEN_CARROT), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.PHYSICAL, EAlteration.GROWTH));
 		Physical_Corrupt = new HiddenSkill(ID_PHYSICAL_CORRUPT, Category_Element_Physical, ID_PHYSICAL_ADEPT, () -> new ItemStack(Items.POPPED_CHORUS_FRUIT), x-1, y-2, new SpellKnowledgeRequirement(EMagicElement.PHYSICAL, EAlteration.CORRUPT));
-		Physical_Weapon = new HiddenSkill(ID_PHYSICAL_WEAPON, Category_Element_Physical, ID_PHYSICAL_ADEPT, () -> new ItemStack(NostrumItems.deepMetalAxe), x+1, y-2, new ResearchRequirement("sword_physical"));
+		Physical_Weapon = new HiddenSkill(ID_PHYSICAL_WEAPON, Category_Element_Physical, ID_PHYSICAL_ADEPT, () -> new ItemStack(NostrumItems.deepMetalAxe), x+1, y-2, new ResearchRequirement(NostrumResearches.ID_Sword_Physical));
 
 		x = 0;
 		y = 1;
@@ -234,7 +235,7 @@ public class NostrumSkills {
 		Fire_Inflict = new HiddenSkill(ID_FIRE_INFLICT, Category_Element_Fire, ID_FIRE_NOVICE, () -> new ItemStack(Items.BLAZE_POWDER), x-1, y-1, new SpellKnowledgeRequirement(EMagicElement.FIRE, EAlteration.INFLICT));
 		Fire_Growth = new HiddenSkill(ID_FIRE_GROWTH, Category_Element_Fire, ID_FIRE_NOVICE, () -> new ItemStack(Items.CHAINMAIL_CHESTPLATE), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.FIRE, EAlteration.GROWTH));
 		Fire_Corrupt = new HiddenSkill(ID_FIRE_CORRUPT, Category_Element_Fire, ID_FIRE_ADEPT, () -> new ItemStack(Items.LAVA_BUCKET), x-1, y-2, new SpellKnowledgeRequirement(EMagicElement.FIRE, EAlteration.CORRUPT));
-		Fire_Weapon = new HiddenSkill(ID_FIRE_WEAPON, Category_Element_Fire, ID_FIRE_ADEPT, () -> new ItemStack(NostrumItems.flameRod), x+1, y-2, new ResearchRequirement("sword_fire"));
+		Fire_Weapon = new HiddenSkill(ID_FIRE_WEAPON, Category_Element_Fire, ID_FIRE_ADEPT, () -> new ItemStack(NostrumItems.flameRod), x+1, y-2, new ResearchRequirement(NostrumResearches.ID_Sword_Fire));
 
 		x = 0;
 		y = 1;
@@ -244,7 +245,7 @@ public class NostrumSkills {
 		Ice_Inflict = new HiddenSkill(ID_ICE_INFLICT, Category_Element_Ice, ID_ICE_NOVICE, () -> new ItemStack(Items.POTION), x-1, y-1, new SpellKnowledgeRequirement(EMagicElement.ICE, EAlteration.INFLICT));
 		Ice_Resist = new HiddenSkill(ID_ICE_SUPPORT, Category_Element_Ice, ID_ICE_NOVICE, () -> SpellRune.getRune(NostrumSpellShapes.OnMana), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.ICE, EAlteration.RESIST));
 		Ice_Corrupt = new HiddenSkill(ID_ICE_CORRUPT, Category_Element_Ice, ID_ICE_ADEPT, () -> new ItemStack(Items.SOUL_LANTERN), x-1, y-2, new SpellKnowledgeRequirement(EMagicElement.ICE, EAlteration.CORRUPT));
-		Ice_Weapon = new HiddenSkill(ID_ICE_WEAPON, Category_Element_Ice, ID_ICE_ADEPT, () -> new ItemStack(NostrumItems.enchantedWeaponIceMaster), x+1, y-2, new ResearchRequirement("enchanted_weapons"));
+		Ice_Weapon = new HiddenSkill(ID_ICE_WEAPON, Category_Element_Ice, ID_ICE_ADEPT, () -> new ItemStack(NostrumItems.enchantedWeaponIceMaster), x+1, y-2, new ResearchRequirement(NostrumResearches.ID_Enchanted_Weapons));
 
 		x = 0;
 		y = 1;
@@ -254,7 +255,7 @@ public class NostrumSkills {
 		Earth_Inflict = new HiddenSkill(ID_EARTH_INFLICT, Category_Element_Earth, ID_EARTH_NOVICE, () -> new ItemStack(Items.IRON_BLOCK), x-1, y-1, new SpellKnowledgeRequirement(EMagicElement.EARTH, EAlteration.INFLICT));
 		Earth_Resist = new HiddenSkill(ID_EARTH_SUPPORT, Category_Element_Earth, ID_EARTH_NOVICE, () -> new ItemStack(NostrumItems.mirrorShield), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.EARTH, EAlteration.RESIST));
 		Earth_Corrupt = new HiddenSkill(ID_EARTH_CORRUPT, Category_Element_Earth, ID_EARTH_ADEPT, () -> new ItemStack(Items.DIAMOND), x-1, y-2, new SpellKnowledgeRequirement(EMagicElement.EARTH, EAlteration.CORRUPT));
-		Earth_Weapon = new HiddenSkill(ID_EARTH_WEAPON, Category_Element_Earth, ID_EARTH_ADEPT, () -> new ItemStack(NostrumItems.earthPike), x+1, y-2, new ResearchRequirement("sword_earth"));
+		Earth_Weapon = new HiddenSkill(ID_EARTH_WEAPON, Category_Element_Earth, ID_EARTH_ADEPT, () -> new ItemStack(NostrumItems.earthPike), x+1, y-2, new ResearchRequirement(NostrumResearches.ID_Sword_Earth));
 
 		x = 0;
 		y = 1;
@@ -264,7 +265,7 @@ public class NostrumSkills {
 		Wind_Inflict = new HiddenSkill(ID_WIND_INFLICT, Category_Element_Wind, ID_WIND_NOVICE, () -> new ItemStack(Items.FEATHER), x-1, y-1, new SpellKnowledgeRequirement(EMagicElement.WIND, EAlteration.INFLICT));
 		Wind_Support = new HiddenSkill(ID_WIND_SUPPORT, Category_Element_Wind, ID_WIND_NOVICE, () -> new ItemStack(Items.GOLDEN_PICKAXE), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.WIND, EAlteration.SUPPORT));
 		Wind_Corrupt = new HiddenSkill(ID_WIND_CORRUPT, Category_Element_Wind, ID_WIND_ADEPT, () -> new ItemStack(Items.ELYTRA), x-1, y-2, new SpellKnowledgeRequirement(EMagicElement.WIND, EAlteration.CORRUPT));
-		Wind_Weapon = new HiddenSkill(ID_WIND_WEAPON, Category_Element_Wind, ID_WIND_ADEPT, () -> new ItemStack(NostrumItems.enchantedWeaponWindMaster), x+1, y-2, new ResearchRequirement("enchanted_weapons"));
+		Wind_Weapon = new HiddenSkill(ID_WIND_WEAPON, Category_Element_Wind, ID_WIND_ADEPT, () -> new ItemStack(NostrumItems.enchantedWeaponWindMaster), x+1, y-2, new ResearchRequirement(NostrumResearches.ID_Enchanted_Weapons));
 
 		x = 0;
 		y = 1;
@@ -274,7 +275,7 @@ public class NostrumSkills {
 		Lightning_Inflict = new HiddenSkill(ID_LIGHTNING_INFLICT, Category_Element_Lightning, ID_LIGHTNING_NOVICE, () -> new ItemStack(Blocks.ICE), x-1, y-1, new SpellKnowledgeRequirement(EMagicElement.LIGHTNING, EAlteration.INFLICT));
 		Lightning_Growth = new HiddenSkill(ID_LIGHTNING_GROWTH, Category_Element_Lightning, ID_LIGHTNING_NOVICE, () -> new ItemStack(Items.GOLDEN_BOOTS), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.LIGHTNING, EAlteration.SUPPORT));
 		Lightning_Corrupt = new HiddenSkill(ID_LIGHTNING_CORRUPT, Category_Element_Lightning, ID_LIGHTNING_ADEPT, () -> new ItemStack(Items.SPLASH_POTION), x-1, y-2, new SpellKnowledgeRequirement(EMagicElement.LIGHTNING, EAlteration.CORRUPT));
-		Lightning_Weapon = new HiddenSkill(ID_LIGHTNING_WEAPON, Category_Element_Lightning, ID_LIGHTNING_ADEPT, () -> new ItemStack(NostrumItems.enchantedWeaponLightningMaster), x+1, y-2, new ResearchRequirement("enchanted_weapons"));
+		Lightning_Weapon = new HiddenSkill(ID_LIGHTNING_WEAPON, Category_Element_Lightning, ID_LIGHTNING_ADEPT, () -> new ItemStack(NostrumItems.enchantedWeaponLightningMaster), x+1, y-2, new ResearchRequirement(NostrumResearches.ID_Enchanted_Weapons));
 
 		x = 0;
 		y = 1;
@@ -284,7 +285,7 @@ public class NostrumSkills {
 		Ender_Inflict = new HiddenSkill(ID_ENDER_INFLICT, Category_Element_Ender, ID_ENDER_NOVICE, () -> new ItemStack(Items.SPIDER_EYE), x-1, y-1, new SpellKnowledgeRequirement(EMagicElement.ENDER, EAlteration.INFLICT));
 		Ender_Growth = new HiddenSkill(ID_ENDER_GROWTH, Category_Element_Ender, ID_ENDER_NOVICE, () -> new ItemStack(NostrumBlocks.paradoxMirror), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.ENDER, EAlteration.GROWTH));
 		Ender_Corrupt = new HiddenSkill(ID_ENDER_CORRUPT, Category_Element_Ender, ID_ENDER_ADEPT, () -> new ItemStack(Items.CARVED_PUMPKIN), x-1, y-2, new SpellKnowledgeRequirement(EMagicElement.ENDER, EAlteration.CORRUPT));
-		Ender_Weapon = new HiddenSkill(ID_ENDER_WEAPON, Category_Element_Ender, ID_ENDER_ADEPT, () -> new ItemStack(NostrumItems.enderRod), x+1, y-2, new ResearchRequirement("sword_ender"));
+		Ender_Weapon = new HiddenSkill(ID_ENDER_WEAPON, Category_Element_Ender, ID_ENDER_ADEPT, () -> new ItemStack(NostrumItems.enderRod), x+1, y-2, new ResearchRequirement(NostrumResearches.ID_Sword_Ender));
 	}
 	
 }

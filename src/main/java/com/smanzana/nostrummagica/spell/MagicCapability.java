@@ -9,6 +9,7 @@ import com.smanzana.nostrummagica.progression.research.NostrumResearch;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 
 /**
@@ -39,9 +40,9 @@ public enum MagicCapability {
 	private final @Nullable Skill skill;
 	private final @Nullable EMagicTier tier;
 	private final @Nullable MagicCapability copyOf;
-	private final @Nullable NostrumResearch research;
+	private final @Nullable ResourceLocation research;
 	
-	private MagicCapability(Skill skill, EMagicTier tier, NostrumResearch research, MagicCapability copyOf) {
+	private MagicCapability(Skill skill, EMagicTier tier, ResourceLocation research, MagicCapability copyOf) {
 		this.skill = skill;
 		this.tier = tier;
 		this.copyOf = copyOf;
@@ -60,7 +61,7 @@ public enum MagicCapability {
 		this(null, null, null, other);
 	}
 	
-	private MagicCapability(NostrumResearch research) {
+	private MagicCapability(ResourceLocation research) {
 		this(null, null, research, null);
 	}
 	
@@ -84,7 +85,7 @@ public enum MagicCapability {
 		}
 		
 		if (this.research != null) {
-			if (attr == null || !NostrumMagica.getCompletedResearch(attr).contains(this.research)) {
+			if (attr == null || !attr.getCompletedResearches().contains(this.research)) {
 				return false;
 			}
 		}

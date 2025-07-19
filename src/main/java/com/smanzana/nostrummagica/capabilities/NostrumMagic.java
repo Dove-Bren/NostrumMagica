@@ -15,7 +15,6 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.criteria.TierCriteriaTrigger;
-import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.loretag.LoreCache;
@@ -23,6 +22,7 @@ import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.LoreMessage;
 import com.smanzana.nostrummagica.network.message.TutorialMessage;
+import com.smanzana.nostrummagica.progression.research.NostrumResearches;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.progression.tutorial.NostrumTutorial;
@@ -31,7 +31,6 @@ import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Spell;
-import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.stat.PlayerStat;
@@ -142,7 +141,7 @@ public class NostrumMagic implements INostrumMagic {
 	private Map<EAlteration, Boolean> alterations;
 	private List<String> completedQuests;
 	private List<String> currentQuests;
-	private List<String> completedResearch;
+	private List<ResourceLocation> completedResearch;
 	private Set<Skill> skills;
 	private BlockPos markLocation;
 	private ResourceKey<Level> markDimension;
@@ -202,13 +201,13 @@ public class NostrumMagic implements INostrumMagic {
 			skillPoints = 0;
 			
 			this.setElementalMastery(EMagicElement.PHYSICAL, EElementalMastery.NOVICE);
-			this.completeResearch("origin");
+			this.completeResearch(NostrumResearches.Origin);
 			this.addResearchPoint();
 			//this.completeResearch("spellcraft");
-			this.giveBasicLore(NostrumItems.GetRune(new SpellComponentWrapper(EMagicElement.FIRE)));
-			this.giveBasicLore(NostrumItems.blankScroll);
-			this.giveBasicLore(NostrumItems.spellScroll);
-			this.giveBasicLore(NostrumItems.reagentMandrakeRoot);
+//			this.giveBasicLore(NostrumItems.GetRune(new SpellComponentWrapper(EMagicElement.FIRE)));
+//			this.giveBasicLore(NostrumItems.blankScroll);
+//			this.giveBasicLore(NostrumItems.spellScroll);
+//			this.giveBasicLore(NostrumItems.reagentMandrakeRoot);
 			
 			if (this.entity != null && this.entity instanceof ServerPlayer player) {
 				NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.CAST_SPELL), player);
@@ -866,12 +865,12 @@ public class NostrumMagic implements INostrumMagic {
 	}
 
 	@Override
-	public List<String> getCompletedResearches() {
+	public List<ResourceLocation> getCompletedResearches() {
 		return this.completedResearch;
 	}
 
 	@Override
-	public void completeResearch(String research) {
+	public void completeResearch(ResourceLocation research) {
 		this.completedResearch.add(research);
 	}
 	
@@ -1249,11 +1248,11 @@ public class NostrumMagic implements INostrumMagic {
 			nbt.put(NBT_QUESTS_COMPLETED, tagList);
 		}
 		
-		stringList = getCompletedResearches();
-		if (stringList != null && !stringList.isEmpty()) {
+		List<ResourceLocation> keyList = getCompletedResearches();
+		if (keyList != null && !keyList.isEmpty()) {
 			ListTag tagList = new ListTag();
-			for (String research : stringList) {
-				tagList.add(StringTag.valueOf(research));
+			for (ResourceLocation research : keyList) {
+				tagList.add(StringTag.valueOf(research.toString()));
 			}
 			nbt.put(NBT_RESEARCHES, tagList);
 		}
@@ -1426,7 +1425,7 @@ public class NostrumMagic implements INostrumMagic {
 		if (tag.contains(NBT_RESEARCHES, Tag.TAG_LIST)) {
 			ListTag tagList = tag.getList(NBT_RESEARCHES, Tag.TAG_STRING);
 			for (int i = 0; i < tagList.size(); i++) {
-				String research = tagList.getString(i);
+				ResourceLocation research = ResourceLocation.parse(tagList.getString(i));
 				completeResearch(research);
 			}
 		}

@@ -47,6 +47,7 @@ import com.smanzana.nostrummagica.pet.PetSoulRegistry;
 import com.smanzana.nostrummagica.progression.quest.NostrumQuest;
 import com.smanzana.nostrummagica.progression.requirement.IRequirement;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch;
+import com.smanzana.nostrummagica.progression.research.NostrumResearches;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.proxy.ClientProxy;
@@ -463,10 +464,10 @@ public class NostrumMagica {
 
 	public static List<NostrumResearch> getCompletedResearch(INostrumMagic attr) {
 		List<NostrumResearch> list = new LinkedList<>();
-		List<String> research = attr.getCompletedResearches();
+		List<ResourceLocation> research = attr.getCompletedResearches();
 
 		if (research != null && !research.isEmpty())
-			for (String researchKey : research) {
+			for (ResourceLocation researchKey : research) {
 				NostrumResearch r = NostrumResearch.lookup(researchKey);
 				if (r != null)
 					list.add(r);
@@ -479,7 +480,7 @@ public class NostrumMagica {
 
 	public void reloadDefaultResearch() {
 		NostrumResearch.ClearAllResearch();
-		ModInit.registerDefaultResearch();
+		NostrumResearches.init();
 		if (CuriosProxy.isEnabled()) {
 			CuriosProxy.reinitResearch();
 		}
@@ -609,8 +610,8 @@ public class NostrumMagica {
 		if (attr == null)
 			return false;
 
-		List<String> finished = attr.getCompletedResearches();
-		if (finished.contains(research.getKey())) {
+		List<ResourceLocation> finished = attr.getCompletedResearches();
+		if (finished.contains(research.getID())) {
 			return true;
 		}
 		
@@ -618,7 +619,7 @@ public class NostrumMagica {
 			return canPurchaseResearch(player, research);
 		}
 
-		String[] parents = research.getAllParents();
+		ResourceLocation[] parents = research.getAllParents();
 		if (parents == null || parents.length == 0) {
 			return true;
 		}
@@ -627,7 +628,7 @@ public class NostrumMagica {
 			return false;
 		}
 
-		for (String parent : parents) {
+		for (ResourceLocation parent : parents) {
 			if (finished.contains(parent)) {
 				return true;
 			}
@@ -655,14 +656,14 @@ public class NostrumMagica {
 		}
 
 		// ALL parents must be completed before research can be taken
-		String[] parents = research.getAllParents();
+		ResourceLocation[] parents = research.getAllParents();
 		if (parents != null && parents.length > 0) {
-			List<String> finished = attr.getCompletedResearches();
+			List<ResourceLocation> finished = attr.getCompletedResearches();
 			if (finished == null || finished.isEmpty()) {
 				return false;
 			}
 
-			for (String parent : parents) {
+			for (ResourceLocation parent : parents) {
 				if (!finished.contains(parent)) {
 					return false;
 				}

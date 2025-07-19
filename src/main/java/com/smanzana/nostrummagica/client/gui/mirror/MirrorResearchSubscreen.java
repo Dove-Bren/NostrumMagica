@@ -35,8 +35,9 @@ import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.ClientPurchaseResearchMessage;
 import com.smanzana.nostrummagica.progression.requirement.IRequirement;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch;
-import com.smanzana.nostrummagica.progression.research.NostrumResearch.NostrumResearchTab;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch.Size;
+import com.smanzana.nostrummagica.progression.research.NostrumResearchTab;
+import com.smanzana.nostrummagica.progression.research.NostrumResearches;
 import com.smanzana.nostrummagica.util.Curves;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
@@ -145,7 +146,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 			researchButtons.put(research, button);
 			
 			if (research.getTab() == null) {
-				NostrumMagica.logger.error("Research has no tab: " + research.getKey());
+				NostrumMagica.logger.error("Research has no tab: " + research.getID());
 			}
 			
 			if (!tabs.containsKey(research.getTab())) {
@@ -166,10 +167,10 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		
 		List<NostrumResearchTab> tabList = Lists.newArrayList(tabs.keySet());
 		Collections.sort(tabList, (l, r) -> {
-			if (l == NostrumResearchTab.MAGICA) {
+			if (l == NostrumResearches.Tab_Magica) {
 				return -1;
 			}
-			if (r == NostrumResearchTab.MAGICA) {
+			if (r == NostrumResearches.Tab_Magica) {
 				return 1;
 			}
 			return l.getRawKey().compareTo(r.getRawKey());
@@ -374,7 +375,7 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 		
 		public void drawTreeLines(PoseStack matrixStackIn, Minecraft mc) {
 			if (research.getParentKeys() != null && research.getParentKeys().length != 0) {
-				for (String key : research.getParentKeys()) {
+				for (ResourceLocation key : research.getParentKeys()) {
 					NostrumResearch parentResearch = NostrumResearch.lookup(key);
 					if (parentResearch == null)
 						continue;

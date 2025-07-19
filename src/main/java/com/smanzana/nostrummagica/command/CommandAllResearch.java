@@ -34,7 +34,7 @@ public class CommandAllResearch  {
 		}
 		
 		for (NostrumResearch research : NostrumResearch.AllResearch()) {
-			attr.completeResearch(research.getKey());
+			attr.completeResearch(research.getID());
 		}
 		NetworkHandler.sendTo(
 				new StatSyncMessage(attr)

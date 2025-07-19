@@ -22,8 +22,9 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -42,7 +43,7 @@ public class NostrumResearch {
 		GIANT,
 	}
 	
-	protected final String key;
+	protected final ResourceLocation id;
 	
 	/**
 	 * Size to display the research task as
@@ -52,12 +53,12 @@ public class NostrumResearch {
 	/**
 	 * List of parent research items. This becomes a sanitized array and expects each to exist.
 	 */
-	protected String[] parentKeys;
+	protected ResourceLocation[] parentKeys;
 	
 	/**
 	 * Parent research items that are not displayed as parents in the GUI
 	 */
-	protected String[] hiddenParentKeys;
+	protected ResourceLocation[] hiddenParentKeys;
 	
 	/**
 	 * Requirements (besides parent keys) that are required to be able to see/purchase this research
@@ -98,17 +99,17 @@ public class NostrumResearch {
 	/**
 	 * Other research items that should automatically be unlocked/purchased when this one is
 	 */
-	protected final String[] linkedKeys;
+	protected final ResourceLocation[] linkedKeys;
 	
 	protected final NostrumResearchTab tab;
 	
-	protected String[] allParents; // Filled in during validation
+	protected ResourceLocation[] allParents; // Filled in during validation
 	
-	private NostrumResearch(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, boolean disallowPurchase, @Nonnull ItemStack icon,
-			String[] parents, String[] hiddenParents, String[] linked,
+	private NostrumResearch(ResourceLocation id, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, boolean disallowPurchase, @Nonnull ItemStack icon,
+			ResourceLocation[] parents, ResourceLocation[] hiddenParents, ResourceLocation[] linked,
 			IRequirement[] requirements,
 			String[] references, String[] referenceDisplays) {
-		this.key = key;
+		this.id = id;
 		this.size = size;
 		this.x = x;
 		this.y = y;
@@ -126,8 +127,8 @@ public class NostrumResearch {
 		NostrumResearch.register(this);
 	}
 	
-	public String getKey() {
-		return key;
+	public ResourceLocation getID() {
+		return id;
 	}
 
 	public Size getSize() {
@@ -155,26 +156,26 @@ public class NostrumResearch {
 	}
 
 	public String getNameKey() {
-		return "research." + key + ".name";
+		return "research." + id + ".name";
 	}
 	
 	public String getDescKey() {
-		return "research." + key + ".desc";
+		return "research." + id + ".desc";
 	}
 	
 	public String getInfoKey() {
-		return "research." + key + ".info";
+		return "research." + id + ".info";
 	}
 	
-	public String[] getParentKeys() {
+	public ResourceLocation[] getParentKeys() {
 		return this.parentKeys;
 	}
 	
-	public String[] getHiddenParentKeys() {
+	public ResourceLocation[] getHiddenParentKeys() {
 		return this.hiddenParentKeys;
 	}
 	
-	public String[] getAllParents() {
+	public ResourceLocation[] getAllParents() {
 		return allParents;
 	}
 	
@@ -210,9 +211,9 @@ public class NostrumResearch {
 		if (attr == null)
 			return;
 		
-		attr.completeResearch(research.getKey());
+		attr.completeResearch(research.getID());
 		if (research.linkedKeys != null) {
-			for (String link : research.linkedKeys) {
+			for (ResourceLocation link : research.linkedKeys) {
 				attr.completeResearch(link);
 			}
 		}
@@ -229,9 +230,9 @@ public class NostrumResearch {
 	 *             Builder methods
 	 ***********************************************/
 	public static final class Builder {
-		protected final List<String> parentKeys;
-		protected final List<String> hiddenParentKeys;
-		protected final List<String> linkedKeys;
+		protected final List<ResourceLocation> parentKeys;
+		protected final List<ResourceLocation> hiddenParentKeys;
+		protected final List<ResourceLocation> linkedKeys;
 		protected final List<String> references;
 		protected final List<String> referenceDisplays;
 		protected final List<IRequirement> requirements;
@@ -245,17 +246,17 @@ public class NostrumResearch {
 			referenceDisplays = new ArrayList<>();
 		}
 		
-		public Builder parent(String parent) {
+		public Builder parent(ResourceLocation parent) {
 			parentKeys.add(parent);
 			return this;
 		}
 		
-		public Builder hiddenParent(String parent) {
+		public Builder hiddenParent(ResourceLocation parent) {
 			hiddenParentKeys.add(parent);
 			return this;
 		}
 		
-		public Builder link(String key) {
+		public Builder link(ResourceLocation key) {
 			this.linkedKeys.add(key);
 			return this;
 		}
@@ -306,15 +307,15 @@ public class NostrumResearch {
 			}
 		}
 		
-		public NostrumResearch build(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, @Nonnull ItemStack icon) {
-			return build(key, tab, size, x, y, hidden, false, icon);
+		public NostrumResearch build(ResourceLocation id, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, @Nonnull ItemStack icon) {
+			return build(id, tab, size, x, y, hidden, false, icon);
 		}
 		
-		public NostrumResearch build(String key, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, boolean disallowPurchase, @Nonnull ItemStack icon) {
-			return new NostrumResearch(key, tab, size, x, y, hidden, disallowPurchase, icon,
-					parentKeys.isEmpty() ? null : parentKeys.toArray(new String[parentKeys.size()]),
-					hiddenParentKeys.isEmpty() ? null : hiddenParentKeys.toArray(new String[hiddenParentKeys.size()]),
-					linkedKeys.isEmpty() ? null : linkedKeys.toArray(new String[linkedKeys.size()]),
+		public NostrumResearch build(ResourceLocation id, NostrumResearchTab tab, Size size, int x, int y, boolean hidden, boolean disallowPurchase, @Nonnull ItemStack icon) {
+			return new NostrumResearch(id, tab, size, x, y, hidden, disallowPurchase, icon,
+					parentKeys.isEmpty() ? null : parentKeys.toArray(new ResourceLocation[parentKeys.size()]),
+					hiddenParentKeys.isEmpty() ? null : hiddenParentKeys.toArray(new ResourceLocation[hiddenParentKeys.size()]),
+					linkedKeys.isEmpty() ? null : linkedKeys.toArray(new ResourceLocation[linkedKeys.size()]),
 					requirements.isEmpty() ? null : requirements.toArray(new IRequirement[requirements.size()]),
 					references.isEmpty() ? null : references.toArray(new String[references.size()]),
 					referenceDisplays.isEmpty() ? null : referenceDisplays.toArray(new String[referenceDisplays.size()])
@@ -335,19 +336,19 @@ public class NostrumResearch {
 	 *             Registry methods
 	 ***********************************************/
 	
-	private static Map<String, NostrumResearch> Registry = new HashMap<>();
+	private static Map<ResourceLocation, NostrumResearch> Registry = new HashMap<>();
 	
 	private static void register(NostrumResearch research) {
-		if (Registry.containsKey(research.key)) {
-			NostrumMagica.logger.error("Duplicate research registration for key " + research.key);
+		if (Registry.containsKey(research.id)) {
+			NostrumMagica.logger.error("Duplicate research registration for key " + research.id);
 			return;
 		}
 		
-		Registry.put(research.key, research);
+		Registry.put(research.id, research);
 	}
 	
-	public static NostrumResearch lookup(String key) {
-		return Registry.get(key);
+	public static NostrumResearch lookup(ResourceLocation id) {
+		return Registry.get(id);
 	}
 	
 	public static Collection<NostrumResearch> AllResearch() {
@@ -367,8 +368,8 @@ public class NostrumResearch {
 		for (NostrumResearch research : Registry.values()) {
 			boolean counted = false;
 			if (research.parentKeys != null) {
-				List<String> outList = new ArrayList<>();
-				for (String dep : research.parentKeys) {
+				List<ResourceLocation> outList = new ArrayList<>();
+				for (ResourceLocation dep : research.parentKeys) {
 					if (Registry.containsKey(dep))
 						outList.add(dep);
 				}
@@ -376,14 +377,14 @@ public class NostrumResearch {
 				if (outList.isEmpty())
 					research.parentKeys = null;
 				else
-					research.parentKeys = outList.toArray(new String[0]);
+					research.parentKeys = outList.toArray(new ResourceLocation[0]);
 				
 				counted = true;
 			}
 			
 			if (research.hiddenParentKeys != null) {
-				List<String> outList = new ArrayList<>();
-				for (String dep : research.hiddenParentKeys) {
+				List<ResourceLocation> outList = new ArrayList<>();
+				for (ResourceLocation dep : research.hiddenParentKeys) {
 					if (Registry.containsKey(dep))
 						outList.add(dep);
 				}
@@ -391,14 +392,14 @@ public class NostrumResearch {
 				if (outList.isEmpty())
 					research.hiddenParentKeys = null;
 				else
-					research.hiddenParentKeys = outList.toArray(new String[0]);
+					research.hiddenParentKeys = outList.toArray(new ResourceLocation[0]);
 				
 				counted = true;
 			}
 			
 			if (counted) {
 				count++;
-				research.allParents = new String[(research.parentKeys == null ? 0 : research.parentKeys.length)
+				research.allParents = new ResourceLocation[(research.parentKeys == null ? 0 : research.parentKeys.length)
 													+ (research.hiddenParentKeys == null ? 0 : research.hiddenParentKeys.length)];
 				if (research.parentKeys != null) {
 					System.arraycopy(research.parentKeys, 0, research.allParents, 0, research.parentKeys.length);
@@ -435,61 +436,5 @@ public class NostrumResearch {
 		
 		if (count != 0)
 			NostrumMagica.logger.info("Validated " + count + " research requirements");
-	}
-	
-	
-	/***********************************************
-	 *             Organization methods
-	 ***********************************************/
-	
-	/**
-	 * Tab key class that helps organize researches into different tabs.
-	 * All checks are done based on reference equality. Instantiate once and use that same instance in all calls.
-	 * @author Skyler
-	 *
-	 */
-	public static class NostrumResearchTab {
-		
-		/**
-		 * Unique key for this tab.
-		 * Drives translations.
-		 */
-		private final String key;
-		
-		/**
-		 * The icon to display on the tab. Required.
-		 */
-		private final @Nonnull ItemStack icon;
-		
-		public NostrumResearchTab(String key, @Nonnull ItemStack icon) {
-			this.key = key;
-			this.icon = icon;
-			
-			AllTabs.add(this);
-		}
-		
-		public String getRawKey() {
-			return key;
-		}
-		
-		public @Nonnull ItemStack getIcon() {
-			return icon;
-		}
-		
-		public String getNameKey() {
-			return "research.tab." + key + ".name";
-		}
-		
-		public static NostrumResearchTab MAGICA = null;
-		public static NostrumResearchTab ADVANCED_MAGICA = null;
-		public static NostrumResearchTab MYSTICISM = null;
-		public static NostrumResearchTab TINKERING = null;
-		public static NostrumResearchTab OUTFITTING = null;
-		
-		private static List<NostrumResearchTab> AllTabs = new ArrayList<>();
-		
-		public static List<NostrumResearchTab> All() {
-			return AllTabs;
-		}
 	}
 }

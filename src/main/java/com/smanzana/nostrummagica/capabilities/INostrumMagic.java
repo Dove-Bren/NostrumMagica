@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.progression.research.NostrumResearch;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
@@ -21,6 +22,7 @@ import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -207,8 +209,9 @@ public interface INostrumMagic extends INBTSerializable<CompoundTag>, INostrumMa
 	public void completeQuest(String quest);
 	
 	// Research
-	public List<String> getCompletedResearches();
-	public void completeResearch(String research);
+	public List<ResourceLocation> getCompletedResearches();
+	public void completeResearch(ResourceLocation research);
+	public default void completeResearch(NostrumResearch research) {completeResearch(research.getID());}
 	
 	// Skills
 	public Collection<Skill> getSkills();
