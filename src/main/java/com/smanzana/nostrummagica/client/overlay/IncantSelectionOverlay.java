@@ -23,12 +23,12 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Matrix4f;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.commonwidget.ITooltip;
 import com.smanzana.nostrummagica.client.gui.commonwidget.Tooltip;
 import com.smanzana.nostrummagica.client.listener.ClientPlayerListener;
+import com.smanzana.nostrummagica.spell.MagicCapability;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -115,15 +115,15 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		// With current unlock order, this is as soon as you unlock any 4th shape which will mean
 		// it's just the same as shape.size() > 3. Room for progression by expanding it but then players
 		// might not be able to try out their new shape.
-		return attr.getTier().isGreaterOrEqual(EMagicTier.KANI) && attr.getShapes().size() > 3;
+		return MagicCapability.INCANT_ALLSHAPES.matches(attr) && attr.getShapes().size() > 3;
 	}
 	
 	protected boolean hasDoubleShapeSelection(INostrumMagic attr) {
-		return attr.getTier().isGreaterOrEqual(EMagicTier.VANI) && hasFullShapeSelection(attr);
+		return MagicCapability.INCANT_TWOSHAPES.matches(attr) && hasFullShapeSelection(attr);
 	}
 	
 	protected boolean hasAlterationSelection(INostrumMagic attr) {
-		return attr.getTier().isGreaterOrEqual(EMagicTier.MANI) && attr.getAlterations() != null && attr.getAlterations().containsValue(Boolean.TRUE);
+		return MagicCapability.INCANT_ALTERATIONS.matches(attr) && attr.getAlterations() != null && attr.getAlterations().containsValue(Boolean.TRUE);
 	}
 	
 	protected boolean isEnabled() {

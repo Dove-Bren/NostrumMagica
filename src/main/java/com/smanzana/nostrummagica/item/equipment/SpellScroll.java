@@ -17,6 +17,7 @@ import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpellRequestMessage;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
+import com.smanzana.nostrummagica.spell.MagicCapability;
 import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.SpellCastEvent;
 import com.smanzana.nostrummagica.spell.SpellCasting;
@@ -67,6 +68,10 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 				NostrumMagica.Proxy.openSpellScreen(spell);
 			}
 			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
+		}
+		
+		if (!MagicCapability.SCROLLCAST_ENABLED.matches(playerIn)) {
+			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStackIn);
 		}
 		
 		if (itemStackIn.isEmpty())

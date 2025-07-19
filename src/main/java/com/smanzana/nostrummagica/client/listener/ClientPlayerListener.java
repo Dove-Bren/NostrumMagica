@@ -17,7 +17,6 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.PortalBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
-import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.IBonusJumpCapability;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.effects.ClientEffect;
@@ -63,6 +62,7 @@ import com.smanzana.nostrummagica.network.message.ClientCastAdhocMessage;
 import com.smanzana.nostrummagica.network.message.ClientCastMessage;
 import com.smanzana.nostrummagica.network.message.SpellTomeIncrementMessage;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
+import com.smanzana.nostrummagica.spell.MagicCapability;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Incantation;
 import com.smanzana.nostrummagica.spell.RegisteredSpell;
@@ -437,8 +437,9 @@ public class ClientPlayerListener extends PlayerListener {
 		this.overlayRenderer.startManaWiggle(wiggleCount);
 	}
 	
-	protected boolean hasSpellChargeUnlocked(Player player, INostrumMagic attr) {
-		return attr.getTier().isGreaterOrEqual(EMagicTier.VANI);
+	protected boolean hasSpellChargeUnlocked(Player player, INostrumMagic attr, boolean isIncant) {
+		final MagicCapability cap = (isIncant ? MagicCapability.INCANT_OVERCHARGE : MagicCapability.SPELLCAST_OVERCHARGE);
+		return cap.matches(attr);
 	}
 	
 	private static final class ClientTomeCharge extends ClientSpellCharge {
@@ -502,7 +503,7 @@ public class ClientPlayerListener extends PlayerListener {
 	public void startIncantationCast(Incantation incant) {
 		final Player player = NostrumMagica.Proxy.getPlayer();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-		if (attr != null && attr.isUnlocked()) {
+		if (attr != null && attr.isUnlocked() && MagicCapability.INCANT_ENABLED.matches(attr)) {
 			if (incant != null) {
 				Spell spell = incant.makeSpell();
 				
@@ -579,6 +580,11 @@ public class ClientPlayerListener extends PlayerListener {
 	}
 	
 	protected boolean hasIncantSelectUnlocked(Player player, INostrumMagic attr) {
+		// This is an unlock check, PLUS a check that we actually have things to display
+		if (!MagicCapability.INCANT_COMPONENT_SELECT.matches(attr)) {
+			return false;
+		}
+		
 		// Can hackily just check elements, since that's how players have to unlock it.
 		// But instead I will checkf or anything to make it expand easier in the future
 		if (attr.getKnownElements().values().stream().filter((b) -> !!b).mapToInt(b -> b ? 1 : 0).sum() > 1) {
@@ -599,7 +605,7 @@ public class ClientPlayerListener extends PlayerListener {
 	protected boolean startIncantHold(Player player) {
 		if (chargeManager.getCurrentCharge() == null && NostrumMagica.instance.getSpellCooldownTracker(player.level).getCooldowns(player).getGlobalCooldown().endTicks < player.tickCount) {
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-			if (attr != null && attr.isUnlocked()) {
+			if (attr != null && attr.isUnlocked() && MagicCapability.INCANT_ENABLED.matches(attr)) {
 				if (hasIncantHand(player)) {
 					// Either enable selection, or just cast baby incantation if nothing else is unlocked
 					if (!hasIncantSelectUnlocked(player, attr)) {
@@ -697,7 +703,7 @@ public class ClientPlayerListener extends PlayerListener {
 	protected void finishChargeCast(ClientSpellCharge charge) {
 		final Player player = NostrumMagica.Proxy.getPlayer();
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-		final boolean chargeHeld = this.getBindingIncant().isDown() && hasSpellChargeUnlocked(player, attr);
+		final boolean chargeHeld = this.getBindingIncant().isDown() && hasSpellChargeUnlocked(player, attr, charge.charge.type() == ChargeType.INCANTATION);
 		if (attr != null && attr.isUnlocked()) {
 			switch (charge.charge.type()) {
 			case INCANTATION:

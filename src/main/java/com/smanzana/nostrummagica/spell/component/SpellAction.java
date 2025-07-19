@@ -784,7 +784,11 @@ public class SpellAction {
 		
 		@Override
 		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
-			;
+			final double radiusSqr = 2.5; 
+			for (Entity ent : location.world.getEntities(caster, AABB.unitCubeFromLowerCorner(location.hitPosition), (e) -> e instanceof LivingEntity && e.distanceToSqr(location.hitPosition) < radiusSqr)) {
+				LivingEntity living = (LivingEntity) ent; // predicate checks this
+				applyEffect(caster, living, efficiency, resultBuilder, log);
+			}
 		}
 		
 		@Override

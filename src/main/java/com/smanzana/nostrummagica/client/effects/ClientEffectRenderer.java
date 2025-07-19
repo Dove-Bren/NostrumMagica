@@ -13,6 +13,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.config.ModConfig;
 import com.smanzana.nostrummagica.spell.EAlteration;
+import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapeProperties;
@@ -56,9 +57,12 @@ public class ClientEffectRenderer {
 			Vec3 destPosition,
 			SpellEffectPart effect);
 	}
+	
+	private static record EffectPair(EMagicElement element, EAlteration alteration) {}
 
 	private final Map<SpellShape, ClientShapeEffectFactory> registeredShapeEffects;
-	private final Map<EAlteration, ClientActionEffectFactory> registeredActionEffects;
+	private final Map<EffectPair, ClientActionEffectFactory> registeredActionEffects;
+	private final Map<EAlteration, ClientActionEffectFactory> registeredAlterationEffects;
 	private final List<ClientEffect> activeEffects;
 	
 	private static ClientEffectRenderer instance = null;
@@ -72,6 +76,7 @@ public class ClientEffectRenderer {
 	private ClientEffectRenderer() {
 		activeEffects = Collections.synchronizedList(new LinkedList<>());
 		registeredShapeEffects = new HashMap<>();
+		registeredAlterationEffects = new HashMap<>();
 		registeredActionEffects = new HashMap<>();
 		MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -134,7 +139,11 @@ public class ClientEffectRenderer {
 	}
 	
 	public void registerEffect(@Nullable EAlteration alteration, ClientActionEffectFactory factory) {
-		this.registeredActionEffects.put(alteration, factory);
+		this.registeredAlterationEffects.put(alteration, factory);
+	}
+	
+	public void registerEffect(EMagicElement element, @Nullable EAlteration alteration, ClientActionEffectFactory factory) {
+		this.registeredActionEffects.put(new EffectPair(element, alteration), factory);
 	}
 	
 	private static boolean DidWarned = false;
@@ -167,10 +176,16 @@ public class ClientEffectRenderer {
 			Vec3 sourcePosition,
 			LivingEntity target,
 			Vec3 destPosition) {
-		ClientActionEffectFactory factory = registeredActionEffects.get(effect.getAlteration());
+		final var effectParts = new EffectPair(effect.getElement(), effect.getAlteration());
+		ClientActionEffectFactory factory = registeredActionEffects.get(effectParts);
+		
+		if (factory == null) {
+			factory = registeredAlterationEffects.get(effect.getAlteration());
+		}
+		
 		if (factory == null) {
 			if (!DidWarned) {
-				NostrumMagica.logger.warn("Trying to spawn effect for unmapped alteration. Create a mapping for the component " + effect.getAlteration());
+				NostrumMagica.logger.warn("Trying to spawn effect for unmapped alteration. Create a mapping for the component " + effectParts);
 				DidWarned = true;
 			}
 			return;
