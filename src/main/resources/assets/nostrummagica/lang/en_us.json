@@ -2288,6 +2288,11 @@
 	"tutorial.nostrummagica.quick_incant": "Quick Recast",
 	"tutorial.nostrummagica.quick_incant.text": "Quick-tap the %1$s key",
 	
+	"tutorial.nostrummagica.overcharge": "Overcharging",
+	"tutorial.nostrummagica.overcharge.text1": "Begin casting a spell",
+	"tutorial.nostrummagica.overcharge.text2": "Keep holding %1$s",
+	"tutorial.nostrummagica.overcharge.text3": "Release to cast",
+	
 	"spelllog.damage.name": "Damage Entity",
 	"spelllog.damage.desc": "Damaged for %2$s %3$sdamage (%1$s base)",
 	"spelllog.heal.name": "Heal Entity",

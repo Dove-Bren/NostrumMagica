@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.listener.ClientPlayerListener;
-import com.smanzana.nostrummagica.client.listener.NostrumTutorial;
+import com.smanzana.nostrummagica.progression.tutorial.NostrumTutorial;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
@@ -27,14 +27,14 @@ public class TutorialMessage {
 		});
 	}
 	
-	private final @Nonnull NostrumTutorial.Tutorial tutorial;
+	private final @Nonnull NostrumTutorial tutorial;
 	
-	public TutorialMessage(@Nonnull NostrumTutorial.Tutorial tutorial) {
+	public TutorialMessage(@Nonnull NostrumTutorial tutorial) {
 		this.tutorial = tutorial;
 	}
 
 	public static TutorialMessage decode(FriendlyByteBuf buf) {
-		return new TutorialMessage(buf.readEnum(NostrumTutorial.Tutorial.class));
+		return new TutorialMessage(buf.readEnum(NostrumTutorial.class));
 	}
 
 	public static void encode(TutorialMessage msg, FriendlyByteBuf buf) {

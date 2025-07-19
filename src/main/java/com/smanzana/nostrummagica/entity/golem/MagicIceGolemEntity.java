@@ -83,7 +83,7 @@ public class MagicIceGolemEntity extends MagicGolemEntity {
 	}
 
 	public static final AttributeSupplier.Builder BuildAttributes() {
-		return MagicGolemEntity.BuildBaseAttributes()
+		return MagicGolemEntity.BuildBaseAttributes(EMagicElement.ICE)
 	        .add(Attributes.MOVEMENT_SPEED, 0.22D)
 	
 	        .add(Attributes.MAX_HEALTH, 20.0D)

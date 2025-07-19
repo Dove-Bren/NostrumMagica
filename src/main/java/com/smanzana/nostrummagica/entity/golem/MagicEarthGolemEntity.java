@@ -91,7 +91,7 @@ public class MagicEarthGolemEntity extends MagicGolemEntity {
 	}
 
 	public static final AttributeSupplier.Builder BuildAttributes() {
-		return MagicGolemEntity.BuildBaseAttributes()
+		return MagicGolemEntity.BuildBaseAttributes(EMagicElement.EARTH)
 				.add(Attributes.MOVEMENT_SPEED, 0.20D)
 
 				.add(Attributes.MAX_HEALTH, 24.0D)

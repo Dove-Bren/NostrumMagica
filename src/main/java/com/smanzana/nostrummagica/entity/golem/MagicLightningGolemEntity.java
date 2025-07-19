@@ -102,7 +102,7 @@ public class MagicLightningGolemEntity extends MagicGolemEntity {
 	}
 
 	public static final AttributeSupplier.Builder BuildAttributes() {
-		return MagicGolemEntity.BuildBaseAttributes()
+		return MagicGolemEntity.BuildBaseAttributes(EMagicElement.LIGHTNING)
 	        .add(Attributes.MOVEMENT_SPEED, 0.25D)
 	
 	        .add(Attributes.MAX_HEALTH, 14.0D)

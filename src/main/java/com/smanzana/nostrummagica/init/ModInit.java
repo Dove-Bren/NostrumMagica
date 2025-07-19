@@ -36,6 +36,7 @@ import com.smanzana.nostrummagica.command.CommandSetDimension;
 import com.smanzana.nostrummagica.command.CommandSetLevel;
 import com.smanzana.nostrummagica.command.CommandSetManaArmor;
 import com.smanzana.nostrummagica.command.CommandSetTier;
+import com.smanzana.nostrummagica.command.CommandShowTutorial;
 import com.smanzana.nostrummagica.command.CommandSpawnObelisk;
 import com.smanzana.nostrummagica.command.CommandTestConfig;
 import com.smanzana.nostrummagica.command.CommandUnlock;
@@ -2132,6 +2133,7 @@ public class ModInit {
 		CommandReloadQuests.register(dispatcher);
 		CommandReloadSkills.register(dispatcher);
 		CommandSetTier.register(dispatcher);
+		CommandShowTutorial.register(dispatcher);
 		
 		// These are client-only, but need to be registered as server ones to work at all.
 		CommandInfoScreenGoto.register(dispatcher);

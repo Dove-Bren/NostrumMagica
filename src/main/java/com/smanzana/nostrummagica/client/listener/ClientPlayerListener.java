@@ -147,7 +147,7 @@ public class ClientPlayerListener extends PlayerListener {
 	private final SelectionRenderer selectionRenderer;
 	private final ClientChargeManager chargeManager;
 	private final ClientTargetManager targetManager;
-	private final NostrumTutorial tutorial;
+	private final NostrumTutorialClient tutorial;
 	
 	public ClientPlayerListener() {
 		super();
@@ -159,7 +159,7 @@ public class ClientPlayerListener extends PlayerListener {
 		this.selectionRenderer = new SelectionRenderer();
 		this.chargeManager = new ClientChargeManager();
 		this.targetManager = new ClientTargetManager();
-		this.tutorial = new NostrumTutorial();
+		this.tutorial = new NostrumTutorialClient();
 		
 		bindingCast1 = new KeyMapping("key.cast1.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_Z, "key.nostrummagica.desc");
 		bindingCast2 = new KeyMapping("key.cast2.desc", KeyConflictContext.IN_GAME, KeyModifier.CONTROL, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X, "key.nostrummagica.desc");
@@ -240,7 +240,7 @@ public class ClientPlayerListener extends PlayerListener {
 		return targetManager;
 	}
 	
-	public NostrumTutorial getTutorial() {
+	public NostrumTutorialClient getTutorial() {
 		return this.tutorial;
 	}
 	
@@ -637,6 +637,7 @@ public class ClientPlayerListener extends PlayerListener {
 					charge.castSlot
 					);
 			this.chargeManager.startCharging(newCharge);
+			onOvercharge();
 		} else {
 			RegisteredSpell[] spells = NostrumMagica.getCurrentSpellLoadout(player);
 			if (charge.castSlot < 0 || spells == null || spells.length == 0 || spells.length <= charge.castSlot) {
@@ -669,6 +670,7 @@ public class ClientPlayerListener extends PlayerListener {
 					charge.chargeSpeed
 					);
 			this.chargeManager.startCharging(newCharge);
+			onOvercharge();
 		} else {
 			//
 			SpellCastProperties props = new SpellCastProperties(1f, charge.charge.overchargeCount(), this.getTargetManager().getLastTarget(1f));
@@ -718,6 +720,10 @@ public class ClientPlayerListener extends PlayerListener {
 //		NostrumMagica.instance.proxy.getPlayer().getAttributes().getInstance(Attributes.MOVEMENT_SPEED).removeModifier(id);
 		
 		this.tutorial.onChargeCancel();
+	}
+	
+	protected void onOvercharge() {
+		this.getTutorial().onOverchargeStage();
 	}
 	
 	protected void spellChargeTick() {

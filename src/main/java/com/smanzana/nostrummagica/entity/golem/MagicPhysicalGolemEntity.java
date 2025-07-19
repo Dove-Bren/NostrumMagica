@@ -33,7 +33,7 @@ public class MagicPhysicalGolemEntity extends MagicGolemEntity {
 					EAlteration.HARM));
 			
 			spellDebuff = Spell.CreateAISpell("Corrupt Offense");
-			spellDebuff.addPart(new SpellShapePart(NostrumSpellShapes.AI));
+			spellDebuff.addPart(new SpellShapePart(NostrumSpellShapes.SeekingBullet));
 			spellDebuff.addPart(new SpellEffectPart(
 					EMagicElement.PHYSICAL,
 					1,
@@ -78,7 +78,7 @@ public class MagicPhysicalGolemEntity extends MagicGolemEntity {
 	}
 
 	public static final AttributeSupplier.Builder BuildAttributes() {
-		return MagicGolemEntity.BuildBaseAttributes()
+		return MagicGolemEntity.BuildBaseAttributes(EMagicElement.PHYSICAL)
 	        .add(Attributes.MOVEMENT_SPEED, 0.23D)
 	
 	        .add(Attributes.MAX_HEALTH, 16.0D)

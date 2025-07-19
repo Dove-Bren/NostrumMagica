@@ -118,7 +118,7 @@ public class MagicFireGolemEntity extends MagicGolemEntity {
 	}
 
 	public static final AttributeSupplier.Builder BuildAttributes() {
-		return MagicGolemEntity.BuildBaseAttributes()
+		return MagicGolemEntity.BuildBaseAttributes(EMagicElement.FIRE)
 	        .add(Attributes.MOVEMENT_SPEED, 0.22D)
 	
 	        .add(Attributes.MAX_HEALTH, 18.0D)

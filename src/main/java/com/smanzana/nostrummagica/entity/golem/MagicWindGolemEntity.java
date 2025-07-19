@@ -83,7 +83,7 @@ public class MagicWindGolemEntity extends MagicGolemEntity {
 	}
 
 	public static final AttributeSupplier.Builder BuildAttributes() {
-		return MagicGolemEntity.BuildBaseAttributes()
+		return MagicGolemEntity.BuildBaseAttributes(EMagicElement.WIND)
 	        .add(Attributes.MOVEMENT_SPEED, 0.33D)
 	
 	        .add(Attributes.MAX_HEALTH, 16.0D)

@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.tile;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.listener.NostrumTutorial;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
@@ -11,6 +10,7 @@ import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.ShrineTriggerEntity;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.TutorialMessage;
+import com.smanzana.nostrummagica.progression.tutorial.NostrumTutorial;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
@@ -203,7 +203,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 				((ServerPlayer)player).connection.send(new ClientboundSetTitleTextPacket(TextComponent.EMPTY));
 				
 				if (attr.getKnownElements().values().stream().mapToInt(b -> b ? 1 : 0).sum() == 2) {
-					NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.Tutorial.FORM_INCANTATION), ((ServerPlayer)player));
+					NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.FORM_INCANTATION), ((ServerPlayer)player));
 				}
 			} else {
 				player.sendMessage(new TranslatableComponent("info.shrine.seektrial"), Util.NIL_UUID);
@@ -432,6 +432,10 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 				
 				((ServerPlayer)player).connection.send(new ClientboundSetSubtitleTextPacket(msg));
 				((ServerPlayer)player).connection.send(new ClientboundSetTitleTextPacket(TextComponent.EMPTY));
+				
+				if (tier.isGreaterOrEqual(EMagicTier.VANI)) {
+					NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.OVERCHARGE), ((ServerPlayer)player));
+				}
 			}
 		}
 

@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.entity.golem;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.IElementalEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
@@ -119,10 +120,22 @@ public abstract class MagicGolemEntity extends TamableAnimal implements ILoreSup
         this.targetSelector.addGoal(1, new GolemAIFindEntityNearestPlayer(this));
     }
     
-    protected static final AttributeSupplier.Builder BuildBaseAttributes() {
-    	return Animal.createMobAttributes()
+    protected static final AttributeSupplier.Builder BuildBaseAttributes(EMagicElement element) {
+    	var attributes = Animal.createMobAttributes()
     			.add(Attributes.ATTACK_DAMAGE, 2.0)
-    			;
+    			.add(NostrumAttributes.GetReduceAttribute(element), 1.0);
+    	
+    	if (element == EMagicElement.PHYSICAL) {
+    		attributes.add(NostrumAttributes.GetReduceAttribute(EMagicElement.FIRE), -3.0);
+    		attributes.add(NostrumAttributes.GetReduceAttribute(EMagicElement.ICE), -3.0);
+    		attributes.add(NostrumAttributes.GetReduceAttribute(EMagicElement.WIND), -3.0);
+    		attributes.add(NostrumAttributes.GetReduceAttribute(EMagicElement.EARTH), -3.0);
+    		attributes.add(NostrumAttributes.GetReduceAttribute(EMagicElement.LIGHTNING), -3.0);
+    		attributes.add(NostrumAttributes.GetReduceAttribute(EMagicElement.ENDER), -3.0);
+    	} else {
+    		attributes.add(NostrumAttributes.GetReduceAttribute(element.getOpposite()), -3.0);
+    	}
+    	return attributes;
     }
 
     protected void customServerAiStep() {
