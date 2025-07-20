@@ -28,20 +28,24 @@ import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.commonwidget.ITooltip;
 import com.smanzana.nostrummagica.client.gui.commonwidget.Tooltip;
 import com.smanzana.nostrummagica.client.listener.ClientPlayerListener;
-import com.smanzana.nostrummagica.spell.MagicCapability;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.Incantation;
+import com.smanzana.nostrummagica.spell.MagicCapability;
+import com.smanzana.nostrummagica.spell.SpellEffects;
+import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
@@ -71,6 +75,12 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	private static final ITooltip noneTooltip = Tooltip.create(new TextComponent("Do not use an alteration, manifesting a raw representation of the element"));
 	private static final ITooltip noneShapeTooltip = Tooltip.create(new TextComponent("Do not use a second shape"));
 	private static final Component terminalText = new TextComponent("Terminal").withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_PURPLE);
+	
+	private static final Component selectTip = new TextComponent("Select");
+	private static final Component abortTip = new TextComponent("Cancel");
+	private static final Component skipSelectTip = new TextComponent("Select Solo");
+	
+	private static final Component releaseText = new TextComponent("Release");
 	
 	protected boolean enabled;
 	protected long showTime; // For behavior like quick-press
@@ -433,13 +443,19 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		shapeFixupStage = null;
 		stages.clear();
 		
-		
+		SelectionStage stage;
 		// First stage is shapes
 		if (hasFullShapeSelection(attr)) {
-			stages.add(makeFullShapeStage(player, attr, false));
+			stage = makeFullShapeStage(player, attr, false);
 		} else {
-			stages.add(makePrimaryShapeStage(player, attr, false));
+			stage = makePrimaryShapeStage(player, attr, false);
 		}
+		if (hasDoubleShapeSelection(attr)) {
+			stage.addKeyHint(ControlTip.SkipSelect);
+		}
+		
+		stages.add(stage);
+		
 		if (hasDoubleShapeSelection(attr)) {
 			if (hasFullShapeSelection(attr)) {
 				shapeFixupStage = makeFullShapeStage(player, attr, true);
@@ -450,7 +466,8 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		}
 		
 		// elements are second
-		stages.add(makeElementStage(player, attr));
+		stage = makeElementStage(player, attr);
+		stages.add(stage);
 		
 //		// Shapes
 //		this.shapeStage1.setPages(this.makeShapePages(player, attr, false));
@@ -458,6 +475,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		
 		// Alterations last
 		if (hasAlterationSelection(attr)) {
+			stage.addKeyHint(ControlTip.SkipSelect); // add to element
 			stages.add(makeAlterationStage(player, attr));
 		}
 		
@@ -683,55 +701,159 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		
 		Tesselator.getInstance().end();
 		
-		final boolean twoShapes = (this.shape != null && this.shape2 != null);
-		if (this.shape != null) {
-			matrixStackIn.pushPose();
-			if (twoShapes) {
-				matrixStackIn.translate(-12, -12, 0);
-			} else {
-				matrixStackIn.translate(-12, -3, 0);
-			}
-			SpellComponentIcon.get(this.shape).draw(matrixStackIn, -6, -6, 12, 12, 1f, 1f, 1f, fadeAlpha);
-			matrixStackIn.translate(0, 7, 0);
-			matrixStackIn.scale(.5f, .5f, 1f);
-			final int len = mc.font.width(this.shape.getDisplayName());
-			mc.font.draw(matrixStackIn, this.shape.getDisplayName(), -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
-			matrixStackIn.popPose();
-		}
-		
-		if (this.shape2 != null) {
-			matrixStackIn.pushPose();
-			matrixStackIn.translate(12, -12, 0);
-			SpellComponentIcon.get(this.shape2).draw(matrixStackIn, -6, -6, 12, 12, 1f, 1f, 1f, fadeAlpha);
-			matrixStackIn.translate(0, 7, 0);
-			matrixStackIn.scale(.5f, .5f, 1f);
-			final int len = mc.font.width(this.shape2.getDisplayName());
-			mc.font.draw(matrixStackIn, this.shape2.getDisplayName(), -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
-			matrixStackIn.popPose();
-		}
-		
-		if (this.element != null) {
-			matrixStackIn.pushPose();
-			if (twoShapes) {
-				matrixStackIn.translate(0, 12, 0);
-			} else {
-				matrixStackIn.translate(12, -3, 0);
-			}
-			SpellComponentIcon.get(this.element).draw(matrixStackIn, -6, -6, 12, 12, 1f, 1f, 1f, fadeAlpha);
-			matrixStackIn.translate(0, 7, 0);
-			matrixStackIn.scale(.5f, .5f, 1f);
-			final int len = mc.font.width(this.element.getDisplayName());
-			mc.font.draw(matrixStackIn, this.element.getDisplayName(), -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
-			matrixStackIn.popPose();
-		}
-		
 		Player player = NostrumMagica.Proxy.getPlayer();
-		if (this.hasEnhancedInfo(NostrumMagica.getMagicWrapper(player))) {
-			int unused;
+		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
+		
+		// Center selection circle
+		{
+			matrixStackIn.pushPose();
+			final boolean showInfo = hasEnhancedInfo(NostrumMagica.getMagicWrapper(player));
+			final boolean twoShapes = (this.shape != null && this.shape2 != null);
+			
+			if (showInfo) {
+				matrixStackIn.translate(0, -4, 0);
+			}
+			
+			if (this.shape != null) {
+				matrixStackIn.pushPose();
+				if (twoShapes) {
+					matrixStackIn.translate(-12, -14, 0);
+				} else {
+					matrixStackIn.translate(-12, -3, 0);
+				}
+				SpellComponentIcon.get(this.shape).draw(matrixStackIn, -6, -6, 12, 12, 1f, 1f, 1f, fadeAlpha);
+				matrixStackIn.translate(0, 7, 0);
+				matrixStackIn.scale(.5f, .5f, 1f);
+				final int len = mc.font.width(this.shape.getDisplayName());
+				mc.font.draw(matrixStackIn, this.shape.getDisplayName(), -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
+				matrixStackIn.popPose();
+			}
+			
+			if (this.shape2 != null) {
+				matrixStackIn.pushPose();
+				matrixStackIn.translate(12, -14, 0);
+				SpellComponentIcon.get(this.shape2).draw(matrixStackIn, -6, -6, 12, 12, 1f, 1f, 1f, fadeAlpha);
+				matrixStackIn.translate(0, 7, 0);
+				matrixStackIn.scale(.5f, .5f, 1f);
+				final int len = mc.font.width(this.shape2.getDisplayName());
+				mc.font.draw(matrixStackIn, this.shape2.getDisplayName(), -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
+				matrixStackIn.popPose();
+			}
+			
+			if (this.element != null) {
+				matrixStackIn.pushPose();
+				if (twoShapes) {
+					matrixStackIn.translate(0, 10, 0);
+					if (showInfo) {
+						matrixStackIn.translate(0, -6, 0);
+					}
+				} else {
+					matrixStackIn.translate(12, -3, 0);
+				}
+				SpellComponentIcon.get(this.element).draw(matrixStackIn, -6, -6, 12, 12, 1f, 1f, 1f, fadeAlpha);
+				matrixStackIn.translate(0, 7, 0);
+				matrixStackIn.scale(.5f, .5f, 1f);
+				final int len = mc.font.width(this.element.getDisplayName());
+				mc.font.draw(matrixStackIn, this.element.getDisplayName(), -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
+				matrixStackIn.popPose();
+			}
+			
+			if (showInfo && shape != null && alteration == null) {
+				int cost = 0;
+				int couldCost;
+				EAlteration couldAlter = null;
+				EMagicElement couldElem = element;
+				if (shape != null) cost += shape.getManaCost(shape.getDefaultProperties());
+				if (shape2 != null) cost += shape2.getManaCost(shape2.getDefaultProperties());
+				if (element != null) cost += 10; // This is based on spellCrafting's default mana cost without an alteration
+				couldCost = cost;
+				if (this.hovered != null) {
+					Object raw = hovered.val();
+					if (raw != null) {
+						if (raw instanceof EAlteration alter) {
+							couldCost += alter.getCost();
+							couldAlter = alter;
+						} else if (raw instanceof EMagicElement elem) {
+							couldCost += 10;
+							couldElem = elem;
+						} else if (raw instanceof SpellShape selShape) {
+							couldCost += selShape.getManaCost(selShape.getDefaultProperties());
+						}
+					}
+				}
+				
+				int availableMana = attr.getMana();
+				TextComponent manaText = new TextComponent("Mana: ");
+				manaText.append(new TextComponent("%d".formatted(cost)).withStyle(availableMana >= cost ? ChatFormatting.RESET : ChatFormatting.RED));
+				if (couldCost != cost) {
+					manaText.append(new TextComponent(" -> ").withStyle(ChatFormatting.RESET));
+					manaText.append(new TextComponent("%d".formatted(couldCost)).withStyle(availableMana >= couldCost ? ChatFormatting.RESET : ChatFormatting.RED));
+				}
+				
+				final Component effectText;
+				if (couldElem != null) {
+					if (attr.hasKnowledge(couldElem, couldAlter)) {
+						SpellAction action = SpellEffects.SolveAction(couldAlter, couldElem, 1);
+						effectText = action.getName().copy().withStyle(ChatFormatting.BOLD);
+					} else {
+						effectText = new TextComponent("???").withStyle(ChatFormatting.BOLD);
+					}
+				} else {
+					effectText = null;
+				}
+				
+				int len;
+				
+				matrixStackIn.pushPose();
+				matrixStackIn.translate(0, 15, 0);
+				if (twoShapes) {
+					matrixStackIn.translate(0, 4, 0);
+				}
+				matrixStackIn.scale(.5f, .5f, 1f);
+				if (effectText != null) {
+					len = mc.font.width(effectText);
+					mc.font.draw(matrixStackIn, effectText, -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
+				}
+				matrixStackIn.translate(0, mc.font.lineHeight + 2, 0);
+				len = mc.font.width(manaText);
+				mc.font.draw(matrixStackIn, manaText, -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
+				matrixStackIn.popPose();
+			}
+			matrixStackIn.popPose();
 		}
+		
+		// Legend
+		//if (!this.getCurrentStage().keyHints.isEmpty())
+		if (this.getCurrentStage() != null)
+		{
+			matrixStackIn.pushPose();
+			matrixStackIn.translate(radius + 2, (radius*.75f) + 2, 0);
+			renderButtonLegend(matrixStackIn, partialTicks, fadeAlpha);
+			matrixStackIn.popPose();
+		}
+		
 		
 		RenderSystem.enableCull();
 		matrixStackIn.popPose();
+	}
+	
+	protected void renderButtonLegend(PoseStack matrixStackIn, float partialTicks, float fadeAlpha) {
+		final var hints = this.getCurrentStage().keyHints;
+		final float textScale = .5f;
+		final int textMargin = 4;
+		final int rowHeight = (int) ((mc.font.lineHeight + textMargin) * textScale);
+		final int height = textMargin + hints.size() * rowHeight;
+		//RenderFuncs.drawGradientRect(matrixStackIn, 0, -height - 8, 100, -height, 0x00DDDDDD, 0x00DDDDDD, 0xFFDDDDDD, 0x00DDDDDD);
+		RenderFuncs.drawGradientRect(matrixStackIn, 0, -height, 100, 0,
+				RenderFuncs.ARGBFade(0xFFDDDDDD, fadeAlpha), RenderFuncs.ARGBFade(0x00DDDDDD, fadeAlpha),
+				RenderFuncs.ARGBFade(0xFFDDDDDD, fadeAlpha), RenderFuncs.ARGBFade(0x00DDDDDD, fadeAlpha));
+
+		matrixStackIn.translate(1, -height + (textMargin*textScale) + 1, 0);
+		matrixStackIn.scale(textScale, textScale, 1f);
+		for (ControlTip tip: hints) {
+			mc.font.draw(matrixStackIn, tip.getDisplay(), 0, 0, RenderFuncs.ARGBFade(0xFF000000, fadeAlpha));
+			matrixStackIn.translate(0, mc.font.lineHeight + textMargin, 0);
+		}
 	}
 	
 	protected void renderWheelSliceTooltip(WheelSlice<?> slice, PoseStack matrixStackIn, float partialTicks, int mouseX, int mouseY) {
@@ -923,9 +1045,12 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	private static final class SelectionStage {
 		public SelectionStagePage[] pages;
 		public int pageIdx = 0;
+		public final List<ControlTip> keyHints;
 		
 		public SelectionStage() {
-			
+			this.keyHints = new ArrayList<>();
+			this.keyHints.add(ControlTip.Select);
+			this.keyHints.add(ControlTip.Cancel);
 		}
 		
 		public SelectionStage setPages(SelectionStagePage ...pages) {
@@ -933,6 +1058,11 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 			if (this.pageIdx >= pages.length) {
 				pageIdx = pages.length - 1;
 			}
+			return this;
+		}
+		
+		public SelectionStage addKeyHint(ControlTip keyHint) {
+			this.keyHints.add(keyHints.size() - 1, keyHint);
 			return this;
 		}
 		
@@ -953,4 +1083,29 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		}
 	}
 	
+	private static final class ControlTip {
+		public static final ControlTip Select = new ControlTip(selectTip, null, Minecraft.getInstance().options.keyAttack);
+		public static final ControlTip Cancel = new ControlTip(abortTip, releaseText, ((ClientPlayerListener)(NostrumMagica.playerListener)).getBindingIncant());
+		public static final ControlTip SkipSelect = new ControlTip(skipSelectTip, null, Minecraft.getInstance().options.keyUse);
+		
+		public final Component display;
+		
+		public ControlTip(Component description, @Nullable Component keyPrefix, KeyMapping key) {
+			MutableComponent builder = new TextComponent("["); 
+			if (keyPrefix != null) {
+				builder.append(keyPrefix).append(" ");
+			}
+			
+			builder.append(key.getTranslatedKeyMessage().copy())
+				.append("] ")
+				.append(description)
+					;
+			
+			display = builder;
+		}
+		
+		public Component getDisplay() {
+			return display;
+		}
+	}
 }

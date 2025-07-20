@@ -1012,7 +1012,7 @@ public class NostrumMagic implements INostrumMagic {
 		if (skill == NostrumSkills.Wind_Adept) {
 			// skills don't have rewards tied to them but maybe they should?
 			this.addShape(NostrumSpellShapes.Cutter);
-		} else if (skill == NostrumSkills.Spellcasting_Overcharge && player != null) {
+		} else if (skill == NostrumSkills.Spellcasting_Overcharge && player != null && player.connection != null) {
 			NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.OVERCHARGE), player);
 		}
 	}
