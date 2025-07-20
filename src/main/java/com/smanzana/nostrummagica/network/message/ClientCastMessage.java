@@ -11,7 +11,9 @@ import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spell.SpellCasting.SpellCastResult;
 import com.smanzana.nostrummagica.util.ItemStacks;
 
+import net.minecraft.Util;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
@@ -59,6 +61,7 @@ public class ClientCastMessage {
 					// Casting from a tome.
 					success = SpellCasting.AttemptToolCast(spell, sp, tome, props).succeeded;
 				} else {
+					sp.sendMessage(new TextComponent("The spell could not be cast, as the tome it's in was not found"), Util.NIL_UUID);
 					NostrumMagica.logger.warn("Got cast from client with mismatched tome");
 					success = false;
 				}

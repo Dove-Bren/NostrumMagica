@@ -2329,6 +2329,11 @@
 	"tutorial.nostrummagica.overcharge.text2": "Keep holding %1$s",
 	"tutorial.nostrummagica.overcharge.text3": "Release to cast",
 	
+	"tutorial.nostrummagica.save_spell": "Precasting",
+	"tutorial.nostrummagica.save_spell.text1": "Begin casting a spell",
+	"tutorial.nostrummagica.save_spell.text2": "Hold %1$s and sneak",
+	"tutorial.nostrummagica.save_spell.text3": "Double-tap %1$s to finish casting",
+	
 	"spelllog.damage.name": "Damage Entity",
 	"spelllog.damage.desc": "Damaged for %2$s %3$sdamage (%1$s base)",
 	"spelllog.heal.name": "Heal Entity",

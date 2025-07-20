@@ -20,8 +20,8 @@ public class ClientChargeManager {
 		
 		public ClientSpellCharge(SpellCharge charge, ItemStack mainhand, ItemStack offhand, float displayRate) {
 			this.charge = charge;
-			this.mainhandItem = mainhand;
-			this.offhandItem = offhand;
+			this.mainhandItem = mainhand.copy();
+			this.offhandItem = offhand.copy();
 			this.chargeSpeed = displayRate;
 		}
 	}

@@ -5,5 +5,6 @@ public enum NostrumTutorial {
 	FORM_INCANTATION,
 	QUICK_INCANT,
 	OVERCHARGE,
+	SAVE_SPELL,
 	;
 }

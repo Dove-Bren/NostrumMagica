@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.tile;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.listener.NostrumTutorialClient.ClientTutorial;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
@@ -436,8 +435,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 				((ServerPlayer)player).connection.send(new ClientboundSetTitleTextPacket(TextComponent.EMPTY));
 				
 				if (tier.isGreaterOrEqual(EMagicTier.VANI)) {
-					int unused; // should be save tutorial
-					NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.OVERCHARGE), ((ServerPlayer)player));
+					NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.SAVE_SPELL), ((ServerPlayer)player));
 				} else if (tier.isGreaterOrEqual(EMagicTier.KANI)) {
 					NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.QUICK_INCANT), ((ServerPlayer)player));
 				}

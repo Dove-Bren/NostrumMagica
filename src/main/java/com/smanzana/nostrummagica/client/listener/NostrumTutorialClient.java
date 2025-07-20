@@ -27,6 +27,7 @@ public class NostrumTutorialClient {
 		FORM_INCANTATION(NostrumTutorial.FORM_INCANTATION, TEXT_FORMINCANT_TITLE, TEXT_FORMINCANT_TEXT1, TutorialToast.Icons.MOUSE),
 		QUICK_INCANT(NostrumTutorial.QUICK_INCANT, TEXT_QUICKINCANT_TITLE, TEXT_QUICKINCANT_TEXT1, TutorialToast.Icons.MOVEMENT_KEYS),
 		OVERCHARGE(NostrumTutorial.OVERCHARGE, TEXT_OVERCHARGE_TITLE, TEXT_OVERCHARGE_TEXT1, TutorialToast.Icons.MOVEMENT_KEYS),
+		SAVE_SPELL(NostrumTutorial.SAVE_SPELL, TEXT_SAVESPELL_TITLE, TEXT_SAVESPELL_TEXT1, TutorialToast.Icons.MOVEMENT_KEYS),
 		;
 		
 		private final NostrumTutorial base;
@@ -70,6 +71,11 @@ public class NostrumTutorialClient {
 	private static final Component TEXT_OVERCHARGE_TEXT1 = new TranslatableComponent("tutorial.nostrummagica.overcharge.text1", new KeybindComponent("key.castslow.desc"));
 	private static final Component TEXT_OVERCHARGE_TEXT2 = new TranslatableComponent("tutorial.nostrummagica.overcharge.text2", new KeybindComponent("key.castslow.desc"));
 	private static final Component TEXT_OVERCHARGE_TEXT3 = new TranslatableComponent("tutorial.nostrummagica.overcharge.text3");
+	
+	private static final Component TEXT_SAVESPELL_TITLE = new TranslatableComponent("tutorial.nostrummagica.save_spell");
+	private static final Component TEXT_SAVESPELL_TEXT1 = new TranslatableComponent("tutorial.nostrummagica.save_spell.text1");
+	private static final Component TEXT_SAVESPELL_TEXT2 = new TranslatableComponent("tutorial.nostrummagica.save_spell.text2", new KeybindComponent("key.castslow.desc"));
+	private static final Component TEXT_SAVESPELL_TEXT3 = new TranslatableComponent("tutorial.nostrummagica.save_spell.text3", new KeybindComponent("key.castslow.desc"));
 
 	protected @Nullable ClientTutorial activeTutorial; 
 	protected @Nullable TutorialToast activeToast;
@@ -127,13 +133,6 @@ public class NostrumTutorialClient {
 			this.setTutorial((ClientTutorial) null);
 			return;
 		}
-		
-		if (this.activeTutorial == ClientTutorial.OVERCHARGE && this.stageIdx == 0) {
-			this.updateToastProgress(1f/3f);
-			this.updateToastMessage(TEXT_OVERCHARGE_TEXT2);
-			this.stageIdx = 1;
-			return;
-		}
 	}
 	
 	public void onIncantationFormAborted() {
@@ -168,12 +167,38 @@ public class NostrumTutorialClient {
 			return;
 		}
 	}
+
+	public void onCastFinished() {
+		if (this.activeTutorial == ClientTutorial.SAVE_SPELL && this.stageIdx == 1) {
+			// Did not hold it
+			this.updateToastProgress(0f/3f);
+			this.updateToastMessage(TEXT_OVERCHARGE_TEXT1);
+			this.stageIdx = 0;
+			return;
+		}
+	}
 	
 	public void onQuickIncant() {
 		if (this.activeTutorial == ClientTutorial.QUICK_INCANT && this.stageIdx == 0) {
 			this.updateToastProgress(1f);
 			this.stageIdx = 1;
 			this.setTutorial((ClientTutorial) null);
+			return;
+		}
+		
+		if (this.activeTutorial == ClientTutorial.OVERCHARGE && this.stageIdx == 0) {
+			this.updateToastProgress(1f/3f);
+			this.updateToastMessage(TEXT_OVERCHARGE_TEXT2);
+			this.stageIdx = 1;
+			return;
+		}
+	}
+	
+	public void onSpellChargeStart() {
+		if (activeTutorial == ClientTutorial.SAVE_SPELL && this.stageIdx == 0) {
+			this.updateToastProgress(1f/3f);
+			this.updateToastMessage(TEXT_SAVESPELL_TEXT2);
+			this.stageIdx = 1;
 			return;
 		}
 		
@@ -201,12 +226,37 @@ public class NostrumTutorialClient {
 			this.stageIdx = 0;
 			return;
 		}
+		
+		if (activeTutorial == ClientTutorial.SAVE_SPELL && this.stageIdx == 1) {
+			this.updateToastProgress(0f/3f);
+			this.updateToastMessage(TEXT_SAVESPELL_TEXT1);
+			this.stageIdx = 0;
+			return;
+		}
 	}
 	
 	public void onOverchargeStage() {
 		if (this.activeTutorial == ClientTutorial.OVERCHARGE && this.stageIdx == 1) {
 			this.updateToastProgress(2f/3f);
 			this.updateToastMessage(TEXT_OVERCHARGE_TEXT3);
+			this.stageIdx = 2;
+			return;
+		}
+	}
+
+	public void onSaveCast() {
+		if (activeTutorial == ClientTutorial.SAVE_SPELL && this.stageIdx == 2) {
+			this.updateToastProgress(3f/3f);
+			this.stageIdx = 3;
+			this.setTutorial((ClientTutorial) null);
+			return;
+		}
+	}
+
+	public void onSpellSaved() {
+		if (activeTutorial == ClientTutorial.SAVE_SPELL && this.stageIdx == 1) {
+			this.updateToastProgress(2f/3f);
+			this.updateToastMessage(TEXT_SAVESPELL_TEXT3);
 			this.stageIdx = 2;
 			return;
 		}

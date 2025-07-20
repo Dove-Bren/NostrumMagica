@@ -954,7 +954,6 @@ public class ClientInit {
 					return effect;
 				});
 		
-		// triggers (that have them)
 		renderer.registerEffect(NostrumSpellShapes.Beam,
 				(source, sourcePos, target, targetPos, properties, characteristics) -> {
 					ClientEffect effect = new ClientEffectBeam(sourcePos == null ? source.position() : sourcePos,
@@ -1102,8 +1101,7 @@ public class ClientInit {
 //				}
 //				);
 		
-		// Alterations
-		
+		// Alterations/Effects
 		renderer.registerEffect(EAlteration.HARM,
 				(source, sourcePos, target, targetPos, part) -> {
 					ClientEffect effect = new ClientEffectMirrored(target == null ? targetPos : new Vec3(0, 0, 0),

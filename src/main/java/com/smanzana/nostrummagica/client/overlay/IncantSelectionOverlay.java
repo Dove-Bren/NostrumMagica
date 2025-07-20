@@ -196,7 +196,7 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	protected void submitSelection() {
 		ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
 		this.lastIncantation = new Incantation(this.shape, this.shape2, this.element, this.alteration);
-		listener.startIncantationCast(this.lastIncantation);
+		listener.startIncantationCast(this.lastIncantation, false);
 		this.enableSelection(false);
 		listener.getTutorial().onIncantationFormed();
 	}
@@ -204,10 +204,11 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	protected void onKeyRelease() {
 		Player player = NostrumMagica.Proxy.getPlayer();
 		ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
-		if (isQuickPressTime() && this.lastIncantation != null && MagicCapability.INCANT_QUICKCAST.matches(player)) {
-			// Recast previous incantation
-			listener.startIncantationCast(this.lastIncantation);
-			listener.getTutorial().onQuickIncant();
+		if (isQuickPressTime()) {
+			if (this.lastIncantation != null && MagicCapability.INCANT_QUICKCAST.matches(player)) {
+				// Recast previous incantation
+				listener.startIncantationCast(this.lastIncantation, true);
+			}
 		} else {
 			listener.getTutorial().onIncantationFormAborted();
 		}
