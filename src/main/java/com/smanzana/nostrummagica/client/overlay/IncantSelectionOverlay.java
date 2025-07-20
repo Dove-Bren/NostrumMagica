@@ -126,6 +126,10 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		return MagicCapability.INCANT_ALTERATIONS.matches(attr) && attr.getAlterations() != null && attr.getAlterations().containsValue(Boolean.TRUE);
 	}
 	
+	protected boolean hasEnhancedInfo(INostrumMagic attr) {
+		return MagicCapability.INCANT_SELECT_INFO.matches(attr);
+	}
+	
 	protected boolean isEnabled() {
 		return enabled;
 	}
@@ -188,8 +192,9 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 	}
 	
 	protected void onKeyRelease() {
+		Player player = NostrumMagica.Proxy.getPlayer();
 		ClientPlayerListener listener = (ClientPlayerListener) NostrumMagica.playerListener;
-		if (isQuickPressTime() && this.lastIncantation != null) {
+		if (isQuickPressTime() && this.lastIncantation != null && MagicCapability.INCANT_QUICKCAST.matches(player)) {
 			// Recast previous incantation
 			listener.startIncantationCast(this.lastIncantation);
 			listener.getTutorial().onQuickIncant();
@@ -718,6 +723,11 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 			final int len = mc.font.width(this.element.getDisplayName());
 			mc.font.draw(matrixStackIn, this.element.getDisplayName(), -len/2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, fadeAlpha));
 			matrixStackIn.popPose();
+		}
+		
+		Player player = NostrumMagica.Proxy.getPlayer();
+		if (this.hasEnhancedInfo(NostrumMagica.getMagicWrapper(player))) {
+			int unused;
 		}
 		
 		RenderSystem.enableCull();

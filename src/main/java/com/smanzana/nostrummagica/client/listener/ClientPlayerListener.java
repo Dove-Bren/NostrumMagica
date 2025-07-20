@@ -635,8 +635,14 @@ public class ClientPlayerListener extends PlayerListener {
 	protected void finishSpellCast(Player player, ClientTomeCharge charge, boolean chargeHeld) {
 		if (chargeHeld && charge.charge.overchargeCount() < 2) {
 			// Make new charge and start charging that
+			// Make a new charge with the appropriate charge count and start it charging again
+			int duration = charge.charge.duration();
+			if (charge.charge.overchargeCount() == 0 && MagicCapability.SPELLCAST_FAST_OVERCHARGE.matches(player)) {
+				duration /= 2;
+			}
+			SpellCharge baseCharge = charge.charge.withOverchargeAndDuration(charge.charge.overchargeCount() + 1, duration);
 			ClientTomeCharge newCharge = new ClientTomeCharge(
-					charge.charge.withOvercharge(charge.charge.overchargeCount() + 1),
+					baseCharge,
 					charge.mainhandItem,
 					charge.offhandItem,
 					charge.chargeSpeed,
@@ -669,8 +675,13 @@ public class ClientPlayerListener extends PlayerListener {
 	protected void finishIncantationCast(Player player, ClientSpellCharge charge, boolean doOvercharge) {
 		if (doOvercharge && charge.charge.overchargeCount() < 2) {
 			// Make a new charge with the appropriate charge count and start it charging again
+			int duration = charge.charge.duration();
+			if (charge.charge.overchargeCount() == 0 && MagicCapability.SPELLCAST_FAST_OVERCHARGE.matches(player)) {
+				duration /= 2;
+			}
+			SpellCharge baseCharge = charge.charge.withOverchargeAndDuration(charge.charge.overchargeCount() + 1, duration);
 			ClientSpellCharge newCharge = new ClientSpellCharge(
-					charge.charge.withOvercharge(charge.charge.overchargeCount() + 1),
+					baseCharge,
 					charge.mainhandItem,
 					charge.offhandItem,
 					charge.chargeSpeed

@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ObeliskPortal;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.spell.MagicCapability;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.Location;
 
@@ -41,11 +42,7 @@ public class PositionToken extends PositionCrystal {
 	}
 	
 	protected static boolean hasRecallUnlocked(Player playerIn, Level worldIn, ItemStack token) {
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(playerIn);
-		if (attr != null && attr.getCompletedResearches().contains("adv_markrecall")) {
-			return true;
-		}
-		return false;
+		return MagicCapability.ADVANCED_MARKRECALL.matches(playerIn);
 	}
 	
 	protected static boolean canAffordRecall(Player playerIn, Level worldIn, ItemStack token) {

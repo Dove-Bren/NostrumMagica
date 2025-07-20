@@ -4,7 +4,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 
 public enum SpellType {
-	Crafted(0, true),
+	Crafted(20, true),
 	Incantation(40, false),
 	AI(0, false),
 	;

@@ -1006,10 +1006,14 @@ public class NostrumMagic implements INostrumMagic {
 	public void addSkill(Skill skill) {
 		skills.add(skill);
 		
+		ServerPlayer player = this.entity != null && this.entity instanceof ServerPlayer serverPlayer ? serverPlayer : null;
+		
 		// Hacky place to do this...
 		if (skill == NostrumSkills.Wind_Adept) {
 			// skills don't have rewards tied to them but maybe they should?
 			this.addShape(NostrumSpellShapes.Cutter);
+		} else if (skill == NostrumSkills.Spellcasting_Overcharge && player != null) {
+			NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.OVERCHARGE), player);
 		}
 	}
 

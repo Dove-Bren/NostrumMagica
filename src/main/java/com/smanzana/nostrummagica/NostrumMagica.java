@@ -60,6 +60,7 @@ import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellChargeTracker;
 import com.smanzana.nostrummagica.spell.SpellCooldownTracker;
 import com.smanzana.nostrummagica.spell.SpellRegistry;
+import com.smanzana.nostrummagica.spell.SpellType;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.stat.PlayerStatTracker;
@@ -708,7 +709,8 @@ public class NostrumMagica {
 			@Nullable EElementalMastery neededMastery = neededMasteries.get(elem);
 			
 			if (neededMastery == EElementalMastery.NOVICE
-					&& attr.hasSkill(NostrumSkills.Spellcasting_ElemFree)) {
+					&& attr.hasSkill(NostrumSkills.Craftcast_ElemFree)
+					&& spell.getType() == SpellType.Crafted) {
 				neededMastery = null;
 			}
 			

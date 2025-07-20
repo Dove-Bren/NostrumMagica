@@ -63,6 +63,7 @@ public class NostrumEffects {
 	@ObjectHolder(SwiftCastEffect.ID_LASTING) public static SwiftCastEffect lastingSwiftCast;
 	@ObjectHolder(SwiftSwimEffect.ID) public static SwiftSwimEffect swiftSwim;
 	@ObjectHolder(CarapaceEffect.ID) public static CarapaceEffect carapace;
+	@ObjectHolder(FasterCastingEffect.ID) public static FasterCastingEffect fasterCast; 
 	
 	@SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<MobEffect> event) {
@@ -117,5 +118,6 @@ public class NostrumEffects {
     	registry.register(new SwiftCastEffect(false).setRegistryName(SwiftCastEffect.ID_LASTING));
     	registry.register(new SwiftSwimEffect().setRegistryName(SwiftSwimEffect.ID));
     	registry.register(new CarapaceEffect().setRegistryName(CarapaceEffect.ID));
+    	registry.register(new FasterCastingEffect().setRegistryName(FasterCastingEffect.ID));
     }
 }

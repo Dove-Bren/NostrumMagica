@@ -1212,9 +1212,10 @@ public class OverlayRenderer extends GuiComponent {
 				
 				final int overcharge = charge.charge.overchargeCount();
 				if (overcharge == 0) { // No overcharge, so start info about rate
+					
 				
 					// Rate
-					final float chargeSpeed = -(SpellCasting.CalculateHandsSpellCastModifier(NostrumMagica.Proxy.getPlayer()) - 1f);
+					final float chargeSpeed = charge.chargeSpeed;//-(SpellCasting.CalculateHandsSpellCastModifier(NostrumMagica.Proxy.getPlayer()) - 1f);
 					if (chargeSpeed != 0f) {
 						matrixStackIn.pushPose();
 						matrixStackIn.translate(0, 12, 0);
@@ -1223,24 +1224,25 @@ public class OverlayRenderer extends GuiComponent {
 						final int len = gui.getFont().width(rate);
 						gui.getFont().draw(matrixStackIn, rate, -len / 2, 0, RenderFuncs.ARGBFade(0xFFFFFFFF, infoAlpha));
 						matrixStackIn.popPose();
-					}
 					
-					RenderSystem.setShaderColor(1f, 1f, 0f, infoAlpha);
-					// Items
-					if (!charge.mainhandItem.isEmpty() && !SpellCasting.ItemAllowsCasting(charge.mainhandItem, EquipmentSlot.MAINHAND)) {
-						matrixStackIn.pushPose();
-						matrixStackIn.translate(4, 20, 0);
-						matrixStackIn.scale(.25f, .25f, .25f);
-						RenderFuncs.RenderGUIItem(charge.mainhandItem, matrixStackIn, -8, -8, -1);
-						matrixStackIn.popPose();
-					}
 					
-					if (!charge.offhandItem.isEmpty() && !SpellCasting.ItemAllowsCasting(charge.offhandItem, EquipmentSlot.OFFHAND)) {
-						matrixStackIn.pushPose();
-						matrixStackIn.translate(-4, 20, 0);
-						matrixStackIn.scale(.25f, .25f, .25f);
-						RenderFuncs.RenderGUIItem(charge.offhandItem, matrixStackIn, -8, -8, -1);
-						matrixStackIn.popPose();
+						RenderSystem.setShaderColor(1f, 1f, 0f, infoAlpha);
+						// Items
+						if (!charge.mainhandItem.isEmpty() && !SpellCasting.ItemAllowsCasting(charge.mainhandItem, EquipmentSlot.MAINHAND)) {
+							matrixStackIn.pushPose();
+							matrixStackIn.translate(4, 20, 0);
+							matrixStackIn.scale(.25f, .25f, .25f);
+							RenderFuncs.RenderGUIItem(charge.mainhandItem, matrixStackIn, -8, -8, -1);
+							matrixStackIn.popPose();
+						}
+						
+						if (!charge.offhandItem.isEmpty() && !SpellCasting.ItemAllowsCasting(charge.offhandItem, EquipmentSlot.OFFHAND)) {
+							matrixStackIn.pushPose();
+							matrixStackIn.translate(-4, 20, 0);
+							matrixStackIn.scale(.25f, .25f, .25f);
+							RenderFuncs.RenderGUIItem(charge.offhandItem, matrixStackIn, -8, -8, -1);
+							matrixStackIn.popPose();
+						}
 					}
 					RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 				} else {

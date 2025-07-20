@@ -156,15 +156,15 @@ public class NostrumResearch {
 	}
 
 	public String getNameKey() {
-		return "research." + id + ".name";
+		return "research." + id.toString().replace(':', '.') + ".name";
 	}
 	
 	public String getDescKey() {
-		return "research." + id + ".desc";
+		return "research." + id.toString().replace(':', '.') + ".desc";
 	}
 	
 	public String getInfoKey() {
-		return "research." + id + ".info";
+		return "research." + id.toString().replace(':', '.') + ".info";
 	}
 	
 	public ResourceLocation[] getParentKeys() {

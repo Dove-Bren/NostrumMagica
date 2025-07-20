@@ -3,6 +3,7 @@ package com.smanzana.nostrummagica.tile;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.EMagicTier;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.client.listener.NostrumTutorialClient.ClientTutorial;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
@@ -15,6 +16,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.MagicCapability;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
@@ -202,7 +204,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 				((ServerPlayer)player).connection.send(new ClientboundSetSubtitleTextPacket(msg));
 				((ServerPlayer)player).connection.send(new ClientboundSetTitleTextPacket(TextComponent.EMPTY));
 				
-				if (attr.getKnownElements().values().stream().mapToInt(b -> b ? 1 : 0).sum() == 2) {
+				if (attr.getKnownElements().values().stream().mapToInt(b -> b ? 1 : 0).sum() == 2 && MagicCapability.INCANT_COMPONENT_SELECT.matches(attr)) {
 					NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.FORM_INCANTATION), ((ServerPlayer)player));
 				}
 			} else {
@@ -434,7 +436,10 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 				((ServerPlayer)player).connection.send(new ClientboundSetTitleTextPacket(TextComponent.EMPTY));
 				
 				if (tier.isGreaterOrEqual(EMagicTier.VANI)) {
+					int unused; // should be save tutorial
 					NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.OVERCHARGE), ((ServerPlayer)player));
+				} else if (tier.isGreaterOrEqual(EMagicTier.KANI)) {
+					NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.QUICK_INCANT), ((ServerPlayer)player));
 				}
 			}
 		}

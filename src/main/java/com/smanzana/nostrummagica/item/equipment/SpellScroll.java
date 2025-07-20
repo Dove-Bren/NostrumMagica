@@ -198,15 +198,11 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 	
 	public int getCastDurabilityCost(Player caster, RegisteredSpell spell) {
 		// By default, cost durability-1 of the scroll so that it has exactly 2 casts.
-		// With skill, take a constant base here (5).
-		// With another skill, take less constant.
+		// With skill, take a constant base here (1)
 		@Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 		if (attr != null) {
-			if (attr.hasSkill(NostrumSkills.Spellcasting_ScrollSanity)) {
-				int base = 5;
-				if (attr.hasSkill(NostrumSkills.Spellcasting_ScrollEfficiency)) {
-					base = 1;
-				}
+			if (attr.hasSkill(NostrumSkills.Craftcast_ScrollEfficiency)) {
+				int base = 1;
 				return base;
 			}
 		}

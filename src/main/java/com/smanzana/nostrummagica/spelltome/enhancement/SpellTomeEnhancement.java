@@ -87,11 +87,12 @@ public abstract class SpellTomeEnhancement {
 	 * most of the alterations here apply to casting
 	 * @param level
 	 * @param summaryIn
-	 * @param target
 	 * @param source
 	 * @param attributes
+	 * @param applyRate TODO
+	 * @param target
 	 */
-	public abstract void onCast(int level, SpellCastSummary summaryIn, LivingEntity source, INostrumMagic attributes);
+	public abstract void onCast(int level, SpellCastSummary summaryIn, LivingEntity source, INostrumMagic attributes, float applyRate);
 	
 	public static void initDefaultEnhancements() {
 		LOWER_REAGENT_COST = new EnhancementLowerReagentCost();

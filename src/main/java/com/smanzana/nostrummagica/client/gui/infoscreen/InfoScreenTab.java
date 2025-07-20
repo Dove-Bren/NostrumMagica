@@ -17,10 +17,12 @@ import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.progression.research.NostrumResearches;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.ritual.RitualRegistry;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.MagicCapability;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.log.SpellLogEntry;
 
@@ -260,7 +262,7 @@ public abstract class InfoScreenTab {
 			
 			@Override
 			public boolean isVisible(INostrumMagic attr) {
-				return (attr.isUnlocked() && attr.getCompletedResearches().contains("rituals") && !getAvailable(attr).isEmpty());
+				return (MagicCapability.RITUAL_ENABLED.matches(attr) && !getAvailable(attr).isEmpty());
 			}
 
 			@Override
@@ -360,7 +362,7 @@ public abstract class InfoScreenTab {
 				buttons.add(button);
 				index("builtin::guides::spellmaking", button);
 				
-				if (attr.getCompletedResearches().contains("spelltomes")) {
+				if (attr.getCompletedResearches().contains(NostrumResearches.ID_Spelltomes)) {
 					button = new SubscreenInfoButton(screen, "spellbinding",
 							new PaginatedInfoSubScreen(screen, "spellbinding"),
 							new ItemStack(Items.WRITABLE_BOOK));
@@ -380,7 +382,7 @@ public abstract class InfoScreenTab {
 				buttons.add(button);
 				index("builtin::guides::levelup", button);
 				
-				if (attr.getCompletedResearches().contains("rituals")) {
+				if (MagicCapability.RITUAL_ENABLED.matches(attr)) {
 					button = new SubscreenInfoButton(screen, "rituals",
 							new PaginatedInfoSubScreen(screen, "rituals"),
 							new ItemStack(NostrumItems.altarItem));
@@ -406,7 +408,7 @@ public abstract class InfoScreenTab {
 				buttons.add(button);
 				index("builtin::guides::reagents", button);
 				
-				if (attr.getCompletedResearches().contains("obelisks")) {
+				if (attr.getCompletedResearches().contains(NostrumResearches.ID_Obelisks)) {
 					button = new SubscreenInfoButton(screen, "obelisks",
 							new PaginatedInfoSubScreen(screen, "obelisks"),
 							new ItemStack(Items.ENDER_PEARL));
@@ -424,8 +426,7 @@ public abstract class InfoScreenTab {
 
 			@Override
 			public boolean isVisible(INostrumMagic attr) {
-				return attr.isUnlocked() &&
-						attr.getCompletedResearches().contains("elemental_trials");
+				return MagicCapability.ELEMENTAL_TRIALS.matches(attr);
 			}
 
 			@Override

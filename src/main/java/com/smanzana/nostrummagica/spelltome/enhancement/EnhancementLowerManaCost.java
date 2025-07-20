@@ -27,9 +27,9 @@ public class EnhancementLowerManaCost extends SpellTomeEnhancement {
 	}
 
 	@Override
-	public void onCast(int level, SpellCastSummary summaryIn, LivingEntity source, INostrumMagic attributes) {
+	public void onCast(int level, SpellCastSummary summaryIn, LivingEntity source, INostrumMagic attributes, float applyRate) {
 		float mod = level > 0 ? .05f * level : 0f;
-		summaryIn.addCostRate(-mod);
+		summaryIn.addCostRate(-mod * applyRate);
 	}
 
 }

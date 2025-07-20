@@ -12,6 +12,7 @@ import java.util.function.BiConsumer;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ISpellTargetBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.capabilities.INostrumMana;
 import com.smanzana.nostrummagica.effect.ElementalSpellBoostEffect;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.ISpellHandlingEntity;
@@ -584,13 +585,26 @@ public final class SpellEffects {
 	protected static final float getTargetEfficiencyBonus(LivingEntity caster, LivingEntity target, SpellEffectPart effect, SpellAction action, float base, ISpellLogBuilder log) {
 		float bonus = 0f;
 		
-		if (effect.getElement() != EMagicElement.PHYSICAL) {
+		if (effect.getElement() != EMagicElement.PHYSICAL && MagicCapability.SPELLCAST_ELEMLINGER.matches(caster)) {
 			final MobEffect boostEffect = ElementalSpellBoostEffect.GetForElement(effect.getElement().getOpposite());
 			if (target.getEffect(boostEffect) != null) {
 				final float amt = .25f * (1 + target.getEffect(boostEffect).getAmplifier());
 				bonus += amt;
 				target.removeEffect(boostEffect);
 				log.addGlobalModifier(NostrumSkills.Spellcasting_ElemLinger, amt, ESpellLogModifierType.BONUS_SCALE);
+				
+				if (MagicCapability.SPELLCAST_ELEMLINGEREATER.matches(caster)) {
+					log.addGlobalModifier(NostrumSkills.Spellcasting_ElemLingerEater, 0, ESpellLogModifierType.BONUS_SCALE);
+					
+					// Reward 10*elemcount mana back
+					// and apply fastcast effect to caster
+					final int refundMana = effect.getElementCount() * 10; // Note: doesn't take into account mana discount, etc.
+					INostrumMana mana = NostrumMagica.getManaWrapper(caster);
+					if (mana != null) {
+						mana.addMana(refundMana);
+					}
+					caster.addEffect(new MobEffectInstance(NostrumEffects.fasterCast, 20 * 10, 0));
+				}
 			}
 		}
 		

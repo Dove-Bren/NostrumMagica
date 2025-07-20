@@ -843,6 +843,10 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	public static void applyEnhancements(ItemStack stack, SpellCastSummary summary, LivingEntity caster) {
+		applyEnhancements(stack, summary, caster, 1f);
+	}
+	
+	public static void applyEnhancements(ItemStack stack, SpellCastSummary summary, LivingEntity caster, float rate) {
 		List<SpellTomeEnhancementWrapper> list = getEnhancements(stack);
 		if (list == null)
 			return;
@@ -853,7 +857,7 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 		
 		for (SpellTomeEnhancementWrapper wrapper : list) {
 			wrapper.getEnhancement().onCast(wrapper.getLevel(),
-					summary, caster, attr);
+					summary, caster, attr, rate);
 		}
 	}
 	

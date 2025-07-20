@@ -32,6 +32,9 @@ public enum NostrumPotions {
 	SWIFT_CAST("swift_cast", () -> SwiftCastEffect.ID_INSTANT, () -> new MobEffectInstance(NostrumEffects.swiftCast, 20 * 15, 0)),
 	SWIFT_CAST_TRIPLE("swift_cast_tri", () -> SwiftCastEffect.ID_INSTANT, () -> new MobEffectInstance(NostrumEffects.swiftCast, 20 * 15, 2)),
 	SWIFT_CAST_LONG("lasting_swift_cast", () -> SwiftCastEffect.ID_INSTANT, () -> new MobEffectInstance(NostrumEffects.lastingSwiftCast, 20 * 15)),
+	FASTER_CAST("fast_cast", () -> FasterCastingEffect.ID, () -> new MobEffectInstance(NostrumEffects.fasterCast, 20 * 60)),
+	FASTER_CAST_EXTENDED("fast_cast_extended", () -> FasterCastingEffect.ID, () -> new MobEffectInstance(NostrumEffects.fasterCast, 20 * 3 * 60)),
+	FASTER_CAST_STRONG("fast_cast_strong", () -> FasterCastingEffect.ID, () -> new MobEffectInstance(NostrumEffects.fasterCast, 20 * 60, 1)),
 	;
 	
 	private final String registryName;
@@ -92,6 +95,20 @@ public enum NostrumPotions {
 	    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.SWIFT_CAST_TRIPLE.getType()),
 	    			Ingredient.of(NostrumTags.Items.WispPebble),
 	    			MakePotion(NostrumPotions.SWIFT_CAST_LONG.getType()));
+	    	
+	    	// Faster casting potion
+	    	// Mana regen potion
+	    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(Potions.MUNDANE),
+	    			Ingredient.of(NostrumTags.Items.ReagentCrystabloom),
+	    			MakePotion(NostrumPotions.FASTER_CAST.getType()));
+	    	
+	    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.FASTER_CAST.getType()),
+	    			Ingredient.of(Tags.Items.DUSTS_REDSTONE),
+	    			MakePotion(NostrumPotions.FASTER_CAST_EXTENDED.getType()));
+	    	
+	    	BrewingRecipeRegistry.addRecipe(new PotionIngredient(NostrumPotions.FASTER_CAST.getType()),
+	    			Ingredient.of(Tags.Items.DUSTS_GLOWSTONE),
+	    			MakePotion(NostrumPotions.FASTER_CAST_STRONG.getType()));
 		});
 	}
 	

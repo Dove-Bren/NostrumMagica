@@ -124,10 +124,7 @@ public class NostrumTutorialClient {
 		if (this.activeTutorial == ClientTutorial.FORM_INCANTATION && this.stageIdx == 1) {
 			this.updateToastProgress(1f);
 			this.stageIdx = 2;
-			
-			//this.setTutorial(null);
-			// For now chain these two together
-			this.setTutorial(ClientTutorial.QUICK_INCANT);
+			this.setTutorial((ClientTutorial) null);
 			return;
 		}
 		

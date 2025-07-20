@@ -16,6 +16,7 @@ import com.smanzana.nostrummagica.progression.requirement.IRequirement;
 import com.smanzana.nostrummagica.ritual.outcome.IItemRitualOutcome;
 import com.smanzana.nostrummagica.ritual.outcome.IRitualOutcome;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.MagicCapability;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -242,7 +243,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 		if (attr == null)
 			return false;
 		
-		if (!attr.getCompletedResearches().contains("rituals"))
+		if (!MagicCapability.RITUAL_ENABLED.matches(attr))
 			return false;
 		
 		if (this.req != null && !req.matches(player))

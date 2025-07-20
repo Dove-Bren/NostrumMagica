@@ -27,9 +27,9 @@ public class EnhancementBonusXP extends SpellTomeEnhancement {
 	}
 
 	@Override
-	public void onCast(int level, SpellCastSummary summaryIn, LivingEntity source, INostrumMagic attributes) {
+	public void onCast(int level, SpellCastSummary summaryIn, LivingEntity source, INostrumMagic attributes, float applyRate) {
 		float mod = level > 0 ? .1f * level : 0f;
-		summaryIn.addXPRate(mod);
+		summaryIn.addXPRate(mod * applyRate);
 	}
 
 }

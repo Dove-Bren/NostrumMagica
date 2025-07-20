@@ -15,9 +15,11 @@ import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.enchantment.SpellChannelingEnchantment;
 import com.smanzana.nostrummagica.entity.dragon.ITameDragon;
+import com.smanzana.nostrummagica.inventory.IInventorySlotKey;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.api.ISpellCastingTool;
 import com.smanzana.nostrummagica.item.api.ISpellEquipment;
+import com.smanzana.nostrummagica.item.equipment.SpellTome;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
@@ -50,7 +52,7 @@ public class SpellCasting {
 		}
 		
 		protected static final SpellCastResult fail(Spell spell, LivingEntity caster) {
-			return fail(spell, caster, new SpellCastSummary(spell.getManaCost(), spell.getXP(true), CalculateBaseCastingTicks(spell)));
+			return fail(spell, caster, new SpellCastSummary(spell.getManaCost(), spell.getXP(true), CalculateBaseCastingTicks(spell, caster)));
 		}
 		
 		protected static final SpellCastResult fail(Spell spell, LivingEntity caster, SpellCastSummary summary) {
@@ -117,15 +119,29 @@ public class SpellCasting {
 		// Cast it!
 		boolean seen = att.wasSpellDone(spell);
 		final float attrSpeedRate = (float) (entity.getAttributeValue(NostrumAttributes.castSpeed) / 100.0);
+		float handSpeedModifier = 1f;
 		final int castTicks;
 		if (attrSpeedRate >= 10f) {
 			castTicks = 0;
 		} else {
-			final float handSpeedModifier = CalculateHandsSpellCastModifier(entity);
-			castTicks = (int) ((CalculateBaseCastingTicks(spell) * handSpeedModifier) / attrSpeedRate);
+			handSpeedModifier = CalculateHandsSpellCastModifier(entity);
+			
+			if (!tool.isEmpty() && spell.getType() == SpellType.Crafted && MagicCapability.CRAFTCAST_TOME_NOHANDS.matches(entity)) {
+				// Check tome slot
+				@Nullable IInventorySlotKey<LivingEntity> key = NostrumMagica.CuriosProxy.getTomeSlotKey(entity);
+				if (key != null) {
+					if (key.getHeldStack(entity) == tool) {
+						handSpeedModifier = 1f;
+					}
+				}
+			}
+			
+			castTicks = (int) ((CalculateBaseCastingTicks(spell, entity) * handSpeedModifier) / attrSpeedRate);
 		}
 		
 		SpellCastSummary summary = new SpellCastSummary(spell.getManaCost(), spell.getXP(seen), castTicks);
+		
+		summary.addCastSpeedRate(handSpeedModifier-1f); // Just visual; cast ticks already calculated
 		
 		// Add player's base magic potency
 		summary.addEfficiency((float) entity.getAttribute(NostrumAttributes.magicPotency).getValue() / 100f);
@@ -143,6 +159,16 @@ public class SpellCasting {
 		// Add tome enchancements
 		if (!tool.isEmpty() && tool.getItem() instanceof ISpellCastingTool) {
 			((ISpellCastingTool) tool.getItem()).onStartCastFromTool(entity, summary, tool);
+		} else if (spell.getType() == SpellType.Incantation && MagicCapability.INCANT_TOME_ENHANCEMENTS.matches(entity)) {
+			// Apply enhancements from equipped tome
+			// Check tome slot
+			@Nullable IInventorySlotKey<LivingEntity> key = NostrumMagica.CuriosProxy.getTomeSlotKey(entity);
+			if (key != null) {
+				final ItemStack tomeItem = key.getHeldStack(entity);
+				if (!tomeItem.isEmpty() && tomeItem.getItem() instanceof SpellTome) {
+					SpellTome.applyEnhancements(tomeItem, summary, entity, .5f);
+				}
+			}
 		}
 		
 		if (freeCast) {
@@ -166,17 +192,33 @@ public class SpellCasting {
 				break;
 			}
 		}
-		if (att.hasSkill(NostrumSkills.Spellcasting_ElemWeight) && hasMasterElem) {
-			summary.addWeightDiscount(1);
-		}
-		if (att.hasSkill(NostrumSkills.Spellcasting_ElemMana) && hasMasterElem) {
-			summary.addCostRate(-.1f);
-		}
-		if (att.hasSkill(NostrumSkills.Spellcasting_Weight1)) {
-			summary.addWeightDiscount(1);
-		}
 		if (att.hasSkill(NostrumSkills.Spellcasting_Potency1)) {
 			summary.addEfficiency(.1f);
+		}
+		if (spell.getType() == SpellType.Crafted && att.hasSkill(NostrumSkills.Craftcast_ElemWeight) && hasMasterElem) {
+			summary.addWeightDiscount(1);
+		}
+		if (spell.getType() == SpellType.Crafted && att.hasSkill(NostrumSkills.Craftcast_ElemMana) && hasMasterElem) {
+			summary.addCostRate(-.1f);
+		}
+		if (spell.getType() == SpellType.Crafted && att.hasSkill(NostrumSkills.Craftcast_Weight1)) {
+			summary.addWeightDiscount(1);
+		}
+		if (spell.getType() == SpellType.Crafted && att.hasSkill(NostrumSkills.Craftcast_Potency1)) {
+			summary.addEfficiency(.25f);
+		}
+		if (spell.getType() == SpellType.Incantation && att.hasSkill(NostrumSkills.Incanting_ManaDiscount1)) {
+			summary.addCostRate(-.05f);
+		}
+		if (spell.getType() == SpellType.Incantation && att.hasSkill(NostrumSkills.Incanting_Potency1)) {
+			summary.addEfficiency(.10f);
+		}
+		if (spell.getType() == SpellType.Incantation && att.hasSkill(NostrumSkills.Incanting_Potency2)) {
+			summary.addEfficiency(.15f);
+		}
+		
+		if (castProperties != null && castProperties.bonusCharges() > 0 && att.hasSkill(NostrumSkills.Spellcasting_StrongOvercharge)) { // Note: checking properties, not remaining extra
+			summary.addEfficiency(.25f * castProperties.bonusCharges());
 		}
 		
 		//////////////////////////////////////////////////////////
@@ -357,15 +399,15 @@ public class SpellCasting {
 		return CalculateGlobalSpellCooldown(result.spell, result.caster, result.summary);
 	}
 	
-	public static final int CalculateBaseCastingTicks(Spell spell) {
+	public static final int CalculateBaseCastingTicks(Spell spell, @Nullable LivingEntity caster) {
 		final int weight = spell.getWeight();
 		final SpellType type = spell.getType();
 		int base = type.getBaseCastTicks();
-//		if (caster != null && NostrumMagica.getMagicWrapper(caster) != null) {
-//			if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Spellcasting_CooldownReduc)) {
-//				base = 10;
-//			}
-//		}
+		if (type == SpellType.Crafted && caster != null && NostrumMagica.getMagicWrapper(caster) != null) {
+			if (NostrumMagica.getMagicWrapper(caster).hasSkill(NostrumSkills.Craftcast_FastBaseCast)) {
+				base = 0;
+			}
+		}
 		return base + (20 * Math.max(0, weight)); 
 	}
 	

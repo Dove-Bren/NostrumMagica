@@ -6,13 +6,12 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.MagicCapability;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellType;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
@@ -22,15 +21,14 @@ import com.smanzana.nostrummagica.spell.component.shapes.SpellShape;
 import com.smanzana.nostrummagica.spellcraft.modifier.ISpellCraftModifier;
 import com.smanzana.nostrummagica.spellcraft.pattern.SpellCraftPattern;
 
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public class SpellCrafting {
 	
 	public static boolean CanCraftSpells(Player player) {
-		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-		return attr != null && attr.isUnlocked() && attr.getCompletedResearches().contains("spellcraft");
+		return MagicCapability.SPELLCRAFT_ENABLED.matches(player);
 	}
 	
 	public static boolean CheckForValidRunes(SpellCraftContext context, Container inventory, int startIdx, int slotCount, @Nonnull List<String> errorsOut) {
