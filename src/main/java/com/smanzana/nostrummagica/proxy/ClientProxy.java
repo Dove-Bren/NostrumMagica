@@ -26,6 +26,7 @@ import com.smanzana.nostrummagica.network.message.ObeliskSelectMessage;
 import com.smanzana.nostrummagica.network.message.StatRequestMessage;
 import com.smanzana.nostrummagica.network.message.WorldPortalTeleportRequestMessage;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
@@ -386,5 +387,10 @@ public class ClientProxy extends CommonProxy {
 		final Minecraft mc = Minecraft.getInstance();
 		return mc.gameMode.useItemOn((LocalPlayer) player, (ClientLevel) world, hand, hit)
 				!= InteractionResult.PASS;
+	}
+
+	@Override
+	public void castScroll(InteractionHand hand, ItemStack itemStackIn, RegisteredSpell spell) {
+		((ClientPlayerListener) NostrumMagica.playerListener).startScrollCast(hand, itemStackIn, spell);
 	}
 }

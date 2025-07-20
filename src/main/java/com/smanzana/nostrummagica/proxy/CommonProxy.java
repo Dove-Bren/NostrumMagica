@@ -29,6 +29,7 @@ import com.smanzana.nostrummagica.network.message.SpellDebugMessage;
 import com.smanzana.nostrummagica.network.message.SpellRequestReplyMessage;
 import com.smanzana.nostrummagica.network.message.StatSyncMessage;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCharacteristics;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
@@ -307,5 +308,9 @@ public class CommonProxy {
 		ServerPlayer serverPlayer = (ServerPlayer) player;
 		return serverPlayer.gameMode.useItemOn(serverPlayer, world, ItemStack.EMPTY, hand, hit)
 				!= InteractionResult.PASS;
+	}
+
+	public void castScroll(InteractionHand hand, ItemStack itemStackIn, RegisteredSpell spell) {
+		; // Do nothing on the server
 	}
 }

@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.client.listener.ClientPlayerListener;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.api.IRaytraceOverlay;
 import com.smanzana.nostrummagica.item.api.ISpellContainerItem;
@@ -90,33 +89,9 @@ public class SpellScroll extends Item implements ILoreTagged, IRaytraceOverlay, 
 			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, itemStackIn);
 		
 		if (worldIn.isClientSide()) {
-			int unused; // this isn't okay
-			((ClientPlayerListener) NostrumMagica.playerListener).startScrollCast(hand, itemStackIn, spell);
+			NostrumMagica.Proxy.castScroll(hand, itemStackIn, spell);
+			//((ClientPlayerListener) NostrumMagica.playerListener).startScrollCast(hand, itemStackIn, spell);
 		}
-//		{
-//		
-//			HitResult mop = RayTrace.raytraceApprox(playerIn.getLevel(), playerIn, playerIn.getEyePosition(), playerIn.getXRot(), playerIn.getYRot(), 100, (e) -> e != playerIn && e instanceof LivingEntity, .5);
-//			final @Nullable LivingEntity hint = RayTrace.entFromRaytrace(mop) == null ? null : (LivingEntity) RayTrace.entFromRaytrace(mop);
-//			
-//			SpellCastResult result = SpellCasting.AttemptScrollCast(spell, playerIn, hint);
-//			if (result.succeeded) {
-//				if (!playerIn.isCreative()) {
-//					ItemStacks.damageItem(itemStackIn, playerIn, hand, getCastDurabilityCost(playerIn, GetSpell(itemStackIn)));
-//				}
-//				
-//				// Set cooldown directly even though event handler will have already set it.
-//				// Using a scroll has more cooldown than noticing other spells being cast.
-//				playerIn.getCooldowns().addCooldown(this, SpellCasting.CalculateSpellCooldown(spell, playerIn, result.summary) * 2);
-//				
-//				NostrumMagica.instance.proxy.syncPlayer((ServerPlayer) playerIn);
-//			}
-//	
-//			if (itemStackIn.getDamageValue() > itemStackIn.getMaxDamage() // Old way, I think never happens?
-//					|| itemStackIn.isEmpty()) {
-//				// Going to break
-//				NostrumMagica.instance.getSpellRegistry().evict(spell);
-//			}
-//		}
 		
 		return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, itemStackIn);
 		
