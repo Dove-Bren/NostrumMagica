@@ -31,7 +31,8 @@ public enum MagicCapability {
 	
 	// General spell casting
 	SPELLCAST_OVERCHARGE(() -> NostrumSkills.Spellcasting_Overcharge), // Can continue casting for extra time to increase potency
-	SPELLCAST_FAST_OVERCHARGE(() -> NostrumSkills.Spellcasting_Overcharge), // Whether overcharge cast times are reduced
+	SPELLCAST_FAST_OVERCHARGE(() -> NostrumSkills.Spellcasting_FastOvercharge), // Whether overcharge cast times are reduced
+	SPELLCAST_STRONG_OVERCHARGE(() -> NostrumSkills.Spellcasting_StrongOvercharge), // Whether overcharge cast times are reduced
 	SPELLCAST_PRECAST(EMagicTier.VANI), // Can precast a spell, allowing nearly-instant casting later
 	SPELLCAST_ELEMLINGER(() -> NostrumSkills.Spellcasting_ElemLinger), // Puts elemental residue that boosts subsequent spells of the right elem
 	SPELLCAST_ELEMLINGEREATER(() -> NostrumSkills.Spellcasting_ElemLingerEater), // Mana refund + swift casting when consuming
@@ -40,7 +41,7 @@ public enum MagicCapability {
 	
 	// Casting advanced actions
 	INCANT_COMPONENT_SELECT(EMagicTier.MANI), // Can select shape, element, alteration incanting
-	INCANT_ALTERATIONS(() -> NostrumSkills.Incanting_Alterations), // Can select alterations when incanting
+	INCANT_ALTERATIONS(INCANT_COMPONENT_SELECT), // Can select alterations when incanting
 	INCANT_TWOSHAPES(() -> NostrumSkills.Incanting_TwoShapes), // Can select up to 2 shapes when incanting
 	INCANT_QUICKCAST(EMagicTier.KANI), // Can quick-press incant button to incant the last incantation
 	INCANT_OVERCHARGE(SPELLCAST_OVERCHARGE), // Same as SPELLCAST_ variant but for incantations

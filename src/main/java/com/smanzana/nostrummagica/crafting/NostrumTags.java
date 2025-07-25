@@ -223,8 +223,10 @@ public class NostrumTags {
 	public static final class Blocks {
 		
 		private static final String TAG_TRANSMUTABLE_BLOCK = "transmutable/block";
+		private static final String TAG_TELEPORTING_BLOCK = "teleporting";
 		
 		public static final TagKey<Block> TransmutableBlock = tag(TAG_TRANSMUTABLE_BLOCK);
+		public static final TagKey<Block> TeleportingBlock = tag(TAG_TELEPORTING_BLOCK);
 		
 		private static TagKey<Block> tag(String path) {
 			return BlockTags.create(new ResourceLocation(NostrumMagica.MODID, path));

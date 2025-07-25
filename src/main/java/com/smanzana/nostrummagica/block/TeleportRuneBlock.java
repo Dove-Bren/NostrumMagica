@@ -92,6 +92,15 @@ public class TeleportRuneBlock extends BaseEntityBlock implements IRoomBridge  {
 		;
 	}
 	
+	protected boolean doTeleport(Level level, BlockState state, BlockPos pos, Entity entity) {
+		BlockEntity te = level.getBlockEntity(pos);
+		if (te == null || !(te instanceof TeleportRuneTileEntity ent)) {
+			return false;
+		}
+		ent.doTeleport(entity);
+		return true;
+	}
+	
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (worldIn.isClientSide) {
@@ -108,7 +117,7 @@ public class TeleportRuneBlock extends BaseEntityBlock implements IRoomBridge  {
 		
 		if (heldItem.isEmpty() || !(heldItem.getItem() instanceof PositionCrystal)) {
 			if (!worldIn.isClientSide) {
-				ent.doTeleport(playerIn);
+				doTeleport(worldIn, state, pos, playerIn);
 			}
 			return InteractionResult.SUCCESS;
 		}

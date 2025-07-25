@@ -179,15 +179,19 @@ public class SeekingGem extends Item implements ILoreTagged {
 				switch (nearest.type) {
 				case EMPTY_CHEST:
 					NostrumMagicaSounds.DAMAGE_ICE.play(world, nearestPos.getX() + .5, nearestPos.getY() + .5, nearestPos.getZ() + .5);
+					world.playSound(null, player.blockPosition(), SoundEvents.NOTE_BLOCK_PLING, SoundSource.PLAYERS, .25f, .75f);
 					break;
 				case KEY_CHEST:
 					NostrumMagicaSounds.AMBIENT_WOOSH3.play(world, nearestPos.getX() + .5, nearestPos.getY() + .5, nearestPos.getZ() + .5);
+					world.playSound(null, player.blockPosition(), SoundEvents.NOTE_BLOCK_PLING, SoundSource.PLAYERS, .25f, .75f);
 					break;
 				case LOOT_CHEST:
 					world.playSound(null, nearestPos, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1f, 1f);
+					world.playSound(null, player.blockPosition(), SoundEvents.NOTE_BLOCK_PLING, SoundSource.PLAYERS, .25f, .75f);
 					break;
 				case NON_EMPTY_CHEST:
 					world.playSound(null, nearestPos, SoundEvents.NOTE_BLOCK_PLING, SoundSource.PLAYERS, 1f, 1f);
+					world.playSound(null, player.blockPosition(), SoundEvents.NOTE_BLOCK_PLING, SoundSource.PLAYERS, .25f, .75f);
 					break;
 				}
 				

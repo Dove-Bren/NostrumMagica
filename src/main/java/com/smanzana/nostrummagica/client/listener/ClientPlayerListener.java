@@ -31,6 +31,7 @@ import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreen;
 import com.smanzana.nostrummagica.client.overlay.OverlayRenderer;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer;
 import com.smanzana.nostrummagica.client.render.OutlineRenderer.Outline;
 import com.smanzana.nostrummagica.client.render.SelectionRenderer;
@@ -74,6 +75,7 @@ import com.smanzana.nostrummagica.spell.SpellChargeTracker.ChargeType;
 import com.smanzana.nostrummagica.spell.SpellChargeTracker.SpellCharge;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.util.RayTrace;
+import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.Util;
 import net.minecraft.client.CameraType;
@@ -458,6 +460,9 @@ public class ClientPlayerListener extends PlayerListener {
 	protected void startCharging(ClientSpellCharge charge) {
 		this.getChargeManager().startCharging(charge);
 		this.getTutorial().onSpellChargeStart();
+		if (charge.charge.overchargeCount() == 0 || charge.charge.duration() >= 20) {
+			NostrumMagicaSounds.CAST_BEGIN.play(NostrumMagica.Proxy.getPlayer());
+		}
 	}
 	
 	private static final class ClientTomeCharge extends ClientSpellCharge {
@@ -755,7 +760,11 @@ public class ClientPlayerListener extends PlayerListener {
 			if (saveHeld) {
 				this.savedCharge = charge;
 				getTutorial().onSpellSaved();
-				// FX?
+				NostrumMagicaSounds.MAGIC_PLUCK.play(player);
+				NostrumParticles.GLOW_ORB.spawn(player.getLevel(), new SpawnParams(50, player.getX(), player.getY() + player.getBbHeight() / 3f, player.getZ(), 2, 40, 0, new TargetLocation(player, true)
+						).color(charge.charge.spell().getPrimaryElement().getColor()).setTargetBehavior(TargetBehavior.JOIN));
+				player.swing(InteractionHand.MAIN_HAND);
+				NostrumMagica.instance.getSpellCooldownTracker(player.getLevel()).setGlobalCooldown(player, 20);
 				return;
 			}
 			

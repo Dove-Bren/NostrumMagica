@@ -13,6 +13,8 @@ import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.world.blueprints.IBlueprint;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
+import com.smanzana.nostrummagica.block.ShortcutRuneBlock;
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.core.BlockPos;
@@ -24,7 +26,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -151,13 +152,18 @@ public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTile
 	protected void entityOnTileTick(Entity entity) {
 		// If no charge yet, play startup effects
 		if (!hasEntityCharge(entity)) {
-			level.playSound(null, worldPosition, SoundEvents.PORTAL_TRIGGER, SoundSource.BLOCKS, 1f, (4f / (float) TELEPORT_CHARGE_TIME));
+			//level.playSound(null, worldPosition, SoundEvents.PORTAL_TRIGGER, SoundSource.BLOCKS, 1f, (4f / (float) TELEPORT_CHARGE_TIME));
+			level.playSound(null, worldPosition, NostrumMagicaSounds.TELEPORT_CHARGE.getEvent(), SoundSource.BLOCKS, 1f, (4f / (float) TELEPORT_CHARGE_TIME));
+			//NostrumMagicaSounds.TELEPORT_CHARGE.play(entity);
 		}
 		
 		incrEntityCharge(entity);
 		final int charge = getEntityCharge(entity);
 		if (charge >= TELEPORT_CHARGE_TIME * 20) {
-			doTeleport(entity);
+			// defer to block
+			//doTeleport(entity);
+			//((TeleportRuneBlock) this.getBlockState().getBlock()).do lol jk
+			doTeleport(entity, getBlockState().getBlock() instanceof ShortcutRuneBlock);
 		} else if (charge > 0) {
 			int count = (charge / 20) / TELEPORT_CHARGE_TIME;
 			final double rx = NostrumMagica.rand.nextFloat() - .5f;
@@ -169,8 +175,15 @@ public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTile
 	}
 	
 	public void doTeleport(Entity entity) {
-		 teleportEntity(entity);
-		 setEntityInCooldown(entity);
+		doTeleport(entity, false);
+	}
+	
+	public void doTeleport(Entity entity, boolean createPair) {
+		if (createPair) {
+			makePairRune();
+		}
+		teleportEntity(entity);
+		setEntityInCooldown(entity);
 	}
 	
 	protected void teleportEntity(Entity entityIn) {
@@ -212,6 +225,23 @@ public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTile
 					NostrumMagicaSounds.DAMAGE_ENDER.play(level, dx, dy, dz);
 					return true;
 				}, 1, 0);
+			}
+		}
+	}
+	
+	protected void makePairRune() {
+		BlockPos offset = getOffset();
+		if (offset == null) {
+			return;
+		}
+		
+		BlockPos target = worldPosition.offset(offset);
+		final BlockState state = level.getBlockState(target);
+		if (!state.is(NostrumTags.Blocks.TeleportingBlock)) {
+			level.setBlockAndUpdate(target, this.getBlockState());
+			BlockEntity blockEnt = level.getBlockEntity(target);
+			if (blockEnt != null && blockEnt instanceof TeleportRuneTileEntity rune) {
+				rune.setOffset(-offset.getX(), -offset.getY(), -offset.getZ());
 			}
 		}
 	}

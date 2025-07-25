@@ -89,7 +89,9 @@ public class SpellCooldownTracker {
 	}
 	
 	protected void notifyPlayer(Player player, int cooldown) {
-		NetworkHandler.sendTo(new SpellGlobalCooldownMessage(cooldown), (ServerPlayer) player);
+		if (player != null && !player.getLevel().isClientSide()) { // Allow clients to set this for themselves for gui experience
+			NetworkHandler.sendTo(new SpellGlobalCooldownMessage(cooldown), (ServerPlayer) player);
+		}
 	}
 	
 	public void clearCooldowns(Player player) {

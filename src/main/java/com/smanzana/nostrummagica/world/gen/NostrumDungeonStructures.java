@@ -95,11 +95,6 @@ public abstract class NostrumDungeonStructures {
 
 		@Override
 		public PostPlacementProcessor getPostPlacementProcessor() {
-			System.out.println();
-			System.out.println();
-			System.out.println("Post process for elemental trials");
-			System.out.println();
-			System.out.println();
 			return super.getPostPlacementProcessor();
 		}
 		

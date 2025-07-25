@@ -1,21 +1,26 @@
 package com.smanzana.nostrummagica.command;
 
+import java.util.concurrent.CompletableFuture;
+
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.smanzana.nostrummagica.item.equipment.SpellTome;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancementWrapper;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 
 public class CommandEnhanceTome {
 	
@@ -26,6 +31,7 @@ public class CommandEnhanceTome {
 				Commands.literal("nostrumenhance")
 					.requires(s -> s.hasPermission(2))
 					.then(Commands.argument("enhancement", StringArgumentType.string())
+						.suggests(CommandEnhanceTome::GetSuggestions)
 						.then(Commands.argument("level", IntegerArgumentType.integer(0, 10))
 								.executes(ctx -> execute(ctx, StringArgumentType.getString(ctx, "enhancement"), IntegerArgumentType.getInteger(ctx, "level")))
 								)
@@ -50,6 +56,10 @@ public class CommandEnhanceTome {
 		SpellTome.addEnhancement(tome, new SpellTomeEnhancementWrapper(enhancement, level));
 		
 		return 0;
+	}
+	
+	private static final <S> CompletableFuture<Suggestions> GetSuggestions(CommandContext<S> ctx, SuggestionsBuilder sb) {
+		return SharedSuggestionProvider.suggest(SpellTomeEnhancement.getEnhancements().stream().map(d -> d.getTitleKey()), sb);
 	}
 
 }

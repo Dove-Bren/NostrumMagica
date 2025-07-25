@@ -26,7 +26,9 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.AmethystClusterBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -203,7 +205,7 @@ public class ShadowDragonArena {
 		
 		for (EMagicElement element : EMagicElement.values()) {
 			ElementalLight light = lights.get(element);
-			if (light == null) {
+			if (light == null || !isLightActive(light)) {
 				continue;
 			}
 			
@@ -215,8 +217,74 @@ public class ShadowDragonArena {
 		return null;
 	}
 	
-	public void activateFogFloor() {
-		// ... this type of thing, although not sure if this would make for an interesting gameplay experience or a boring one
+	public void activateFogClouds() {
+		// Cloud above each light.
+		// Height here should match height given to dragon for chain rendering
+		for (ElementalLight light : lights.values()) {
+			if (light == null) {
+				continue;
+			}
+			
+			BlockPos cloudCenter = light.source().above(Math.min(12, (light.bounds().maxY() - 3) - light.source().getY()));
+			final int radius = 2;
+			for (int i = -radius; i <= radius; i++)
+			for (int j = -(radius-Math.abs(i)); j <= (radius-Math.abs(i)); j++)
+			for (int k = -radius; k <= radius; k++) {
+				level.setBlock(cloudCenter.offset(i, j, k), NostrumBlocks.fogEdgeBlock.defaultBlockState(), Block.UPDATE_CLIENTS);
+			}
+			level.setBlockAndUpdate(cloudCenter.above(), Blocks.BEDROCK.defaultBlockState());
+			level.setBlockAndUpdate(cloudCenter, Blocks.AMETHYST_CLUSTER.defaultBlockState().setValue(AmethystClusterBlock.FACING, Direction.DOWN));
+		}
+		
+		// Put fog on dragon
+		{
+			final BlockPos center = centerPillar.topCenter().above();
+			final int radius = 2;
+			for (int i = -radius; i <= radius; i++)
+			for (int j = -(radius-Math.abs(i)); j <= (radius-Math.abs(i)); j++)
+			for (int k = -radius; k <= radius; k++) {
+				final BlockPos pos = center.offset(i, k, j);
+				if (level.isEmptyBlock(pos)) {
+					level.setBlock(pos, NostrumBlocks.fogEdgeBlock.defaultBlockState(), Block.UPDATE_CLIENTS);
+				}
+			}
+		}
+	}
+	
+	public void removeFogClouds() {
+		final IBlockWalker walker = new IBlockWalker() {
+			@Override
+			public boolean canVisit(BlockGetter arg0, BlockPos ignorePos, BlockState ignoreState, BlockPos walkPos, BlockState walkState, int dist) {
+				return walkState.is(Blocks.BEDROCK)
+						|| walkState.is(Blocks.AMETHYST_CLUSTER)
+						|| walkState.is(NostrumBlocks.fogBlock)
+						|| walkState.is(NostrumBlocks.fogEdgeBlock)
+						|| walkState.is(NostrumBlocks.fogHiddenBlock)
+						;
+			}
+
+			@Override
+			public WalkResult walk(BlockGetter arg0, BlockPos ignorePos, BlockState ignoreState, BlockPos walkPos, BlockState walkState, int dist, int walkCount, Consumer<BlockPos> addBlock) {
+				level.removeBlock(walkPos, false); 
+				return WalkResult.CONTINUE;
+			}
+			
+		};
+		
+		// Reverse what's in the setup
+		for (ElementalLight light : lights.values()) {
+			if (light == null) {
+				continue;
+			}
+			
+			BlockPos cloudCenter = light.source().above(Math.min(12, (light.bounds().maxY() - 3) - light.source().getY()));
+			WorldUtil.WalkConnectedBlocks(level, cloudCenter, walker, 1024);
+		}
+		
+		{
+			final BlockPos center = centerPillar.topCenter().above().above(); // just one up is the spawner, and we don't want to get rid of that!
+			WorldUtil.WalkConnectedBlocks(level, center, walker, 64);
+		}
 	}
 	
 	public void deactivateLights() {
@@ -258,6 +326,8 @@ public class ShadowDragonArena {
 			
 			level.removeBlock(light.source().above().above(), false);
 		}
+		
+		removeFogClouds();
 	}
 	
 	public void resetArena() {
@@ -268,6 +338,7 @@ public class ShadowDragonArena {
 			
 			resetLightSource(light);
 		}
+		activateFogClouds();
 	}
 	
 	protected static final boolean IsArenaEmptyBlock(BlockState state) {
@@ -276,6 +347,10 @@ public class ShadowDragonArena {
 	
 	protected void setLightActive(ElementalLight source, boolean active) {
 		NostrumBlocks.laser.setLaserState(level, source.source(), level.getBlockState(source.source()), active);
+	}
+	
+	protected boolean isLightActive(ElementalLight source) {
+		return NostrumBlocks.laser.isLaserEnabled(level, level.getBlockState(source.source()), source.source());
 	}
 	
 	protected void resetLightSource(ElementalLight source) {
@@ -295,8 +370,12 @@ public class ShadowDragonArena {
 				continue;
 			}
 			
+			// Dupes logic to get Y level from fog creation method above
+			int cloudCenterY = light.source().getY() + Math.min(12, (light.bounds().maxY() - 3) - light.source().getY());
+			
 			BlockEntity ent = level.getBlockEntity(light.source());
-			if (ent == null || !(ent instanceof LaserBlockEntity laser) || laser.getLaserWholeSegments() < 3) {
+			if (ent == null || !(ent instanceof LaserBlockEntity laser)
+					|| laser.getLaserWholeSegments() < (cloudCenterY - light.source().getY())) {
 				return false;
 			}
 		}

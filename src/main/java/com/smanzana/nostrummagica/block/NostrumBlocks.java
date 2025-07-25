@@ -167,6 +167,7 @@ public class NostrumBlocks {
 	@ObjectHolder(LaserLight.ID) public static LaserLight laserLight;
 	@ObjectHolder(LaserTrigger.ID) public static LaserTrigger laserTrigger;
 	@ObjectHolder(TemplateStamperBlock.ID) public static TemplateStamperBlock templateStamper;
+	@ObjectHolder(ShortcutRuneBlock.ID) public static ShortcutRuneBlock shortcutRune;
 	
 	private static void registerBlockItem(Block block, ResourceLocation registryName, Item.Properties builder, IForgeRegistry<Item> registry) {
 		BlockItem item = new BlockItem(block, builder);
@@ -281,6 +282,7 @@ public class NostrumBlocks {
     	//registerBlockItem(fogEdgeBlock, fogEdgeBlock.getRegistryName(), registry); No need
     	registerBlockItem(laserTrigger, laserTrigger.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(templateStamper, NostrumItems.PropDungeonBase(), registry);
+    	registerBlockItem(shortcutRune, NostrumItems.PropDungeonUnstackable(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -413,6 +415,7 @@ public class NostrumBlocks {
     	registerBlock(new LaserLight(), LaserLight.ID, registry);
     	registerBlock(new LaserTrigger(), LaserTrigger.ID, registry);
     	registerBlock(new TemplateStamperBlock(), TemplateStamperBlock.ID, registry);
+    	registerBlock(new ShortcutRuneBlock(), ShortcutRuneBlock.ID, registry);
     }
 
 	public static Block elementalStone(EMagicElement element) {

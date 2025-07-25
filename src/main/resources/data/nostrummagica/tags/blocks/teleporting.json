@@ -1,0 +1,8 @@
+{
+	"replace": false,
+	"values": [
+		"nostrummagica:teleport_rune",
+		"nostrummagica:teleportation_portal",
+		"nostrummagica:shortcut_rune"
+	]
+}

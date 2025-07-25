@@ -27,6 +27,7 @@ public enum NostrumMagicaSounds {
 	DAMAGE_ENDER("spell.damage.ender", SoundSource.HOSTILE),
 	STATUS_BUFF1("spell.buff1", SoundSource.AMBIENT),
 	STATUS_BUFF2("spell.buff2", SoundSource.AMBIENT),
+	STATUS_BUFF3("spell.buff3", SoundSource.AMBIENT),
 	STATUS_DEBUFF1("spell.debuff1", SoundSource.AMBIENT),
 	STATUS_DEBUFF2("spell.debuff2", SoundSource.AMBIENT),
 	STATUS_DEBUFF3("spell.debuff3", SoundSource.AMBIENT),
@@ -75,6 +76,10 @@ public enum NostrumMagicaSounds {
 	BUBBLE_SPRAY("spell.bubble_spray", SoundSource.AMBIENT),
 	BUBBLE_POP("spell.bubble_pop", SoundSource.AMBIENT),
 	ROCK_SMASH("spell.smash", SoundSource.PLAYERS),
+	TELEPORT_CHARGE("blocks.teleport_charge", SoundSource.BLOCKS),
+	PRIMALMAGE_CHANT("mob.primal_mage.chant", SoundSource.HOSTILE),
+	CAST_BEGIN("spell.cast.begin", SoundSource.PLAYERS),
+	MAGIC_PLUCK("ambient.magic_pluck", SoundSource.AMBIENT),
 	;
 	
 	private ResourceLocation resource;

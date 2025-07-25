@@ -232,7 +232,7 @@ public class SpelltomeRenderer {
 		
 		public final void setCharging(LivingEntity entity, boolean charging) {
 			Tracker tracker = getTracker(entity);
-			if (tracker.charging != charging) {
+			if (tracker.charging != charging || tracker.startTicks > entity.tickCount) {
 				tracker.startTicks = entity.tickCount;
 				tracker.charging = charging;
 			}

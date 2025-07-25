@@ -23,6 +23,7 @@ import com.smanzana.nostrummagica.entity.AggroTable;
 import com.smanzana.nostrummagica.serializer.BlockPosListSerializer;
 import com.smanzana.nostrummagica.serializer.OptionalMagicElementDataSerializer;
 import com.smanzana.nostrummagica.serializer.PrimalMagePoseSerializer;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
@@ -33,6 +34,7 @@ import com.smanzana.nostrummagica.util.SpellUtils;
 import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -48,8 +50,10 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.PowerableMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -384,6 +388,10 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 		}
 		
 		// else just vulnerable, so let through and make fall if not already there
+		
+		// Cap damage
+		amount = Math.min(amount, this.getMaxHealth() / 10);
+		
 		this.setBattleState(BattleState.FALLEN);
 		this.level.playSound(null, this, SoundEvents.EVOKER_HURT, getSoundSource(), 1f, 1f);
 		return super.hurt(source, amount);
@@ -605,12 +613,31 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 	}
 	
 	@Override
+	public void tickDeath() {
+		++this.deathTime;
+		this.setNoGravity(true);
+		
+		this.move(MoverType.SELF, new Vec3(0, 0.025, 0));
+		
+		if (this.deathTime == 100 && !this.level.isClientSide()) {
+			ExperienceOrb.award((ServerLevel) level, position(), this.xpReward);
+			
+			this.level.broadcastEntityEvent(this, (byte)60);
+			this.remove(Entity.RemovalReason.KILLED);
+		}
+	}
+	
+	@Override
 	public void tick() {
 		super.tick();
 		
 		if (this.level.isClientSide()) {
 			this.clientTick();
 		} else {
+			if (this.isDeadOrDying()) {
+				return;
+			}
+			
 			this.aggroTable.decayTick();
 			if (this.homeBlock == null) {
 				this.homeBlock = getOnPos(); // Persisted so should only happen once per spawning
@@ -798,7 +825,13 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 		floatingHoverTickBase(60f, 1.5f);
 		
 		if (this.tickCount % 20 == 0) {
-			this.level.playSound(null, this, SoundEvents.VILLAGER_TRADE, getSoundSource(), 1f, 1f);
+			this.level.playSound(null, this, NostrumMagicaSounds.PRIMALMAGE_CHANT.getEvent(), getSoundSource(), 1f, 1f);
+		}
+		if (stateSubTicks < (80 - 30) && this.tickCount % 10 == 0) {
+			BlockPos crystalPos = this.arena.getElementalCrystal(floatElement);
+			NostrumParticles.GLOW_TRAIL.spawn(level, new SpawnParams(1, crystalPos.getX() + .5, crystalPos.getY() + 1, crystalPos.getZ() + .5, 0,
+					30, 10, new TargetLocation(this, true)
+					).gravity(false).color(this.floatElement.getColor()).setTargetBehavior(TargetBehavior.JOIN));
 		}
 	}
 	
@@ -828,6 +861,12 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 		
 		if (this.tickCount % 20 == 0) {
 			this.level.playSound(null, this, SoundEvents.EVOKER_AMBIENT, getSoundSource(), 1f, 1f);
+		}
+		if (this.tickCount % 2 == 0) {
+			BlockPos crystalPos = this.arena.getElementalCrystal(floatElement);
+			NostrumParticles.FILLED_ORB.spawn(level, new SpawnParams(1, crystalPos.getX() + .5, crystalPos.getY() + 1, crystalPos.getZ() + .5, 0,
+					40, 20, new TargetLocation(this, true)
+					).gravity(false).color(this.floatElement.getColor()).setTargetBehavior(TargetBehavior.ORBIT_LAZY));
 		}
 	}
 	
@@ -912,13 +951,13 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 			stateSubTicks = 0;
 		}
 		
-//		if (pose == BattlePose.FALLEN) {
-//			this.setBoundingBox(this.getBoundingBoxForPose(Pose.STANDING).inflate(.5, 0, .5));
-//		} else if (pose == BattlePose.CASTING_VULN) {
-//			this.setBoundingBox(this.getBoundingBoxForPose(Pose.STANDING).inflate(1, .5, 1));
-//		} else {
-//			this.setBoundingBox(this.getBoundingBoxForPose(Pose.STANDING));
-//		}
+		if (this.isDeadOrDying()) {
+			final int period = Math.max(5, 20 - (this.deathTime / 5));
+			if (this.deathTime % period == 0) {
+				level.addParticle(ParticleTypes.EXPLOSION, getX() + random.nextGaussian() * 1, getY() + random.nextGaussian() * 1, getZ() + random.nextGaussian() * 1, 0, 0, 0);
+				level.playLocalSound(getX(), getY(), getZ(), SoundEvents.GENERIC_EXPLODE, this.getSoundSource(), .5f, .8f, false);
+			}
+		}
 	}
 
 }

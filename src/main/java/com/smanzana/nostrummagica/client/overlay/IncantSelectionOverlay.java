@@ -445,17 +445,24 @@ public class IncantSelectionOverlay implements IIngameOverlay {
 		stages.clear();
 		
 		SelectionStage stage;
-		// First stage is shapes
-		if (hasFullShapeSelection(attr)) {
-			stage = makeFullShapeStage(player, attr, false);
-		} else {
-			stage = makePrimaryShapeStage(player, attr, false);
-		}
-		if (hasDoubleShapeSelection(attr)) {
-			stage.addKeyHint(ControlTip.SkipSelect);
-		}
 		
-		stages.add(stage);
+		//if (hasShapeSelection(attr))
+		if (attr.getShapes().size() > 1)
+		{
+			// First stage is shapes
+			if (hasFullShapeSelection(attr)) {
+				stage = makeFullShapeStage(player, attr, false);
+			} else {
+				stage = makePrimaryShapeStage(player, attr, false);
+			}
+			if (hasDoubleShapeSelection(attr)) {
+				stage.addKeyHint(ControlTip.SkipSelect);
+			}
+			
+			stages.add(stage);
+		} else {
+			this.shape = NostrumSpellShapes.Touch;
+		}
 		
 		if (hasDoubleShapeSelection(attr)) {
 			if (hasFullShapeSelection(attr)) {

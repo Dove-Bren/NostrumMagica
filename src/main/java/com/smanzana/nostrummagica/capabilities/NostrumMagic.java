@@ -825,7 +825,7 @@ public class NostrumMagic implements INostrumMagic {
 	@Override
 	public void setKnowledge(EMagicElement element, EAlteration alteration) {
 		if (spellKnowledge == null)
-			spellKnowledge = new EnumMap<>(EMagicElement.class);
+			spellKnowledge = new HashMap<>(); // can't be enum map, since alteration can be null
 		Map<EAlteration, Boolean> map = spellKnowledge.get(element);
 		if (map == null) {
 			map = new HashMap<>();
@@ -833,7 +833,7 @@ public class NostrumMagic implements INostrumMagic {
 		}
 		
 		Boolean old = map.put(alteration, true);
-		if ((old == null || !old) && entity != null && entity instanceof Player) {
+		if ((old == null || !old) && entity != null && entity instanceof ServerPlayer serverPlayer && serverPlayer.connection != null) {
 			NostrumMagica.Proxy.syncPlayer((ServerPlayer) entity);
 		}
 	}
@@ -1452,13 +1452,18 @@ public class NostrumMagic implements INostrumMagic {
 					EMagicElement elem = EMagicElement.valueOf(key);
 					CompoundTag subtag = compound.getCompound(key);
 					for (String altKey : subtag.getAllKeys()) {
-						EAlteration alt;
-						if (altKey.equalsIgnoreCase("none"))
-							alt = null;
-						else
-							alt = EAlteration.valueOf(altKey);
-						if (subtag.getBoolean(altKey)) {
-							setKnowledge(elem, alt);
+						EAlteration alt = null;
+						try {
+							if (altKey.equalsIgnoreCase("none"))
+								alt = null;
+							else
+								alt = EAlteration.valueOf(altKey);
+							if (subtag.getBoolean(altKey)) {
+								setKnowledge(elem, alt);
+							}
+						} catch (Exception e) {
+							NostrumMagica.logger.error("Failed to parse sub alteration row for %s: %s", alt == null ? "No Alteration" : alt.toString(), e);
+							continue;
 						}
 					}
 				} catch (Exception e) {

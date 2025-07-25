@@ -7,6 +7,7 @@ import com.smanzana.autodungeons.world.blueprints.Blueprint;
 import com.smanzana.autodungeons.world.blueprints.Blueprint.LoadContext;
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
 import com.smanzana.autodungeons.world.blueprints.IBlueprint;
+import com.smanzana.nostrummagica.util.DimensionUtils;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -123,7 +124,7 @@ public class TemplateStamperBlockEntity extends BlockEntity implements IOriented
 	}
 	
 	protected void showHintToNearby() {
-		for (Player player : ((ServerLevel) level).getPlayers(p -> p.distanceToSqr(Vec3.atCenterOf(getBlockPos())) < 400)) {
+		for (Player player : ((ServerLevel) level).getPlayers(p -> DimensionUtils.IsSorceryDim(p.getLevel()) && p.distanceToSqr(Vec3.atCenterOf(getBlockPos())) < 2500)) {
 			player.sendMessage(HINT_TEXT, Util.NIL_UUID);
 		}
 	}

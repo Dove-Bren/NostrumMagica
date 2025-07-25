@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.saveddata.SavedData;
 
 /**
@@ -59,9 +60,9 @@ public class NostrumDimensionMapper extends SavedData {
 		/**
 		 * When we find conflicted offsets, we need to move over. We do so by shifting mostly in X to tryh and find a free spot.
 		 */
-		private void bump() {
-			this.offsetX += 14;
-			this.offsetZ += 5;
+		private void bump(int bumpCount) {
+			this.offsetX += Mth.sign(offsetX) * (1 + ((bumpCount + 1) >> 1));
+			this.offsetZ += Mth.sign(offsetZ) * (1 + ((bumpCount + 1) >> 1));
 		}
 		
 		private CompoundTag asNBT() {
@@ -95,7 +96,8 @@ public class NostrumDimensionMapper extends SavedData {
 		}
 	}
 	
-	public static final int OFFSET_CHUNK_LEN = (5120 / 16);
+	public static final int GRID_LEN = 5120;
+	public static final int OFFSET_CHUNK_LEN = (GRID_LEN / 16);
 	public static final String DATA_NAME = NostrumMagica.MODID + "_dimension_mappings";
 	
 	/**
@@ -108,10 +110,15 @@ public class NostrumDimensionMapper extends SavedData {
 		int hash = uuid.hashCode();
 		hash &= System.currentTimeMillis() & (0xFFFFFFFF); //d1a76729-1ccb-3de3-b2b3-c7efa54f7c6f
 		
-		// X will be least and second-most significant bytes added (overflow discarded)
-		// Z will be same but with most significant and second-least significant
-		int x = 255 & (((hash & 0x00FF0000) >> 16) + (hash & 0x000000FF));
-		int z = 255 & (((hash & 0xFF000000) >> 24) + ((hash & 0x0000FF00) >> 24));
+//		// X will be least and second-most significant bytes added (overflow discarded)
+//		// Z will be same but with most significant and second-least significant
+//		int x = 255 & (((hash & 0x00FF0000) >> 16) + (hash & 0x000000FF));
+//		int z = 255 & (((hash & 0xFF000000) >> 24) + ((hash & 0x0000FF00) >> 24));
+		
+		// Crunch UUIDs down to center. Take least-sig 4 bits for x and next-least sig 4 bits for z
+		int x = 0xF & (hash & 0x0000000F);
+		int z = 0xF & ((hash & 0x000000F0) >> 4);
+		
 		return new NostrumDimensionOffset(x, z);
 	}
 	
@@ -169,8 +176,9 @@ public class NostrumDimensionMapper extends SavedData {
 		
 		existing = GetDefaultOffset(id);
 		
+		int bumpCount = 0;
 		while (map.containsValue(existing)) {
-			existing.bump();
+			existing.bump(bumpCount++);
 		}
 		map.put(id, existing);
 		this.setDirty();

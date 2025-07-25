@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
+import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.AggroTable;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.TameLightning;
@@ -42,6 +43,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
@@ -137,6 +139,8 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 	protected BattleState battleState;
 	private final ShadowDragonSpells spells;
 	private final List<Entity> summonedEntities;
+	private float lastHealthThresholdPassed = 1f;
+	private int diveCount;
 	
 	// State sub variables, expected to be reset when battle state changes
 	protected int stateTicks; // tick count when state was started
@@ -320,6 +324,10 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 			return super.hurt(source, amount);
 		}
 		
+		if (source == DamageSource.IN_WALL) {
+			return false;
+		}
+		
 		if (!isActivated()) {
 			return false;
 		}
@@ -347,11 +355,16 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 			} else {
 				amount *= 1.5f;
 				this.setRevealedElement(null);
+				this.addEffect(new MobEffectInstance(NostrumEffects.rend, 20 * 30, 1));
+				this.addEffect(new MobEffectInstance(NostrumEffects.magicRend, 20 * 30, 2));
 				if (!level.isClientSide() && level instanceof ServerLevel server) {
-					server.sendParticles(ParticleTypes.BUBBLE_POP, this.getX(), getY() + this.getBbHeight() / 2f, getZ(), 20, 0, 0, 0, .2);
+					server.sendParticles(ParticleTypes.BUBBLE_POP, this.getX(), getY() + this.getBbHeight() / 2f, getZ(), 100, 0, 0, 0, .2);
 				}
 			}
 		}
+		
+		// Cap damage
+		amount = Math.min(amount, this.getMaxHealth() / 10);
 		
 //		// else just vulnerable, so let through and make fall if not already there
 //		this.setBattleState(BattleState.FALLEN);
@@ -377,7 +390,7 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 	
 	@Override
 	public void push(Entity pusher) {
-		if (!this.isActivated()) {
+		if (!this.isActivated() || this.isHidden() || this.getBattleState() == BattleState.FALLEN) {
 			return;
 		}
 		
@@ -588,9 +601,6 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 			if (this.hasSummonChallengePhase(healthRatio) || this.hasArenaChallengePhase(healthRatio)) {
 				return BattleState.MOVE_TO_CENTER;
 			}
-			
-			// If none available, force into a dive
-			return BattleState.DIVE;
 		}
 		
 		// Else want/have to do a follow phase. Pick the appropriate start state for health
@@ -733,7 +743,7 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 		
 		if (this.deathTime == 100 && !this.level.isClientSide()) {
 			this.arena.activateLights();
-			ExperienceOrb.award((ServerLevel) level, position(), 1250);
+			ExperienceOrb.award((ServerLevel) level, position(), this.xpReward);
 			
 			this.level.broadcastEntityEvent(this, (byte)60);
 			this.remove(Entity.RemovalReason.KILLED);
@@ -760,6 +770,7 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 		}
 		if (this.arena == null) { // not persisted, so will happen every time reloladed
 			this.arena = ShadowDragonArena.Capture(getLevel(), this.homeBlock);
+			this.arena.resetArena();
 		}
 		
 		for (Player player : this.getLevel().getNearbyPlayers(TargetingConditions.forCombat(), this, arena.getBounds())) {
@@ -845,9 +856,9 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 			// Will mean server crashes in b oss fight reset, but that might be
 			// better than loading in to an active boss fight
 			if (NostrumMagica.isBlockLoaded(level, this.homeBlock)) {
-				if (this.arena != null) {
-					this.arena.resetArena();
-				}
+//				if (this.arena != null) {
+//					this.arena.resetArena(); We do this every time the arena is captured
+//				}
 				this.setPos(Vec3.atBottomCenterOf(this.homeBlock.above()));
 				this.setHealth(this.getMaxHealth());
 			}
@@ -879,7 +890,15 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 	}
 	
 	protected void fallenTick() {
-		if (this.stateSubTicks++ > 100 || this.getStateHealthChange() > .1f) {
+		if (this.lastHealthThresholdPassed > .5f && this.getHealth() / this.getMaxHealth() <= .5f) {
+			this.lastHealthThresholdPassed = .5f;
+			this.setRevealedElement(null);
+			this.setBattleState(BattleState.MOVE_TO_CENTER);
+		} else if (this.lastHealthThresholdPassed > .8f && this.getHealth() / this.getMaxHealth() <= .8f) {
+			this.lastHealthThresholdPassed = .8f;
+			this.setRevealedElement(null);
+			this.setBattleState(BattleState.MOVE_TO_CENTER);
+		} else if (this.stateSubTicks++ > 100 || this.getStateHealthChange() > .1f) {
 			this.setBattleState(this.getNextPhaseState(false));
 		}
 	}
@@ -929,17 +948,23 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 		if (this.stateSubTicks++ == 0) {
 			// Decide how long we'll stay in this state
 			stateSubTimer = 20 * this.random.nextInt(4) + 120;
-		} else if (this.stateSubTicks >= stateSubTimer || this.getStateHealthChange() > .1f) {
-			// If phase was pushed from damage, always go to 'next' phase state. Otherwise, optionally do it
-			// based on luck and if we don't decide to do a dive
-			this.setRevealedElement(null);
-			if (this.stateSubTicks < stateSubTimer // AKA !!stateHealthChange > .1f
-					|| random.nextBoolean()) {
-				stateSubTicks = 0; // in case we come back to this state
-				this.setBattleState(getNextPhaseState(true));
-			} else {
-				this.setBattleState(BattleState.DIVE);
+			if (this.diveCount <= 0) {
+				diveCount = this.random.nextInt(4) + 2;
 			}
+		} else if (this.lastHealthThresholdPassed > .5f && this.getHealth() / this.getMaxHealth() <= .5f) {
+			this.lastHealthThresholdPassed = .5f;
+			this.setRevealedElement(null);
+			this.setBattleState(BattleState.MOVE_TO_CENTER);
+		} else if (this.lastHealthThresholdPassed > .8f && this.getHealth() / this.getMaxHealth() <= .8f) {
+			this.lastHealthThresholdPassed = .8f;
+			this.setRevealedElement(null);
+			this.setBattleState(BattleState.MOVE_TO_CENTER);
+		} else if (this.stateSubTicks >= stateSubTimer || this.getStateHealthChange() > .1f) {
+			if (this.getStateHealthChange() > .1f) {
+				diveCount--; // Speed to more intense attacks
+			}
+			this.setRevealedElement(null);
+			this.setBattleState(BattleState.DIVE);
 		} else {
 			final @Nullable LivingEntity target = this.aggroTable.getMainTarget();
 			if (target != null) {
@@ -956,16 +981,14 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 		if (this.stateSubTicks++ == 0) {
 			// Decide how long we'll stay in this state
 			stateSubTimer = 20 * this.random.nextInt(4) + 80;
-		} else if (this.stateSubTicks >= stateSubTimer || this.getStateHealthChange() > .1f) {
-			// If phase was pushed from damage, always go to 'next' phase state. Otherwise, optionally do it
-			// based on luck and if we don't decide to do a dive
-			if (this.stateSubTicks < stateSubTimer // AKA !!stateHealthChange > .1f
-					|| random.nextInt(4) == 0) {
-				stateSubTicks = 0; // in case we come back to this state
-				this.setBattleState(getNextPhaseState(true));
-			} else {
-				this.setBattleState(BattleState.DIVE);
+			if (this.diveCount <= 0) {
+				diveCount = this.random.nextInt(4) + 2;
 			}
+		} else if (this.stateSubTicks >= stateSubTimer || this.getStateHealthChange() > .1f) {
+			if (this.getStateHealthChange() > .1f) {
+				diveCount--; // Speed to more intense attacks
+			}
+			this.setBattleState(BattleState.DIVE);
 		} else if (this.arena.getLaserElementBelow(this) != null) {
 			this.setRevealedElement(this.arena.getLaserElementBelow(this));
 			this.setBattleState(BattleState.FOLLOW_PLAYER_PASSIVE);
@@ -984,7 +1007,7 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 	protected void diveAttackTick() {
 		final @Nullable LivingEntity target = this.aggroTable.getMainTarget();
 		if (target == null) {
-			this.setBattleState(this.getNextPhaseState(false));
+			this.setBattleState(this.getNextPhaseState(--this.diveCount <= 0));
 			return;
 		}
 		
@@ -1025,7 +1048,7 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 				this.hasImpulse = true;
 			}
 		} else {
-			this.setBattleState(this.getNextPhaseState(false));
+			this.setBattleState(this.getNextPhaseState(--this.diveCount <= 0));
 		}
 	}
 	
@@ -1052,7 +1075,8 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 			final float healthRatio = this.getHealth() / this.getMaxHealth();
 			
 			// Only two charging states. First roll for more difficult one. Then always take non-difficult, if we have it.
-			if (random.nextBoolean() && this.hasSummonChallengePhase(healthRatio)) {
+			// (check dive count > 0 which would indicate we came here early, like on health boundary check)
+			if ((diveCount > 0 || random.nextBoolean()) && this.hasSummonChallengePhase(healthRatio)) {
 				this.setBattleState(BattleState.CHARGE_ARENA_SUMMON);
 				return;
 			}

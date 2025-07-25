@@ -355,6 +355,12 @@ public abstract class FogBlock extends Block implements ILaserReactive, IRoomBou
 		}
 		
 		@Override
+		public BlockState updateShape(BlockState state, Direction p_54724_, BlockState p_54725_, LevelAccessor level, BlockPos pos, BlockPos p_54728_) {
+			level.scheduleTick(pos, state.getBlock(), 20);
+			return super.updateShape(state, p_54724_, p_54725_, level, pos, p_54728_);
+		}
+		
+		@Override
 		@OnlyIn(Dist.CLIENT)
 		public float getShadeBrightness(BlockState state, BlockGetter worldIn, BlockPos pos) {
 			return 1.0F;

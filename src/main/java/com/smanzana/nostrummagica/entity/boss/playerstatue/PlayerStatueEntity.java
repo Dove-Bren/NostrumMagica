@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.entity.boss.playerstatue;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
@@ -14,6 +15,8 @@ import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -26,8 +29,10 @@ import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PowerableMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -69,6 +74,10 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 	
 	private final ServerBossEvent bossInfo = (ServerBossEvent) new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.YELLOW, BossEvent.BossBarOverlay.NOTCHED_6).setDarkenScreen(true);
 	
+	// Persisted information
+	protected BlockPos homeBlock;
+	
+	// Transient state variables
 	private boolean activated;
 	private AggroTable<LivingEntity> aggroTable; // null on client
 	protected BattleState battleState;
@@ -115,6 +124,20 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 	        .add(Attributes.KNOCKBACK_RESISTANCE, 1.0);
     }
 	
+	public void readAdditionalSaveData(CompoundTag tag) {
+		super.readAdditionalSaveData(tag);
+		if (tag.contains("origin_block")) {
+			this.homeBlock = NbtUtils.readBlockPos(tag.getCompound("origin_block"));
+		}
+	}
+
+	public void addAdditionalSaveData(CompoundTag tag) {
+		super.addAdditionalSaveData(tag);
+		if (this.homeBlock != null) {
+			tag.put("origin_block", NbtUtils.writeBlockPos(this.homeBlock));
+		}
+	}
+	
 	@Override
 	protected void customServerAiStep() {
 		super.customServerAiStep();
@@ -152,15 +175,37 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 	}
 	
 	@Override
+	public void tickDeath() {
+		++this.deathTime;
+		this.setNoGravity(true);
+		
+		this.move(MoverType.SELF, new Vec3(0, 0.025, 0));
+		
+		if (this.deathTime == 100 && !this.level.isClientSide()) {
+			ExperienceOrb.award((ServerLevel) level, position(), this.xpReward);
+			
+			this.level.broadcastEntityEvent(this, (byte)60);
+			this.remove(Entity.RemovalReason.KILLED);
+		}
+	}
+	
+	@Override
 	public void tick() {
 		super.tick();
 		
 		if (this.level.isClientSide()) {
 			this.clientTick();
 		} else {
+			if (this.isDeadOrDying()) {
+				return;
+			}
+			
 			this.aggroTable.decayTick();
+			if (this.homeBlock == null) {
+				this.homeBlock = getOnPos(); // Persisted so should only happen once per spawning
+			}
 			if (this.arenaBounds == null) {
-				this.arenaBounds = discoverArena();
+				this.arenaBounds = discoverArena(this.homeBlock);
 			}
 			
 			for (Player player : this.getLevel().getNearbyPlayers(TargetingConditions.forCombat(), this, arenaBounds)) {
@@ -215,7 +260,7 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 			return false;
 		}
 		
-		if (isVulnerableBelow() && source.getEntity() != null && !attackerIsBelow(source.getEntity())) {
+		if (isVulnerableBelow() && source.getEntity() != null && (!attackerIsBelow(source.getEntity()) || this.tickCount - this.lastHurtByPlayerTime < 20)) {
 			return false;
 		}
 		
@@ -223,6 +268,14 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 		if (source != DamageSource.OUT_OF_WORLD) {
 			if (this.getShieldCharges() > 0) {
 				this.consumeShieldCharge();
+				if (source.getEntity() != null) {
+					if (source.getEntity() instanceof Player player) {
+						this.setLastHurtByPlayer(player);					
+					} else if (source.getEntity() instanceof LivingEntity living) {
+						this.setLastHurtByMob(living);
+					}
+				}
+				
 				return false;
 			}
 		
@@ -442,7 +495,7 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 		return base + (int) ((1-perc) * 8);
 	}
 	
-	protected AABB discoverArena() {
+	protected AABB discoverArena(BlockPos origin) {
 		// Assume we are on ground. Find the block below us and then find the horizontal extents of it
 		
 		// do a simplified walk where we assume it's a rectangle and that if we go east/south/west/north from our c urrent space, we'll
@@ -455,7 +508,7 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 		final int maxY;
 		final MutableBlockPos cursor = new MutableBlockPos();
 		
-		cursor.set(getOnPos());
+		cursor.set(origin);
 		while (true) {
 			cursor.move(Direction.SOUTH); // +z
 			if (!level.isEmptyBlock(cursor.above())) {
@@ -464,7 +517,7 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 		}
 		maxZ = cursor.getZ() - 1; // -1 cause where it's at is where it failed
 		
-		cursor.set(getOnPos());
+		cursor.set(origin);
 		while (true) {
 			cursor.move(Direction.NORTH); // -z
 			if (!level.isEmptyBlock(cursor.above())) {
@@ -473,7 +526,7 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 		}
 		minZ = cursor.getZ() + 1;
 		
-		cursor.set(getOnPos());
+		cursor.set(origin);
 		while (true) {
 			cursor.move(Direction.EAST); // +x
 			if (!level.isEmptyBlock(cursor.above())) {
@@ -482,7 +535,7 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 		}
 		maxX = cursor.getX() - 1;
 		
-		cursor.set(getOnPos());
+		cursor.set(origin);
 		while (true) {
 			cursor.move(Direction.WEST); // -x
 			if (!level.isEmptyBlock(cursor.above())) {
@@ -491,8 +544,8 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 		}
 		minX = cursor.getX() + 1;
 		
-		minY = this.getOnPos().getY();
-		cursor.set(getOnPos());
+		minY = origin.getY();
+		cursor.set(origin);
 		while (true) {
 			cursor.move(Direction.UP); // +y
 			if (!level.isEmptyBlock(cursor) && !level.getBlockState(cursor).getCollisionShape(level, cursor).isEmpty()) {
@@ -529,6 +582,19 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 		if (this.activated) {
 			this.setBattleState(BattleState.JUMPING);
 		} else {
+			if (!this.getOnPos().equals(this.homeBlock)) {
+				// Presumably reloaded. Likely because player died and ran back.
+				// Will mean server crashes in b oss fight reset, but that might be
+				// better than loading in to an active boss fight
+				if (NostrumMagica.isBlockLoaded(level, this.homeBlock)) {
+					//resetArena();
+					this.setPos(Vec3.atBottomCenterOf(this.homeBlock.above()));
+					this.setHealth(this.getMaxHealth());
+				}
+				
+				return;
+			}
+			
 			// when we load, this may not be true
 			this.setBattlePose(BattlePose.INACTIVE);
 		}
@@ -599,6 +665,14 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 			NostrumParticles.FILLED_ORB.spawn(level, new SpawnParams(1 + (stateSubTicks++ / 20), getX(), getY() + this.getBbHeight() / 2, getZ(), 3,
 					30, 10, new TargetLocation(this, true)
 					).color(0xA0E5E52D).setTargetBehavior(TargetBehavior.JOIN));
+		}
+		
+		if (this.isDeadOrDying()) {
+			final int period = Math.max(5, 20 - (this.deathTime / 5));
+			if (this.deathTime % period == 0) {
+				level.addParticle(ParticleTypes.EXPLOSION, getX() + random.nextGaussian() * 1, getY() + random.nextGaussian() * 1, getZ() + random.nextGaussian() * 1, 0, 0, 0);
+				level.playLocalSound(getX(), getY(), getZ(), SoundEvents.GENERIC_EXPLODE, this.getSoundSource(), .5f, .8f, false);
+			}
 		}
 	}
 }

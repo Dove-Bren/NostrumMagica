@@ -60,7 +60,6 @@ public class NostrumSkills {
 	private static final ResourceLocation ID_CRAFTEDCAST_POTENCY1 = NostrumMagica.Loc("craftcast.potency1");
 	private static final ResourceLocation ID_CRAFTEDCAST_SCROLLEFFICIENCY = NostrumMagica.Loc("craftcast.scrollefficiency");
 
-	private static final ResourceLocation ID_INCANTING_ALTERATIONS = NostrumMagica.Loc("incanting.alterations");
 	private static final ResourceLocation ID_INCANTING_TWOSHAPES = NostrumMagica.Loc("incanting.twoshapes");
 	private static final ResourceLocation ID_INCANTING_ALLSHAPES = NostrumMagica.Loc("incanting.allshapes");
 	private static final ResourceLocation ID_INCANTING_SELECT_INFO = NostrumMagica.Loc("incanting.select_info");
@@ -153,7 +152,6 @@ public class NostrumSkills {
 	public static /*final*/ Skill Craftcast_Potency1;
 	public static /*final*/ Skill Craftcast_ScrollEfficiency;
 	
-	public static /*final*/ Skill Incanting_Alterations;
 	public static /*final*/ Skill Incanting_TwoShapes;
 	public static /*final*/ Skill Incanting_AllShapes;
 	public static /*final*/ Skill Incanting_SelectInfo;
@@ -229,10 +227,10 @@ public class NostrumSkills {
 		Spellcraft_Infopanel = new Skill(ID_SPELLCRAFT_INFOPANEL, Category_Magica, ID_SPELLCRAFT_ALTERATIONS, () -> new ItemStack(Items.PAPER), x-1, y-1);
 		Spellcraft_ElemBuilding = new Skill(ID_SPELLCRAFT_ELEMBUILDING, Category_Magica, ID_SPELLCRAFT_INFOPANEL, () -> SpellRune.getRune(EMagicElement.ICE), x-1, y-2);
 		//
-		Spellcraft_Weight1 = new Skill(ID_SPELLCRAFT_WEIGHT1, Category_Magica, ID_SPELLCRAFT_ALTERATIONS, () -> new ItemStack(Items.FEATHER), x+1, y-1);
-		Spellcraft_ElemWeight = new Skill(ID_SPELLCRAFT_ELEMWEIGHT, Category_Magica, ID_SPELLCRAFT_WEIGHT1, () -> new ItemStack(NostrumItems.masteryOrb), x+1, y-2);
-		Spellcraft_ManaDiscount1 = new Skill(ID_SPELLCRAFT_MANADISCOUNT1, Category_Magica, ID_SPELLCRAFT_WEIGHT1, () -> new ItemStack(Items.BOOK), x+2, y-2);
-		Spellcraft_ManaDiscount2 = new Skill(ID_SPELLCRAFT_MANADISCOUNT2, Category_Magica, ID_SPELLCRAFT_MANADISCOUNT1, () -> new ItemStack(Items.WRITABLE_BOOK), x+2, y-3);
+		Spellcraft_ManaDiscount1 = new Skill(ID_SPELLCRAFT_MANADISCOUNT1, Category_Magica, ID_SPELLCRAFT_ALTERATIONS, () -> new ItemStack(Items.BOOK), x+1, y-1);
+		Spellcraft_ElemWeight = new Skill(ID_SPELLCRAFT_ELEMWEIGHT, Category_Magica, ID_SPELLCRAFT_MANADISCOUNT1, () -> new ItemStack(NostrumItems.masteryOrb), x+1, y-2);
+		Spellcraft_Weight1 = new Skill(ID_SPELLCRAFT_WEIGHT1, Category_Magica, ID_SPELLCRAFT_MANADISCOUNT1, () -> new ItemStack(Items.FEATHER), x+2, y-2);
+		Spellcraft_ManaDiscount2 = new Skill(ID_SPELLCRAFT_MANADISCOUNT2, Category_Magica, ID_SPELLCRAFT_WEIGHT1, () -> new ItemStack(Items.WRITABLE_BOOK), x+2, y-3);
 		
 		x = 0;
 		y = 1;
@@ -262,13 +260,12 @@ public class NostrumSkills {
 		
 		x = -1;
 		y = 0;
-		Incanting_Alterations = new Skill(ID_INCANTING_ALTERATIONS, Category_Magica, null, () -> SpellRune.getRune(EAlteration.CORRUPT), x, y);
-		Incanting_AllShapes = new HiddenSkill(ID_INCANTING_ALLSHAPES, Category_Magica, ID_INCANTING_ALTERATIONS, () -> new ItemStack(NostrumItems.crystalMedium), x-1, y+1, new TierRequirement(EMagicTier.KANI));
+		Incanting_SelectInfo = new Skill(ID_INCANTING_SELECT_INFO, Category_Magica, null, () -> new ItemStack(Items.PAPER), x, y);
+		Incanting_AllShapes = new HiddenSkill(ID_INCANTING_ALLSHAPES, Category_Magica, ID_INCANTING_SELECT_INFO, () -> new ItemStack(NostrumItems.crystalMedium), x-1, y+1, new TierRequirement(EMagicTier.KANI));
 		Incanting_TwoShapes = new HiddenSkill(ID_INCANTING_TWOSHAPES, Category_Magica, ID_INCANTING_ALLSHAPES, () -> SpellRune.getRune(NostrumSpellShapes.Touch), x-2, y+2, new TierRequirement(EMagicTier.KANI));
+		
 		//
-		Incanting_SelectInfo = new Skill(ID_INCANTING_SELECT_INFO, Category_Magica, ID_INCANTING_ALTERATIONS, () -> new ItemStack(Items.PAPER), x-1, y+0);
-		//
-		Incanting_Potency1 = new Skill(ID_INCANTING_POTENCY1, Category_Magica, ID_INCANTING_ALTERATIONS, () -> new ItemStack(Items.BELL), x-1, y-1);
+		Incanting_Potency1 = new Skill(ID_INCANTING_POTENCY1, Category_Magica, ID_INCANTING_SELECT_INFO, () -> new ItemStack(Items.BELL), x-1, y-1);
 		Incanting_Potency2 = new Skill(ID_INCANTING_POTENCY2, Category_Magica, ID_INCANTING_POTENCY1, () -> new ItemStack(Items.TURTLE_HELMET), x-2, y-1);
 		Incanting_ManaDiscount1 = new Skill(ID_INCANTING_MANADISCOUNT1, Category_Magica, ID_INCANTING_POTENCY1, () -> new ItemStack(NostrumItems.resourceManaLeaf), x-2, y-2);
 		Incanting_TomeUse = new Skill(ID_INCANTING_TOMEUSE, Category_Magica, ID_INCANTING_POTENCY1, () -> new ItemStack(NostrumItems.spellTomePage), x-2, y-0);

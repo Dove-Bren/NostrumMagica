@@ -1,0 +1,7 @@
+{
+    "parent": "nostrummagica:block/magic_rune",
+    "textures": {
+        "all": "nostrummagica:block/shortcut_rune",
+        "particle": "nostrummagica:block/shortcut_rune"
+    }
+}

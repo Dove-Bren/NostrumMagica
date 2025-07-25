@@ -165,6 +165,10 @@ public class LaserBlock extends DirectionalBlock implements EntityBlock, ITrigge
 		}
 	}
 	
+	protected boolean isLaserEnabled(LaserBlockEntity ent) {
+		return ent.getEnabled();
+	}
+	
 	protected void toggleLaser(Level worldIn, BlockState state, BlockPos pos) {
 		LaserBlockEntity ent = getEntity(worldIn, state, pos);
 		setLaserEnabled(ent, !ent.getEnabled());
@@ -224,6 +228,11 @@ public class LaserBlock extends DirectionalBlock implements EntityBlock, ITrigge
 		if (ent != null) {
 			this.setLaserEnabled(ent, enabled);
 		}
+	}
+	
+	public boolean isLaserEnabled(Level worldIn, BlockState state, BlockPos pos) {
+		LaserBlockEntity ent = getEntity(worldIn, state, pos);
+		return isLaserEnabled(ent);
 	}
 	
 	public EMagicElement getLaserElement(Level world, BlockPos pos, BlockState state) {

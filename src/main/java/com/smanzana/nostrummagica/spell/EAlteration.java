@@ -20,15 +20,15 @@ import net.minecraft.world.item.Items;
 public enum EAlteration {
 
 	INFLICT(5, 1, ReagentType.SKY_ASH),
-	HARM(5, 0, ReagentType.GRAVE_DUST),
-	RESIST(10, 1, ReagentType.CRYSTABLOOM),
-	SUPPORT(10, 1, ReagentType.GINSENG),
-	GROWTH(15, 1, ReagentType.SKY_ASH, () -> new ItemStack(Items.AMETHYST_SHARD)),
-	ENCHANT(15, 1, ReagentType.BLACK_PEARL),
-	EXTRACT(15, 1, ReagentType.MANDRAKE_ROOT),
 	SUMMON(30, 2, ReagentType.MANI_DUST),
-	RUIN(15, 2, ReagentType.SPIDER_SILK),
+	ENCHANT(15, 1, ReagentType.BLACK_PEARL),
+	RESIST(10, 1, ReagentType.CRYSTABLOOM),
+	GROWTH(15, 1, ReagentType.SKY_ASH, () -> new ItemStack(Items.AMETHYST_SHARD)),
+	SUPPORT(10, 1, ReagentType.GINSENG),
+	EXTRACT(15, 1, ReagentType.MANDRAKE_ROOT),
 	CORRUPT(15, 1, ReagentType.GRAVE_DUST, () -> new ItemStack(Items.PHANTOM_MEMBRANE)),
+	RUIN(15, 2, ReagentType.SPIDER_SILK),
+	HARM(5, 0, ReagentType.GRAVE_DUST),
 	;
 	
 	private final ResourceLocation glyph;

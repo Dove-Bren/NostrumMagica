@@ -136,7 +136,7 @@ public class NostrumBlockEntities {
 		register(registry, BlockEntityType.Builder.of(TemporaryPortalTileEntity::new, NostrumBlocks.temporaryTeleportationPortal).build(null), ID_TemporaryPortal);
 		register(registry, BlockEntityType.Builder.of(ProgressionDoorTileEntity::new, NostrumBlocks.progressionDoor).build(null), ID_ProgressionDoor);
 		register(registry, BlockEntityType.Builder.of(SwitchBlockTileEntity::new, NostrumBlocks.switchBlock).build(null), ID_SwitchBlock);
-		register(registry, BlockEntityType.Builder.of(TeleportRuneTileEntity::new, NostrumBlocks.teleportRune).build(null), ID_TeleportRune);
+		register(registry, BlockEntityType.Builder.of(TeleportRuneTileEntity::new, NostrumBlocks.teleportRune, NostrumBlocks.shortcutRune).build(null), ID_TeleportRune);
 		register(registry, BlockEntityType.Builder.of(PutterBlockTileEntity::new, NostrumBlocks.putterBlock).build(null), ID_PutterBlock);
 		register(registry, BlockEntityType.Builder.of(ActiveHopperTileEntity::new, NostrumBlocks.activeHopper).build(null), ID_ActiveHopper);
 		register(registry, BlockEntityType.Builder.of(ItemDuctTileEntity::new, NostrumBlocks.itemDuct).build(null), ID_ItemDuct);

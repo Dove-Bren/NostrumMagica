@@ -37,7 +37,7 @@ public class ShadowDragonSpells {
 	protected Spell makeBombSpell(EMagicElement element) {
 		return SpellUtils.MakeSpell("Dragon's %s bomb".formatted(element.getBareName()),
 				NostrumSpellShapes.Mortar, NostrumSpellShapes.Mortar.makeProps(true),
-				NostrumSpellShapes.Burst, NostrumSpellShapes.Burst.makeProps(5f).setValue(SpellShapeSelector.PROPERTY, SpellShapeSelector.ENTITIES),
+				NostrumSpellShapes.Burst, NostrumSpellShapes.Burst.makeProps(3f).setValue(SpellShapeSelector.PROPERTY, SpellShapeSelector.ENTITIES),
 				element, 3, EAlteration.HARM
 				);
 	}

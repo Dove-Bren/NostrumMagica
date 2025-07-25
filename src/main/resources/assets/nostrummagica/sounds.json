@@ -48,7 +48,8 @@
         "sounds":
         [
             "nostrummagica:spell/damage_fire1",
-            "nostrummagica:spell/damage_fire2"
+            "nostrummagica:spell/damage_fire2",
+			"nostrummagica:spell/damage_fire3"
         ]
     },
     
@@ -122,6 +123,14 @@
         ]
     },
     
+    "spell.buff3":
+    {
+        "sounds":
+        [
+            "nostrummagica:spell/buff3"
+        ]
+    },
+    
     "spell.debuff1":
     {
         "sounds":
@@ -153,6 +162,12 @@
             "nostrummagica:spell/shield_cast"
         ]
     },
+	
+	"spell.cast.begin": {
+		"sounds": [
+			"nostrummagica:spell/cast_begin"
+		]
+	},
     
     "spell.cast.launch":
     {
@@ -291,6 +306,21 @@
             "nostrummagica:ambient/portal"
         ]
     },
+	
+	"ambient.magic_pluck": {
+		"category": "neutral",
+		"sounds": [
+			"nostrummagica:spell/magic_pluck"
+		]
+	},
+	
+	"blocks.teleport_charge":
+	{
+		"category": "neutral",
+		"sounds": [
+			"nostrummagica:blocks/teleport_charge"
+		]
+	},
     
     "mob.dragon.idle":
     {
@@ -390,6 +420,12 @@
             "nostrummagica:entity/lux/death1"
         ]
     },
+	
+	"mob.primal_mage.chant": {
+		"sounds": [
+			"nostrummagica:entity/primal_mage/chant"
+		]
+	},
     
     "item.hookshot.shoot":
     {
