@@ -166,7 +166,7 @@ public class SpellDamage {
 			return 0f;
 		}
 		
-		double amt = 0;
+		double amt = 1; // start at 1 from base attack
 		
 		// Reduce any from main-hand weapon, since that's given assuming it's used to attack
 		ItemStack held = caster.getMainHandItem();
@@ -209,25 +209,15 @@ public class SpellDamage {
 		final Damage damage = new Damage(baseDamage, efficiency, log);
 		LogDamage(0, baseDamage, damage, "Start");
 		
-		if (element == EMagicElement.NEUTRAL) {
-			// Neutral is reduced by real armor but not affected by magic resist effects and attributes.
-			// It still gains power from magic boost/magic damage AND the strength status effect/attack attribute AND is still reduces with magic reduction (below).
-			final float baseAttribute = GetPhysicalAttributeBonusNoMainhand(caster);
-			final float mainhand = GetPhysicalAttributeBonusMainhand(caster);
-			damage.baseFlat("PhysicalAttributeBase", baseAttribute);
-			
-			// Note that the neutral master skill includes using some of this
-			final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-			if (attr != null && attr.hasSkill(NostrumSkills.Neutral_Master)) {
-				damage.baseFlat(NostrumSkills.Neutral_Master, (int) (mainhand * .2f));
-			}
-		} else {
+		{
 		
 			final int armor = target.getArmorValue();
 			final boolean undead = target.isInvertedHealAndHarm();
 			final boolean ender;
 			final boolean light;
 			final boolean flamy;
+			final boolean inAir;
+			final boolean isHeavy;
 			
 			if (target instanceof EnderMan || target instanceof Endermite
 					|| target instanceof DragonEntity) {
@@ -257,6 +247,20 @@ public class SpellDamage {
 				flamy = false;
 			}
 			
+			if (target.isOnGround()) {
+				inAir = false;
+			} else if (magic != null && magic.hasSkill(NostrumSkills.Earth_Inflict) && target.getEffect(NostrumEffects.rooted) != null) {
+				inAir = false;
+			} else {
+				inAir = true;
+			}
+			
+			if (target.getBbWidth() > 1.5f || target.getBbHeight() > 2.5f) { // same as hookshot
+				isHeavy = true;
+			} else {
+				isHeavy = false;
+			}
+			
 			if (element == EMagicElement.FIRE && magic != null && magic.hasSkill(NostrumSkills.Fire_Adept)) {
 				damage.baseFlat(NostrumSkills.Fire_Adept, 2);
 			}
@@ -271,6 +275,16 @@ public class SpellDamage {
 					// Matches strength attribute boost
 					damage.baseFlat(NostrumSkills.Earth_Adept, 3 * (strength.getAmplifier() + 1));
 				}
+			}
+			
+			if (element == EMagicElement.NEUTRAL && magic != null && magic.hasSkill(NostrumSkills.Neutral_Adept)) {
+				final float baseAttribute = GetPhysicalAttributeBonusNoMainhand(caster);
+				damage.baseFlat("PhysicalAttributeBase", baseAttribute);
+			}
+			
+			if (element == EMagicElement.NEUTRAL && magic != null && magic.hasSkill(NostrumSkills.Neutral_Master)) {
+				final float mainhand = GetPhysicalAttributeBonusMainhand(caster);
+				damage.baseFlat(NostrumSkills.Neutral_Master, (int) (mainhand * .2f));
 			}
 				
 			switch (element) {
@@ -292,9 +306,19 @@ public class SpellDamage {
 					damage.bonusScale("FireXFire", -.5f); // 1.5x damage against undead. Regular otherwise
 				}
 				break;
+			case NEUTRAL:
+				// No change for neutral damage
+				//damage.mul("NeutralDamage", 1f); not useful for logging 
+				break;
 			case EARTH:
-				// No change for earth damage
-				//damage.mul("EarthDamage", 1f); not useful for logging 
+				// Earth doesn't affect airborn entities
+				if (inAir) {
+					damage.bonusScale("EarthXAirborn", -1f);
+					return 0.0f;
+				}
+				if (isHeavy) {
+					damage.bonusScale("EarthXHeavy", +.4f);
+				}
 				break;
 			case ICE:
 				// More affective against everything except undead
@@ -333,16 +357,11 @@ public class SpellDamage {
 			damage.finalFlat(NostrumSkills.Neutral_Inflict, -2 * (magicWeakness.getAmplifier() + 1));
 		}
 		
-		// No magic resist for neutral; it uses armor value
-		if (element != EMagicElement.NEUTRAL) {
+		// Aplly magic resistance
+		{
 			attr = target.getAttribute(NostrumAttributes.magicResist);
 			if (attr != null && attr.getValue() != 0.0D) {
 				damage.resistScale("MagicResistAttribute", (float) (Math.max(0.0D, Math.min(2.0D, 1.0D - (attr.getValue() / 100.0D)))) - 1f);
-			}
-		} else {
-			final float mod = GetArmorModifier(target, damage) - 1f;
-			if (mod != 0f) {
-				damage.resistScale("PhysicalArmor", mod);
 			}
 		}
 		
