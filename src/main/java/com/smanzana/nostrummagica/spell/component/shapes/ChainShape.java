@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+
+import javax.annotation.Nullable;
 
 import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
@@ -94,21 +97,35 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 		}
 	}
 	
-	protected void getEntLinks(List<LivingEntity> entsAffected, Map<LivingEntity, List<LivingEntity>> entLinks, LivingEntity target, Level world, double radius, int arc, boolean teamLock) {
+	protected void getEntLinks(List<LivingEntity> entsAffected, Map<LivingEntity, List<LivingEntity>> entLinks, @Nullable LivingEntity start, Vec3 startPos, Level world, double radius, int arc, BiPredicate<LivingEntity, LivingEntity> teamCheck) {
 		final Set<Entity> seen = new HashSet<>();
 		final List<LivingEntity> next = new ArrayList<>(arc * 2);
+		LivingEntity firstEnt = null;
 		
-		next.add(target);
+		next.add(start);
 		
 		while (!next.isEmpty() && arc > 0) {
-			final LivingEntity center = next.remove(0);
+			final LivingEntity centerEnt = next.remove(0);
 			
-			if (seen.contains(center)) {
+			if (centerEnt != null && seen.contains(centerEnt)) {
 				continue;
 			}
 			
-			seen.add(center);
-			entsAffected.add(center); // Assume all entities put in `cur` that haven't been seen yet count in terms of teams, living, etc.
+			final Vec3 center;
+			if (centerEnt == null) {
+				center = startPos;
+			} else {
+				center = centerEnt.position().add(0, centerEnt.getBbHeight() / 2f, 0);
+			}
+			
+			if (centerEnt != null) {
+				seen.add(centerEnt);
+				entsAffected.add(centerEnt); // Assume all entities put in `cur` that haven't been seen yet count in terms of teams, living, etc.
+				if (firstEnt == null) {
+					firstEnt = centerEnt;
+				}
+			}
+			
 			arc--;
 			
 			if (arc == 0) {
@@ -117,12 +134,12 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 			
 			// Find any other eligible entities around them
 			List<Entity> entities = world.getEntities((Entity) null, 
-					new AABB(center.getX() - radius,
-								center.getY() - radius,
-								center.getZ() - radius,
-								center.getX() + radius,
-								center.getY() + radius,
-								center.getZ() + radius),
+					new AABB(center.x() - radius,
+								center.y() - radius,
+								center.z() - radius,
+								center.x() + radius,
+								center.y() + radius,
+								center.z() + radius),
 					(ent) -> {
 						return ent != null && NostrumMagica.resolveLivingEntity(ent) != null;
 					});
@@ -149,7 +166,7 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 				}
 				
 				// Check team requirements, if required
-				if (teamLock && !NostrumMagica.IsSameTeam(living, center)) {
+				if (firstEnt != null && !teamCheck.test(firstEnt, living)) {
 					continue;
 				}
 				
@@ -160,7 +177,7 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 				
 				// Eligible!
 				next.add(living);
-				entLinks.computeIfAbsent(center, (k) -> new ArrayList<>()).add(living);
+				entLinks.computeIfAbsent(centerEnt, (k) -> new ArrayList<>()).add(living);
 			}
 		}
 	}
@@ -210,37 +227,15 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 		List<LivingEntity> entsAffected = new ArrayList<>();
 		List<SpellLocation> locsAffected = new ArrayList<>();
 
-		int unused; // This ends up being kind of lame, since chained things don't center around hit location but around whatever the first ent is.
-		// Would be better if the center stayed a chain originating point the whole time.
-		// Would LOOK cooler if there was a chain tether to starting spot, too
 		if (this.affectsEntities(params)) {
-			final LivingEntity firstEnt;
-			if (entity != null) {
-				firstEnt = entity;
+			final BiPredicate<LivingEntity, LivingEntity> teamCheck;
+			if (getTeamLock(params)) {
+				teamCheck = NostrumMagica::IsSameTeam;
 			} else {
-				// Find nearest start entity
-				final Vec3 center = location.hitPosition;
-				List<Entity> entities = world.getEntities((Entity) null, 
-						new AABB(center.x() - radius,
-									center.y() - radius,
-									center.z() - radius,
-									center.x() + radius,
-									center.y() + radius,
-									center.z() + radius),
-						(ent) -> {
-							return ent != null && NostrumMagica.resolveLivingEntity(ent) != null;
-						});
-				Collections.sort(entities, (a, b) -> {
-					return (int) (a.distanceToSqr(center) - b.distanceToSqr(center));
-				});
-				
-				// First element is shortest distance
-				firstEnt = entities.isEmpty() ? null : (LivingEntity) entities.get(0);
+				teamCheck = (l1, l2) -> true;
 			}
 			
-			if (firstEnt != null) {
-				this.getEntLinks(entsAffected, entLinks, firstEnt, world, radius, arc, getTeamLock(params));
-			}
+			this.getEntLinks(entsAffected, entLinks, entity, location.hitPosition, world, radius, arc, teamCheck);
 		}
 		if (this.affectsBlocks(params)) {
 			this.getBlockLinks(locsAffected, blockLinks, location, radius, arc);
@@ -248,13 +243,16 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 		
 		if (!state.isPreview()) {
 			if (!entLinks.isEmpty()) {
+				
+				
 				Set<LivingEntity> seen = new HashSet<>();
 				for (Entry<LivingEntity, List<LivingEntity>> row : entLinks.entrySet()) {
-					final LivingEntity ent1 = row.getKey();
+					final @Nullable LivingEntity ent1 = row.getKey();
 					for (LivingEntity other : row.getValue()) {
 						if (seen.add(other)) {
+							final TargetLocation origin = (ent1 == null ? new TargetLocation(location.hitPosition) : new TargetLocation(ent1, true));
 							NostrumParticles.LIGHTNING_CHAIN.spawn(world, new SpawnParams(16, location.hitPosition.x, location.hitPosition.y, location.hitPosition.z, 0, 20, 0,
-								new TargetLocation(ent1, true)).setExtraTarget(new TargetLocation(other, true)).gravity(false).color(characteristics.element.getColor()));
+									origin).setExtraTarget(new TargetLocation(other, true)).gravity(false).color(characteristics.element.getColor()));
 						}
 					}
 				}
