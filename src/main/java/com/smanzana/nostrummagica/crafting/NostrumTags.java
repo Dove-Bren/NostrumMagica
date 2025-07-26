@@ -2,11 +2,13 @@ package com.smanzana.nostrummagica.crafting;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 
 public class NostrumTags {
@@ -231,5 +233,28 @@ public class NostrumTags {
 		private static TagKey<Block> tag(String path) {
 			return BlockTags.create(new ResourceLocation(NostrumMagica.MODID, path));
 		}
+	}
+	
+	public static final class Biomes {
+		
+		private static final String TAG_SORCERY_DIMENSION = "sorcery_dimension";
+		private static final String TAG_STRUCT_DRAGON_DUNGEON = "has_structure/dungeon_dragon";
+		private static final String TAG_STRUCT_PORTAL_DUNGEON = "has_structure/dungeon_portal";
+		private static final String TAG_STRUCT_PLANTBOSS_DUNGEON = "has_structure/dungeon_plantboss";
+		
+		public static final TagKey<Biome> SorceryDimension = tag(TAG_SORCERY_DIMENSION);
+		public static final TagKey<Biome> HasDragonDungeon = tag(TAG_STRUCT_DRAGON_DUNGEON);
+		public static final TagKey<Biome> HasPortalDungeon = tag(TAG_STRUCT_PORTAL_DUNGEON);
+		public static final TagKey<Biome> HasPlantDungeon = tag(TAG_STRUCT_PLANTBOSS_DUNGEON);
+		
+		private static TagKey<Biome> tag(String path) {
+			return TagKey.create(Registry.BIOME_REGISTRY, NostrumMagica.Loc(path));
+		}
+		
+//		private static TagKey<Biome> forgeTag(String name) {
+//			final ResourceLocation loc = new ResourceLocation("forge", name);
+//			return TagKey.create(Registry.BIOME_REGISTRY, loc);
+//		}
+		
 	}
 }

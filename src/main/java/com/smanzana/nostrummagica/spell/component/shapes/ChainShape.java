@@ -202,7 +202,7 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 		double radius = 7.0;
 		Level world = location.world;
 		if (world == null)
-			world = state.getSelf().getCommandSenderWorld();
+			world = state.getSelf().getLevel();
 		int arc = getMaxArcs(params) + 1; // +1 to include center
 
 		Map<LivingEntity, List<LivingEntity>> entLinks = new HashMap<>();
@@ -210,6 +210,9 @@ public class ChainShape extends InstantShape implements ISelectableShape {
 		List<LivingEntity> entsAffected = new ArrayList<>();
 		List<SpellLocation> locsAffected = new ArrayList<>();
 
+		int unused; // This ends up being kind of lame, since chained things don't center around hit location but around whatever the first ent is.
+		// Would be better if the center stayed a chain originating point the whole time.
+		// Would LOOK cooler if there was a chain tether to starting spot, too
 		if (this.affectsEntities(params)) {
 			final LivingEntity firstEnt;
 			if (entity != null) {

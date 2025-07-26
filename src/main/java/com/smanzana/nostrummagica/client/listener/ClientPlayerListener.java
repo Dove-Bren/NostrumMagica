@@ -1016,7 +1016,7 @@ public class ClientPlayerListener extends PlayerListener {
 					final double y = player.getY() + vector4f.y();
 					final double z = player.getZ() + vector4f.z();
 					
-					NostrumParticles.GLOW_ORB.spawn(player.getLevel(), new SpawnParams(1, x, y, z, .0125f, 40, 0, new Vec3(0, .05, 0), new Vec3(.001, .01, .001)).color(0x40FFFFFF & elem.getColor()));
+					NostrumParticles.GLOW_ORB.spawn(player.getLevel(), new SpawnParams(1, x, y, z, .0125f, 40, 0, new Vec3(0, .05, 0), new Vec3(.001, .01, .001)).color(0xA0FFFFFF & elem.getColor()));
 					player.getLevel().addParticle(ParticleTypes.CRIT, x, y, z, 0, .1f, 0);
 				}
 			}
@@ -1086,7 +1086,7 @@ public class ClientPlayerListener extends PlayerListener {
 				if (NostrumMagica.rand.nextBoolean()) {
 					player.getLevel().addParticle(ParticleTypes.CRIT, x, y, z, 0, .1f, 0);
 				} else {
-					NostrumParticles.GLOW_ORB.spawn(player.getLevel(), new SpawnParams(1, x, y, z, .0125f, 40, 0, new Vec3(0, .015, 0), new Vec3(.001, .01, .001)).color(0x40FFFFFF & elem.getColor()));
+					NostrumParticles.GLOW_ORB.spawn(player.getLevel(), new SpawnParams(1, x, y, z, .0125f, 40, 0, new Vec3(0, .015, 0), new Vec3(.001, .01, .001)).color(0xA0FFFFFF & elem.getColor()));
 				}
 			}
 		}

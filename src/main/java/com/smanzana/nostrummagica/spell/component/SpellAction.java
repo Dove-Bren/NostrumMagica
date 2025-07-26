@@ -2453,8 +2453,10 @@ public class SpellAction {
 		private static final Component LABEL_LIGHT_STATUS_NAME = new TranslatableComponent("spelllog.nostrummagica.light.name");
 		private static final Component LABEL_LIGHT_STATUS_DESC = new TranslatableComponent("spelllog.nostrummagica.light.desc");
 		
-		public LightEffect() {
-			
+		private final boolean temporary;
+		
+		public LightEffect(boolean temporary) {
+			this.temporary = temporary;
 		}
 
 		@Override
@@ -2470,9 +2472,13 @@ public class SpellAction {
 			final BlockState state = NostrumBlocks.mageLight.defaultBlockState();
 			final BlockPos pos = location.hitBlockPos;
 			if (location.world.getBlockState(pos).getMaterial().isReplaceable() && state.canSurvive(location.world, pos) && location.world.setBlockAndUpdate(pos, state)) {
-				NostrumMagicaSounds.DAMAGE_EARTH.play(location.world, pos);
+				NostrumMagicaSounds.MAGIC_PLUCK.play(location.world, pos);
 				resultBuilder.applied |= true;
 				resultBuilder.affectedPos = new SpellLocation(location.world, pos);
+				
+				if (this.temporary) {
+					location.world.scheduleTick(pos, state.getBlock(), 20 * 15);
+				}
 			}
 		}
 
@@ -2727,8 +2733,8 @@ public class SpellAction {
 		return this;
 	}
 	
-	public SpellAction lightBlock() {
-		effects.add(new LightEffect());
+	public SpellAction lightBlock(boolean temporary) {
+		effects.add(new LightEffect(temporary));
 		return this;
 	}
 	

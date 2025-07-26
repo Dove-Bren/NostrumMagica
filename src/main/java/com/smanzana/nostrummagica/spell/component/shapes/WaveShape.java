@@ -426,7 +426,7 @@ public class WaveShape extends AreaShape {
 
 	@Override
 	public int getWeight(SpellShapeProperties properties) {
-		return 2;
+		return 1 + (getLength(properties) > 7f ? 1 : 0);
 	}
 
 	@Override

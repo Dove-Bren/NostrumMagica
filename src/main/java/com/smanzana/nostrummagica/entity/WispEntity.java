@@ -576,7 +576,7 @@ public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchant
 			}
 			
 			// Other dimensions, just check nearby wisp count
-			List<WispEntity> wisps = world.getEntitiesOfClass(WispEntity.class, bb, null);
+			List<WispEntity> wisps = world.getEntitiesOfClass(WispEntity.class, bb, e -> true);
 			
 			return wisps.size() < 1;
 		}

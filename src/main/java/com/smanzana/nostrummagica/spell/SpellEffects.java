@@ -314,9 +314,11 @@ public final class SpellEffects {
 	}
 	
 	private static final SpellAction solveBase(EMagicElement element, int elementCount) {
+		int duration = 20 * 15 * elementCount;
+		int amp = elementCount - 1;
 		switch (element) {
 		case PHYSICAL:
-			return new SpellAction().blockBreak(elementCount).knockback(elementCount).name("bash");
+			return new SpellAction().status(MobEffects.GLOWING, duration, amp).lightBlock(elementCount < 2).name("light");
 		case EARTH:
 			return new SpellAction().grow(elementCount).name("grow");
 		case ENDER:
@@ -324,7 +326,7 @@ public final class SpellEffects {
 		case FIRE:
 			return new SpellAction().cursedFire(elementCount).name("cursed_fire");
 		case ICE:
-			return new SpellAction().mysticWater(elementCount-1, elementCount * 2, 20 * 60).name("mystic_water");
+			return new SpellAction().mysticWater(amp, elementCount * 2, 20 * 60).name("mystic_water");
 		case LIGHTNING:
 			return new SpellAction().lightning().name("lightningbolt");
 		case WIND:
@@ -389,7 +391,7 @@ public final class SpellEffects {
 		case PHYSICAL:
 			return new SpellAction().status(NostrumEffects.carapace, duration, amp).name("carapace");
 		case EARTH:
-			return new SpellAction().status(MobEffects.GLOWING, duration, amp).lightBlock().name("light");
+			return new SpellAction().blockBreak(elementCount).knockback(elementCount).name("bash");
 		case ENDER:
 			return new SpellAction().status(MobEffects.NIGHT_VISION, duration, amp).name("night_vision");
 		case FIRE:

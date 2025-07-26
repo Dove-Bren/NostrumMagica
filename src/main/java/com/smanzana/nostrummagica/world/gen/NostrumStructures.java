@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.mojang.serialization.Codec;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.DragonStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.ElementalTrialStructure;
 import com.smanzana.nostrummagica.world.gen.NostrumDungeonStructures.KaniDungeonStructure;
@@ -18,8 +19,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -29,7 +28,6 @@ import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStruct
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -111,52 +109,50 @@ public class NostrumStructures {
 		// (max-min) ?
 		
 		structure = new PortalStructure();
-		configured = structure.configured(FeatureConfiguration.NONE, Tags.Biomes.IS_OVERWORLD);
+		configured = structure.configured(FeatureConfiguration.NONE, NostrumTags.Biomes.HasPortalDungeon);
 		// Avg dist: sqrt(24^2 + 24^2) = 543 blocks
 		CONFIGURED_DUNGEON_PORTAL = configured;
 		REF_DUNGEON_PORTAL = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PORTAL_ID), NostrumMagica.Loc(DUNGEONGEN_PORTAL_CONF_ID));
 		
 		structure = new DragonStructure();
-		configured = structure.configured(FeatureConfiguration.NONE, Tags.Biomes.IS_OVERWORLD);
+		configured = structure.configured(FeatureConfiguration.NONE, NostrumTags.Biomes.HasDragonDungeon);
 		// Avg dist: sqrt(32^2 + 32^2) = 724 blocks
 		CONFIGURED_DUNGEON_DRAGON = configured;
 		REF_DUNGEON_DRAGON = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_DRAGON_ID), NostrumMagica.Loc(DUNGEONGEN_DRAGON_CONF_ID));
 		
 		structure = new PlantBossStructure();
-		configured = structure.configured(FeatureConfiguration.NONE, Tags.Biomes.IS_OVERWORLD);
+		configured = structure.configured(FeatureConfiguration.NONE, NostrumTags.Biomes.HasPlantDungeon);
 		// Avg dist: sqrt(32^2 + 32^2) = 724 blocks
 		CONFIGUREDDUNGEON_PLANTBOSS = configured;
 		REF_DUNGEON_PLANTBOSS = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_ID), NostrumMagica.Loc(DUNGEONGEN_PLANTBOSS_CONF_ID));
 		
-		final TagKey<Biome> fakeSorceryBiomeKey = TagKey.create(Registry.BIOME_REGISTRY, NostrumMagica.Loc("sorcery_dimension"));
-		
 		structure = new ManiCastleStructure();
-		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
+		configured = structure.configured(FeatureConfiguration.NONE, NostrumTags.Biomes.SorceryDimension);
 		CONFIGUREDDUNGEON_MANI_CASTLE = configured;
 		REF_DUNGEON_MANI_CASTLE = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_MANI_CASTLE_ID), NostrumMagica.Loc(DUNGEONGEN_MANI_CASTLE_CONF_ID));
 		
 		structure = new SorceryIslandStructure();
-		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
+		configured = structure.configured(FeatureConfiguration.NONE, NostrumTags.Biomes.SorceryDimension);
 		CONFIGUREDDUNGEON_SORCERY_ISLAND = configured;
 		REF_DUNGEON_SORCERY_ISLAND = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_SORCERY_ISLAND_ID), NostrumMagica.Loc(DUNGEONGEN_SORCERY_ISLAND_CONF_ID));
 		
 		structure = new KaniDungeonStructure();
-		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
+		configured = structure.configured(FeatureConfiguration.NONE, NostrumTags.Biomes.SorceryDimension);
 		CONFIGUREDDUNGEON_KANI_DUNGEON = configured;
 		REF_DUNGEON_KANI_DUNGEON = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_KANI_DUNGEON_ID), NostrumMagica.Loc(DUNGEONGEN_KANI_DUNGEON_CONF_ID));
 		
 		structure = new VaniSolarStructure();
-		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
+		configured = structure.configured(FeatureConfiguration.NONE, NostrumTags.Biomes.SorceryDimension);
 		CONFIGUREDDUNGEON_VANI_SOLAR = configured;
 		REF_DUNGEON_VANI_SOLAR = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_VANI_SOLAR_ID), NostrumMagica.Loc(DUNGEONGEN_VANI_SOLAR_CONF_ID));
 		
 		structure = new LegacySorceryStructure();
-		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
+		configured = structure.configured(FeatureConfiguration.NONE, NostrumTags.Biomes.SorceryDimension);
 		CONFIGUREDDUNGEON_LEGACY_SORCERY = configured;
 		REF_DUNGEON_LEGACY_SORCERY = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_LEGACY_SORCERY_ID), NostrumMagica.Loc(DUNGEONGEN_LEGACY_SORCERY_CONF_ID));
 		
 		structure = new ElementalTrialStructure();
-		configured = structure.configured(FeatureConfiguration.NONE, fakeSorceryBiomeKey);
+		configured = structure.configured(FeatureConfiguration.NONE, NostrumTags.Biomes.SorceryDimension);
 		CONFIGUREDDUNGEON_ELEMENTAL_TRIAL = configured;
 		REF_DUNGEON_ELEMENTAL_TRIAL = registerStructure(event, structure, configured, NostrumMagica.Loc(DUNGEONGEN_ELEMENTAL_TRIAL_ID), NostrumMagica.Loc(DUNGEONGEN_ELEMENTAL_TRIAL_CONF_ID));
 		

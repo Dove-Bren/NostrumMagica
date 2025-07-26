@@ -132,7 +132,7 @@ public class GlowOrbParticle extends TextureSheetParticle implements IMotionPart
 			RenderSystem.depthMask(false);
 			RenderSystem.enableDepthTest();
 			RenderSystem.enableBlend();
-			RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+			RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE);
 			//RenderSystem.alphaFunc(GL11.GL_GREATER, 0);
 			//RenderSystem.disableLighting();
 			// Texture set up by batch renderer but would need to be here if this were a real particlerendertype
@@ -143,6 +143,7 @@ public class GlowOrbParticle extends TextureSheetParticle implements IMotionPart
 		@Override
 		public void end(Tesselator tessellator) {
 			tessellator.end();
+			RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 		}
 		
 	};
