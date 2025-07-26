@@ -384,7 +384,7 @@ public class ReagentBag extends Item implements ILoreTagged {
 	protected static final boolean autoFillRitual(Level world, BlockPos pos, BlockEntity te, Player player, ItemStack bag) {
 		if (te instanceof AltarTileEntity && !((AltarTileEntity) te).getItem().isEmpty()) {
 			// Capture current actual layout
-			AltarRitualLayout layout = AltarRitualLayout.Capture(world, pos, EMagicElement.PHYSICAL);
+			AltarRitualLayout layout = AltarRitualLayout.Capture(world, pos, EMagicElement.NEUTRAL);
 			if (!layout.hasTierBlocks(1)) { // only for tier 2+ (encoded as 1+)
 				return false;
 			}

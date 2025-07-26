@@ -314,7 +314,7 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 		super.defineSynchedData();
 		
 		this.entityData.define(STATUS, WilloStatus.NEUTRAL);
-		this.entityData.define(ELEMENT, EMagicElement.PHYSICAL);
+		this.entityData.define(ELEMENT, EMagicElement.NEUTRAL);
 	}
 	
 	protected void setStatus(WilloStatus status) {
@@ -334,7 +334,7 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 		super.readAdditionalSaveData(compound);
 		if (compound.contains("element", Tag.TAG_STRING)) {
 			try {
-				this.entityData.set(ELEMENT, EMagicElement.valueOf(compound.getString("element").toUpperCase()));
+				this.entityData.set(ELEMENT, EMagicElement.parse(compound.getString("element").toUpperCase()));
 			} catch (Exception e) {
 				this.entityData.set(ELEMENT, EMagicElement.ICE);
 			}
@@ -402,7 +402,7 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 	
 	@Override
 	public boolean hurt(DamageSource source, float amount) {
-		// Aggro if physical or non-opposing element.
+		// Aggro if neutral or non-opposing element.
 		// Panic if opposing element and not already panicked.
 		
 		
@@ -744,46 +744,46 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 			// Note: spell spot 1 and 2 are 'neutral' spells and can be cast on passing-by players.
 			// The others are only cast when aggro or panicking
 			
-			// Physical
+			// Neutral
 			putSpell("Physic Blast",
 					NostrumSpellShapes.Projectile,
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					2,
 					EAlteration.HARM);
 			putSpell("Shield",
 					NostrumSpellShapes.Burst,
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					1,
 					EAlteration.RESIST);
 			putSpell("Shield",
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					2,
 					EAlteration.SUPPORT);
 			putSpell("Weaken",
 					NostrumSpellShapes.Projectile,
 					NostrumSpellShapes.Burst,
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					1,
 					EAlteration.INFLICT);
 			putSpell("Weaken II",
 					NostrumSpellShapes.SeekingBullet,
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					2,
 					EAlteration.INFLICT);
 			putSpell("Summon Pets",
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					2,
 					EAlteration.SUMMON);
 //			putSpell("Crush",
 //					NostrumSpellShapes.Projectile,
 //					SingleShape.instance(),
-//					EMagicElement.PHYSICAL,
+//					EMagicElement.NEUTRAL,
 //					1,
 //					null);
 //			putSpell("Bone Crusher",
 //					NostrumSpellShapes.Projectile,
 //					SingleShape.instance(),
-//					EMagicElement.PHYSICAL,
+//					EMagicElement.NEUTRAL,
 //					2,
 //					null);
 			
@@ -842,7 +842,7 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 					3,
 					EAlteration.SUPPORT);
 			putSpell("Summon Pets (Fire)",
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					3,
 					EAlteration.SUMMON);
 

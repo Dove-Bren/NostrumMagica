@@ -125,7 +125,7 @@ public class Spell {
 	
 	protected void determineCharacteristics() {
 		boolean harmful = false;
-		EMagicElement element = EMagicElement.PHYSICAL;
+		EMagicElement element = EMagicElement.NEUTRAL;
 		
 		if (!parts.isEmpty()) {
 			element = parts.get(0).getElement();
@@ -346,7 +346,7 @@ public class Spell {
 	public Map<EMagicElement, Integer> getElements() {
 		Map<EMagicElement, Integer> list = new EnumMap<>(EMagicElement.class);
 		for (SpellEffectPart part : parts) {
-			EMagicElement element = part.getElement() == null ? EMagicElement.PHYSICAL : part.getElement();
+			EMagicElement element = part.getElement() == null ? EMagicElement.NEUTRAL : part.getElement();
 			int count = 0;
 			if (list.get(element) != null)
 				count = list.get(element);

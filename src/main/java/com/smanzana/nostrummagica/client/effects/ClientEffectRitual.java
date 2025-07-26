@@ -34,7 +34,7 @@ public class ClientEffectRitual extends ClientEffect {
 	private static final int DURATION_TIER2 = 20 * 6;
 	private static final int DURATION_TIER1 = 20 * 2;
 	
-	protected EMagicElement element = EMagicElement.PHYSICAL;
+	protected EMagicElement element = EMagicElement.NEUTRAL;
 	protected ItemStack center = ItemStack.EMPTY; // Either .empty() or present
 	protected List<ItemStack> extras = null; // can be null or size 4 with .empty() for blank altars
 	protected List<ItemStack> reagents = new ArrayList<>(); // Either size 1 or 4

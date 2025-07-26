@@ -161,6 +161,6 @@ public class SpellIngredientBuilder {
 		}
 		
 		NostrumMagica.logger.error("Null spell ingredient");
-		return new SpellIngredient(EMagicElement.PHYSICAL, getCurrentWeight(), getCurrentMana(), getCurrentElementCountBonus(), getCurrentEfficiency());
+		return new SpellIngredient(EMagicElement.NEUTRAL, getCurrentWeight(), getCurrentMana(), getCurrentElementCountBonus(), getCurrentEfficiency());
 	}
 }

@@ -129,7 +129,7 @@ import com.smanzana.nostrummagica.entity.golem.MagicEnderGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicFireGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicIceGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
-import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicNeutralGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 import com.smanzana.nostrummagica.fluid.NostrumFluids;
 import com.smanzana.nostrummagica.inventory.tooltip.ConfigurableHintTooltip;
@@ -143,7 +143,7 @@ import com.smanzana.nostrummagica.item.api.ICrystalEnchantableItem;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.item.equipment.AspectedEnderWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedFireWeapon;
-import com.smanzana.nostrummagica.item.equipment.AspectedPhysicalWeapon;
+import com.smanzana.nostrummagica.item.equipment.AspectedNeutralWeapon;
 import com.smanzana.nostrummagica.item.equipment.CasterWandItem;
 import com.smanzana.nostrummagica.item.equipment.ChargingSwordItem;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem;
@@ -329,7 +329,7 @@ public class ClientInit {
 			
 		};
 		ev.getItemColors().register(tinter, NostrumItems.essenceEarth, NostrumItems.essenceEnder, NostrumItems.essenceFire,
-				NostrumItems.essenceIce, NostrumItems.essenceLightning, NostrumItems.essencePhysical, NostrumItems.essenceWind
+				NostrumItems.essenceIce, NostrumItems.essenceLightning, NostrumItems.essenceNeutral, NostrumItems.essenceWind
 				);
 		
 		ev.getItemColors().register(new CasterWandItem.CasterWandColor(), NostrumItems.casterWand);
@@ -370,7 +370,7 @@ public class ClientInit {
 		event.registerEntityRenderer(NostrumEntityTypes.golemIce, (manager) -> new GolemRenderer<MagicIceGolemEntity>(manager));
 		event.registerEntityRenderer(NostrumEntityTypes.golemLightning, (manager) -> new GolemRenderer<MagicLightningGolemEntity>(manager));
 		event.registerEntityRenderer(NostrumEntityTypes.golemEnder, (manager) -> new GolemRenderer<MagicEnderGolemEntity>(manager));
-		event.registerEntityRenderer(NostrumEntityTypes.golemPhysical, (manager) -> new GolemRenderer<MagicPhysicalGolemEntity>(manager));
+		event.registerEntityRenderer(NostrumEntityTypes.golemNeutral, (manager) -> new GolemRenderer<MagicNeutralGolemEntity>(manager));
 		event.registerEntityRenderer(NostrumEntityTypes.golemWind, (manager) -> new GolemRenderer<MagicWindGolemEntity>(manager));
 		event.registerEntityRenderer(NostrumEntityTypes.koid, (manager) -> new KoidRenderer(manager, .3f));
 		event.registerEntityRenderer(NostrumEntityTypes.dragonRed, (manager) ->  new DragonRedRenderer<RedDragonEntity>(manager, 5));
@@ -532,7 +532,7 @@ public class ClientInit {
 		ItemProperties.register(NostrumItems.enderRod, ChargingSwordItem.PROPERTY_CHARGING, AspectedEnderWeapon::ModelCharging);
 		ItemProperties.register(NostrumItems.flameRod, ChargingSwordItem.PROPERTY_CHARGE, AspectedFireWeapon::ModelCharge);
 		ItemProperties.register(NostrumItems.flameRod, ChargingSwordItem.PROPERTY_CHARGING, AspectedFireWeapon::ModelCharging);
-		ItemProperties.register(NostrumItems.deepMetalAxe, NostrumMagica.Loc("blocking"), AspectedPhysicalWeapon::ModelBlocking);
+		ItemProperties.register(NostrumItems.deepMetalAxe, NostrumMagica.Loc("blocking"), AspectedNeutralWeapon::ModelBlocking);
 		ItemProperties.register(NostrumItems.hookshotWeak, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
 		ItemProperties.register(NostrumItems.hookshotMedium, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
 		ItemProperties.register(NostrumItems.hookshotStrong, NostrumMagica.Loc("extended"), HookshotItem::ModelExtended);
@@ -775,7 +775,7 @@ public class ClientInit {
 		registerEffectGemRenderer(NostrumEffects.spellBoostFire);
 		registerEffectGemRenderer(NostrumEffects.spellBoostIce);
 		registerEffectGemRenderer(NostrumEffects.spellBoostLightning);
-		registerEffectGemRenderer(NostrumEffects.spellBoostPhysical);
+		registerEffectGemRenderer(NostrumEffects.spellBoostNeutral);
 		registerEffectGemRenderer(NostrumEffects.spellBoostWind);
 		
 	}
@@ -1250,7 +1250,7 @@ public class ClientInit {
 
 		renderer.registerEffect((EAlteration) null,
 				(source, sourcePos, target, targetPos, part) -> {
-					// TODO physical breaks stuff. Lots of particles. Should we return null here?
+					// TODO earth breaks stuff. Lots of particles. Should we return null here?
 					
 					ClientEffect effect = new ClientEffectMirrored(targetPos == null ? target.position() : targetPos,
 							new ClientEffectFormFlat(ClientEffectIcon.TING4, 0, 0, 0),

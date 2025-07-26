@@ -16,7 +16,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public enum EMagicElement implements StringRepresentable {
 
-	PHYSICAL(0xFF223344),
+	NEUTRAL(0xFF223344),
 	FIRE(0xFFC21C00),
 	ICE(0xFF3294A3),
 	EARTH(0xFF60350D),
@@ -70,7 +70,7 @@ public enum EMagicElement implements StringRepresentable {
 			return ChatFormatting.AQUA;
 		case LIGHTNING:
 			return ChatFormatting.YELLOW;
-		case PHYSICAL:
+		case NEUTRAL:
 			return ChatFormatting.DARK_GRAY;
 		case WIND:
 			return ChatFormatting.DARK_GREEN;
@@ -90,7 +90,7 @@ public enum EMagicElement implements StringRepresentable {
 			return FIRE;
 		case LIGHTNING:
 			return ENDER;
-		case PHYSICAL:
+		case NEUTRAL:
 			return null;
 		case WIND:
 			return EARTH;
@@ -111,8 +111,8 @@ public enum EMagicElement implements StringRepresentable {
 			return element == WIND;
 		case LIGHTNING:
 			return element == ENDER;
-		case PHYSICAL:
-			return element != PHYSICAL;
+		case NEUTRAL:
+			return element != NEUTRAL;
 		case WIND:
 			return element == FIRE;
 		}
@@ -125,14 +125,14 @@ public enum EMagicElement implements StringRepresentable {
 		case EARTH:
 			return element == FIRE;
 		case ENDER:
-			return element == PHYSICAL;
+			return element == NEUTRAL;
 		case FIRE:
 			return element == WIND;
 		case ICE:
 			return element == EARTH;
 		case LIGHTNING:
-			return element == PHYSICAL;
-		case PHYSICAL:
+			return element == NEUTRAL;
+		case NEUTRAL:
 			return false;
 		case WIND:
 			return element == ICE;
@@ -145,18 +145,22 @@ public enum EMagicElement implements StringRepresentable {
 		return EMagicElement.values()[rand.nextInt(EMagicElement.values().length)];
 	}
 	
+	public static EMagicElement parse(String value) {
+		EMagicElement element = EMagicElement.NEUTRAL;
+		try {
+			element = EMagicElement.valueOf(value.toUpperCase());
+		} catch (Exception e) {
+			;
+		}
+		return element;
+	}
+	
 	public Tag toNBT() {
 		return StringTag.valueOf(this.name().toLowerCase());
 	}
 	
 	public static final EMagicElement FromNBT(Tag nbt) {
-		EMagicElement element = EMagicElement.PHYSICAL;
-		try {
-			element = EMagicElement.valueOf(((StringTag) nbt).getAsString().toUpperCase());
-		} catch (Exception e) {
-			;
-		}
-		return element;
+		return EMagicElement.parse(((StringTag) nbt).getAsString().toUpperCase());
 	}
 
 	public List<Component> getTooltip() {

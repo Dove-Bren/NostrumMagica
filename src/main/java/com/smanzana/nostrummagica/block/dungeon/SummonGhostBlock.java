@@ -62,7 +62,7 @@ public class SummonGhostBlock extends BaseEntityBlock implements ISpellTargetBlo
 			.isSuffocating((state, level, pos) -> false)
 			);
 	
-		this.registerDefaultState(this.defaultBlockState().setValue(ELEMENT, EMagicElement.PHYSICAL));
+		this.registerDefaultState(this.defaultBlockState().setValue(ELEMENT, EMagicElement.NEUTRAL));
 	}
 	
 	public BlockState getGhostState(BlockState state, BlockGetter level, BlockPos pos) {
@@ -216,7 +216,7 @@ public class SummonGhostBlock extends BaseEntityBlock implements ISpellTargetBlo
 	}
 	
 	public static boolean WrapBlock(Level world, BlockPos pos) {
-		return WrapBlock(world, pos, EMagicElement.PHYSICAL);
+		return WrapBlock(world, pos, EMagicElement.NEUTRAL);
 	}
 	
 	public static boolean WrapBlock(Level world, BlockPos pos, EMagicElement element) {

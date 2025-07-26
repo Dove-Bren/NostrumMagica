@@ -74,13 +74,13 @@ public class SpellEffectPart {
 	
 	public static SpellEffectPart FromNBT(CompoundTag tag) {
 		@Nullable EAlteration alteration = null;
-		EMagicElement element = EMagicElement.PHYSICAL;
+		EMagicElement element = EMagicElement.NEUTRAL;
 		int elementCount = 1;
 		float potency = 1f;
 		
 		if (tag.contains(NBT_ELEMENT, Tag.TAG_STRING)) {
 			try {
-				element = EMagicElement.valueOf(tag.getString(NBT_ELEMENT).toUpperCase());
+				element = EMagicElement.parse(tag.getString(NBT_ELEMENT).toUpperCase());
 			} catch (Exception e) {
 				
 			}

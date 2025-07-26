@@ -682,7 +682,7 @@ public class NostrumMagica {
 		for (SpellEffectPart part : spell.getSpellEffectParts()) {
 			EMagicElement elem = part.getElement();
 			if (elem == null)
-				elem = EMagicElement.PHYSICAL;
+				elem = EMagicElement.NEUTRAL;
 			int level = part.getElementCount();
 			
 			final EElementalMastery neededMastery;

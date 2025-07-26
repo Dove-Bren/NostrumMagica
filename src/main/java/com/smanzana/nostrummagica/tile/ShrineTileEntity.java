@@ -146,7 +146,7 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 		
 		public Element(BlockPos pos, BlockState state) {
 			super(NostrumBlockEntities.ElementShrine, pos, state);
-			this.element = EMagicElement.PHYSICAL;
+			this.element = EMagicElement.NEUTRAL;
 		}
 		
 		public EMagicElement getElement() {

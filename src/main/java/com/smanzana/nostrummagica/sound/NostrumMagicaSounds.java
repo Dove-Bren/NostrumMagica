@@ -20,7 +20,7 @@ public enum NostrumMagicaSounds {
 	GOLEM_IDLE("mob.golem.idle", SoundSource.NEUTRAL),
 	DAMAGE_FIRE("spell.damage.fire", SoundSource.HOSTILE),
 	DAMAGE_ICE("spell.damage.ice", SoundSource.HOSTILE),
-	DAMAGE_PHYSICAL("spell.damage.physical", SoundSource.HOSTILE),
+	DAMAGE_NEUTRAL("spell.damage.neutral", SoundSource.HOSTILE),
 	DAMAGE_LIGHTNING("spell.damage.lightning", SoundSource.HOSTILE),
 	DAMAGE_EARTH("spell.damage.earth", SoundSource.HOSTILE),
 	DAMAGE_WIND("spell.damage.wind", SoundSource.HOSTILE),

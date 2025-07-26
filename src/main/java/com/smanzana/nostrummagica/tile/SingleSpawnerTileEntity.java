@@ -16,7 +16,7 @@ import com.smanzana.nostrummagica.entity.golem.MagicEnderGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicFireGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicIceGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
-import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicNeutralGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 
 import net.minecraft.core.BlockPos;
@@ -68,7 +68,7 @@ public class SingleSpawnerTileEntity extends BlockEntity implements TickableBloc
 			if (type == null)
 				return null;
 			
-			EntityType<?> entType = NostrumEntityTypes.golemPhysical;
+			EntityType<?> entType = NostrumEntityTypes.golemNeutral;
 			
 			switch (type) {
 			case GOLEM_EARTH:
@@ -86,8 +86,8 @@ public class SingleSpawnerTileEntity extends BlockEntity implements TickableBloc
 			case GOLEM_LIGHTNING:
 				entType = NostrumEntityTypes.golemLightning;
 				break;
-			case GOLEM_PHYSICAL:
-				entType = NostrumEntityTypes.golemPhysical;
+			case GOLEM_NEUTRAL:
+				entType = NostrumEntityTypes.golemNeutral;
 				break;
 			case GOLEM_WIND:
 				entType = NostrumEntityTypes.golemWind;
@@ -170,8 +170,8 @@ public class SingleSpawnerTileEntity extends BlockEntity implements TickableBloc
 		case GOLEM_LIGHTNING:
 			entity = new MagicLightningGolemEntity(NostrumEntityTypes.golemLightning, world);
 			break;
-		case GOLEM_PHYSICAL:
-			entity = new MagicPhysicalGolemEntity(NostrumEntityTypes.golemPhysical, world);
+		case GOLEM_NEUTRAL:
+			entity = new MagicNeutralGolemEntity(NostrumEntityTypes.golemNeutral, world);
 			break;
 		case GOLEM_WIND:
 			entity = new MagicWindGolemEntity(NostrumEntityTypes.golemWind, world);

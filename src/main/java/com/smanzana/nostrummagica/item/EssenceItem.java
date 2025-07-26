@@ -52,8 +52,8 @@ public class EssenceItem extends Item implements ILoreTagged {
 		case LIGHTNING:
 			essence = NostrumItems.essenceLightning;
 			break;
-		case PHYSICAL:
-			essence = NostrumItems.essencePhysical;
+		case NEUTRAL:
+			essence = NostrumItems.essenceNeutral;
 			break;
 		case WIND:
 			essence = NostrumItems.essenceWind;

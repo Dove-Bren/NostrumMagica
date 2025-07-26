@@ -77,7 +77,7 @@ public final class SpellEffects {
 	
 	private static final SpellAction solveRuin(EMagicElement element, int elementCount) {
 		switch (element) {
-		case PHYSICAL:
+		case NEUTRAL:
 			return new SpellAction().transmute(elementCount).name("transmute");
 		case EARTH:
 		case ENDER:
@@ -96,12 +96,12 @@ public final class SpellEffects {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
 		switch (element) {
-		case PHYSICAL:
+		case NEUTRAL:
 			return new SpellAction().status(MobEffects.WEAKNESS, duration, amp)
 					.status(NostrumEffects.magicWeakness, duration, amp, (caster, target, eff) -> {
-						// Only apply with physical inflict skill
+						// Only apply with neutral inflict skill
 						INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-						if (attr != null && attr.hasSkill(NostrumSkills.Physical_Inflict)) {
+						if (attr != null && attr.hasSkill(NostrumSkills.Neutral_Inflict)) {
 							return true;
 						}
 						return false;
@@ -184,7 +184,7 @@ public final class SpellEffects {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
 		switch (element) {
-		case PHYSICAL:
+		case NEUTRAL:
 			return new SpellAction().status(MobEffects.DAMAGE_RESISTANCE, duration, amp).name("resistance");
 		case EARTH:
 			return new SpellAction().status(NostrumEffects.physicalShield, duration, (caster, target, eff) -> {
@@ -222,7 +222,7 @@ public final class SpellEffects {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
 		switch (element) {
-		case PHYSICAL:
+		case NEUTRAL:
 			return new SpellAction().status(MobEffects.ABSORPTION, duration * 5, amp).name("lifeboost");
 		case EARTH:
 			return new SpellAction().status(MobEffects.DAMAGE_BOOST, duration, amp).name("strength");
@@ -261,11 +261,11 @@ public final class SpellEffects {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
 		switch (element) {
-		case PHYSICAL:
+		case NEUTRAL:
 			return new SpellAction().healFood(4 * elementCount).status(NostrumEffects.naturesBlessing, duration * 5, amp, (caster, target, eff) -> {
-				// Only apply with physical growth skill
+				// Only apply with neutral growth skill
 				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-				if (attr != null && attr.hasSkill(NostrumSkills.Physical_Growth)) {
+				if (attr != null && attr.hasSkill(NostrumSkills.Neutral_Growth)) {
 					return true;
 				}
 				return false;
@@ -317,7 +317,7 @@ public final class SpellEffects {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
 		switch (element) {
-		case PHYSICAL:
+		case NEUTRAL:
 			return new SpellAction().status(MobEffects.GLOWING, duration, amp).lightBlock(elementCount < 2).name("light");
 		case EARTH:
 			return new SpellAction().grow(elementCount).name("grow");
@@ -344,7 +344,7 @@ public final class SpellEffects {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
 		switch (element) {
-		case PHYSICAL:
+		case NEUTRAL:
 			return new SpellAction().status(NostrumEffects.rend, duration, amp).name("rend");
 		case EARTH:
 			return new SpellAction().harvest(elementCount).name("harvest");
@@ -388,7 +388,7 @@ public final class SpellEffects {
 		int duration = 20 * 15 * elementCount;
 		int amp = elementCount - 1;
 		switch (element) {
-		case PHYSICAL:
+		case NEUTRAL:
 			return new SpellAction().status(NostrumEffects.carapace, duration, amp).name("carapace");
 		case EARTH:
 			return new SpellAction().blockBreak(elementCount).knockback(elementCount).name("bash");
@@ -587,7 +587,7 @@ public final class SpellEffects {
 	protected static final float getTargetEfficiencyBonus(LivingEntity caster, LivingEntity target, SpellEffectPart effect, SpellAction action, float base, ISpellLogBuilder log) {
 		float bonus = 0f;
 		
-		if (effect.getElement() != EMagicElement.PHYSICAL && MagicCapability.SPELLCAST_ELEMLINGER.matches(caster)) {
+		if (effect.getElement() != EMagicElement.NEUTRAL && MagicCapability.SPELLCAST_ELEMLINGER.matches(caster)) {
 			final MobEffect boostEffect = ElementalSpellBoostEffect.GetForElement(effect.getElement().getOpposite());
 			if (target.getEffect(boostEffect) != null) {
 				final float amt = .25f * (1 + target.getEffect(boostEffect).getAmplifier());
@@ -649,10 +649,10 @@ public final class SpellEffects {
 				log.addGlobalModifier(NostrumSkills.Lightning_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
 			}
 			break;
-		case PHYSICAL:
-			if (attr.hasSkill(NostrumSkills.Physical_Novice)) {
+		case NEUTRAL:
+			if (attr.hasSkill(NostrumSkills.Neutral_Novice)) {
 				bonus += .2f;
-				log.addGlobalModifier(NostrumSkills.Physical_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
+				log.addGlobalModifier(NostrumSkills.Neutral_Novice, .2f, ESpellLogModifierType.BONUS_SCALE);
 			}
 			break;
 		case WIND:

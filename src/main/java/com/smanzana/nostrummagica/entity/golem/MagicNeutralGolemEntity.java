@@ -15,9 +15,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.Level;
 
-public class MagicPhysicalGolemEntity extends MagicGolemEntity {
+public class MagicNeutralGolemEntity extends MagicGolemEntity {
 	
-	public static final String ID = "physical_golem";
+	public static final String ID = "neutral_golem";
 	
 	private static Spell spellRanged;
 	private static Spell spellDebuff;
@@ -28,21 +28,21 @@ public class MagicPhysicalGolemEntity extends MagicGolemEntity {
 			//spellRanged.addPart(new SpellPart()); should be projectile
 			spellRanged.addPart(new SpellShapePart(NostrumSpellShapes.Projectile));
 			spellRanged.addPart(new SpellEffectPart(
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					1,
 					EAlteration.HARM));
 			
 			spellDebuff = Spell.CreateAISpell("Corrupt Offense");
 			spellDebuff.addPart(new SpellShapePart(NostrumSpellShapes.SeekingBullet));
 			spellDebuff.addPart(new SpellEffectPart(
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					1,
 					EAlteration.INFLICT));
 		}
 	}
 
-	public MagicPhysicalGolemEntity(EntityType<MagicPhysicalGolemEntity> type, Level worldIn) {
-		super(type, worldIn, EMagicElement.PHYSICAL, true, true, false);
+	public MagicNeutralGolemEntity(EntityType<MagicNeutralGolemEntity> type, Level worldIn) {
+		super(type, worldIn, EMagicElement.NEUTRAL, true, true, false);
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class MagicPhysicalGolemEntity extends MagicGolemEntity {
 
 	@Override
 	public void doRangeTask(LivingEntity target) {
-		MagicPhysicalGolemEntity.init();
+		MagicNeutralGolemEntity.init();
 		
 		// Either do debuff or damage
 		if (target.getEffect(MobEffects.WEAKNESS) == null) {
@@ -78,7 +78,7 @@ public class MagicPhysicalGolemEntity extends MagicGolemEntity {
 	}
 
 	public static final AttributeSupplier.Builder BuildAttributes() {
-		return MagicGolemEntity.BuildBaseAttributes(EMagicElement.PHYSICAL)
+		return MagicGolemEntity.BuildBaseAttributes(EMagicElement.NEUTRAL)
 	        .add(Attributes.MOVEMENT_SPEED, 0.23D)
 	
 	        .add(Attributes.MAX_HEALTH, 16.0D)
@@ -89,7 +89,7 @@ public class MagicPhysicalGolemEntity extends MagicGolemEntity {
 
 	@Override
 	public String getTextureKey() {
-		return "physical";
+		return "neutral";
 	}
 	
 //	@Override
@@ -99,7 +99,7 @@ public class MagicPhysicalGolemEntity extends MagicGolemEntity {
 //			count += lootingModifier;
 //			
 //			this.entityDropItem(EssenceItem.getEssence(
-//					EMagicElement.PHYSICAL,
+//					EMagicElement.NEUTRAL,
 //					count), 0);
 //			
 //			int denom = ROSE_DROP_DENOM;

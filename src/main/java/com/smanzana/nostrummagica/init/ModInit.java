@@ -127,7 +127,7 @@ import com.smanzana.nostrummagica.trial.TrialEnder;
 import com.smanzana.nostrummagica.trial.TrialFire;
 import com.smanzana.nostrummagica.trial.TrialIce;
 import com.smanzana.nostrummagica.trial.TrialLightning;
-import com.smanzana.nostrummagica.trial.TrialPhysical;
+import com.smanzana.nostrummagica.trial.TrialNeutral;
 import com.smanzana.nostrummagica.trial.TrialWind;
 import com.smanzana.nostrummagica.trial.WorldTrial;
 import com.smanzana.nostrummagica.util.Ingredients;
@@ -340,7 +340,7 @@ public class ModInit {
 
 		// Boons
 		{
-			recipe = RitualRecipe.createTier1("buff.luck", new ItemStack(Items.RABBIT_FOOT), EMagicElement.PHYSICAL,
+			recipe = RitualRecipe.createTier1("buff.luck", new ItemStack(Items.RABBIT_FOOT), EMagicElement.NEUTRAL,
 					ReagentType.SPIDER_SILK, new ResearchRequirement(NostrumResearches.ID_Boon),
 					new OutcomePotionEffect(MobEffects.LUCK, 0, 120 * 20));
 			registry.register(recipe);
@@ -377,7 +377,7 @@ public class ModInit {
 			registry.register(recipe);
 
 			recipe = RitualRecipe.createTier1("buff.nightvision", new ItemStack(Items.GOLDEN_CARROT),
-					EMagicElement.PHYSICAL, ReagentType.BLACK_PEARL, new ResearchRequirement(NostrumResearches.ID_Boon),
+					EMagicElement.NEUTRAL, ReagentType.BLACK_PEARL, new ResearchRequirement(NostrumResearches.ID_Boon),
 					new OutcomePotionEffect(MobEffects.NIGHT_VISION, 0, 120 * 20));
 			registry.register(recipe);
 
@@ -912,16 +912,16 @@ public class ModInit {
 				new ResearchRequirement(NostrumResearches.ID_Sword_Earth),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.earthPike))));
 		
-		registry.register(RitualRecipe.createTier3("spawn_sword_physical", new ItemStack(NostrumItems.deepMetalAxe),
+		registry.register(RitualRecipe.createTier3("spawn_sword_neutral", new ItemStack(NostrumItems.deepMetalAxe),
 				null, new ReagentType[] { ReagentType.GRAVE_DUST, ReagentType.MANI_DUST,
 						ReagentType.SKY_ASH, ReagentType.BLACK_PEARL },
-				Ingredients.MatchMageBlade(EMagicElement.PHYSICAL),
+				Ingredients.MatchMageBlade(EMagicElement.NEUTRAL),
 				new Ingredient[] { Ingredient.EMPTY,
 						Ingredient.of(Items.DIAMOND_AXE),
 						Ingredient.of(Items.SHULKER_SHELL),
 						Ingredient.EMPTY
 						},
-				new ResearchRequirement(NostrumResearches.ID_Sword_Physical),
+				new ResearchRequirement(NostrumResearches.ID_Sword_Neutral),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.deepMetalAxe))));
 
 		registry.register(RitualRecipe.createTier3("create_seeking_gem",
@@ -1056,7 +1056,7 @@ public class ModInit {
 
 					registry.register(RitualRecipe.createTier3(regName, name, 
 							outcome,
-							elem == EMagicElement.PHYSICAL ? null : elem,
+							elem == EMagicElement.NEUTRAL ? null : elem,
 							new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST,
 									ReagentType.MANI_DUST },
 							input, new Ingredient[] { essence, gem, essence, essence },
@@ -1090,7 +1090,7 @@ public class ModInit {
 
 				registry
 						.register(RitualRecipe.createTier3(regName, name, new ItemStack(ElementalArmor.get(elem, slot, ElementalArmor.Type.MASTER)),
-								elem == EMagicElement.PHYSICAL ? null : elem,
+								elem == EMagicElement.NEUTRAL ? null : elem,
 								new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST,
 										ReagentType.MANI_DUST },
 								input,
@@ -1136,7 +1136,7 @@ public class ModInit {
 				}
 
 				registry.register(RitualRecipe.createTier3(regName, name, outcome,
-						elem == EMagicElement.PHYSICAL ? null : elem,
+						elem == EMagicElement.NEUTRAL ? null : elem,
 						new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SKY_ASH, ReagentType.MANI_DUST,
 								ReagentType.MANI_DUST },
 						input, new Ingredient[] { essence, gem, essence, essence },
@@ -1212,7 +1212,7 @@ public class ModInit {
 				registry
 						.register(RitualRecipe.createTier3(
 								"craft_dragonarmor_" + slot.getName() + "_" + material.name().toLowerCase(), result,
-								EMagicElement.PHYSICAL,
+								EMagicElement.NEUTRAL,
 								new ReagentType[] { ReagentType.MANDRAKE_ROOT, ReagentType.SKY_ASH,
 										ReagentType.BLACK_PEARL, ReagentType.MANI_DUST },
 								base, new Ingredient[] { Ingredient.EMPTY, base, cost, Ingredient.EMPTY },
@@ -1223,7 +1223,7 @@ public class ModInit {
 					registry
 							.register(RitualRecipe.createTier3(
 									"upgrade_dragonarmor_" + slot.getName() + "_" + material.name().toLowerCase(),
-									result, EMagicElement.PHYSICAL,
+									result, EMagicElement.NEUTRAL,
 									new ReagentType[] { ReagentType.MANDRAKE_ROOT, ReagentType.SKY_ASH,
 											ReagentType.BLACK_PEARL, ReagentType.MANI_DUST },
 									prev, new Ingredient[] { Ingredient.EMPTY, augment, cost, Ingredient.EMPTY },
@@ -1234,7 +1234,7 @@ public class ModInit {
 
 		registry.register(RitualRecipe.createTier3("improve_hookshot_medium",
 				new ItemStack(NostrumItems.hookshotMedium),
-				EMagicElement.PHYSICAL,
+				EMagicElement.NEUTRAL,
 				new ReagentType[] { ReagentType.SPIDER_SILK, ReagentType.SPIDER_SILK, ReagentType.SKY_ASH,
 						ReagentType.MANI_DUST },
 				Ingredient.of(NostrumTags.Items.HookshotWeak),
@@ -1572,8 +1572,8 @@ public class ModInit {
 		// Specialty types
 		x = -3;
 		y = 0;
-		new NostrumQuest("phykills1", "kills1", x, y, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.PHYSICAL), 25));
-		new NostrumQuest("phykills2", "phykills1", x-1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.PHYSICAL), 1000));
+		new NostrumQuest("phykills1", "kills1", x, y, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.NEUTRAL), 25));
+		new NostrumQuest("phykills2", "phykills1", x-1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.NEUTRAL), 1000));
 		new NostrumQuest("firekills1", "kills2", x, y, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.FIRE), 50));
 		new NostrumQuest("firekills2", "firekills1", x-1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.FIRE), 1000));
 		new NostrumQuest("icekills1", "kills2", x, y, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.KillsWithElement(EMagicElement.ICE), 50));
@@ -1600,8 +1600,8 @@ public class ModInit {
 		// Specialty types
 		x = 3;
 		y = 0;
-		new NostrumQuest("phydmgdealt1", "dmgdealt1", x, y, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.PHYSICAL), 50));
-		new NostrumQuest("phydmgdealt2", "phydmgdealt1", x+1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.PHYSICAL), 5000));
+		new NostrumQuest("phydmgdealt1", "dmgdealt1", x, y, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.NEUTRAL), 50));
+		new NostrumQuest("phydmgdealt2", "phydmgdealt1", x+1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.NEUTRAL), 5000));
 		new NostrumQuest("firedmgdealt1", "dmgdealt2", x, y, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.FIRE), 200));
 		new NostrumQuest("firedmgdealt2", "firedmgdealt1", x+1, y++, wrapAttribute(AwardType.REGEN, 0.04f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.FIRE), 5000));
 		new NostrumQuest("icedmgdealt1", "dmgdealt2", x, y, wrapAttribute(AwardType.MANA, 0.01f), new StatRequirement(PlayerStat.ElementalDamgeDealt(EMagicElement.ICE), 200));
@@ -1654,7 +1654,7 @@ public class ModInit {
 		WorldTrial.setTrial(EMagicElement.EARTH, new TrialEarth());
 		WorldTrial.setTrial(EMagicElement.ENDER, new TrialEnder());
 		WorldTrial.setTrial(EMagicElement.LIGHTNING, new TrialLightning());
-		WorldTrial.setTrial(EMagicElement.PHYSICAL, new TrialPhysical());
+		WorldTrial.setTrial(EMagicElement.NEUTRAL, new TrialNeutral());
 	}
 
 	@SubscribeEvent(priority=EventPriority.HIGH)

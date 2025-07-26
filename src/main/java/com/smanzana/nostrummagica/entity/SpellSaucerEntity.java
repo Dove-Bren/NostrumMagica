@@ -136,7 +136,7 @@ public abstract class SpellSaucerEntity extends SpellProjectileEntity {
 	@Override
 	protected void defineSynchedData() {
 		super.defineSynchedData();
-		//this.dataManager.register(ELEMENT, EMagicElement.PHYSICAL);
+		//this.dataManager.register(ELEMENT, EMagicElement.NEUTRAL);
 	}
 	
 	@Override

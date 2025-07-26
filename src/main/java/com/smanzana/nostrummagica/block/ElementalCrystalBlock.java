@@ -60,7 +60,7 @@ public class ElementalCrystalBlock extends BaseEntityBlock implements ISpellTarg
 				.lightLevel((state) -> 12)
 				);
 		
-		this.registerDefaultState(this.defaultBlockState().setValue(ELEMENT, EMagicElement.PHYSICAL));
+		this.registerDefaultState(this.defaultBlockState().setValue(ELEMENT, EMagicElement.NEUTRAL));
 	}
 	
 	@Override
@@ -117,8 +117,8 @@ public class ElementalCrystalBlock extends BaseEntityBlock implements ISpellTarg
 		// Blocks require ENCHANT and take the element
 		final EMagicElement element = getElement(state);
 		
-		// Only physical can be changed by non-creative players
-		if ((!(caster instanceof Player player) || !player.isCreative()) && element != EMagicElement.PHYSICAL) {
+		// Only neutral can be changed by non-creative players
+		if ((!(caster instanceof Player player) || !player.isCreative()) && element != EMagicElement.NEUTRAL) {
 			return false;
 		}
 		

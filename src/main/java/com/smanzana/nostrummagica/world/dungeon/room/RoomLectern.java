@@ -225,7 +225,7 @@ public class RoomLectern extends StaticRoom {
 		case LIGHTNING:
 			elemStr = "The Lightning";
 			break;
-		case PHYSICAL:
+		case NEUTRAL:
 			elemStr = "Metal";
 			break;
 		case WIND:

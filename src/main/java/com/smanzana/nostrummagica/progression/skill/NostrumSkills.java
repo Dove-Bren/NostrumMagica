@@ -23,7 +23,7 @@ import net.minecraft.resources.ResourceLocation;
 public class NostrumSkills {
 
 	public static final SkillCategory Category_Magica = new SkillCategory(NostrumMagica.Loc("magica"), 0xFF2080A0, () -> new ItemStack(NostrumItems.spellScroll), null);
-	public static final SkillCategory Category_Element_Physical = new SkillCategory(NostrumMagica.Loc(EMagicElement.PHYSICAL.name().toLowerCase()), EMagicElement.PHYSICAL.getColor(), () -> SpellRune.getRune(EMagicElement.PHYSICAL), EMagicElement.PHYSICAL);
+	public static final SkillCategory Category_Element_Neutral = new SkillCategory(NostrumMagica.Loc(EMagicElement.NEUTRAL.name().toLowerCase()), EMagicElement.NEUTRAL.getColor(), () -> SpellRune.getRune(EMagicElement.NEUTRAL), EMagicElement.NEUTRAL);
 	public static final SkillCategory Category_Element_Fire = new SkillCategory(NostrumMagica.Loc(EMagicElement.FIRE.name().toLowerCase()), EMagicElement.FIRE.getColor(), () -> SpellRune.getRune(EMagicElement.FIRE), EMagicElement.FIRE);
 	public static final SkillCategory Category_Element_Ice = new SkillCategory(NostrumMagica.Loc(EMagicElement.ICE.name().toLowerCase()), EMagicElement.ICE.getColor(), () -> SpellRune.getRune(EMagicElement.ICE), EMagicElement.ICE);
 	public static final SkillCategory Category_Element_Earth = new SkillCategory(NostrumMagica.Loc(EMagicElement.EARTH.name().toLowerCase()), EMagicElement.EARTH.getColor(), () -> SpellRune.getRune(EMagicElement.EARTH), EMagicElement.EARTH);
@@ -68,13 +68,13 @@ public class NostrumSkills {
 	private static final ResourceLocation ID_INCANTING_POTENCY1 = NostrumMagica.Loc("incanting.potency1");
 	private static final ResourceLocation ID_INCANTING_POTENCY2 = NostrumMagica.Loc("incanting.potency2");
 	
-	private static final ResourceLocation ID_PHYSICAL_NOVICE = NostrumMagica.Loc("physical.novice");
-	private static final ResourceLocation ID_PHYSICAL_ADEPT = NostrumMagica.Loc("physical.adept");
-	private static final ResourceLocation ID_PHYSICAL_MASTER = NostrumMagica.Loc("physical.master");
-	private static final ResourceLocation ID_PHYSICAL_CORRUPT = NostrumMagica.Loc("physical.corrupt");
-	private static final ResourceLocation ID_PHYSICAL_WEAPON = NostrumMagica.Loc("physical.weapon");
-	private static final ResourceLocation ID_PHYSICAL_INFLICT = NostrumMagica.Loc("physical.inflict");
-	private static final ResourceLocation ID_PHYSICAL_GROWTH = NostrumMagica.Loc("physical.growth");
+	private static final ResourceLocation ID_NEUTRAL_NOVICE = NostrumMagica.Loc("neutral.novice");
+	private static final ResourceLocation ID_NEUTRAL_ADEPT = NostrumMagica.Loc("neutral.adept");
+	private static final ResourceLocation ID_NEUTRAL_MASTER = NostrumMagica.Loc("neutral.master");
+	private static final ResourceLocation ID_NEUTRAL_CORRUPT = NostrumMagica.Loc("neutral.corrupt");
+	private static final ResourceLocation ID_NEUTRAL_WEAPON = NostrumMagica.Loc("neutral.weapon");
+	private static final ResourceLocation ID_NEUTRAL_INFLICT = NostrumMagica.Loc("neutral.inflict");
+	private static final ResourceLocation ID_NEUTRAL_GROWTH = NostrumMagica.Loc("neutral.growth");
 
 	private static final ResourceLocation ID_FIRE_NOVICE = NostrumMagica.Loc("fire.novice");
 	private static final ResourceLocation ID_FIRE_ADEPT = NostrumMagica.Loc("fire.adept");
@@ -160,13 +160,13 @@ public class NostrumSkills {
 	public static /*final*/ Skill Incanting_Potency1;
 	public static /*final*/ Skill Incanting_Potency2;
 	
-	public static /*final*/ Skill Physical_Novice;
-	public static /*final*/ Skill Physical_Adept;
-	public static /*final*/ Skill Physical_Master;
-	public static /*final*/ Skill Physical_Corrupt;
-	public static /*final*/ Skill Physical_Weapon;
-	public static /*final*/ Skill Physical_Inflict;
-	public static /*final*/ Skill Physical_Growth;
+	public static /*final*/ Skill Neutral_Novice;
+	public static /*final*/ Skill Neutral_Adept;
+	public static /*final*/ Skill Neutral_Master;
+	public static /*final*/ Skill Neutral_Corrupt;
+	public static /*final*/ Skill Neutral_Weapon;
+	public static /*final*/ Skill Neutral_Inflict;
+	public static /*final*/ Skill Neutral_Growth;
 
 	public static /*final*/ Skill Fire_Novice;
 	public static /*final*/ Skill Fire_Adept;
@@ -273,13 +273,13 @@ public class NostrumSkills {
 		
 		x = 0;
 		y = 1;
-		Physical_Novice = new HiddenSkill(ID_PHYSICAL_NOVICE, Category_Element_Physical, null, () -> SpellRune.getRune(EMagicElement.PHYSICAL), x, y, new ElementMasteryRequirement(EMagicElement.PHYSICAL, EElementalMastery.NOVICE));
-		Physical_Adept = new HiddenSkill(ID_PHYSICAL_ADEPT, Category_Element_Physical, ID_PHYSICAL_NOVICE, () -> new ItemStack(Items.IRON_CHESTPLATE), x, y-1, new ElementMasteryRequirement(EMagicElement.PHYSICAL, EElementalMastery.ADEPT));
-		Physical_Master = new HiddenSkill(ID_PHYSICAL_MASTER, Category_Element_Physical, ID_PHYSICAL_ADEPT, () -> new ItemStack(Items.NETHERITE_SWORD), x, y-2, new ElementMasteryRequirement(EMagicElement.PHYSICAL, EElementalMastery.MASTER));
-		Physical_Inflict = new HiddenSkill(ID_PHYSICAL_INFLICT, Category_Element_Physical, ID_PHYSICAL_NOVICE, () -> new ItemStack(Items.WOODEN_SWORD), x-1, y-1, new SpellKnowledgeRequirement(EMagicElement.PHYSICAL, EAlteration.INFLICT));
-		Physical_Growth = new HiddenSkill(ID_PHYSICAL_GROWTH, Category_Element_Physical, ID_PHYSICAL_NOVICE, () -> new ItemStack(Items.GOLDEN_CARROT), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.PHYSICAL, EAlteration.GROWTH));
-		Physical_Corrupt = new HiddenSkill(ID_PHYSICAL_CORRUPT, Category_Element_Physical, ID_PHYSICAL_ADEPT, () -> new ItemStack(Items.POPPED_CHORUS_FRUIT), x-1, y-2, new SpellKnowledgeRequirement(EMagicElement.PHYSICAL, EAlteration.CORRUPT));
-		Physical_Weapon = new HiddenSkill(ID_PHYSICAL_WEAPON, Category_Element_Physical, ID_PHYSICAL_ADEPT, () -> new ItemStack(NostrumItems.deepMetalAxe), x+1, y-2, new ResearchRequirement(NostrumResearches.ID_Sword_Physical));
+		Neutral_Novice = new HiddenSkill(ID_NEUTRAL_NOVICE, Category_Element_Neutral, null, () -> SpellRune.getRune(EMagicElement.NEUTRAL), x, y, new ElementMasteryRequirement(EMagicElement.NEUTRAL, EElementalMastery.NOVICE));
+		Neutral_Adept = new HiddenSkill(ID_NEUTRAL_ADEPT, Category_Element_Neutral, ID_NEUTRAL_NOVICE, () -> new ItemStack(Items.IRON_CHESTPLATE), x, y-1, new ElementMasteryRequirement(EMagicElement.NEUTRAL, EElementalMastery.ADEPT));
+		Neutral_Master = new HiddenSkill(ID_NEUTRAL_MASTER, Category_Element_Neutral, ID_NEUTRAL_ADEPT, () -> new ItemStack(Items.NETHERITE_SWORD), x, y-2, new ElementMasteryRequirement(EMagicElement.NEUTRAL, EElementalMastery.MASTER));
+		Neutral_Inflict = new HiddenSkill(ID_NEUTRAL_INFLICT, Category_Element_Neutral, ID_NEUTRAL_NOVICE, () -> new ItemStack(Items.WOODEN_SWORD), x-1, y-1, new SpellKnowledgeRequirement(EMagicElement.NEUTRAL, EAlteration.INFLICT));
+		Neutral_Growth = new HiddenSkill(ID_NEUTRAL_GROWTH, Category_Element_Neutral, ID_NEUTRAL_NOVICE, () -> new ItemStack(Items.GOLDEN_CARROT), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.NEUTRAL, EAlteration.GROWTH));
+		Neutral_Corrupt = new HiddenSkill(ID_NEUTRAL_CORRUPT, Category_Element_Neutral, ID_NEUTRAL_ADEPT, () -> new ItemStack(Items.POPPED_CHORUS_FRUIT), x-1, y-2, new SpellKnowledgeRequirement(EMagicElement.NEUTRAL, EAlteration.CORRUPT));
+		Neutral_Weapon = new HiddenSkill(ID_NEUTRAL_WEAPON, Category_Element_Neutral, ID_NEUTRAL_ADEPT, () -> new ItemStack(NostrumItems.deepMetalAxe), x+1, y-2, new ResearchRequirement(NostrumResearches.ID_Sword_Neutral));
 
 		x = 0;
 		y = 1;

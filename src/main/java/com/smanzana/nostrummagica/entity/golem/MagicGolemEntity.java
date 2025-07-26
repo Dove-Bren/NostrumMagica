@@ -125,7 +125,7 @@ public abstract class MagicGolemEntity extends TamableAnimal implements ILoreSup
     			.add(Attributes.ATTACK_DAMAGE, 2.0)
     			.add(NostrumAttributes.GetReduceAttribute(element), 1.0);
     	
-    	if (element == EMagicElement.PHYSICAL) {
+    	if (element == EMagicElement.NEUTRAL) {
     		attributes.add(NostrumAttributes.GetReduceAttribute(EMagicElement.FIRE), -3.0);
     		attributes.add(NostrumAttributes.GetReduceAttribute(EMagicElement.ICE), -3.0);
     		attributes.add(NostrumAttributes.GetReduceAttribute(EMagicElement.WIND), -3.0);

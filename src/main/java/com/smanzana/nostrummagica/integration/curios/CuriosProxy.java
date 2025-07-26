@@ -247,10 +247,10 @@ public class CuriosProxy {
 		registry.register(recipe);
 		
 		ItemStack dragonwings = new ItemStack(NostrumCurios.dragonWingPendant);
-		((DragonWingPendantItem) dragonwings.getItem()).setEmbeddedElement(dragonwings, EMagicElement.PHYSICAL);
+		((DragonWingPendantItem) dragonwings.getItem()).setEmbeddedElement(dragonwings, EMagicElement.NEUTRAL);
 		recipe = RitualRecipe.createTier3("create_dragon_wing_pendant",
 				dragonwings,
-				EMagicElement.PHYSICAL,
+				EMagicElement.NEUTRAL,
 				new ReagentType[] {ReagentType.GRAVE_DUST, ReagentType.SKY_ASH, ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM},
 				Ingredient.of(Tags.Items.INGOTS_GOLD),
 				new Ingredient[] {Ingredient.of(NostrumTags.Items.DragonWing), Ingredient.of(NostrumCurios.ringGold), Ingredient.of(NostrumTags.Items.CrystalMedium), Ingredient.of(NostrumTags.Items.DragonWing)},

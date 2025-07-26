@@ -163,7 +163,7 @@ public class DungeonLauncherTileEntity extends BlockEntity implements TickableBl
 		if (projectile instanceof MagicDamageProjectileEntity) {
 			// Change speed based on element
 			switch (((MagicDamageProjectileEntity) projectile).getElement()) {
-			case PHYSICAL:
+			case NEUTRAL:
 			default:
 				; // No change
 				break;

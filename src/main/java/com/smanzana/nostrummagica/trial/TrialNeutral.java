@@ -11,10 +11,10 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-public class TrialPhysical extends WorldTrial {
+public class TrialNeutral extends WorldTrial {
 
-	public TrialPhysical() {
-		super(EMagicElement.PHYSICAL);
+	public TrialNeutral() {
+		super(EMagicElement.NEUTRAL);
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 

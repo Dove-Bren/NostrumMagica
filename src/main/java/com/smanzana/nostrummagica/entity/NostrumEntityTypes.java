@@ -18,7 +18,7 @@ import com.smanzana.nostrummagica.entity.golem.MagicEnderGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicFireGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicIceGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
-import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicNeutralGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 
 import net.minecraft.core.BlockPos;
@@ -51,7 +51,7 @@ import net.minecraftforge.registries.ObjectHolder;
 @ObjectHolder(NostrumMagica.MODID)
 public class NostrumEntityTypes {
 
-	@ObjectHolder(MagicPhysicalGolemEntity.ID) public static EntityType<MagicPhysicalGolemEntity> golemPhysical;
+	@ObjectHolder(MagicNeutralGolemEntity.ID) public static EntityType<MagicNeutralGolemEntity> golemNeutral;
 	@ObjectHolder(MagicLightningGolemEntity.ID) public static EntityType<MagicLightningGolemEntity> golemLightning;
 	@ObjectHolder(MagicFireGolemEntity.ID) public static EntityType<MagicFireGolemEntity> golemFire;
 	@ObjectHolder(MagicEarthGolemEntity.ID) public static EntityType<MagicEarthGolemEntity> golemEarth;
@@ -101,10 +101,10 @@ public class NostrumEntityTypes {
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<EntityType<?>> event) {
 		final IForgeRegistry<EntityType<?>> registry = event.getRegistry();
-    	registry.register(EntityType.Builder.<MagicPhysicalGolemEntity>of(MagicPhysicalGolemEntity::new, MobCategory.MISC)
+    	registry.register(EntityType.Builder.<MagicNeutralGolemEntity>of(MagicNeutralGolemEntity::new, MobCategory.MISC)
 				.sized(0.8F, 1.6F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
-			.build("").setRegistryName(MagicPhysicalGolemEntity.ID));
+			.build("").setRegistryName(MagicNeutralGolemEntity.ID));
 		registry.register(EntityType.Builder.<MagicLightningGolemEntity>of(MagicLightningGolemEntity::new, MobCategory.MISC)
 				.sized(0.8F, 1.6F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(false)
@@ -393,7 +393,7 @@ public class NostrumEntityTypes {
 	
 	@SubscribeEvent
 	public static void registerAttributes(EntityAttributeCreationEvent event) {
-		event.put(golemPhysical, MagicPhysicalGolemEntity.BuildAttributes().build());
+		event.put(golemNeutral, MagicNeutralGolemEntity.BuildAttributes().build());
 		event.put(golemLightning, MagicLightningGolemEntity.BuildAttributes().build());
 		event.put(golemFire, MagicFireGolemEntity.BuildAttributes().build());
 		event.put(golemEarth, MagicEarthGolemEntity.BuildAttributes().build());

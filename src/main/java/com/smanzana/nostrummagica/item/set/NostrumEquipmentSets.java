@@ -26,10 +26,10 @@ import net.minecraftforge.registries.ObjectHolder;
 @ObjectHolder(NostrumMagica.MODID)
 public class NostrumEquipmentSets {
 	
-	private static final String ID_MAGICARMOR_PHYSICAL = "magic_armor.physical";
-	private static final String ID_MAGICARMOR_PHYSICAL_NOVICE = ID_MAGICARMOR_PHYSICAL + ".novice";
-	private static final String ID_MAGICARMOR_PHYSICAL_ADEPT = ID_MAGICARMOR_PHYSICAL + ".adept";
-	private static final String ID_MAGICARMOR_PHYSICAL_MASTER = ID_MAGICARMOR_PHYSICAL + ".master";
+	private static final String ID_MAGICARMOR_NEUTRAL = "magic_armor.neutral";
+	private static final String ID_MAGICARMOR_NEUTRAL_NOVICE = ID_MAGICARMOR_NEUTRAL + ".novice";
+	private static final String ID_MAGICARMOR_NEUTRAL_ADEPT = ID_MAGICARMOR_NEUTRAL + ".adept";
+	private static final String ID_MAGICARMOR_NEUTRAL_MASTER = ID_MAGICARMOR_NEUTRAL + ".master";
 	private static final String ID_MAGICARMOR_FIRE = "magic_armor.fire";
 	private static final String ID_MAGICARMOR_FIRE_NOVICE = ID_MAGICARMOR_FIRE + ".novice";
 	private static final String ID_MAGICARMOR_FIRE_ADEPT = ID_MAGICARMOR_FIRE + ".adept";
@@ -58,9 +58,9 @@ public class NostrumEquipmentSets {
 	private static final String ID_KOID = "koid";
 	private static final String ID_GOLEM = "golem";
 	
-	private static final UUID SET_UUID_PHYSICAL_NOVICE = UUID.fromString("7164440b-20da-4b04-9e3f-491515ff57d8");
-	private static final UUID SET_UUID_PHYSICAL_ADEPT = UUID.fromString("2bf205b7-ec52-40d5-bf91-ec94b665139f");
-	private static final UUID SET_UUID_PHYSICAL_MASTER = UUID.fromString("2c0e8d42-164b-4cf5-8f3c-7f96035aba81");
+	private static final UUID SET_UUID_NEUTRAL_NOVICE = UUID.fromString("7164440b-20da-4b04-9e3f-491515ff57d8");
+	private static final UUID SET_UUID_NEUTRAL_ADEPT = UUID.fromString("2bf205b7-ec52-40d5-bf91-ec94b665139f");
+	private static final UUID SET_UUID_NEUTRAL_MASTER = UUID.fromString("2c0e8d42-164b-4cf5-8f3c-7f96035aba81");
 	private static final UUID SET_UUID_FIRE_NOVICE = UUID.fromString("0f40ec59-be0b-4496-bb74-743f71b5386d");
 	private static final UUID SET_UUID_FIRE_ADEPT = UUID.fromString("1961c447-7c54-44e6-89b2-32502d5e8624");
 	private static final UUID SET_UUID_FIRE_MASTER = UUID.fromString("87d9d2b9-ae03-4785-b397-3c6b536da229");
@@ -83,9 +83,9 @@ public class NostrumEquipmentSets {
 	private static final UUID SET_UUID_KOID = UUID.fromString("e168a2bd-1f68-48f6-b5d4-5b6eafb3243e");
 	private static final UUID SET_UUID_GOLEM = UUID.fromString("724dccca-56bd-48f3-ab8f-5b6653a275c5");
 	
-	@ObjectHolder(ID_MAGICARMOR_PHYSICAL_NOVICE) public static ElementalArmorSet physicalNoviceArmor;
-	@ObjectHolder(ID_MAGICARMOR_PHYSICAL_ADEPT) public static ElementalArmorSet physicalAdeptArmor;
-	@ObjectHolder(ID_MAGICARMOR_PHYSICAL_MASTER) public static ElementalArmorSet physicalMasterArmor;
+	@ObjectHolder(ID_MAGICARMOR_NEUTRAL_NOVICE) public static ElementalArmorSet neutralNoviceArmor;
+	@ObjectHolder(ID_MAGICARMOR_NEUTRAL_ADEPT) public static ElementalArmorSet neutralAdeptArmor;
+	@ObjectHolder(ID_MAGICARMOR_NEUTRAL_MASTER) public static ElementalArmorSet neutralMasterArmor;
 	@ObjectHolder(ID_MAGICARMOR_FIRE_NOVICE) public static ElementalArmorSet fireNoviceArmor;
 	@ObjectHolder(ID_MAGICARMOR_FIRE_ADEPT) public static ElementalArmorSet fireAdeptArmor;
 	@ObjectHolder(ID_MAGICARMOR_FIRE_MASTER) public static ElementalArmorSet fireMasterArmor;
@@ -112,9 +112,9 @@ public class NostrumEquipmentSets {
 	public static void registerSets(RegistryEvent.Register<EquipmentSet> event) {
 		final IForgeRegistry<EquipmentSet> registry = event.getRegistry();
 		
-		registry.register(makeSet(ID_MAGICARMOR_PHYSICAL_NOVICE, SET_UUID_PHYSICAL_NOVICE, EMagicElement.PHYSICAL, ElementalArmor.Type.NOVICE, false, null));
-		registry.register(makeSet(ID_MAGICARMOR_PHYSICAL_ADEPT, SET_UUID_PHYSICAL_ADEPT, EMagicElement.PHYSICAL, ElementalArmor.Type.ADEPT, false, null));
-		registry.register(makeSet(ID_MAGICARMOR_PHYSICAL_MASTER, SET_UUID_PHYSICAL_MASTER, EMagicElement.PHYSICAL, ElementalArmor.Type.MASTER, true, null));
+		registry.register(makeSet(ID_MAGICARMOR_NEUTRAL_NOVICE, SET_UUID_NEUTRAL_NOVICE, EMagicElement.NEUTRAL, ElementalArmor.Type.NOVICE, false, null));
+		registry.register(makeSet(ID_MAGICARMOR_NEUTRAL_ADEPT, SET_UUID_NEUTRAL_ADEPT, EMagicElement.NEUTRAL, ElementalArmor.Type.ADEPT, false, null));
+		registry.register(makeSet(ID_MAGICARMOR_NEUTRAL_MASTER, SET_UUID_NEUTRAL_MASTER, EMagicElement.NEUTRAL, ElementalArmor.Type.MASTER, true, null));
 
 		registry.register(makeSet(ID_MAGICARMOR_FIRE_NOVICE, SET_UUID_FIRE_NOVICE, EMagicElement.FIRE, ElementalArmor.Type.NOVICE, false, (e) -> ElementalFireArmor.onFullSetTick(e, ElementalArmor.Type.NOVICE)));
 		registry.register(makeSet(ID_MAGICARMOR_FIRE_ADEPT, SET_UUID_FIRE_ADEPT, EMagicElement.FIRE, ElementalArmor.Type.ADEPT, false, (e) -> ElementalFireArmor.onFullSetTick(e, ElementalArmor.Type.ADEPT)));

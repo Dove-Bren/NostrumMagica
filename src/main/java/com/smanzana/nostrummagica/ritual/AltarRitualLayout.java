@@ -35,7 +35,7 @@ import net.minecraft.world.level.Level;
  */
 public class AltarRitualLayout implements IRitualLayout {
 	
-	protected static final AltarRitualLayout EMPTY = new AltarRitualLayout(0, EMagicElement.PHYSICAL, ItemStack.EMPTY, null, null); 
+	protected static final AltarRitualLayout EMPTY = new AltarRitualLayout(0, EMagicElement.NEUTRAL, ItemStack.EMPTY, null, null); 
 
 	protected final int tier;
 	protected final EMagicElement element;
@@ -358,7 +358,7 @@ public class AltarRitualLayout implements IRitualLayout {
 					
 					NostrumMagicaSounds.AMBIENT_WOOSH2.play(world, pos.getX(), pos.getY(), pos.getZ());
 	
-					NostrumMagica.Proxy.playRitualEffect(world, pos, result.element == null ? EMagicElement.PHYSICAL : result.element,
+					NostrumMagica.Proxy.playRitualEffect(world, pos, result.element == null ? EMagicElement.NEUTRAL : result.element,
 							result.centerItem, result.extraItems, result.reagentItems, result.output);
 					
 					if (player instanceof ServerPlayer) {

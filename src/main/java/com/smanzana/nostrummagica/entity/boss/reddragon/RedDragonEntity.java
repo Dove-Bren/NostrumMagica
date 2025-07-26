@@ -161,16 +161,16 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 					);
 			DSPELL_Weaken = SpellUtils.MakeSpell("Weaken",
 					NostrumSpellShapes.AI,
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					2,
 					EAlteration.INFLICT);
 			DSPELL_Curse = SpellUtils.MakeSpell("Curse",
 					NostrumSpellShapes.OnDamage,
 					NostrumSpellShapes.Delay,
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					2,
 					EAlteration.HARM,
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					1,
 					EAlteration.INFLICT);
 		}

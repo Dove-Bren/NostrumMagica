@@ -76,8 +76,8 @@ public class MagicCharm extends Item implements ILoreTagged {
 		case LIGHTNING:
 			item = NostrumItems.magicCharmLightning;
 			break;
-		case PHYSICAL:
-			item = NostrumItems.magicCharmPhysical;
+		case NEUTRAL:
+			item = NostrumItems.magicCharmNeutral;
 			break;
 		case WIND:
 			item = NostrumItems.magicCharmWind;
@@ -141,8 +141,8 @@ public class MagicCharm extends Item implements ILoreTagged {
 		case LIGHTNING:
 			used = doLightning(playerIn, (ServerLevel) worldIn);
 			break;
-		case PHYSICAL:
-			used = doPhysical(playerIn, (ServerLevel) worldIn);
+		case NEUTRAL:
+			used = doNeutral(playerIn, (ServerLevel) worldIn);
 			break;
 		case WIND:
 			used = doWind(playerIn, (ServerLevel) worldIn);
@@ -310,14 +310,14 @@ public class MagicCharm extends Item implements ILoreTagged {
 		return false;
 	}
 	
-	private boolean doPhysical(Player player, ServerLevel world) {
+	private boolean doNeutral(Player player, ServerLevel world) {
 		player.addEffect(new MobEffectInstance(
 				MobEffects.MOVEMENT_SPEED,
 				20 * 30,
 				1
 				));
 		
-		NostrumMagicaSounds.DAMAGE_PHYSICAL.play(world, player.getX(), player.getY(), player.getZ());
+		NostrumMagicaSounds.DAMAGE_NEUTRAL.play(world, player.getX(), player.getY(), player.getZ());
 		
 		return true;
 	}

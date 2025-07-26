@@ -12,14 +12,14 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 
 public class ElementalEnchantEffect extends MobEffect {
 
-	public static final String ID_PHYSICAL = "enchant_physical";
+	public static final String ID_NEUTRAL = "enchant_neutral";
 	public static final String ID_EARTH = "enchant_earth";
 	public static final String ID_FIRE = "enchant_fire";
 	public static final String ID_ENDER = "enchant_ender";
 	public static final String ID_ICE = "enchant_ice";
 	public static final String ID_LIGHTNING = "enchant_lightning";
 	public static final String ID_WIND = "enchant_wind";
-	private static final String MOD_UUID_PHYSICAL = "29722cd0-345e-4fd2-9695-a8e794288dcc";
+	private static final String MOD_UUID_NEUTRAL = "29722cd0-345e-4fd2-9695-a8e794288dcc";
 	private static final String MOD_UUID_EARTH = "21098b4d-eefa-4894-9cb5-f89997edc5a7";
 	private static final String MOD_UUID_FIRE = "84c5972a-401f-4210-8c46-47b241ac5228";
 	private static final String MOD_UUID_ENDER = "fe6a1c87-69c3-4415-b48c-248aab83f1b5";
@@ -39,8 +39,8 @@ public class ElementalEnchantEffect extends MobEffect {
 			return MOD_UUID_ICE;
 		case LIGHTNING:
 			return MOD_UUID_LIGHTNING;
-		case PHYSICAL:
-			return MOD_UUID_PHYSICAL;
+		case NEUTRAL:
+			return MOD_UUID_NEUTRAL;
 		case WIND:
 			return MOD_UUID_WIND;
 		}
@@ -54,10 +54,10 @@ public class ElementalEnchantEffect extends MobEffect {
 		
 		this.element = element;
 		
-		if (element == EMagicElement.PHYSICAL) {
+		if (element == EMagicElement.NEUTRAL) {
 			this.addAttributeModifier(Attributes.ARMOR, GetModID(this.element), 2D, AttributeModifier.Operation.ADDITION);
 			for (EMagicElement weakElem : EMagicElement.values()) {
-				if (weakElem == EMagicElement.PHYSICAL) {
+				if (weakElem == EMagicElement.NEUTRAL) {
 					continue;
 				}
 				this.addAttributeModifier(NostrumAttributes.GetReduceAttribute(weakElem), GetModID(this.element), -.5D, AttributeModifier.Operation.ADDITION);
@@ -70,7 +70,7 @@ public class ElementalEnchantEffect extends MobEffect {
 	
 	public static ElementalEnchantEffect GetForElement(EMagicElement element) {
 		if (element == null) {
-			element = EMagicElement.PHYSICAL;
+			element = EMagicElement.NEUTRAL;
 		}
 		switch (element) {
 		case EARTH:
@@ -83,8 +83,8 @@ public class ElementalEnchantEffect extends MobEffect {
 			return NostrumEffects.enchantIce;
 		case LIGHTNING:
 			return NostrumEffects.enchantLightning;
-		case PHYSICAL:
-			return NostrumEffects.enchantPhysical;
+		case NEUTRAL:
+			return NostrumEffects.enchantNeutral;
 		case WIND:
 			return NostrumEffects.enchantWind;
 		}

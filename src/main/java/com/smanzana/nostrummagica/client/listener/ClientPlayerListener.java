@@ -647,7 +647,7 @@ public class ClientPlayerListener extends PlayerListener {
 					if (!hasIncantSelectUnlocked(player, attr)) {
 						startIncantationCast(new Incantation(
 								attr.getShapes() == null || attr.getShapes().isEmpty() ? NostrumSpellShapes.Touch : attr.getShapes().get(0),
-								EMagicElement.PHYSICAL, // hardcoding that physical is first element
+								EMagicElement.NEUTRAL, // hardcoding that neutral is first element
 								null
 								) {
 							@Override

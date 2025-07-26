@@ -71,7 +71,7 @@ public class NostrumResearches {
 	public static final ResourceLocation ID_Sword_Fire = NostrumMagica.Loc("sword_fire");
 	public static final ResourceLocation ID_Sword_Earth = NostrumMagica.Loc("sword_earth");
 	public static final ResourceLocation ID_Sword_Ender = NostrumMagica.Loc("sword_ender");
-	public static final ResourceLocation ID_Sword_Physical = NostrumMagica.Loc("sword_physical");
+	public static final ResourceLocation ID_Sword_Neutral = NostrumMagica.Loc("sword_neutral");
 	public static final ResourceLocation ID_Enchanted_Weapons = NostrumMagica.Loc("enchanted_weapons");
 	public static final ResourceLocation ID_Enchanted_Armor = NostrumMagica.Loc("enchanted_armor");
 	public static final ResourceLocation ID_Enchanted_Armor_Adv = NostrumMagica.Loc("enchanted_armor_adv");
@@ -143,7 +143,7 @@ public class NostrumResearches {
 	public static /*final*/ NostrumResearch Sword_Fire;
 	public static /*final*/ NostrumResearch Sword_Earth;
 	public static /*final*/ NostrumResearch Sword_Ender;
-	public static /*final*/ NostrumResearch Sword_Physical;
+	public static /*final*/ NostrumResearch Sword_Neutral;
 	public static /*final*/ NostrumResearch Enchanted_Weapons;
 	public static /*final*/ NostrumResearch Enchanted_Armor;
 	public static /*final*/ NostrumResearch Enchanted_Armor_Adv;
@@ -227,7 +227,7 @@ public class NostrumResearches {
 				.reference("builtin::trials::wind", "info.trial.wind.name")
 				.reference("builtin::trials::ender", "info.trial.ender.name")
 				.reference("builtin::trials::lightning", "info.trial.lightning.name")
-				.reference("builtin::trials::physical", "info.trial.physical.name").build(ID_Elemental_Trials,
+				.reference("builtin::trials::neutral", "info.trial.neutral.name").build(ID_Elemental_Trials,
 						Tab_Magica, NostrumResearch.Size.NORMAL, 0, 1, true, new ItemStack(NostrumItems.masteryOrb));
 
 		Rituals = NostrumResearch.startBuilding().parent(ID_Origin).reference("builtin::guides::rituals", "info.rituals.name")
@@ -260,7 +260,7 @@ public class NostrumResearches {
 
 		Summonkoids = NostrumResearch.startBuilding().parent(ID_Rituals).hiddenParent(ID_Magic_Token).lore(KoidEntity.KoidLore.instance())
 				.reference("ritual::koid", "ritual.koid.name").build(ID_Summonkoids, Tab_Magica,
-						NostrumResearch.Size.NORMAL, 3, 2, true, new ItemStack(NostrumItems.essencePhysical));
+						NostrumResearch.Size.NORMAL, 3, 2, true, new ItemStack(NostrumItems.essenceNeutral));
 
 		Loretable = NostrumResearch.startBuilding().hiddenParent(ID_Spellcraft).parent(ID_Rituals)
 				.reference("ritual::lore_table", "ritual.lore_table.name").build(ID_Loretable, Tab_Magica,
@@ -277,7 +277,7 @@ public class NostrumResearches {
 						Tab_Mysticism, NostrumResearch.Size.NORMAL, -2, 0, true,
 						new ItemStack(NostrumItems.resourceToken));
 
-		Essence_Seeds = NostrumResearch.startBuilding().hiddenParent(ID_Magic_Token).lore(NostrumItems.essencePhysical)
+		Essence_Seeds = NostrumResearch.startBuilding().hiddenParent(ID_Magic_Token).lore(NostrumItems.essenceNeutral)
 				.lore(KoidEntity.KoidLore.instance()).lore(WispEntity.WispLoreTag.instance())
 				.reference("ritual::essence_seed", "ritual.essence_seed.name").build(ID_Essence_Seeds,
 						Tab_Mysticism, NostrumResearch.Size.NORMAL, -3, 0, false, new ItemStack(NostrumItems.reagentSeedEssence));
@@ -296,7 +296,7 @@ public class NostrumResearches {
 						new ItemStack(NostrumItems.seekingGem));
 
 		Spellrunes = NostrumResearch.startBuilding().hiddenParent(ID_Magic_Token).hiddenParent(ID_Spellcraft)
-				.lore(NostrumItems.GetRune(new SpellComponentWrapper(EMagicElement.FIRE))).reference("ritual::rune.physical", "ritual.rune.physical.name")
+				.lore(NostrumItems.GetRune(new SpellComponentWrapper(EMagicElement.FIRE))).reference("ritual::rune.neutral", "ritual.rune.neutral.name")
 				.reference("ritual::rune.single", "ritual.rune.single.name")
 				.reference("ritual::rune.inflict", "ritual.rune.inflict.name")
 				.reference("ritual::rune.touch", "ritual.rune.touch.name")
@@ -365,8 +365,8 @@ public class NostrumResearches {
 			.reference("ritual::spawn_sword_ender", "ritual.spawn_sword_ender.name").build(ID_Sword_Ender,
 			Tab_Outfitting, NostrumResearch.Size.NORMAL, 1, 4, true, new ItemStack(NostrumItems.enderRod));
 		
-		Sword_Physical = NostrumResearch.startBuilding().hiddenParent(ID_Mage_Blade).hiddenParent(ID_Enchanted_Armor_Adv)
-			.reference("ritual::spawn_sword_physical", "ritual.spawn_sword_physical.name").build(ID_Sword_Physical,
+		Sword_Neutral = NostrumResearch.startBuilding().hiddenParent(ID_Mage_Blade).hiddenParent(ID_Enchanted_Armor_Adv)
+			.reference("ritual::spawn_sword_neutral", "ritual.spawn_sword_neutral.name").build(ID_Sword_Neutral,
 			Tab_Outfitting, NostrumResearch.Size.NORMAL, 2, 4, true, new ItemStack(NostrumItems.deepMetalAxe));
 
 		Enchanted_Weapons = NostrumResearch.startBuilding().parent(ID_Enchanted_Armor)
@@ -424,8 +424,8 @@ public class NostrumResearches {
 						Tab_Outfitting, NostrumResearch.Size.NORMAL, 3, -1, false,
 						new ItemStack(NostrumItems.hookshotClaw));
 
-		Charms = NostrumResearch.startBuilding().hiddenParent(ID_Magic_Token).lore(NostrumItems.essencePhysical)
-				.reference("ritual::charm.physical", "ritual.charm.physical.name")
+		Charms = NostrumResearch.startBuilding().hiddenParent(ID_Magic_Token).lore(NostrumItems.essenceNeutral)
+				.reference("ritual::charm.neutral", "ritual.charm.neutral.name")
 				.reference("ritual::charm.fire", "ritual.charm.fire.name")
 				.reference("ritual::charm.ice", "ritual.charm.ice.name")
 				.reference("ritual::charm.earth", "ritual.charm.earth.name")
@@ -507,11 +507,11 @@ public class NostrumResearches {
 			builder.reference("ritual::thano_infusion", "ritual.thano_infusion.name");
 			if (!ModConfig.config.usingEasierThano()) {
 				builder.hiddenParent(ID_Vani).hiddenParent(ID_Reagent_Bag).hiddenParent(ID_Mage_Staff)
-						.lore(NostrumItems.resourceToken).lore(NostrumItems.masteryOrb).lore(NostrumItems.essencePhysical);
+						.lore(NostrumItems.resourceToken).lore(NostrumItems.masteryOrb).lore(NostrumItems.essenceNeutral);
 
 			} else {
 				builder.hiddenParent(ID_Kani).hiddenParent(ID_Reagent_Bag).lore(NostrumItems.resourceToken)
-						.lore(NostrumItems.essencePhysical);
+						.lore(NostrumItems.essenceNeutral);
 			}
 
 			Thano_Pendant = builder.build(ID_Thano_Pendant, Tab_Advanced_Magica, NostrumResearch.Size.GIANT, 2, -1, true,

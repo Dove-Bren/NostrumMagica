@@ -131,7 +131,7 @@ public class MirrorCharacterSubscreen implements IMirrorSubscreen {
 			x = leftMargin + width/2;
 			list = new Attribute[] {
 					NostrumAttributes.reduceAll,
-					NostrumAttributes.GetReduceAttribute(EMagicElement.PHYSICAL),
+					NostrumAttributes.GetReduceAttribute(EMagicElement.NEUTRAL),
 					NostrumAttributes.GetReduceAttribute(EMagicElement.EARTH),
 					NostrumAttributes.GetReduceAttribute(EMagicElement.ENDER),
 					NostrumAttributes.GetReduceAttribute(EMagicElement.FIRE),

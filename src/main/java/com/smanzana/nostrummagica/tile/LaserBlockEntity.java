@@ -54,7 +54,7 @@ public class LaserBlockEntity extends BlockEntity implements TickableBlockEntity
 	
 	public LaserBlockEntity(BlockPos pos, BlockState state) {
 		super(NostrumBlockEntities.Laser, pos, state);
-		this.element = EMagicElement.PHYSICAL;
+		this.element = EMagicElement.NEUTRAL;
 		this.toggleMode = false;
 		this.laserLength = 0;
 		this.enabled = false;

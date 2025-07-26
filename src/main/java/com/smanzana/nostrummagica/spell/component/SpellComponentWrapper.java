@@ -98,7 +98,7 @@ public class SpellComponentWrapper {
 	public static SpellComponentWrapper fromKeyString(String keyString) {
 		if (keyString == null || keyString.trim().isEmpty() ||
 				keyString.indexOf(':') == -1)
-			return new SpellComponentWrapper(EMagicElement.PHYSICAL);
+			return new SpellComponentWrapper(EMagicElement.NEUTRAL);
 		
 		int pos = keyString.indexOf(':');
 		String type = keyString.substring(0, pos);
@@ -107,10 +107,10 @@ public class SpellComponentWrapper {
 		switch (type.toLowerCase()) {
 		case "element":
 			try {
-				EMagicElement elem = EMagicElement.valueOf(key.toUpperCase());
+				EMagicElement elem = EMagicElement.parse(key.toUpperCase());
 				return new SpellComponentWrapper(elem);
 			} catch (Exception e) {
-				return new SpellComponentWrapper(EMagicElement.PHYSICAL);
+				return new SpellComponentWrapper(EMagicElement.NEUTRAL);
 			}
 		case "alteration":
 			try {
@@ -122,11 +122,11 @@ public class SpellComponentWrapper {
 		case "shape":
 			SpellShape shape = SpellShape.get(key);
 			if (shape == null)
-				return new SpellComponentWrapper(EMagicElement.PHYSICAL);
+				return new SpellComponentWrapper(EMagicElement.NEUTRAL);
 			else
 				return new SpellComponentWrapper(shape);
 		default:
-			return new SpellComponentWrapper(EMagicElement.PHYSICAL);
+			return new SpellComponentWrapper(EMagicElement.NEUTRAL);
 		}
 	}
 	
@@ -143,7 +143,7 @@ public class SpellComponentWrapper {
 			buf.append("shape:");
 			buf.append(shape.getShapeKey());
 		} else {
-			buf.append("element:").append("PHYSICAL");
+			buf.append("element:").append("NEUTRAL");
 		}
 		
 		return buf.toString();

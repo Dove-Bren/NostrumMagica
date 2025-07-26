@@ -14,7 +14,7 @@ import net.minecraft.world.effect.MobEffectCategory;
  */
 public class ElementalSpellBoostEffect extends MobEffect {
 
-	public static final String ID_PHYSICAL = "spellboost_physical";
+	public static final String ID_NEUTRAL = "spellboost_neutral";
 	public static final String ID_EARTH = "spellboost_earth";
 	public static final String ID_FIRE = "spellboost_fire";
 	public static final String ID_ENDER = "spellboost_ender";
@@ -31,7 +31,7 @@ public class ElementalSpellBoostEffect extends MobEffect {
 	
 	public static ElementalSpellBoostEffect GetForElement(EMagicElement element) {
 		if (element == null) {
-			element = EMagicElement.PHYSICAL;
+			element = EMagicElement.NEUTRAL;
 		}
 		switch (element) {
 		case EARTH:
@@ -44,8 +44,8 @@ public class ElementalSpellBoostEffect extends MobEffect {
 			return NostrumEffects.spellBoostIce;
 		case LIGHTNING:
 			return NostrumEffects.spellBoostLightning;
-		case PHYSICAL:
-			return NostrumEffects.spellBoostPhysical;
+		case NEUTRAL:
+			return NostrumEffects.spellBoostNeutral;
 		case WIND:
 			return NostrumEffects.spellBoostWind;
 		}

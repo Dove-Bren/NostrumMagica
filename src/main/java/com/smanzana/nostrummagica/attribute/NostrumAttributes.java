@@ -19,7 +19,7 @@ import net.minecraftforge.registries.ObjectHolder;
 @ObjectHolder(NostrumMagica.MODID)
 public class NostrumAttributes {
 	
-	protected static final String ID_REDUCE_PHYSICAL = MagicReductionAttribute.ID_PREFIX + "physical";
+	protected static final String ID_REDUCE_NEUTRAL = MagicReductionAttribute.ID_PREFIX + "neutral";
 	protected static final String ID_REDUCE_EARTH = MagicReductionAttribute.ID_PREFIX + "earth";
 	protected static final String ID_REDUCE_ENDER = MagicReductionAttribute.ID_PREFIX + "ender";
 	protected static final String ID_REDUCE_FIRE = MagicReductionAttribute.ID_PREFIX + "fire";
@@ -27,7 +27,7 @@ public class NostrumAttributes {
 	protected static final String ID_REDUCE_LIGHTNING = MagicReductionAttribute.ID_PREFIX + "lightning";
 	protected static final String ID_REDUCE_WIND = MagicReductionAttribute.ID_PREFIX + "wind";
 	
-	protected static final String ID_XP_PHYSICAL = ElementXPBonusAttribute.ID_PREFIX + "physical";
+	protected static final String ID_XP_NEUTRAL = ElementXPBonusAttribute.ID_PREFIX + "neutral";
 	protected static final String ID_XP_EARTH = ElementXPBonusAttribute.ID_PREFIX + "earth";
 	protected static final String ID_XP_ENDER = ElementXPBonusAttribute.ID_PREFIX + "ender";
 	protected static final String ID_XP_FIRE = ElementXPBonusAttribute.ID_PREFIX + "fire";
@@ -38,7 +38,7 @@ public class NostrumAttributes {
 	@ObjectHolder(MagicPotencyAttribute.ID) public static MagicPotencyAttribute magicPotency;
 	@ObjectHolder(MagicResistAttribute.ID) public static MagicResistAttribute magicResist;
 	@ObjectHolder(ManaRegenAttribute.ID) public static ManaRegenAttribute manaRegen;
-	@ObjectHolder(ID_REDUCE_PHYSICAL) public static MagicReductionAttribute reducePhysical;
+	@ObjectHolder(ID_REDUCE_NEUTRAL) public static MagicReductionAttribute reduceNeutral;
 	@ObjectHolder(ID_REDUCE_EARTH) public static MagicReductionAttribute reduceEarth;
 	@ObjectHolder(ID_REDUCE_ENDER) public static MagicReductionAttribute reduceEnder;
 	@ObjectHolder(ID_REDUCE_FIRE) public static MagicReductionAttribute reduceFire;
@@ -49,7 +49,7 @@ public class NostrumAttributes {
 	@ObjectHolder(MagicDamageAttribute.ID) public static MagicDamageAttribute magicDamage;
 	@ObjectHolder(ManaCostReductionAttribute.ID) public static ManaCostReductionAttribute manaCost;
 	@ObjectHolder(MagicXPBonusAttribute.ID) public static MagicXPBonusAttribute xpBonus;
-	@ObjectHolder(ID_XP_PHYSICAL) public static ElementXPBonusAttribute xpPhysical;
+	@ObjectHolder(ID_XP_NEUTRAL) public static ElementXPBonusAttribute xpNeutral;
 	@ObjectHolder(ID_XP_EARTH) public static ElementXPBonusAttribute xpEarth;
 	@ObjectHolder(ID_XP_ENDER) public static ElementXPBonusAttribute xpEnder;
 	@ObjectHolder(ID_XP_FIRE) public static ElementXPBonusAttribute xpFire;
@@ -128,13 +128,13 @@ public class NostrumAttributes {
 			return reduceIce;
 		case LIGHTNING:
 			return reduceLightning;
-		case PHYSICAL:
-			return reducePhysical;
+		case NEUTRAL:
+			return reduceNeutral;
 		case WIND:
 			return reduceWind;
 		}
 		
-		return reducePhysical;
+		return reduceNeutral;
 	}
 	
 	public static ElementXPBonusAttribute GetXPAttribute(EMagicElement element) {
@@ -149,12 +149,12 @@ public class NostrumAttributes {
 			return xpIce;
 		case LIGHTNING:
 			return xpLightning;
-		case PHYSICAL:
-			return xpPhysical;
+		case NEUTRAL:
+			return xpNeutral;
 		case WIND:
 			return xpWind;
 		}
 		
-		return xpPhysical;
+		return xpNeutral;
 	}
 }

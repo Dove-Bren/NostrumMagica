@@ -60,7 +60,7 @@ public class KoidRenderer extends MobRenderer<KoidEntity, RenderShivModel<KoidEn
 		case LIGHTNING:
 			color = 0xFFEAEA2C;
 			break;
-		case PHYSICAL:
+		case NEUTRAL:
 			color = 0xFFFFFFFF;
 			break;
 		case WIND:

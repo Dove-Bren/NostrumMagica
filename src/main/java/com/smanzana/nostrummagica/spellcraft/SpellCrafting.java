@@ -383,7 +383,7 @@ public class SpellCrafting {
 					return false;
 				}
 			} else {
-				EMagicElement runeElement = ingredient.element == null ? EMagicElement.PHYSICAL : ingredient.element;
+				EMagicElement runeElement = ingredient.element == null ? EMagicElement.NEUTRAL : ingredient.element;
 				if ((element != null && element != runeElement)
 						|| elementCount == 3) {
 					flushEffect(idx-1, null);

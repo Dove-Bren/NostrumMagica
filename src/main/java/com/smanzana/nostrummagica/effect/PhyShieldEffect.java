@@ -11,11 +11,11 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 
-public class PhysicalShieldEffect extends MobEffect {
+public class PhyShieldEffect extends MobEffect {
 
 	public static final String ID = "shieldp";
 	
-	public PhysicalShieldEffect() {
+	public PhyShieldEffect() {
 		super(MobEffectCategory.BENEFICIAL, 0xFF80805D);
 	}
 	

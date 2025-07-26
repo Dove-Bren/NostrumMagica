@@ -5,9 +5,9 @@ import com.smanzana.nostrummagica.spell.EMagicElement;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 
-public class ElementalPhysicalArmor extends ElementalArmor {
+public class ElementalNeutralArmor extends ElementalArmor {
 
-	public static final String ID_PREFIX = "armor_physical_";
+	public static final String ID_PREFIX = "armor_neutral_";
 	public static final String ID_HELM_NOVICE = ID_PREFIX + "helm_novice";
 	public static final String ID_HELM_ADEPT = ID_PREFIX + "helm_adept";
 	public static final String ID_HELM_MASTER = ID_PREFIX + "helm_master";
@@ -24,8 +24,8 @@ public class ElementalPhysicalArmor extends ElementalArmor {
 	public static final String ID_FEET_ADEPT = ID_PREFIX + "feet_adept";
 	public static final String ID_FEET_MASTER = ID_PREFIX + "feet_master";
 		
-	public ElementalPhysicalArmor(EquipmentSlot slot, Type type, Item.Properties properties) {
-		super(EMagicElement.PHYSICAL, slot, type, properties);
+	public ElementalNeutralArmor(EquipmentSlot slot, Type type, Item.Properties properties) {
+		super(EMagicElement.NEUTRAL, slot, type, properties);
 	}
 	
 }

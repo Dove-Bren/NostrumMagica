@@ -36,7 +36,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 		public final List<ItemStack> reagentItems;
 		
 		public RitualResult(boolean performed, EMagicElement element, ItemStack output, ItemStack centerItem, List<ItemStack> extraItems, List<ItemStack> reagentTypes) {
-			this.element = element == null ? EMagicElement.PHYSICAL : element;
+			this.element = element == null ? EMagicElement.NEUTRAL : element;
 			this.performed = performed;
 			this.output = output;
 			this.centerItem = centerItem;
@@ -221,7 +221,7 @@ public class RitualRecipe /*extends ForgeRegistryEntry<RitualRecipe>*/ implement
 	
 	private RitualRecipe(String registryName, String nameKey, EMagicElement element, int tier) {
 		this.tier = tier;
-		this.element = element == null ? EMagicElement.PHYSICAL : element;
+		this.element = element == null ? EMagicElement.NEUTRAL : element;
 		this.titleKey = nameKey;
 		this.centerItem = Ingredient.EMPTY;
 		if (tier == 0) {

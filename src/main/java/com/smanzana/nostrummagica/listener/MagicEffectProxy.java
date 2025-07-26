@@ -83,7 +83,7 @@ public class MagicEffectProxy {
 			if (nbt.contains(NBT_ELEMENT)) {
 				String key = nbt.getString(NBT_ELEMENT);
 				try {
-					EMagicElement elem = EMagicElement.valueOf(key.toUpperCase());
+					EMagicElement elem = EMagicElement.parse(key.toUpperCase());
 					data.element(elem);
 				} catch (Exception e) {
 					;
@@ -217,7 +217,7 @@ public class MagicEffectProxy {
 		
 		SpecialEffect effect = SpecialEffect.SHIELD_PHYSICAL;
 		if (source instanceof MagicDamageSource
-				&& ((MagicDamageSource) source).getElement() != EMagicElement.PHYSICAL)
+				&& ((MagicDamageSource) source).getElement() != EMagicElement.NEUTRAL)
 			effect = SpecialEffect.SHIELD_MAGIC;
 		
 		Map<SpecialEffect, EffectData> record = effects.get(id);

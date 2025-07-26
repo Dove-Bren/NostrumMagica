@@ -91,8 +91,8 @@ public abstract class CombatTrial {
 			return new CombatTrialIce(world, center, focusedPlayer);
 		case LIGHTNING:
 			return new CombatTrialLightning(world, center, focusedPlayer);
-		case PHYSICAL:
-			return new CombatTrialPhysical(world, center, focusedPlayer);
+		case NEUTRAL:
+			return new CombatTrialNeutral(world, center, focusedPlayer);
 		case WIND:
 			return new CombatTrialWind(world, center, focusedPlayer);
 		}

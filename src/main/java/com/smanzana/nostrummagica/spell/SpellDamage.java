@@ -209,17 +209,17 @@ public class SpellDamage {
 		final Damage damage = new Damage(baseDamage, efficiency, log);
 		LogDamage(0, baseDamage, damage, "Start");
 		
-		if (element == EMagicElement.PHYSICAL) {
-			// Physical is reduced by real armor but not affected by magic resist effects and attributes.
+		if (element == EMagicElement.NEUTRAL) {
+			// Neutral is reduced by real armor but not affected by magic resist effects and attributes.
 			// It still gains power from magic boost/magic damage AND the strength status effect/attack attribute AND is still reduces with magic reduction (below).
 			final float baseAttribute = GetPhysicalAttributeBonusNoMainhand(caster);
 			final float mainhand = GetPhysicalAttributeBonusMainhand(caster);
 			damage.baseFlat("PhysicalAttributeBase", baseAttribute);
 			
-			// Note that the physical master skill includes using some of this
+			// Note that the neutral master skill includes using some of this
 			final @Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-			if (attr != null && attr.hasSkill(NostrumSkills.Physical_Master)) {
-				damage.baseFlat(NostrumSkills.Physical_Master, (int) (mainhand * .2f));
+			if (attr != null && attr.hasSkill(NostrumSkills.Neutral_Master)) {
+				damage.baseFlat(NostrumSkills.Neutral_Master, (int) (mainhand * .2f));
 			}
 		} else {
 		
@@ -330,11 +330,11 @@ public class SpellDamage {
 		// TODO: make into attribute?
 		final @Nullable MobEffectInstance magicWeakness = caster == null ? null : caster.getEffect(NostrumEffects.magicWeakness);
 		if (magicWeakness != null && magicWeakness.getDuration() > 0) {
-			damage.finalFlat(NostrumSkills.Physical_Inflict, -2 * (magicWeakness.getAmplifier() + 1));
+			damage.finalFlat(NostrumSkills.Neutral_Inflict, -2 * (magicWeakness.getAmplifier() + 1));
 		}
 		
-		// No magic resist for physical; it uses armor value
-		if (element != EMagicElement.PHYSICAL) {
+		// No magic resist for neutral; it uses armor value
+		if (element != EMagicElement.NEUTRAL) {
 			attr = target.getAttribute(NostrumAttributes.magicResist);
 			if (attr != null && attr.getValue() != 0.0D) {
 				damage.resistScale("MagicResistAttribute", (float) (Math.max(0.0D, Math.min(2.0D, 1.0D - (attr.getValue() / 100.0D)))) - 1f);

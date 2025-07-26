@@ -62,7 +62,7 @@ public class MageBlade extends SwordItem implements ILoreTagged, ISpellEquipment
 		
 		if (stack.hasTag() && stack.getTag().contains(NBT_ELEMENT)) {
 			try {	
-				stored = EMagicElement.valueOf(stack.getTag().getString(NBT_ELEMENT));
+				stored = EMagicElement.parse(stack.getTag().getString(NBT_ELEMENT));
 			} catch (Exception e) {
 				stored = null;
 			}

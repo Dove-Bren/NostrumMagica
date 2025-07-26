@@ -470,11 +470,11 @@ public abstract class InfoScreenTab {
 				buttons.add(button);
 				this.index("builtin::trials::lightning", button);
 				
-				button = new SubscreenInfoButton(screen, "trial.physical",
-						new PaginatedInfoSubScreen(screen, "trial.physical"),
-						SpellRune.getRune(EMagicElement.PHYSICAL));
+				button = new SubscreenInfoButton(screen, "trial.neutral",
+						new PaginatedInfoSubScreen(screen, "trial.neutral"),
+						SpellRune.getRune(EMagicElement.NEUTRAL));
 				buttons.add(button);
-				this.index("builtin::trials::physical", button);
+				this.index("builtin::trials::neutral", button);
 					
 				return buttons;
 			}

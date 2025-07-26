@@ -46,7 +46,7 @@ public class RendEffect extends MobEffect {
 				if (effect != null && effect.getDuration() > 0) {
 					// Check for explosive rend
 					INostrumMagic attr = NostrumMagica.getMagicWrapper(source);
-					if (attr != null && attr.hasSkill(NostrumSkills.Physical_Corrupt) && NostrumMagica.rand.nextInt(4) == 0) {
+					if (attr != null && attr.hasSkill(NostrumSkills.Neutral_Corrupt) && NostrumMagica.rand.nextInt(4) == 0) {
 						
 						// Spread
 						for (Entity ent : target.getCommandSenderWorld().getEntities(target, target.getBoundingBox().inflate(10), (ent) -> ent instanceof LivingEntity && (NostrumMagica.IsSameTeam((LivingEntity) ent, target) || (ent instanceof Monster && target instanceof Monster)))) {

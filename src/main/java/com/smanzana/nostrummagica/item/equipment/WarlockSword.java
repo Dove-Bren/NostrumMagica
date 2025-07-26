@@ -166,13 +166,13 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 			items.add(addCapacity(new ItemStack(this), 10));
 			items.add(setLevel(setLevel(setLevel(setLevel(
 					new ItemStack(this),
-					EMagicElement.PHYSICAL, 1),
+					EMagicElement.NEUTRAL, 1),
 					EMagicElement.FIRE, 2),
 					EMagicElement.WIND, 2),
 					EMagicElement.ENDER, 2));
 			items.add(setLevel(setLevel(setLevel(setLevel(
 					new ItemStack(this),
-					EMagicElement.PHYSICAL, 1),
+					EMagicElement.NEUTRAL, 1),
 					EMagicElement.ICE, 2),
 					EMagicElement.EARTH, 2),
 					EMagicElement.LIGHTNING, 2));
@@ -275,13 +275,13 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 //			subItems.add(addCapacity(new ItemStack(this), 10));
 //			subItems.add(setLevel(setLevel(setLevel(setLevel(
 //					new ItemStack(this),
-//					EMagicElement.PHYSICAL, 1),
+//					EMagicElement.NEUTRAL, 1),
 //					EMagicElement.FIRE, 2),
 //					EMagicElement.WIND, 2),
 //					EMagicElement.ENDER, 2));
 //			subItems.add(setLevel(setLevel(setLevel(setLevel(
 //					new ItemStack(this),
-//					EMagicElement.PHYSICAL, 1),
+//					EMagicElement.NEUTRAL, 1),
 //					EMagicElement.ICE, 2),
 //					EMagicElement.EARTH, 2),
 //					EMagicElement.LIGHTNING, 2));

@@ -108,7 +108,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 				continue;
 			}
 			EMagicElement elem = InfusedGemItem.GetElement(inSlot);
-			if (elem != null && elem != EMagicElement.PHYSICAL) {
+			if (elem != null && elem != EMagicElement.NEUTRAL) {
 				return elem;
 			}
 		}
@@ -142,7 +142,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		}
 		
 		EMagicElement element = InfusedGemItem.GetElement(stack);
-		if (element == null || element == EMagicElement.PHYSICAL) {
+		if (element == null || element == EMagicElement.NEUTRAL) {
 			return false;
 		}
 		

@@ -117,7 +117,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		case EARTH:
 		case ENDER:
 		case FIRE:
-		case PHYSICAL:
+		case NEUTRAL:
 		default:
 			return false;
 		case WIND:
@@ -276,7 +276,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		case EARTH:
 		case ENDER:
 		case FIRE:
-		case PHYSICAL:
+		case NEUTRAL:
 			break;
 		case WIND:
 			// now just does on right click
@@ -312,7 +312,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		case EARTH:
 		case ENDER:
 		case FIRE:
-		case PHYSICAL:
+		case NEUTRAL:
 			; // No weapon
 			break;
 		case ICE:

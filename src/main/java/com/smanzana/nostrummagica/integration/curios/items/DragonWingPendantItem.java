@@ -100,7 +100,7 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 		
 		EMagicElement elem = this.getEmbeddedElement(stack);
 		if (elem == null) {
-			elem = EMagicElement.PHYSICAL;
+			elem = EMagicElement.NEUTRAL;
 		}
 		
 		return elem.getColor();
@@ -123,9 +123,9 @@ public class DragonWingPendantItem extends NostrumCurio implements IDragonWingRe
 		String name = stack.getTag().getString("element");
 		EMagicElement ret = null;
 		try {
-			ret = EMagicElement.valueOf(name.toUpperCase());
+			ret = EMagicElement.parse(name.toUpperCase());
 		} catch (Exception e) {
-			ret = EMagicElement.PHYSICAL;
+			ret = EMagicElement.NEUTRAL;
 		}
 		
 		return ret;

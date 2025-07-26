@@ -53,11 +53,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID)
-public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, ISpellEquipment {
+public class AspectedNeutralWeapon extends SwordItem implements ILoreTagged, ISpellEquipment {
 
-	public static final String ID = "sword_physical";
+	public static final String ID = "sword_neutral";
 	
-	public AspectedPhysicalWeapon() {
+	public AspectedNeutralWeapon() {
 		super(Tiers.DIAMOND, 6, -3.0F, NostrumItems.PropEquipment().durability(1240));
 	}
 	
@@ -98,7 +98,7 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	
 	@Override
 	public String getLoreKey() {
-		return "sword_physical";
+		return "sword_neutral";
 	}
 
 	@Override
@@ -191,8 +191,8 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 	
 	protected static void doBlock(LivingEntity blocker) {
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(blocker);
-		final boolean hasBonus = ElementalArmor.GetSetCount(blocker, EMagicElement.PHYSICAL, ElementalArmor.Type.MASTER) == 4;
-		final boolean hasSkill = attr != null && attr.hasSkill(NostrumSkills.Physical_Weapon);
+		final boolean hasBonus = ElementalArmor.GetSetCount(blocker, EMagicElement.NEUTRAL, ElementalArmor.Type.MASTER) == 4;
+		final boolean hasSkill = attr != null && attr.hasSkill(NostrumSkills.Neutral_Weapon);
 		blocker.addEffect(new MobEffectInstance(NostrumEffects.rendStrike, 1 * 20, 0));
 		
 		if (hasBonus) {
@@ -213,7 +213,7 @@ public class AspectedPhysicalWeapon extends SwordItem implements ILoreTagged, IS
 		
 		final LivingEntity ent = event.getEntityLiving();
 		final DamageSource source = event.getSource();
-		if (ent.isBlocking() && ent.getUseItem().getItem() instanceof AspectedPhysicalWeapon) {
+		if (ent.isBlocking() && ent.getUseItem().getItem() instanceof AspectedNeutralWeapon) {
 			// This is based on LivingEntity#attackEntityFrom
 			if (event.getAmount() > 0.0F
 					// && ent.canBlockDamageSource(source)) { not visible

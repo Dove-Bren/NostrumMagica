@@ -57,7 +57,7 @@ public class PortingUtil {
 		SpellComponentWrapper component = null;
 		switch (oldType) {
 		case "element": 
-			EMagicElement elem = EMagicElement.valueOf(oldName.toUpperCase());
+			EMagicElement elem = EMagicElement.parse(oldName.toUpperCase());
 			component = new SpellComponentWrapper(elem);
 			break;
 		case "alteration":
@@ -74,7 +74,7 @@ public class PortingUtil {
 		
 		if (component == null) {
 			NostrumMagica.logger.warn("Failed to remap rune: " + oldType + "[" + oldName + "]");
-			component = new SpellComponentWrapper(EMagicElement.PHYSICAL);
+			component = new SpellComponentWrapper(EMagicElement.NEUTRAL);
 		}
 		
 		rune = SpellRune.GetRuneForType(component);
@@ -127,8 +127,8 @@ public class PortingUtil {
 			for (EMagicElement elem : EMagicElement.values()) {
 				submap.put(elem.ordinal() + 1, InfusedGemItem.getGemItem(elem));
 			}
-			// Physical was weird
-			submap.put(0, InfusedGemItem.getGemItem(EMagicElement.PHYSICAL));
+			// Neutral was weird
+			submap.put(0, InfusedGemItem.getGemItem(EMagicElement.NEUTRAL));
 		}
 		ItemMap1_12_2.put(id, submap);
 		

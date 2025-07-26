@@ -1156,8 +1156,8 @@ public class PlayerListener {
 			return;
 		}
 		
-		// Physical gives shield when armor is reduced
-		if (attr.hasSkill(NostrumSkills.Physical_Adept)) {
+		// Neutral gives shield when armor is reduced
+		if (attr.hasSkill(NostrumSkills.Neutral_Adept)) {
 			if (entity.isAlive() && entity.getHealth() > 0f && entity.getArmorValue() < getLastTickArmor(entity)) {
 				entity.addEffect(new MobEffectInstance(NostrumEffects.physicalShield, 20 * 15, 0));
 			}

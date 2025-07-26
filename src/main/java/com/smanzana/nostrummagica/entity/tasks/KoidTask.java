@@ -91,33 +91,33 @@ public class KoidTask extends Goal {
 			
 			Spell spell;
 			
-			// Physical
+			// Neutral
 			putSpell(buffSpells, "Summon Golem",
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					1,
 					EAlteration.SUMMON);
 			putSpell(buffSpells, "Shield",
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					1,
 					EAlteration.RESIST);
 			putSpell(rangedSpells, "Weaken",
 					NostrumSpellShapes.AI,
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					1,
 					EAlteration.INFLICT);
 			putSpell(rangedSpells, "Weaken II",
 					NostrumSpellShapes.AI,
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					2,
 					EAlteration.INFLICT);
 			putSpell(rangedSpells, "Crush",
 					NostrumSpellShapes.AI,
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					1,
 					EAlteration.HARM);
 			putSpell(meleeSpells, "Bone Crusher",
 					NostrumSpellShapes.AI,
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					2,
 					EAlteration.HARM);
 			

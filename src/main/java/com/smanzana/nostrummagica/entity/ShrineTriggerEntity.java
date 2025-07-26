@@ -75,7 +75,7 @@ public abstract class ShrineTriggerEntity<E extends ShrineTileEntity<?>> extends
 			if (this.getLinkedTileEntity() != null) {
 				return this.getLinkedTileEntity().getElement();
 			}
-			return EMagicElement.PHYSICAL;
+			return EMagicElement.NEUTRAL;
 		}
 	}
 	

@@ -48,7 +48,7 @@ public class TrialBlockTileEntity extends BlockEntity implements TickableBlockEn
 		activeTrial = null;
 		activeTrialPlayer = null;
 		trialTicks = 0;
-		element = EMagicElement.PHYSICAL;
+		element = EMagicElement.NEUTRAL;
 	}
 	
 	public float getScale() {

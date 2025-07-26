@@ -16,17 +16,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
 
-public class CombatTrialPhysical extends CombatTrialStaged {
+public class CombatTrialNeutral extends CombatTrialStaged {
 	
-	protected CombatTrialPhysical(ServerLevel world, BlockPos center, Player player) {
+	protected CombatTrialNeutral(ServerLevel world, BlockPos center, Player player) {
 		super(world, center, player);
 		
-		CachedSpawnProvider spawnProvider = new CachedSpawnProvider(world, center, CombatTrialPhysical::isSpawnSuggestion);
+		CachedSpawnProvider spawnProvider = new CachedSpawnProvider(world, center, CombatTrialNeutral::isSpawnSuggestion);
 		this.setStages(
-				new CombatTrialStage(player, new RandomPoolMobProvider(NostrumEntityTypes.golemPhysical), spawnProvider, 3),
-				new CombatTrialStage(player, new TweakedMobPool(NostrumEntityTypes.golemPhysical, EntityType.IRON_GOLEM), spawnProvider, 4),
+				new CombatTrialStage(player, new RandomPoolMobProvider(NostrumEntityTypes.golemNeutral), spawnProvider, 3),
+				new CombatTrialStage(player, new TweakedMobPool(NostrumEntityTypes.golemNeutral, EntityType.IRON_GOLEM), spawnProvider, 4),
 				new CombatTrialStage(player, new TweakedMobPool(NostrumEntityTypes.willo), spawnProvider, 1),
-				new CombatTrialStage(player, new TweakedMobPool(NostrumEntityTypes.golemPhysical, NostrumEntityTypes.koid, EntityType.IRON_GOLEM), spawnProvider, 5)
+				new CombatTrialStage(player, new TweakedMobPool(NostrumEntityTypes.golemNeutral, NostrumEntityTypes.koid, EntityType.IRON_GOLEM), spawnProvider, 5)
 				);
 	}
 	
@@ -48,9 +48,9 @@ public class CombatTrialPhysical extends CombatTrialStaged {
 			Mob ent = super.provideEntity(world);
 			
 			if (ent instanceof WilloEntity) {
-				((WilloEntity) ent).setElement(EMagicElement.PHYSICAL);
+				((WilloEntity) ent).setElement(EMagicElement.NEUTRAL);
 			} else if (ent instanceof KoidEntity) {
-				((KoidEntity) ent).setElement(EMagicElement.PHYSICAL);
+				((KoidEntity) ent).setElement(EMagicElement.NEUTRAL);
 			} else if (ent instanceof IronGolem) {
 				; // Thought I was going to have to do something but doesn't seem like it
 			}

@@ -49,7 +49,7 @@ public class MagicDamageProjectileEntity extends AbstractHurtingProjectile {
 	@Override
 	protected void defineSynchedData() {
 		super.defineSynchedData();
-		entityData.define(ELEMENT, EMagicElement.PHYSICAL);
+		entityData.define(ELEMENT, EMagicElement.NEUTRAL);
 	}
 
 	public EMagicElement getElement() {
@@ -173,9 +173,9 @@ public class MagicDamageProjectileEntity extends AbstractHurtingProjectile {
 		case LIGHTNING:
 			sound = NostrumMagicaSounds.DAMAGE_LIGHTNING;
 			break;
-		case PHYSICAL:
+		case NEUTRAL:
 		default:
-			sound = NostrumMagicaSounds.DAMAGE_PHYSICAL;
+			sound = NostrumMagicaSounds.DAMAGE_NEUTRAL;
 			break;
 		case WIND:
 			sound = NostrumMagicaSounds.DAMAGE_WIND;

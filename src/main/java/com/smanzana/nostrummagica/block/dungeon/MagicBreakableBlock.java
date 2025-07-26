@@ -46,7 +46,7 @@ public class MagicBreakableBlock extends Block implements ISpellTargetBlock {
 				.noDrops()
 				);
 		
-		this.registerDefaultState(this.defaultBlockState().setValue(ELEMENT, EMagicElement.PHYSICAL));
+		this.registerDefaultState(this.defaultBlockState().setValue(ELEMENT, EMagicElement.NEUTRAL));
 	}
 	
 	@Override

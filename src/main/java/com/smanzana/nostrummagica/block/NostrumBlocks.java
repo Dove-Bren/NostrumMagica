@@ -430,7 +430,7 @@ public class NostrumBlocks {
 			return iceStone;
 		case LIGHTNING:
 			return lightningStone;
-		case PHYSICAL:
+		case NEUTRAL:
 			return null;
 		case WIND:
 			return windStone;

@@ -200,7 +200,7 @@ public class NostrumMagic implements INostrumMagic {
 			maxxp = LevelCurves.maxXP(1);
 			skillPoints = 0;
 			
-			this.setElementalMastery(EMagicElement.PHYSICAL, EElementalMastery.NOVICE);
+			this.setElementalMastery(EMagicElement.NEUTRAL, EElementalMastery.NOVICE);
 			this.completeResearch(NostrumResearches.Origin);
 			this.addResearchPoint();
 			//this.completeResearch("spellcraft");
@@ -1356,7 +1356,7 @@ public class NostrumMagic implements INostrumMagic {
 		// ELEMENTS
 		compound = tag.getCompound(NBT_MASTERED_ELEMENTS);
 		for (String key : compound.getAllKeys()) {
-			EMagicElement elem = EMagicElement.valueOf(key);
+			EMagicElement elem = EMagicElement.parse(key);
 			setElementalMastery(elem, EElementalMastery.fromNBT(compound.get(key)));
 		}
 		
@@ -1364,7 +1364,7 @@ public class NostrumMagic implements INostrumMagic {
 		for (String key : compound.getAllKeys()) {
 			boolean val = compound.getBoolean(key);
 			if (val) {
-				EMagicElement elem = EMagicElement.valueOf(key);
+				EMagicElement elem = EMagicElement.parse(key);
 				startTrial(elem);
 			}
 		}
@@ -1449,7 +1449,7 @@ public class NostrumMagic implements INostrumMagic {
 			compound = tag.getCompound(NBT_SPELLKNOWLEDGE);
 			for (String key : compound.getAllKeys()) {
 				try {
-					EMagicElement elem = EMagicElement.valueOf(key);
+					EMagicElement elem = EMagicElement.parse(key);
 					CompoundTag subtag = compound.getCompound(key);
 					for (String altKey : subtag.getAllKeys()) {
 						EAlteration alt = null;

@@ -168,7 +168,7 @@ public class ElementalArmor extends ArmorItem
 		case EARTH:
 		case ENDER:
 		case FIRE:
-		case PHYSICAL:
+		case NEUTRAL:
 			return true;
 		case WIND:
 		case ICE:
@@ -210,7 +210,7 @@ public class ElementalArmor extends ArmorItem
 		case FIRE:
 			fullProt = (20f / 25f);
 			break;
-		case PHYSICAL:
+		case NEUTRAL:
 			fullProt = 1f;
 			break;
 		case ICE:
@@ -281,7 +281,7 @@ public class ElementalArmor extends ArmorItem
 		case FIRE:
 			fullProt = .45f;
 			break;
-		case PHYSICAL:
+		case NEUTRAL:
 			fullProt = .5f;
 			break;
 		case ICE:
@@ -408,7 +408,7 @@ public class ElementalArmor extends ArmorItem
 		case EARTH:
 			mod = 1.1f;
 			break;
-		case PHYSICAL:
+		case NEUTRAL:
 			mod = 1.2f;
 			break;
 		case FIRE:
@@ -438,7 +438,7 @@ public class ElementalArmor extends ArmorItem
 		case FIRE:
 		case ICE:
 		case LIGHTNING:
-		case PHYSICAL:
+		case NEUTRAL:
 			return .05; // +5% per piecce. 20% for 4 pieces (same as speed I)
 		case WIND:
 			return .075; // +7.5% per piecce. 30% for 4 pieces (halfway between speed I and II)
@@ -458,7 +458,7 @@ public class ElementalArmor extends ArmorItem
 		case FIRE:
 		case ICE:
 		case LIGHTNING:
-		case PHYSICAL:
+		case NEUTRAL:
 			return .2; // same as jump-boost 2
 		case WIND:
 			return .3;
@@ -476,7 +476,7 @@ public class ElementalArmor extends ArmorItem
 		switch (element) {
 		case EARTH:
 		case ICE:
-		case PHYSICAL:
+		case NEUTRAL:
 		case WIND:
 			total = 0;
 			break;
@@ -581,7 +581,7 @@ public class ElementalArmor extends ArmorItem
 //			if (NostrumMagica.rand.nextFloat() <= 0.35f * (float) (Math.min(2, level) + 1))
 			action = new SpellAction().burn(5 * 20);
 			break;
-		case PHYSICAL:
+		case NEUTRAL:
 		case WIND:
 		case LIGHTNING:
 		case ICE:
@@ -898,57 +898,57 @@ public class ElementalArmor extends ArmorItem
 				break;
 			}
 			break;
-		case PHYSICAL:
+		case NEUTRAL:
 			switch (slot) {
 			case HEAD:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorPhysicalHeadNovice;
+					armor = NostrumItems.enchantedArmorNeutralHeadNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorPhysicalHeadAdept;
+					armor = NostrumItems.enchantedArmorNeutralHeadAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorPhysicalHeadMaster;
+					armor = NostrumItems.enchantedArmorNeutralHeadMaster;
 					break;
 				}
 				break;
 			case CHEST:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorPhysicalChestNovice;
+					armor = NostrumItems.enchantedArmorNeutralChestNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorPhysicalChestAdept;
+					armor = NostrumItems.enchantedArmorNeutralChestAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorPhysicalChestMaster;
+					armor = NostrumItems.enchantedArmorNeutralChestMaster;
 					break;
 				}
 				break;
 			case LEGS:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorPhysicalLegsNovice;
+					armor = NostrumItems.enchantedArmorNeutralLegsNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorPhysicalLegsAdept;
+					armor = NostrumItems.enchantedArmorNeutralLegsAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorPhysicalLegsMaster;
+					armor = NostrumItems.enchantedArmorNeutralLegsMaster;
 					break;
 				}
 				break;
 			case FEET:
 				switch (type) {
 				case NOVICE:
-					armor = NostrumItems.enchantedArmorPhysicalFeetNovice;
+					armor = NostrumItems.enchantedArmorNeutralFeetNovice;
 					break;
 				case ADEPT:
-					armor = NostrumItems.enchantedArmorPhysicalFeetAdept;
+					armor = NostrumItems.enchantedArmorNeutralFeetAdept;
 					break;
 				case MASTER:
-					armor = NostrumItems.enchantedArmorPhysicalFeetMaster;
+					armor = NostrumItems.enchantedArmorNeutralFeetMaster;
 					break;
 				}
 				break;
@@ -1184,7 +1184,7 @@ public class ElementalArmor extends ArmorItem
 							new Vec3(0, 0.01 * (NostrumMagica.rand.nextBoolean() ? 1 : -1), 0), null).color(.8f, 1f,
 									1f, 0f));
 			break;
-		case PHYSICAL:
+		case NEUTRAL:
 		case WIND:
 		default:
 			effect = null;
@@ -1420,7 +1420,7 @@ public class ElementalArmor extends ArmorItem
 	protected boolean hasDragonFlight(LivingEntity entity) {
 		if (this.type == Type.MASTER && this.slot == EquipmentSlot.CHEST) {
 			boolean hasRightElement = element == EMagicElement.ENDER || element == EMagicElement.EARTH
-					|| element == EMagicElement.FIRE || element == EMagicElement.PHYSICAL;
+					|| element == EMagicElement.FIRE || element == EMagicElement.NEUTRAL;
 			if (!hasRightElement) {
 				ItemStack chest = entity.getItemBySlot(EquipmentSlot.CHEST);
 				hasRightElement = ElementalArmor.GetHasWingUpgrade(chest);
@@ -2236,7 +2236,7 @@ public class ElementalArmor extends ArmorItem
 	public boolean shouldRenderDragonWings(ItemStack stack, Player player) {
 		final boolean flying = player.isFallFlying();
 		// Maybe should have an interface?
-		if (ElementalArmor.GetSetCount(player, EMagicElement.PHYSICAL, Type.MASTER) == 4
+		if (ElementalArmor.GetSetCount(player, EMagicElement.NEUTRAL, Type.MASTER) == 4
 				|| ElementalArmor.GetSetCount(player, EMagicElement.EARTH, Type.MASTER) == 4
 				|| ElementalArmor.GetSetCount(player, EMagicElement.FIRE, Type.MASTER) == 4
 				|| ElementalArmor.GetSetCount(player, EMagicElement.ENDER, Type.MASTER) == 4

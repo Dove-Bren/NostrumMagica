@@ -110,7 +110,7 @@ public class SpellProjectileEntity extends AbstractHurtingProjectile {
 	protected void defineSynchedData() {
 		super.defineSynchedData();
 		
-		this.entityData.define(ELEMENT, EMagicElement.PHYSICAL);
+		this.entityData.define(ELEMENT, EMagicElement.NEUTRAL);
 	}
 	
 	public void setFilter(@Nullable Predicate<Entity> filter) {

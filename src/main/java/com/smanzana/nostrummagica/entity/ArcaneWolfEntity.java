@@ -548,7 +548,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		entityData.define(MAX_MANA, 100);
 		entityData.define(RUNE_COLOR, 0x00000000);
 		entityData.define(ELEMENTAL_TYPE, ArcaneWolfElementalType.NONELEMENTAL);
-		entityData.define(TRAINING_ELEMENT, EMagicElement.PHYSICAL);
+		entityData.define(TRAINING_ELEMENT, EMagicElement.NEUTRAL);
 		entityData.define(TRAINING_XP, 0);
 		entityData.define(TRAINING_LEVEL, 0);
 	}
@@ -1267,7 +1267,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 	
 	public @Nullable EMagicElement getTrainingElement() {
 		final EMagicElement elem = entityData.get(TRAINING_ELEMENT);
-		if (elem == EMagicElement.PHYSICAL) {
+		if (elem == EMagicElement.NEUTRAL) {
 			return null;
 		}
 		return elem;
@@ -1275,13 +1275,13 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 	
 	protected void setTrainingElement(@Nullable EMagicElement element) {
 		if (element == null) {
-			element = EMagicElement.PHYSICAL;
+			element = EMagicElement.NEUTRAL;
 		}
 		entityData.set(TRAINING_ELEMENT, element);
 	}
 	
 	public boolean startTraining(EMagicElement element) {
-		if (element == null || element == EMagicElement.PHYSICAL || this.getTrainingElement() != null) {
+		if (element == null || element == EMagicElement.NEUTRAL || this.getTrainingElement() != null) {
 			return false;
 		}
 		
@@ -1495,7 +1495,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		this.setTrainingElement(null);
 		if (compound.contains(NBT_TRAINING_ELEMENT)) {
 			try {
-				this.setTrainingElement(EMagicElement.valueOf(compound.getString(NBT_TRAINING_ELEMENT).toUpperCase()));
+				this.setTrainingElement(EMagicElement.parse(compound.getString(NBT_TRAINING_ELEMENT).toUpperCase()));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -1816,7 +1816,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 	}
 	
 	protected void levelUpTrainingElement(EMagicElement element) {
-		if (element == null || element == EMagicElement.PHYSICAL) {
+		if (element == null || element == EMagicElement.NEUTRAL) {
 			return;
 		}
 		
@@ -1871,7 +1871,7 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 	}
 	
 	protected void finishTrainingElement(EMagicElement element) {
-		if (element == null || element == EMagicElement.PHYSICAL) {
+		if (element == null || element == EMagicElement.NEUTRAL) {
 			return;
 		}
 		

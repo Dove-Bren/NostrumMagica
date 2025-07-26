@@ -117,7 +117,7 @@ public class RitualRecipeCategory implements IRecipeCategory<RitualRecipe> {
 		angle = 0f;
 		
 		if (recipeFlavor == null)
-			recipeFlavor = EMagicElement.PHYSICAL;
+			recipeFlavor = EMagicElement.NEUTRAL;
 		
 		float frac = (float) (System.currentTimeMillis() % 3000L) / 3000f;
 		angle = frac * 360f;

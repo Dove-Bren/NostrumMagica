@@ -530,12 +530,12 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 					// Leave two elements active
 					arena.deactivateLights();
 					EMagicElement elem1 = EMagicElement.getRandom(random);
-					while (elem1 == EMagicElement.PHYSICAL || elem1 == EMagicElement.WIND || elem1 == EMagicElement.EARTH) {
+					while (elem1 == EMagicElement.NEUTRAL || elem1 == EMagicElement.WIND || elem1 == EMagicElement.EARTH) {
 						elem1 = EMagicElement.getRandom(random);
 					}
 					
 					EMagicElement elem2 = EMagicElement.getRandom(random);
-					while (elem2 == EMagicElement.PHYSICAL || elem2 == EMagicElement.WIND || elem2 == EMagicElement.EARTH || elem2 == elem1) {
+					while (elem2 == EMagicElement.NEUTRAL || elem2 == EMagicElement.WIND || elem2 == EMagicElement.EARTH || elem2 == elem1) {
 						elem2 = EMagicElement.getRandom(random);
 					}
 					arena.activateLight(elem1);
@@ -543,7 +543,7 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 				} else {
 					arena.deactivateLights();
 					EMagicElement elem1 = EMagicElement.getRandom(random);
-					while (elem1 == EMagicElement.PHYSICAL || elem1 == EMagicElement.WIND || elem1 == EMagicElement.EARTH) {
+					while (elem1 == EMagicElement.NEUTRAL || elem1 == EMagicElement.WIND || elem1 == EMagicElement.EARTH) {
 						elem1 = EMagicElement.getRandom(random);
 					}
 					arena.activateLight(elem1);
@@ -714,8 +714,8 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 		case LIGHTNING:
 			summonType = NostrumEntityTypes.golemLightning;
 			break;
-		case PHYSICAL:
-			summonType = NostrumEntityTypes.golemPhysical;
+		case NEUTRAL:
+			summonType = NostrumEntityTypes.golemNeutral;
 			break;
 		case WIND:
 			summonType = NostrumEntityTypes.golemWind;

@@ -18,14 +18,14 @@ import com.smanzana.nostrummagica.item.armor.ElementalEnderArmor;
 import com.smanzana.nostrummagica.item.armor.ElementalFireArmor;
 import com.smanzana.nostrummagica.item.armor.ElementalIceArmor;
 import com.smanzana.nostrummagica.item.armor.ElementalLightningArmor;
-import com.smanzana.nostrummagica.item.armor.ElementalPhysicalArmor;
+import com.smanzana.nostrummagica.item.armor.ElementalNeutralArmor;
 import com.smanzana.nostrummagica.item.armor.ElementalWindArmor;
 import com.smanzana.nostrummagica.item.armor.KoidHelmet;
 import com.smanzana.nostrummagica.item.armor.MageArmor;
 import com.smanzana.nostrummagica.item.equipment.AspectedEarthWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedEnderWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedFireWeapon;
-import com.smanzana.nostrummagica.item.equipment.AspectedPhysicalWeapon;
+import com.smanzana.nostrummagica.item.equipment.AspectedNeutralWeapon;
 import com.smanzana.nostrummagica.item.equipment.AspectedWeapon;
 import com.smanzana.nostrummagica.item.equipment.CasterWandItem;
 import com.smanzana.nostrummagica.item.equipment.GoldMirrorItem;
@@ -77,7 +77,7 @@ public class NostrumItems {
 	protected static final String ID_FIRE = "fire";
 	protected static final String ID_ICE = "ice";
 	protected static final String ID_LIGHTNING = "lightning";
-	protected static final String ID_PHYSICAL = "physical";
+	protected static final String ID_NEUTRAL = "neutral";
 	protected static final String ID_WIND = "wind";
 	
 	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem; // TODO could clean up; is just a BlockItem
@@ -165,18 +165,18 @@ public class NostrumItems {
 //	@ObjectHolder(MagicLightningArmor.ID_FEET_ADEPT) public static MagicLightningArmor enchantedArmorLightningFeetAdept;
 	@ObjectHolder(ElementalLightningArmor.ID_FEET_MASTER) public static ElementalLightningArmor enchantedArmorLightningFeetMaster;
 	
-	@ObjectHolder(ElementalPhysicalArmor.ID_HELM_NOVICE) public static ElementalPhysicalArmor enchantedArmorPhysicalHeadNovice;
-	@ObjectHolder(ElementalPhysicalArmor.ID_HELM_ADEPT) public static ElementalPhysicalArmor enchantedArmorPhysicalHeadAdept;
-	@ObjectHolder(ElementalPhysicalArmor.ID_HELM_MASTER) public static ElementalPhysicalArmor enchantedArmorPhysicalHeadMaster;
-	@ObjectHolder(ElementalPhysicalArmor.ID_CHEST_NOVICE) public static ElementalPhysicalArmor enchantedArmorPhysicalChestNovice;
-	@ObjectHolder(ElementalPhysicalArmor.ID_CHEST_ADEPT) public static ElementalPhysicalArmor enchantedArmorPhysicalChestAdept;
-	@ObjectHolder(ElementalPhysicalArmor.ID_CHEST_MASTER) public static ElementalPhysicalArmor enchantedArmorPhysicalChestMaster;
-	@ObjectHolder(ElementalPhysicalArmor.ID_LEGS_NOVICE) public static ElementalPhysicalArmor enchantedArmorPhysicalLegsNovice;
-	@ObjectHolder(ElementalPhysicalArmor.ID_LEGS_ADEPT) public static ElementalPhysicalArmor enchantedArmorPhysicalLegsAdept;
-	@ObjectHolder(ElementalPhysicalArmor.ID_LEGS_MASTER) public static ElementalPhysicalArmor enchantedArmorPhysicalLegsMaster;
-	@ObjectHolder(ElementalPhysicalArmor.ID_FEET_NOVICE) public static ElementalPhysicalArmor enchantedArmorPhysicalFeetNovice;
-	@ObjectHolder(ElementalPhysicalArmor.ID_FEET_ADEPT) public static ElementalPhysicalArmor enchantedArmorPhysicalFeetAdept;
-	@ObjectHolder(ElementalPhysicalArmor.ID_FEET_MASTER) public static ElementalPhysicalArmor enchantedArmorPhysicalFeetMaster;
+	@ObjectHolder(ElementalNeutralArmor.ID_HELM_NOVICE) public static ElementalNeutralArmor enchantedArmorNeutralHeadNovice;
+	@ObjectHolder(ElementalNeutralArmor.ID_HELM_ADEPT) public static ElementalNeutralArmor enchantedArmorNeutralHeadAdept;
+	@ObjectHolder(ElementalNeutralArmor.ID_HELM_MASTER) public static ElementalNeutralArmor enchantedArmorNeutralHeadMaster;
+	@ObjectHolder(ElementalNeutralArmor.ID_CHEST_NOVICE) public static ElementalNeutralArmor enchantedArmorNeutralChestNovice;
+	@ObjectHolder(ElementalNeutralArmor.ID_CHEST_ADEPT) public static ElementalNeutralArmor enchantedArmorNeutralChestAdept;
+	@ObjectHolder(ElementalNeutralArmor.ID_CHEST_MASTER) public static ElementalNeutralArmor enchantedArmorNeutralChestMaster;
+	@ObjectHolder(ElementalNeutralArmor.ID_LEGS_NOVICE) public static ElementalNeutralArmor enchantedArmorNeutralLegsNovice;
+	@ObjectHolder(ElementalNeutralArmor.ID_LEGS_ADEPT) public static ElementalNeutralArmor enchantedArmorNeutralLegsAdept;
+	@ObjectHolder(ElementalNeutralArmor.ID_LEGS_MASTER) public static ElementalNeutralArmor enchantedArmorNeutralLegsMaster;
+	@ObjectHolder(ElementalNeutralArmor.ID_FEET_NOVICE) public static ElementalNeutralArmor enchantedArmorNeutralFeetNovice;
+	@ObjectHolder(ElementalNeutralArmor.ID_FEET_ADEPT) public static ElementalNeutralArmor enchantedArmorNeutralFeetAdept;
+	@ObjectHolder(ElementalNeutralArmor.ID_FEET_MASTER) public static ElementalNeutralArmor enchantedArmorNeutralFeetMaster;
 	
 //	@ObjectHolder(MagicWindArmor.ID_HELM_NOVICE) public static MagicWindArmor enchantedArmorWindHeadNovice;
 //	@ObjectHolder(MagicWindArmor.ID_HELM_ADEPT) public static MagicWindArmor enchantedArmorWindHeadAdept;
@@ -205,7 +205,7 @@ public class NostrumItems {
 	@ObjectHolder(EssenceItem.ID_PREFIX + ID_ICE) public static EssenceItem essenceIce;
 	@ObjectHolder(EssenceItem.ID_PREFIX + ID_ENDER) public static EssenceItem essenceEnder;
 	@ObjectHolder(EssenceItem.ID_PREFIX + ID_LIGHTNING) public static EssenceItem essenceLightning;
-	@ObjectHolder(EssenceItem.ID_PREFIX + ID_PHYSICAL) public static EssenceItem essencePhysical;
+	@ObjectHolder(EssenceItem.ID_PREFIX + ID_NEUTRAL) public static EssenceItem essenceNeutral;
 	@ObjectHolder(EssenceItem.ID_PREFIX + ID_WIND) public static EssenceItem essenceWind;
 	@ObjectHolder(HookshotItem.ID_PREFIX + "weak") public static HookshotItem hookshotWeak;
 	@ObjectHolder(HookshotItem.ID_PREFIX + "medium") public static HookshotItem hookshotMedium;
@@ -228,7 +228,7 @@ public class NostrumItems {
 	@ObjectHolder(MagicCharm.ID_PREFIX + ID_FIRE) public static MagicCharm magicCharmFire;
 	@ObjectHolder(MagicCharm.ID_PREFIX + ID_ICE) public static MagicCharm magicCharmIce;
 	@ObjectHolder(MagicCharm.ID_PREFIX + ID_LIGHTNING) public static MagicCharm magicCharmLightning;
-	@ObjectHolder(MagicCharm.ID_PREFIX + ID_PHYSICAL) public static MagicCharm magicCharmPhysical;
+	@ObjectHolder(MagicCharm.ID_PREFIX + ID_NEUTRAL) public static MagicCharm magicCharmNeutral;
 	@ObjectHolder(MagicCharm.ID_PREFIX + ID_WIND) public static MagicCharm magicCharmWind;
 	@ObjectHolder(MagicSwordBase.ID) public static MagicSwordBase magicSwordBase;
 	@ObjectHolder(MasteryOrb.ID) public static MasteryOrb masteryOrb;
@@ -302,7 +302,7 @@ public class NostrumItems {
 	@ObjectHolder(FillItem.ID_MECHBLOCK_GHOST_CONNECTED) public static FillItem fillSummonableBlock;
 	@ObjectHolder(MageBlade.ID) public static MageBlade mageBlade;
 	@ObjectHolder(AspectedFireWeapon.ID) public static AspectedFireWeapon flameRod;
-	@ObjectHolder(AspectedPhysicalWeapon.ID) public static AspectedPhysicalWeapon deepMetalAxe;
+	@ObjectHolder(AspectedNeutralWeapon.ID) public static AspectedNeutralWeapon deepMetalAxe;
 	@ObjectHolder(AspectedEarthWeapon.ID) public static AspectedEarthWeapon earthPike;
 	@ObjectHolder(AspectedEnderWeapon.ID) public static AspectedEnderWeapon enderRod;
 	@ObjectHolder(CasterWandItem.ID) public static CasterWandItem casterWand;
@@ -467,18 +467,18 @@ public class NostrumItems {
 //    	register(registry, new MagicLightningArmor(EquipmentSlotType.FEET, MagicArmor.Type.ADEPT, PropEquipment()).setRegistryName(MagicLightningArmor.ID_FEET_ADEPT));
     	register(registry, new ElementalLightningArmor(EquipmentSlot.FEET, ElementalArmor.Type.MASTER, PropEquipment()).setRegistryName(ElementalLightningArmor.ID_FEET_MASTER));
     	
-    	register(registry, new ElementalPhysicalArmor(EquipmentSlot.HEAD, ElementalArmor.Type.NOVICE, PropEquipment()).setRegistryName(ElementalPhysicalArmor.ID_HELM_NOVICE));
-    	register(registry, new ElementalPhysicalArmor(EquipmentSlot.HEAD, ElementalArmor.Type.ADEPT, PropEquipment()).setRegistryName(ElementalPhysicalArmor.ID_HELM_ADEPT));
-    	register(registry, new ElementalPhysicalArmor(EquipmentSlot.HEAD, ElementalArmor.Type.MASTER, PropEquipment()).setRegistryName(ElementalPhysicalArmor.ID_HELM_MASTER));
-    	register(registry, new ElementalPhysicalArmor(EquipmentSlot.CHEST, ElementalArmor.Type.NOVICE, PropEquipment()).setRegistryName(ElementalPhysicalArmor.ID_CHEST_NOVICE));
-    	register(registry, new ElementalPhysicalArmor(EquipmentSlot.CHEST, ElementalArmor.Type.ADEPT, PropEquipment()).setRegistryName(ElementalPhysicalArmor.ID_CHEST_ADEPT));
-    	register(registry, new ElementalPhysicalArmor(EquipmentSlot.CHEST, ElementalArmor.Type.MASTER, PropEquipment()).setRegistryName(ElementalPhysicalArmor.ID_CHEST_MASTER));
-    	register(registry, new ElementalPhysicalArmor(EquipmentSlot.LEGS, ElementalArmor.Type.NOVICE, PropEquipment()).setRegistryName(ElementalPhysicalArmor.ID_LEGS_NOVICE));
-    	register(registry, new ElementalPhysicalArmor(EquipmentSlot.LEGS, ElementalArmor.Type.ADEPT, PropEquipment()).setRegistryName(ElementalPhysicalArmor.ID_LEGS_ADEPT));
-    	register(registry, new ElementalPhysicalArmor(EquipmentSlot.LEGS, ElementalArmor.Type.MASTER, PropEquipment()).setRegistryName(ElementalPhysicalArmor.ID_LEGS_MASTER));
-    	register(registry, new ElementalPhysicalArmor(EquipmentSlot.FEET, ElementalArmor.Type.NOVICE, PropEquipment()).setRegistryName(ElementalPhysicalArmor.ID_FEET_NOVICE));
-    	register(registry, new ElementalPhysicalArmor(EquipmentSlot.FEET, ElementalArmor.Type.ADEPT, PropEquipment()).setRegistryName(ElementalPhysicalArmor.ID_FEET_ADEPT));
-    	register(registry, new ElementalPhysicalArmor(EquipmentSlot.FEET, ElementalArmor.Type.MASTER, PropEquipment()).setRegistryName(ElementalPhysicalArmor.ID_FEET_MASTER));
+    	register(registry, new ElementalNeutralArmor(EquipmentSlot.HEAD, ElementalArmor.Type.NOVICE, PropEquipment()).setRegistryName(ElementalNeutralArmor.ID_HELM_NOVICE));
+    	register(registry, new ElementalNeutralArmor(EquipmentSlot.HEAD, ElementalArmor.Type.ADEPT, PropEquipment()).setRegistryName(ElementalNeutralArmor.ID_HELM_ADEPT));
+    	register(registry, new ElementalNeutralArmor(EquipmentSlot.HEAD, ElementalArmor.Type.MASTER, PropEquipment()).setRegistryName(ElementalNeutralArmor.ID_HELM_MASTER));
+    	register(registry, new ElementalNeutralArmor(EquipmentSlot.CHEST, ElementalArmor.Type.NOVICE, PropEquipment()).setRegistryName(ElementalNeutralArmor.ID_CHEST_NOVICE));
+    	register(registry, new ElementalNeutralArmor(EquipmentSlot.CHEST, ElementalArmor.Type.ADEPT, PropEquipment()).setRegistryName(ElementalNeutralArmor.ID_CHEST_ADEPT));
+    	register(registry, new ElementalNeutralArmor(EquipmentSlot.CHEST, ElementalArmor.Type.MASTER, PropEquipment()).setRegistryName(ElementalNeutralArmor.ID_CHEST_MASTER));
+    	register(registry, new ElementalNeutralArmor(EquipmentSlot.LEGS, ElementalArmor.Type.NOVICE, PropEquipment()).setRegistryName(ElementalNeutralArmor.ID_LEGS_NOVICE));
+    	register(registry, new ElementalNeutralArmor(EquipmentSlot.LEGS, ElementalArmor.Type.ADEPT, PropEquipment()).setRegistryName(ElementalNeutralArmor.ID_LEGS_ADEPT));
+    	register(registry, new ElementalNeutralArmor(EquipmentSlot.LEGS, ElementalArmor.Type.MASTER, PropEquipment()).setRegistryName(ElementalNeutralArmor.ID_LEGS_MASTER));
+    	register(registry, new ElementalNeutralArmor(EquipmentSlot.FEET, ElementalArmor.Type.NOVICE, PropEquipment()).setRegistryName(ElementalNeutralArmor.ID_FEET_NOVICE));
+    	register(registry, new ElementalNeutralArmor(EquipmentSlot.FEET, ElementalArmor.Type.ADEPT, PropEquipment()).setRegistryName(ElementalNeutralArmor.ID_FEET_ADEPT));
+    	register(registry, new ElementalNeutralArmor(EquipmentSlot.FEET, ElementalArmor.Type.MASTER, PropEquipment()).setRegistryName(ElementalNeutralArmor.ID_FEET_MASTER));
     	
 //    	register(registry, new MagicWindArmor(EquipmentSlotType.HEAD, MagicArmor.Type.NOVICE, PropEquipment()).setRegistryName(MagicWindArmor.ID_HELM_NOVICE));
 //    	register(registry, new MagicWindArmor(EquipmentSlotType.HEAD, MagicArmor.Type.ADEPT, PropEquipment()).setRegistryName(MagicWindArmor.ID_HELM_ADEPT));
@@ -507,13 +507,13 @@ public class NostrumItems {
     	register(registry, new EssenceItem(EMagicElement.ICE).setRegistryName(EssenceItem.ID_PREFIX + ID_ICE));
     	register(registry, new EssenceItem(EMagicElement.ENDER).setRegistryName(EssenceItem.ID_PREFIX + ID_ENDER));
     	register(registry, new EssenceItem(EMagicElement.LIGHTNING).setRegistryName(EssenceItem.ID_PREFIX + ID_LIGHTNING));
-    	register(registry, new EssenceItem(EMagicElement.PHYSICAL).setRegistryName(EssenceItem.ID_PREFIX + ID_PHYSICAL));
+    	register(registry, new EssenceItem(EMagicElement.NEUTRAL).setRegistryName(EssenceItem.ID_PREFIX + ID_NEUTRAL));
     	register(registry, new EssenceItem(EMagicElement.WIND).setRegistryName(EssenceItem.ID_PREFIX + ID_WIND));
     	register(registry, new HookshotItem(HookshotItem.HookshotType.WEAK).setRegistryName(HookshotItem.ID_PREFIX + "weak"));
     	register(registry, new HookshotItem(HookshotItem.HookshotType.MEDIUM).setRegistryName(HookshotItem.ID_PREFIX + "medium"));
     	register(registry, new HookshotItem(HookshotItem.HookshotType.STRONG).setRegistryName(HookshotItem.ID_PREFIX + "strong"));
     	register(registry, new HookshotItem(HookshotItem.HookshotType.CLAW).setRegistryName(HookshotItem.ID_PREFIX + "claw"));
-    	register(registry, new InfusedGemItem(EMagicElement.PHYSICAL).setRegistryName(InfusedGemItem.ID_PREFIX + "unattuned"));
+    	register(registry, new InfusedGemItem(EMagicElement.NEUTRAL).setRegistryName(InfusedGemItem.ID_PREFIX + "unattuned"));
     	register(registry, new InfusedGemItem(EMagicElement.EARTH).setRegistryName(InfusedGemItem.ID_PREFIX + ID_EARTH));
     	register(registry, new InfusedGemItem(EMagicElement.ENDER).setRegistryName(InfusedGemItem.ID_PREFIX + ID_ENDER));
     	register(registry, new InfusedGemItem(EMagicElement.FIRE).setRegistryName(InfusedGemItem.ID_PREFIX + ID_FIRE));
@@ -530,7 +530,7 @@ public class NostrumItems {
     	register(registry, new MagicCharm(EMagicElement.FIRE).setRegistryName(MagicCharm.ID_PREFIX + ID_FIRE));
     	register(registry, new MagicCharm(EMagicElement.ICE).setRegistryName(MagicCharm.ID_PREFIX + ID_ICE));
     	register(registry, new MagicCharm(EMagicElement.LIGHTNING).setRegistryName(MagicCharm.ID_PREFIX + ID_LIGHTNING));
-    	register(registry, new MagicCharm(EMagicElement.PHYSICAL).setRegistryName(MagicCharm.ID_PREFIX + ID_PHYSICAL));
+    	register(registry, new MagicCharm(EMagicElement.NEUTRAL).setRegistryName(MagicCharm.ID_PREFIX + ID_NEUTRAL));
     	register(registry, new MagicCharm(EMagicElement.WIND).setRegistryName(MagicCharm.ID_PREFIX + ID_WIND));
     	register(registry, new MagicSwordBase().setRegistryName(MagicSwordBase.ID));
     	register(registry, new MasteryOrb().setRegistryName(MasteryOrb.ID));
@@ -607,7 +607,7 @@ public class NostrumItems {
     	register(registry, new ConnectedFillItem(SummonGhostBlock::WrapBlock).setRegistryName(FillItem.ID_MECHBLOCK_GHOST_CONNECTED));
     	register(registry, new MageBlade().setRegistryName(MageBlade.ID));
     	register(registry, new AspectedFireWeapon().setRegistryName(AspectedFireWeapon.ID));
-    	register(registry, new AspectedPhysicalWeapon().setRegistryName(AspectedPhysicalWeapon.ID));
+    	register(registry, new AspectedNeutralWeapon().setRegistryName(AspectedNeutralWeapon.ID));
     	register(registry, new AspectedEarthWeapon().setRegistryName(AspectedEarthWeapon.ID));
     	register(registry, new AspectedEnderWeapon().setRegistryName(AspectedEnderWeapon.ID));
     	register(registry, new CasterWandItem().setRegistryName(CasterWandItem.ID));

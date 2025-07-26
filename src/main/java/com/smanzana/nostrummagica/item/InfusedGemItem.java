@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * One for each element, except physical
+ * One for each element, except neutral
  * @author Skyler
  *
  */
@@ -52,7 +52,7 @@ public class InfusedGemItem extends Item implements ILoreTagged, ICrystalEnchant
 	 */
 	public static Item getGemItem(EMagicElement element) {
 		if (element == null) {
-			element = EMagicElement.PHYSICAL;
+			element = EMagicElement.NEUTRAL;
 		}
 		
 		InfusedGemItem gem = null;
@@ -72,7 +72,7 @@ public class InfusedGemItem extends Item implements ILoreTagged, ICrystalEnchant
 		case LIGHTNING:
 			gem = NostrumItems.infusedGemLightning;
 			break;
-		case PHYSICAL:
+		case NEUTRAL:
 			gem = NostrumItems.infusedGemUnattuned;
 			break;
 		case WIND:
@@ -175,14 +175,14 @@ public class InfusedGemItem extends Item implements ILoreTagged, ICrystalEnchant
 	@Override
 	public boolean canEnchant(ItemStack stack, EMagicElement element) {
 		// Only void gems are enchantable
-		return element != EMagicElement.PHYSICAL
-				&& (this.element == null || this.element == EMagicElement.PHYSICAL)
+		return element != EMagicElement.NEUTRAL
+				&& (this.element == null || this.element == EMagicElement.NEUTRAL)
 				;
 	}
 
 	@Override
 	public Result attemptEnchant(ItemStack stack, EMagicElement element) {
-		if (this.element == EMagicElement.PHYSICAL || this.element == null) {
+		if (this.element == EMagicElement.NEUTRAL || this.element == null) {
 			int count = 1;
 			return new Result(true, InfusedGemItem.getGem(element, count));
 		} else {

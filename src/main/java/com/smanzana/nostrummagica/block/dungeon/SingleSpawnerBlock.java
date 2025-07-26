@@ -54,7 +54,7 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 		GOLEM_FIRE,
 		GOLEM_ICE,
 		GOLEM_LIGHTNING,
-		GOLEM_PHYSICAL,
+		GOLEM_NEUTRAL,
 		GOLEM_WIND,
 		DRAGON_RED,
 		PLANT_BOSS,
@@ -83,7 +83,7 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 				.noCollission()
 				);
 		
-		this.registerDefaultState(this.stateDefinition.any().setValue(MOB, Type.GOLEM_PHYSICAL));
+		this.registerDefaultState(this.stateDefinition.any().setValue(MOB, Type.GOLEM_NEUTRAL));
 	}
 	
 	@Override
@@ -174,8 +174,8 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 				case LIGHTNING:
 					type = NostrumEntityTypes.golemLightning;
 					break;
-				case PHYSICAL:
-					type = NostrumEntityTypes.golemPhysical;
+				case NEUTRAL:
+					type = NostrumEntityTypes.golemNeutral;
 					break;
 				case WIND:
 					type = NostrumEntityTypes.golemWind;

@@ -37,7 +37,7 @@ import com.smanzana.nostrummagica.entity.golem.MagicFireGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicIceGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicLightningGolemEntity;
-import com.smanzana.nostrummagica.entity.golem.MagicPhysicalGolemEntity;
+import com.smanzana.nostrummagica.entity.golem.MagicNeutralGolemEntity;
 import com.smanzana.nostrummagica.entity.golem.MagicWindGolemEntity;
 import com.smanzana.nostrummagica.integration.curios.items.NostrumCurios;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
@@ -234,9 +234,9 @@ public class SpellAction {
 			case LIGHTNING:
 				sound = NostrumMagicaSounds.DAMAGE_LIGHTNING;
 				break;
-			case PHYSICAL:
+			case NEUTRAL:
 			default:
-				sound = NostrumMagicaSounds.DAMAGE_PHYSICAL;
+				sound = NostrumMagicaSounds.DAMAGE_NEUTRAL;
 				break;
 			case WIND:
 				sound = NostrumMagicaSounds.DAMAGE_WIND;
@@ -1230,7 +1230,7 @@ public class SpellAction {
 			this.power = power;
 			
 			if (this.element == null)
-				this.element = EMagicElement.PHYSICAL;
+				this.element = EMagicElement.NEUTRAL;
 		}
 
 		@Override
@@ -1269,8 +1269,8 @@ public class SpellAction {
 				golem = new MagicWindGolemEntity(NostrumEntityTypes.golemWind, world);
 				break;
 			default:
-			case PHYSICAL:
-				golem = new MagicPhysicalGolemEntity(NostrumEntityTypes.golemPhysical, world);
+			case NEUTRAL:
+				golem = new MagicNeutralGolemEntity(NostrumEntityTypes.golemNeutral, world);
 				break;
 			}
 			

@@ -30,7 +30,7 @@ public class WispRenderer extends EntityRenderer<WispEntity> {
 	
 	protected int getColor(WispEntity wisp) {
 		final EMagicElement element = (wisp == null ? null : wisp.getElement());
-		return (element == null ? EMagicElement.PHYSICAL : element).getColor();
+		return (element == null ? EMagicElement.NEUTRAL : element).getColor();
 	}
 	
 	protected void renderModel(WispEntity entityIn, PoseStack matrixStackIn, VertexConsumer bufferIn, int packedLightIn,

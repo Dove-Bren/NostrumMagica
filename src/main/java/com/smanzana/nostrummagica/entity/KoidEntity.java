@@ -231,7 +231,7 @@ public class KoidEntity extends Monster implements ILoreSupplier, IElementalEnti
 	@Override
 	protected void defineSynchedData() {
 		super.defineSynchedData();
-		this.entityData.define(KOID_VARIANT, EMagicElement.PHYSICAL.ordinal());
+		this.entityData.define(KOID_VARIANT, EMagicElement.NEUTRAL.ordinal());
 	}
 	
 	public void setCombatTask() {

@@ -36,7 +36,7 @@ public class EnchantedArmorBaseModel<T extends LivingEntity> extends HumanoidMod
 		cubes.texOffs(0, 20);
 		cubes.addBox(-6, -10, -2, 12, 1, 4, deform);
 		
-		// Testing features -- physical/spikes/horns?
+		// Testing features -- neutral/spikes/horns?
 		if (level >= 1) {
 			cubes.texOffs(48, 6);
 			cubes.addBox(-3, -10, -7, 1, 1, 4, deform);
@@ -52,7 +52,7 @@ public class EnchantedArmorBaseModel<T extends LivingEntity> extends HumanoidMod
 			cubes.addBox(2, -12, -10, 1, 1, 2, deform);
 		}
 		
-		// Testing features -- physical/spikes/tendrils?
+		// Testing features -- neutral/spikes/tendrils?
 		if (level >= 2) {
 	        cubes.texOffs(48, 0);
 	        cubes.addBox(-10, -9, -1, 4, 1, 2, deform);

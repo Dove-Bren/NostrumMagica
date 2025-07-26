@@ -247,7 +247,7 @@ public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchant
 		
 		if (level.isClientSide) {
 			EMagicElement element = this.getElement();
-			if (element == null) element = EMagicElement.PHYSICAL;
+			if (element == null) element = EMagicElement.NEUTRAL;
 			int color = element.getColor();
 			NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
 					1, getX(), getY() + getBbHeight()/2f, getZ(), 0, 40, 0,
@@ -306,7 +306,7 @@ public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchant
 		super.defineSynchedData();
 		
 		this.entityData.define(HOME, Optional.empty());
-		this.entityData.define(ELEMENT, EMagicElement.PHYSICAL);
+		this.entityData.define(ELEMENT, EMagicElement.NEUTRAL);
 	}
 	
 	protected void setHome(BlockPos home) {
@@ -666,10 +666,10 @@ public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchant
 			
 			Spell spell;
 			
-			// Physical
+			// Neutral
 			putSpell("Physic Blast",
 					NostrumSpellShapes.Projectile,
-					EMagicElement.PHYSICAL,
+					EMagicElement.NEUTRAL,
 					1,
 					EAlteration.HARM);
 			
