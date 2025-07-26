@@ -12,6 +12,7 @@ import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.ILaserReactive;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.util.ShapeUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -332,7 +333,7 @@ public abstract class FogBlock extends Block implements ILaserReactive, IRoomBou
 			if (context != CollisionContext.empty() && context instanceof EntityCollisionContext) {
 				@Nullable Entity entity = ((EntityCollisionContext) context).getEntity();
 				if (entity == null || !(entity instanceof Player) || !((Player) entity).isCreative()) {
-					return Shapes.empty();
+					return ShapeUtil.EMPTY_NOCRASH;
 				}
 			}
 			

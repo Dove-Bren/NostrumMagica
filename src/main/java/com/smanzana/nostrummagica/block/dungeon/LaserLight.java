@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.capabilities.ILaserReactive;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.util.ShapeUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -64,7 +65,7 @@ public class LaserLight extends Block implements ILaserReactive {
 		if (context != CollisionContext.empty() && context instanceof EntityCollisionContext) {
 			@Nullable Entity entity = ((EntityCollisionContext) context).getEntity();
 			if (entity == null || !(entity instanceof Player) || !((Player) entity).isCreative()) {
-				return Shapes.empty();
+				return ShapeUtil.EMPTY_NOCRASH;
 			}
 		}
 		

@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.TriggerRepeaterTileEntity;
 import com.smanzana.nostrummagica.util.DimensionUtils;
+import com.smanzana.nostrummagica.util.ShapeUtil;
 import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.Util;
@@ -84,7 +85,7 @@ public class TriggerRepeaterBlock extends BaseEntityBlock implements ITriggeredB
 			}
 		}
 		
-		return Shapes.empty();
+		return ShapeUtil.EMPTY_NOCRASH;
 	}
 	
 	@Override

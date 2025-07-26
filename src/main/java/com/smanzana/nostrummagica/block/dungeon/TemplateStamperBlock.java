@@ -11,6 +11,7 @@ import com.smanzana.nostrummagica.item.mapmaking.CopyWandItem;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.TemplateStamperBlockEntity;
 import com.smanzana.nostrummagica.util.DimensionUtils;
+import com.smanzana.nostrummagica.util.ShapeUtil;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -77,7 +78,7 @@ public class TemplateStamperBlock extends BaseEntityBlock implements ITriggeredB
 			}
 		}
 		
-		return Shapes.empty();
+		return ShapeUtil.EMPTY_NOCRASH;
 	}
 	
 	@Override

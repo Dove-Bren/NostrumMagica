@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.util.ShapeUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
@@ -77,7 +78,7 @@ public class DungeonAirBlock extends HalfTransparentBlock {
 		if (context != CollisionContext.empty() && context instanceof EntityCollisionContext) {
 			@Nullable Entity entity = ((EntityCollisionContext) context).getEntity();
 			if (entity == null || !(entity instanceof Player) || !((Player) entity).isCreative()) {
-				return Shapes.empty();
+				return ShapeUtil.EMPTY_NOCRASH;
 			}
 		}
 		

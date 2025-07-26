@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.util.ShapeUtil;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -94,7 +96,7 @@ public class ToggleLogicDoor extends LogicDoorBlock {
 			if (context != CollisionContext.empty() && context instanceof EntityCollisionContext) {
 				final @Nullable Entity entity = ((EntityCollisionContext) context).getEntity();
 				if (entity == null || !(entity instanceof Player) || !((Player) entity).isCreative()) {
-					return Shapes.empty();
+					return ShapeUtil.EMPTY_NOCRASH;
 				}
 			}
 		}

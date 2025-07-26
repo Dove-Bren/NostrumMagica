@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
+import com.smanzana.nostrummagica.util.ShapeUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -82,7 +83,7 @@ public class TogglePlatformBlock extends Block implements ITriggeredBlock {
 		if (!isEnabled(state) && context != CollisionContext.empty() && context instanceof EntityCollisionContext) {
 			final @Nullable Entity entity = ((EntityCollisionContext) context).getEntity();
 			if (entity == null || !(entity instanceof Player) || !((Player) entity).isCreative()) {
-				return Shapes.empty();
+				return ShapeUtil.EMPTY_NOCRASH;
 			}
 		}
 		

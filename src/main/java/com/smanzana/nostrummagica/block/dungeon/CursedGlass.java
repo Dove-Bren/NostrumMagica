@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.CursedGlassTileEntity;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
+import com.smanzana.nostrummagica.util.ShapeUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -109,7 +110,7 @@ public class CursedGlass extends SwitchBlock {
 			return Shapes.block();
 		}
 		
-		return Shapes.empty();
+		return ShapeUtil.EMPTY_NOCRASH;
 		//return CURSED_GLASS_AABB;
 	}
 	

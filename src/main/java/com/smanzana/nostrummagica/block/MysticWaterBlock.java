@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.smanzana.nostrummagica.fluid.MysticWaterFluid;
+import com.smanzana.nostrummagica.util.ShapeUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -105,7 +106,7 @@ public class MysticWaterBlock extends Block implements BucketPickup {
 	
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-		return Shapes.empty();
+		return ShapeUtil.EMPTY_NOCRASH;
 	}
 	
 	@Override

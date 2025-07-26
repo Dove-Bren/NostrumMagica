@@ -12,6 +12,7 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.SingleSpawnerTileEntity;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
+import com.smanzana.nostrummagica.util.ShapeUtil;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -114,7 +115,7 @@ public class SingleSpawnerBlock extends BaseEntityBlock {
 			}
 		}
 		
-		return Shapes.empty();
+		return ShapeUtil.EMPTY_NOCRASH;
 	}
 	
 	@Override

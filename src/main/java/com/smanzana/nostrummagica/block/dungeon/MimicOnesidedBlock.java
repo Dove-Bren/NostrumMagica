@@ -10,6 +10,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.tile.DelayLoadedMimicBlockTileEntity;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
+import com.smanzana.nostrummagica.util.ShapeUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -154,7 +155,7 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 				}
 				
 				if (!blocks) {
-					return Shapes.empty();
+					return ShapeUtil.EMPTY_NOCRASH;
 				}
 			}
 		}
