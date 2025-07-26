@@ -12,7 +12,7 @@
 		"mob=golem_lightning,triggered=false": {
 			"model": "nostrummagica:block/spawner"
 		},
-		"mob=golem_physical,triggered=false": {
+		"mob=golem_neutral,triggered=false": {
 			"model": "nostrummagica:block/spawner"
 		},
 		"mob=golem_ender,triggered=false": {
@@ -41,7 +41,7 @@
 		"mob=golem_lightning,triggered=true": {
 			"model": "nostrummagica:block/none"
 		},
-		"mob=golem_physical,triggered=true": {
+		"mob=golem_neutral,triggered=true": {
 			"model": "nostrummagica:block/none"
 		},
 		"mob=golem_ender,triggered=true": {

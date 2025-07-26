@@ -1,6 +1,6 @@
 {
     "variants": {
-        "element=physical": { "model": "nostrummagica:block/elemental_crystal_block" },
+        "element=neutral": { "model": "nostrummagica:block/elemental_crystal_block" },
 		"element=fire": { "model": "nostrummagica:block/elemental_crystal_block" },
 		"element=ice": { "model": "nostrummagica:block/elemental_crystal_block" },
 		"element=wind": { "model": "nostrummagica:block/elemental_crystal_block" },

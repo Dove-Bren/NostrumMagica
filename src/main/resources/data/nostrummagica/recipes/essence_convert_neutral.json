@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
   "result": {
-    "item": "nostrummagica:nostrum_essence_physical"
+    "item": "nostrummagica:nostrum_essence_neutral"
   },
   "ingredients": [
     {

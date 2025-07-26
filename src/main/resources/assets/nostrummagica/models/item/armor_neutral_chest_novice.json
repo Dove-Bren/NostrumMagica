@@ -1,7 +1,7 @@
 {
 	"parent": "builtin/generated",
 	"textures": {
-		"layer0": "nostrummagica:item/armor_physical_chest_adept"
+		"layer0": "nostrummagica:item/armor_neutral_chest_novice"
 	},
 	"display": {
 		"thirdperson": {

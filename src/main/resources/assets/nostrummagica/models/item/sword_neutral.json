@@ -1,7 +1,7 @@
 {
 	"parent": "item/handheld",
 	"textures": {
-		"layer0": "nostrummagica:item/sword_physical"
+		"layer0": "nostrummagica:item/sword_neutral"
 	},
 	"display": {
 		"thirdperson_righthand": {
@@ -31,7 +31,7 @@
             "predicate": {
                 "nostrummagica:blocking": 1
             },
-            "model": "nostrummagica:item/sword_physical_blocking"
+            "model": "nostrummagica:item/sword_neutral_blocking"
         }
     ]
 }

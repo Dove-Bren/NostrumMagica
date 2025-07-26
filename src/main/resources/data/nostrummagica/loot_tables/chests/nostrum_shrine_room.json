@@ -53,8 +53,8 @@
       },
       {
         "type": "item",
-        "name": "nostrummagica:rune_physical",
-        "entryName": "runephysical",
+        "name": "nostrummagica:rune_neutral",
+        "entryName": "runeneutral",
         "weight": 2
       },
       {

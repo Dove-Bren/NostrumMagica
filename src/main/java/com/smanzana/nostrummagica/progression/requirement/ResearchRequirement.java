@@ -35,6 +35,6 @@ public class ResearchRequirement implements IRequirement{
 	@Override
 	public List<Component> getDescription(Player player) {
 		return Lists.newArrayList(new TranslatableComponent("info.requirement.research", 
-				new TranslatableComponent("research." + researchKey + ".name").withStyle(ChatFormatting.DARK_AQUA)));
+				new TranslatableComponent("research." + researchKey.toString().replace(':', '.') + ".name").withStyle(ChatFormatting.DARK_AQUA)));
 	}
 }

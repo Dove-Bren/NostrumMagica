@@ -12,7 +12,7 @@
 		"mob=golem_lightning": {
 			"model": "nostrummagica:block/spawner"
 		},
-		"mob=golem_physical": {
+		"mob=golem_neutral": {
 			"model": "nostrummagica:block/spawner"
 		},
 		"mob=golem_ender": {

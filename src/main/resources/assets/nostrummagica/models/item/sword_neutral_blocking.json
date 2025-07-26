@@ -1,5 +1,5 @@
 {
-	"parent": "nostrummagica:item/sword_physical",
+	"parent": "nostrummagica:item/sword_neutral",
 	"display": {
 		"firstperson_righthand": {
 			"rotation": [-60, 30, 95],

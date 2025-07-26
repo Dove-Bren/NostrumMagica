@@ -26,7 +26,7 @@
             "predicate": {
                 "nostrummagica:element": 1
             },
-            "model": "nostrummagica:item/mage_blade_physical"
+            "model": "nostrummagica:item/mage_blade_neutral"
         },
 		{
             "predicate": {

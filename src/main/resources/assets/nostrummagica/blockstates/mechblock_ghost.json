@@ -1,6 +1,6 @@
 {
     "variants": {
-        "element=physical": { "model": "nostrummagica:block/mechblock_ghost" },
+        "element=neutral": { "model": "nostrummagica:block/mechblock_ghost" },
 		"element=fire": { "model": "nostrummagica:block/mechblock_ghost" },
 		"element=ice": { "model": "nostrummagica:block/mechblock_ghost" },
 		"element=wind": { "model": "nostrummagica:block/mechblock_ghost" },

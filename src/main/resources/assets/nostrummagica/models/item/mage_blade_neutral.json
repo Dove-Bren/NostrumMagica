@@ -1,6 +1,6 @@
 {
 	"parent": "nostrummagica:item/mage_blade",
 	"textures": {
-		"layer0": "nostrummagica:item/mage_blade_physical"
+		"layer0": "nostrummagica:item/mage_blade_neutral"
 	}
 }

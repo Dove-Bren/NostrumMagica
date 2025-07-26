@@ -1,7 +1,7 @@
 {
 	"parent": "builtin/generated",
 	"textures": {
-		"layer0": "nostrummagica:item/armor_physical_legs_master"
+		"layer0": "nostrummagica:item/armor_neutral_feet_master"
 	},
 	"display": {
 		"thirdperson": {
