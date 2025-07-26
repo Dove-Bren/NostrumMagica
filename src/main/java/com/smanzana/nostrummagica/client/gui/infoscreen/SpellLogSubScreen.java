@@ -14,6 +14,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellComponentIcon;
 import com.smanzana.nostrummagica.client.gui.commonwidget.LabeledWidget;
+import com.smanzana.nostrummagica.client.gui.commonwidget.ListWidget;
 import com.smanzana.nostrummagica.client.gui.commonwidget.ObscurableChildWidget;
 import com.smanzana.nostrummagica.client.gui.commonwidget.ObscurableWidget;
 import com.smanzana.nostrummagica.client.gui.commonwidget.ParentWidget;
@@ -563,11 +564,17 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 				this.addChild(new TextWidget(mc.screen, new TextComponent("No modifiers"), 8, height, 100, 10).scale(.75f));
 				height += (int) (mc.font.lineHeight * .75f);
 			} else {
+				ListWidget<ModifierWidget> modList = new ListWidget<>(8, height, width - 16, heightIn - height, TextComponent.EMPTY);
+				modList.setSpacing(2);
+				modList.setAutoSizeChildren();
+				int listHeight = 0;
 				for (SpellLogModifier mod : line.getModifiers()) {
-					final ModifierWidget modWidget = new ModifierWidget(mod, 8, height, 100, 10);
-					this.addChild(modWidget);
-					height += modWidget.getHeight();
+					final ModifierWidget modWidget = new ModifierWidget(mod, 0, 0, 100, 10);
+					modList.addChild(modWidget);
+					listHeight += modWidget.getHeight();
 				}
+				this.addChild(modList);
+				height += listHeight;
 			}
 
 			height += 2; // bottom margin

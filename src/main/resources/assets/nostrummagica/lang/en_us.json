@@ -2378,6 +2378,7 @@
 	"spelllogmod.nostrummagica.skill": "[Skill] ",
 	"spelllogmod.nostrummagica.spellboost": "Spell Target Bonus",
 	"spelllogmod.nostrummagica.efficiency": "Casting Efficiency Bonus",
+	"spelllogmod.nostrummagica.incantpenalty": "Incantation Cast",
 	"spelllogmod.nostrummagica.firexundead": "Fire VS Undead Bonus",
 	"spelllogmod.nostrummagica.firexfire": "Fire VS Fire Penalty",
 	"spelllogmod.nostrummagica.enderxender": "Ender VS Ender Negation",

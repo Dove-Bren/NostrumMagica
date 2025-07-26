@@ -30,6 +30,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 public class SpellState implements ISpellState {
 	private static final Component LABEL_MOD_EFF = new TranslatableComponent("spelllogmod.nostrummagica.efficiency");
+	private static final Component LABEL_MOD_INCANT_PENALTY = new TranslatableComponent("spelllogmod.nostrummagica.incantpenalty");
 	
 	protected final Spell spell;
 	protected final LivingEntity caster;
@@ -186,6 +187,11 @@ public class SpellState implements ISpellState {
 		log.pushModifierStack();
 		if (this.castProperties.efficiency() != 1f) {
 			log.addGlobalModifier(LABEL_MOD_EFF, this.castProperties.efficiency()-1f, ESpellLogModifierType.BONUS_SCALE);
+		}
+		
+		if (spell.getType() == SpellType.Incantation) {
+			// actaul decrease is embedded on part efficiency, which maybe isn't smart or smooth...
+			log.addGlobalModifier(LABEL_MOD_INCANT_PENALTY, -.5f, ESpellLogModifierType.BONUS_SCALE);
 		}
 		
 		final SpellEffects.ApplyResult result = SpellEffects.ApplySpellEffects(caster, parts, this.castProperties,
