@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.client.gui.infoscreen;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -27,6 +26,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public abstract class PersonalSubScreen implements IInfoSubScreen {
 
@@ -34,262 +34,6 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 	
 	public PersonalSubScreen(INostrumMagic attr) {
 		this.attr = attr;
-	}
-	
-	// Screen with information about unlocking the magic system, for newbs
-	public static class PersonalDiscoveryScreen extends PersonalSubScreen {
-		
-		public PersonalDiscoveryScreen(INostrumMagic attr) {
-			super(attr);
-		}
-		
-		@Override
-		public void draw(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
-			
-			String desc;
-			if (attr.isUnlocked()) {
-				desc = I18n.get("info.discovery.spells", new Object[0]);
-			} else {
-				SpellShape shape = null;
-				EMagicElement element = null;
-				if (!attr.getShapes().isEmpty())
-					shape = attr.getShapes().get(0);
-				
-				Map<EMagicElement, Boolean> map = attr.getKnownElements();
-				for (EMagicElement elem : map.keySet()) {
-					Boolean val;
-					val = map.get(elem);
-					if (val != null && val) {
-						element = elem;
-						break;
-					}
-				}
-				
-				if (shape != null || element != null) {
-					desc = I18n.get("info.discovery.starting2", new Object[0]);
-				} else {
-					desc = I18n.get("info.discovery.starting", new Object[0]);
-				}
-				
-				// Draw rotating icons
-				final int iconWidth = 24;
-				final int space = 32;
-				final long cycle = 1500;
-				int drawx = x + (int) (.5 * width) + (-iconWidth / 2) + (-space) + (-iconWidth);
-				int drawy = y + height - (iconWidth + 20);
-				int strLen;
-				String str;
-				float color[];
-
-				RenderSystem.enableBlend();
-				RenderFuncs.drawRect(matrixStackIn, drawx - 2, drawy - 2, drawx + iconWidth + 2, drawy + iconWidth + 2, 0xA0000000);
-				if (element != null)
-					color = new float[] {1f, 1f, 1f, 1f};
-				else {
-					color = new float[] {.8f, .5f, .5f, .5f};
-					element = EMagicElement.values()[
-		                  (int) (System.currentTimeMillis() / cycle) % EMagicElement.values().length
-					      ];
-				}
-				SpellComponentIcon.get(element).draw(matrixStackIn, drawx, drawy, iconWidth, iconWidth, color[0], color[1], color[2], color[3]);
-				str = I18n.get("element.name", new Object[0]);
-				strLen = mc.font.width(str);
-				mc.font.draw(matrixStackIn, str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.font.lineHeight), 0xFFFFFF);
-				
-				drawx += iconWidth + space;
-				RenderFuncs.drawRect(matrixStackIn, drawx - 2, drawy - 2, drawx + iconWidth + 2, drawy + iconWidth + 2, 0xA0000000);
-				if (shape != null)
-					color = new float[] {1f, 1f, 1f, 1f};
-				else {
-					color = new float[] {.8f, .5f, .5f, .5f};
-					Collection<SpellShape> shapes = SpellShape.getAllShapes();
-					SpellShape[] shapeArray = shapes.toArray(new SpellShape[0]);
-					shape = shapeArray[
-		                  (int) (System.currentTimeMillis() / cycle) % shapeArray.length
-					      ];
-				}
-				SpellComponentIcon.get(shape).draw(matrixStackIn, drawx, drawy, iconWidth, iconWidth, color[0], color[1], color[2], color[3]);
-				str = I18n.get("shape.name", new Object[0]);
-				strLen = mc.font.width(str);
-				mc.font.draw(matrixStackIn, str, (drawx + iconWidth / 2) - strLen/2, drawy - (3 + mc.font.lineHeight), 0xFFFFFF);
-				
-			}
-			
-			RenderFuncs.drawSplitString(matrixStackIn, mc.font, desc, x + 5, y + 20, width - 10, 0xFFFFFFFF);
-			int len;
-			desc = I18n.get("info.discovery.name", (Object[])null);
-			len = mc.font.width(desc);
-			mc.font.drawShadow(matrixStackIn, desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
-		}
-
-		@Override
-		public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
-			return null;
-		}
-		
-	}
-	
-	// Screen where all of your stats and what they equate to are displayed
-	public static class PersonalStatsScreen extends PersonalSubScreen {
-		
-		// Display wrapper that supports tooltips! Whoo!
-		private class StatLabel {
-			
-			private String label;
-			private List<Component> tooltip;
-			private int x;
-			private int y;
-			private int width;
-			private int height;
-			
-			public StatLabel(String key, int x, int y) {
-				label = I18n.get(key + ".name", (Object[]) null) + ": ";
-				parseTooltip(key);
-				
-				Minecraft mc = Minecraft.getInstance();
-				this.width = mc.font.width(label);
-				this.height = mc.font.lineHeight;
-				this.x = x;
-				this.y = y;
-			}
-			
-			private void parseTooltip(String key) {
-				String raw = I18n.get(key + ".desc", (Object[]) null).trim();
-				tooltip = new ArrayList<>();
-				int index = raw.indexOf('|');
-				while (index != -1) {
-					String sub = raw.substring(0, index).trim();
-					tooltip.add(new TextComponent(sub));
-					raw = raw.substring(index + 1).trim();
-					index = raw.indexOf('|');
-				}
-				
-				tooltip.add(new TextComponent(raw));
-			}
-			
-			public void draw(PoseStack matrixStackIn, Minecraft mc, int offsetx, int offsety, int width, int height) {
-				mc.font.draw(matrixStackIn, label, offsetx + x, offsety + y, 0xFFFFFFFF);
-			}
-			
-			public void drawOverlay(PoseStack matrixStackIn, Minecraft mc, int offsetx, int offsety, int width, int height, int mouseX, int mouseY) {
-				if (mouseX >= offsetx + x && mouseX <= x + offsetx + this.width
-						&& mouseY >= offsety + y && mouseY <= y + offsety + this.height) {
-					mc.screen.renderTooltip(matrixStackIn, tooltip, Optional.empty(), mouseX, mouseY, mc.font);
-				}
-			}
-			
-		}
-		
-		private List<StatLabel> labels;
-		private int valueOffsetPrimary;
-		private int valueOffsetDerived;
-		
-		public PersonalStatsScreen(INostrumMagic attr) {
-			super(attr);
-			labels = null;
-		}
-		
-		@Override
-		public void draw(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
-			
-			if (labels == null) {
-				int drawX = 0;
-				int drawY = 0;
-				
-				labels = new ArrayList<>();
-				
-				StatLabel label;
-				valueOffsetPrimary = valueOffsetDerived = 0;
-				
-				
-				label = new StatLabel("level", drawX, drawY);
-				labels.add(label);
-				valueOffsetPrimary = Math.max(valueOffsetPrimary, label.width);
-				drawY += 15;
-				label = new StatLabel("tier", drawX, drawY);
-				labels.add(label);
-				valueOffsetPrimary = Math.max(valueOffsetPrimary, label.width);
-				drawY += 15;
-				
-				drawY = 0;
-				drawX = width - 200;
-				label = new StatLabel("mana", drawX, drawY);
-				labels.add(label);
-				valueOffsetDerived = Math.max(valueOffsetDerived, label.width);
-				drawY += 15;
-				label = new StatLabel("manabonus", drawX, drawY);
-				labels.add(label);
-				valueOffsetDerived = Math.max(valueOffsetDerived, label.width);
-				drawY += 15;
-				label = new StatLabel("lmc", drawX, drawY);
-				labels.add(label);
-				valueOffsetDerived = Math.max(valueOffsetDerived, label.width);
-				drawY += 15;
-				label = new StatLabel("manaregen", drawX, drawY);
-				labels.add(label);
-				valueOffsetDerived = Math.max(valueOffsetDerived, label.width);
-				drawY += 15;
-			}
-			
-			int drawX, drawY;
-			
-			drawY = y + 20;
-			drawX = x + 20;
-			
-			for (StatLabel label : labels) {
-				label.draw(matrixStackIn, mc, drawX, drawY, width, height);
-			}
-			
-			// draw values
-			String text;
-			int color = 0xFF22FF00;
-			drawY = y + 20;
-			drawX = x + 20 + valueOffsetPrimary;
-			text = String.format("%2d", attr.getLevel());
-			mc.font.draw(matrixStackIn, text, drawX, drawY, color);
-			drawY += 15;
-			
-			//text = String.format("%d", attr.getTier().getName());
-			mc.font.draw(matrixStackIn, attr.getTier().getName(), drawX, drawY, color);
-			drawY += 15;
-			
-			//text = String.format("3.1%f%%", );
-			drawX = x + 20 + (width - 200) + valueOffsetDerived;
-			drawY = y + 20;
-			
-			text = String.format("%4d", attr.getMaxMana());
-			mc.font.draw(matrixStackIn, text, drawX, drawY, color);
-			drawY += 15;
-			
-			text = String.format("%+5.1f%%", attr.getManaModifier() * 100f);
-			mc.font.draw(matrixStackIn, text, drawX, drawY, color);
-			drawY += 15;
-			
-			text = String.format("%+5.1f%%", attr.getManaCostModifier() * 100f);
-			mc.font.draw(matrixStackIn, text, drawX, drawY, color);
-			drawY += 15;
-			
-			text = String.format("%+05.1f%%", attr.getManaRegenModifier() * 100f);
-			mc.font.draw(matrixStackIn, text, drawX, drawY, color);
-			drawY += 15;
-			
-			String desc;
-			int len;
-			desc = I18n.get("info.stats.name", (Object[])null);
-			len = mc.font.width(desc);
-			mc.font.drawShadow(matrixStackIn, desc, x + ((width - len) / 2), y + 5, 0xFFFFFFFF);
-
-			
-			for (StatLabel label : labels) {
-				label.drawOverlay(matrixStackIn, mc, x + 20, y + 20, width, height, mouseX, mouseY);
-			}
-		}
-
-		@Override
-		public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
-			return null;
-		}
-		
 	}
 	
 	// Screen with what you've unlocked (runes) and tips on where to find others
@@ -301,6 +45,15 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		
 		@Override
 		public void draw(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {
+			
+			if (!attr.isUnlocked()) {
+				
+				Component text = new TranslatableComponent("info.magic.locked");
+				final int len = mc.font.width(text);
+				mc.font.draw(matrixStackIn, text, -len/2, 30, 0xFFFFFFFF);
+				
+				return;
+			}
 			
 			final float known = 1f;
 			final float unknown = .15f;
@@ -438,7 +191,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		}
 
 		@Override
-		public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
+		public Collection<AbstractWidget> getWidgets(INostrumMagic attr, int x, int y, int width, int height) {
 			return null;
 		}
 		
@@ -515,7 +268,7 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 		}
 
 		@Override
-		public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
+		public Collection<AbstractWidget> getWidgets(INostrumMagic attr, int x, int y, int width, int height) {
 			return null;
 		}
 		

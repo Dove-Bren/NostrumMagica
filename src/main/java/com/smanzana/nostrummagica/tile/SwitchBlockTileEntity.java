@@ -1,11 +1,16 @@
 package com.smanzana.nostrummagica.tile;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.autodungeons.api.block.entity.IOrientedTileEntity;
 import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.world.blueprints.IBlueprint;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
+import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.SwitchTriggerEntity;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
@@ -286,6 +291,12 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 		if (!this.isTriggered() && !this.level.isClientSide()) {
 			final boolean isMagic = (source instanceof MagicDamageSource);
 			if (hitType == SwitchHitType.ANY || isMagic) {
+				if (entity != null) {
+					@Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(entity);
+					if (attr != null && attr.isUnlocked()) {
+						attr.giveFullLore(LoreRegistry.HitSwitchLore);
+					}
+				}
 				doTrigger();
 			} else {
 				// Wrong input type
@@ -297,6 +308,12 @@ public class SwitchBlockTileEntity extends EntityProxiedTileEntity<SwitchTrigger
 	@Override
 	public void trigger(LivingEntity caster, SpellEffectPart effect, SpellAction action) {
 		if (!this.isTriggered() && !this.level.isClientSide()) {
+			if (caster != null) {
+				@Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.isUnlocked()) {
+					attr.giveFullLore(LoreRegistry.HitSwitchLore);
+				}
+			}
 			doTrigger();
 		}
 	}

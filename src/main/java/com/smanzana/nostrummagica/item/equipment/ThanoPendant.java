@@ -2,25 +2,25 @@ package com.smanzana.nostrummagica.item.equipment;
 
 import java.util.List;
 
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.api.ISpellEquipment;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellCasting;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
 
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -78,8 +78,8 @@ public class ThanoPendant extends Item implements ILoreTagged, ISpellEquipment {
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 	
 	public static int thanosGetWholeCharges(ItemStack stack) {

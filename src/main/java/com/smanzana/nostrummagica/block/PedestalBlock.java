@@ -6,8 +6,10 @@ import java.util.stream.Collectors;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
-import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.tile.PedestalBlockEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -34,13 +36,13 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class AltarBlock extends BaseEntityBlock {
+public class PedestalBlock extends BaseEntityBlock implements ILoreTagged {
 	
 	public static final String ID = "altar_block";
 	protected static final VoxelShape ALTAR_AABB = Block.box(16 * 0.3D, 16 * 0.0D, 16 * 0.3D, 16 * 0.7D, 16 * 0.8D, 16 * 0.7D);
 	private static final int TICK_DELAY = 5;
 	
-	public AltarBlock() {
+	public PedestalBlock() {
 		super(Block.Properties.of(Material.STONE)
 				.strength(3.5f, 10f)
 				.sound(SoundType.STONE)
@@ -80,7 +82,7 @@ public class AltarBlock extends BaseEntityBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new AltarTileEntity(pos, state);
+		return new PedestalBlockEntity(pos, state);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -89,7 +91,7 @@ public class AltarBlock extends BaseEntityBlock {
 		if (state.getBlock() != newState.getBlock()) {
 			BlockEntity te = world.getBlockEntity(pos);
 			if (te != null) {
-				AltarTileEntity altar = (AltarTileEntity) te;
+				PedestalBlockEntity altar = (PedestalBlockEntity) te;
 				if (altar.getItem() != null) {
 					Containers.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), altar.getItem());
 				}
@@ -129,8 +131,8 @@ public class AltarBlock extends BaseEntityBlock {
 	@Override
 	public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
 		BlockEntity te = worldIn.getBlockEntity(pos);
-		if (te != null && te instanceof AltarTileEntity && ((AltarTileEntity) te).getItem().isEmpty()) {
-			AltarTileEntity altar = (AltarTileEntity) te;
+		if (te != null && te instanceof PedestalBlockEntity && ((PedestalBlockEntity) te).getItem().isEmpty()) {
+			PedestalBlockEntity altar = (PedestalBlockEntity) te;
 			List<ItemEntity> items = getCapturableItems(worldIn, pos);
 			if (items != null && !items.isEmpty()) {
 				ItemEntity first = items.get(0);
@@ -162,7 +164,7 @@ public class AltarBlock extends BaseEntityBlock {
 		
 		ItemStack heldItem = playerIn.getItemInHand(hand);
 		
-		AltarTileEntity altar = (AltarTileEntity) te;
+		PedestalBlockEntity altar = (PedestalBlockEntity) te;
 		if (altar.getItem().isEmpty()) {
 			// Accepting items
 			if (!heldItem.isEmpty()) {
@@ -197,5 +199,31 @@ public class AltarBlock extends BaseEntityBlock {
 				return InteractionResult.FAIL;
 		}
 		
+	}
+	
+	@Override
+	public String getLoreKey() {
+		return "altar_item";
+	}
+
+	@Override
+	public String getLoreDisplayName() {
+		return "Ritual Altar";
+	}
+	
+	@Override
+	public Lore getBasicLore() {
+		return new Lore().add("Altars can be used to hold items.", "There's probably a better use for them...");
+				
+	}
+	
+	@Override
+	public Lore getDeepLore() {
+		return new Lore().add("Ritual Altars hold items for display or use in a ritual.", "Only tier III rituals use altars.", "Up to 5 altars can be used in a single ritual.");
+	}
+
+	@Override
+	public ELoreCategory getCategory() {
+		return ELoreCategory.BLOCK;
 	}
 }

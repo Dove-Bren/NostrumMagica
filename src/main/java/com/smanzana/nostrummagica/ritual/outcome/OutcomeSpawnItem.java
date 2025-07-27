@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
-import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.tile.PedestalBlockEntity;
 import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.world.entity.item.ItemEntity;
@@ -43,7 +43,7 @@ public class OutcomeSpawnItem implements IItemRitualOutcome {
 					stack.copy());
 			world.addFreshEntity(entity);
 		} else {
-			AltarTileEntity altar = (AltarTileEntity) world.getBlockEntity(center);
+			PedestalBlockEntity altar = (PedestalBlockEntity) world.getBlockEntity(center);
 			altar.setItem(stack.copy());
 		}
 		

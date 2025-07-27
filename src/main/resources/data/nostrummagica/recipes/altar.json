@@ -1,7 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "result": {
-    "item": "nostrummagica:altar_item"
+    "item": "nostrummagica:altar_block"
   },
   "pattern": [
     "SSS",

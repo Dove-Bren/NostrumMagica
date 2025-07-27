@@ -2,11 +2,11 @@ package com.smanzana.nostrummagica.item.armor;
 
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class ElementalLightningArmor extends ElementalArmor {
 

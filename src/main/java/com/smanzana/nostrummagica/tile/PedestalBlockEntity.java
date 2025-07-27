@@ -14,15 +14,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class AltarTileEntity extends BlockEntity implements WorldlyContainer {
+public class PedestalBlockEntity extends BlockEntity implements WorldlyContainer {
 	
 	private @Nonnull ItemStack stack = ItemStack.EMPTY;
 	
 	// Transient display variables
 	private boolean hideItem;
 	
-	public AltarTileEntity(BlockPos pos, BlockState state) {
-		super(NostrumBlockEntities.Altar, pos, state);
+	public PedestalBlockEntity(BlockPos pos, BlockState state) {
+		super(NostrumBlockEntities.Pedestal, pos, state);
 	}
 	
 	public @Nonnull ItemStack getItem() {

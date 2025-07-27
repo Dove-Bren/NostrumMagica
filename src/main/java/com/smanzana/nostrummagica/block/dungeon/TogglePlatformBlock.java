@@ -7,7 +7,9 @@ import javax.annotation.Nullable;
 
 import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.util.ShapeUtil;
 
 import net.minecraft.core.BlockPos;
@@ -26,6 +28,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -162,6 +165,8 @@ public class TogglePlatformBlock extends Block implements ITriggeredBlock {
 					return IBlockWalker.WalkResult.CONTINUE;
 				}
 			}, 256);
+			
+			NostrumMagica.awardLoreToNearbyPlayers(world, Vec3.atCenterOf(blockPos), LoreRegistry.TogglePlatformLore, true, 50);
 		}
 	}
 	

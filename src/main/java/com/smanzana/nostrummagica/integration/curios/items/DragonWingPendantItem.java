@@ -6,14 +6,14 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.api.IDragonWingRenderItem;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraft.nbt.Tag;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

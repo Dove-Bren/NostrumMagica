@@ -160,7 +160,7 @@ public class SpellLogSubScreen implements IInfoSubScreen {
 	}
 
 	@Override
-	public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
+	public Collection<AbstractWidget> getWidgets(INostrumMagic attr, int x, int y, int width, int height) {
 		List<AbstractWidget> widgets = new ArrayList<>();
 		
 		this.stageButtons.clear();

@@ -66,7 +66,7 @@ import net.minecraftforge.registries.ObjectHolder;
 public class NostrumBlocks {
 	
 	@ObjectHolder(ActiveHopperBlock.ID) public static ActiveHopperBlock activeHopper;
-	@ObjectHolder(AltarBlock.ID) public static AltarBlock altar;
+	@ObjectHolder(PedestalBlock.ID) public static PedestalBlock pedestal;
 	@ObjectHolder(CandleBlock.ID) public static CandleBlock candle;
 	@ObjectHolder(ChalkBlock.ID) public static ChalkBlock chalk;
 	@ObjectHolder(EssenceCropBlock.ID) public static EssenceCropBlock essenceCrop;
@@ -192,7 +192,7 @@ public class NostrumBlocks {
     	final IForgeRegistry<Item> registry = event.getRegistry();
     	
     	registerBlockItem(activeHopper, activeHopper.getRegistryName(), registry);
-    	//registerBlockItem(altar, altar.getRegistryName(), registry);
+    	registerBlockItem(pedestal, pedestal.getRegistryName(), registry);
     	registerBlockItem(candle, candle.getRegistryName(), registry);
     	//registerBlockItem(chalk, chalk.getRegistryName(), registry);
     	//registerBlockItem(essenceCrop, essenceCrop.getRegistryName(), registry);
@@ -283,6 +283,10 @@ public class NostrumBlocks {
     	registerBlockItem(laserTrigger, laserTrigger.getRegistryName(), NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(templateStamper, NostrumItems.PropDungeonBase(), registry);
     	registerBlockItem(shortcutRune, NostrumItems.PropDungeonUnstackable(), registry);
+    	registerBlockItem(elementShrineBlock, NostrumItems.PropDungeonUnstackable(), registry);
+    	registerBlockItem(alterationShrineBlock, NostrumItems.PropDungeonUnstackable(), registry);
+    	registerBlockItem(shapeShrineBlock, NostrumItems.PropDungeonUnstackable(), registry);
+    	registerBlockItem(tierShrineBlock, NostrumItems.PropDungeonUnstackable(), registry);
     }
     
     private static void registerBlock(Block block, String registryName, IForgeRegistry<Block> registry) {
@@ -299,7 +303,7 @@ public class NostrumBlocks {
     	final IForgeRegistry<Block> registry = event.getRegistry();
     	
     	registerBlock(new ActiveHopperBlock(), ActiveHopperBlock.ID, registry);
-    	registerBlock(new AltarBlock(), AltarBlock.ID, registry);
+    	registerBlock(new PedestalBlock(), PedestalBlock.ID, registry);
     	registerBlock(new CandleBlock(), CandleBlock.ID, registry);
     	registerBlock(new ChalkBlock(), ChalkBlock.ID, registry);
     	registerBlock(new EssenceCropBlock(), EssenceCropBlock.ID, registry);

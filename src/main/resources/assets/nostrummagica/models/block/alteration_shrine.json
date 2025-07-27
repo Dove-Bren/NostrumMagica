@@ -1,0 +1,6 @@
+{
+	"parent": "nostrummagica:block/element_shrine",
+	"textures": {
+		"symbol": "nostrummagica:models/symbol/alteration_inflict"
+	}
+}

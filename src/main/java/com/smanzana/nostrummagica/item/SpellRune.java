@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.RuneShaperGui;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spell.EAlteration;
@@ -215,8 +215,8 @@ public abstract class SpellRune extends Item implements ILoreTagged {
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_SPELLS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 	
 	public static final class ElementSpellRune extends SpellRune {

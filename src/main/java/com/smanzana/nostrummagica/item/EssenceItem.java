@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.item;
 
 import java.util.Optional;
 
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -88,8 +88,8 @@ public class EssenceItem extends Item implements ILoreTagged {
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 	
 	public EMagicElement getElement() {

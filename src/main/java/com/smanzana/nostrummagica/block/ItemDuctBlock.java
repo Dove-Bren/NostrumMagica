@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.block;
 
 import javax.annotation.Nullable;
 
+import com.sk89q.worldedit.world.World;
 import com.smanzana.nostrummagica.tile.ItemDuctTileEntity;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;

@@ -1,3 +1,6 @@
 {
-    "parent":"nostrummagica:block/cursed_glass"
+    "parent":"nostrummagica:block/cursed_glass",
+    "textures": {
+        "all": "nostrummagica:item/cursed_glass"
+    }
 }

@@ -6,8 +6,8 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.api.ISelectionItem;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.util.DimensionUtils;
@@ -217,8 +217,8 @@ public class PositionCrystal extends Item implements ILoreTagged, ISelectionItem
 	}
 	
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 
 	@Override

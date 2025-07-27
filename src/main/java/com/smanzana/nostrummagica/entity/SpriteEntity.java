@@ -5,10 +5,10 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.tasks.FollowEntityGenericGoal;
 import com.smanzana.nostrummagica.entity.tasks.SpellAttackGoal;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -316,8 +316,8 @@ public class SpriteEntity extends PathfinderMob implements ILoreSupplier, IEleme
 		}
 
 		@Override
-		public InfoScreenTabs getTab() {
-			return InfoScreenTabs.INFO_ENTITY;
+		public ELoreCategory getCategory() {
+			return ELoreCategory.ENTITY;
 		}
 
 		@Override

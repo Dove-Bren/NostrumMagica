@@ -2,8 +2,10 @@ package com.smanzana.nostrummagica.util;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.BufferUploader;
@@ -25,9 +27,12 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -35,8 +40,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -889,6 +896,73 @@ public final class RenderFuncs {
 			buffer.vertex(transform, coords[i][0], coords[i][1], coords[i][2]).color(color[0], color[1], color[2], color[3]).uv(coords[i][3], coords[i][4]).endVertex();
 		}
 		
+		
+	}
+	
+	public static final void RenderEntityInGUI(int x, int y, float scale, float lookOffsetX, float lookOffsetY, LivingEntity entity) {
+		var source = Minecraft.getInstance().renderBuffers().bufferSource();
+		RenderEntityInGUI(x, y, scale, lookOffsetX, lookOffsetY, entity, source, (s) -> s.endBatch());
+		source.endBatch();
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static final <T extends MultiBufferSource> void RenderEntityInGUI(int x, int y, float scale, float lookOffsetX, float lookOffsetY, LivingEntity entity, T source, Consumer<T> flush) {
+		// A basic copy of InventoryScreen's renderEntityInInventory, but with buffer source passed in
+		
+		float f = (float)Math.atan((double)(lookOffsetX / 40.0F));
+		float f1 = (float)Math.atan((double)(lookOffsetY / 40.0F));
+		PoseStack posestack = RenderSystem.getModelViewStack();
+		posestack.pushPose();
+		posestack.translate((double)x, (double)y, 1050.0D);
+		posestack.scale(1.0F, 1.0F, -1.0F);
+		RenderSystem.applyModelViewMatrix();
+		PoseStack posestack1 = new PoseStack();
+		posestack1.translate(0.0D, 0.0D, 1000.0D);
+		posestack1.scale((float)scale, (float)scale, (float)scale);
+		Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
+		Quaternion quaternion1 = Vector3f.XP.rotationDegrees(f1 * 20.0F);
+		quaternion.mul(quaternion1);
+		posestack1.mulPose(quaternion);
+		float f2 = entity.yBodyRot;
+		float f3 = entity.getYRot();
+		float f4 = entity.getXRot();
+		float f5 = entity.yHeadRotO;
+		float f6 = entity.yHeadRot;
+		entity.yBodyRot = 180.0F + f * 20.0F;
+		entity.setYRot(180.0F + f * 40.0F);
+		entity.setXRot(-f1 * 20.0F);
+		entity.yHeadRot = entity.getYRot();
+		entity.yHeadRotO = entity.getYRot();
+		Lighting.setupForEntityInInventory();
+		EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+		quaternion1.conj();
+		entityrenderdispatcher.overrideCameraOrientation(quaternion1);
+		entityrenderdispatcher.setRenderShadow(false);
+		RenderSystem.runAsFancy(() -> {
+			entityrenderdispatcher.render(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, posestack1, source, 15728880);
+		});
+		flush.accept(source);
+		entityrenderdispatcher.setRenderShadow(true);
+		entity.yBodyRot = f2;
+		entity.setYRot(f3);
+		entity.setXRot(f4);
+		entity.yHeadRotO = f5;
+		entity.yHeadRot = f6;
+		posestack.popPose();
+		RenderSystem.applyModelViewMatrix();
+		Lighting.setupFor3DItems();
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static final void renderFluidState(FluidState state, PoseStack matrixStackIn, MultiBufferSource buffersIn, int combinedLightIn, int combinedOverlayIn, float red, float green, float blue, float alpha) {
+		// Wish I could just call ....Minecraft.getInstance().getBlockRenderer().renderLiquid(null, null, null, null, state)
+		
+		// Instead, I guess grab the textures and render a full cuboid?
+		VertexConsumer buffer = buffersIn.getBuffer(RenderType.translucent()); // assume all are translucent
+		TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(state.getType().getAttributes().getStillTexture());
+		
+		RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
+		RenderFuncs.drawUnitCube(matrixStackIn, buffer, sprite.getU0(), sprite.getU1(), sprite.getV0(), sprite.getV1(), combinedLightIn, combinedOverlayIn, red, green, blue, alpha);
 		
 	}
 	

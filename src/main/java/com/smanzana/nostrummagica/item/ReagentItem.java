@@ -4,8 +4,8 @@ import javax.annotation.Nonnull;
 
 import com.smanzana.nostrumaetheria.api.capability.IAetherBurnable;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.integration.aetheria.AetheriaProxy;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -204,8 +204,8 @@ public class ReagentItem extends Item implements ILoreTagged, ICapabilityProvide
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_REAGENTS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 	
 	private static final Capability<IAetherBurnable> AETHER_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});

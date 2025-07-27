@@ -1,12 +1,12 @@
 package com.smanzana.nostrummagica.item.equipment;
 
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.NostrumItems;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.Tiers;
 
 public class MagicSwordBase extends SwordItem implements ILoreTagged {
 
@@ -42,8 +42,8 @@ public class MagicSwordBase extends SwordItem implements ILoreTagged {
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 
 }

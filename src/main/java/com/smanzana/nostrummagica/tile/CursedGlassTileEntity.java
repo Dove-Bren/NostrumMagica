@@ -4,10 +4,12 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.dungeon.CursedGlass;
 import com.smanzana.nostrummagica.entity.CursedGlassTriggerEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.SwitchTriggerEntity;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.SpellEffectEvent.SpellEffectEndEvent;
@@ -261,6 +263,8 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	@Override
 	public void trigger(LivingEntity entity, DamageSource source, float damage) {
 		if (!this.isBroken()) {
+			NostrumMagica.awardLore(entity, LoreRegistry.CursedGlassLore, true);
+			
 			// See if this hit breaks it
 			if (shouldBreak(source, damage)) {
 				this.doBreak();

@@ -18,7 +18,7 @@ public class NostrumBlockEntities {
 	private static final String ID_SingleSpawner = "nostrum_mob_spawner_te";
 	private static final String ID_MatchSpawner = "nostrum_mob_spawner_trigger_te";
 	private static final String ID_TriggeredMatchSpawner = "triggered_match_spawner_te";
-	private static final String ID_Altar = "nostrum_altar_te";
+	private static final String ID_Pedestal = "nostrum_altar_te";
 	private static final String ID_Candle = "nostrum_candle_te";
 	private static final String ID_NostrumObelisk = "nostrum_obelisk";
 	private static final String ID_ObeliskPortal = "obelisk_portal";
@@ -68,7 +68,7 @@ public class NostrumBlockEntities {
 	@ObjectHolder(ID_SingleSpawner) public static BlockEntityType<SingleSpawnerTileEntity> SingleSpawner;
 	@ObjectHolder(ID_MatchSpawner) public static BlockEntityType<MatchSpawnerTileEntity> MatchSpawner;
 	@ObjectHolder(ID_TriggeredMatchSpawner) public static BlockEntityType<TriggeredMatchSpawnerTileEntity> TriggeredMatchSpawner;
-	@ObjectHolder(ID_Altar) public static BlockEntityType<AltarTileEntity> Altar;
+	@ObjectHolder(ID_Pedestal) public static BlockEntityType<PedestalBlockEntity> Pedestal;
 	@ObjectHolder(ID_Candle) public static BlockEntityType<CandleTileEntity> Candle;
 	@ObjectHolder(ID_NostrumObelisk) public static BlockEntityType<ObeliskTileEntity> NostrumObelisk;
 	@ObjectHolder(ID_ObeliskPortal) public static BlockEntityType<ObeliskPortalTileEntity> ObeliskPortal;
@@ -125,7 +125,7 @@ public class NostrumBlockEntities {
 		register(registry, BlockEntityType.Builder.of(SingleSpawnerTileEntity::new, NostrumBlocks.singleSpawner).build(null), ID_SingleSpawner);
 		register(registry, BlockEntityType.Builder.of(MatchSpawnerTileEntity::new, NostrumBlocks.matchSpawner).build(null), ID_MatchSpawner);
 		register(registry, BlockEntityType.Builder.of(TriggeredMatchSpawnerTileEntity::new, NostrumBlocks.triggeredMatchSpawner).build(null), ID_TriggeredMatchSpawner);
-		register(registry, BlockEntityType.Builder.of(AltarTileEntity::new, NostrumBlocks.altar).build(null), ID_Altar);
+		register(registry, BlockEntityType.Builder.of(PedestalBlockEntity::new, NostrumBlocks.pedestal).build(null), ID_Pedestal);
 		register(registry, BlockEntityType.Builder.of(CandleTileEntity::new, NostrumBlocks.candle).build(null), ID_Candle);
 		register(registry, BlockEntityType.Builder.of(ObeliskTileEntity::new, NostrumBlocks.obelisk).build(null), ID_NostrumObelisk);
 		register(registry, BlockEntityType.Builder.of(ObeliskPortalTileEntity::new, NostrumBlocks.obeliskPortal).build(null), ID_ObeliskPortal);

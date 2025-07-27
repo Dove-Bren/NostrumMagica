@@ -8,9 +8,11 @@ import com.smanzana.autodungeons.api.block.entity.IUniqueBlueprintTileEntity;
 import com.smanzana.autodungeons.api.block.entity.IWorldKeyHolder;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.dungeon.DungeonKeyChestBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.core.BlockPos;
@@ -152,6 +154,7 @@ public class DungeonKeyChestTileEntity extends BlockEntity implements IWorldKeyH
 		
 		NostrumMagicaSounds fanfare = isLarge() ? NostrumMagicaSounds.AMBIENT_WOOSH2 : NostrumMagicaSounds.AMBIENT_WOOSH3;
 		fanfare.play(level, worldPosition);
+		NostrumMagica.awardLore(player, LoreRegistry.KeyChestLore, true);
 	}
 	
 	@Override

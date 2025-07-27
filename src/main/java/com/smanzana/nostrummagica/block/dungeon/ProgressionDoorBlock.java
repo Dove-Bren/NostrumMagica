@@ -3,8 +3,10 @@ package com.smanzana.nostrummagica.block.dungeon;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.ResourceCrystal;
 import com.smanzana.nostrummagica.item.SpellRune;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.tile.ProgressionDoorTileEntity;
 
@@ -72,6 +74,7 @@ public class ProgressionDoorBlock extends MagicDoorBlock implements EntityBlock 
 				NostrumMagicaSounds.CAST_FAIL.play(worldIn, pos.getX(), pos.getY(), pos.getZ());
 			} else {
 				this.clearDoor(worldIn, pos, state);
+				NostrumMagica.awardLore(playerIn, LoreRegistry.ProgressDoorLore, true);
 			}
 		}
 		

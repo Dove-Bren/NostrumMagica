@@ -5,7 +5,7 @@ import java.util.List;
 import com.smanzana.nostrummagica.item.equipment.SpellTome;
 import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
-import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.tile.PedestalBlockEntity;
 import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.world.entity.player.Player;
@@ -29,7 +29,7 @@ public class OutcomeCreateTome implements IRitualOutcome {
 		
 		// If there's an altar, we'll enchant the item there
 		// Otherwise enchant the item the player has
-		AltarTileEntity altar = (AltarTileEntity) world.getBlockEntity(center);
+		PedestalBlockEntity altar = (PedestalBlockEntity) world.getBlockEntity(center);
 		if (recipe.getTier() == 0) {
 			// give to player
 			

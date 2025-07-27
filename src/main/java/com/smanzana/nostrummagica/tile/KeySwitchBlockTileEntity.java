@@ -7,10 +7,12 @@ import com.smanzana.autodungeons.api.block.entity.IUniqueBlueprintTileEntity;
 import com.smanzana.autodungeons.api.block.entity.IWorldKeyHolder;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.KeySwitchTriggerEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
@@ -127,6 +129,7 @@ public class KeySwitchBlockTileEntity extends EntityProxiedTileEntity<KeySwitchT
 			return p.distanceToSqr(worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5) < 900;
 		})) {
 			player.sendMessage(new TranslatableComponent("info.world_key.gotkey"), Util.NIL_UUID);
+			NostrumMagica.awardLore(player, LoreRegistry.KeySwitchLore, true);
 		}
 		
 		NostrumMagicaSounds.AMBIENT_WOOSH2.play(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);

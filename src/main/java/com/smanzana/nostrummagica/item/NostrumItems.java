@@ -80,7 +80,6 @@ public class NostrumItems {
 	protected static final String ID_NEUTRAL = "neutral";
 	protected static final String ID_WIND = "wind";
 	
-	@ObjectHolder(AltarItem.ID) public static AltarItem altarItem; // TODO could clean up; is just a BlockItem
 	@ObjectHolder(ArcaneWolfSoulItem.ID) public static ArcaneWolfSoulItem arcaneWolfSoulItem;
 	@ObjectHolder(BlankScroll.ID) public static BlankScroll blankScroll;
 	@ObjectHolder(ChalkItem.ID) public static ChalkItem chalkItem;
@@ -382,7 +381,6 @@ public class NostrumItems {
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> event) {
 		final IForgeRegistry<Item> registry = event.getRegistry();
-		register(registry, new AltarItem().setRegistryName(AltarItem.ID));
     	register(registry, new ArcaneWolfSoulItem().setRegistryName(ArcaneWolfSoulItem.ID));
     	register(registry, new BlankScroll().setRegistryName(BlankScroll.ID));
     	register(registry, new ChalkItem().setRegistryName(ChalkItem.ID));

@@ -12,7 +12,6 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
@@ -20,6 +19,7 @@ import com.smanzana.nostrummagica.entity.IElementalEntity;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.api.IRaytraceOverlay;
 import com.smanzana.nostrummagica.item.api.ISpellEquipment;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -114,8 +114,8 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 	
 	@Override

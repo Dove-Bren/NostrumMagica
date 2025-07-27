@@ -3,15 +3,15 @@ package com.smanzana.nostrummagica.item;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.block.AltarBlock;
+import com.smanzana.nostrummagica.block.PedestalBlock;
 import com.smanzana.nostrummagica.block.CandleBlock;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.api.ICrystalEnchantableItem;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.ritual.AltarRitualLayout;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.tile.PedestalBlockEntity;
 import com.smanzana.nostrummagica.tile.CandleTileEntity;
 
 import net.minecraft.core.BlockPos;
@@ -141,8 +141,8 @@ public class InfusedGemItem extends Item implements ILoreTagged, ICrystalEnchant
  			}
  			
 			return InteractionResult.SUCCESS;
-		} else if (state.getBlock() instanceof AltarBlock) {
-			if (!(te instanceof AltarTileEntity))
+		} else if (state.getBlock() instanceof PedestalBlock) {
+			if (!(te instanceof PedestalBlockEntity))
 				return InteractionResult.PASS;
 			
 			if (AltarRitualLayout.AttemptRitual(worldIn, pos, playerIn, element)) {
@@ -156,8 +156,8 @@ public class InfusedGemItem extends Item implements ILoreTagged, ICrystalEnchant
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 	
 	public EMagicElement getElement() {

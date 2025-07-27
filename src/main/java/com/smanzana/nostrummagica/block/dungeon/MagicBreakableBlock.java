@@ -4,9 +4,11 @@ import java.util.function.Consumer;
 
 import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ISpellTargetBlock;
 import com.smanzana.nostrummagica.block.property.MagicElementProperty;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
@@ -79,6 +81,9 @@ public class MagicBreakableBlock extends Block implements ISpellTargetBlock {
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (!playerIn.isCreative()) {
+			if (!worldIn.isClientSide()) {
+				NostrumMagica.awardLore(playerIn, LoreRegistry.BreakBlockLore, true);
+			}
 			return InteractionResult.PASS;
 		}
 		
@@ -134,6 +139,7 @@ public class MagicBreakableBlock extends Block implements ISpellTargetBlock {
 		if (effect.getElement() == element
 				&& effect.getAlteration() == EAlteration.INFLICT) {
 			this.trigger(level, pos, state);
+			NostrumMagica.awardLore(caster, LoreRegistry.BreakBlockLore, true);
 			return true;
 		}
 		

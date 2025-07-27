@@ -5,12 +5,12 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.HookShotEntity;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.integration.caelus.NostrumElytraWrapper;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.api.IElytraRenderer;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -182,8 +182,8 @@ public class HookshotItem extends Item implements ILoreTagged, IElytraRenderer {
 	}
 	
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 	
 	public static void SetHook(ItemStack stack, HookShotEntity entity) {

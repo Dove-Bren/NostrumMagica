@@ -1,6 +1,8 @@
 package com.smanzana.nostrummagica.block.dungeon;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -13,6 +15,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class LogicDoorBlock extends MagicDoorBlock implements ITriggeredBlock {
 
@@ -42,6 +45,9 @@ public class LogicDoorBlock extends MagicDoorBlock implements ITriggeredBlock {
 				this.trigger(worldIn, pos, state, null);
 				return InteractionResult.SUCCESS;
 			}
+		} else {
+			// Award them lore at least
+			NostrumMagica.awardLore(player, LoreRegistry.SealedDoorLore, true);
 		}
 		
 		return InteractionResult.PASS;
@@ -50,5 +56,6 @@ public class LogicDoorBlock extends MagicDoorBlock implements ITriggeredBlock {
 	@Override
 	public void trigger(Level world, BlockPos pos, BlockState state, BlockPos triggerPos) {
 		this.clearDoor(world, pos, state);
+		NostrumMagica.awardLoreToNearbyPlayers(world, Vec3.atCenterOf(pos), LoreRegistry.SealedDoorLore, true, 50);
 	}
 }

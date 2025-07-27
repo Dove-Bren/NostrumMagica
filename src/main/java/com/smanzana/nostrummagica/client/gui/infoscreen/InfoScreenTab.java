@@ -1,7 +1,9 @@
 package com.smanzana.nostrummagica.client.gui.infoscreen;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +18,9 @@ import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellRune;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.progression.research.NostrumResearches;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.ritual.RitualRegistry;
@@ -26,7 +30,6 @@ import com.smanzana.nostrummagica.spell.MagicCapability;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 import com.smanzana.nostrummagica.spell.log.SpellLogEntry;
 
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -34,224 +37,21 @@ import net.minecraft.world.item.Items;
 public abstract class InfoScreenTab {
 	private static InfoScreenTab PERSONAL;
 	private static InfoScreenTab RITUALS;
-	private static InfoScreenTab INFO_REAGENTS;
-	private static InfoScreenTab INFO_TOMES;
-	private static InfoScreenTab INFO_SPELLS;
-	private static InfoScreenTab INFO_BLOCKS;
-	private static InfoScreenTab INFO_ITEMS;
-	private static InfoScreenTab INFO_ENTITY;
 	private static InfoScreenTab INFO_GUIDES;
 	private static InfoScreenTab INFO_TRIALS;
 	private static InfoScreenTab INFO_DRAGONS;
+	private static InfoScreenTab LORE;
 	private static InfoScreenTab SPELL_LOG;
 	
 	public static void init() {
-		if (INFO_ITEMS != null)
+		if (RITUALS != null)
 			return;
-		
-		INFO_REAGENTS = new InfoScreenTab(InfoScreenTabs.INFO_REAGENTS,
-				ReagentItem.CreateStack(ReagentType.MANDRAKE_ROOT, 1)) {
-
-			private List<ILoreTagged> getAvailable(INostrumMagic attr) {
-				List<ILoreTagged> list = new LinkedList<>();
-				for (ILoreTagged tag : attr.getAllLore()) {
-					if (tag.getTab() == this.tab && attr.hasLore(tag))
-						list.add(tag);
-				}
-				
-				return list;
-			}
-			
-			@Override
-			public boolean isVisible(INostrumMagic attr) {
-				List<ILoreTagged> lore = getAvailable(attr);
-				return (!lore.isEmpty());
-			}
-
-			@Override
-			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
-				List<ILoreTagged> lore = getAvailable(attr);
-				List<InfoButton> buttons = new LinkedList<>();
-				for (ILoreTagged tag : lore) {
-					InfoButton button = new LoreInfoButton(screen, tag);
-					buttons.add(button);
-					index(ILoreTagged.GetInfoKey(tag), button);
-				}
-				return buttons;
-			}
-			
-		};
-		
-		INFO_BLOCKS = new InfoScreenTab(InfoScreenTabs.INFO_BLOCKS,
-				new ItemStack(Blocks.GRASS_BLOCK.asItem())) {
-
-			private List<ILoreTagged> getAvailable(INostrumMagic attr) {
-				List<ILoreTagged> list = new LinkedList<>();
-				for (ILoreTagged tag : attr.getAllLore()) {
-					if (tag.getTab() == this.tab && attr.hasLore(tag))
-						list.add(tag);
-				}
-				
-				return list;
-			}
-			
-			@Override
-			public boolean isVisible(INostrumMagic attr) {
-				List<ILoreTagged> lore = getAvailable(attr);
-				return (!lore.isEmpty());
-			}
-
-			@Override
-			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
-				List<ILoreTagged> lore = getAvailable(attr);
-				List<InfoButton> buttons = new LinkedList<>();
-				for (ILoreTagged tag : lore) {
-					InfoButton button = new LoreInfoButton(screen, tag);
-					buttons.add(button);
-					index(ILoreTagged.GetInfoKey(tag), button);
-				}
-				return buttons;
-			}
-			
-		};
-		
-		INFO_TOMES = new InfoScreenTab(InfoScreenTabs.INFO_TOMES,
-				new ItemStack(NostrumItems.spellTomeAdvanced)) {
-
-			private List<ILoreTagged> getAvailable(INostrumMagic attr) {
-				List<ILoreTagged> list = new LinkedList<>();
-				for (ILoreTagged tag : attr.getAllLore()) {
-					if (tag.getTab() == this.tab && attr.hasLore(tag))
-						list.add(tag);
-				}
-				
-				return list;
-			}
-			
-			@Override
-			public boolean isVisible(INostrumMagic attr) {
-				List<ILoreTagged> lore = getAvailable(attr);
-				return (!lore.isEmpty());
-			}
-
-			@Override
-			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
-				List<ILoreTagged> lore = getAvailable(attr);
-				List<InfoButton> buttons = new LinkedList<>();
-				for (ILoreTagged tag : lore) {
-					InfoButton button = new LoreInfoButton(screen, tag);
-					buttons.add(button);
-					index(ILoreTagged.GetInfoKey(tag), button);
-				}
-				return buttons;
-			}
-			
-		};
-		
-		INFO_SPELLS = new InfoScreenTab(InfoScreenTabs.INFO_SPELLS,
-				SpellRune.getRune(EMagicElement.FIRE)) {
-
-			private List<ILoreTagged> getAvailable(INostrumMagic attr) {
-				List<ILoreTagged> list = new LinkedList<>();
-				for (ILoreTagged tag : attr.getAllLore()) {
-					if (tag.getTab() == this.tab && attr.hasLore(tag))
-						list.add(tag);
-				}
-				
-				return list;
-			}
-			
-			@Override
-			public boolean isVisible(INostrumMagic attr) {
-				List<ILoreTagged> lore = getAvailable(attr);
-				return (!lore.isEmpty());
-			}
-
-			@Override
-			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
-				List<ILoreTagged> lore = getAvailable(attr);
-				List<InfoButton> buttons = new LinkedList<>();
-				for (ILoreTagged tag : lore) {
-					InfoButton button = new LoreInfoButton(screen, tag);
-					buttons.add(button);
-					index(ILoreTagged.GetInfoKey(tag), button);
-				}
-				return buttons;
-			}
-			
-		};
-		
-		INFO_ENTITY = new InfoScreenTab(InfoScreenTabs.INFO_ENTITY,
-				new ItemStack(Items.SKELETON_SKULL)) {
-
-			private List<ILoreTagged> getAvailable(INostrumMagic attr) {
-				List<ILoreTagged> list = new LinkedList<>();
-				for (ILoreTagged tag : attr.getAllLore()) {
-					if (tag.getTab() == this.tab && attr.hasLore(tag))
-						list.add(tag);
-				}
-				
-				return list;
-			}
-			
-			@Override
-			public boolean isVisible(INostrumMagic attr) {
-				List<ILoreTagged> lore = getAvailable(attr);
-				return (!lore.isEmpty());
-			}
-
-			@Override
-			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
-				List<ILoreTagged> lore = getAvailable(attr);
-				List<InfoButton> buttons = new LinkedList<>();
-				for (ILoreTagged tag : lore) {
-					InfoButton button = new LoreInfoButton(screen, tag);
-					buttons.add(button);
-					index(ILoreTagged.GetInfoKey(tag), button);
-				}
-				return buttons;
-			}
-			
-		};
-		
-		INFO_ITEMS = new InfoScreenTab(InfoScreenTabs.INFO_ITEMS,
-				new ItemStack(NostrumItems.crystalSmall)) {
-
-			private List<ILoreTagged> getAvailable(INostrumMagic attr) {
-				List<ILoreTagged> list = new LinkedList<>();
-				for (ILoreTagged tag : attr.getAllLore()) {
-					if (tag.getTab() == this.tab && attr.hasLore(tag))
-						list.add(tag);
-				}
-				
-				return list;
-			}
-			
-			@Override
-			public boolean isVisible(INostrumMagic attr) {
-				List<ILoreTagged> lore = getAvailable(attr);
-				return (!lore.isEmpty());
-			}
-
-			@Override
-			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
-				List<ILoreTagged> lore = getAvailable(attr);
-				List<InfoButton> buttons = new LinkedList<>();
-				for (ILoreTagged tag : lore) {
-					InfoButton button = new LoreInfoButton(screen, tag);
-					buttons.add(button);
-					index(ILoreTagged.GetInfoKey(tag), button);
-				}
-				return buttons;
-			}
-			
-		};
 		
 		RITUALS = new InfoScreenTab(InfoScreenTabs.RITUALS,
 				new ItemStack(NostrumBlocks.candle)) {
 
 			private List<RitualRecipe> getAvailable(INostrumMagic attr) {
-				List<RitualRecipe> list = new LinkedList<>();
+				List<RitualRecipe> list = new ArrayList<>();
 				for (RitualRecipe ritual : RitualRegistry.instance().getRegisteredRituals()) {
 					if (ritual.getRequirement() == null || ritual.getRequirement().matches(Minecraft.getInstance().player))
 						list.add(ritual);
@@ -268,7 +68,7 @@ public abstract class InfoScreenTab {
 			@Override
 			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
 				List<RitualRecipe> rituals = getAvailable(attr);
-				List<InfoButton> buttons = new LinkedList<>();
+				List<InfoButton> buttons = new ArrayList<>();
 				for (RitualRecipe tag : rituals) {
 					RitualInfoButton button = new RitualInfoButton(screen, tag);
 					buttons.add(button);
@@ -289,25 +89,17 @@ public abstract class InfoScreenTab {
 
 			@Override
 			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
-				List<InfoButton> buttons = new LinkedList<>();
+				List<InfoButton> buttons = new ArrayList<>();
 				
-				buttons.add(new SubscreenInfoButton(screen, "discovery",
-						new PersonalSubScreen.PersonalDiscoveryScreen(attr),
-						new ItemStack(NostrumItems.spellTomeNovice)));
+				buttons.add(new SubscreenInfoButton(screen, "growth",
+						new PersonalSubScreen.PersonalGrowthScreen(attr),
+						new ItemStack(Items.COMPASS)));
 				
 				if (attr.isUnlocked()) {
-					
-					buttons.add(new SubscreenInfoButton(screen, "stats",
-							new PersonalSubScreen.PersonalStatsScreen(attr),
-							new ItemStack(NostrumItems.spellTomePage)));
 					
 //					buttons.add(new SubscreenInfoButton(screen, "incantation",
 //							new PersonalSubScreen.PersonalIncantationScreen(attr, screen),
 //							new ItemStack(NostrumItems.mageStaff)));
-					
-					buttons.add(new SubscreenInfoButton(screen, "growth",
-							new PersonalSubScreen.PersonalGrowthScreen(attr),
-							new ItemStack(Items.COMPASS)));
 					
 					buttons.add(new SubscreenInfoButton(screen, "exploration",
 							new PersonalSubScreen.PersonalExplorationScreen(attr),
@@ -329,8 +121,26 @@ public abstract class InfoScreenTab {
 
 			@Override
 			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
-				List<InfoButton> buttons = new LinkedList<>();
+				List<InfoButton> buttons = new ArrayList<>();
 				InfoButton button;
+				
+				button = new SubscreenInfoButton(screen, "first_steps",
+						new PaginatedInfoSubScreen(screen, "first_steps"),
+						new ItemStack(Items.LEATHER_BOOTS));
+				buttons.add(button);
+				index("builtin::guides::first_steps", button);
+				
+				button = new SubscreenInfoButton(screen, "spell_casting",
+						new PaginatedInfoSubScreen(screen, "spell_casting"),
+						new ItemStack(NostrumItems.mageStaff));
+				buttons.add(button);
+				index("builtin::guides::spell_casting", button);
+				
+				button = new SubscreenInfoButton(screen, "incantations",
+						new PaginatedInfoSubScreen(screen, "incantations"),
+						new ItemStack(NostrumItems.resourceSkillFlute));
+				buttons.add(button);
+				index("builtin::guides::incantations", button);
 				
 				button = new SubscreenInfoButton(screen, "spells",
 						new PaginatedInfoSubScreen(screen, "spells"),
@@ -356,45 +166,17 @@ public abstract class InfoScreenTab {
 				buttons.add(button);
 				index("builtin::guides::alteration", button);
 				
-				button = new SubscreenInfoButton(screen, "spellmaking",
-						new PaginatedInfoSubScreen(screen, "spellmaking"),
-						new ItemStack(NostrumItems.blankScroll));
+				button = new SubscreenInfoButton(screen, "spell_weight",
+						new PaginatedInfoSubScreen(screen, "spell_weight"),
+						new ItemStack(Items.CHAIN));
 				buttons.add(button);
-				index("builtin::guides::spellmaking", button);
-				
-				if (attr.getCompletedResearches().contains(NostrumResearches.ID_Spelltomes)) {
-					button = new SubscreenInfoButton(screen, "spellbinding",
-							new PaginatedInfoSubScreen(screen, "spellbinding"),
-							new ItemStack(Items.WRITABLE_BOOK));
-					buttons.add(button);
-					index("builtin::guides::spellbinding", button);
-					
-					button = new SubscreenInfoButton(screen, "tomes",
-							new PaginatedInfoSubScreen(screen, "tomes"),
-							new ItemStack(NostrumItems.spellTomeCombat));
-					buttons.add(button);
-					index("builtin::guides::tomes", button);
-				}
+				index("builtin::guides::spell_weight", button);
 				
 				button = new SubscreenInfoButton(screen, "levelup",
 						new PaginatedInfoSubScreen(screen, "levelup"),
 						new ItemStack(Items.PLAYER_HEAD));
 				buttons.add(button);
 				index("builtin::guides::levelup", button);
-				
-				if (MagicCapability.RITUAL_ENABLED.matches(attr)) {
-					button = new SubscreenInfoButton(screen, "rituals",
-							new PaginatedInfoSubScreen(screen, "rituals"),
-							new ItemStack(NostrumItems.altarItem));
-					buttons.add(button);
-					index("builtin::guides::rituals", button);
-				}
-				
-				button = new SubscreenInfoButton(screen, "modification",
-						new PaginatedInfoSubScreen(screen, "modification"),
-						new ItemStack(NostrumBlocks.modificationTable));
-				buttons.add(button);
-				index("builtin::guides::modification", button);
 				
 				button = new SubscreenInfoButton(screen, "elementdamage",
 						new PaginatedInfoSubScreen(screen, "elementdamage"),
@@ -415,6 +197,14 @@ public abstract class InfoScreenTab {
 					buttons.add(button);
 					index("builtin::guides::obelisks", button);
 				}
+				
+				if (attr.getCompletedResearches().contains(NostrumResearches.ID_Soulbound_Pets)) {
+					button = new SubscreenInfoButton(screen, "soulbound_pets",
+							new PaginatedInfoSubScreen(screen, "soulbound_pets"),
+							new ItemStack(NostrumItems.dragonSoulItem));
+					buttons.add(button);
+					index("builtin::guides::soulbound_pets", button);
+				}
 					
 				return buttons;
 			}
@@ -431,7 +221,7 @@ public abstract class InfoScreenTab {
 
 			@Override
 			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
-				List<InfoButton> buttons = new LinkedList<>();
+				List<InfoButton> buttons = new ArrayList<>();
 				InfoButton button;
 				
 				button = new SubscreenInfoButton(screen, "trial.fire",
@@ -492,7 +282,7 @@ public abstract class InfoScreenTab {
 
 			@Override
 			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
-				List<InfoButton> buttons = new LinkedList<>();
+				List<InfoButton> buttons = new ArrayList<>();
 				
 				buttons.add(new SubscreenInfoButton(screen, "tamed_dragon.intro",
 						new PaginatedInfoSubScreen(screen, "tamed_dragon.intro"),
@@ -521,6 +311,32 @@ public abstract class InfoScreenTab {
 			
 		};
 		
+		LORE = new InfoScreenTab(InfoScreenTabs.LORE, new ItemStack(NostrumItems.blankScroll)) {
+			@Override
+			public boolean isVisible(INostrumMagic attr) {
+				return attr.isUnlocked();
+			}
+
+			@Override
+			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
+				final List<InfoButton> buttons = new ArrayList<>();
+				Map<ELoreCategory, LoreCategoryButton> catMap = new EnumMap<>(ELoreCategory.class);
+				for (ELoreCategory category : ELoreCategory.values()) {
+					LoreCategoryButton button = new LoreCategoryButton(screen, category);
+					catMap.put(category, button);
+					buttons.add(button);
+				}
+				
+				Collection<ILoreTagged> lore = LoreRegistry.instance().allLore();
+				for (ILoreTagged tag : lore) {
+					// Index each tag
+					index(ILoreTagged.GetInfoKey(tag), catMap.get(tag.getCategory()));
+				}
+				
+				return buttons;
+			}
+		};
+		
 		SPELL_LOG = new InfoScreenTab(InfoScreenTabs.SPELL_LOG,
 				new ItemStack(NostrumItems.spellScroll, 1)) {
 
@@ -531,7 +347,7 @@ public abstract class InfoScreenTab {
 
 			@Override
 			public List<InfoButton> getButtons(InfoScreen screen, INostrumMagic attr) {
-				List<InfoButton> buttons = new LinkedList<>();
+				List<InfoButton> buttons = new ArrayList<>();
 				
 				for (SpellLogEntry log : SpellLogEntry.LAST) {
 					buttons.add(new SpellLogButton(screen, log));
@@ -546,27 +362,6 @@ public abstract class InfoScreenTab {
 	public static InfoScreenTab get(InfoScreenTabs tab) {
 		InfoScreenTab ret = null;
 		switch (tab) {
-		case INFO_BLOCKS:
-			ret = INFO_BLOCKS;
-			break;
-		case INFO_REAGENTS:
-			ret = INFO_REAGENTS;
-			break;
-		case INFO_SPELLS:
-			ret = INFO_SPELLS;
-			break;
-		case INFO_TOMES:
-			ret = INFO_TOMES;
-			break;
-		case RITUALS:
-			ret = RITUALS;
-			break;
-		case INFO_ENTITY:
-			ret = INFO_ENTITY;
-			break;
-		case INFO_ITEMS:
-			ret = INFO_ITEMS;
-			break;
 		case PERSONAL:
 			ret = PERSONAL;
 			break;
@@ -581,6 +376,12 @@ public abstract class InfoScreenTab {
 			break;
 		case SPELL_LOG:
 			ret = SPELL_LOG;
+			break;
+		case LORE:
+			ret = LORE;
+			break;
+		case RITUALS:
+			ret = RITUALS;
 			break;
 		}
 		

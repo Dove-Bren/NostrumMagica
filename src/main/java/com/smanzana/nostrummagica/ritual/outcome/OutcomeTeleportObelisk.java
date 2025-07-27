@@ -11,7 +11,7 @@ import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
-import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.tile.PedestalBlockEntity;
 import com.smanzana.nostrummagica.tile.ObeliskTileEntity;
 import com.smanzana.nostrummagica.util.Location;
 import com.smanzana.nostrummagica.util.TextUtils;
@@ -40,7 +40,7 @@ public class OutcomeTeleportObelisk implements IRitualOutcome {
 		final ItemStack centerItem = layout.getCenterItem(world, center);
 		
 		// Put the geogem back on the altar
-		( (AltarTileEntity) world.getBlockEntity(center)).setItem(centerItem);
+		( (PedestalBlockEntity) world.getBlockEntity(center)).setItem(centerItem);
 		
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (ModConfig.config.obeliskReqMagic() && (attr == null || !attr.isUnlocked()))

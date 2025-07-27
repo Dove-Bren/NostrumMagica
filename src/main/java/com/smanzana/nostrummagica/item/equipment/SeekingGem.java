@@ -12,10 +12,10 @@ import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.autodungeons.world.dungeon.DungeonRecord;
 import com.smanzana.nostrummagica.block.dungeon.DungeonKeyChestBlock;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
@@ -253,7 +253,7 @@ public class SeekingGem extends Item implements ILoreTagged {
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 }

@@ -5,10 +5,10 @@ import java.util.UUID;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.util.TargetLocation;
 
@@ -69,8 +69,8 @@ public class DragonSoulItem extends PetSoulItem {
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_DRAGONS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 
 	@Override

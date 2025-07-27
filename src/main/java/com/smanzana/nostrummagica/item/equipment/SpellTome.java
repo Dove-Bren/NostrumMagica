@@ -18,13 +18,13 @@ import com.smanzana.nostrummagica.client.gui.book.IBookPage;
 import com.smanzana.nostrummagica.client.gui.book.LinedTextPage;
 import com.smanzana.nostrummagica.client.gui.book.SpellPreviewPage;
 import com.smanzana.nostrummagica.client.gui.book.TitlePage;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.SpellPlate;
 import com.smanzana.nostrummagica.item.SpellTomePage;
 import com.smanzana.nostrummagica.item.api.IRaytraceOverlay;
 import com.smanzana.nostrummagica.item.api.ISpellCastingTool;
 import com.smanzana.nostrummagica.item.api.ISpellContainerItem;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -967,8 +967,8 @@ public class SpellTome extends Item implements GuiBook, ILoreTagged, IRaytraceOv
 	}
 	
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_TOMES;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 	
 	@Override

@@ -9,8 +9,10 @@ import javax.annotation.Nullable;
 import com.smanzana.autodungeons.api.block.scan.IRoomBoundary;
 import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.ILaserReactive;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.ShapeUtil;
 
@@ -198,6 +200,7 @@ public abstract class FogBlock extends Block implements ILaserReactive, IRoomBou
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (!playerIn.isCreative()) {
+			NostrumMagica.awardLore(playerIn, LoreRegistry.FogBlockLore, true);
 			return InteractionResult.PASS;
 		}
 		

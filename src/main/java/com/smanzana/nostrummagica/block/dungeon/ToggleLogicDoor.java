@@ -2,6 +2,8 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.util.ShapeUtil;
 
 import net.minecraft.core.BlockPos;
@@ -16,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -82,6 +85,7 @@ public class ToggleLogicDoor extends LogicDoorBlock {
 	@Override
 	public void trigger(Level world, BlockPos pos, BlockState state, BlockPos triggerPos) {
 		this.toggle(world, pos, state);
+		NostrumMagica.awardLoreToNearbyPlayers(world, Vec3.atCenterOf(pos), LoreRegistry.ToggleDoorLore, true, 50);
 	}
 	
 //	@Override

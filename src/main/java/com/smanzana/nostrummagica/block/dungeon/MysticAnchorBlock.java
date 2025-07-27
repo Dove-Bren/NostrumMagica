@@ -6,6 +6,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ISpellTargetBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
@@ -117,6 +118,7 @@ public class MysticAnchorBlock extends Block implements ISpellTargetBlock {
 			
 			entity.teleportTo(toPos.getX() + .5, toPos.getY(), toPos.getZ() + .5);
 			((ServerLevel) world).sendParticles(ParticleTypes.PORTAL, toPos.getX() + .5, toPos.getY() + NostrumMagica.rand.nextDouble() * 2.0D, toPos.getZ() + .5, 30, NostrumMagica.rand.nextGaussian(), 0.0D, NostrumMagica.rand.nextGaussian(), .1);
+			NostrumMagica.awardLore(entity, LoreRegistry.MysticAnchorLore, true);
 		}
 	}
 	

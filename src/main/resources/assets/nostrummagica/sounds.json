@@ -53,12 +53,12 @@
         ]
     },
     
-    "spell.damage.physical":
+    "spell.damage.neutral":
     {
         "sounds":
         [
-            "nostrummagica:spell/damage_physical1",
-            "nostrummagica:spell/damage_physical2"
+            "nostrummagica:spell/damage_neutral1",
+            "nostrummagica:spell/damage_neutral2"
         ]
     },
     

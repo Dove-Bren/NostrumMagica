@@ -2,10 +2,12 @@ package com.smanzana.nostrummagica.tile;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.dungeon.PushBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
@@ -346,6 +348,8 @@ public class PushBlockTileEntity extends BlockEntity {
 	}
 	
 	public boolean onPlayerPush(Player player, Direction direction) {
+		NostrumMagica.awardLore(player, LoreRegistry.PushBlockLore, true);
+		
 		// Can only 'push manually' if no element is present
 		if (this.element == null) {
 			

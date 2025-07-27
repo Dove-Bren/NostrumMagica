@@ -15,7 +15,7 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.ritual.RitualRecipe.RitualResult;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.tile.PedestalBlockEntity;
 import com.smanzana.nostrummagica.tile.CandleTileEntity;
 import com.smanzana.nostrummagica.tile.IReagentProviderTile;
 
@@ -157,7 +157,7 @@ public class AltarRitualLayout implements IRitualLayout {
 		}
 		
 		// Remaining two tiers require altar center
-		if (!(centerTE instanceof AltarTileEntity)) {
+		if (!(centerTE instanceof PedestalBlockEntity)) {
 			return EMPTY;
 		}
 		
@@ -186,8 +186,8 @@ public class AltarRitualLayout implements IRitualLayout {
 	
 	protected static final ItemStack GetAltarItem(Level world, BlockPos pos) {
 		BlockEntity te = world.getBlockEntity(pos);
-		if (te != null && te instanceof AltarTileEntity) {
-			return ((AltarTileEntity) te).getItem();
+		if (te != null && te instanceof PedestalBlockEntity) {
+			return ((PedestalBlockEntity) te).getItem();
 		}
 		
 		return ItemStack.EMPTY;
@@ -288,8 +288,8 @@ public class AltarRitualLayout implements IRitualLayout {
 	protected static final void ClearAltar(Level world, BlockPos pos) {
 		BlockEntity te;
 		te = world.getBlockEntity(pos);
-		if (te != null && te instanceof AltarTileEntity) {
-			((AltarTileEntity) te).setItem(ItemStack.EMPTY);
+		if (te != null && te instanceof PedestalBlockEntity) {
+			((PedestalBlockEntity) te).setItem(ItemStack.EMPTY);
 		}
 	}
 	
@@ -316,21 +316,21 @@ public class AltarRitualLayout implements IRitualLayout {
 		
 		if (!leftover.isEmpty()) {
 			BlockEntity te = world.getBlockEntity(center);
-			if (te != null && te instanceof AltarTileEntity) {
+			if (te != null && te instanceof PedestalBlockEntity) {
 				Iterator<ItemStack> it = leftover.iterator();
 				
 				// Sort of special case for first item
-				if (((AltarTileEntity) te).getItem().isEmpty()) {
-					((AltarTileEntity) te).setItem(it.next());
+				if (((PedestalBlockEntity) te).getItem().isEmpty()) {
+					((PedestalBlockEntity) te).setItem(it.next());
 					it.remove();
 				}
 				
 				VisitTier3Extras(world, center, (w, pos) -> {
 					if (it.hasNext()) {
 						BlockEntity posTE = w.getBlockEntity(pos);
-						if (posTE != null && posTE instanceof AltarTileEntity) {
-							if (((AltarTileEntity) posTE).getItem().isEmpty()) {
-								((AltarTileEntity) posTE).setItem(it.next());
+						if (posTE != null && posTE instanceof PedestalBlockEntity) {
+							if (((PedestalBlockEntity) posTE).getItem().isEmpty()) {
+								((PedestalBlockEntity) posTE).setItem(it.next());
 								it.remove();
 							}
 						}

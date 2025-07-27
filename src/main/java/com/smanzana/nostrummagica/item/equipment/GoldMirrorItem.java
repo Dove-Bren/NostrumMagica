@@ -1,8 +1,8 @@
 package com.smanzana.nostrummagica.item.equipment;
 
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.api.IPositionHolderItem;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.network.NetworkHandler;
@@ -49,8 +49,8 @@ public class GoldMirrorItem extends HandheldMirrorItem implements ILoreTagged {
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 
 	@Override

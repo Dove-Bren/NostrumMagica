@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
-import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.tile.PedestalBlockEntity;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -36,7 +36,7 @@ public class OutcomeModifyCenterItemGeneric implements IRitualOutcome {
 	public void perform(Level world, Player player, BlockPos center, IRitualLayout layout, RitualRecipe recipe) {
 		// If there's an altar, we'll enchant the item there
 		// Otherwise enchant the item the player has
-		AltarTileEntity altar = (AltarTileEntity) world.getBlockEntity(center);
+		PedestalBlockEntity altar = (PedestalBlockEntity) world.getBlockEntity(center);
 		ItemStack centerItem = layout.getCenterItem(world, center);
 		if (recipe.getTier() == 0 || centerItem.isEmpty()) {
 			// enchant item on player

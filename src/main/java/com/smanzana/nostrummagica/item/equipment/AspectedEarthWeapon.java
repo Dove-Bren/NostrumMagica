@@ -9,11 +9,11 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.MineBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.api.ISpellEquipment;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
@@ -141,8 +141,8 @@ public class AspectedEarthWeapon extends DiggerItem implements ILoreTagged, ISpe
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 	
 	@Override

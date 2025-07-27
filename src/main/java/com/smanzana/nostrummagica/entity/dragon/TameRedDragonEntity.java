@@ -14,7 +14,6 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonBondInfoSheet;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonInfoSheet;
 import com.smanzana.nostrummagica.client.gui.petgui.reddragon.RedDragonInventorySheet;
@@ -36,9 +35,11 @@ import com.smanzana.nostrummagica.item.DragonSoulItem;
 import com.smanzana.nostrummagica.item.RoseItem;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.item.equipment.SpellScroll;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.pet.IPetWithSoul;
+import com.smanzana.nostrummagica.progression.research.NostrumResearches;
 import com.smanzana.nostrummagica.serializer.PetJobSerializer;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.Spell;
@@ -2235,7 +2236,7 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		}
 
 		@Override
-		public InfoScreenTabs getTab() {
+		public ELoreCategory getCategory() {
 			// Don't actually display! We're going to show our own page!
 			return null;
 		}
@@ -2278,9 +2279,9 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		}
 
 		@Override
-		public InfoScreenTabs getTab() {
+		public ELoreCategory getCategory() {
 			// Don't actually display! We're going to show our own page!
-			return InfoScreenTabs.INFO_DRAGONS;
+			return ELoreCategory.ENTITY;
 		}
 
 		@Override
@@ -2491,10 +2492,11 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 				this.hurt(DamageSource.GENERIC, 1000000f);
 			}
 			
-			// Award lore about soul bonding
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(stabber);
 			if (attr != null) {
-				attr.giveFullLore(SoulBoundLore.instance());
+				if (!attr.getCompletedResearches().contains(NostrumResearches.Soulbound_Pets.getID())) {
+					attr.completeResearch(NostrumResearches.Soulbound_Pets);
+				}
 				attr.giveBasicLore(SoulBoundDragonLore.instance);
 			}
 			

@@ -3,7 +3,7 @@ package com.smanzana.nostrummagica.ritual.outcome;
 import com.smanzana.nostrummagica.item.PetSoulItem;
 import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
-import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.tile.PedestalBlockEntity;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -44,8 +44,8 @@ public class OutcomeReviveSoulboundPet extends OutcomeSpawnEntity {
 		// Also return soul item to center pedestal
 		BlockEntity te;
 		te = world.getBlockEntity(center);
-		if (te != null && te instanceof AltarTileEntity) {
-			((AltarTileEntity) te).setItem(layout.getCenterItem(world, center).copy());
+		if (te != null && te instanceof PedestalBlockEntity) {
+			((PedestalBlockEntity) te).setItem(layout.getCenterItem(world, center).copy());
 		}
 	}
 	

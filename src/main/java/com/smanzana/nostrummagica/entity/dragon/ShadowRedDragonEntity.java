@@ -1,31 +1,31 @@
 package com.smanzana.nostrummagica.entity.dragon;
 
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.boss.reddragon.RedDragonEntity;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonFocusedTargetGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonNearestAttackableTargetGoal;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
-import net.minecraft.nbt.Tag;
 
 public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreSupplier {
 	
@@ -116,8 +116,8 @@ public class ShadowRedDragonEntity extends RedDragonBaseEntity implements ILoreS
 		}
 
 		@Override
-		public InfoScreenTabs getTab() {
-			return InfoScreenTabs.INFO_ENTITY;
+		public ELoreCategory getCategory() {
+			return ELoreCategory.ENTITY;
 		}
 
 		@Override

@@ -15,6 +15,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
 import com.smanzana.nostrummagica.block.ShortcutRuneBlock;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.core.BlockPos;
@@ -181,6 +182,9 @@ public class TeleportRuneTileEntity extends BlockEntity implements IOrientedTile
 	public void doTeleport(Entity entity, boolean createPair) {
 		if (createPair) {
 			makePairRune();
+			NostrumMagica.awardLore(entity, LoreRegistry.ShortcutTileLore, true);
+		} else {
+			NostrumMagica.awardLore(entity, LoreRegistry.TeleportTileLore, true);
 		}
 		teleportEntity(entity);
 		setEntityInCooldown(entity);

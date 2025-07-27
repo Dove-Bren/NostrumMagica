@@ -2,9 +2,11 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import java.util.Random;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -52,6 +54,7 @@ public class RootingAirBlock extends DungeonAirBlock {
 	public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
 		if (entity instanceof LivingEntity living) {
 			living.addEffect(new MobEffectInstance(NostrumEffects.rooted, 20));
+			NostrumMagica.awardLore(entity, LoreRegistry.RootingAirLore, true);
 		} else {
 			entity.setDeltaMovement(entity.getDeltaMovement().multiply(1, 0, 1).add(0, -.2, 0));
 		}

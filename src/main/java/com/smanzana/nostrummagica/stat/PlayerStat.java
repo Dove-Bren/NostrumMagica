@@ -76,8 +76,8 @@ public class PlayerStat {
 	private static final Map<EMagicElement, PlayerStat> KillsWithElementMap = new EnumMap<>(EMagicElement.class);
 	public static final PlayerStat KillsWithElement(EMagicElement element) {return KillsWithElementMap.computeIfAbsent(element, (e) -> new ElementalPlayerStat(e, NostrumMagica.Loc("kills.withelement")));}
 	// Kills with any type of magic
-	public static final PlayerStat KillsWithMagic = new PlayerStat(NostrumMagica.Loc("kills.totalwithmagic")); 
-
+	public static final PlayerStat KillsWithMagic = new PlayerStat(NostrumMagica.Loc("kills.totalwithmagic"));
+	
 	private final ResourceLocation id;
 	private final BaseComponent name;
 	

@@ -8,6 +8,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.entity.ShrineTriggerEntity;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.TutorialMessage;
 import com.smanzana.nostrummagica.progression.tutorial.NostrumTutorial;
@@ -78,13 +79,14 @@ public abstract class ShrineTileEntity<E extends ShrineTriggerEntity<?>> extends
 	
 	@Override
 	public void trigger(LivingEntity entity, DamageSource source, float damage) {
-		if (entity != null && entity instanceof Player && canPlayerSee((Player) entity)) {
+		if (entity != null && entity instanceof Player player && canPlayerSee(player)) {
 			final Vec3 pos = Vec3.atLowerCornerOf(this.getBlockPos()).add(getEntityOffset());
 			final float yOffset = (this.getTriggerEntity() == null ? 0 : this.getTriggerEntity().getBbHeight()/2f);
 			final int origHitCount = getHitCount();
 			if (origHitCount+1 >= MAX_HITS) {
 				this.setHitCount(0);
-				this.doReward((Player) entity);
+				this.doReward(player);
+				NostrumMagica.awardLore(player, LoreRegistry.ShrineLore, true);
 				
 				NostrumParticles.LIGHT_EXPLOSION.spawn(level, new SpawnParams(
 						50, pos.x(), pos.y() + yOffset, pos.z(), 0, 100, 0, Vec3.ZERO, Vec3.ZERO

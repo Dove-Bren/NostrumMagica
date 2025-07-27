@@ -2,7 +2,7 @@ package com.smanzana.nostrummagica.item;
 
 import java.util.List;
 
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.spelltome.enhancement.SpellTomeEnhancement;
@@ -150,8 +150,8 @@ public class SpellTomePage extends Item implements ILoreTagged {
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_TOMES;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 	
 	@Override

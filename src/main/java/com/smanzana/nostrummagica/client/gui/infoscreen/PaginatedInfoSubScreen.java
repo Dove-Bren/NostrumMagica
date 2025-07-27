@@ -127,7 +127,7 @@ public class PaginatedInfoSubScreen implements IInfoSubScreen {
 	}
 
 	@Override
-	public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
+	public Collection<AbstractWidget> getWidgets(INostrumMagic attr, int x, int y, int width, int height) {
 		return Lists.newArrayList(
 				new NextPageButton(this.screen, 0, 0, false),
 				new NextPageButton(this.screen, 0, 0, true),

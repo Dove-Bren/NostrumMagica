@@ -48,7 +48,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 		chalk = NostrumBlocks.chalk.defaultBlockState();
 		candle = NostrumBlocks.candle.defaultBlockState().setValue(
 				CandleBlock.LIT, true);
-		altar = NostrumBlocks.altar.defaultBlockState();
+		altar = NostrumBlocks.pedestal.defaultBlockState();
 		
 		if (I18n.exists("ritual." + ritual.getTitleKey() + ".desc")) {
 			String lines = I18n.get("ritual." + ritual.getTitleKey() + ".desc", new Object[0]);
@@ -324,7 +324,7 @@ public class RitualInfoSubScreen implements IInfoSubScreen {
 	}
 
 	@Override
-	public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height) {
+	public Collection<AbstractWidget> getWidgets(INostrumMagic attr, int x, int y, int width, int height) {
 		return null;
 	}
 

@@ -6,8 +6,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.item.PositionCrystal;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
@@ -322,7 +322,7 @@ public class ParadoxMirrorBlock extends BaseEntityBlock implements ILoreTagged {
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 }

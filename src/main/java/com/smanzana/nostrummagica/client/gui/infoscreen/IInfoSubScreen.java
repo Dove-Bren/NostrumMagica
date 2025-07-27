@@ -14,6 +14,6 @@ public interface IInfoSubScreen {
 
 	public default void drawForeground(INostrumMagic attr, Minecraft mc, PoseStack matrixStackIn, int x, int y, int width, int height, int mouseX, int mouseY) {}
 	
-	public Collection<AbstractWidget> getWidgets(int x, int y, int width, int height);
+	public Collection<AbstractWidget> getWidgets(INostrumMagic attr, int x, int y, int width, int height);
 	
 }

@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.NostrumMagica;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior;
 import com.smanzana.nostrummagica.entity.IElementalEntity;
@@ -25,6 +24,7 @@ import com.smanzana.nostrummagica.entity.tasks.dragon.DragonMeleeAttackGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonNearestAttackableTargetGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonSummonShadowAttackGoal;
 import com.smanzana.nostrummagica.entity.tasks.dragon.DragonTakeoffLandGoal;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -561,8 +561,8 @@ public class RedDragonEntity extends RedDragonBaseEntity implements IMultiPartEn
 		}
 
 		@Override
-		public InfoScreenTabs getTab() {
-			return InfoScreenTabs.INFO_ENTITY;
+		public ELoreCategory getCategory() {
+			return ELoreCategory.ENTITY;
 		}
 
 		@Override

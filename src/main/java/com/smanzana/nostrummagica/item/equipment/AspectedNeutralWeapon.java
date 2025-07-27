@@ -7,12 +7,12 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.api.ISpellEquipment;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
@@ -118,8 +118,8 @@ public class AspectedNeutralWeapon extends SwordItem implements ILoreTagged, ISp
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 	
 	@Override

@@ -1,5 +1,5 @@
 {
 	"variants": {
-		"": {"model": "nostrummagica:block/pedestal",  "x": 270 }
+		"": {"model": "nostrummagica:block/pedestal" }
 	}
 }

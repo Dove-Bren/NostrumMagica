@@ -7,7 +7,7 @@ import com.smanzana.nostrummagica.item.equipment.SpellTome;
 import com.smanzana.nostrummagica.ritual.IRitualLayout;
 import com.smanzana.nostrummagica.ritual.RitualRecipe;
 import com.smanzana.nostrummagica.spell.RegisteredSpell;
-import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.tile.PedestalBlockEntity;
 import com.smanzana.nostrummagica.util.TextUtils;
 
 import net.minecraft.Util;
@@ -80,11 +80,11 @@ public class OutcomeBindSpell implements IRitualOutcome {
 				|| scroll.isEmpty())
 			return;
 		
-		AltarTileEntity altar = (AltarTileEntity) world.getBlockEntity(center);
+		PedestalBlockEntity altar = (PedestalBlockEntity) world.getBlockEntity(center);
 		altar.setItem(tome); // Re-set tome back into altar
 		
 		if (!SpellTome.startBinding(player, tome, scroll)) {
-			altar = (AltarTileEntity) world.getBlockEntity(center.offset(4, 0, 0));
+			altar = (PedestalBlockEntity) world.getBlockEntity(center.offset(4, 0, 0));
 			altar.setItem(scroll);
 		}
 	}

@@ -6,10 +6,10 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.fluid.PoisonWaterFluid;
 import com.smanzana.nostrummagica.item.NostrumItems;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.IBlockLoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -86,10 +86,10 @@ public class PoisonWaterBlock extends LiquidBlock {
 				if (attr != null && attr.isUnlocked()) {
 					// Either give full or basic randomly, so that the average experience
 					// is that players have to stay in the water long enough to get full
-					if (attr.hasLore(PoisonWaterTag.instance()) && world.random.nextInt(50) == 0) {
-						attr.giveFullLore(PoisonWaterTag.instance());
+					if (attr.hasLore(PoisonWaterTag.instance) && world.random.nextInt(50) == 0) {
+						attr.giveFullLore(PoisonWaterTag.instance);
 					} else {
-						attr.giveBasicLore(PoisonWaterTag.instance());
+						attr.giveBasicLore(PoisonWaterTag.instance);
 					}
 				}
 				
@@ -110,10 +110,7 @@ public class PoisonWaterBlock extends LiquidBlock {
 		
 		private static final String LoreKey = "poison_water";
 		
-		private static final PoisonWaterTag instance = new PoisonWaterTag();
-		public static final PoisonWaterTag instance() {
-			return instance;
-		}
+		public static final PoisonWaterTag instance = new PoisonWaterTag();
 	
 		@Override
 		public String getLoreKey() {
@@ -137,8 +134,8 @@ public class PoisonWaterBlock extends LiquidBlock {
 		}
 
 		@Override
-		public InfoScreenTabs getTab() {
-			return InfoScreenTabs.INFO_BLOCKS;
+		public ELoreCategory getCategory() {
+			return ELoreCategory.BLOCK;
 		}
 
 		@Override

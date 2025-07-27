@@ -789,7 +789,7 @@ public class PlayerListener {
 			if (event.getState().getBlock() instanceof ILoreTagged) {
 				attr.giveBasicLore((ILoreTagged) event.getState().getBlock());
 			} else if (event.getState().is(BlockTags.LEAVES)) {
-				attr.giveBasicLore(LoreRegistry.Leaves.instance());
+				attr.giveBasicLore(LoreRegistry.Leaves.instance);
 			}
 		}
 	}
@@ -815,7 +815,7 @@ public class PlayerListener {
 						attr.giveBasicLore(tag);
 					}
 				} else if (event.getEntityLiving().isInvertedHealAndHarm()) {
-					attr.giveBasicLore(LoreRegistry.UndeadLore.instance());
+					attr.giveBasicLore(LoreRegistry.UndeadLore.instance);
 				}
 			}
 			

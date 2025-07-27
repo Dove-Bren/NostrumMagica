@@ -14,7 +14,7 @@ import com.smanzana.nostrummagica.client.effects.modifiers.ClientEffectModifier;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.spell.EMagicElement;
-import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.tile.PedestalBlockEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.TargetLocation;
 
@@ -54,8 +54,8 @@ public class ClientEffectRitual extends ClientEffect {
 	public void onStart() {
 		Minecraft mc = Minecraft.getInstance();
 		BlockEntity te = mc.level.getBlockEntity(new BlockPos(origin).below());
-		if (te != null && te instanceof AltarTileEntity) {
-			((AltarTileEntity) te).hideItem(true);
+		if (te != null && te instanceof PedestalBlockEntity) {
+			((PedestalBlockEntity) te).hideItem(true);
 		}
 	}
 	
@@ -63,8 +63,8 @@ public class ClientEffectRitual extends ClientEffect {
 	public void onEnd() {
 		Minecraft mc = Minecraft.getInstance();
 		BlockEntity te = mc.level.getBlockEntity(new BlockPos(origin).below());
-		if (te != null && te instanceof AltarTileEntity) {
-			((AltarTileEntity) te).hideItem(false);
+		if (te != null && te instanceof PedestalBlockEntity) {
+			((PedestalBlockEntity) te).hideItem(false);
 		}
 	}
 	

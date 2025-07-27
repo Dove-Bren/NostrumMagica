@@ -7,10 +7,12 @@ import com.smanzana.autodungeons.api.block.entity.IUniqueBlueprintTileEntity;
 import com.smanzana.autodungeons.api.block.entity.IWorldKeyHolder;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.dungeon.LockedChestBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.util.Inventories;
 
@@ -122,6 +124,7 @@ public class LockedChestTileEntity extends BlockEntity implements TickableBlockE
 			player.sendMessage(new TranslatableComponent("info.locked_chest.nokey"), Util.NIL_UUID);
 			NostrumMagicaSounds.HOOKSHOT_TICK.play(player.level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
 		}
+		NostrumMagica.awardLore(player, LoreRegistry.LockedChestLore, true);
 	}
 	
 	protected void unlock() {

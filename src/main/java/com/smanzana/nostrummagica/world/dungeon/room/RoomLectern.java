@@ -25,7 +25,7 @@ import com.smanzana.nostrummagica.spell.SpellType;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
-import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.tile.PedestalBlockEntity;
 import com.smanzana.nostrummagica.world.dungeon.NostrumDungeons;
 import com.smanzana.nostrummagica.world.dungeon.NostrumOverworldDungeon;
 
@@ -106,7 +106,7 @@ public class RoomLectern extends StaticRoom {
 				'T', new StaticBlockState(Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.WEST).setValue(StairBlock.HALF, Half.BOTTOM).setValue(StairBlock.SHAPE, StairsShape.STRAIGHT)),
 				'Q', Blocks.QUARTZ_BLOCK,
 				'G', new StaticBlockState(NostrumBlocks.singleSpawner.getState(SingleSpawnerBlock.Type.GOLEM_FIRE)),
-				'L', NostrumBlocks.altar,
+				'L', NostrumBlocks.pedestal,
 				' ', null);
 		// T STAIR, Q QUARTZ, L PEDESTAL+SPELL,  NW norsou, g golem
 	}
@@ -353,7 +353,7 @@ public class RoomLectern extends StaticRoom {
 			}
 			else
 			{
-				AltarTileEntity te = (AltarTileEntity) ent;
+				PedestalBlockEntity te = (PedestalBlockEntity) ent;
 				ItemStack scroll = new ItemStack(NostrumItems.spellScroll, 1);
 				RegisteredSpell spell = genSpell(world.getRandom());
 				SpellScroll.setSpell(scroll, spell);

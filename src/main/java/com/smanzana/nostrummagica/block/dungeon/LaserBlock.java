@@ -2,8 +2,10 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ITriggeredBlock;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.tile.LaserBlockEntity;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
@@ -32,6 +34,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -221,6 +224,7 @@ public class LaserBlock extends DirectionalBlock implements EntityBlock, ITrigge
 	@Override
 	public void trigger(Level world, BlockPos blockPos, BlockState state, BlockPos triggerPos) {
 		toggleLaser(world, state, blockPos);
+		NostrumMagica.awardLoreToNearbyPlayers(world, Vec3.atCenterOf(blockPos), LoreRegistry.LaserBlockLore, true, 50);
 	}
 	
 	public void setLaserState(Level world, BlockPos pos, BlockState state, boolean enabled) {

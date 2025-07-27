@@ -416,7 +416,7 @@ public class ClientInit {
 		//event.registerBlockEntityRenderer(NostrumTileEntities.SymbolTileEntityType, TileEntitySymbolRenderer::new);
 		event.registerBlockEntityRenderer(NostrumBlockEntities.TrialBlock, TrialBlockEntityRenderer::new);
 		event.registerBlockEntityRenderer(NostrumBlockEntities.Candle, CandleBlockEntityRenderer::new);
-		event.registerBlockEntityRenderer(NostrumBlockEntities.Altar, AltarBlockEntityRenderer::new);
+		event.registerBlockEntityRenderer(NostrumBlockEntities.Pedestal, AltarBlockEntityRenderer::new);
 		event.registerBlockEntityRenderer(NostrumBlockEntities.NostrumObelisk, ObeliskBlockEntityRenderer::new);
 		event.registerBlockEntityRenderer(NostrumBlockEntities.TeleportationPortal, PortalBlockEntityRenderer::new);
 		event.registerBlockEntityRenderer(NostrumBlockEntities.ObeliskPortal, PortalBlockEntityRenderer::new);

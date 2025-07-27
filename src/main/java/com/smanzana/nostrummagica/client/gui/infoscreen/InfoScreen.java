@@ -209,6 +209,13 @@ public class InfoScreen extends StackableScreen {
 			}
 		}
 		
+		// Tooltips and foregrounds
+		for (Widget child : this.renderables) {
+			if (child instanceof AbstractWidget widget) {
+				widget.renderToolTip(matrixStackIn, mouseX, mouseY);
+			}
+		}
+		
 	}
 	
 	@Override
@@ -239,7 +246,7 @@ public class InfoScreen extends StackableScreen {
 			
 			yOffset += POS_SUBSCREEN_VOFFSET;
 						
-			Collection<AbstractWidget> screenbutts = subscreen.getWidgets(xOffset, yOffset, width - xOffset, height - yOffset);
+			Collection<AbstractWidget> screenbutts = subscreen.getWidgets(attribute, xOffset, yOffset, width - xOffset, height - yOffset);
 			if (screenbutts != null && !screenbutts.isEmpty())
 				this.subscreenButtons.addAll(screenbutts);
 		}

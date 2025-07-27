@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.client.gui.container.IJEIAwareGuiContainer;
 import com.smanzana.nostrummagica.client.gui.container.MasterSpellCreationGui;
 import com.smanzana.nostrummagica.client.gui.container.RuneShaperGui;
@@ -175,7 +176,7 @@ public class NostrumMagicaJEIPlugin implements IModPlugin {
 	
 	@Override
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registry) {
-		registry.addRecipeCatalyst(new ItemStack(NostrumItems.altarItem), RitualRecipeCategory.Type);
+		registry.addRecipeCatalyst(new ItemStack(NostrumBlocks.pedestal), RitualRecipeCategory.Type);
 	}
 	
 	@SuppressWarnings("unchecked")

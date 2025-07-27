@@ -3,10 +3,10 @@ package com.smanzana.nostrummagica.entity.dragon;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 

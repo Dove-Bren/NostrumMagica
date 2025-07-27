@@ -13,13 +13,13 @@ import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.tasks.SpellAttackGoal;
 import com.smanzana.nostrummagica.entity.tasks.StayHomeGoal;
 import com.smanzana.nostrummagica.item.EssenceItem;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -290,8 +290,8 @@ public class WispEntity extends AbstractGolem implements ILoreSupplier, IEnchant
 		}
 
 		@Override
-		public InfoScreenTabs getTab() {
-			return InfoScreenTabs.INFO_ENTITY;
+		public ELoreCategory getCategory() {
+			return ELoreCategory.ENTITY;
 		}
 
 		@Override

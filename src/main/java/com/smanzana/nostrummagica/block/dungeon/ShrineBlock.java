@@ -2,11 +2,13 @@ package com.smanzana.nostrummagica.block.dungeon;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.item.ResourceCrystal;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.AlterationSpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.ElementSpellRune;
 import com.smanzana.nostrummagica.item.SpellRune.ShapeSpellRune;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.ShrineTileEntity;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
@@ -63,6 +65,9 @@ public abstract class ShrineBlock<E extends ShrineTileEntity<?>> extends BaseEnt
 	
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
+		if (!worldIn.isClientSide()) {
+			NostrumMagica.awardLore(playerIn, LoreRegistry.ShrineLore, true);
+		}
 		
 		if (hand != InteractionHand.MAIN_HAND || !playerIn.isCreative()) {
 			return InteractionResult.PASS;

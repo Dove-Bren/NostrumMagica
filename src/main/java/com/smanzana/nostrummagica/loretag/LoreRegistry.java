@@ -1,28 +1,32 @@
 package com.smanzana.nostrummagica.loretag;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
+import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.PoisonWaterBlock.PoisonWaterTag;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.WolfTameLore;
-import com.smanzana.nostrummagica.entity.boss.reddragon.RedDragonEntity;
 import com.smanzana.nostrummagica.entity.KoidEntity;
 import com.smanzana.nostrummagica.entity.LuxEntity;
 import com.smanzana.nostrummagica.entity.SpriteEntity;
 import com.smanzana.nostrummagica.entity.WilloEntity;
 import com.smanzana.nostrummagica.entity.WispEntity;
+import com.smanzana.nostrummagica.entity.boss.reddragon.RedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.DragonEggEntity;
 import com.smanzana.nostrummagica.entity.dragon.ShadowRedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity.TameRedDragonLore;
 import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
-import com.smanzana.nostrummagica.pet.IPetWithSoul.SoulBoundLore;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Skeleton;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 /**
  * Provides lookup from key to ILoreTagged to support offlining and onlining
@@ -56,11 +60,14 @@ public class LoreRegistry {
 		return lore.get(key);
 	}
 	
+	public Collection<ILoreTagged> allLore() {
+		return lore.values();
+	}
+	
 	private void init() {
 		// All of the compile-time known lore elements are here.
 		register(TameRedDragonLore.instance());
 		register(TameRedDragonEntity.SoulBoundDragonLore.instance());
-		register(SoulBoundLore.instance());
 		register(WolfTameLore.instance());
 		
 		register(LuxEntity.LuxLoreTag.instance());
@@ -75,20 +82,34 @@ public class LoreRegistry {
 		register(MagicGolemEntity.GolemLore.instance());
 		//register(PlantBossEntity.PlantBossLore.instance());
 		
-		register(UndeadLore.instance());
-		register(Leaves.instance());
-		register(PoisonWaterTag.instance());
+		register(UndeadLore.instance);
+		register(Leaves.instance);
+		register(PoisonWaterTag.instance);
+		register(PushBlockLore);
+		register(HitSwitchLore);
+		register(BreakBlockLore);
+		register(ProgressDoorLore);
+		register(SealedDoorLore);
+		register(ToggleDoorLore);
+		register(LockedDoorLore);
+		register(TeleportTileLore);
+		register(ShortcutTileLore);
+		register(ShrineLore);
+		register(TogglePlatformLore);
+		register(CursedGlassLore);
+		register(KeyChestLore);
+		register(KeySwitchLore);
+		register(LockedChestLore);
+		register(LaserBlockLore);
+		register(FogBlockLore);
+		register(MysticAnchorLore);
+		register(RootingAirLore);
+		register(GhostBlockLore);
 	}
 	
 	public static final class UndeadLore implements IEntityLoreTagged<Skeleton> {
 		
-		private static UndeadLore instance = null;
-		public static UndeadLore instance() {
-			if (instance == null) {
-				instance = new UndeadLore();
-			}
-			return instance;
-		}
+		public static final UndeadLore instance = new UndeadLore();
 
 		@Override
 		public String getLoreKey() {
@@ -111,8 +132,8 @@ public class LoreRegistry {
 		}
 
 		@Override
-		public InfoScreenTabs getTab() {
-			return InfoScreenTabs.INFO_ENTITY;
+		public ELoreCategory getCategory() {
+			return ELoreCategory.ENTITY;
 		}
 
 		@Override
@@ -123,13 +144,7 @@ public class LoreRegistry {
 	
 	public static final class Leaves implements IBlockLoreTagged {
 		
-		private static Leaves instance = null;
-		public static Leaves instance() {
-			if (instance == null) {
-				instance = new Leaves();
-			}
-			return instance;
-		}
+		public static final Leaves instance = new Leaves();
 
 		@Override
 		public String getLoreKey() {
@@ -152,13 +167,86 @@ public class LoreRegistry {
 		}
 
 		@Override
-		public InfoScreenTabs getTab() {
-			return InfoScreenTabs.INFO_BLOCKS;
+		public ELoreCategory getCategory() {
+			return ELoreCategory.BLOCK;
 		}
 
 		@Override
 		public Block getBlock() {
 			return Blocks.OAK_LEAVES;
 		}
+	}
+	
+	public static MechBlockLore PushBlockLore = new MechBlockLore("push_block", () -> NostrumBlocks.pushBlock);
+	public static MechBlockLore HitSwitchLore = new MechBlockLore("hitswitches", () -> NostrumBlocks.switchBlock);
+	public static MechBlockLore BreakBlockLore = new MechBlockLore("inflict_block", () -> NostrumBlocks.breakBlock);
+	public static MechBlockLore ProgressDoorLore = new MechBlockLore("progression_door", () -> NostrumBlocks.progressionDoor);
+	public static MechBlockLore SealedDoorLore = new MechBlockLore("logic_door", () -> NostrumBlocks.logicDoor);
+	public static MechBlockLore ToggleDoorLore = new MechBlockLore("toggle_door", () -> NostrumBlocks.toggleDoor);
+	public static MechBlockLore LockedDoorLore = new MechBlockLore("locked_door", () -> NostrumBlocks.smallDungeonDoor);
+	public static MechBlockLore TeleportTileLore = new MechBlockLore("teleport_rune", () -> NostrumBlocks.teleportRune);
+	public static MechBlockLore ShortcutTileLore = new MechBlockLore("shortcut_rune", () -> NostrumBlocks.shortcutRune);
+	public static MechBlockLore ShrineLore = new MechBlockLore("shrine", () -> NostrumBlocks.elementShrineBlock);
+	public static MechBlockLore TogglePlatformLore = new MechBlockLore("toggle_platform", () -> NostrumBlocks.togglePlatform);
+	public static MechBlockLore CursedGlassLore = new MechBlockLore("cursed_glass", () -> NostrumBlocks.cursedGlass);
+	public static MechBlockLore KeyChestLore = new MechBlockLore("key_chest", () -> NostrumBlocks.smallDungeonKeyChest);
+	public static MechBlockLore KeySwitchLore = new MechBlockLore("key_switch", () -> NostrumBlocks.keySwitch);
+	public static MechBlockLore LockedChestLore = new MechBlockLore("locked_chest", () -> Blocks.CHEST);
+	public static MechBlockLore LaserBlockLore = new MechBlockLore("laser", () -> NostrumBlocks.laser);
+	public static MechBlockLore FogBlockLore = new MechBlockLore("fog", () -> NostrumBlocks.fogBlock);
+	public static MechBlockLore MysticAnchorLore = new MechBlockLore("mystic_anchor", () -> NostrumBlocks.mysticAnchor);
+	public static MechBlockLore RootingAirLore = new MechBlockLore("rooting_air", () -> NostrumBlocks.rootingAir);
+	public static MechBlockLore GhostBlockLore = new MechBlockLore("ghost_block", () -> NostrumBlocks.summonGhostBlock);
+	
+	private static class MechBlockLore implements IBlockLoreTagged {
+
+		private final String key;
+		private final Supplier<Block> block;
+		
+		private @Nullable Block cacheBlock;
+		
+		public MechBlockLore(String key, Supplier<Block> block) {
+			this.key = key;
+			this.block = block;
+		}
+		
+		@Override
+		public String getLoreKey() {
+			return key;
+		}
+
+		@Override
+		public String getLoreDisplayName() {
+			return I18n.get("lore.%s.name".formatted(key));
+		}
+		
+		protected String[] getLoreLines() {
+			return I18n.get("lore.%s.desc".formatted(key))
+					.split("\\|");
+		}
+
+		@Override
+		public Lore getBasicLore() {
+			return getDeepLore();
+		}
+
+		@Override
+		public Lore getDeepLore() {
+			return new Lore().add(getLoreLines());
+		}
+
+		@Override
+		public ELoreCategory getCategory() {
+			return ELoreCategory.DUNGEON;
+		}
+
+		@Override
+		public Block getBlock() {
+			if (cacheBlock == null) {
+				cacheBlock = block.get();
+			}
+			return cacheBlock;
+		}
+		
 	}
 }

@@ -10,11 +10,11 @@ import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spell.component.SpellShapePart;
 import com.smanzana.nostrummagica.spell.component.shapes.NostrumSpellShapes;
 
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.Level;
 
 public class MagicEarthGolemEntity extends MagicGolemEntity {

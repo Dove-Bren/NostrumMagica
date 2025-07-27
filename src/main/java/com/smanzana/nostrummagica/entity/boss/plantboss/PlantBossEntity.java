@@ -15,13 +15,13 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.block.PoisonWaterBlock;
 import com.smanzana.nostrummagica.block.TeleportRuneBlock;
 import com.smanzana.nostrummagica.block.dungeon.DungeonBlock;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.entity.AggroTable;
 import com.smanzana.nostrummagica.entity.IMultiPartEntity;
 import com.smanzana.nostrummagica.entity.MultiPartEntityPart;
 import com.smanzana.nostrummagica.entity.NostrumEntityTypes;
 import com.smanzana.nostrummagica.fluid.PoisonWaterFluid;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.ILoreSupplier;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
@@ -638,8 +638,8 @@ public class PlantBossEntity extends Mob implements ILoreSupplier, IMultiPartEnt
 		}
 		
 		@Override
-		public InfoScreenTabs getTab() {
-			return InfoScreenTabs.INFO_ENTITY;
+		public ELoreCategory getCategory() {
+			return ELoreCategory.ENTITY;
 		}
 
 		@Override

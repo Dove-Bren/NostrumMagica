@@ -43,6 +43,7 @@ import com.smanzana.nostrummagica.listener.MagicEffectProxy;
 import com.smanzana.nostrummagica.listener.ManaArmorListener;
 import com.smanzana.nostrummagica.listener.PlayerListener;
 import com.smanzana.nostrummagica.listener.PlayerStatListener;
+import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.pet.PetSoulRegistry;
 import com.smanzana.nostrummagica.progression.quest.NostrumQuest;
 import com.smanzana.nostrummagica.progression.requirement.IRequirement;
@@ -86,6 +87,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -763,6 +765,32 @@ public class NostrumMagica {
 
 	public static @Nullable Entity getEntityByUUID(Level world, UUID id) {
 		return Entities.FindEntity(world, id);
+	}
+	
+	public static boolean awardLore(Entity ent, ILoreTagged lore, boolean full) {
+		@Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(ent);
+		if (attr != null && attr.isUnlocked()) {
+			if (!full && !attr.hasLore(lore)) {
+				attr.giveBasicLore(lore);
+				return true;
+			} else if (full) {
+				boolean ret = attr.hasFullLore(lore);
+				attr.giveFullLore(lore);
+				return !ret;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean awardLoreToNearbyPlayers(Level level, Vec3 center, ILoreTagged lore, boolean full, double radius) {
+		boolean any = false;
+		for (Entity ent : level.getEntities(null, AABB.ofSize(center, radius, radius, radius))) {
+			if (awardLore(ent, lore, full)) {
+				any = true;
+			}
+		}
+		
+		return any;
 	}
 
 	public SpellRegistry getSpellRegistry() {

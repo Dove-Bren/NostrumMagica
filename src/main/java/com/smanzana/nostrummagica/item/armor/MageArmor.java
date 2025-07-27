@@ -7,11 +7,11 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
-import com.smanzana.nostrummagica.client.model.WitchHatModel;
 import com.smanzana.nostrummagica.client.model.NostrumModelLayers;
+import com.smanzana.nostrummagica.client.model.WitchHatModel;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.item.NostrumItems;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 
@@ -127,8 +127,8 @@ public class MageArmor extends ArmorItem implements ILoreTagged {
 	}
 
 	@Override
-	public InfoScreenTabs getTab() {
-		return InfoScreenTabs.INFO_ITEMS;
+	public ELoreCategory getCategory() {
+		return ELoreCategory.ITEM;
 	}
 	
 	public static MageArmor get(EquipmentSlot slot) {

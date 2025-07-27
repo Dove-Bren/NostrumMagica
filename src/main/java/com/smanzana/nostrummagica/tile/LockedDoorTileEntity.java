@@ -7,9 +7,11 @@ import com.smanzana.autodungeons.api.block.entity.IUniqueBlueprintTileEntity;
 import com.smanzana.autodungeons.api.block.entity.IWorldKeyHolder;
 import com.smanzana.autodungeons.world.WorldKey;
 import com.smanzana.autodungeons.world.dungeon.DungeonInstance;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.dungeon.LockedDoorBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 
 import net.minecraft.Util;
@@ -117,6 +119,7 @@ public class LockedDoorTileEntity extends BlockEntity implements TickableBlockEn
 			player.sendMessage(new TranslatableComponent("info.locked_door.nokey"), Util.NIL_UUID);
 			NostrumMagicaSounds.HOOKSHOT_TICK.play(player.level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5);
 		}
+		NostrumMagica.awardLore(player, LoreRegistry.LockedDoorLore, true);
 	}
 	
 	protected void unlock() {

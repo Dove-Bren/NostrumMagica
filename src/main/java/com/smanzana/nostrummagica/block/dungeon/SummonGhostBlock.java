@@ -4,10 +4,12 @@ import java.util.function.Consumer;
 
 import com.smanzana.autodungeons.util.WorldUtil;
 import com.smanzana.autodungeons.util.WorldUtil.IBlockWalker;
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.ISpellTargetBlock;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.block.property.MagicElementProperty;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
@@ -111,6 +113,9 @@ public class SummonGhostBlock extends BaseEntityBlock implements ISpellTargetBlo
 	@Override
 	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
 		if (!playerIn.isCreative()) {
+			if (!worldIn.isClientSide()) {
+				NostrumMagica.awardLore(playerIn, LoreRegistry.GhostBlockLore, true);
+			}
 			return InteractionResult.PASS;
 		}
 		
@@ -192,6 +197,8 @@ public class SummonGhostBlock extends BaseEntityBlock implements ISpellTargetBlo
 	@Override
 	public boolean processSpellEffect(Level level, BlockState state, BlockPos pos, LivingEntity caster,
 			SpellLocation hitLocation, SpellEffectPart effect, SpellAction action) {
+		NostrumMagica.awardLore(caster, LoreRegistry.GhostBlockLore, true);
+		
 		// Blocks require CONJURE with matching elements
 		final EMagicElement element = getElement(state);
 		if (effect.getElement() == element

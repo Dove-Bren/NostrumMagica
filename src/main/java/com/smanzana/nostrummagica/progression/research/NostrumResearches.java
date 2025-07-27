@@ -17,7 +17,6 @@ import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonArmorMaterial;
 import com.smanzana.nostrummagica.item.armor.DragonArmor.DragonEquipmentSlot;
 import com.smanzana.nostrummagica.item.armor.ElementalArmor;
 import com.smanzana.nostrummagica.item.equipment.AspectedWeapon;
-import com.smanzana.nostrummagica.pet.IPetWithSoul;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.component.SpellComponentWrapper;
@@ -185,25 +184,24 @@ public class NostrumResearches {
 				new ItemStack(NostrumItems.spellTomeNovice));
 
 		Spellcraft = NostrumResearch.startBuilding().parent(ID_Origin)
-				.reference("builtin::guides::spellmaking", "info.spellmaking.name").reference(NostrumItems.GetRune(new SpellComponentWrapper(EMagicElement.FIRE)))
+				.reference(NostrumItems.GetRune(new SpellComponentWrapper(EMagicElement.FIRE)))
 				.reference(NostrumItems.blankScroll).reference(NostrumItems.spellScroll).reference(NostrumItems.reagentMandrakeRoot)
 				.build(ID_Spellcraft, Tab_Magica, NostrumResearch.Size.GIANT, -1, 1, false,
 						new ItemStack(NostrumItems.spellScroll));
 
 		Spelltomes = NostrumResearch.startBuilding().parent(ID_Spellcraft).hiddenParent(ID_Rituals).lore(NostrumItems.spellPlateNovice)
-				.reference("builtin::guides::tomes", "info.tomes.name").reference("ritual::tome", "ritual.tome.name")
+				.reference("ritual::tome", "ritual.tome.name")
 				.reference(NostrumItems.spellTomeNovice).reference(NostrumItems.spellPlateNovice).reference(NostrumItems.spellScroll)
 				.build(ID_Spelltomes, Tab_Magica, NostrumResearch.Size.NORMAL, -2, 2, false,
 						new ItemStack(NostrumItems.spellPlateNovice));
 
 		Spelltomes_Advanced = NostrumResearch.startBuilding().parent(ID_Spelltomes).lore(NostrumItems.spellTomePage)
-				.reference("builtin::guides::tomes", "info.tomes.name").reference("ritual::tome", "ritual.tome.name")
+				.reference("ritual::tome5", "ritual.tome.name")
 				.reference(NostrumItems.spellTomePage).build(ID_Spelltomes_Advanced, Tab_Magica,
 						NostrumResearch.Size.NORMAL, -1, 3, true, new ItemStack(NostrumItems.spellTomePage));
 
 		Spellbinding = NostrumResearch.startBuilding().parent(ID_Spelltomes)
-				.reference("builtin::guides::spellmaking", "info.spellbinding.name")
-				.reference("ritual::spell_binding", "ritual.spell_binding.name").build(ID_Spellbinding,
+				.build(ID_Spellbinding,
 						Tab_Magica, NostrumResearch.Size.NORMAL, -2, 3, false, new ItemStack(NostrumItems.spellTomeNovice));
 
 		Tome_Workshop = NostrumResearch.startBuilding().parent(ID_Spelltomes)
@@ -230,8 +228,8 @@ public class NostrumResearches {
 				.reference("builtin::trials::neutral", "info.trial.neutral.name").build(ID_Elemental_Trials,
 						Tab_Magica, NostrumResearch.Size.NORMAL, 0, 1, true, new ItemStack(NostrumItems.masteryOrb));
 
-		Rituals = NostrumResearch.startBuilding().parent(ID_Origin).reference("builtin::guides::rituals", "info.rituals.name")
-				.reference(NostrumItems.altarItem).reference(NostrumItems.chalkItem).reference(NostrumItems.reagentMandrakeRoot)
+		Rituals = NostrumResearch.startBuilding().parent(ID_Origin)
+				.reference(NostrumBlocks.pedestal.asItem()).reference(NostrumItems.chalkItem).reference(NostrumItems.reagentMandrakeRoot)
 				.reference(NostrumItems.infusedGemUnattuned).build(ID_Rituals, Tab_Magica, NostrumResearch.Size.GIANT, 1, 1,
 						false, new ItemStack(NostrumItems.infusedGemUnattuned));
 
@@ -538,10 +536,10 @@ public class NostrumResearches {
 						Tab_Advanced_Magica, NostrumResearch.Size.LARGE, -3, 0, true,
 						new ItemStack(NostrumItems.skillEnderPin));
 
-		Soulbound_Pets = NostrumResearch.startBuilding().hiddenParent(ID_Kani).lore(IPetWithSoul.SoulBoundLore.instance())
+		Soulbound_Pets = NostrumResearch.startBuilding().hiddenParent(ID_Kani)
 				.reference("ritual::revive_soulbound_pet_dragon", "ritual.revive_soulbound_pet_dragon.name")
 				.reference("ritual::revive_soulbound_pet_wolf", "ritual.revive_soulbound_pet_wolf.name")
-				.build(ID_Soulbound_Pets, Tab_Advanced_Magica, NostrumResearch.Size.GIANT, 0, 1, true,
+				.build(ID_Soulbound_Pets, Tab_Advanced_Magica, NostrumResearch.Size.GIANT, 0, 1, true, true,
 						new ItemStack(NostrumItems.dragonSoulItem));
 
 		Wolf_Transformation = NostrumResearch.startBuilding().parent(ID_Rituals).hiddenParent(ID_Soul_Daggers).hiddenParent(ID_Kani)

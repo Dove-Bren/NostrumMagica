@@ -14,7 +14,6 @@ import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.CapabilityHandler;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.INostrumMana;
-import com.smanzana.nostrummagica.client.gui.infoscreen.InfoScreenTabs;
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfAbilitySheet;
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfBondInfoSheet;
 import com.smanzana.nostrummagica.client.gui.petgui.arcanewolf.ArcaneWolfInfoSheet;
@@ -33,9 +32,11 @@ import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfMysticGoal;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfNatureGoal;
 import com.smanzana.nostrummagica.entity.tasks.arcanewolf.ArcaneWolfStormGoal;
 import com.smanzana.nostrummagica.item.ArcaneWolfSoulItem;
+import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.pet.IPetWithSoul;
+import com.smanzana.nostrummagica.progression.research.NostrumResearches;
 import com.smanzana.nostrummagica.serializer.ArcaneWolfElementalTypeSerializer;
 import com.smanzana.nostrummagica.serializer.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.serializer.PetJobSerializer;
@@ -1678,10 +1679,11 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 				this.hurt(DamageSource.GENERIC, 1000000f);
 			}
 			
-			// Award lore about soul bonding
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(stabber);
 			if (attr != null) {
-				attr.giveFullLore(SoulBoundLore.instance());
+				if (!attr.getCompletedResearches().contains(NostrumResearches.Soulbound_Pets.getID())) {
+					attr.completeResearch(NostrumResearches.Soulbound_Pets);
+				}
 			}
 			
 			return true;
@@ -2077,9 +2079,9 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		}
 
 		@Override
-		public InfoScreenTabs getTab() {
+		public ELoreCategory getCategory() {
 			// Don't actually display! We're going to show our own page!
-			return InfoScreenTabs.INFO_ENTITY;
+			return ELoreCategory.ENTITY;
 		}
 
 		@Override

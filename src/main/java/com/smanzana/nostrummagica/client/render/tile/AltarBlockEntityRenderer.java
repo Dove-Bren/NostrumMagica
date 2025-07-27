@@ -2,21 +2,21 @@ package com.smanzana.nostrummagica.client.render.tile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
-import com.smanzana.nostrummagica.tile.AltarTileEntity;
+import com.smanzana.nostrummagica.tile.PedestalBlockEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.item.ItemStack;
 
-public class AltarBlockEntityRenderer extends BlockEntityRendererBase<AltarTileEntity> {
+public class AltarBlockEntityRenderer extends BlockEntityRendererBase<PedestalBlockEntity> {
 
 	public AltarBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
 		super(context);
 	}
 	
 	@Override
-	public void render(AltarTileEntity tileEntityIn, float partialTicks, PoseStack matrixStackIn,
+	public void render(PedestalBlockEntity tileEntityIn, float partialTicks, PoseStack matrixStackIn,
 			MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
 
 		final ItemStack item = tileEntityIn.getItem();
