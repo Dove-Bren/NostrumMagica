@@ -161,6 +161,10 @@ public class PushBlockTileEntity extends BlockEntity {
 			return true;
 		}
 		
+		if (this.isStacked()) { // stacked blocks can't push other blocks
+			return false; 
+		}
+		
 		BlockState toState = level.getBlockState(to);
 		if (!(toState.getBlock() instanceof PushBlock)) {
 			return false;
