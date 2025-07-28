@@ -208,6 +208,7 @@ public class ModInit {
 		NostrumResearches.init();//registerDefaultResearch();
 
 		NostrumLoot.RegisterLootFunctions();
+		NostrumLoot.RegisterLootConditions();
 		new NostrumLootHandler();
 		//DungeonRoomRegistry.instance().loadRegistryFromDisk(); Done in feature loading since it's required by that system and this is too late :(
 		//NostrumDimensionMapper.registerDimensions();
