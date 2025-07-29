@@ -48,11 +48,18 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 		lastDamage = 0f;
 		lastAttacker = null;
 		
-		MinecraftForge.EVENT_BUS.register(this);
+		if (!((CursedGlass) this.getBlockState().getBlock()).isDummy(this.getBlockState())) {
+			MinecraftForge.EVENT_BUS.addListener(this::onSpellEnd);
+			// Interesting note: calling `register(this)` for all 27*2 (for two entities) causes a huge client frame lag spike!
+		}
 	}
 	
 	public CursedGlassTileEntity(BlockPos pos, BlockState state) {
 		this(NostrumBlockEntities.CursedGlass, pos, state);
+	}
+	
+	public boolean isDummy() {
+		return ((CursedGlass) this.getBlockState().getBlock()).isDummy(this.getBlockState());
 	}
 	
 	private static final String NBT_REQUIRED_DAMAGE = "required_damage";
@@ -62,6 +69,10 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	@Override
 	public void saveAdditional(CompoundTag nbt) {
 		super.saveAdditional(nbt);
+		if (isDummy()) {
+			return;
+		}
+		
 		nbt.putFloat(NBT_REQUIRED_DAMAGE, this.requiredDamage);
 		if (this.requiredElement != null) {
 			nbt.put(NBT_REQUIRED_ELEMENT, this.requiredElement.toNBT());
@@ -72,6 +83,10 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	@Override
 	public void load(CompoundTag nbt) {
 		super.load(nbt);
+		
+		if (isDummy()) {
+			return;
+		}
 		
 		this.requiredDamage = nbt.getFloat(NBT_REQUIRED_DAMAGE);
 		if (nbt.contains(NBT_REQUIRED_ELEMENT)) {
@@ -87,6 +102,10 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	}
 
 	public void setRequiredDamage(float requiredDamage) {
+		if (isDummy()) {
+			return;
+		}
+		
 		this.requiredDamage = requiredDamage;
 		this.dirty();
 	}
@@ -96,6 +115,10 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	}
 
 	public void setRequiredElement(EMagicElement requiredElement) {
+		if (isDummy()) {
+			return;
+		}
+		
 		this.requiredElement = requiredElement;
 		this.dirty();
 	}
@@ -105,6 +128,10 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	}
 	
 	public void setNoSwitch(boolean noSwitch) {
+		if (isDummy()) {
+			return;
+		}
+		
 		this.noSwitch = noSwitch;
 		this.dirty();
 	}
@@ -119,33 +146,20 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	
 	@Override
 	protected boolean shouldHaveProxy() {
+		if (isDummy()) {
+			return false;
+		}
+		
 		// Should have switch entity if we're not "no switch" (always have the entity)
 		// OR if we're not broken yet
 		return !this.isNoSwitch()
-				|| !this.isBroken();
+				|| !this.isBroken()
+				;
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
-		
-//		if (world.isRemote) {
-//			return;
-//		}
-//		
-//		// Do tick logic based on type
-//		final long gameTicks = world.getGameTime();
-//		switch (this.triggerType) {
-//		case ONE_TIME:
-//			oneTimeTick(gameTicks);
-//			break;
-//		case REPEATABLE:
-//			repeatableTick(gameTicks);
-//			break;
-//		case TIMED:
-//			timedTick(gameTicks);
-//			break;
-//		}
 	}
 	
 	@Override

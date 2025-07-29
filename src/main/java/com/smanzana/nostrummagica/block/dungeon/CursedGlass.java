@@ -135,12 +135,12 @@ public class CursedGlass extends SwitchBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return isDummy(state) ? null : new CursedGlassTileEntity(pos, state);
+		return new CursedGlassTileEntity(pos, state);
 	}
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.CursedGlass);
+		return isDummy(state) ? null : TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.CursedGlass);
 	}
 	
 	@Override

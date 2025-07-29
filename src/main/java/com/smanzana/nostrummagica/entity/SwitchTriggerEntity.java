@@ -12,5 +12,6 @@ public class SwitchTriggerEntity extends TileProxyTriggerEntity<SwitchBlockTileE
 	
 	public SwitchTriggerEntity(EntityType<? extends SwitchTriggerEntity> type, Level worldIn) {
 		super(type, worldIn);
+		this.setOnGround(true);
 	}
 }

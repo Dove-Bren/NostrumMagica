@@ -7,6 +7,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
+import com.smanzana.nostrummagica.entity.SwitchTriggerEntity;
 import com.smanzana.nostrummagica.entity.dragon.DragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.ShadowRedDragonEntity;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
@@ -247,7 +248,7 @@ public class SpellDamage {
 				flamy = false;
 			}
 			
-			if (target.isOnGround()) {
+			if (target.isOnGround() || target instanceof SwitchTriggerEntity) {
 				inAir = false;
 			} else if (magic != null && magic.hasSkill(NostrumSkills.Earth_Inflict) && target.getEffect(NostrumEffects.rooted) != null) {
 				inAir = false;
