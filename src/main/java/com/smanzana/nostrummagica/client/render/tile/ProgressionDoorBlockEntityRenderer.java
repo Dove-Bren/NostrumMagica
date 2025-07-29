@@ -34,6 +34,11 @@ public class ProgressionDoorBlockEntityRenderer extends BlockEntityRendererBase<
 	@Override
 	public void render(ProgressionDoorTileEntity tileEntityIn, float partialTicks, PoseStack matrixStackIn,
 			MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
+		if (!tileEntityIn.isMaster()) {
+			return;
+		}
+		
+		
 		final Minecraft mc = Minecraft.getInstance();
 		final double time = (double)tileEntityIn.getLevel().getGameTime() + partialTicks;
 		final INostrumMagic attr = NostrumMagica.getMagicWrapper(mc.player);

@@ -53,9 +53,18 @@ public class LockedDoorTileEntity extends BlockEntity implements TickableBlockEn
 		setChanged();
 	}
 	
+	public boolean isMaster() {
+		return ((LockedDoorBlock)(this.getBlockState().getBlock())).isMaster(this.getBlockState());
+	}
+	
 	@Override
 	public void saveAdditional(CompoundTag nbt) {
 		super.saveAdditional(nbt);
+		
+		if (!this.isMaster()) {
+			return;
+		}
+		
 		nbt.put(NBT_LOCK, lockKey.asNBT());
 		nbt.putString(NBT_COLOR, color.name());
 	}
@@ -64,7 +73,7 @@ public class LockedDoorTileEntity extends BlockEntity implements TickableBlockEn
 	public void load(CompoundTag nbt) {
 		super.load(nbt);
 		
-		if (nbt == null)
+		if (nbt == null || !isMaster())
 			return;
 		
 		lockKey = WorldKey.fromNBT(nbt.getCompound(NBT_LOCK));
@@ -111,6 +120,11 @@ public class LockedDoorTileEntity extends BlockEntity implements TickableBlockEn
 	}
 	
 	public void attemptUnlock(Player player) {
+		if (!isMaster()) {
+			NostrumMagica.logger.error("Received unlock attempt to non-master block entity");
+			return;
+		}
+		
 		if (player.isCreative()
 				|| AutoDungeons.GetWorldKeys().consumeKey(lockKey)
 				) {
@@ -168,6 +182,10 @@ public class LockedDoorTileEntity extends BlockEntity implements TickableBlockEn
 	
 	@Override
 	public void onRoomBlueprintSpawn(DungeonInstance dungeonInstance, UUID roomID, boolean isWorldGen) {
+		if (!isMaster()) {
+			return;
+		}
+		
 		// TODO: should this use dungeon ID? Or even let it be configurable?
 		// Sorcery dungeon is one big room, and I feel like MOST of my uses of this
 		// will want unique-per-room keys?
@@ -175,14 +193,6 @@ public class LockedDoorTileEntity extends BlockEntity implements TickableBlockEn
 		// that's wrong?
 		final WorldKey newKey = this.lockKey.mutateWithID(roomID);
 		setWorldKey(newKey, isWorldGen);
-	}
-	
-	private BlockPos bottomStash = null;
-	public BlockPos getBottomCenterPos() {
-		if (bottomStash == null) {
-			bottomStash = LockedDoorBlock.FindBottomCenterPos(getLevel(), getBlockPos());
-		}
-		return bottomStash;
 	}
 	
 	public Direction getFace() {

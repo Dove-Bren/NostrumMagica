@@ -38,21 +38,31 @@ public class ProgressionDoorTileEntity extends BlockEntity {
 		this.requiredTier = EMagicTier.LOCKED;
 	}
 	
+	public boolean isMaster() {
+		return ((ProgressionDoorBlock) this.getBlockState().getBlock()).isMaster(this.getBlockState());
+	}
+	
 	public ProgressionDoorTileEntity require(SpellComponentWrapper component) {
-		requiredComponents.add(component);
-		this.dirty();
+		if (isMaster()) {
+			requiredComponents.add(component);
+			this.dirty();
+		}
 		return this;
 	}
 	
 	public ProgressionDoorTileEntity level(int level) {
-		this.requiredLevel = level;
-		this.dirty();
+		if (isMaster()) {
+			this.requiredLevel = level;
+			this.dirty();
+		}
 		return this;
 	}
 	
 	public ProgressionDoorTileEntity tier(EMagicTier tier) {
-		this.requiredTier = tier;
-		this.dirty();
+		if (isMaster()) {
+			this.requiredTier = tier;
+			this.dirty();
+		}
 		return this;
 	}
 	
@@ -137,6 +147,10 @@ public class ProgressionDoorTileEntity extends BlockEntity {
 	public void load(CompoundTag compound) {
 		super.load(compound);
 		
+		if (!isMaster()) { 
+			return;
+		}
+		
 		this.requiredLevel = compound.getInt(NBT_LEVEL);
 		this.requiredTier = EMagicTier.FromNBT(compound.get(NBT_TIER));
 		this.requiredComponents.clear();
@@ -151,6 +165,11 @@ public class ProgressionDoorTileEntity extends BlockEntity {
 	@Override
 	public void saveAdditional(CompoundTag nbt) {
 		super.saveAdditional(nbt);
+		
+		if (!isMaster()) {
+			return;
+		}
+		
 		if (this.requiredLevel > 0)
 			nbt.putInt(NBT_LEVEL, this.requiredLevel);
 		

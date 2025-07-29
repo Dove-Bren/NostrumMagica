@@ -283,22 +283,26 @@ public class MimicOnesidedBlock extends MimicBlock implements IDirectionalBlock 
 		}
 		
 		BlockPos pos = moveCursor.apply(myPos);
+		if (!NostrumMagica.isBlockLoaded(world, pos)) {
+			return Blocks.AIR.defaultBlockState();
+		}
+		
 		BlockState state = world.getBlockState(pos);
 		
 		// If it's another mimic block, look below it.
 		// I want to just say "getMirrorState" but that doesn't always work? logic puzzle.
 		while (state.getBlock() instanceof MimicBlock) {
 			pos = moveCursor.apply(pos);
-			if (pos.getY() <= 0) {
+			if (pos.getY() <= world.getMinBuildHeight() || !NostrumMagica.isBlockLoaded(world, pos)) {
 				state = Blocks.AIR.defaultBlockState();
 			} else {
 				state = world.getBlockState(pos);
 			}
 		}
 		
-		if (state.isAir()) {
-			state = null;
-		}
+//		if (state.isAir()) {
+//			state = null;
+//		}
 		return state;
 	}
 	

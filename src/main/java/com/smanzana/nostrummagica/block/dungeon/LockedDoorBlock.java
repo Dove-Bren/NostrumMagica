@@ -41,15 +41,12 @@ public class LockedDoorBlock extends MagicDoorBlock implements EntityBlock {
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		if (!this.isMaster(state))
-			return null;
-		
 		return new LockedDoorTileEntity(pos, state);
 	}
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.LockedDoor);
+		return isMaster(state) ? TickableBlockEntity.createServerTickerHelper(world, type, NostrumBlockEntities.LockedDoor) : null;
 	}
 	
 	@Override

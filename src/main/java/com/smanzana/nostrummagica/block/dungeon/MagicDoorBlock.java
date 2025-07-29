@@ -133,50 +133,6 @@ public abstract class MagicDoorBlock extends HorizontalDirectionalBlock implemen
 				return walkFunc.walk(pos, state) ? IBlockWalker.WalkResult.ABORT : IBlockWalker.WalkResult.CONTINUE;
 			}
 		}, 512);
-		
-		
-//		Set<BlockPos> visited = new HashSet<>();
-//		List<BlockPos> next = new LinkedList<>();
-//		
-//		next.add(start);
-//		
-//		while (!next.isEmpty()) {
-//			BlockPos cur = next.remove(0);
-//			
-//			if (visited.contains(cur))
-//				continue;
-//			
-//			visited.add(cur);
-//			BlockState state = world.getBlockState(cur);
-//			
-//			if (start == cur) {
-//				// Block was already destroyed, so use saved blockstate
-//				state = startState;
-//			} else {
-//				if (state == null || !(state.getBlock() instanceof MagicDoorBlock))
-//					continue;
-//			}
-//			
-//			if (walkFunc.walk(cur, state)) {
-//				return cur;
-//			}
-//			
-//			next.add(cur.up());
-//			next.add(cur.down());
-//			if (state.get(HORIZONTAL_FACING).getHorizontalIndex() % 2 != 0) {
-//				next.add(cur.north());
-//				next.add(cur.south());
-//			} else {
-//				next.add(cur.east());
-//				next.add(cur.west());
-//			}
-////			next.add(cur.east());
-////			next.add(cur.west());
-////			next.add(cur.north());
-////			next.add(cur.south());
-//		}
-//		
-//		return null;
 	}
 	
 	public BlockState getSlaveState(Direction facing) {

@@ -165,6 +165,10 @@ public class LockedDoorBlockEntityRenderer<E extends LockedDoorTileEntity> exten
 	@Override
 	public void render(E tileEntityIn, float partialTicks, PoseStack matrixStackIn,
 			MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
+		if (!tileEntityIn.isMaster()) {
+			return;
+		}
+		
 		final Minecraft mc = Minecraft.getInstance();
 		final double time = (double)tileEntityIn.getLevel().getGameTime() + partialTicks;
 		

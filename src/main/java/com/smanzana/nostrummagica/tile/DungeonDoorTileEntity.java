@@ -26,6 +26,10 @@ public class DungeonDoorTileEntity extends LockedDoorTileEntity {
 	
 	@Override
 	public void onRoomBlueprintSpawn(DungeonInstance dungeonInstance, UUID roomID, boolean isWorldGen) {
+		if (!isMaster()) {
+			return;
+		}
+		
 		// Set key to dungeon keys
 		this.setWorldKey(((DungeonDoorBlock) this.getBlockState().getBlock()).pickDungeonKey(dungeonInstance), isWorldGen);
 	}

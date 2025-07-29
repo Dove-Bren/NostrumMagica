@@ -43,15 +43,12 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		if (!this.isMaster(state))
-			return null;
-		
 		return new DungeonDoorTileEntity(pos, state);
 	}
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.DungeonDoor);
+		return isMaster(state) ? TickableBlockEntity.createServerTickerHelper(world, type, NostrumBlockEntities.DungeonDoor) : null;
 	}
 	
 	@Override
@@ -117,7 +114,7 @@ public abstract class DungeonDoorBlock extends LockedDoorBlock implements ILarge
 	
 	@Override
 	public boolean isLargeDoor(BlockState state) {
-		return state.getValue(MASTER);
+		return this.isMaster(state);
 	}
 	
 	@Override
