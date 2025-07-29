@@ -1,6 +1,5 @@
 package com.smanzana.nostrummagica.block;
 
-import java.util.List;
 import java.util.Random;
 
 import javax.annotation.Nullable;
@@ -8,8 +7,6 @@ import javax.annotation.Nullable;
 import com.google.common.base.Predicate;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.network.NetworkHandler;
-import com.smanzana.nostrummagica.network.message.CandleIgniteMessage;
 import com.smanzana.nostrummagica.tile.CandleTileEntity;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
 import com.smanzana.nostrummagica.tile.TickableBlockEntity;
@@ -19,9 +16,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.item.ItemStack;
@@ -44,11 +42,9 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.network.PacketDistributor.TargetPoint;
 
 public class CandleBlock extends BaseEntityBlock {
 
@@ -65,7 +61,6 @@ public class CandleBlock extends BaseEntityBlock {
 			return facing != Direction.DOWN;
 		}
 	});
-	private static final int TICK_DELAY = 5;
 	
 	public CandleBlock() {
 		super(Block.Properties.of(Material.CLOTH_DECORATION)
@@ -155,68 +150,27 @@ public class CandleBlock extends BaseEntityBlock {
     public static void light(Level world, BlockPos pos, BlockState state) {
     	if (!state.getValue(LIT)) {
 	    	world.setBlockAndUpdate(pos, state.setValue(LIT, true));
-			
-			if (!world.getBlockTicks().hasScheduledTick(pos, state.getBlock())) {
-				world.scheduleTick(pos, state.getBlock(), TICK_DELAY);
-			}
     	}
     }
     
     public static void extinguish(Level world, BlockPos pos, BlockState state) {
-    	extinguish(world, pos, state, false);
-    }
-    
-    public static void extinguish(Level world, BlockPos pos, BlockState state, boolean force) {
-    	
-    	if (world.getBlockEntity(pos) != null) {
-    		world.removeBlockEntity(pos);
-    		world.sendBlockUpdated(pos, state, state, 2);
-    	}
-    	
-    	if (!world.isClientSide) {
-			NetworkHandler.sendToAllAround(new CandleIgniteMessage(world.dimension(), pos, null),
-					new TargetPoint(pos.getX(), pos.getY(), pos.getZ(), 64, world.dimension()));
-		}
-    	
-    	if (!force && CandleBlock.IsCandleEnhanced(world, pos)) {
-    		if (!world.getBlockTicks().hasScheduledTick(pos, state.getBlock())) {
-				world.scheduleTick(pos, state.getBlock(), TICK_DELAY);
-			}
-			return;
-    	}
-    	
     	world.setBlockAndUpdate(pos, state.setValue(LIT, false));
+    	
+    	if (world instanceof ServerLevel serverLevel) {
+	    	serverLevel.sendParticles(ParticleTypes.SMOKE, pos.getX() + .5, pos.getY() + .6, pos.getZ() + .5,
+					5, 0, .02, 0, .01);
+			serverLevel.playSound(null, pos, SoundEvents.GENERIC_EXTINGUISH_FIRE, SoundSource.BLOCKS, 1f, 1f);
+    	}
     }
 
 	@Override
 	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return null;
-		
-		// We don't create when the block is placed.
+		return new CandleTileEntity(pos, state);
 	}
 	
 	@Override
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-		return TickableBlockEntity.createTickerHelper(type, NostrumBlockEntities.Candle);
-	}
-	
-//	@Override
-//	public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean isMoving) {
-//		super.onBlockAdded(worldIn, pos, state);
-//	}
-	
-	@SuppressWarnings("deprecation")
-	@Override
-	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving) {
-		if (newState.getBlock() != state.getBlock()) {
-			super.onRemove(state, world, pos, newState, isMoving);
-			
-			BlockEntity ent = world.getBlockEntity(pos);
-			if (ent == null)
-				return;
-			
-			world.removeBlockEntity(pos);
-		}
+		return TickableBlockEntity.createServerTickerHelper(world, type, NostrumBlockEntities.Candle);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
@@ -225,6 +179,14 @@ public class CandleBlock extends BaseEntityBlock {
 		
 		if (null == stateIn || !stateIn.getValue(LIT))
 			return;
+		
+		final boolean hasReagent;
+		BlockEntity te = worldIn.getBlockEntity(pos);
+		if (te == null || !(te instanceof CandleTileEntity candleEnt)) {
+			hasReagent = false;
+		} else {
+			hasReagent = candleEnt.getReagentType() != null;
+		}
 		
 		Direction facing = stateIn.getValue(FACING);
 		double d0 = (double)pos.getX() + 0.5D;
@@ -257,37 +219,7 @@ public class CandleBlock extends BaseEntityBlock {
 		}
 		
         worldIn.addParticle(ParticleTypes.SMOKE, d0, d1, d2, 0.0D, 0.0D, 0.0D);
-        worldIn.addParticle(ParticleTypes.FLAME, d0, d1, d2, 0.0D, 0.0D, 0.0D);
-	}
-	
-	@Override
-	public void tick(BlockState state, ServerLevel worldIn, BlockPos pos, Random rand) {
-		// Check for a reagent item over the candle
-		if (state.getValue(LIT) && worldIn.getBlockEntity(pos) == null) {
-			List<ItemEntity> items = worldIn.getEntitiesOfClass(ItemEntity.class, Shapes.block().bounds().move(pos).expandTowards(0, 1, 0));
-			if (items != null && !items.isEmpty()) {
-				for (ItemEntity item : items) {
-					ItemStack stack = item.getItem();
-					if (stack.getItem() instanceof ReagentItem) {
-						ReagentType type = ReagentItem.FindType(stack.split(1));
-						if (type != null) {
-							setReagent(worldIn, pos, state, type);
-						}
-						
-						if (stack.getCount() <= 0) {
-							item.discard();
-						}
-						
-						break;
-					}
-				}
-			}
-			
-			if (!worldIn.getBlockTicks().hasScheduledTick(pos, this)) {
-				worldIn.scheduleTick(pos, this, TICK_DELAY);
-			}
-		}
-		
+        worldIn.addParticle(hasReagent ? ParticleTypes.SOUL_FIRE_FLAME : ParticleTypes.FLAME, d0, d1, d2, 0.0D, 0.0D, 0.0D);
 	}
 	
 	@Override
@@ -318,60 +250,27 @@ public class CandleBlock extends BaseEntityBlock {
 			
 			if (hand == InteractionHand.MAIN_HAND && (playerIn.getMainHandItem().isEmpty())) {
 				// putting it out
-				extinguish(worldIn, pos, state, true);
+				extinguish(worldIn, pos, state);
 				return InteractionResult.SUCCESS;
 			}
 			
 			return InteractionResult.FAIL;
 		}
 
-		if (!(heldItem.getItem() instanceof ReagentItem))
+		if (!(heldItem.getItem() instanceof ReagentItem reagentItem))
 			return InteractionResult.FAIL;
 		
 		BlockEntity te = worldIn.getBlockEntity(pos);
-		if (te != null)
+		if (te == null || !(te instanceof CandleTileEntity candleEnt))
 			return InteractionResult.FAIL;
 		
-		ReagentType type = ReagentItem.FindType(heldItem);
+		ReagentType type = reagentItem.getType();
+		if (!candleEnt.tryAddReagent(type)) {
+			return InteractionResult.FAIL;
+		}
+		
 		heldItem.split(1);
-		
-		if (type == null)
-			return InteractionResult.FAIL;
-		
-		setReagent(worldIn, pos, state, type);
-		
 		return InteractionResult.SUCCESS;
-	}
-	
-	public static void setReagent(Level world, BlockPos pos, BlockState state, ReagentType type) {
-		if (world.isClientSide && type == null) {
-			extinguish(world, pos, state, false);
-			return;
-		}
-		
-		light(world, pos, state);
-		
-		CandleTileEntity candle = null;
-		if (world.getBlockEntity(pos) != null) {
-			BlockEntity te = world.getBlockEntity(pos);
-			if (te instanceof CandleTileEntity) {
-				candle = (CandleTileEntity) te;
-			} else {
-				world.removeBlockEntity(pos);
-			}
-		}
-		
-		if (candle == null) {
-			candle = new CandleTileEntity(type, pos, state);
-			world.setBlockEntity(candle);
-		}
-		
-		candle.setReagentType(type);
-		
-		if (!world.isClientSide) {
-			NetworkHandler.sendToAllAround(new CandleIgniteMessage(world.dimension(), pos, type),
-					new TargetPoint(pos.getX(), pos.getY(), pos.getZ(), 64, world.dimension()));
-		}
 	}
 	
 	@Override

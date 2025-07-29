@@ -195,8 +195,11 @@ public class AltarRitualLayout implements IRitualLayout {
 	
 	protected static final ItemStack GetReagent(Level world, BlockPos pos) {
 		BlockEntity te = world.getBlockEntity(pos);
-		if (te != null && te instanceof IReagentProviderTile) {
-			return ReagentItem.CreateStack(((IReagentProviderTile) te).getPresentReagentType(te, world, pos), 1);
+		if (te != null && te instanceof IReagentProviderTile provider) {
+			final ReagentType type = provider.getPresentReagentType(te, world, pos);
+			if (type != null) {
+				return ReagentItem.CreateStack(type, 1);
+			}
 		}
 		
 		return ItemStack.EMPTY;

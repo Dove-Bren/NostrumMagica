@@ -487,10 +487,10 @@ public class ReagentBag extends Item implements ILoreTagged {
 					}
 					// Candle TE can exist or not
 					BlockEntity candleTE = world.getBlockEntity(candlePos);
-					if (candleTE != null && candleTE instanceof CandleTileEntity && ((CandleTileEntity) candleTE).getReagentType() != null) {
-						ReagentType type = ((CandleTileEntity) candleTE).getReagentType();
+					if (candleTE != null && candleTE instanceof CandleTileEntity candleEnt && candleEnt.getReagentType() != null) {
+						ReagentType type = candleEnt.getReagentType();
 						addItem(bag, ReagentItem.CreateStack(type, 1));
-						CandleBlock.extinguish(world, candlePos, state, false);
+						candleEnt.setReagentType(null);
 					}
 				});
 				
@@ -525,16 +525,16 @@ public class ReagentBag extends Item implements ILoreTagged {
 					AltarRitualLayout.VisitTier2Candles(world, pos, (w, candlePos) -> {
 						if (!found[0]) {
 							BlockState state = world.getBlockState(candlePos);
-							if (state == null || !(state.getBlock() instanceof CandleBlock)) {
+							if (state == null || !(state.getBlock() instanceof CandleBlock) || !state.getValue(CandleBlock.LIT)) {
 								return;
 							}
 							// Candle TE can exist or not
 							BlockEntity candleTE = world.getBlockEntity(candlePos);
-							if (candleTE != null && candleTE instanceof CandleTileEntity && ((CandleTileEntity) candleTE).getReagentType() != null) {
+							if (candleTE == null || !(candleTE instanceof CandleTileEntity candleEnt) || candleEnt.getReagentType() != null) {
 								return;
 							}
 							
-							CandleBlock.setReagent(world, candlePos, world.getBlockState(candlePos), missing);
+							candleEnt.setReagentType(missing);
 							found[0] = true;
 						}
 					});

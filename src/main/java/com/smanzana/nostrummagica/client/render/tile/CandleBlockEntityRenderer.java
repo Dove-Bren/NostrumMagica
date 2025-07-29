@@ -27,6 +27,10 @@ public class CandleBlockEntityRenderer extends BlockEntityRendererBase<CandleTil
 	@Override
 	public void render(CandleTileEntity tileEntityIn, float partialTicks, PoseStack matrixStackIn,
 			MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
+		
+		if (tileEntityIn.getReagentType() == null) {
+			return;
+		}
 
 		final ItemStack item = itemCache.get(tileEntityIn.getReagentType());
 		

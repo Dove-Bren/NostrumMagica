@@ -31,4 +31,8 @@ public interface TickableBlockEntity {
 		return createTickerHelper(worldType, expectedType, (world, pos, state, entity) -> entity.tick());
 	}
 	
+	public static <E extends BlockEntity & TickableBlockEntity, A extends BlockEntity> BlockEntityTicker<A> createServerTickerHelper(Level level, BlockEntityType<A> worldType, BlockEntityType<E> expectedType) {
+		return level.isClientSide() ? null : createTickerHelper(worldType, expectedType);
+	}
+	
 }
