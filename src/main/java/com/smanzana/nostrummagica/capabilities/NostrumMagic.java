@@ -229,6 +229,13 @@ public class NostrumMagic implements INostrumMagic {
 		
 		if (this.entity != null && this.entity instanceof ServerPlayer) {
 			TierCriteriaTrigger.Instance.trigger((ServerPlayer) this.entity, tier);
+			
+			if (tier.isGreaterOrEqual(EMagicTier.KANI)) {
+				this.giveFullLore(LoreRegistry.QuickCastLore);
+			}
+			if (tier.isGreaterOrEqual(EMagicTier.VANI)) {
+				this.giveFullLore(LoreRegistry.SpellSavingLore);
+			}
 		}
 	}
 	
@@ -1014,6 +1021,7 @@ public class NostrumMagic implements INostrumMagic {
 			this.addShape(NostrumSpellShapes.Cutter);
 		} else if (skill == NostrumSkills.Spellcasting_Overcharge && player != null && player.connection != null) {
 			NetworkHandler.sendTo(new TutorialMessage(NostrumTutorial.OVERCHARGE), player);
+			this.giveFullLore(LoreRegistry.SpellOverchargingLore);
 		}
 	}
 

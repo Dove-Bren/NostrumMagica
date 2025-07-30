@@ -21,10 +21,14 @@ import com.smanzana.nostrummagica.entity.dragon.ShadowRedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity;
 import com.smanzana.nostrummagica.entity.dragon.TameRedDragonEntity.TameRedDragonLore;
 import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
+import com.smanzana.nostrummagica.item.NostrumItems;
 
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Skeleton;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
@@ -105,6 +109,13 @@ public class LoreRegistry {
 		register(MysticAnchorLore);
 		register(RootingAirLore);
 		register(GhostBlockLore);
+		
+		register(IncantationCastingLore);
+		register(QuickCastLore);
+		register(SpellSavingLore);
+		register(SpellOverchargingLore);
+		register(CraftedCastingLore);
+		register(ScrollCastingLore);
 	}
 	
 	public static final class UndeadLore implements IEntityLoreTagged<Skeleton> {
@@ -197,17 +208,19 @@ public class LoreRegistry {
 	public static MechBlockLore MysticAnchorLore = new MechBlockLore("mystic_anchor", () -> NostrumBlocks.mysticAnchor);
 	public static MechBlockLore RootingAirLore = new MechBlockLore("rooting_air", () -> NostrumBlocks.rootingAir);
 	public static MechBlockLore GhostBlockLore = new MechBlockLore("ghost_block", () -> NostrumBlocks.summonGhostBlock);
+	public static MechItemLore IncantationCastingLore = new MechItemLore("casting_incantations", () -> new ItemStack(Items.PLAYER_HEAD));
+	public static MechItemLore QuickCastLore = new MechItemLore("quick_cast", () -> new ItemStack(NostrumItems.crystalMedium));
+	public static MechItemLore SpellSavingLore = new MechItemLore("spell_saving", () -> new ItemStack(NostrumItems.crystalLarge));
+	public static MechItemLore SpellOverchargingLore = new MechItemLore("spell_overcharge", () -> new ItemStack(NostrumItems.spellTomePage));
+	public static MechItemLore CraftedCastingLore = new MechItemLore("crafted_casting", () -> new ItemStack(NostrumItems.spellTomeAdvanced));
+	public static MechItemLore ScrollCastingLore = new MechItemLore("scroll_casting", () -> new ItemStack(NostrumItems.spellScroll));
 	
-	private static class MechBlockLore implements IBlockLoreTagged {
+	private static abstract class MechLore implements ILoreTagged {
 
 		private final String key;
-		private final Supplier<Block> block;
 		
-		private @Nullable Block cacheBlock;
-		
-		public MechBlockLore(String key, Supplier<Block> block) {
+		public MechLore(String key) {
 			this.key = key;
-			this.block = block;
 		}
 		
 		@Override
@@ -239,6 +252,19 @@ public class LoreRegistry {
 		public ELoreCategory getCategory() {
 			return ELoreCategory.DUNGEON;
 		}
+		
+	}
+	
+	private static class MechBlockLore extends MechLore implements IBlockLoreTagged {
+
+		private final Supplier<Block> block;
+		
+		private @Nullable Block cacheBlock;
+		
+		public MechBlockLore(String key, Supplier<Block> block) {
+			super(key);
+			this.block = block;
+		}
 
 		@Override
 		public Block getBlock() {
@@ -246,6 +272,35 @@ public class LoreRegistry {
 				cacheBlock = block.get();
 			}
 			return cacheBlock;
+		}
+		
+	}
+	
+	private static class MechItemLore extends MechLore implements IItemLoreTagged {
+
+		private final Supplier<ItemStack> stack;
+		
+		private @Nullable ItemStack cacheStack;
+		
+		public MechItemLore(String key, Supplier<ItemStack> item) {
+			super(key);
+			this.stack = item;
+		}
+
+		@Override
+		public Item getItem() {
+			if (cacheStack == null) {
+				cacheStack = stack.get();
+			}
+			return cacheStack.getItem();
+		}
+
+		@Override
+		public ItemStack makeStack() {
+			if (cacheStack == null) {
+				cacheStack = stack.get();
+			}
+			return cacheStack;
 		}
 		
 	}

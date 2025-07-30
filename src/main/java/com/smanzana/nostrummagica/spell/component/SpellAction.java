@@ -1528,7 +1528,7 @@ public class SpellAction {
 				Vec3 direction = Vec3.directionFromRotation(dirPitch, dirYaw);
 				
 				// Blink in that direction
-				Vec3 dest = SpellTeleportation.Blink(entity, entity.position().add(0, entity.getEyeHeight(), 0), direction, radius, hasBelt);
+				Vec3 dest = SpellTeleportation.Blink(entity, entity.position().add(0, entity.getEyeHeight(), 0), direction, radius, hasBelt && entity.isCrouching());
 				
 				// Check if far enough
 				if (dest != null && dest.distanceTo(entity.position()) > 3) {

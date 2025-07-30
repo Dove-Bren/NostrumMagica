@@ -48,9 +48,13 @@ public abstract class PersonalSubScreen implements IInfoSubScreen {
 			
 			if (!attr.isUnlocked()) {
 				
+				matrixStackIn.pushPose();
+				matrixStackIn.translate(x + (width / 2), y, 0);
+				
 				Component text = new TranslatableComponent("info.magic.locked");
 				final int len = mc.font.width(text);
 				mc.font.draw(matrixStackIn, text, -len/2, 30, 0xFFFFFFFF);
+				matrixStackIn.popPose();
 				
 				return;
 			}

@@ -20,6 +20,7 @@ import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.api.ISpellCastingTool;
 import com.smanzana.nostrummagica.item.api.ISpellEquipment;
 import com.smanzana.nostrummagica.item.equipment.SpellTome;
+import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 import com.smanzana.nostrummagica.spelltome.SpellCastSummary;
@@ -363,6 +364,21 @@ public class SpellCasting {
 			
 			if (!seen && entity instanceof Player) {
 				PlayerStatTracker.Update((Player) entity, (stats) -> stats.incrStat(PlayerStat.UniqueSpellsCast));
+			}
+			
+			switch (spell.getType()) {
+			case AI:
+				break;
+			case Crafted:
+				if (tool.isEmpty()) { // hmm why didn't I make 'scroll' a spell cast type?
+					NostrumMagica.awardLore(entity, LoreRegistry.ScrollCastingLore, true);
+				} else {
+					NostrumMagica.awardLore(entity, LoreRegistry.CraftedCastingLore, true);
+				}
+				break;
+			case Incantation:
+				NostrumMagica.awardLore(entity, LoreRegistry.IncantationCastingLore, true);
+				break;
 			}
 		}
 		

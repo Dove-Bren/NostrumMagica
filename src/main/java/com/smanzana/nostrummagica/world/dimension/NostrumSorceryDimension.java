@@ -259,68 +259,6 @@ public class NostrumSorceryDimension {
 			}
 		}
 		
-//		private Map<UUID, Boolean> teleportingMarker = new HashMap<>();
-		
-//		// Hook travel event and change teleporter to our custom once, since
-//		// default teleporter looks for nether portals...
-//		@SubscribeEvent
-//		public void onTeleport(EntityTravelToDimensionEvent event) {
-//			if (checkDimension(event.getDimension())) {
-//				Entity ent = event.getEntity();
-//				Boolean marker = teleportingMarker.get(ent.getUniqueID()); // how is this recursing?
-//				if (marker != null && marker){
-//					return;
-//				}
-//				
-//				event.setCanceled(true);
-//				
-//				if (ent instanceof ServerPlayerEntity) {
-//					ServerPlayerEntity player = (ServerPlayerEntity) ent;
-//					MinecraftServer server = player.getServer();
-//					teleportingMarker.put(player.getUniqueID(), true);
-//					DimensionEntryTeleporter.respawnPlayer(player);
-//					new DimensionEntryTeleporter(server.getWorld(NostrumDimensions.GetSorceryDimension()))
-//						.placeInPortal(player, 0f);
-//					player.teleport(newWorld, x, y, z, yaw, pitch);
-////					server.getPlayerList().transferPlayerToDimension(
-////							player, dim, new DimensionEntryTeleporter(server.getWorld(dim)));
-//					teleportingMarker.put(player.getUniqueID(), false);
-//				}
-//			} else if (checkDimension(event.getEntity())
-//					&& DimensionUtils.IsOverworld(event.getDimension())) {
-//				// Leaving our dimension to homeworld
-//				Entity ent = event.getEntity();
-//				
-//				Boolean marker = teleportingMarker.get(ent.getUniqueID());
-//				if (marker != null && marker){
-//					return;
-//				}
-//				
-//				// Can't set the world's teleporter to a return one :/
-//				event.setCanceled(true);
-//
-//				if (ent instanceof ServerPlayerEntity) {
-//					ServerPlayerEntity player = (ServerPlayerEntity) ent;
-//					MinecraftServer server = player.getServer();
-//					teleportingMarker.put(player.getUniqueID(), true);
-//					
-//					RegistryKey<World> toDim = World.OVERWORLD;
-//					if (NostrumMagica.getMagicWrapper(player) != null) {
-//						INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
-//						if (attr.getSorceryPortalPos() != null) {
-//							toDim = attr.getSorceryPortalDimension();
-//						}
-//					}
-//					
-//					new DimensionReturnTeleporter(server.getWorld(toDim))
-//						.placeInPortal(player, 0f);
-////					server.getPlayerList().transferPlayerToDimension(
-////							player, toDim, new DimensionReturnTeleporter(server.getWorld(toDim)));
-//					teleportingMarker.put(player.getUniqueID(), false);
-//				}
-//			}
-//		}
-		
 		@SubscribeEvent
 		public void onExplosion(ExplosionEvent.Detonate event) {
 			if (checkDimension(event.getWorld()) && event.getAffectedBlocks() != null) {
@@ -375,17 +313,20 @@ public class NostrumSorceryDimension {
 					continue; // skip rate limitting
 				}
 				
-				if (player.isCreative() || player.isSpectator()) {
-					continue;
-				}
-				
-				double distSqr = Math.pow(player.getX() - player.xOld, 2)
-						+ Math.pow(player.getZ() - player.zOld, 2)
-						+ Math.pow(player.getY() - player.yOld, 2);
-				if (distSqr > 25) {
-					// Player appears to have teleported
-					player.teleportTo(player.xOld, player.yOld, player.zOld);
-				}
+//				if (player.isCreative() || player.isSpectator()) {
+//					continue;
+//				}
+//				
+//				final Vec3 lastPos = NostrumMagica.playerListener.getLastTickPos(player);
+//				double distSqr = player.position().distanceToSqr(lastPos);
+//				
+////				double distSqr = Math.pow(player.getX() - player.xOld, 2)
+////						+ Math.pow(player.getZ() - player.zOld, 2)
+////						+ Math.pow(player.getY() - player.yOld, 2);
+//				if (distSqr > 10) {
+//					// Player appears to have teleported
+//					player.teleportTo(lastPos.x, lastPos.y, lastPos.z);
+//				}
 			}
 		}
 	}
