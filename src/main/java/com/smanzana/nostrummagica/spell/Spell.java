@@ -104,24 +104,9 @@ public class Spell {
 		}
 	}
 
-//	public static Spell CreateFake(String name, int id) {
-//		Spell s = new Spell(name, 0, 0);
-//		s.registryID = id;
-//		
-//		NostrumMagica.instance.getSpellRegistry().override(id, s);
-//		return s;
-//	}
-	
 	public static Spell CreateAISpell(String name) {
 		return new Spell(name, SpellType.AI, 50, 10);
 	}
-	
-//	/**
-//	 * Takes a transient spell and makes it an official, non-transient spell
-//	 */
-//	public void promoteFromTrans() {
-//		NostrumMagica.instance.getSpellRegistry().removeTransientStatus(this);
-//	}
 	
 	protected void determineCharacteristics() {
 		boolean harmful = false;

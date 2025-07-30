@@ -1,6 +1,7 @@
 package com.smanzana.nostrummagica.util;
 
 import java.util.EnumMap;
+import java.util.function.Function;
 
 public class NonNullEnumMap<K extends Enum<K>, V> extends EnumMap<K,V> {
 
@@ -15,6 +16,13 @@ public class NonNullEnumMap<K extends Enum<K>, V> extends EnumMap<K,V> {
 		this.defaultValue = fill;
 		this.keyClass = keyType;
 		clear();
+	}
+	
+	public NonNullEnumMap(Class<K> keyType, V emptyValue, Function<K, V> provider) {
+		this(keyType, emptyValue);
+		for (K type : this.keyClass.getEnumConstants()) {
+			this.put(type, provider.apply(type));
+		}
 	}
 	
 	@Override
