@@ -20,7 +20,7 @@ public class CommandReloadRenderTypes {
 				);
 		
 		// Register client-handler, too
-		ClientCommands.Register(Command, CommandReloadRenderTypes::handleClient);
+		ClientCommands.Register(Command, CommandReloadRenderTypes::HandleClient);
 	}
 
 	private static final int execute(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
@@ -30,7 +30,7 @@ public class CommandReloadRenderTypes {
 		return 0;
 	}
 	
-	private static final boolean handleClient(Player player, String msg) {
+	public static final boolean HandleClient(Player player, String msg) {
 		NostrumRenderTypes.InitRenderStates();
 		return true;
 	}

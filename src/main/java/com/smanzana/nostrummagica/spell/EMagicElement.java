@@ -11,8 +11,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.StringRepresentable;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public enum EMagicElement implements StringRepresentable {
 
@@ -57,7 +55,6 @@ public enum EMagicElement implements StringRepresentable {
 		return color;
 	}
 	
-	@OnlyIn(Dist.CLIENT)
 	public ChatFormatting getChatColor() {
 		switch(this) {
 		case EARTH:

@@ -3,6 +3,8 @@ package com.smanzana.nostrummagica.network.message;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.SpellChargeTracker.SpellCharge;
 
@@ -26,20 +28,23 @@ public class SpellChargeServerUpdateMessage {
 	}
 		
 	private final UUID id;
-	private final SpellCharge charge;
+	private final @Nullable SpellCharge charge;
 	
-	public SpellChargeServerUpdateMessage(UUID id, SpellCharge charge) {
+	public SpellChargeServerUpdateMessage(UUID id, @Nullable SpellCharge charge) {
 		this.id = id;
 		this.charge = charge;
 	}
 	
 	public static SpellChargeServerUpdateMessage decode(FriendlyByteBuf buf) {
-		return new SpellChargeServerUpdateMessage(buf.readUUID(), SpellCharge.FromNBT(buf.readNbt()));
+		return new SpellChargeServerUpdateMessage(buf.readUUID(), buf.readBoolean() ? SpellCharge.FromNBT(buf.readNbt()) : null);
 	}
 
 	public static void encode(SpellChargeServerUpdateMessage msg, FriendlyByteBuf buf) {
 		buf.writeUUID(msg.id);
-		buf.writeNbt(msg.charge.toNBT());
+		buf.writeBoolean(msg.charge != null);
+		if (msg.charge != null) {
+			buf.writeNbt(msg.charge.toNBT());
+		}
 	}
 
 }

@@ -111,8 +111,8 @@ public class NostrumMagica {
 
 	public static NostrumMagica instance;
 	
-	public static final CommonProxy Proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
-	public static final CuriosProxy CuriosProxy = DistExecutor.safeRunForDist(() -> CuriosClientProxy::new, () -> CuriosProxy::new);
+	public static final CommonProxy Proxy = DistExecutor.unsafeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
+	public static final CuriosProxy CuriosProxy = DistExecutor.unsafeRunForDist(() -> CuriosClientProxy::new, () -> CuriosProxy::new);
 	//public static final AetheriaProxy AetheriaProxy = DistExecutor.safeRunForDist(() -> AetheriaClientProxy::new, () -> AetheriaProxy::new);;
 	//public final EnderIOProxy enderIO;
 	public static final MinecoloniesProxy MinecoloniesProxy = new MinecoloniesProxy();
@@ -150,7 +150,7 @@ public class NostrumMagica {
 		
 		(new ModConfig()).register();
 		
-		playerListener = DistExecutor.safeRunForDist(() -> ClientPlayerListener::new, () -> PlayerListener::new);
+		playerListener = DistExecutor.unsafeRunForDist(() -> ClientPlayerListener::new, () -> PlayerListener::new);
 		magicEffectProxy = new MagicEffectProxy();
 		manaArmorListener = new ManaArmorListener();
 		statListener = new PlayerStatListener();

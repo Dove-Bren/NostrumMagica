@@ -24,7 +24,7 @@ public class CommandInfoScreenGoto {
 				);
 		
 		// Register client-handler, too
-		ClientCommands.Register(Command, CommandInfoScreenGoto::handleClient);
+		ClientCommands.Register(Command, CommandInfoScreenGoto::HandleClient);
 	}
 
 	private static final int execute(CommandContext<CommandSourceStack> context, final String tag) throws CommandSyntaxException {
@@ -34,7 +34,7 @@ public class CommandInfoScreenGoto {
 		return 0;
 	}
 	
-	private static final boolean handleClient(Player player, String msg) {
+	public static final boolean HandleClient(Player player, String msg) {
 		// expect {/nostrumgoto "Lore::thing"}
 		final String tag = msg.substring(Command.length() + 3, msg.length() - 1);
 		NostrumMagica.Proxy.openLoreLink(tag);

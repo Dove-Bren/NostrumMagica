@@ -24,7 +24,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 public class OutlineRenderer {
 	
@@ -94,7 +93,7 @@ public class OutlineRenderer {
 	private void forceRenderOutline(float partialTicks) {
 		Minecraft mc = Minecraft.getInstance();
 		final LevelRenderer worldRenderer = mc.levelRenderer;
-		final PostChain outlineShader = ObfuscationReflectionHelper.getPrivateValue(LevelRenderer.class, worldRenderer, "entityEffect");
+		final PostChain outlineShader = worldRenderer.entityEffect;
 		
 		outlineShader.process(partialTicks);
 		mc.getMainRenderTarget().bindWrite(false);

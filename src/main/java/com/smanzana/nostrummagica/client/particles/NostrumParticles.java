@@ -26,15 +26,15 @@ import net.minecraftforge.network.PacketDistributor.TargetPoint;
 @Mod.EventBusSubscriber(modid = NostrumMagica.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum NostrumParticles {
 
-	GLOW_ORB(new NostrumParticleType("glow_orb"), GlowOrbParticle::MakeParticle),
-	LIGHTNING_STATIC(new NostrumParticleType("lightning_static"), LightningStaticParticle::MakeParticle),
-	FILLED_ORB(new NostrumParticleType("filled_orb"), FilledOrbParticle::MakeParticle),
-	WARD(new NostrumParticleType("ward"), WardParticle::MakeParticle),
-	LIGHT_EXPLOSION(new NostrumParticleType("light_explosion"), LightExplosionParticle::MakeParticle),
-	GLOW_TRAIL(new NostrumParticleType("glow_trail"), GlowRibbonParticle::MakeParticle),
-	SMOKE_TRAIL(new NostrumParticleType("smoke_trail"), SmokeStreamRibbonParticle::MakeParticle),
-	RISING_GLOW(new NostrumParticleType("rising_glow"), RisingGlowRibbonParticle::MakeParticle),
-	LIGHTNING_CHAIN(new NostrumParticleType("lightning_chain"), LightningChainParticle::MakeParticle),
+	GLOW_ORB(new NostrumParticleType("glow_orb")),
+	LIGHTNING_STATIC(new NostrumParticleType("lightning_static")),
+	FILLED_ORB(new NostrumParticleType("filled_orb")),
+	WARD(new NostrumParticleType("ward")),
+	LIGHT_EXPLOSION(new NostrumParticleType("light_explosion")),
+	GLOW_TRAIL(new NostrumParticleType("glow_trail")),
+	SMOKE_TRAIL(new NostrumParticleType("smoke_trail")),
+	RISING_GLOW(new NostrumParticleType("rising_glow")),
+	LIGHTNING_CHAIN(new NostrumParticleType("lightning_chain")),
 	;
 	
 	@SubscribeEvent
@@ -45,21 +45,15 @@ public enum NostrumParticles {
 	}
 	
 	private final NostrumParticleType type;
-	private INostrumParticleFactory<?> factory;
 	
-	private <F extends INostrumParticleFactory<?>> NostrumParticles(NostrumParticleType type, F factory) {
+	private NostrumParticles(NostrumParticleType type) {
 		this.type = type;
-		this.factory = factory;
 	}
 	
 	public NostrumParticleType getType() {
 		return this.type;
 	}
 
-	public INostrumParticleFactory<?> getFactory() {
-		return factory;
-	}
-	
 	public void spawn(Level world, SpawnParams params) {
 		Spawn(this, world, params);
 	}

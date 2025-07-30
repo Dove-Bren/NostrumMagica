@@ -59,8 +59,18 @@ import com.smanzana.nostrummagica.client.gui.widget.QuickMoveBagButton;
 import com.smanzana.nostrummagica.client.listener.ClientPlayerListener;
 import com.smanzana.nostrummagica.client.model.DragonRedModel;
 import com.smanzana.nostrummagica.client.model.MimicBlockBakedModel;
+import com.smanzana.nostrummagica.client.particles.FilledOrbParticle;
+import com.smanzana.nostrummagica.client.particles.GlowOrbParticle;
+import com.smanzana.nostrummagica.client.particles.GlowRibbonParticle;
+import com.smanzana.nostrummagica.client.particles.INostrumParticleFactory;
+import com.smanzana.nostrummagica.client.particles.LightExplosionParticle;
+import com.smanzana.nostrummagica.client.particles.LightningChainParticle;
+import com.smanzana.nostrummagica.client.particles.LightningStaticParticle;
 import com.smanzana.nostrummagica.client.particles.NostrumParticleData;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
+import com.smanzana.nostrummagica.client.particles.RisingGlowRibbonParticle;
+import com.smanzana.nostrummagica.client.particles.SmokeStreamRibbonParticle;
+import com.smanzana.nostrummagica.client.particles.WardParticle;
 import com.smanzana.nostrummagica.client.render.IEffectRenderer;
 import com.smanzana.nostrummagica.client.render.NostrumRenderTypes;
 import com.smanzana.nostrummagica.client.render.SpellShapeRenderer;
@@ -118,6 +128,9 @@ import com.smanzana.nostrummagica.client.render.tile.PushBlockBlockEntityRendere
 import com.smanzana.nostrummagica.client.render.tile.SummonGhostBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TemplateStamperBlockEntityRenderer;
 import com.smanzana.nostrummagica.client.render.tile.TrialBlockEntityRenderer;
+import com.smanzana.nostrummagica.command.ClientCommands;
+import com.smanzana.nostrummagica.command.CommandInfoScreenGoto;
+import com.smanzana.nostrummagica.command.CommandReloadRenderTypes;
 import com.smanzana.nostrummagica.crafting.NostrumTags;
 import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.entity.ChakramSpellSaucerEntity;
@@ -210,7 +223,6 @@ import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.ForgeModelBakery;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -246,7 +258,6 @@ public class ClientInit {
 		
 		// Register client command registering command.
 		// Note that it's on the game event bus, so it has to be registered special
-		MinecraftForge.EVENT_BUS.addListener(ClientInit::registerCommands);
 		MinecraftForge.EVENT_BUS.addListener(QuickMoveBagButton::OnContainerScreenShow);
 		MinecraftForge.EVENT_BUS.addListener(ClientInit::InjectTooltips);
 		MinecraftForge.EVENT_BUS.addListener(AbsoluteTooltipComponent::CaptureTooltipDimensions);
@@ -272,15 +283,15 @@ public class ClientInit {
     	MinecraftForgeClient.registerTooltipComponentFactory(LoreHintTooltip.class, LoreHintTooltipComponent::new);
     	MinecraftForgeClient.registerTooltipComponentFactory(ImbuementTooltip.class, ImbuementTooltipComponent::new);
     	
+    	registerClientCommands();
     }
 	
 	// Subscribed to game bus in #clientSetup
-	public static final void registerCommands(RegisterCommandsEvent event) {
+	public static final void registerClientCommands() {
 		// Client-only commands
-		// Note: registered in common mod one to show up on server and be valid commands
-//		final CommandDispatcher<CommandSource> dispatcher = event.getDispatcher();
-//		CommandInfoScreenGoto.register(dispatcher);
-//		CommandDebugEffect.register(dispatcher);
+		// Note: also registered in common mod one to show up on server and be valid commands, but client does not get the 'RegisterCommandsEvent'
+		ClientCommands.Register(CommandInfoScreenGoto.Command, CommandInfoScreenGoto::HandleClient);
+    	ClientCommands.Register(CommandReloadRenderTypes.Command, CommandReloadRenderTypes::HandleClient);
 	}
 	
 	@SubscribeEvent
@@ -435,19 +446,30 @@ public class ClientInit {
 		event.registerBlockEntityRenderer(NostrumBlockEntities.TemplateStamper, TemplateStamperBlockEntityRenderer::new);
 	}
 	
+	private static final <T extends Particle> void registerNostrumParticleProvider(ParticleEngine manager, NostrumParticles type, INostrumParticleFactory<T> factory) {
+		manager.register(type.getType(), (sprites) -> new ParticleProvider<NostrumParticleData>() {
+			@Override
+			public Particle createParticle(NostrumParticleData typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+				return factory.createParticle(worldIn, sprites, typeIn.getParams());
+			}
+		});
+	}
+	
 	@SubscribeEvent
 	public static void registerClientParticleFactories(ParticleFactoryRegisterEvent event) {
 		final Minecraft mc = Minecraft.getInstance();
 		ParticleEngine manager = mc.particleEngine;
 		
-		for (NostrumParticles particle : NostrumParticles.values()) {
-			manager.register(particle.getType(), (sprites) -> new ParticleProvider<NostrumParticleData>() {
-				@Override
-				public Particle createParticle(NostrumParticleData typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-					return particle.getFactory().createParticle(worldIn, sprites, typeIn.getParams());
-				}
-			});
-		}
+		registerNostrumParticleProvider(manager, NostrumParticles.GLOW_ORB, GlowOrbParticle::MakeParticle);
+		registerNostrumParticleProvider(manager, NostrumParticles.LIGHTNING_STATIC, LightningStaticParticle::MakeParticle);
+		registerNostrumParticleProvider(manager, NostrumParticles.FILLED_ORB, FilledOrbParticle::MakeParticle);
+		registerNostrumParticleProvider(manager, NostrumParticles.WARD, WardParticle::MakeParticle);
+		registerNostrumParticleProvider(manager, NostrumParticles.LIGHT_EXPLOSION, LightExplosionParticle::MakeParticle);
+		registerNostrumParticleProvider(manager, NostrumParticles.GLOW_TRAIL, GlowRibbonParticle::MakeParticle);
+		registerNostrumParticleProvider(manager, NostrumParticles.SMOKE_TRAIL, SmokeStreamRibbonParticle::MakeParticle);
+		registerNostrumParticleProvider(manager, NostrumParticles.RISING_GLOW, RisingGlowRibbonParticle::MakeParticle);
+		registerNostrumParticleProvider(manager, NostrumParticles.LIGHTNING_CHAIN, LightningChainParticle::MakeParticle);
+		
 	}
 	
 	private static final void registerBlockRenderLayer() {

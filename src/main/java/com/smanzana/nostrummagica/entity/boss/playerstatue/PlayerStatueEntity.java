@@ -95,7 +95,7 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 	public PlayerStatueEntity(EntityType<? extends PlayerStatueEntity> type, Level worldIn) {
 		super(type, worldIn);
         this.noCulling = true;
-        this.xpReward = 1250;
+        this.xpReward = 0;
 		
         if (!worldIn.isClientSide()) {
 			this.aggroTable = new AggroTable<>((ent) -> {
@@ -182,7 +182,7 @@ public class PlayerStatueEntity extends Mob implements PowerableMob {
 		this.move(MoverType.SELF, new Vec3(0, 0.025, 0));
 		
 		if (this.deathTime == 100 && !this.level.isClientSide()) {
-			ExperienceOrb.award((ServerLevel) level, position(), this.xpReward);
+			ExperienceOrb.award((ServerLevel) level, position(), 1250);
 			
 			this.level.broadcastEntityEvent(this, (byte)60);
 			this.remove(Entity.RemovalReason.KILLED);

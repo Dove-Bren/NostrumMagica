@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.spell.SpellChargeTracker.SpellCharge;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.NetworkEvent;
@@ -24,7 +23,7 @@ public class SpellChargeClientUpdateMessage {
 		
 		final Player player = ctx.get().getSender();
 		
-		Minecraft.getInstance().submit(() -> {
+		ctx.get().enqueueWork(() -> {
 			NostrumMagica.instance.getSpellChargeTracker().overrideServerCharge(player.getUUID(), message.charge);
 		});
 	}

@@ -160,7 +160,7 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 		super(type, level);
 		
 		this.noCulling = true;
-        this.xpReward = 1250;
+        this.xpReward = 0;
 		
         if (!level.isClientSide()) {
 			this.aggroTable = new AggroTable<>((ent) -> {
@@ -620,7 +620,7 @@ public class PrimalMageEntity extends SpellcasterIllager implements PowerableMob
 		this.move(MoverType.SELF, new Vec3(0, 0.025, 0));
 		
 		if (this.deathTime == 100 && !this.level.isClientSide()) {
-			ExperienceOrb.award((ServerLevel) level, position(), this.xpReward);
+			ExperienceOrb.award((ServerLevel) level, position(), 1250);
 			
 			this.level.broadcastEntityEvent(this, (byte)60);
 			this.remove(Entity.RemovalReason.KILLED);
