@@ -47,6 +47,9 @@ public record SpellCastProperties(
 			CompoundTag tag = new CompoundTag();
 			tag.putFloat(NBT_EFFICIENCY, efficiency);
 			tag.putInt(NBT_CHARGE_BONUS, bonusCharges);
+			if (targetHintID != null) {
+				tag.putInt(NBT_TARGET_HINT, targetHintID);
+			}
 			return tag;
 		}
 		
