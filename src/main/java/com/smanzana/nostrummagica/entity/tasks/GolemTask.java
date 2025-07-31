@@ -147,9 +147,11 @@ public class GolemTask extends Goal {
 		
 		// Else don't execute task
 		if (target != null && target.isAlive()) {
-			if (!pathTo(target)) {
-				return false;
-			}
+			pathTo(target);
+			// This used to eraly out with no path, but i don't remember why...
+//			if (!) {
+//				return false;
+//			}
 		} else {
 			pathTo(owner);
 				
@@ -196,9 +198,10 @@ public class GolemTask extends Goal {
 		}
 
 		if (target != null && target.isAlive()) {
-			double distTarget = target.position().distanceTo(golem.position());
+			double distTarget = target.position().distanceTo(golem.position()) - (target.getBbWidth() / 2);
 			
-			double meleeRange = (double)(golem.getBbWidth() * 2.0F * golem.getBbWidth() * 2.0F);
+			double meleeRange = .75 + (golem.getBbWidth() / 2);//(double)(golem.getBbWidth() * 2.0F * golem.getBbWidth());
+			
 			if (distTarget < meleeRange) {
 				inMelee = true;
 			}
@@ -243,10 +246,13 @@ public class GolemTask extends Goal {
     			return true;
 			
         	//golem.getNavigator().clearPath();
-			success = golem.getNavigation().moveTo(target, 1.0);
-			if (success) {
-				updateCooldown = 15;
-			}
+        	var path = golem.getNavigation().createPath(target, 0);
+        	if (path != null) {
+        		success = golem.getNavigation().moveTo(path, 1.0);
+        		if (success) {
+    				updateCooldown = 15;
+    			}
+        	}
 		} else if (range) {
 			
 			success = true;

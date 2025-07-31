@@ -23,6 +23,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -108,6 +109,13 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 		
 		this.requiredDamage = requiredDamage;
 		this.dirty();
+		
+		if (this.getTriggerEntity() != null) {
+			if (this.requiredDamage > 0) {
+				getTriggerEntity().getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.requiredDamage);
+				getTriggerEntity().setHealth(this.requiredDamage);
+			}
+		}
 	}
 
 	public EMagicElement getRequiredElement() {
@@ -171,6 +179,10 @@ public class CursedGlassTileEntity extends SwitchBlockTileEntity {
 	protected SwitchTriggerEntity makeTriggerEntity(Level world, double x, double y, double z) {
 		CursedGlassTriggerEntity ent = new CursedGlassTriggerEntity(NostrumEntityTypes.cursedGlassTrigger, world);
 		ent.setPos(x, y, z);
+		if (this.requiredDamage > 0) {
+			ent.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.requiredDamage);
+			ent.setHealth(this.requiredDamage);
+		}
 		return ent;
 	}
 	

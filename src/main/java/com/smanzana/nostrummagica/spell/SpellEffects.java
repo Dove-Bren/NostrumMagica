@@ -85,7 +85,7 @@ public final class SpellEffects {
 		case ICE:
 		case LIGHTNING:
 		case WIND:
-			return new SpellAction().damage(element, 2f + (float) (2 * elementCount))
+			return new SpellAction().damage(element, 6f + (float) (4 * elementCount))
 					.name("ruin." + element.name().toLowerCase());
 		}
 		
@@ -137,7 +137,7 @@ public final class SpellEffects {
 			}).name("blindness");
 		case FIRE:
 			// Note: damage is AFTER burn so that if burn takes away shields the damage comes through after
-			return new SpellAction().burn(elementCount * 20 * 5).damage(EMagicElement.FIRE, 1f + ((float) amp/2f)).name("burn");
+			return new SpellAction().burn(elementCount * 20 * 5).damage(EMagicElement.FIRE, 2f + (float)amp).name("burn");
 		case ICE:
 			return new SpellAction().status(NostrumEffects.frostbite, duration, amp, (caster, target, eff) -> {
 				if (caster == target) {
@@ -309,7 +309,7 @@ public final class SpellEffects {
 	
 	private static final SpellAction solveHarm(EMagicElement element, int elementCount) {
 		// Damage spell
-		return new SpellAction().damage(element, (float) (elementCount + 1))
+		return new SpellAction().damage(element, (float) (4 + 2 *elementCount))
 				.name("damage." + element.name().toLowerCase());
 	}
 	
@@ -395,7 +395,7 @@ public final class SpellEffects {
 		case ENDER:
 			return new SpellAction().status(MobEffects.NIGHT_VISION, duration, amp).name("night_vision");
 		case FIRE:
-			return new SpellAction().stealHealth(element, 1 + elementCount).name("health_steal");
+			return new SpellAction().stealHealth(element, 4 + 2 * elementCount).name("health_steal");
 		case ICE:
 			return new SpellAction().stealMana(element, 5 + (5 * elementCount)).name("mana_steal");
 		case LIGHTNING:

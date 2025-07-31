@@ -32,7 +32,16 @@ public class Incantation {
 	}
 	
 	public Incantation(SpellShape shape, @Nullable SpellShape shape2, EMagicElement element, @Nullable EAlteration alteration) {
-		this(new SpellShapePart(shape), shape2 == null ? null : new SpellShapePart(shape2), new SpellEffectPart(element, 1, alteration, .5f));
+		this(new SpellShapePart(shape), shape2 == null ? null : new SpellShapePart(shape2), MakeEffect(element, alteration));
+	}
+	
+	protected static final SpellEffectPart MakeEffect(EMagicElement element, @Nullable EAlteration alteration) {
+		if (alteration == EAlteration.HARM
+				|| (alteration == EAlteration.RUIN && element != EMagicElement.NEUTRAL)
+				) {
+			return new SpellEffectPart(element, 1, alteration, 1f); // normally-effective damage components
+		}
+		return new SpellEffectPart(element, 1, alteration, .5f);
 	}
 	
 	public SpellShape getShape() {

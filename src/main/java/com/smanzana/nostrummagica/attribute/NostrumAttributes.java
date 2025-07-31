@@ -93,25 +93,29 @@ public class NostrumAttributes {
 		}
 	}
 	
+	protected static void addIfMissing(EntityAttributeModificationEvent event, EntityType<? extends LivingEntity> type, Attribute attribute) {
+		if (!event.has(type, attribute)) event.add(type, attribute);
+	}
+	
 	@SubscribeEvent
 	public static void onAttributeConstruct(EntityAttributeModificationEvent event) {
 		for (EntityType<? extends LivingEntity> type : event.getTypes()) {
-			event.add(type, magicResist);
-			event.add(type, magicPotency);
-			event.add(type, manaRegen);
-			event.add(type, magicDamage);
-			event.add(type, manaCost);
-			event.add(type, xpBonus);
-			event.add(type, xpAllElements);
-			event.add(type, reduceAll);
-			event.add(type, castSpeed);
+			addIfMissing(event, type, magicResist);
+			addIfMissing(event, type, magicPotency);
+			addIfMissing(event, type, manaRegen);
+			addIfMissing(event, type, magicDamage);
+			addIfMissing(event, type, manaCost);
+			addIfMissing(event, type, xpBonus);
+			addIfMissing(event, type, xpAllElements);
+			addIfMissing(event, type, reduceAll);
+			addIfMissing(event, type, castSpeed);
 			for (EMagicElement elem : EMagicElement.values()) {
-				event.add(type, GetReduceAttribute(elem));
-				event.add(type, GetXPAttribute(elem));
+				addIfMissing(event, type, GetReduceAttribute(elem));
+				addIfMissing(event, type, GetXPAttribute(elem));
 			}
 			
 			if (type == EntityType.PLAYER) {
-				event.add(type, bonusJump);
+				addIfMissing(event, type, bonusJump);
 			}
 		}
 	}
