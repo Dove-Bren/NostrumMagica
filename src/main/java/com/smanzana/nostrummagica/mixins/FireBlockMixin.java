@@ -28,11 +28,13 @@ public class FireBlockMixin extends BaseFireBlock {
 		super(p_41383_, 0);
 	}
 	
+	// Note: Vanilla has "checkBurnOut" with no Direcetion final arg whereas forge patches it to "tryCatchFire".
+	// https://github.com/MinecraftForge/MinecraftForge/blob/1.18.x/patches/minecraft/net/minecraft/world/level/block/FireBlock.java.patch
 	//Lnet/minecraft/world/level/block/FireBlock;checkBurnOut(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;ILjava/util/Random;I)V
-	@Inject(method = "tryCatchFire", at=@At(value="HEAD"), cancellable = true)
-	public void ontryCatchFire(Level level, BlockPos pos, int chance, Random rand, int fireAge, Direction face, CallbackInfo ci) {
-		final BlockPos spreadPos = pos.relative(face);
-		FireSpreadAttemptEvent event = new FireSpreadAttemptEvent(level, pos, spreadPos);
+	@Inject(method = "tryCatchFire", at=@At(value="HEAD"), cancellable = true, remap=false)
+	public void onTryCatchFire(Level level, BlockPos pos, int chance, Random rand, int fireAge, Direction face, CallbackInfo ci) {
+		final BlockPos origPos = pos.relative(face);
+		FireSpreadAttemptEvent event = new FireSpreadAttemptEvent(level, origPos, pos);
 		if (MinecraftForge.EVENT_BUS.post(event)) {
 			ci.cancel();
 		}
