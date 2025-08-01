@@ -975,9 +975,11 @@ public class WilloEntity extends Monster implements ILoreSupplier, IElementalEnt
 	
 	public static boolean canSpawnExtraCheck(EntityType<WilloEntity> type, ServerLevelAccessor world, MobSpawnType reason, BlockPos pos, Random rand) {
 		// Do extra checks in the nether, which has a smaller pool of spawns and so weight 1 is bigger than intended
-		
 		if (DimensionUtils.IsNether(world.getLevel())) {
 			return world.getDifficulty() != Difficulty.PEACEFUL && rand.nextInt(35) == 0 && checkMobSpawnRules(type, world, reason, pos, rand);
+		} else if (DimensionUtils.IsOverworld(world.getLevel())) {
+			// Require out a certain distance in overworld
+			return pos.distSqr(world.getLevel().getSharedSpawnPos()) > 500 * 500; 
 		} else {
 			return true;
 		}
