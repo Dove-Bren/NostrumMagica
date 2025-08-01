@@ -92,6 +92,7 @@ import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FarmBlock;
@@ -933,15 +934,6 @@ public class SpellAction {
 			
 			entity.setSecondsOnFire((int) Math.ceil((float) duration / 20.0f));
 			
-			@Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-			if (attr != null && attr.hasSkill(NostrumSkills.Fire_Inflict)) {
-				// Also bust shields
-				entity.removeEffect(NostrumEffects.mysticWater);
-				entity.removeEffect(NostrumEffects.physicalShield);
-				entity.removeEffect(NostrumEffects.magicShield);
-				entity.removeEffect(MobEffects.ABSORPTION);
-			}
-			
 			resultBuilder.applied |= true;
 			
 			log.generalEffectStart(LABEL_BURN_NAME,
@@ -958,10 +950,6 @@ public class SpellAction {
 				NostrumMagicaSounds.DAMAGE_FIRE.play(location.world,
 						applyPos.getX() + .5, applyPos.getY(), applyPos.getZ() + .5);
 				resultBuilder.applied |= true;
-			}
-			
-			if (DimensionUtils.IsSorceryDim(location.world)) {
-				return;
 			}
 			
 			if (location.world.isEmptyBlock(applyPos)) {
@@ -994,8 +982,10 @@ public class SpellAction {
 		private static final Component LABEL_LIGHTNING_NAME = new TranslatableComponent("spelllog.nostrummagica.lightning.name");
 		private static final Component LABEL_LIGHTNING_MOD_BELT = new TranslatableComponent("spelllogmod.nostrummagica.lightningbelt");
 		
-		public LightningEffect() {
-			
+		protected final int power;
+		
+		public LightningEffect(int power) {
+			this.power = power;
 		}
 		
 		@Override
@@ -1029,7 +1019,9 @@ public class SpellAction {
 				}
 			}
 			
-			float damage = 5; // Default for lightning
+			// Base 5 damage which is standard for lightning.
+			// Add 0, 1, 2 for power.
+			float damage = 5 + (power - 1); // Default for lightning
 			INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
 			if (attr != null && attr.hasSkill(NostrumSkills.Lightning_Adept)) {
 				damage += 1;
@@ -1845,7 +1837,10 @@ public class SpellAction {
 		@Override
 		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			BlockPos pos = location.hitBlockPos;
-			if (location.world.isEmptyBlock(pos) || location.world.getBlockState(pos).getBlock() instanceof MysticWaterBlock) {
+			if (location.world.isEmptyBlock(pos)
+					|| location.world.getBlockState(pos).getBlock() instanceof MysticWaterBlock
+					|| location.world.getBlockState(pos).getBlock() instanceof BaseFireBlock
+					) {
 				boolean allowed = true;
 				
 				// In sorcery dimension, make sure no lava is nearby
@@ -1901,6 +1896,16 @@ public class SpellAction {
 			caster.setLastHurtMob(entity);
 			entity.setLastHurtByMob(caster);
 			entity.hurt(DamageSource.mobAttack(caster), 0);
+			
+			@Nullable INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+			if (attr != null && attr.hasSkill(NostrumSkills.Fire_Inflict)) {
+				// Also bust shields
+				entity.removeEffect(NostrumEffects.mysticWater);
+				entity.removeEffect(NostrumEffects.physicalShield);
+				entity.removeEffect(NostrumEffects.magicShield);
+				entity.removeEffect(MobEffects.ABSORPTION);
+			}
+			
 			resultBuilder.applied |= true;
 		}
 
@@ -2632,8 +2637,8 @@ public class SpellAction {
 		return this;
 	}
 	
-	public SpellAction lightning() {
-		effects.add(new LightningEffect());
+	public SpellAction lightning(int elementCount) {
+		effects.add(new LightningEffect(elementCount));
 		return this;
 	}
 	

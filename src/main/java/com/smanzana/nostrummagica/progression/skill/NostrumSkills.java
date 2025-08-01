@@ -122,7 +122,7 @@ public class NostrumSkills {
 	private static final ResourceLocation ID_ENDER_CORRUPT = NostrumMagica.Loc("ender.corrupt");
 	private static final ResourceLocation ID_ENDER_WEAPON = NostrumMagica.Loc("ender.weapon");
 	private static final ResourceLocation ID_ENDER_INFLICT = NostrumMagica.Loc("ender.inflict");
-	private static final ResourceLocation ID_ENDER_GROWTH = NostrumMagica.Loc("ender.growth");
+	private static final ResourceLocation ID_ENDER_SWAP = NostrumMagica.Loc("ender.swap");
 	
 	public static /*final*/ Skill Spellcraft_TwoShapes;
 	public static /*final*/ Skill Spellcraft_ElemBuilding;
@@ -214,7 +214,7 @@ public class NostrumSkills {
 	public static /*final*/ Skill Ender_Corrupt;
 	public static /*final*/ Skill Ender_Weapon;
 	public static /*final*/ Skill Ender_Inflict;
-	public static /*final*/ Skill Ender_Growth;
+	public static /*final*/ Skill Ender_Swap;
 	
 	public static void init() {
 		Skill.ClearSkills();
@@ -337,7 +337,7 @@ public class NostrumSkills {
 		Ender_Adept = new HiddenSkill(ID_ENDER_ADEPT, Category_Element_Ender, ID_ENDER_NOVICE, () -> new ItemStack(Items.ENDER_PEARL), x, y-1, new ElementMasteryRequirement(EMagicElement.ENDER, EElementalMastery.ADEPT));
 		Ender_Master = new HiddenSkill(ID_ENDER_MASTER, Category_Element_Ender, ID_ENDER_ADEPT, () -> new ItemStack(Items.ENDER_EYE), x, y-2, new ElementMasteryRequirement(EMagicElement.ENDER, EElementalMastery.MASTER));
 		Ender_Inflict = new HiddenSkill(ID_ENDER_INFLICT, Category_Element_Ender, ID_ENDER_NOVICE, () -> new ItemStack(Items.SPIDER_EYE), x-1, y-1, new SpellKnowledgeRequirement(EMagicElement.ENDER, EAlteration.INFLICT));
-		Ender_Growth = new HiddenSkill(ID_ENDER_GROWTH, Category_Element_Ender, ID_ENDER_NOVICE, () -> new ItemStack(NostrumBlocks.paradoxMirror), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.ENDER, EAlteration.GROWTH));
+		Ender_Swap = new HiddenSkill(ID_ENDER_SWAP, Category_Element_Ender, ID_ENDER_NOVICE, () -> new ItemStack(NostrumBlocks.paradoxMirror), x+1, y-1, new SpellKnowledgeRequirement(EMagicElement.ENDER, null));
 		Ender_Corrupt = new HiddenSkill(ID_ENDER_CORRUPT, Category_Element_Ender, ID_ENDER_ADEPT, () -> new ItemStack(Items.CARVED_PUMPKIN), x-1, y-2, new SpellKnowledgeRequirement(EMagicElement.ENDER, EAlteration.CORRUPT));
 		Ender_Weapon = new HiddenSkill(ID_ENDER_WEAPON, Category_Element_Ender, ID_ENDER_ADEPT, () -> new ItemStack(NostrumItems.enderRod), x+1, y-2, new ResearchRequirement(NostrumResearches.ID_Sword_Ender));
 	}

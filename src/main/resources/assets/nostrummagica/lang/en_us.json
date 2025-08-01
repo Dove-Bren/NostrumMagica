@@ -1308,7 +1308,7 @@
     "spelleffect.mystic_water.name": "Mystic Water",
     "spelleffect.mystic_water.desc": "When cast on a block, conjures an unmoving body of mystic water. When cast on an entity, grants the Mystic Water effect which instantly douses flames and provides healing for 2 points per level when needed.",
     "spelleffect.lightningbolt.name": "Summon Lightning",
-    "spelleffect.lightningbolt.desc": "Calls forth a bolt of lightning.",
+    "spelleffect.lightningbolt.desc": "Calls forth a bolt of lightning, dealing 4 + 1 lightning damage per level.",
     "spelleffect.mystic_air.name": "Mystic Air",
     "spelleffect.mystic_air.desc": "When cast on a block, creates a temporary magic wall. What the wall allows through depends on the potency of the effect. When cast on an entity, grants the Mystic Air effect which prevents drowning and can reduce fall damage.",
     "spelleffect.summon.fire.name": "Summon Fire Golem",
@@ -1888,7 +1888,7 @@
 	"skill.nostrummagica.fire.weapon": "Flame Rod Blast",
 	"skill.nostrummagica.fire.weapon.desc": "Adjusts the Flame Rod's cast effect to affect all entities around the target entity.",
 	"skill.nostrummagica.fire.inflict": "Shield Burn",
-	"skill.nostrummagica.fire.inflict.desc": "When inflicting the burn effect, remove any active magic or physical shield, mystic water, or absorption effects.",
+	"skill.nostrummagica.fire.inflict.desc": "When inflicting the cursed fire effect, remove any active magic or physical shield, mystic water, or absorption effects.",
 	"skill.nostrummagica.fire.growth": "Too Hot",
 	"skill.nostrummagica.fire.growth.desc": "Makes mobs (not players) drop their armor instead of damaging it.",
 	
@@ -1964,8 +1964,8 @@
 	"skill.nostrummagica.ender.weapon.desc": "Modifies the ball effect when using the Ender Rod with the Ender armor set to grant 2 points of magic and physical shielding per entity hit when exploding.",
 	"skill.nostrummagica.ender.inflict": "Mob Blindness",
 	"skill.nostrummagica.ender.inflict.desc": "Enhances spell-inflicted blindness to affect mobs as well.",
-	"skill.nostrummagica.ender.growth": "Effect Swap",
-	"skill.nostrummagica.ender.growth.desc": "Swaps status effects with swap targets.",
+	"skill.nostrummagica.ender.swap": "Effect Swap",
+	"skill.nostrummagica.ender.swap.desc": "When swapping targets with the swap effect, also swap status effects.",
 	
 	"shapeprop.wall.radius.name": "Radius",
 	"shapeprop.wall.radius.desc": "Radius in blocks of the wall",

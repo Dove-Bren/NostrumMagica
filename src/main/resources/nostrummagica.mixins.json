@@ -7,7 +7,8 @@
 		"PlayerModelMixin"
 	],
 	"mixins": [
-		"BowItemMixin"
+		"BowItemMixin",
+		"FireBlockMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

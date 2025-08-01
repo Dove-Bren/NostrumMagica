@@ -285,7 +285,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			break;
 		case LIGHTNING:
 			if (NostrumMagica.rand.nextFloat() < 0.1f * typeScale(this.type))
-				action = new SpellAction().lightning();
+				action = new SpellAction().lightning(1);
 			break;
 		case ICE:
 			if (NostrumMagica.rand.nextFloat() < 0.5f * typeScale(this.type))

@@ -136,8 +136,7 @@ public final class SpellEffects {
 				return false;
 			}).name("blindness");
 		case FIRE:
-			// Note: damage is AFTER burn so that if burn takes away shields the damage comes through after
-			return new SpellAction().burn(elementCount * 20 * 5).damage(EMagicElement.FIRE, 2f + (float)amp).name("burn");
+			return new SpellAction().cursedFire(elementCount).name("cursed_fire");
 		case ICE:
 			return new SpellAction().status(NostrumEffects.frostbite, duration, amp, (caster, target, eff) -> {
 				if (caster == target) {
@@ -273,14 +272,7 @@ public final class SpellEffects {
 		case EARTH:
 			return new SpellAction().status(MobEffects.REGENERATION, duration, amp).name("regen");
 		case ENDER:
-			return new SpellAction().swap().swapStatus((caster, target, eff) -> {
-				// Only apply with ender growth skill
-				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
-				if (attr != null && attr.hasSkill(NostrumSkills.Ender_Growth)) {
-					return true;
-				}
-				return false;
-			}).name("swap");
+			return new SpellAction().phase(elementCount).name("phase");
 		case FIRE:
 			return new SpellAction().dropEquipment(elementCount, (caster, target, eff) -> {
 				// Only apply with fire growth skill AND if a mob
@@ -322,13 +314,22 @@ public final class SpellEffects {
 		case EARTH:
 			return new SpellAction().grow(elementCount).name("grow");
 		case ENDER:
-			return new SpellAction().phase(elementCount).name("phase");
+			return new SpellAction().swap().swapStatus((caster, target, eff) -> {
+				// Only apply with ender growth skill
+				INostrumMagic attr = NostrumMagica.getMagicWrapper(caster);
+				if (attr != null && attr.hasSkill(NostrumSkills.Ender_Swap)) {
+					return true;
+				}
+				return false;
+			}).name("swap");
+			
 		case FIRE:
-			return new SpellAction().cursedFire(elementCount).name("cursed_fire");
+			// Note: damage is AFTER burn so that if burn takes away shields the damage comes through after
+			return new SpellAction().burn(elementCount * 20 * 5).damage(EMagicElement.FIRE, 2f + (float)amp).name("burn");
 		case ICE:
 			return new SpellAction().mysticWater(amp, elementCount * 2, 20 * 60).name("mystic_water");
 		case LIGHTNING:
-			return new SpellAction().lightning().name("lightningbolt");
+			return new SpellAction().lightning(elementCount).name("lightningbolt");
 		case WIND:
 			return new SpellAction().wall(elementCount).name("mystic_air");
 		}

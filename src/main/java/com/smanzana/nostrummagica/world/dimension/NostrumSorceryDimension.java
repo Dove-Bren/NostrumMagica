@@ -8,6 +8,8 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic.VanillaRespawnInfo;
 import com.smanzana.nostrummagica.util.DimensionUtils;
+import com.smanzana.nostrummagica.world.FireBlockEvent.FireCheckOddsEvent;
+import com.smanzana.nostrummagica.world.FireBlockEvent.FireSpreadAttemptEvent;
 
 import net.minecraft.client.renderer.FogRenderer.FogMode;
 import net.minecraft.core.BlockPos;
@@ -22,8 +24,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.FireBlock;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.portal.PortalInfo;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
@@ -34,7 +34,6 @@ import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.WorldTickEvent;
 import net.minecraftforge.event.entity.EntityMobGriefingEvent;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
-import net.minecraftforge.event.world.BlockEvent.EntityPlaceEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -267,22 +266,25 @@ public class NostrumSorceryDimension {
 		}
 		
 		@SubscribeEvent
-		public void onBlockPlace(EntityPlaceEvent event) {
-			if (checkDimension(event.getEntity()) && (
-					event.getPlacedBlock().getBlock() instanceof FireBlock
-					|| event.getPlacedBlock().getMaterial() == Material.FIRE
-				)) {
-				event.setCanceled(true);
-			}
-			
-		}
-		
-		@SubscribeEvent
 		public void onMobGrief(EntityMobGriefingEvent event) {
 			if (event.getEntity() != null
 					&& event.getEntity().level != null
 					&& checkDimension(event.getEntity())) {
 				event.setResult(Result.DENY);
+			}
+		}
+		
+		@SubscribeEvent
+		public void onFireSpreadAttempt(FireSpreadAttemptEvent event) {
+			if (checkDimension(event.getLevel())) {
+				event.setCanceled(true);
+			}
+		}
+		
+		@SubscribeEvent
+		public void onFireOddsCheck(FireCheckOddsEvent event) {
+			if (checkDimension(event.getLevel())) {
+				event.setOdds(0); // don't spread
 			}
 		}
 		
