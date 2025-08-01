@@ -65,6 +65,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -89,6 +90,7 @@ public class OverlayRenderer extends GuiComponent {
 	private static final ResourceLocation GUI_ICONS = new ResourceLocation(NostrumMagica.MODID, "textures/gui/icons.png");
 	private static final ResourceLocation GUI_CAST_CENTER = new ResourceLocation(NostrumMagica.MODID, "textures/gui/cast_swirl_hand.png");
 	private static final ResourceLocation GUI_CAST_TAIL = new ResourceLocation(NostrumMagica.MODID, "textures/gui/cast_swirl_tail.png");
+	private static final ResourceLocation OVERLAY_FROSTBITE = new ResourceLocation("textures/misc/powder_snow_outline.png"); // copied from vanilla, which has it private
 	private static final int GUI_ORB_WIDTH = 9;
 	private static final int GUI_ORB_HEIGHT = 9;
 	private static final int GUI_BAR_WIDTH = 17;
@@ -128,6 +130,7 @@ public class OverlayRenderer extends GuiComponent {
 	protected IIngameOverlay spellChargeOverlay;
 	protected IncantSelectionOverlay incantationSelectOverlay;
 	protected IIngameOverlay spellCooldownOverlay;
+	protected IIngameOverlay frostbiteOverlay;
 	
 	private int wiggleIndex; // set to multiples of 12 for each wiggle
 	private static final int wiggleOffsets[] = {0, 1, 1, 2, 1, 1, 0, -1, -1, -2, -1, -1};
@@ -157,6 +160,7 @@ public class OverlayRenderer extends GuiComponent {
 		spellChargeOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.CROSSHAIR_ELEMENT, "NostrumMagica::spellChargeOverlay", this::renderSpellChargeOverlay);
 		incantationSelectOverlay = new IncantSelectionOverlay(); OverlayRegistry.registerOverlayTop("NostrumMagica::incantationSelectOverlay", incantationSelectOverlay);
 		spellCooldownOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.CROSSHAIR_ELEMENT, "NostrumMagica::spellCooldownOverlay", this::renderSpellCooldownOverlay);
+		frostbiteOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.FROSTBITE_ELEMENT, "", this::renderFrostbiteOverlay);
 	}
 	
 	private void renderMysticAirOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
@@ -1049,6 +1053,36 @@ public class OverlayRenderer extends GuiComponent {
 			RenderSystem.defaultBlendFunc();
 		}
 	}
+	
+	private void renderFrostbiteOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
+		final Player player = NostrumMagica.Proxy.getPlayer();
+		final MobEffectInstance effect = player.getEffect(NostrumEffects.frostbite);
+		if (effect != null && effect.getDuration() > 0) {
+			final float alpha = effect.getDuration() > 20 ? 1f : ((float)effect.getDuration()/20f);
+			gui.setupOverlayRenderState(true, false);
+			//gui.renderTextureOverlay(OVERLAY_FROSTBITE, alpha); private :(
+			{
+				RenderSystem.disableDepthTest();
+				RenderSystem.depthMask(false);
+				RenderSystem.defaultBlendFunc();
+				RenderSystem.setShader(GameRenderer::getPositionTexShader);
+				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, alpha);
+				RenderSystem.setShaderTexture(0, OVERLAY_FROSTBITE);
+				Tesselator tesselator = Tesselator.getInstance();
+				BufferBuilder bufferbuilder = tesselator.getBuilder();
+				bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+				bufferbuilder.vertex(0.0D, (double)height, -90.0D).uv(0.0F, 1.0F).endVertex();
+				bufferbuilder.vertex((double)width, (double)height, -90.0D).uv(1.0F, 1.0F).endVertex();
+				bufferbuilder.vertex((double)width, 0.0D, -90.0D).uv(1.0F, 0.0F).endVertex();
+				bufferbuilder.vertex(0.0D, 0.0D, -90.0D).uv(0.0F, 0.0F).endVertex();
+				tesselator.end();
+				RenderSystem.depthMask(true);
+				RenderSystem.enableDepthTest();
+				RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+			}
+		}
+	}
+	
 	
 	public void startManaWiggle(int wiggleCount) {
 		this.wiggleIndex = 12 * wiggleCount;
