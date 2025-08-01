@@ -85,7 +85,7 @@ public class ProjectileShape extends SpellShape implements ISelectableShape {
 					getState().getSelf(),
 					pos,
 					dir,
-					5.0f, PROJECTILE_RANGE);
+					2.0f, PROJECTILE_RANGE);
 			
 			projectile.setFilter(hitEnts ? new ProjectileFilter(this.getState(), hitAllies) : e -> false);
 			

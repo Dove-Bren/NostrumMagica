@@ -22,6 +22,7 @@ public class NostrumSorceryDungeon extends StaticDungeon {
 	
 	public NostrumSorceryDungeon(IDungeonRoomRef<?> start) {
 		super(start);
+		this.setColor(0xFF602080);
 	}
 	
 	@Override

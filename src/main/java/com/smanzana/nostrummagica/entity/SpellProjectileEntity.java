@@ -7,12 +7,9 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.block.dungeon.MysticAnchorBlock;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
-import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.serializer.MagicElementDataSerializer;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.spell.SpellLocation;
-import com.smanzana.nostrummagica.util.RenderFuncs;
-import com.smanzana.nostrummagica.util.TargetLocation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
@@ -21,6 +18,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -166,12 +164,24 @@ public class SpellProjectileEntity extends AbstractHurtingProjectile {
 	
 	protected void doClientEffect() {
 		int color = getElement().getColor();
-		color = (0x19000000) | (color & 0x00FFFFFF);
-		NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
-				2,
-				getX(), getY() + getBbHeight()/2f, getZ(), 0, 40, 0,
-				new Vec3(random.nextFloat() * .05 - .025, random.nextFloat() * .05, random.nextFloat() * .05 - .025), null
-			).color(color));
+		color = (0x80000000) | (color & 0x00FFFFFF);
+		
+		// Ars Nouveau repeats this based on how fast the particle is moving
+		final double dx = getX() - xOld;
+		final double dy = getY() - yOld;
+		final double dz = getZ() - zOld;
+		final double dist = Math.sqrt(Mth.square(dx) + Mth.square(dy) + Mth.square(dz));
+		for (int i = 0; i < dist * 8; i++) {
+			final float prog = (float) i / (float) (dist * 8);
+			final double xOff = dx * prog;
+			final double yOff = dy * prog;
+			final double zOff = dz * prog;
+			NostrumParticles.GLOW_ORB.spawn(level, new SpawnParams(
+					1,
+					xOld + xOff, yOld + yOff + getBbHeight()/2f, zOld + zOff, .075, 40, 10, Vec3.ZERO, Vec3.ZERO
+					//new Vec3(random.nextFloat() * .05 - .025, random.nextFloat() * .05, random.nextFloat() * .05 - .025), null
+				).color(color));
+		}
 	}
 	
 	protected void onProjectileDeath() {
@@ -179,8 +189,8 @@ public class SpellProjectileEntity extends AbstractHurtingProjectile {
 	}
 	
 	protected void spawnTrailParticle() {
-		NostrumParticles.GLOW_TRAIL.spawn(level, new SpawnParams(1, getX(), getY(), getZ(), 0, 300, 0,
-				new TargetLocation(this, true)).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(this.getElement().getColor(), .7f)));
+//		NostrumParticles.GLOW_TRAIL.spawn(level, new SpawnParams(1, getX(), getY(), getZ(), 0, 300, 0,
+//				new TargetLocation(this, true)).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(this.getElement().getColor(), .7f)));
 	}
 	
 	@Override

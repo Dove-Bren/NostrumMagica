@@ -45,8 +45,7 @@ public class GlowOrbParticle extends TextureSheetParticle implements IMotionPart
 		this.fixedRandom = NostrumMagica.rand.nextFloat();
 		this.motion = new ParticleTargetMotion(this.fixedRandom, .2f);
 		
-		
-		this.quadSize = .1f;
+		this.quadSize = .2f;
 		this.sprites = sprites;
 		this.setSpriteFromAge(sprites);
 	}
@@ -91,17 +90,17 @@ public class GlowOrbParticle extends TextureSheetParticle implements IMotionPart
 		
 		this.setSpriteFromAge(sprites);
 		
-		if (this.age < 20) {
+		if (this.age < 10) {
 			// fade in in first second
-			this.alpha = ((float) age / 20f);
-		} else if (this.age >= this.lifetime - 20f) {
-			// Fade out in last second
-			this.alpha = ((float) (lifetime - age) / 20f);
+			this.alpha = ((float) age / 10f) * maxAlpha;
 		} else {
-			this.alpha = 1f;
+			// Fade out in last second
+			final float prog = 1f - ((age - 10) / (lifetime - 10));
+			this.alpha = prog * maxAlpha;
 		}
 		
-		this.alpha *= maxAlpha;
+		//this.alpha = this.maxAlpha * (1f - ((float) age / (float)lifetime));
+		this.quadSize = .1f * (1f - ((float) age / (float)lifetime));
 		
 		if (this.getMotion().shouldUpdate()) {
 			final @Nullable MotionUpdate update = this.getMotion().update(new Vec3(x, y, z), new Vec3(xd, yd, zd));
@@ -118,7 +117,6 @@ public class GlowOrbParticle extends TextureSheetParticle implements IMotionPart
 	public void render(VertexConsumer buffer, Camera camera, float partialTicks) {
 		//BatchRenderParticle.RenderQuad(matrixStackIn, buffer, this, renderInfo, partialTicks, .1f);
 		//BatchRenderParticle.RenderQuad(matrixStackIn, buffer, this, renderInfo, partialTicks, .05f);
-		this.quadSize = .1f;
 		super.render(buffer, camera, partialTicks);
 //		this.quadSize = .05f;
 //		super.render(buffer, camera, partialTicks);

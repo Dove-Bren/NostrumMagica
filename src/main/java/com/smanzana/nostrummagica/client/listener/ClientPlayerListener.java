@@ -1085,8 +1085,10 @@ public class ClientPlayerListener extends PlayerListener {
 				
 				if (NostrumMagica.rand.nextBoolean()) {
 					player.getLevel().addParticle(ParticleTypes.CRIT, x, y, z, 0, .1f, 0);
-				} else {
-					NostrumParticles.GLOW_ORB.spawn(player.getLevel(), new SpawnParams(1, x, y, z, .0125f, 40, 0, new Vec3(0, .015, 0), new Vec3(.001, .01, .001)).color(0xA0FFFFFF & elem.getColor()));
+				}
+				
+				for (int i = 0; i < 2; i++) {
+					NostrumParticles.GLOW_ORB.spawn(player.getLevel(), new SpawnParams(1, x, y, z, .025f, 20, 10, new Vec3(0, .015, 0), new Vec3(.001, .01, .001)).color(0xA0FFFFFF & elem.getColor()));
 				}
 			}
 		}

@@ -28,7 +28,7 @@ public class NostrumDungeons {
 			new DungeonStartRoom(NostrumDungeonRooms.PLANTBOSS_LOBBY,
 					NostrumDungeonRooms.PLANTBOSS_ENTRANCE, NostrumDungeonRooms.RefExtendedEntranceStaircaseLight),
 				NostrumDungeonRooms.PLANTBOSS_BOSSROOM
-			).setColor(0x80106020)
+			).setColor(0xFF106020)
 			.setLootTable(NostrumMagica.Loc("chests/nostrum_shrine_room"))
 			.setDisplayTitle(new TranslatableComponent("dungeon.plant_boss.name").withStyle(ChatFormatting.GREEN, ChatFormatting.BOLD))
 			;
@@ -41,7 +41,7 @@ public class NostrumDungeons {
 			new DungeonStartRoom(NostrumDungeonRooms.RefDragonLobby, NostrumDungeonRooms.RefEntryDragon, NostrumDungeonRooms.RefExtendedEntranceStaircaseLight),
 			NostrumDungeonRooms.RefRedDragonArena,
 			4, 1
-			).setColor(0x80601005)
+			).setColor(0xFF601005)
 			.setLootTable(NostrumMagica.Loc("chests/nostrum_shrine_room"))
 			.setDisplayTitle(new TranslatableComponent("dungeon.red_dragon.name").withStyle(ChatFormatting.RED, ChatFormatting.BOLD))
 			;
@@ -55,7 +55,7 @@ public class NostrumDungeons {
 					NostrumDungeonRooms.PORTAL_ENTRANCE,
 					NostrumDungeonRooms.RefExtendedEntranceStaircaseLight),
 			NostrumDungeonRooms.PORTAL_ENDROOM
-			).setColor(0x80402080)
+			).setColor(0xFF402080)
 			.setLootTable(NostrumMagica.Loc("chests/nostrum_shrine_room"))
 			.setDisplayTitle(new TranslatableComponent("dungeon.portal.name").withStyle(ChatFormatting.DARK_PURPLE, ChatFormatting.BOLD))
 			;

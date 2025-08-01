@@ -127,11 +127,11 @@ public class ClientEffectRitual extends ClientEffect {
 		matrixStackIn.popPose();
 		
 		if (NostrumMagica.rand.nextBoolean()
-				&& NostrumMagica.rand.nextBoolean()) {
+				) {
 			NostrumParticles.GLOW_ORB.spawn(mc.player.level, (new SpawnParams(
 					1, origin.x + pos.x, origin.y + pos.y - .15, origin.z + pos.z, .1, 15, 5,
 					new Vec3(0, -.01, 0), null
-					)).color(.4f, .3f, .2f, .4f));
+					)).color(.8f, .3f, .2f, .4f));
 			
 			//int count, double spawnX, double spawnY, double spawnZ, double spawnJitterRadius, int lifetime, int lifetimeJitter, 
 			//Vector3d velocity, boolean unused
@@ -169,7 +169,7 @@ public class ClientEffectRitual extends ClientEffect {
 			NostrumParticles.GLOW_ORB.spawn(mc.player.level, (new SpawnParams(
 					1, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, 0, 45, 15,
 					new Vec3(0, -.02, 0), null
-					)).color(.4f, .3f, .2f, .4f));
+					)).color(.8f, .3f, .2f, .4f));
 		}
 	}
 	
@@ -177,7 +177,7 @@ public class ClientEffectRitual extends ClientEffect {
 		NostrumParticles.GLOW_ORB.spawn(mc.player.level, (new SpawnParams(
 				10, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, 0, 40, 20,
 				Vec3.ZERO, new Vec3(.1, .1, .1)
-				)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)));
+				)).color(0x88000000 | (this.element.getColor() & 0x00FFFFFF)));
 	}
 	
 	protected void drawPhase1(PoseStack matrixStackIn, ClientEffectRenderDetail detail, Minecraft mc, float adjProgress, float partialTicks) {
@@ -274,16 +274,16 @@ public class ClientEffectRitual extends ClientEffect {
 				final double range = 4;
 				final Vec3 pos = Vec3.ZERO;
 				if (adjProgress < .85f) {
-					NostrumParticles.FILLED_ORB.spawn(mc.player.level, (new SpawnParams(
+					NostrumParticles.GLOW_ORB.spawn(mc.player.level, (new SpawnParams(
 							4, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, range, 30, 20,
 							new Vec3(0, .01, 0), new Vec3(.1, .1, .1)
-							)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)));
+							)).color(0x88000000 | (this.element.getColor() & 0x00FFFFFF)));
 				} else {
 					final double yDiff = .35 + .5;
-					NostrumParticles.FILLED_ORB.spawn(mc.player.level, (new SpawnParams(
+					NostrumParticles.GLOW_ORB.spawn(mc.player.level, (new SpawnParams(
 							4, origin.x + pos.x, origin.y + pos.y, origin.z + pos.z, range, 20, 0,
 							new TargetLocation(origin.add(0, yDiff, 0))
-							)).color(0x40000000 | (this.element.getColor() & 0x00FFFFFF)));
+							)).color(0x88000000 | (this.element.getColor() & 0x00FFFFFF)));
 				}
 				
 			}
