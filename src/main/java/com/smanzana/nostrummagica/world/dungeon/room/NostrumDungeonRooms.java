@@ -4,6 +4,7 @@ import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomRegistry;
 import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomRegistry.DungeonRoomRegisterEvent;
 import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef.DungeonLobbyRoomRef;
 import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef.DungeonRoomRef;
+import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef.DungeonRoomTagRef;
 import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef.DungeonStaircaseRoomRef;
 import com.smanzana.nostrummagica.NostrumMagica;
 
@@ -40,7 +41,8 @@ public class NostrumDungeonRooms {
 	private static final ResourceLocation PLANTBOSS_ENTRANCE_NAME = NostrumMagica.Loc("plantboss_dungeon_entrance");
 	private static final ResourceLocation PLANTBOSS_BOSSROOM_NAME = NostrumMagica.Loc("plant_boss_room");
 	private static final ResourceLocation PORTAL_LOBBY_NAME = NostrumMagica.Loc("portal_lobby");
-	private static final ResourceLocation PORTAL_ENTRANCE_NAME = NostrumMagica.Loc("portal_entrance");
+//	private static final ResourceLocation PORTAL_ENTRANCE_NAME = NostrumMagica.Loc("portal_entrance");
+	private static final String PORTAL_ENTRANCE_TAG = "portal_entrance";
 	private static final ResourceLocation PORTAL_END_NAME = NostrumMagica.Loc("portal_room");
 	private static final ResourceLocation MANI_CASTLE_START_NAME = NostrumMagica.Loc("mani_castle/mani_castle_start");
 	private static final ResourceLocation SORCERY_ISLAND_NAME = NostrumMagica.Loc("sorcery_island");
@@ -53,7 +55,7 @@ public class NostrumDungeonRooms {
 	public static final DungeonRoomRef PLANTBOSS_ENTRANCE = new DungeonRoomRef(PLANTBOSS_ENTRANCE_NAME);
 	public static final DungeonRoomRef PLANTBOSS_BOSSROOM = new DungeonRoomRef(PLANTBOSS_BOSSROOM_NAME);
 	public static final DungeonLobbyRoomRef PORTAL_LOBBY = new DungeonLobbyRoomRef(PORTAL_LOBBY_NAME);
-	public static final DungeonRoomRef PORTAL_ENTRANCE = new DungeonRoomRef(PORTAL_ENTRANCE_NAME);
+	public static final DungeonRoomTagRef PORTAL_ENTRANCE = new DungeonRoomTagRef(PORTAL_ENTRANCE_TAG);
 	public static final DungeonRoomRef PORTAL_ENDROOM = new DungeonRoomRef(PORTAL_END_NAME);
 	public static final DungeonRoomRef RefManiCastleStart = new DungeonRoomRef(MANI_CASTLE_START_NAME);
 	public static final DungeonRoomRef RefSorceryIsland = new DungeonRoomRef(SORCERY_ISLAND_NAME);

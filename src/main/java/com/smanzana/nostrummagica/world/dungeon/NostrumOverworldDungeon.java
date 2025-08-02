@@ -5,8 +5,10 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import com.smanzana.autodungeons.world.blueprints.BlueprintLocation;
+import com.smanzana.autodungeons.world.dungeon.DungeonRecord;
 import com.smanzana.autodungeons.world.dungeon.DungeonRoomInstance;
 import com.smanzana.autodungeons.world.dungeon.RandomPoolDungeon;
+import com.smanzana.autodungeons.world.dungeon.room.DungeonRoomRegistry;
 import com.smanzana.autodungeons.world.dungeon.room.DungeonStartRoom;
 import com.smanzana.autodungeons.world.dungeon.room.IDungeonRoomRef;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
@@ -21,6 +23,8 @@ import net.minecraft.world.phys.Vec3;
 
 public class NostrumOverworldDungeon extends RandomPoolDungeon {
 	
+	private static final String TAG_NOSHOW = "nostrum_hidden";
+	
 	public NostrumOverworldDungeon(String tag, DungeonStartRoom starting, IDungeonRoomRef<?> ending, int minPath, int randPath) {
 		super(tag, starting, ending, minPath, randPath);
 	}
@@ -29,6 +33,15 @@ public class NostrumOverworldDungeon extends RandomPoolDungeon {
 		this(tag, starting, ending, 2, 3);
 	}
 	
+	@Override
+	public boolean countsAsDungeon(DungeonRecord record) {
+		if (DungeonRoomRegistry.GetInstance().hasTag(record.currentRoom.getRoomTemplate(), TAG_NOSHOW)) {
+			return false;
+		}
+		
+		return super.countsAsDungeon(record);
+	}
+
 	@Override
 	protected void spawnDungeonParticles(Level world, Player player) {
 		Random rand = player.level.random;
