@@ -18,6 +18,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -111,10 +112,16 @@ public class WhirlwindEntity extends Entity {
 	}
 	
 	protected void doWhirlwindPush(Entity ent) {
-		final float force = getPushForce(ent);
-		Vec3 dir = ent.position().subtract(position()).add(0, 1, 0);
-		ent.setDeltaMovement(ent.getDeltaMovement().add(dir.normalize().scale(force)));
-		ent.hasImpulse = true;
+		
+		if (ent instanceof AbstractArrow) {
+			ent.setDeltaMovement(new Vec3(0, 1, 0).add(ent.getDeltaMovement().scale(.1)));
+			ent.hasImpulse = true;
+		} else {
+			final float force = getPushForce(ent);
+			Vec3 dir = ent.position().subtract(position()).add(0, 1, 0);
+			ent.setDeltaMovement(ent.getDeltaMovement().add(dir.normalize().scale(force)));
+			ent.hasImpulse = true;
+		}
 		
 		NostrumMagicaSounds.DAMAGE_WIND.play(ent);
 	}

@@ -1292,26 +1292,19 @@ public class SpellAction {
 		
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
-			WhirlwindEntity whirlwind = spawnSummon(entity.level, (int) (this.duration * efficiency), caster, entity);
-			whirlwind.setPos(entity.position());
-			entity.level.addFreshEntity(whirlwind);
-			
-			NostrumMagicaSounds.CAST_CONTINUE.play(entity.level,
-					entity.getX() + .5, entity.getY(), entity.getZ() + .5);
-			resultBuilder.applied |= true;
-			//resultBuilder.affectedPos = new SpellLocation(entity.level, entity.position());
+			; // don't do anything on entities, since coupled with mystic air effect
+//			WhirlwindEntity whirlwind = spawnSummon(entity.level, (int) (this.duration * efficiency), caster, entity);
+//			whirlwind.setPos(entity.position());
+//			entity.level.addFreshEntity(whirlwind);
+//			
+//			NostrumMagicaSounds.CAST_CONTINUE.play(entity.level,
+//					entity.getX() + .5, entity.getY(), entity.getZ() + .5);
+//			resultBuilder.applied |= true;
 		}
 
 		@Override
 		public void apply(LivingEntity caster, SpellLocation location, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
 			super.apply(caster, location, efficiency, resultBuilder, log);
-			
-//			final int baseTime = getSummonBaseDuration();
-//			final int time = (int) (baseTime * efficiency);
-//			final Component LABEL_SUMMON_NAME = new TranslatableComponent("spelllog.nostrummagica.summon.name", this.element.getDisplayName());
-//			final Component LABEL_SUMMON_DESC = new TranslatableComponent("spelllog.nostrummagica.summon.desc", this.element.getDisplayName(), "" + power, "" + ((float) (baseTime) / 20f), "" + ((float) time / 20f));
-//			log.generalEffectStart(LABEL_SUMMON_NAME, LABEL_SUMMON_DESC, false);
-//			log.generalEffectFinish(0f, 0f);
 		}
 		
 		protected WhirlwindEntity spawnSummon(Level world, int duration, LivingEntity caster, @Nullable LivingEntity target) {
@@ -1768,12 +1761,7 @@ public class SpellAction {
 
 		@Override
 		public void apply(LivingEntity caster, LivingEntity entity, float efficiency, SpellActionResult resultBuilder, ISpellLogBuilder log) {
-			// Apply mystic air.
-			// Doing in here instead of a status effect so that wall doesn't get created if used on an entity
-			final int duration = (int) (20 * 60 * efficiency);
-			final int amp = (int) (level * efficiency) - 1; // amp 0 is 1
-			entity.addEffect(new MobEffectInstance(NostrumEffects.mysticAir, duration, amp));
-			resultBuilder.applied |= true;
+			; // don't create wall on entities
 		}
 
 		@Override
@@ -1782,7 +1770,7 @@ public class SpellAction {
 			if (!location.world.isEmptyBlock(pos) && !(location.world.getBlockState(pos).getBlock() instanceof MagicWallBlock)) {
 				NostrumMagicaSounds.CAST_FAIL.play(location.world, pos);
 			} else {
-				NostrumMagicaSounds.DAMAGE_WIND.play(location.world, pos);
+				NostrumMagicaSounds.DAMAGE_EARTH.play(location.world, pos);
 				location.world.setBlockAndUpdate(pos, NostrumBlocks.magicWall.getState(level));
 				resultBuilder.applied |= true;
 				resultBuilder.affectedPos = new SpellLocation(location.world, pos);

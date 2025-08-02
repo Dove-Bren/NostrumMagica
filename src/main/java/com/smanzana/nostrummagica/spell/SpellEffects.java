@@ -211,7 +211,7 @@ public final class SpellEffects {
 		case LIGHTNING:
 			return new SpellAction().status(NostrumEffects.magicResist, duration, amp).name("magicresist");
 		case WIND:
-			return new SpellAction().whirlwind((5 + (elementCount * 5)) * 20, 1f + (elementCount * .5f)).name("whirlwind");
+			return new SpellAction().status(NostrumEffects.damageSplit, duration, amp).name("damage_split");
 		}
 		
 		return null;
@@ -270,7 +270,7 @@ public final class SpellEffects {
 				return false;
 			}).name("food");
 		case EARTH:
-			return new SpellAction().status(MobEffects.REGENERATION, duration, amp).name("regen");
+			return new SpellAction().grow(elementCount).name("grow");
 		case ENDER:
 			return new SpellAction().phase(elementCount).name("phase");
 		case FIRE:
@@ -312,7 +312,7 @@ public final class SpellEffects {
 		case NEUTRAL:
 			return new SpellAction().status(MobEffects.GLOWING, duration, amp).lightBlock(elementCount < 2).name("light");
 		case EARTH:
-			return new SpellAction().grow(elementCount).name("grow");
+			return new SpellAction().status(MobEffects.REGENERATION, duration, amp).wall(elementCount).name("warm_earth");
 		case ENDER:
 			return new SpellAction().swap().swapStatus((caster, target, eff) -> {
 				// Only apply with ender growth skill
@@ -331,7 +331,7 @@ public final class SpellEffects {
 		case LIGHTNING:
 			return new SpellAction().lightning(elementCount).name("lightningbolt");
 		case WIND:
-			return new SpellAction().wall(elementCount).name("mystic_air");
+			return new SpellAction().status(NostrumEffects.mysticAir, 20 * 60, amp).whirlwind((5 + (elementCount * 5)) * 20, 1f + (elementCount * .5f)).name("mystic_air");
 		}
 		
 		return null;

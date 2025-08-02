@@ -63,7 +63,8 @@ public class NostrumEffects {
 	@ObjectHolder(SwiftCastEffect.ID_LASTING) public static SwiftCastEffect lastingSwiftCast;
 	@ObjectHolder(SwiftSwimEffect.ID) public static SwiftSwimEffect swiftSwim;
 	@ObjectHolder(CarapaceEffect.ID) public static CarapaceEffect carapace;
-	@ObjectHolder(FasterCastingEffect.ID) public static FasterCastingEffect fasterCast; 
+	@ObjectHolder(FasterCastingEffect.ID) public static FasterCastingEffect fasterCast;
+	@ObjectHolder(DamageSplitEffect.ID) public static DamageSplitEffect damageSplit;
 	
 	@SubscribeEvent
     public static void registerPotions(RegistryEvent.Register<MobEffect> event) {
@@ -119,5 +120,6 @@ public class NostrumEffects {
     	registry.register(new SwiftSwimEffect().setRegistryName(SwiftSwimEffect.ID));
     	registry.register(new CarapaceEffect().setRegistryName(CarapaceEffect.ID));
     	registry.register(new FasterCastingEffect().setRegistryName(FasterCastingEffect.ID));
+    	registry.register(new DamageSplitEffect().setRegistryName(DamageSplitEffect.ID));
     }
 }
