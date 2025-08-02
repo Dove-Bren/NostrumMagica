@@ -501,6 +501,19 @@ public class ModInit {
 				new ResearchRequirement(NostrumResearches.ID_Balanced_Infusion),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.resourceSlabBalanced))));
 
+		// elemental crystal -- all the elements!
+		registry.register(RitualRecipe.createTier3("elemental_crystal",
+				new ItemStack(NostrumBlocks.elementalCrystal), null,
+				new ReagentType[] {
+						ReagentType.BLACK_PEARL, ReagentType.CRYSTABLOOM, ReagentType.GINSENG, ReagentType.MANDRAKE_ROOT },
+				Ingredient.of(NostrumTags.Items.SlabBalanced),
+				new Ingredient[] { Ingredient.of(NostrumBlocks.windStone),
+						Ingredient.of(NostrumBlocks.fireStone),
+						Ingredient.of(NostrumBlocks.iceStone),
+						Ingredient.of(NostrumBlocks.earthStone) },
+				new ResearchRequirement(NostrumResearches.ID_Elemental_Crystals),
+				new OutcomeSpawnItem(new ItemStack(NostrumBlocks.elementalCrystal))));
+
 		// Thano Pendant -- tier 3. gold ingot. Paliv + Cerci fragments + 2 mani
 		// crystals.
 		registry.register(RitualRecipe.createTier3("thano_infusion",

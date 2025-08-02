@@ -27,6 +27,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 
 /**
  * Represents a piece of research a player can complete.
@@ -303,7 +304,19 @@ public class NostrumResearch {
 				return this.reference(ILoreTagged.GetInfoKey((ILoreTagged) item), item.getDescriptionId());
 			} else {
 				NostrumMagica.logger.error(
-						"Provided item reference (%s) does not extend the required interfaces (ILoreTagged or InfoScreenIndexed) and cannot be a reference".formatted(item.toString()));
+						"%s: Provided item reference (%s) does not extend the required interfaces (ILoreTagged or InfoScreenIndexed) and cannot be a reference".formatted(item.toString()));
+				return this;
+			}
+		}
+		
+		public Builder reference(Block block) {
+			if (block instanceof InfoScreenIndexed) {
+				return this.reference((InfoScreenIndexed) block, block.getDescriptionId());
+			} else if (block instanceof ILoreTagged) {
+				return this.reference(ILoreTagged.GetInfoKey((ILoreTagged) block), block.getDescriptionId());
+			} else {
+				NostrumMagica.logger.error(
+						"%s: Provided block reference (%s) does not extend the required interfaces (ILoreTagged or InfoScreenIndexed) and cannot be a reference".formatted(block.toString()));
 				return this;
 			}
 		}

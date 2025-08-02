@@ -219,7 +219,7 @@ public class PedestalBlock extends BaseEntityBlock implements ILoreTagged {
 	
 	@Override
 	public Lore getDeepLore() {
-		return new Lore().add("Ritual Altars hold items for display or use in a ritual.", "Only tier III rituals use altars.", "Up to 5 altars can be used in a single ritual.");
+		return new Lore().add("Ritual Altars hold items for display or use in a ritual.", "Only tier II and III rituals use altars.", "Up to 5 altars can be used in a single ritual.");
 	}
 
 	@Override

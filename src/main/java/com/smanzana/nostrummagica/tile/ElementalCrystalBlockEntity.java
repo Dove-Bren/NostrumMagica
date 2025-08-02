@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import javax.annotation.Nullable;
+
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.NostrumBlocks;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
@@ -21,10 +23,15 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.Tags;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class ElementalCrystalBlockEntity extends BlockEntity implements TickableBlockEntity {
 	
@@ -67,8 +74,50 @@ public class ElementalCrystalBlockEntity extends BlockEntity implements Tickable
 		}
 	}
 	
+	static final Map<Item, ICrystalEnchantableItem> BUILTIN = new HashMap<>();
+	{
+		ICrystalEnchantableItem glassEnchant = new ICrystalEnchantableItem() {
+
+			@Override
+			public boolean canEnchant(ItemStack stack, EMagicElement element) {
+				return element != EMagicElement.NEUTRAL;
+			}
+
+			@Override
+			public Result attemptEnchant(ItemStack stack, EMagicElement element) {
+				return new Result(true, new ItemStack(NostrumBlocks.elementalStone(element)));
+			}
+			
+		};
+		
+		ForgeRegistries.BLOCKS.tags().getTag(Tags.Blocks.GLASS).forEach((b) -> {
+			final Item item = b.asItem();
+			if (item == null || item == Items.AIR) {
+				return;
+			}
+			
+			BUILTIN.put(item, glassEnchant);
+		});
+	}
+	
+	public static final @Nullable ICrystalEnchantableItem GetEnchantability(ItemStack stack) {
+		// This should be a capability check... but I don't want the capability to be on the item stack for most of these items.
+		// I just want to put it on vanilla glass.
+		
+		if (stack.isEmpty()) {
+			return null;
+		}
+		
+		if (stack.getItem() instanceof ICrystalEnchantableItem enchantable) {
+			return enchantable;
+		}
+		
+		return BUILTIN.get(stack.getItem());
+	}
+	
 	protected ItemEntity transformItem(ItemEntity entity) {
-		if (entity.getItem().isEmpty() || !(entity.getItem().getItem() instanceof ICrystalEnchantableItem enchantable)) {
+		ICrystalEnchantableItem enchantable = GetEnchantability(entity.getItem());
+		if (enchantable == null) {
 			return entity;
 		}
 		
@@ -140,9 +189,9 @@ public class ElementalCrystalBlockEntity extends BlockEntity implements Tickable
 	}
 	
 	protected boolean canWorkItem(ItemEntity ent) {
-		return ent.isAlive()
-				&& !ent.getItem().isEmpty()
-				&& ent.getItem().getItem() instanceof ICrystalEnchantableItem enchantable
+		ICrystalEnchantableItem enchantable = GetEnchantability(ent.getItem());
+		return enchantable != null
+				&& ent.isAlive()
 				&& enchantable.canEnchant(ent.getItem(), getElement())
 				; 
 	}
@@ -198,9 +247,6 @@ public class ElementalCrystalBlockEntity extends BlockEntity implements Tickable
 		//handleUpdateTag(pkt.getTag());
 	}
 	
-//	private void dirty() {
-//		level.sendBlockUpdated(worldPosition, this.level.getBlockState(worldPosition), this.level.getBlockState(worldPosition), 3);
-//		setChanged();
-//	}
+	
 	
 }

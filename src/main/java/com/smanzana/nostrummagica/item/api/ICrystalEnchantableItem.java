@@ -3,8 +3,8 @@ package com.smanzana.nostrummagica.item.api;
 import javax.annotation.Nonnull;
 
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.tile.ElementalCrystalBlockEntity;
 
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -27,8 +27,8 @@ public interface ICrystalEnchantableItem {
 	}
 	
 	public static boolean isEnchantable(ItemStack stack) {
-		Item item = stack.getItem();
-		return !stack.isEmpty() && item instanceof ICrystalEnchantableItem && ((ICrystalEnchantableItem) item).canEnchant(stack, null);
+		final var enchantability = ElementalCrystalBlockEntity.GetEnchantability(stack);
+		return enchantability != null && enchantability.canEnchant(stack, null);
 	}
 	
 	/**

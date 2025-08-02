@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.block;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.capabilities.ILaserReactive;
 import com.smanzana.nostrummagica.spell.EAlteration;
 import com.smanzana.nostrummagica.spell.EMagicElement;
@@ -8,14 +9,19 @@ import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HalfTransparentBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
-public class ElementalStoneBlock extends HalfTransparentBlock implements ILaserReactive, ISpellTargetBlock {
+public class ElementalStoneBlock extends HalfTransparentBlock implements ILaserReactive, ISpellTargetBlock, ILoreBlock {
 	
 	protected static final String ID_FIRE_STONE = "fire_stone";
 	protected static final String ID_ICE_STONE = "ice_stone";
@@ -55,12 +61,26 @@ public class ElementalStoneBlock extends HalfTransparentBlock implements ILaserR
 		if (effect.getElement() != element && effect.getElement() != EMagicElement.NEUTRAL
 				&& effect.getAlteration() == EAlteration.ENCHANT) {
 			level.setBlockAndUpdate(pos, NostrumBlocks.elementalStone(effect.getElement()).defaultBlockState());
+			NostrumMagica.awardLore(caster, this, NostrumMagica.rand.nextInt(20) == 0);
 			return true;
 		}
 		
 		return false;
 	}
 	
+
 	
+	@Override
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
+		if (!worldIn.isClientSide()) {
+			NostrumMagica.awardLore(playerIn, this, NostrumMagica.rand.nextInt(20) == 0);
+		}
+		return InteractionResult.PASS;
+	}
+	
+	@Override
+	public ResourceLocation getLoreName() {
+		return NostrumMagica.Loc("elemental_stone");
+	}
 	
 }

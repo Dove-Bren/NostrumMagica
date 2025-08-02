@@ -61,6 +61,7 @@ public class NostrumResearches {
 	public static final ResourceLocation ID_Fierce_Infusion = NostrumMagica.Loc("fierce_infusion");
 	public static final ResourceLocation ID_Kind_Infusion = NostrumMagica.Loc("kind_infusion");
 	public static final ResourceLocation ID_Balanced_Infusion = NostrumMagica.Loc("balanced_infusion");
+	public static final ResourceLocation ID_Elemental_Crystals = NostrumMagica.Loc("elemental_crystals");
 	public static final ResourceLocation ID_Mage_Staff = NostrumMagica.Loc("mage_staff");
 	public static final ResourceLocation ID_Thanos_Staff = NostrumMagica.Loc("thanos_staff");
 	public static final ResourceLocation ID_Caster_Wand = NostrumMagica.Loc("caster_wand");
@@ -133,6 +134,7 @@ public class NostrumResearches {
 	public static /*final*/ NostrumResearch Fierce_Infusion;
 	public static /*final*/ NostrumResearch Kind_Infusion;
 	public static /*final*/ NostrumResearch Balanced_Infusion;
+	public static /*final*/ NostrumResearch Elemental_Crystals;
 	public static /*final*/ NostrumResearch Mage_Staff;
 	public static /*final*/ NostrumResearch Thanos_Staff;
 	public static /*final*/ NostrumResearch Caster_Wand;
@@ -229,7 +231,7 @@ public class NostrumResearches {
 						Tab_Magica, NostrumResearch.Size.NORMAL, 0, 1, true, new ItemStack(NostrumItems.masteryOrb));
 
 		Rituals = NostrumResearch.startBuilding().parent(ID_Origin)
-				.reference(NostrumBlocks.pedestal.asItem()).reference(NostrumItems.chalkItem).reference(NostrumItems.reagentMandrakeRoot)
+				.reference(NostrumBlocks.pedestal).reference(NostrumItems.chalkItem).reference(NostrumItems.reagentMandrakeRoot)
 				.reference(NostrumItems.infusedGemUnattuned).build(ID_Rituals, Tab_Magica, NostrumResearch.Size.GIANT, 1, 1,
 						false, new ItemStack(NostrumItems.infusedGemUnattuned));
 
@@ -321,6 +323,12 @@ public class NostrumResearches {
 				.reference("ritual::balanced_infusion", "ritual.balanced_infusion.name").build(ID_Balanced_Infusion,
 						Tab_Mysticism, NostrumResearch.Size.LARGE, 2, 1, true,
 						new ItemStack(NostrumItems.resourceSlabBalanced));
+		
+		Elemental_Crystals = NostrumResearch.startBuilding()
+				.hiddenParent(ID_Vani)
+				.lore(NostrumBlocks.elementalCrystal)
+				.reference("ritual::elemental_crystal", "ritual.elemental_crystal.name")
+				.build(ID_Elemental_Crystals, Tab_Mysticism, NostrumResearch.Size.LARGE, 2, 2, true, new ItemStack(NostrumBlocks.elementalCrystal));
 
 		// Outfitting (weapon/armor)
 		Mage_Staff = NostrumResearch.startBuilding().hiddenParent(ID_Rituals)

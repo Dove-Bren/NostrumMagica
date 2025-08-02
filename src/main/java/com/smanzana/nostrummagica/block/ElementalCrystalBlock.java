@@ -2,6 +2,7 @@ package com.smanzana.nostrummagica.block;
 
 import java.util.Random;
 
+import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.block.property.MagicElementProperty;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -16,6 +17,8 @@ import com.smanzana.nostrummagica.tile.TickableBlockEntity;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -31,6 +34,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -38,7 +42,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class ElementalCrystalBlock extends BaseEntityBlock implements ISpellTargetBlock {
+public class ElementalCrystalBlock extends BaseEntityBlock implements ISpellTargetBlock, ILoreBlock {
 
 	public static final String ID = "elemental_crystal_block";
 
@@ -106,9 +110,9 @@ public class ElementalCrystalBlock extends BaseEntityBlock implements ISpellTarg
 	@Override
 	public void animateTick(BlockState stateIn, Level worldIn, BlockPos pos, Random rand) {
 		NostrumParticles.GLOW_ORB.spawn(worldIn, new SpawnParams(
-				3,
-				pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, .5, 40, 20,
-				new Vec3(rand.nextFloat() * .05 - .025, rand.nextFloat() * .05, rand.nextFloat() * .05 - .025), null
+				10,
+				pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, .5, 50, 40,
+				new Vec3(0, .0125, 0), new Vec3(.025, .025, .025)
 				).color(this.getElement(stateIn).getColor()));
 	}
 
@@ -136,6 +140,14 @@ public class ElementalCrystalBlock extends BaseEntityBlock implements ISpellTarg
 			return RenderFuncs.ARGBFade(block.getElement(state).getColor(), .6f);
 		}
 		return 0x80FFFFFF;
+	}
+	
+	@Override
+	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player playerIn, InteractionHand hand, BlockHitResult hit) {
+		if (!worldIn.isClientSide()) {
+			NostrumMagica.awardLore(playerIn, this, NostrumMagica.rand.nextInt(20) == 0);
+		}
+		return InteractionResult.PASS;
 	}
 	
 }

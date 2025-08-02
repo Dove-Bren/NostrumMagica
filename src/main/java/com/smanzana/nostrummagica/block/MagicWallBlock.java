@@ -4,12 +4,19 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import com.smanzana.nostrummagica.spell.EAlteration;
+import com.smanzana.nostrummagica.spell.SpellLocation;
+import com.smanzana.nostrummagica.spell.component.SpellAction;
+import com.smanzana.nostrummagica.spell.component.SpellEffectPart;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -26,7 +33,7 @@ import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class MagicWallBlock extends HalfTransparentBlock {
+public class MagicWallBlock extends HalfTransparentBlock implements ISpellTargetBlock {
 
 	public static final String ID = "magic_wall";
 	private static final IntegerProperty DECAY = IntegerProperty.create("decay", 0, 3);
@@ -110,6 +117,19 @@ public class MagicWallBlock extends HalfTransparentBlock {
 	public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor worldIn, BlockPos currentPos, BlockPos facingPos) {
 		//worldIn.getPendingBlockTicks().scheduleTick(currentPos, state.getBlock(), DECAY_TICKS);
 		return state;
+	}
+
+	@Override
+	public boolean processSpellEffect(Level level, BlockState state, BlockPos pos, LivingEntity caster,
+			SpellLocation hitLocation, SpellEffectPart effect, SpellAction action) {
+		if (effect.getAlteration() == EAlteration.ENCHANT) {
+			ItemStack stack = new ItemStack(NostrumBlocks.elementalStone(effect.getElement()));
+			popResource(level, pos, stack);
+			level.removeBlock(pos, true);
+			return true;
+		}
+		
+		return false;
 	}
 
 }
