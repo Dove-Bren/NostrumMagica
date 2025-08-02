@@ -6,7 +6,7 @@ import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
 import com.smanzana.nostrummagica.client.particles.ParticleTargetBehavior.TargetBehavior;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
-import com.smanzana.nostrummagica.item.MasteryOrb;
+import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.spell.EElementalMastery;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.tile.NostrumBlockEntities;
@@ -110,7 +110,7 @@ public class TrialBlock extends BaseEntityBlock {
 		}
 		
 		// Make sure we have an orb first
-		if (heldItem.isEmpty() || !(heldItem.getItem() instanceof MasteryOrb)) {
+		if (heldItem.isEmpty() || !(heldItem.getItem() == NostrumItems.masteryOrb)) {
 			return InteractionResult.FAIL;
 		}
 		

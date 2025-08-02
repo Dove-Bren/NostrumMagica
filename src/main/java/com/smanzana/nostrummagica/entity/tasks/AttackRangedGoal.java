@@ -40,10 +40,16 @@ public class AttackRangedGoal<T extends Mob> extends Goal
 		return (!this.entity.getMainHandItem().isEmpty() && this.entity.getMainHandItem().getItem() instanceof BowItem)
 				|| (!this.entity.getOffhandItem().isEmpty() && this.entity.getOffhandItem().getItem() instanceof BowItem);
 	}
+	
+	@Override
+	public boolean requiresUpdateEveryTick() {
+		return true;
+	}
 
 	/**
 	 * Returns whether the Goal should begin execution.
 	 */
+	@Override
 	public boolean canUse() {
 		return this.entity.getTarget() == null ? false : this.hasWeaponEquipped(entity);
 	}
@@ -51,6 +57,7 @@ public class AttackRangedGoal<T extends Mob> extends Goal
 	/**
 	 * Returns whether an in-progress Goal should continue executing
 	 */
+	@Override
 	public boolean canContinueToUse() {
 		return (this.canUse() || !this.entity.getNavigation().isDone()) && this.hasWeaponEquipped(entity);
 	}
@@ -99,6 +106,7 @@ public class AttackRangedGoal<T extends Mob> extends Goal
 	/**
 	 * Execute a one shot task or start executing a continuous task
 	 */
+	@Override
 	public void start() {
 		super.start();
 		startAimAnimation(entity);
@@ -108,6 +116,7 @@ public class AttackRangedGoal<T extends Mob> extends Goal
 	/**
 	 * Resets the task
 	 */
+	@Override
 	public void stop() {
 		super.stop();
 		this.seeTime = 0;
@@ -128,6 +137,7 @@ public class AttackRangedGoal<T extends Mob> extends Goal
 	/**
 	 * Updates the task
 	 */
+	@Override
 	public void tick() {
 		LivingEntity entitylivingbase = this.entity.getTarget();
 

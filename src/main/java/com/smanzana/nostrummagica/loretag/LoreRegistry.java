@@ -233,11 +233,6 @@ public class LoreRegistry {
 			return I18n.get("lore.%s.name".formatted(key));
 		}
 		
-		protected String[] getLoreLines() {
-			return I18n.get("lore.%s.desc".formatted(key))
-					.split("\\|");
-		}
-
 		@Override
 		public Lore getBasicLore() {
 			return getDeepLore();
@@ -245,7 +240,7 @@ public class LoreRegistry {
 
 		@Override
 		public Lore getDeepLore() {
-			return new Lore().add(getLoreLines());
+			return new Lore("lore.%s.desc".formatted(key));
 		}
 
 		@Override

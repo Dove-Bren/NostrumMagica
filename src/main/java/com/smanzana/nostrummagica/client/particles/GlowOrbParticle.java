@@ -95,7 +95,7 @@ public class GlowOrbParticle extends TextureSheetParticle implements IMotionPart
 			this.alpha = ((float) age / 10f) * maxAlpha;
 		} else {
 			// Fade out in last second
-			final float prog = 1f - ((age - 10) / (lifetime - 10));
+			final float prog = 1f - ((age - 10) / Math.max(1, lifetime - 10));
 			this.alpha = prog * maxAlpha;
 		}
 		

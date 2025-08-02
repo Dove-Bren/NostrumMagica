@@ -21,7 +21,7 @@ import com.smanzana.nostrummagica.client.gui.commonwidget.ObscurableChildWidget;
 import com.smanzana.nostrummagica.client.gui.commonwidget.ParentWidget;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui.SpellGui.SpellPartBar.IHoverHandler;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
-import com.smanzana.nostrummagica.item.BlankScroll;
+import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
@@ -85,7 +85,7 @@ public class SpellCreationGui {
 			@Override
 			public boolean mayPlace(@Nonnull ItemStack stack) {
 				return (stack.isEmpty()
-						|| stack.getItem() instanceof BlankScroll);
+						|| stack.getItem() == NostrumItems.blankScroll);
 			}
 			
 			@Override
@@ -233,7 +233,7 @@ public class SpellCreationGui {
 		}
 		
 		protected boolean isValidScroll(ItemStack stack) {
-			return !stack.isEmpty() && stack.getItem() instanceof BlankScroll;
+			return !stack.isEmpty() && stack.getItem() == NostrumItems.blankScroll;
 		}
 		
 		protected void checkScroll() {
@@ -276,7 +276,7 @@ public class SpellCreationGui {
 					}
 				} else {
 					// Trying to add an item
-					if (cur.getItem() instanceof BlankScroll) {
+					if (cur.getItem() == NostrumItems.blankScroll) {
 						ItemStack existing = inventory.getScrollSlotContents();
 						if (existing.isEmpty()) {
 							inventory.setScrollSlotContents(cur.split(1));

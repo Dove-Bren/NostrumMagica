@@ -29,8 +29,8 @@ import net.minecraft.world.item.Items;
 public class NostrumResearches {
 
 	public static NostrumResearchTab Tab_Magica = new NostrumResearchTab("magica", () -> new ItemStack(NostrumItems.spellTomeCombat));
-	public static NostrumResearchTab Tab_Advanced_Magica = new NostrumResearchTab("mysticism", () -> new ItemStack(NostrumItems.crystalSmall));
-	public static NostrumResearchTab Tab_Mysticism = new NostrumResearchTab("advanced_magica", () -> new ItemStack(NostrumItems.thanoPendant));
+	public static NostrumResearchTab Tab_Mysticism = new NostrumResearchTab("mysticism", () -> new ItemStack(NostrumItems.crystalSmall));
+	public static NostrumResearchTab Tab_Advanced_Magica = new NostrumResearchTab("advanced_magica", () -> new ItemStack(NostrumItems.thanoPendant));
 	public static NostrumResearchTab Tab_Tinkering = new NostrumResearchTab("tinkering", () -> new ItemStack(NostrumBlocks.putterBlock));
 	public static NostrumResearchTab Tab_Outfitting = new NostrumResearchTab("outfitting", () -> new ItemStack(NostrumItems.mageStaff));
 

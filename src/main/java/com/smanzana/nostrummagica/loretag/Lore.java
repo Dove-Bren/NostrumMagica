@@ -1,8 +1,15 @@
 package com.smanzana.nostrummagica.loretag;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
+
+import com.smanzana.nostrummagica.NostrumMagica;
+
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Collection of lore information.
@@ -12,15 +19,23 @@ import java.util.List;
  */
 public class Lore {
 
-	private List<String> data;
+	private List<Component> data;
 	
 	public Lore() {
-		this.data = new LinkedList<>();
+		this.data = new ArrayList<>();
 	}
 	
-	public Lore(String firstLine) {
+	public Lore(String unlocalized) {
 		this();
-		this.add(firstLine);
+		
+		if (unlocalized.contains(" ")) {
+			NostrumMagica.logger.warn("Unlocalized lore text appears to have a space in it. This seems unintentional: " + unlocalized);
+		}
+		this.add(this.getLoreLines(unlocalized));
+	}
+	
+	public Lore(ResourceLocation key) {
+		this(key.toString().replace(':', '.'));
 	}
 	
 	public Lore(Collection<String> lines) {
@@ -28,11 +43,15 @@ public class Lore {
 		this.add(lines);
 	}
 	
-	public List<String> getData() {
+	public List<Component> getData() {
 		return data;
 	}
 	
 	public Lore add(String line) {
+		return add(new TextComponent(line));
+	}
+	
+	public Lore add(Component line) {
 		data.add(line);
 		return this;
 	}
@@ -49,6 +68,10 @@ public class Lore {
 			add(line);
 		
 		return this;
+	}
+	
+	protected String[] getLoreLines(String unloc) {
+		return I18n.get(unloc).split("\\|");
 	}
 	
 }

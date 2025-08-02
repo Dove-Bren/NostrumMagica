@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
-import com.smanzana.nostrummagica.item.BlankScroll;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.SpellRune;
@@ -142,7 +141,7 @@ public class SpellTableTileEntity extends BlockEntity implements ISpellCraftingI
 			return true;
 		
 		if (index == 0) {
-			return stack.getItem() instanceof BlankScroll;
+			return stack.getItem() == NostrumItems.blankScroll;
 		}
 		
 		if (index < getReagentSlotIndex()) {
@@ -214,7 +213,7 @@ public class SpellTableTileEntity extends BlockEntity implements ISpellCraftingI
 	@Override
 	public RegisteredSpell craft(Player crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
 		ItemStack stack = this.getItem(0);
-		if (stack.isEmpty() || !(stack.getItem() instanceof BlankScroll)) {
+		if (stack.isEmpty() || !(stack.getItem() == NostrumItems.blankScroll)) {
 			return null;
 		}
 		

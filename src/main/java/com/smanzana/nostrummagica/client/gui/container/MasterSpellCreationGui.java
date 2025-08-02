@@ -12,12 +12,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
-import com.smanzana.nostrummagica.item.BlankScroll;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.ReagentItem.ReagentType;
-import com.smanzana.nostrummagica.item.equipment.SpellTome;
 import com.smanzana.nostrummagica.item.SpellRune;
+import com.smanzana.nostrummagica.item.equipment.SpellTome;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpellCraftMessage;
 import com.smanzana.nostrummagica.spell.Spell;
@@ -131,7 +130,7 @@ public class MasterSpellCreationGui {
 				@Override
 				public boolean mayPlace(@Nonnull ItemStack stack) {
 					return (stack.isEmpty()
-							|| stack.getItem() instanceof BlankScroll);
+							|| stack.getItem() == NostrumItems.blankScroll);
 				}
 				
 				@Override
@@ -206,7 +205,7 @@ public class MasterSpellCreationGui {
 			// in the tome slot. Is there?
 			isValid = false;
 			@Nonnull ItemStack stack = this.inventory.getItem(0);
-			if (!stack.isEmpty() && stack.getItem() instanceof BlankScroll)
+			if (!stack.isEmpty() && stack.getItem() == NostrumItems.blankScroll)
 				isValid = true;
 			
 			validate();
@@ -241,7 +240,7 @@ public class MasterSpellCreationGui {
 			
 			isValid = false;
 			ItemStack stack = this.inventory.getItem(0);
-			if (!stack.isEmpty() && (stack.getItem() instanceof SpellTome || stack.getItem() instanceof BlankScroll))
+			if (!stack.isEmpty() && (stack.getItem() instanceof SpellTome || stack.getItem() == NostrumItems.blankScroll))
 				isValid = true;
 		}
 		
@@ -304,7 +303,7 @@ public class MasterSpellCreationGui {
 							if (cur.isEmpty())
 								break;
 						}
-					} else if (cur.getItem() instanceof BlankScroll) {
+					} else if (cur.getItem() == NostrumItems.blankScroll) {
 						ItemStack existing = inventory.getItem(inventory.getScrollSlotIndex());
 						if (existing.isEmpty()) {
 							inventory.setItem(inventory.getScrollSlotIndex(),
@@ -314,7 +313,7 @@ public class MasterSpellCreationGui {
 					} else if (cur.getItem() instanceof SpellRune) {
 						// Only allow adding if blank scroll is in place
 						ItemStack scroll = inventory.getItem(inventory.getScrollSlotIndex());
-						if (scroll.isEmpty() || !(scroll.getItem() instanceof BlankScroll)) {
+						if (scroll.isEmpty() || !(scroll.getItem() == NostrumItems.blankScroll)) {
 							// Do nothing
 						} else if (!inventory.getItem(inventory.getRuneSlotIndex() + inventory.getRuneSlotCount() - 1).isEmpty()) {
 							// If something's in last slot, we're full

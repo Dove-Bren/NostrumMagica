@@ -7,7 +7,6 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.client.gui.container.SpellCreationGui;
 import com.smanzana.nostrummagica.crafting.ISpellCraftingInventory;
 import com.smanzana.nostrummagica.criteria.CraftSpellCriteriaTrigger;
-import com.smanzana.nostrummagica.item.BlankScroll;
 import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.SpellRune;
 import com.smanzana.nostrummagica.item.equipment.SpellScroll;
@@ -140,7 +139,7 @@ public class BasicSpellTableTileEntity extends BlockEntity implements ISpellCraf
 			return true;
 		
 		if (index == 0) {
-			return stack.getItem() instanceof BlankScroll;
+			return stack.getItem() == NostrumItems.blankScroll;
 		}
 		
 		
@@ -200,7 +199,7 @@ public class BasicSpellTableTileEntity extends BlockEntity implements ISpellCraf
 	@Override
 	public RegisteredSpell craft(Player crafter, ISpellCraftingInventory inventory, String name, int iconIndex, @Nullable SpellCraftPattern pattern) {
 		ItemStack stack = this.getItem(0);
-		if (stack.isEmpty() || !(stack.getItem() instanceof BlankScroll)) {
+		if (stack.isEmpty() || !(stack.getItem() == NostrumItems.blankScroll)) {
 			return null;
 		}
 		

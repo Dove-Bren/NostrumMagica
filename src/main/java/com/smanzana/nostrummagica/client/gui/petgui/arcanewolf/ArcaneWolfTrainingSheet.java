@@ -9,7 +9,7 @@ import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.ArcaneWolfElementalType;
 import com.smanzana.nostrummagica.item.InfusedGemItem;
-import com.smanzana.nostrummagica.item.MasteryOrb;
+import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.petcommand.api.client.container.IPetContainer;
@@ -133,7 +133,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		
 		if (index == 0) {
 			// Only mastery orbs can go there
-			return stack.getItem() instanceof MasteryOrb;
+			return stack.getItem() == NostrumItems.masteryOrb;
 		}
 		
 		// Other slots must be attuned gems
@@ -296,7 +296,7 @@ public class ArcaneWolfTrainingSheet implements IPetGUISheet<ArcaneWolfEntity> {
 		// Primary slot mode needs mastery orb, too
 		if (mode == SlotMode.PRIMARY) {
 			ItemStack center = localInv.getItem(0);
-			if (center.isEmpty() || !(center.getItem() instanceof MasteryOrb)) {
+			if (center.isEmpty() || !(center.getItem() == NostrumItems.masteryOrb)) {
 				return;
 			}
 		}

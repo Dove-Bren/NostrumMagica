@@ -3,7 +3,6 @@ package com.smanzana.nostrummagica.client.gui.infoscreen;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -114,7 +113,7 @@ public class LoreCategorySubScreen implements IInfoSubScreen {
 			this.lore = lore;
 			
 			if (lore != null) {
-				final List<Component> lines = lore.getData().stream().map(s -> (Component) new TextComponent(s)).collect(Collectors.toCollection(ArrayList::new));
+				final List<Component> lines = new ArrayList<>(lore.getData());
 				for (int i = lines.size()-1; i > 0; i--) {
 					lines.add(i, new TextComponent(" "));
 				}

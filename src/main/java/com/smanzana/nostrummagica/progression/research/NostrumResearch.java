@@ -302,7 +302,8 @@ public class NostrumResearch {
 			} else if (item instanceof ILoreTagged) {
 				return this.reference(ILoreTagged.GetInfoKey((ILoreTagged) item), item.getDescriptionId());
 			} else {
-				NostrumMagica.logger.error("Provided item reference does not extend the required interfaces (ILoreTagged or InfoScreenIndexed) and cannot be a reference");
+				NostrumMagica.logger.error(
+						"Provided item reference (%s) does not extend the required interfaces (ILoreTagged or InfoScreenIndexed) and cannot be a reference".formatted(item.toString()));
 				return this;
 			}
 		}
