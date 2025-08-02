@@ -298,11 +298,16 @@ public class MirrorResearchSubscreen extends PanningMirrorSubscreen {
 	protected void onButtonResearch(ResearchState state, NostrumResearch research) {
 		//if (ignoreButton(button)) return;
 		
+		boolean purchased = false;
 		if (state == ResearchState.INACTIVE && attr.getResearchPoints() > 0) {
 			NetworkHandler.sendToServer(
 				new ClientPurchaseResearchMessage(research)	
 				);
-		} else if (state == ResearchState.COMPLETED) {
+			
+			// Exploitable: fall through even befor server confirms purchase
+			purchased = true;
+			
+		} /*else*/ if (state == ResearchState.COMPLETED || purchased) {
 			String info = I18n.get(research.getInfoKey(), new Object[0]);
 			List<IBookPage> pages = new LinkedList<>();
 			BookScreen.makePagesFrom(pages, info);
