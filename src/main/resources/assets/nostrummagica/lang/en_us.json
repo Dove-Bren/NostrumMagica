@@ -386,6 +386,7 @@
 	"effect.nostrummagica.soul_vampire": "Soul Vampire",
 	"effect.nostrummagica.loot_luck": "Curse of Loss",
 	"effect.nostrummagica.swift_swim": "Swift Swim",
+	"effect.nostrummagica.damage_split": "Damage Split",
 	
 	"effect.nostrummagica.enchant_earth": "Earth Enchantment",
 	"effect.nostrummagica.enchant_ender": "Ender Enchantment",
@@ -574,6 +575,7 @@
 	"entity.nostrummagica.whirlwind": "Whirlwind",
 	"entity.nostrummagica.primal_mage": "Primal Mage",
 	"entity.nostrummagica.shadow_dragon_boss": "Shadow Dragon",
+	"entity.nostrummagica.entity_cursed_glass_trigger": "Cursed Glass",
 
     "entity.nostrummagica.placeholder.soulbound": "Soulbound Pet",
 
@@ -737,8 +739,8 @@
     "config.nostrummagica.spell": "Spell Feedback",
     "config.nostrummagica.spell.spell_debug": "Spell Debug",
 
-    "death.attack.magic.PHYSICAL": "%1$s was killed by neutral energies",
-    "death.attack.magic.attacker.PHYSICAL": "%1$s was killed by %2$s using neutral energies",
+    "death.attack.magic.NEUTRAL": "%1$s was killed by neutral energies",
+    "death.attack.magic.attacker.NEUTRAL": "%1$s was killed by %2$s using neutral energies",
     "death.attack.magic.WIND": "%1$s was sliced to pieces by wind magic",
     "death.attack.magic.attacker.WIND": "%1$s was sliced to pieces by %2$s's wind magic",
     "death.attack.magic.EARTH": "%1$s was crushed by earth magic",

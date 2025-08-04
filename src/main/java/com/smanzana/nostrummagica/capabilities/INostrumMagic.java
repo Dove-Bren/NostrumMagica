@@ -10,7 +10,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
-import com.smanzana.nostrummagica.loretag.Lore;
 import com.smanzana.nostrummagica.progression.research.NostrumResearch;
 import com.smanzana.nostrummagica.progression.skill.Skill;
 import com.smanzana.nostrummagica.spell.EAlteration;
@@ -132,7 +131,6 @@ public interface INostrumMagic extends INBTSerializable<CompoundTag>, INostrumMa
 	public boolean hasLore(ILoreTagged tagged);
 	public boolean hasFullLore(ILoreTagged tagged);
 	public List<ILoreTagged> getAllLore();
-	public Lore getLore(ILoreTagged tagged);
 	public void giveBasicLore(ILoreTagged tagged);
 	public void giveFullLore(ILoreTagged tagged);
 	

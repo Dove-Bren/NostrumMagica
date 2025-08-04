@@ -36,7 +36,7 @@ public class BlockPosListSerializer implements EntityDataSerializer<List<BlockPo
 		int len = buf.readInt();
 		List<BlockPos> array = new ArrayList<>(len);
 		for (int i = 0; i < len; i++) {
-			array.set(i, buf.readBlockPos());
+			array.add(buf.readBlockPos());
 		}
 		return array;
 	}

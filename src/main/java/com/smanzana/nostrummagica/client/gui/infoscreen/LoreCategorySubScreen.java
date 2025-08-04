@@ -24,6 +24,7 @@ import com.smanzana.nostrummagica.loretag.IEntityLoreTagged;
 import com.smanzana.nostrummagica.loretag.IItemLoreTagged;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.loretag.LoreCache;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.spell.EMagicElement;
 import com.smanzana.nostrummagica.util.Color;
@@ -81,7 +82,12 @@ public class LoreCategorySubScreen implements IInfoSubScreen {
 				continue;
 			}
 			
-			@Nullable Lore lore = attr.getLore(tag);
+			@Nullable Lore lore;
+			if (attr.hasLore(tag)) {
+				lore = attr.hasFullLore(tag) ? LoreCache.instance().getDeepLore(tag) : LoreCache.instance().getBasicLore(tag);
+			} else {
+				lore = null;
+			}
 			grid.addChild(new LoreIconWidget(0, 0, 16, 16, tag, lore));
 			
 			loreMax++;

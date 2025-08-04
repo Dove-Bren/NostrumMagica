@@ -16,8 +16,6 @@ import javax.annotation.Nullable;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.criteria.TierCriteriaTrigger;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
-import com.smanzana.nostrummagica.loretag.Lore;
-import com.smanzana.nostrummagica.loretag.LoreCache;
 import com.smanzana.nostrummagica.loretag.LoreRegistry;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.LoreMessage;
@@ -407,7 +405,7 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public boolean hasLore(ILoreTagged tagged) {
-		return (getLore(tagged) != null);
+		return (loreLevels.getOrDefault(tagged.getLoreKey(), 0) >= 1);
 	}
 	
 	@Override
@@ -418,23 +416,6 @@ public class NostrumMagic implements INostrumMagic {
 		return (level != null && level >= 2);
 	}
 
-	@Override
-	public Lore getLore(ILoreTagged tagged) {
-		String key = tagged.getLoreKey();
-		Integer level = loreLevels.get(key);
-		
-		if (level == null || level == 0)
-			return null;
-		
-		Lore lore = null;
-		if (level == 1)
-			lore = LoreCache.instance().getBasicLore(tagged);
-		else if (level == 2)
-			lore = LoreCache.instance().getDeepLore(tagged);
-		
-		return lore;
-	}
-	
 	public static int getKnowledge(INostrumMagic attr) {
 		int knowledge = 0;
 		for (Integer val : attr.serializeLoreLevels().values()) {
@@ -463,7 +444,7 @@ public class NostrumMagic implements INostrumMagic {
 
 	@Override
 	public void giveBasicLore(ILoreTagged tagged) {
-		if (getLore(tagged) != null)
+		if (hasLore(tagged))
 			return; // Already has some lore
 		
 		String key = tagged.getLoreKey();
