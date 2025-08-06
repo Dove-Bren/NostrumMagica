@@ -52,11 +52,11 @@ import com.smanzana.nostrummagica.spell.SpellTeleportation;
 import com.smanzana.nostrummagica.spell.component.Transmutation.TransmuteResult;
 import com.smanzana.nostrummagica.spell.log.ESpellLogModifierType;
 import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
+import com.smanzana.nostrummagica.util.Color;
 import com.smanzana.nostrummagica.util.DimensionUtils;
 import com.smanzana.nostrummagica.util.HarvestUtil;
 import com.smanzana.nostrummagica.util.HarvestUtil.ITreeWalker;
 import com.smanzana.nostrummagica.util.ItemStacks;
-import com.smanzana.nostrummagica.util.RenderFuncs;
 import com.smanzana.nostrummagica.util.TargetLocation;
 import com.smanzana.petcommand.api.PetFuncs;
 
@@ -326,7 +326,7 @@ public class SpellAction {
 				}
 				
 				NostrumParticles.RISING_GLOW.spawn(entity.level, new SpawnParams(3, entity.getX(), entity.getY(), entity.getZ(), 0, 20, 0,
-						new TargetLocation(entity, false)).setTargetBehavior(TargetBehavior.ATTACH).color(RenderFuncs.ARGBFade(EMagicElement.ICE.getColor(), .6f)));
+						new TargetLocation(entity, false)).setTargetBehavior(TargetBehavior.ATTACH).color(new Color(EMagicElement.ICE.getColor()).scaleAlpha(.6f)));
 			}
 			
 			NostrumMagicaSounds.STATUS_BUFF2.play(entity);

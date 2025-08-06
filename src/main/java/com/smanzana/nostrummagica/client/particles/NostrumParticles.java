@@ -7,6 +7,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.network.NetworkHandler;
 import com.smanzana.nostrummagica.network.message.SpawnNostrumParticleMessage;
+import com.smanzana.nostrummagica.util.Color;
 import com.smanzana.nostrummagica.util.ColorUtil;
 import com.smanzana.nostrummagica.util.NetTargetLocation;
 import com.smanzana.nostrummagica.util.NetUtils;
@@ -219,6 +220,10 @@ public enum NostrumParticles {
 		
 		public SpawnParams color(float alpha, float red, float green, float blue) {
 			return color(ColorUtil.colorToARGB(red, green, blue, alpha));
+		}
+		
+		public SpawnParams color(Color color) {
+			return this.color(color.toARGB());
 		}
 		
 		public SpawnParams gravity(boolean gravity) {

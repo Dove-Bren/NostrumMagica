@@ -147,6 +147,6 @@ public class RuneLibraryTileEntity extends BlockEntity {
 			return handlerProxy.cast();
 		}
 		
-		return null;
+		return super.getCapability(capability, facing);
 	}
 }
