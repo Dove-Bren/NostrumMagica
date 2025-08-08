@@ -431,8 +431,8 @@ public class WarlockSword extends SwordItem implements ILoreTagged, ISpellEquipm
 				HitResult result = RayTrace.raytraceApprox(worldIn, playerIn, playerIn.position().add(0, playerIn.getEyeHeight(), 0),
 						playerIn.getXRot(), playerIn.getYRot(), SeekingBulletShape.MAX_DIST, (ent) -> {
 							if (ent != null && playerIn != ent) {
-								if (ent instanceof ITameableEntity && ((ITameableEntity) ent).getOwner() != null) {
-									if (playerIn.getUUID().equals(((ITameableEntity) ent).getOwner().getUUID())) {
+								if (ent instanceof ITameableEntity && ((ITameableEntity) ent).getPetOwner() != null) {
+									if (playerIn.getUUID().equals(((ITameableEntity) ent).getPetOwner().getUUID())) {
 										return false; // We own the target entity
 									}
 								}

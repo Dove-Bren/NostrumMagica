@@ -623,8 +623,8 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 	public void setWasHatched(boolean hatched) {
 		this.entityData.set(HATCHED, hatched);
 		
-		if (level != null && !level.isClientSide) {
-			ObfuscationReflectionHelper.setPrivateValue(Mob.class, this, hatched, "persistenceRequired");
+		if (level != null && !level.isClientSide && hatched) {
+			this.setPersistenceRequired();
 		}
 	}
 	
@@ -2529,6 +2529,11 @@ public class TameRedDragonEntity extends RedDragonBaseEntity implements ITameabl
 		}
 		
 		return super.getCapability(cap, face);
+	}
+
+	@Override
+	public Entity getPetOwner() {
+		return getOwner();
 	}
 	
 }

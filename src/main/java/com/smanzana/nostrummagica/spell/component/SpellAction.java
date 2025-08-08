@@ -366,7 +366,7 @@ public class SpellAction {
 			
 			if (entity instanceof Player) {
 				Player player = (Player) entity;
-				player.getFoodData().eat((int) (amount * efficiency), 2);
+				player.getFoodData().eat((int) (amount * efficiency), 1);
 				NostrumMagicaSounds.STATUS_BUFF2.play(entity);
 				resultBuilder.applied |= true;
 				log.generalEffectStart(LABEL_FOOD_NAME, new TranslatableComponent("spelllog.nostrummagica.food.desc", "" + amount, "" + (int) (amount * efficiency)), false);
@@ -2469,8 +2469,12 @@ public class SpellAction {
 				resultBuilder.applied |= true;
 				resultBuilder.affectedPos = new SpellLocation(location.world, pos);
 				
-				if (this.temporary) {
-					location.world.scheduleTick(pos, state.getBlock(), 20 * 15);
+				if (DimensionUtils.IsSorceryDim(location.world)) {
+					location.world.scheduleTick(pos, state.getBlock(), 20 * 15); // Always 15 seconds in sorcery
+				} else if (temporary) {
+					location.world.scheduleTick(pos, state.getBlock(), 20 * 120);
+				} else {
+					; // don't tick it and never make it disappear
 				}
 			}
 		}

@@ -612,6 +612,10 @@ public class NostrumMagica {
 		INostrumMagic attr = NostrumMagica.getMagicWrapper(player);
 		if (attr == null)
 			return false;
+		
+		if (research == NostrumResearches.Thano_Pendant) {
+			System.out.println("Considering thano");
+		}
 
 		List<ResourceLocation> finished = attr.getCompletedResearches();
 		if (finished.contains(research.getID())) {

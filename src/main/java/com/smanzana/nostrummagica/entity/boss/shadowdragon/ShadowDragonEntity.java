@@ -78,6 +78,8 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 		CHARGE_ARENA_SUMMON(true, false), // Returning to center and charging up a summon spell
 		
 		HIDE_FOR_SUMMONS(true, false),
+		
+		WAITING_FOR_PLAYER(true, false), // Has no target, and is waiting before resetting
 		;
 		
 		public final boolean isInvuln;
@@ -483,6 +485,8 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 		case MOVE_TO_CENTER:
 			pose = BattlePose.FLOAT_SHADOW;
 			break;
+		case WAITING_FOR_PLAYER:
+			pose = BattlePose.FLOAT_SHADOW;
 		}
 		return pose;
 	}
@@ -594,6 +598,10 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 	
 	protected BattleState getNextPhaseState(boolean wantChargeState) {
 		final float healthRatio = this.getHealth() / this.getMaxHealth();
+		
+		if (this.aggroTable.getMainTarget() == null) {
+			return BattleState.WAITING_FOR_PLAYER;
+		}
 		
 		// If wantChargeState, we want to do a charging challenge state instead of a follow state.
 		// So first pick a charging state, if we have any at this point
@@ -811,6 +819,25 @@ public class ShadowDragonEntity extends Mob implements PowerableMob {
 		case MOVE_TO_CENTER:
 			this.moveToCenterTick();
 			break;
+		case WAITING_FOR_PLAYER:
+			this.waitingTick();
+			break;
+		}
+	}
+
+	private void waitingTick() {
+		if (this.aggroTable.getMainTarget() != null) {
+			this.setBattleState(this.getNextPhaseState(false));
+			return;
+		} else if (this.stateSubTicks++ > 20 * 10) {
+			// reset
+			this.arena.resetArena();
+			this.setPos(Vec3.atBottomCenterOf(this.homeBlock.above()));
+			this.setHealth(this.getMaxHealth());
+			this.setBattleState(BattleState.INACTIVE);
+			return;
+		} else {
+			this.arenaGotoCenterTick();
 		}
 	}
 

@@ -2126,4 +2126,9 @@ public class ArcaneWolfEntity extends Wolf implements ITameableEntity, IEntityPe
 		
 		return super.getCapability(cap, face);
 	}
+
+	@Override
+	public Entity getPetOwner() {
+		return this.getOwner();
+	}
 }
