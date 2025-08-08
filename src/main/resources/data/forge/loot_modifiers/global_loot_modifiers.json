@@ -1,6 +1,8 @@
 {
   "replace": false,
   "entries": [
-    "nostrummagica:add_skyash"
+    "nostrummagica:add_skyash",
+	"nostrummagica:add_grave_dust",
+	"nostrummagica:add_spider_silk"
   ]
 }

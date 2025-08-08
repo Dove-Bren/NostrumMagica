@@ -2,8 +2,11 @@ package com.smanzana.nostrummagica.loot;
 
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.loot.condition.BlockTagCondition;
+import com.smanzana.nostrummagica.loot.condition.SpiderEntityCondition;
+import com.smanzana.nostrummagica.loot.condition.UndeadEntityCondition;
 import com.smanzana.nostrummagica.loot.function.RollEnhancementPageFunction;
 import com.smanzana.nostrummagica.loot.function.RollTomeplateFunction;
+import com.smanzana.nostrummagica.loot.modifier.ReagentMobDropModifier;
 import com.smanzana.nostrummagica.loot.modifier.SkyAshModifier;
 
 import net.minecraft.core.Registry;
@@ -20,6 +23,8 @@ public class NostrumLoot {
 	public static LootItemFunctionType FUNCTION_ROLL_TOMEPLATE;
 	public static LootItemFunctionType FUNCTION_ROLL_ENHANCEMENT;
 	public static LootItemConditionType CONDITION_BLOCK_TAG;
+	public static LootItemConditionType CONDITION_UNDEAD_ENTITY;
+	public static LootItemConditionType CONDITION_SPIDER_ENTITY;
 
 	//@SubscribeEvent registry<ILootFunction> ....
 	public static final void RegisterLootFunctions() {
@@ -29,12 +34,15 @@ public class NostrumLoot {
 	
 	public static final void RegisterLootConditions() {
 		CONDITION_BLOCK_TAG = Register(BlockTagCondition.ID, new LootItemConditionType(BlockTagCondition.SERIALIZER));
+		CONDITION_UNDEAD_ENTITY = Register(UndeadEntityCondition.ID, new LootItemConditionType(UndeadEntityCondition.SERIALIZER));
+		CONDITION_SPIDER_ENTITY = Register(SpiderEntityCondition.ID, new LootItemConditionType(SpiderEntityCondition.SERIALIZER));
 	}
 	
 	@SubscribeEvent
 	public static final void registerModifiers(RegistryEvent.Register<GlobalLootModifierSerializer<?>> event) {
 		final var registry = event.getRegistry();
-		registry.register(SkyAshModifier.SERIALIZER.setRegistryName(NostrumMagica.Loc("add_skyash")));
+		registry.register(SkyAshModifier.SERIALIZER.setRegistryName(NostrumMagica.Loc(SkyAshModifier.ID)));
+		registry.register(ReagentMobDropModifier.SERIALIZER.setRegistryName(NostrumMagica.Loc(ReagentMobDropModifier.ID)));
 	}
 	
 	private static final LootItemFunctionType Register(String id, LootItemFunctionType type) {

@@ -1,0 +1,10 @@
+{
+	"type": "nostrummagica:add_reagent",
+	"conditions": [{
+		"condition": "nostrummagica:entity_undead"
+	}],
+	"base_chance": 0.3,
+	"looting_chance": 0,
+	"item": "nostrummagica:reagent_grave_dust",
+	"roll_per_looting": true
+}

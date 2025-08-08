@@ -1,0 +1,10 @@
+{
+	"type": "nostrummagica:add_reagent",
+	"conditions": [{
+		"condition": "nostrummagica:entity_spider"
+	}],
+	"base_chance": 0.4,
+	"looting_chance": 0,
+	"item": "nostrummagica:reagent_spider_silk",
+	"roll_per_looting": true
+}

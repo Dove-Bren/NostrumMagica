@@ -30,7 +30,6 @@ import com.smanzana.nostrummagica.effect.NostrumEffects;
 import com.smanzana.nostrummagica.enchantment.ManaRecoveryEnchantment;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity;
 import com.smanzana.nostrummagica.entity.ArcaneWolfEntity.WolfTypeCapability;
-import com.smanzana.nostrummagica.item.NostrumItems;
 import com.smanzana.nostrummagica.item.PositionCrystal;
 import com.smanzana.nostrummagica.item.ReagentItem;
 import com.smanzana.nostrummagica.item.SpellRune;
@@ -79,8 +78,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.animal.Wolf;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.BlockItem;
@@ -105,7 +102,6 @@ import net.minecraftforge.event.entity.EntityTeleportEvent;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingVisibilityEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
@@ -882,39 +878,6 @@ public class PlayerListener {
 		
 		NostrumMagica.instance.getSpellCooldownTracker(event.getPlayer().level)
 			.clearCooldowns(event.getPlayer());
-	}
-	
-	@SubscribeEvent
-	public void onMobDrop(LivingDropsEvent event) {
-		if (event.getEntityLiving().getLevel().isClientSide()) {
-			return;
-		}
-		
-		if (event.getEntityLiving().isInvertedHealAndHarm()) {
-			for (int i = 0; i <= event.getLootingLevel(); i++) {
-				if (NostrumMagica.rand.nextFloat() <= 0.3f) {
-					ItemEntity entity = new ItemEntity(event.getEntity().level,
-							event.getEntity().getX(),
-							event.getEntity().getY(),
-							event.getEntity().getZ(),
-							new ItemStack(NostrumItems.reagentGraveDust, 1));
-					event.getDrops().add(entity);
-				}
-			}
-				
-		}
-		if (event.getEntityLiving() instanceof Spider) {
-			for (int i = 0; i <= event.getLootingLevel(); i++) {
-				if (NostrumMagica.rand.nextFloat() <= 0.4f) {
-					ItemEntity entity = new ItemEntity(event.getEntity().level,
-							event.getEntity().getX(),
-							event.getEntity().getY(),
-							event.getEntity().getZ(),
-							new ItemStack(NostrumItems.reagentSpiderSilk, 1));
-					event.getDrops().add(entity);
-				}
-			}
-		}
 	}
 	
 	@SubscribeEvent
