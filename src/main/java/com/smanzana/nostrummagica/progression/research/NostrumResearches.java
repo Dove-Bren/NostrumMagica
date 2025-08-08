@@ -524,8 +524,9 @@ public class NostrumResearches {
 					new ItemStack(NostrumItems.thanoPendant));
 		}
 
-		Modification_Table = NostrumResearch.startBuilding().hiddenParent(ID_Vani).hiddenParent(ID_Loretable)
+		Modification_Table = NostrumResearch.startBuilding().hiddenParent(ID_Kani).hiddenParent(ID_Loretable)
 				.hiddenParent(ID_Spelltomes_Advanced)
+				.hiddenParent(ID_Tome_Workshop)
 				.reference("ritual::modification_table", "ritual.modification_table.name").build(ID_Modification_Table,
 						Tab_Advanced_Magica, NostrumResearch.Size.GIANT, 0, -1, true,
 						new ItemStack(NostrumBlocks.modificationTable));
