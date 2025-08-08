@@ -128,7 +128,7 @@ public class ProjectileShape extends SpellShape implements ISelectableShape {
 	}
 
 	private static final String ID = "projectile";
-	private static final double PROJECTILE_RANGE = 30.0;
+	public static final double PROJECTILE_RANGE = 30.0;
 	
 	private static final class ProjectileFilter implements Predicate<Entity> {
 

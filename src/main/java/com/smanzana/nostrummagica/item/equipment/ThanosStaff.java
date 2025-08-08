@@ -43,6 +43,7 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellEquipme
 	private static final String NBT_XP = "absorbed_xp";
 	
 	protected static UUID THANOSTAFF_POTENCY_UUID = UUID.fromString("d46057a6-872d-45d5-9d09-9cb1f0daf62e");
+	protected static UUID THANOSTAFF_CASTSPEED_UUID = UUID.fromString("714308d2-c3ba-4260-9b82-525f510f0ed5");
 	
 	public ThanosStaff() {
 		super(Tiers.WOOD, 3, -2.4F, NostrumItems.PropEquipment().durability(500));
@@ -62,6 +63,7 @@ public class ThanosStaff extends SwordItem implements ILoreTagged, ISpellEquipme
         
         if (equipmentSlot == EquipmentSlot.MAINHAND || equipmentSlot == EquipmentSlot.OFFHAND) {
 			builder.put(NostrumAttributes.magicPotency, new AttributeModifier(THANOSTAFF_POTENCY_UUID, "Potency modifier", 15, AttributeModifier.Operation.ADDITION));
+			builder.put(NostrumAttributes.castSpeed, new AttributeModifier(THANOSTAFF_CASTSPEED_UUID, "Castspeed modifier", 15, AttributeModifier.Operation.ADDITION));
 		}
 
         return builder.build();

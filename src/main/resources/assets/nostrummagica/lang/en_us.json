@@ -321,6 +321,7 @@
 	
 	"item.nostrummagica.gold_mirror": "Gold Mirror",
 	"item.nostrummagica.silver_mirror": "Silver Mirror",
+	"item.nostrummagica.staff_projectile": "Orb Staff",
 
     "set.nostrummagica.magic_armor.neutral.novice.name": "Sturdy Set",
     "set.nostrummagica.magic_armor.neutral.adept.name": "Reinforced Set",
@@ -2179,6 +2180,9 @@
 	"lore.item.nostrummagica.living_flute.name": "Living Flute",
 	"lore.item.nostrummagica.living_flute.basic": "A fleshy flute that feels as if it has a heartbeat.",
 	"lore.item.nostrummagica.living_flute.deep": "A fleshy flute that feels as if it has a heartbeat.|Through careful combination with other powerful materials, you can create a powerful Skill Mirror item.",
+	"lore.item.nostrummagica.staff_projectile.name": "Orb Staff",
+	"lore.item.nostrummagica.staff_projectile.basic": "A magic staff that fires orbs of elemental energy.|Can be attuned to different elements.",
+	"lore.item.nostrummagica.staff_projectile.deep": "A magic staff that fires orbs of elemental energy.|Fires a spell based on the element it's attuned to as if the caster was casting a lvl 2 version of the element with no alteration.|Can be attuned at elemental crystals found deep underground.",
 	
 	"lore.block.nostrummagica.elemental_crystal_block.name": "Elemental Crystals",
 	"lore.block.nostrummagica.elemental_crystal_block.basic": "This large, floating crystal has a strong and bright connection to an element. You can tell which element by looking at the color.|Some items can absorb the elemental energy of the crystal simply by being thrown next to it!",

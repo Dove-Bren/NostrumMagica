@@ -163,6 +163,7 @@ import com.smanzana.nostrummagica.item.equipment.HookshotItem;
 import com.smanzana.nostrummagica.item.equipment.MageBlade;
 import com.smanzana.nostrummagica.item.equipment.MirrorShield;
 import com.smanzana.nostrummagica.item.equipment.MirrorShieldImproved;
+import com.smanzana.nostrummagica.item.equipment.ProjectileStaff;
 import com.smanzana.nostrummagica.item.equipment.SoulDagger;
 import com.smanzana.nostrummagica.item.equipment.SpellTome.TomeStyle;
 import com.smanzana.nostrummagica.item.equipment.ThanosStaff;
@@ -569,6 +570,7 @@ public class ClientInit {
 		ItemProperties.register(NostrumItems.thanosStaff, NostrumMagica.Loc("activated"), ThanosStaff::ModelActivated);
 		ItemProperties.register(NostrumItems.casterWand, ChargingSwordItem.PROPERTY_CHARGE, CasterWandItem::ModelCharge);
 		ItemProperties.register(NostrumItems.casterWand, ChargingSwordItem.PROPERTY_CHARGING, CasterWandItem::ModelCharging);
+		ItemProperties.register(NostrumItems.projectileStaff, NostrumMagica.Loc("element"), ProjectileStaff::ModelElement);
 	}
 	
 	@SuppressWarnings("deprecation")

@@ -1512,9 +1512,6 @@ public class ModInit {
 				new ResearchRequirement(NostrumResearches.ID_Gold_Mirror), new OutcomeSpawnItem(new ItemStack(NostrumItems.goldMirror))));
 		
 		
-		//silver_mirror
-		//gold_mirror
-
 		// Mana Armorer
 		registry
 				.register(RitualRecipe
@@ -1528,12 +1525,20 @@ public class ModInit {
 										Ingredient.of(NostrumItems.dragonEggFragment) },
 								new ResearchRequirement(NostrumResearches.ID_Mana_Armor),
 								new OutcomeSpawnItem(new ItemStack(NostrumBlocks.manaArmorerBlock, 1))));
+		
 
-//		registry.register(
-//				RitualRecipe.createTier2("ritual.form_obelisk.name", EMagicElement.ENDER,
-//					new ReagentType[] {ReagentType.BLACK_PEARL, ReagentType.MANI_DUST, ReagentType.SKY_ASH, ReagentType.SPIDER_SILK},
-//					center, outcome)
-//				);
+		registry.register(RitualRecipe.createTier3(
+				"orb_staff", new ItemStack(NostrumItems.projectileStaff), null,
+				new ReagentType[] { ReagentType.GINSENG, ReagentType.SKY_ASH,
+						ReagentType.CRYSTABLOOM, ReagentType.MANDRAKE_ROOT },
+				Ingredient.of(NostrumItems.mageStaff),
+				new Ingredient[] { Ingredient.EMPTY, 
+						Ingredient.of(NostrumTags.Items.CrystalMedium),
+						Ingredient.of(NostrumItems.resourceWispPebble),
+						Ingredient.EMPTY },
+				new ResearchRequirement(NostrumResearches.ID_Caster_Wand),
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.projectileStaff, 1))));
+
 	}
 
 	private static IReward wrapAttribute(AwardType type, float val) {

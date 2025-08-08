@@ -9,6 +9,7 @@
 		"nostrummagica:mage_blade",
 		"nostrummagica:sword_fire",
 		"nostrummagica:sword_ender",
-		"nostrummagica:caster_wand"
+		"nostrummagica:caster_wand",
+		"nostrummagica:staff_projectile"
 	]
 }

@@ -1,0 +1,6 @@
+{
+	"parent": "nostrummagica:item/staff_projectile",
+	"textures": {
+		"layer0": "nostrummagica:item/staff_projectile_ice"
+	}
+}

@@ -1,0 +1,62 @@
+{
+	"parent": "item/handheld",
+	"textures": {
+		"layer0": "nostrummagica:item/staff_projectile_neutral"
+	},
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, -90, -45],
+			"translation": [0, 8, 1.25]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [0, 90, 45],
+			"translation": [0, 8, 1.25]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, -45, -60],
+			"translation": [2, -0.5, -0.75]
+		},
+		"firstperson_lefthand": {
+			"rotation": [0, -70, 30],
+			"translation": [2, -1, -0.5]
+		}
+	},
+    "overrides": [
+		{
+            "predicate": {
+                "nostrummagica:element": 2
+            },
+            "model": "nostrummagica:item/staff_projectile_fire"
+        },
+		{
+            "predicate": {
+                "nostrummagica:element": 3
+            },
+            "model": "nostrummagica:item/staff_projectile_ice"
+        },
+		{
+            "predicate": {
+                "nostrummagica:element": 4
+            },
+            "model": "nostrummagica:item/staff_projectile_earth"
+        },
+		{
+            "predicate": {
+                "nostrummagica:element": 5
+            },
+            "model": "nostrummagica:item/staff_projectile_wind"
+        },
+		{
+            "predicate": {
+                "nostrummagica:element": 6
+            },
+            "model": "nostrummagica:item/staff_projectile_lightning"
+        },
+		{
+            "predicate": {
+                "nostrummagica:element": 7
+            },
+            "model": "nostrummagica:item/staff_projectile_ender"
+        }
+    ]
+}

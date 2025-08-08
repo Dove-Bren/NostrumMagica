@@ -24,6 +24,7 @@ import com.smanzana.nostrummagica.entity.golem.MagicGolemEntity;
 import com.smanzana.nostrummagica.item.NostrumItems;
 
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.item.Item;
@@ -296,6 +297,12 @@ public class LoreRegistry {
 				cacheStack = stack.get();
 			}
 			return cacheStack;
+		}
+
+		@Override
+		public ResourceLocation getItemRegistryName() {
+			// TODO Auto-generated method stub
+			return null;
 		}
 		
 	}

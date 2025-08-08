@@ -22,7 +22,7 @@ public class SpiderEntityCondition implements LootItemCondition {
 
 	@Override
 	public boolean test(LootContext context) {
-		Entity ent = context.getParam(LootContextParams.THIS_ENTITY);
+		Entity ent = context.getParamOrNull(LootContextParams.THIS_ENTITY);
 		return ent != null && ent instanceof Spider;
 	}
 

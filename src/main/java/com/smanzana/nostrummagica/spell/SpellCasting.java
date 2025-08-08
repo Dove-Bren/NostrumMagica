@@ -142,7 +142,7 @@ public class SpellCasting {
 		
 		SpellCastSummary summary = new SpellCastSummary(spell.getManaCost(), spell.getXP(seen), castTicks);
 		
-		summary.addCastSpeedRate(handSpeedModifier-1f); // Just visual; cast ticks already calculated
+		summary.addCastSpeedRate((handSpeedModifier-1f) - (attrSpeedRate-1f)); // Just visual; cast ticks already calculated
 		
 		// Add player's base magic potency
 		summary.addEfficiency((float) entity.getAttribute(NostrumAttributes.magicPotency).getValue() / 100f);

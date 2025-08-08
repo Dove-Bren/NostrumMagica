@@ -38,6 +38,7 @@ public class MageStaff extends SwordItem implements ILoreTagged, ISpellEquipment
 	public static final String ID = "mage_staff";
 	
 	protected static UUID MAGESTAFF_POTENCY_UUID = UUID.fromString("3c262e7c-237c-48fa-aaf7-7b4be23affb3");
+	protected static UUID MAGESTAFF_CASTSPEED_UUID = UUID.fromString("cec62c3a-4ef2-48f8-94ff-6b56f3982e4d");
 	
 	public MageStaff() {
 		super(Tiers.WOOD, 3, -2.4F, NostrumItems.PropEquipment().durability(200));
@@ -56,6 +57,7 @@ public class MageStaff extends SwordItem implements ILoreTagged, ISpellEquipment
 		
 		if (equipmentSlot == EquipmentSlot.MAINHAND || equipmentSlot == EquipmentSlot.OFFHAND) {
 			builder.put(NostrumAttributes.magicPotency, new AttributeModifier(MAGESTAFF_POTENCY_UUID, "Potency modifier", 20, AttributeModifier.Operation.ADDITION));
+			builder.put(NostrumAttributes.castSpeed, new AttributeModifier(MAGESTAFF_CASTSPEED_UUID, "Castspeed modifier", 25, AttributeModifier.Operation.ADDITION));
 		}
 
         return builder.build();

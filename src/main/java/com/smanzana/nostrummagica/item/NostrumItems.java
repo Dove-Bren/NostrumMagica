@@ -36,6 +36,7 @@ import com.smanzana.nostrummagica.item.equipment.MageStaff;
 import com.smanzana.nostrummagica.item.equipment.MagicSwordBase;
 import com.smanzana.nostrummagica.item.equipment.MirrorShield;
 import com.smanzana.nostrummagica.item.equipment.MirrorShieldImproved;
+import com.smanzana.nostrummagica.item.equipment.ProjectileStaff;
 import com.smanzana.nostrummagica.item.equipment.ReagentBag;
 import com.smanzana.nostrummagica.item.equipment.RuneBag;
 import com.smanzana.nostrummagica.item.equipment.SeekingGem;
@@ -332,6 +333,7 @@ public class NostrumItems {
 	@ObjectHolder(KoidHelmet.ID) public static KoidHelmet koidHelm;
 	@ObjectHolder(GoldMirrorItem.ID) public static GoldMirrorItem goldMirror;
 	@ObjectHolder(SilverMirrorItem.ID) public static SilverMirrorItem silverMirror;
+	@ObjectHolder(ProjectileStaff.ID) public static ProjectileStaff projectileStaff;
 	
 	@ObjectHolder(PoisonWaterFluid.ID_BREAKABLE + "_bucket") public static BucketItem poisonWaterBucket;
 	@ObjectHolder(PoisonWaterFluid.ID_UNBREAKABLE + "_bucket") public static BucketItem unbreakablePoisonWaterBucket;
@@ -635,6 +637,7 @@ public class NostrumItems {
     	register(registry, new KoidHelmet(PropEquipment().rarity(Rarity.UNCOMMON)).setRegistryName(KoidHelmet.ID));
     	register(registry, new GoldMirrorItem(PropEquipment()).setRegistryName(GoldMirrorItem.ID));
     	register(registry, new SilverMirrorItem(PropEquipment()).setRegistryName(SilverMirrorItem.ID));
+    	register(registry, new ProjectileStaff().setRegistryName(ProjectileStaff.ID));
     	
     	// Generate and register spell runes
     	{
