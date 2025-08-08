@@ -613,10 +613,6 @@ public class NostrumMagica {
 		if (attr == null)
 			return false;
 		
-		if (research == NostrumResearches.Modification_Table) {
-			System.out.println("Considering mod table");
-		}
-
 		List<ResourceLocation> finished = attr.getCompletedResearches();
 		if (finished.contains(research.getID())) {
 			return true;

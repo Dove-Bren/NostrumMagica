@@ -4,9 +4,12 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.NostrumMagica.NostrumTeleportEvent;
+import com.smanzana.nostrummagica.attribute.MagicAttackDamageAttribute;
+import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -63,13 +66,29 @@ public class AspectedEnderWeapon extends ChargingSwordItem implements ILoreTagge
 	private static final int USE_DURATION = 20; // In ticks
 	private static final float MAX_BALL_DIST = 30;
 	
+	protected Multimap<Attribute, AttributeModifier> defaultAttribs;
+	
 	public AspectedEnderWeapon() {
 		super(Tiers.GOLD, 5, -2.6F, NostrumItems.PropEquipment().durability(1240));
+//		this.defaultAttribs = makeMainhandAttribs();
 	}
 	
 	@Override
 	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot equipmentSlot) {
-		return super.getDefaultAttributeModifiers(equipmentSlot);
+		if (defaultAttribs == null) {
+			defaultAttribs = makeMainhandAttribs();
+		}
+		return EquipmentSlot.MAINHAND == equipmentSlot ? defaultAttribs : super.getDefaultAttributeModifiers(equipmentSlot);
+	}
+	
+	protected Multimap<Attribute, AttributeModifier> makeMainhandAttribs() {
+		Multimap<Attribute, AttributeModifier> multimap = super.getDefaultAttributeModifiers(EquipmentSlot.MAINHAND);
+		ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+		builder.putAll(multimap);
+		
+		builder.put(NostrumAttributes.magicAttackEnder, new AttributeModifier(MagicAttackDamageAttribute.UUID_BASE_WEAPON_ATTACK_ENDER, "Weapon modifier", 2f, AttributeModifier.Operation.ADDITION));
+		
+		return builder.build();
     }
 	
 	@Override

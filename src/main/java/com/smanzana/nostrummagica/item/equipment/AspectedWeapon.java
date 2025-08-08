@@ -9,6 +9,8 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.smanzana.nostrummagica.NostrumMagica;
+import com.smanzana.nostrummagica.attribute.MagicAttackDamageAttribute;
+import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles;
 import com.smanzana.nostrummagica.client.particles.NostrumParticles.SpawnParams;
@@ -158,7 +160,7 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 			break;
 		}
 		
-		int base = 5 + (bonus * 2);
+		int base = 1 + (bonus * 2);
 		
 		return (int) ((float) base * mod);
 	}
@@ -231,6 +233,19 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 		return 1;
 	}
 	
+	private static float getMagicDamage(Type type) {
+		switch (type) {
+		case NOVICE:
+			return 1f;
+		case ADEPT:
+			return 2f;
+		case MASTER:
+			return 3f;
+		}
+		
+		return 1;
+	}
+	
 	protected static final UUID OFFHAND_ATTACK_SPEED_MODIFIER = UUID.fromString("B2879ABC-4180-1234-B01B-487954A3BAC4");
 	
 	private Type type;
@@ -249,6 +264,42 @@ public class AspectedWeapon extends SwordItem implements IReactiveEquipment {
 	@Override
 	public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
 		Multimap<Attribute, AttributeModifier> multimap = super.getDefaultAttributeModifiers(slot);
+		
+		if (EquipmentSlot.MAINHAND == slot) {
+			final UUID modID;
+			switch (this.element) {
+			case EARTH:
+				modID = MagicAttackDamageAttribute.UUID_BASE_WEAPON_ATTACK_EARTH;
+				break;
+			case ENDER:
+				modID = MagicAttackDamageAttribute.UUID_BASE_WEAPON_ATTACK_ENDER;
+				break;
+			case FIRE:
+				modID = MagicAttackDamageAttribute.UUID_BASE_WEAPON_ATTACK_FIRE;
+				break;
+			case ICE:
+				modID = MagicAttackDamageAttribute.UUID_BASE_WEAPON_ATTACK_ICE;
+				break;
+			case LIGHTNING:
+				modID = MagicAttackDamageAttribute.UUID_BASE_WEAPON_ATTACK_LIGHTNING;
+				break;
+			case NEUTRAL:
+			default:
+				modID = MagicAttackDamageAttribute.UUID_BASE_WEAPON_ATTACK_NEUTRAL;
+				break;
+			case WIND:
+				modID = MagicAttackDamageAttribute.UUID_BASE_WEAPON_ATTACK_WIND;
+				break;
+			}
+			
+			
+			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+			builder.putAll(multimap);
+			builder.put(NostrumAttributes.GetMagicAttackAttribute(element), new AttributeModifier(modID, "Weapon modifier", getMagicDamage(type), AttributeModifier.Operation.ADDITION));
+			multimap = builder.build();
+			
+			return builder.build();
+		}
 
 		if (slot == EquipmentSlot.OFFHAND && element == EMagicElement.WIND) {
 			ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();

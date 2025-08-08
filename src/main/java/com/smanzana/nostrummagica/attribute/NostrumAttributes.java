@@ -35,6 +35,14 @@ public class NostrumAttributes {
 	protected static final String ID_XP_LIGHTNING = ElementXPBonusAttribute.ID_PREFIX + "lightning";
 	protected static final String ID_XP_WIND = ElementXPBonusAttribute.ID_PREFIX + "wind";
 	
+	protected static final String ID_MAGIC_ATTACK_NEUTRAL = MagicAttackDamageAttribute.ID_PREFIX + "neutral";
+	protected static final String ID_MAGIC_ATTACK_EARTH = MagicAttackDamageAttribute.ID_PREFIX + "earth";
+	protected static final String ID_MAGIC_ATTACK_ENDER = MagicAttackDamageAttribute.ID_PREFIX + "ender";
+	protected static final String ID_MAGIC_ATTACK_FIRE = MagicAttackDamageAttribute.ID_PREFIX + "fire";
+	protected static final String ID_MAGIC_ATTACK_ICE = MagicAttackDamageAttribute.ID_PREFIX + "ice";
+	protected static final String ID_MAGIC_ATTACK_LIGHTNING = MagicAttackDamageAttribute.ID_PREFIX + "lightning";
+	protected static final String ID_MAGIC_ATTACK_WIND = MagicAttackDamageAttribute.ID_PREFIX + "wind";
+	
 	@ObjectHolder(MagicPotencyAttribute.ID) public static MagicPotencyAttribute magicPotency;
 	@ObjectHolder(MagicResistAttribute.ID) public static MagicResistAttribute magicResist;
 	@ObjectHolder(ManaRegenAttribute.ID) public static ManaRegenAttribute manaRegen;
@@ -59,6 +67,13 @@ public class NostrumAttributes {
 	@ObjectHolder(AllElementXPBonusAttribute.ID) public static AllElementXPBonusAttribute xpAllElements;
 	@ObjectHolder(BonusJumpAttribute.ID) public static BonusJumpAttribute bonusJump;
 	@ObjectHolder(CastSpeedAttribute.ID) public static CastSpeedAttribute castSpeed; 
+	@ObjectHolder(ID_MAGIC_ATTACK_NEUTRAL) public static MagicAttackDamageAttribute magicAttackNeutral;
+	@ObjectHolder(ID_MAGIC_ATTACK_EARTH) public static MagicAttackDamageAttribute magicAttackEarth;
+	@ObjectHolder(ID_MAGIC_ATTACK_ENDER) public static MagicAttackDamageAttribute magicAttackEnder;
+	@ObjectHolder(ID_MAGIC_ATTACK_FIRE) public static MagicAttackDamageAttribute magicAttackFire;
+	@ObjectHolder(ID_MAGIC_ATTACK_ICE) public static MagicAttackDamageAttribute magicAttackIce;
+	@ObjectHolder(ID_MAGIC_ATTACK_LIGHTNING) public static MagicAttackDamageAttribute magicAttackLightning;
+	@ObjectHolder(ID_MAGIC_ATTACK_WIND) public static MagicAttackDamageAttribute magicAttackWind;
 	
 	protected static final String makeName(String base) {
 		return "attribute.nostrummagica." + base + ".name";
@@ -88,8 +103,10 @@ public class NostrumAttributes {
 		for (EMagicElement elem : EMagicElement.values()) {
 			final String REDUC_ID = MagicReductionAttribute.ID_PREFIX + elem.name().toLowerCase();
 			final String XP_ID = ElementXPBonusAttribute.ID_PREFIX + elem.name().toLowerCase();
+			final String ATTACK_ID = MagicAttackDamageAttribute.ID_PREFIX + elem.name().toLowerCase();
 			makeAndRegister(registry, (name) -> new MagicReductionAttribute(elem, name), REDUC_ID);
 			makeAndRegister(registry, (name) -> new ElementXPBonusAttribute(elem, name), XP_ID);
+			makeAndRegister(registry, (name) -> new MagicAttackDamageAttribute(elem, name), ATTACK_ID);
 		}
 	}
 	
@@ -112,6 +129,7 @@ public class NostrumAttributes {
 			for (EMagicElement elem : EMagicElement.values()) {
 				addIfMissing(event, type, GetReduceAttribute(elem));
 				addIfMissing(event, type, GetXPAttribute(elem));
+				addIfMissing(event, type, GetMagicAttackAttribute(elem));
 			}
 			
 			if (type == EntityType.PLAYER) {
@@ -160,5 +178,26 @@ public class NostrumAttributes {
 		}
 		
 		return xpNeutral;
+	}
+	
+	public static MagicAttackDamageAttribute GetMagicAttackAttribute(EMagicElement element) {
+		switch (element) {
+		case EARTH:
+			return magicAttackEarth;
+		case ENDER:
+			return magicAttackEnder;
+		case FIRE:
+			return magicAttackFire;
+		case ICE:
+			return magicAttackIce;
+		case LIGHTNING:
+			return magicAttackLightning;
+		case NEUTRAL:
+			return magicAttackNeutral;
+		case WIND:
+			return magicAttackWind;
+		}
+		
+		return magicAttackNeutral;
 	}
 }

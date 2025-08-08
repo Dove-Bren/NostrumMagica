@@ -109,13 +109,13 @@ public class InfusedGemItem extends Item implements ILoreTagged, ICrystalEnchant
 	
 	@Override
 	public Lore getBasicLore() {
-		return new Lore().add("By combining magical reagents with an enderpearl, you can create a Void Gem.", "The gem lacks any elemental affinity and otherwise seems useless.");
+		return new Lore().add("By combining magical reagents with an enderpearl, you can create a Void Gem.", "The gem power rituals, although the more powerful rituals need elemental gems.");
 				
 	}
 	
 	@Override
 	public Lore getDeepLore() {
-		return new Lore().add("By combining magical reagents with an enderpearl, you can create a Void Gem.", "Void gems alone are not very useful.", "In order to use them, they must be inbued with the power of an element.", "Perhaps an Alter rune would do the trick...");
+		return new Lore().add("By combining magical reagents with an enderpearl, you can create a Void Gem.", "Void gems can be infused by bringing them close to elemental crystals buried in the ground.");
 	}
 	
 	@Override

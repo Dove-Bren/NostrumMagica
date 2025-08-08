@@ -49,11 +49,13 @@ import com.smanzana.nostrummagica.network.message.VanillaEffectSyncMessage;
 import com.smanzana.nostrummagica.progression.skill.NostrumSkills;
 import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.MagicDamageSource;
 import com.smanzana.nostrummagica.spell.RegisteredSpell;
 import com.smanzana.nostrummagica.spell.Spell;
 import com.smanzana.nostrummagica.spell.SpellActionSummary;
 import com.smanzana.nostrummagica.spell.SpellCastEvent;
 import com.smanzana.nostrummagica.spell.SpellCasting;
+import com.smanzana.nostrummagica.spell.SpellDamage;
 import com.smanzana.nostrummagica.spell.component.SpellAction;
 import com.smanzana.nostrummagica.spell.log.ISpellLogBuilder;
 import com.smanzana.nostrummagica.tile.TeleportRuneTileEntity;
@@ -75,6 +77,7 @@ import net.minecraft.world.damagesource.EntityDamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Spider;
@@ -564,6 +567,8 @@ public class PlayerListener {
 		onHealth(ent);
 	}
 	
+	protected boolean elemAttribRecurse = false;
+	
 	@SubscribeEvent
 	public void onAttack(LivingAttackEvent event) {
 		if (event.isCanceled())
@@ -684,6 +689,26 @@ public class PlayerListener {
 							}
 						}
 					}
+				}
+				
+				if (!elemAttribRecurse && !(event.getSource() instanceof MagicDamageSource)) {
+					elemAttribRecurse = true;
+					for (EMagicElement element : EMagicElement.values()) {
+						Attribute attr = NostrumAttributes.GetMagicAttackAttribute(element);
+						final float amt = (float) livingSource.getAttributeValue(attr);
+						if (amt > 0) {
+							livingTarget.setInvulnerable(false);
+							livingTarget.invulnerableTime = 0;
+							SpellDamage.DamageEntity(livingTarget, element, amt, livingSource);
+							livingTarget.setInvulnerable(false);
+							livingTarget.invulnerableTime = 0;
+	//						if (!livingTarget.level.isClientSide()) {
+	//							doEffect(livingTarget, element);
+	//						}
+						}
+						
+					}
+					elemAttribRecurse = false;
 				}
 			}
 		}

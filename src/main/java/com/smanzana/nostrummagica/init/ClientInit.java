@@ -182,11 +182,11 @@ import com.smanzana.nostrummagica.util.Curves;
 import com.smanzana.nostrummagica.util.Curves.ICurve3d;
 import com.smanzana.nostrummagica.util.RenderFuncs;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleEngine;
@@ -202,6 +202,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
@@ -861,8 +862,9 @@ public class ClientInit {
 			event.getTooltipElements().add(Either.right(new LoreHintTooltip(level)));
 		}
 		
-		if (Screen.hasShiftDown() && stack.is(NostrumTags.Items.SpellChanneling)) {
-			event.getTooltipElements().add(Either.left(new TranslatableComponent("info.item.spellchanneling")));
+		if (stack.is(NostrumTags.Items.SpellChanneling)) {
+			event.getTooltipElements().add(Either.left(new TextComponent("")));
+			event.getTooltipElements().add(Either.left(new TranslatableComponent("info.item.spellchanneling").withStyle(ChatFormatting.DARK_PURPLE)));
 		}
 		
 		ItemImbuement imbue = ItemImbuement.FromItemStack(stack);
