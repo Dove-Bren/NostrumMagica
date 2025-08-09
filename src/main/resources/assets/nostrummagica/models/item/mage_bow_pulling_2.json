@@ -1,0 +1,6 @@
+{
+    "parent": "nostrummagica:item/mage_bow",
+    "textures": {
+        "layer0": "nostrummagica:item/mage_bow_pulling_2"
+    }
+}

@@ -161,6 +161,7 @@ import com.smanzana.nostrummagica.item.equipment.CasterWandItem;
 import com.smanzana.nostrummagica.item.equipment.ChargingSwordItem;
 import com.smanzana.nostrummagica.item.equipment.HookshotItem;
 import com.smanzana.nostrummagica.item.equipment.MageBlade;
+import com.smanzana.nostrummagica.item.equipment.MageBow;
 import com.smanzana.nostrummagica.item.equipment.MirrorShield;
 import com.smanzana.nostrummagica.item.equipment.MirrorShieldImproved;
 import com.smanzana.nostrummagica.item.equipment.ProjectileStaff;
@@ -415,6 +416,7 @@ public class ClientInit {
 		event.registerEntityRenderer(NostrumEntityTypes.alterationShrine, (manager) -> new ShrineTriggerRenderer.Alteration(manager));
 		event.registerEntityRenderer(NostrumEntityTypes.tierShrine, (manager) -> new ShrineTriggerRenderer.Tier(manager));
 		event.registerEntityRenderer(NostrumEntityTypes.magicDamageProjectile, (manager) -> new MagicProjectileRenderer(manager, .5f));
+		event.registerEntityRenderer(NostrumEntityTypes.arrowShard, (manager) -> new MagicProjectileRenderer(manager, .5f));
 		event.registerEntityRenderer(NostrumEntityTypes.cursedGlassTrigger, (manager) -> new CursedGlassTriggerRenderer(manager));
 		event.registerEntityRenderer(NostrumEntityTypes.seekerSpellSaucer, SeekerSaucerRenderer::new);
 		event.registerEntityRenderer(NostrumEntityTypes.boulder, SpellBoulderRenderer::new);
@@ -571,7 +573,9 @@ public class ClientInit {
 		ItemProperties.register(NostrumItems.casterWand, ChargingSwordItem.PROPERTY_CHARGE, CasterWandItem::ModelCharge);
 		ItemProperties.register(NostrumItems.casterWand, ChargingSwordItem.PROPERTY_CHARGING, CasterWandItem::ModelCharging);
 		ItemProperties.register(NostrumItems.projectileStaff, NostrumMagica.Loc("element"), ProjectileStaff::ModelElement);
-	}
+		ItemProperties.register(NostrumItems.mageBow, MageBow.PROPERTY_PULLING, MageBow::ModelPulling);
+		ItemProperties.register(NostrumItems.mageBow, MageBow.PROPERTY_PULL, MageBow::ModelPull);
+		}
 	
 	@SuppressWarnings("deprecation")
 	@SubscribeEvent

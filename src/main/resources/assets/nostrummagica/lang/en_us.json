@@ -322,6 +322,7 @@
 	"item.nostrummagica.gold_mirror": "Gold Mirror",
 	"item.nostrummagica.silver_mirror": "Silver Mirror",
 	"item.nostrummagica.staff_projectile": "Orb Staff",
+	"item.nostrummagica.mage_bow": "Mage Bow",
 
     "set.nostrummagica.magic_armor.neutral.novice.name": "Sturdy Set",
     "set.nostrummagica.magic_armor.neutral.adept.name": "Reinforced Set",
@@ -1689,6 +1690,8 @@
 	
     "ritual.silver_mirror.name": "Craft Silver Mirror",
 	"ritual.gold_mirror.name": "Craft Gold Mirror",
+	"ritual.mage_bow.name": "Craft Mage Bow",
+	"ritual.staff_projectile.name": "Craft Orb Staff",
 
     "enhancement.lower_reagent_cost.name": "Lower Reagent Cost",
     "enhancement.lower_reagent_cost.desc": "Reduces the amount of reagents used up when casting a spell",
@@ -2183,6 +2186,9 @@
 	"lore.item.nostrummagica.staff_projectile.name": "Orb Staff",
 	"lore.item.nostrummagica.staff_projectile.basic": "A magic staff that fires orbs of elemental energy.|Can be attuned to different elements.",
 	"lore.item.nostrummagica.staff_projectile.deep": "A magic staff that fires orbs of elemental energy.|Fires a spell based on the element it's attuned to as if the caster was casting a lvl 2 version of the element with no alteration.|Can be attuned at elemental crystals found deep underground.",
+	"lore.item.nostrummagica.mage_bow.name": "Mage Bow",
+	"lore.item.nostrummagica.mage_bow.basic": "A golden bow infused with magic. Fires arrows like normal, but can also consume elemental essences to augment the arrow.",
+	"lore.item.nostrummagica.mage_bow.deep": "A golden bow infused with magic. Fires arrows like normal, but can also consume elemental essences to augment the arrow.|Will fire three additional projectiles by consuming an elemental essence in your inventory, dealing additional magic damage.",
 	
 	"lore.block.nostrummagica.elemental_crystal_block.name": "Elemental Crystals",
 	"lore.block.nostrummagica.elemental_crystal_block.basic": "This large, floating crystal has a strong and bright connection to an element. You can tell which element by looking at the color.|Some items can absorb the elemental energy of the crystal simply by being thrown next to it!",
@@ -2427,7 +2433,13 @@
 	"research.nostrummagica.elemental_crystals.name": "Elemental Crystals",
 	"research.nostrummagica.elemental_crystals.desc": "Tough As Rock",
 	"research.nostrummagica.elemental_crystals.info": "You've finally found a way to make a neutral elemental crystal! This large crystal can be placed wherever you like. Additionally, it's neutral energies can be attuned to other elements with the right spell. Just make sure to choose wisely, as the transformation cannot be reversed!|  Be aware that elemental crystals are very stable and take a long time to break with even the most efficient pickaxes.",
-
+	"research.nostrummagica.mage_bow.name": "Mage Bows",
+	"research.nostrummagica.mage_bow.desc": "Like Shooting Stars",
+	"research.nostrummagica.mage_bow.info": "You've decided to work magic into a bow. The gold inlay of the bow and the kani crystal provide good magic conduction, and the bow is able to use some magic!|  The Mage Bow fires like a regular bow, requiring ammo to fire. However, if you have any elemental essence in your inventory, the bow will consume it to also fire 3 additional projectiles each doing 2 elemental damage to the entity your arrow hits.|  Beware that if your arrow misses, you will not get the essence back.",	
+	"research.nostrummagica.essence_eater.name": "Essence Eater",
+	"research.nostrummagica.essence_eater.desc": "Like Candy",
+	"research.nostrummagica.essence_eater.info": "After a risky ritual mixup, you have discovered that you can actually EAT the magic essences! Doing so grants you a temporary magic boost, adding magic damage to your weapon attacks!|  Eating an elemental essence will give you 2 magic damage on your next 5 weapon attacks.",
+	
     "research.nostrummagica.soulbound_pets.name": "Soulbound Pets",
     "research.nostrummagica.soulbound_pets.desc": "Always and Forever",
     "research.nostrummagica.soulbound_pets.info": "Congratulations! You've soulbonded with one of your pets! Now, you can revive the pet even if it dies!|  To revive a pet that's died, use the soul item the pet dropped when you soulbonded with it. For example, Dragon Soul Embers. Be aware that soul items usually must be charged with mana before they can be used.",

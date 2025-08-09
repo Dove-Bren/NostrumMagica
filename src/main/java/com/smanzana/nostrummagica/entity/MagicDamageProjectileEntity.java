@@ -154,7 +154,13 @@ public class MagicDamageProjectileEntity extends AbstractHurtingProjectile {
 	
 	protected void damageEntity(LivingEntity entity) {
 		@Nullable LivingEntity shooter = (this.getShooter() != null && this.getShooter() instanceof LivingEntity) ? (LivingEntity) this.getShooter() : null;
+		if (entity.isInvulnerable()) {
+			entity.invulnerableTime = 0;
+			entity.setInvulnerable(false);
+		}
 		SpellDamage.DamageEntity(entity, getElement(), damage, shooter);
+		entity.invulnerableTime = 0;
+		entity.setInvulnerable(false);
 		
 		NostrumMagicaSounds sound;
 		switch (getElement()) {

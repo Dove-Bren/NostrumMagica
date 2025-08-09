@@ -1538,7 +1538,20 @@ public class ModInit {
 						Ingredient.EMPTY },
 				new ResearchRequirement(NostrumResearches.ID_Caster_Wand),
 				new OutcomeSpawnItem(new ItemStack(NostrumItems.projectileStaff, 1))));
+		
 
+		registry.register(RitualRecipe.createTier3(
+				"mage_bow", new ItemStack(NostrumItems.mageBow), null,
+				new ReagentType[] { ReagentType.CRYSTABLOOM, ReagentType.MANDRAKE_ROOT,
+						ReagentType.BLACK_PEARL, ReagentType.MANI_DUST },
+				Ingredient.of(Items.BOW),
+				new Ingredient[] { Ingredient.of(NostrumTags.Items.Essence), 
+						Ingredient.of(NostrumTags.Items.CrystalMedium),
+						Ingredient.of(Tags.Items.INGOTS_GOLD),
+						Ingredient.of(NostrumTags.Items.Essence) },
+				new ResearchRequirement(NostrumResearches.ID_Mage_Bow),
+				new OutcomeSpawnItem(new ItemStack(NostrumItems.mageBow, 1))));
+		
 	}
 
 	private static IReward wrapAttribute(AwardType type, float val) {

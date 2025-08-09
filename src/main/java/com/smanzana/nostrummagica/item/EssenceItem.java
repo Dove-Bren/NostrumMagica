@@ -8,8 +8,12 @@ import com.smanzana.nostrummagica.listener.MagicEffectProxy.SpecialEffect;
 import com.smanzana.nostrummagica.loretag.ELoreCategory;
 import com.smanzana.nostrummagica.loretag.ILoreTagged;
 import com.smanzana.nostrummagica.loretag.Lore;
+import com.smanzana.nostrummagica.sound.NostrumMagicaSounds;
 import com.smanzana.nostrummagica.spell.EMagicElement;
+import com.smanzana.nostrummagica.spell.MagicCapability;
 
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -133,6 +137,10 @@ public class EssenceItem extends Item implements ILoreTagged {
 		
 		final ItemStack stack = playerIn.getItemInHand(hand);
 		
+		if (!MagicCapability.ESSENCE_EATER.matches(playerIn)) {
+			return new InteractionResultHolder<ItemStack>(InteractionResult.PASS, stack);
+		}
+		
 		if (worldIn.isClientSide)
 			return new InteractionResultHolder<ItemStack>(InteractionResult.SUCCESS, stack);
 		
@@ -143,6 +151,8 @@ public class EssenceItem extends Item implements ILoreTagged {
 			playerIn.removeEffectNoUpdate(NostrumEffects.magicBuff);
 			NostrumMagica.magicEffectProxy.applyMagicBuff(playerIn, this.element, 2, 5);
 			playerIn.addEffect(new MobEffectInstance(NostrumEffects.magicBuff, 60 * 20, (int) (5 - 1)));
+			//NostrumMagicaSounds.CAST_CONTINUE.play(playerIn.getLevel(), playerIn.getX(), playerIn.getY(), playerIn.getZ());
+			playerIn.getLevel().playSound(null, playerIn, SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 1f, 1f);
 		}
 		
 		if (used) {

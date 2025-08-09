@@ -105,6 +105,8 @@ public class NostrumResearches {
 	public static final ResourceLocation ID_Soulbound_Pets = NostrumMagica.Loc("soulbound_pets");
 	public static final ResourceLocation ID_Wolf_Transformation = NostrumMagica.Loc("wolf_transformation");
 	public static final ResourceLocation ID_Mana_Armor = NostrumMagica.Loc("mana_armor");
+	public static final ResourceLocation ID_Mage_Bow = NostrumMagica.Loc("mage_bow");
+	public static final ResourceLocation ID_Essence_Eater = NostrumMagica.Loc("essence_eater");
 
 	
 	public static /*final*/ NostrumResearch Origin;
@@ -178,6 +180,8 @@ public class NostrumResearches {
 	public static /*final*/ NostrumResearch Soulbound_Pets;
 	public static /*final*/ NostrumResearch Wolf_Transformation;
 	public static /*final*/ NostrumResearch Mana_Armor;
+	public static /*final*/ NostrumResearch Mage_Bow;
+	public static /*final*/ NostrumResearch Essence_Eater;
 
 	
 	public static void init() {
@@ -257,6 +261,10 @@ public class NostrumResearches {
 				.reference("ritual::buff.nightvision", "ritual.buff.nightvision.name")
 				.reference("ritual::buff.waterbreathing", "ritual.buff.waterbreathing.name")
 				.build(ID_Boon, Tab_Magica, NostrumResearch.Size.LARGE, 3, 0, true, new ItemStack(Items.SPLASH_POTION));
+		
+		Essence_Eater = NostrumResearch.startBuilding().parent(ID_Boon)
+				.lore(NostrumItems.essenceEarth).tier(EMagicTier.KANI)
+				.build(ID_Essence_Eater, Tab_Magica, NostrumResearch.Size.LARGE, 3, -1, true, new ItemStack(NostrumItems.essenceFire));
 
 		Summonkoids = NostrumResearch.startBuilding().parent(ID_Rituals).hiddenParent(ID_Magic_Token).lore(KoidEntity.KoidLore.instance())
 				.reference("ritual::koid", "ritual.koid.name").build(ID_Summonkoids, Tab_Magica,
@@ -353,6 +361,10 @@ public class NostrumResearches {
 		Soul_Daggers = NostrumResearch.startBuilding().parent(ID_Thanos_Staff).parent(ID_Warlock_Sword).hiddenParent(ID_Vani)
 				.reference("ritual::spawn_soul_dagger", "ritual.spawn_soul_dagger.name").build(ID_Soul_Daggers,
 						Tab_Outfitting, NostrumResearch.Size.LARGE, 2, 1, true, new ItemStack(NostrumItems.soulDagger));
+		
+		Mage_Bow = NostrumResearch.startBuilding().hiddenParent(ID_Mage_Staff).lore(NostrumItems.essenceNeutral)
+				.reference("ritual::mage_bow", "ritual.mage_bow.name")
+				.build(ID_Mage_Bow, Tab_Outfitting, NostrumResearch.Size.LARGE, 0, 2, true, new ItemStack(NostrumItems.mageBow));
 
 		Mage_Blade = NostrumResearch.startBuilding().parent(ID_Enchanted_Weapons).hiddenParent(ID_Mage_Staff)
 				.spellComponent(null, EAlteration.ENCHANT)

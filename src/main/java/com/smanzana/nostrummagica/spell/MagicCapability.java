@@ -53,6 +53,9 @@ public enum MagicCapability {
 	// Spellcraft
 	SPELLCRAFT_ENABLED(NostrumResearches.ID_Spellcraft),
 	
+	// Adventure
+	ESSENCE_EATER(NostrumResearches.ID_Essence_Eater),
+	
 	;
 	
 	private @Nullable Skill skill;

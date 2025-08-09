@@ -92,6 +92,7 @@ public class NostrumEntityTypes {
 	@ObjectHolder(ShrineTriggerEntity.Alteration.ID) public static EntityType<ShrineTriggerEntity.Alteration> alterationShrine;
 	@ObjectHolder(ShrineTriggerEntity.Tier.ID) public static EntityType<ShrineTriggerEntity.Tier> tierShrine;
 	@ObjectHolder(MagicDamageProjectileEntity.ID) public static EntityType<MagicDamageProjectileEntity> magicDamageProjectile;
+	@ObjectHolder(ArrowShardProjectile.ID) public static EntityType<ArrowShardProjectile> arrowShard;
 	@ObjectHolder(CursedGlassTriggerEntity.ID) public static EntityType<CursedGlassTriggerEntity> cursedGlassTrigger;
 	@ObjectHolder(PlayerStatueEntity.ID) public static EntityType<PlayerStatueEntity> playerStatue;
 	@ObjectHolder(WhirlwindEntity.ID) public static EntityType<WhirlwindEntity> whirlwind;
@@ -240,6 +241,10 @@ public class NostrumEntityTypes {
 				.sized(.3F, .3F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
 			.build("").setRegistryName(MagicDamageProjectileEntity.ID));
+		registry.register(EntityType.Builder.<ArrowShardProjectile>of(ArrowShardProjectile::new, MobCategory.MISC)
+				.sized(.3F, .3F)
+				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)
+			.build("").setRegistryName(ArrowShardProjectile.ID));
 		registry.register(EntityType.Builder.<SpellBoulderEntity>of(SpellBoulderEntity::new, MobCategory.MISC)
 				.sized(2.5F, 2.5F)
 				.setTrackingRange(64).setUpdateInterval(1).setShouldReceiveVelocityUpdates(true)

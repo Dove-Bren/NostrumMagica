@@ -36,7 +36,7 @@ public class SeekerSaucerRenderer<T extends SeekerSpellSaucerEntity> extends Ent
 	
 	@Override
 	public void render(T entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
-		
+		int unused; // remove this!
 		if (entityIn.tickCount > 1000) {
 		final EMagicElement element = entityIn.getElement();
 		final Color baseColor = new Color(element.getColor());
