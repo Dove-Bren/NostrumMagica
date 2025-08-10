@@ -211,7 +211,7 @@ public class ElementalArmor extends ArmorItem
 			fullProt = (20f / 25f);
 			break;
 		case NEUTRAL:
-			fullProt = 1f;
+			fullProt = (23f / 25f);
 			break;
 		case ICE:
 			fullProt = (20f / 25f);

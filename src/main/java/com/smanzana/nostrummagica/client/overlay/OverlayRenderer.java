@@ -70,9 +70,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
@@ -650,20 +648,7 @@ public class OverlayRenderer extends GuiComponent {
 			final Minecraft mc = Minecraft.getInstance();
 			final LocalPlayer player = mc.player;
 			
-			// Clone calc of left y offset, since it's not passed through
-			int left_height = 39;
-			AttributeInstance attrMaxHealth = player.getAttribute(Attributes.MAX_HEALTH);
-	        float healthMax = (float)attrMaxHealth.getValue();
-	        if (ModConfig.config.displayArmorOverlayOneLine()) {
-	        	// Cap to 20 -- one full row
-	        	healthMax = Math.min(20f, healthMax);
-	        }
-	        float absorb = Mth.ceil(player.getAbsorptionAmount());
-			int healthRows = Mth.ceil((healthMax + absorb) / 2.0F / 10.0F);
-	        int rowHeight = Math.max(10 - (healthRows - 2), 3);
-	
-	        left_height += (healthRows * rowHeight);
-	        if (rowHeight != 10) left_height += 10 - rowHeight;
+			int left_height = gui.left_height - 10;
 	        int left = width / 2 - 91;
 	        int top = height - left_height;
 			
