@@ -24,6 +24,7 @@ import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import com.smanzana.nostrummagica.NostrumMagica;
 import com.smanzana.nostrummagica.attribute.IPrintableAttribute;
+import com.smanzana.nostrummagica.attribute.NostrumAttributes;
 import com.smanzana.nostrummagica.block.dungeon.DungeonAirBlock;
 import com.smanzana.nostrummagica.capabilities.INostrumMagic;
 import com.smanzana.nostrummagica.client.gui.SpellIcon;
@@ -121,6 +122,7 @@ public class OverlayRenderer extends GuiComponent {
 	protected IIngameOverlay manaOrbOverlay;
 	protected IIngameOverlay manaBarOverlay;
 	protected IIngameOverlay armorOverlay;
+	protected IIngameOverlay magicResistOverlay;
 	protected IIngameOverlay shieldHeartOverlay;
 	protected IIngameOverlay traceOverlay;
 	protected IIngameOverlay contingencyOverlay;
@@ -150,6 +152,7 @@ public class OverlayRenderer extends GuiComponent {
 		manaOrbOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.EXPERIENCE_BAR_ELEMENT, "NostrumMagica::manaOrbOverlay", this::renderManaOrbOverlay);
 		manaBarOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.EXPERIENCE_BAR_ELEMENT, "NostrumMagica::manaBarOverlay", this::renderManaBarOverlay);
 		armorOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.ARMOR_LEVEL_ELEMENT, "NostrumMagica::armorOverlay", this::renderArmorOverlay);
+		magicResistOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.ARMOR_LEVEL_ELEMENT, "NostrumMagica::magicResistOverlay", this::renderMagicResistOverlay);
 		shieldHeartOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.PLAYER_HEALTH_ELEMENT, "NostrumMagica::shieldHeartOverlay", this::renderShieldOverlay);
 		
 		traceOverlay = OverlayRegistry.registerOverlayAbove(ForgeIngameGui.CROSSHAIR_ELEMENT, "NostrumMagica::traceOverlay", this::renderTraceOverlay);
@@ -643,6 +646,40 @@ public class OverlayRenderer extends GuiComponent {
 		}
 	}
 	
+	private void renderMagicResistOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
+		if (ModConfig.config.displayArmorOverlay() && gui.shouldDrawSurvivalElements()) {
+			final Minecraft mc = Minecraft.getInstance();
+			final LocalPlayer player = mc.player;
+			
+			int left_height = gui.left_height - 10;
+	        int left = width / 2 - 91;
+	        int top = height - left_height;
+			
+	        matrixStackIn.pushPose();
+			RenderSystem.enableBlend();
+			
+			int level = (int) (player.getAttributeValue(NostrumAttributes.magicResist));
+			level = Math.min(100, level); // cap at 100
+			
+			// Spread across 20 levels
+			level /= 5;
+			
+			// have to render each half differently
+	        for (int i = 0; i < level; i++)
+	        {
+	        	if (i % 2 == 0) {
+	        		RenderFuncs.blit(matrixStackIn, left, top, 34, 9, 4, 3, 0.1f, .2f, 1f, .8f);
+	        	} else {
+	        		RenderFuncs.blit(matrixStackIn, left, top, 38, 9, 4, 3, .1f, .2f, 1f, .8f);
+	        	}
+	            left += 4;
+	        }
+			
+			RenderSystem.disableBlend();
+			matrixStackIn.popPose();
+		}
+	}
+	
 	private void renderArmorOverlay(ForgeIngameGui gui, PoseStack matrixStackIn, float partialTicks, int width, int height) {
 		if (ModConfig.config.displayArmorOverlay() && gui.shouldDrawSurvivalElements()) {
 			final Minecraft mc = Minecraft.getInstance();
@@ -662,7 +699,8 @@ public class OverlayRenderer extends GuiComponent {
 			level = Math.min(20, level * 4);
 	        for (int i = 0; i < level; i += 2)
 	        {
-	            RenderFuncs.blit(matrixStackIn, left, top, 34, 9, 9, 3, 0.1f, .2f, 1f, .8f);
+	        	RenderFuncs.blit(matrixStackIn, left + 2, top + 4, 34 + 2, 9 + 4, 1, 4, 1f, .2f, .1f, .8f);
+	        	RenderFuncs.blit(matrixStackIn, left + 6, top + 4, 34 + 6, 9 + 4, 1, 4, 1f, .2f, 1f, .8f);
 	            left += 8;
 	        }
 			

@@ -1,5 +1,6 @@
 package com.smanzana.nostrummagica.util;
 
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +17,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -26,9 +28,16 @@ import net.minecraftforge.common.Tags;
 
 public class HarvestUtil {
 	
+	private static final Method seedDrops;
+	
+	static {
+		seedDrops = net.minecraftforge.fml.util.ObfuscationReflectionHelper.findMethod(CropBlock.class, "m_6404_"); // getBaseSeedId
+	}
+	
 	private static Item getCropSeed(Block block) {
 		try {
-			return ((CropBlock) block).getBaseSeedId().asItem();
+			//return ((CropBlock) block).getBaseSeedId().asItem();
+			return ((ItemLike) seedDrops.invoke(block)).asItem();
 		}
 
 		catch (Exception e) {

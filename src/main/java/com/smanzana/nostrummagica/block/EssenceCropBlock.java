@@ -55,7 +55,7 @@ public class EssenceCropBlock extends CropBlock {
 	}
 	
 	@Override
-	public Item getBaseSeedId() {
+	protected Item getBaseSeedId() {
 		return NostrumItems.reagentSeedEssence;
 	}
 	
