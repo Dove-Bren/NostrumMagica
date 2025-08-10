@@ -25,7 +25,7 @@ public class GinsengCropBlock extends CropBlock {
 	}
 	
 	@Override
-	protected Item getBaseSeedId() {
+	public Item getBaseSeedId() {
 		return NostrumItems.reagentSeedGinseng;
 	}
 	

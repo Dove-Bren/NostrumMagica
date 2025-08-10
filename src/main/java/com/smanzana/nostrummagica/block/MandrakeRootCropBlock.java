@@ -25,7 +25,7 @@ public class MandrakeRootCropBlock extends CropBlock {
 	}
 	
 	@Override
-	protected Item getBaseSeedId() {
+	public Item getBaseSeedId() {
 		return NostrumItems.reagentSeedMandrake;
 	}
 	

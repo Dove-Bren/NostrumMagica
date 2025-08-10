@@ -49,9 +49,12 @@ public class CapabilityHandler {
 	
 	@SubscribeEvent
 	public void onClone(PlayerEvent.Clone event) {
-		if (event.isWasDeath()) {
-			event.getOriginal().reviveCaps();
-			INostrumMagic cap = NostrumMagica.getMagicWrapper(event.getOriginal());
+		//if (!event.isWasDeath())
+		event.getOriginal().reviveCaps();
+		INostrumMagic cap = NostrumMagica.getMagicWrapper(event.getOriginal());
+		if (cap != null)
+		{
+			
 			event.getPlayer().getCapability(CAPABILITY_MAGIC, null).orElse(null)
 				.copy(cap);
 			
@@ -66,8 +69,8 @@ public class CapabilityHandler {
 			IBonusJumpCapability jump = NostrumMagica.getBonusJump(event.getOriginal());
 			event.getPlayer().getCapability(CAPABILITY_BONUSJUMP, null).orElse(null)
 				.copy(jump);
-			event.getOriginal().invalidateCaps();
 		}
+		event.getOriginal().invalidateCaps();
 		//if (!event.getEntityPlayer().world.isRemote)
 		//	NostrumMagica.instance.proxy.syncPlayer((ServerPlayerEntity) event.getEntityPlayer());
 	}

@@ -62,7 +62,7 @@ public class MageBow extends BowItem implements IItemLoreTagged {
 
 	@Override
 	public int getDefaultProjectileRange() {
-		return 20;
+		return 17;
 	}
 	
 	protected @Nullable EMagicElement checkElementAmmo(Player shooter, boolean consume) {

@@ -640,7 +640,7 @@ public class NostrumItems {
     	register(registry, new GoldMirrorItem(PropEquipment()).setRegistryName(GoldMirrorItem.ID));
     	register(registry, new SilverMirrorItem(PropEquipment()).setRegistryName(SilverMirrorItem.ID));
     	register(registry, new ProjectileStaff().setRegistryName(ProjectileStaff.ID));
-    	register(registry, new MageBow(PropEquipment().rarity(Rarity.UNCOMMON)).setRegistryName(MageBow.ID));
+    	register(registry, new MageBow(PropEquipment().durability(640).rarity(Rarity.UNCOMMON)).setRegistryName(MageBow.ID));
     	
     	// Generate and register spell runes
     	{
